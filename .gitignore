@@ -1,0 +1,15 @@
+//nodejs
+node_modules
+
+
+//idea
+out
+.idea
+*.iml
+
+
+//gradle
+.gradle
+gradle
+wrapper
+build

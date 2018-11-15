@@ -1,0 +1,22 @@
+plugins {
+  id "java"
+  id "com.google.protobuf"
+}
+
+dependencies {
+   implementation('com.google.protobuf:protobuf-java:3.6.1')
+}
+
+
+
+protobuf {
+  generateProtoTasks {
+    all().each { task ->
+      task.builtins {
+        js {
+          option "import_style=commonjs"
+        }
+      }
+    }
+    }
+}
