@@ -9,12 +9,12 @@ pluginManagement {
   }
 
   resolutionStrategy {
-    def kotlin_plugins = ["kotlin2js"]
+    def kotlin_plugins = ["kotlin2js", "kotlin", "kotlin-multiplatform"]
 
     eachPlugin {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
-        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0")
+        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
       } else if (pluginId == 'com.google.protobuf') {
          useModule("com.google.protobuf:protobuf-gradle-plugin:0.8.7")
       }
@@ -23,8 +23,11 @@ pluginManagement {
 }
 
 gradle.ext {
-  kotlinVersion = "1.3.0"
+  kotlinVersion = "1.3.10"
 }
 
 
 include 'ast'
+include 'ast-proto'
+include 'ts-nashorn-wrapper'
+include 'ts'

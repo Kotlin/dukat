@@ -1,0 +1,14 @@
+plugins {
+  id "com.moowork.node" version "1.2.0"
+}
+
+task build(type: NodeTask) {
+  inputs.dir("./src")
+  outputs.dir("./build/ts")
+
+  script = file("./node_modules/typescript/bin/tsc")
+  args = ["-p", "tsconfig.json"]
+}
+
+
+

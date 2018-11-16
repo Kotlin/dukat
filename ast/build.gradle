@@ -1,22 +1,51 @@
 plugins {
-  id "java"
-  id "com.google.protobuf"
-}
-
-dependencies {
-   implementation('com.google.protobuf:protobuf-java:3.6.1')
+  id 'kotlin-multiplatform'
 }
 
 
-
-protobuf {
-  generateProtoTasks {
-    all().each { task ->
-      task.builtins {
-        js {
-          option "import_style=commonjs"
+kotlin {
+  targets {
+    fromPreset(presets.jvm, 'jvm') {
+      compilations.all {
+        tasks[compileKotlinTaskName].kotlinOptions {
+          jvmTarget = '1.8'
         }
       }
     }
+
+    fromPreset(presets.js, 'js') {
+      compilations.all {
+        tasks[compileKotlinTaskName].kotlinOptions {
+          metaInfo = false
+          sourceMap = true
+          moduleKind = 'commonjs'
+        }
+      }
     }
+  }
+
+  sourceSets {
+    commonMain {
+      kotlin.srcDir("common/src")
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+      }
+    }
+
+    jvmMain {
+      kotlin.srcDir("jvm/src")
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+      }
+    }
+
+    jsMain {
+      kotlin.srcDir("js/src")
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+      }
+    }
+  }
 }
+
+

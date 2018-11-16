@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "build/ts",
+    "strict": true,
+    "moduleResolution": "node",
+    "listFiles": true,
+    "listEmittedFiles": true
+  },  
+  "include": [
+    "src/**/*.ts"
+  ]
+}

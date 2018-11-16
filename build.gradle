@@ -1,7 +1,23 @@
 allprojects {
-    repositories {
-      mavenCentral()
-      jcenter()
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    jcenter()
+  }
+
+
+  afterEvaluate { project ->
+    if (project.plugins.hasPlugin("kotlin")) {
+
+      project.sourceSets {
+        main.kotlin.srcDirs = ['src']
+      }
+
+      dependencies {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:$gradle.kotlinVersion")
+      }
     }
+  }
+
 }
 
