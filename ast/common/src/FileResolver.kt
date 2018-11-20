@@ -1,5 +1,11 @@
 package org.jetbrains.dukat.ast
 
-expect class FileResolver {
-    fun resolve(fileName: String): String;
+import kotlin.js.JsName
+
+class FileResolver {
+
+    @JsName("resolve")
+    fun resolve(fileName: String): String {
+        return fileContent(fileName);
+    }
 }

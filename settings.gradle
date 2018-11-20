@@ -29,5 +29,4 @@ gradle.ext {
 
 include 'ast'
 include 'ast-proto'
-include 'ts-nashorn-wrapper'
 include 'ts'

@@ -50,7 +50,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions): string {
-    return "lib.d.ts";
+    return "./ts/node_modules/typescript/lib/lib.d.ts";
   }
 
   getCurrentDirectory(): string {
@@ -76,7 +76,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 let main = (fileResolver: FileResolver) => {
   let documentRegistry = ts.createDocumentRegistry();
   let host= new SomeLanguageServiceHost(fileResolver);
-  host.register("./src/converter.ts");
+  host.register("./ast/common/test/data/simplest_var.declarations.d.ts");
 
   let languageService = ts.createLanguageService(host, documentRegistry);
 
@@ -84,10 +84,12 @@ let main = (fileResolver: FileResolver) => {
   var program = languageService.getProgram();
 
   if (program != null) {
-    let fileName = "./src/converter.ts";
+    let fileName = "./ast/common/test/data/simplest_var.declarations.d.ts";
     var sourceFile = program.getSourceFile(fileName);
 
-    console.log(`SOURCE FILE NULL??? [${fileName}]`, typeof sourceFile);
+    if (sourceFile != null) {
+      console.log(sourceFile.text);
+    }
   }
 }
 
