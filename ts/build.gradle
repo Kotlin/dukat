@@ -3,6 +3,7 @@ plugins {
 }
 
 task build(type: NodeTask) {
+  inputs.file("./tsconfig.json")
   inputs.dir("./src")
   outputs.dir("./build/ts")
 

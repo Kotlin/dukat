@@ -1,17 +1,10 @@
-import org.jetbrains.dukat.ast.FileResolver
-import java.io.File
+package org.jetbrains.dukat.ast
+
 import java.io.FileReader
-import java.util.ArrayList
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.Invocable
+import javax.script.ScriptEngineManager
 
-
-interface SomeStrangeSet<T> {
-    fun has(value: T): Boolean;
-}
-
-fun main() {
+actual fun translator(fileResolver: FileResolver) {
     val engineManager = ScriptEngineManager()
     var engine = engineManager.getEngineByName("nashorn")
     engine.eval("var global = this;")
@@ -21,5 +14,11 @@ fun main() {
     engine.eval(FileReader("./ts/build/ts/converter.js"));
 
     val invocable = engine as Invocable
-    invocable.invokeFunction("main", FileResolver())
+    invocable.invokeFunction("main", fileResolver)
+}
+
+
+
+fun main() {
+    translator(FileResolver())
 }

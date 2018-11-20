@@ -3,6 +3,5 @@ plugins {
 }
 
 dependencies {
-
-  compile(project(":ts"))
+  implementation(project(":ast"))
 }

@@ -4,6 +4,7 @@
     "outDir": "build/ts",
     "strict": true,
     "moduleResolution": "node",
+    "module": "none",
     "listFiles": true,
     "listEmittedFiles": true
   },  
