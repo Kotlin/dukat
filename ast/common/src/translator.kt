@@ -1,3 +1,3 @@
 package org.jetbrains.dukat.ast
 
-expect fun translator(fileResolver: FileResolver);
+expect fun translator(astTree: AstTree, fileResolver: FileResolver)

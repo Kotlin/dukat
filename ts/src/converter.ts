@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/typescript/lib/typescriptServices.d.ts"/>
 /// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
+
 if (typeof ts == "undefined") {
   (global as any).ts = require("typescript/lib/tsserverlibrary");
 }
@@ -72,23 +73,45 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 }
 
 
+function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) {
+  if (type == undefined) {
+    return astFactory.createSimpleTypeDeclaration(-1)
+  } else {
+    if (type.kind == 167) {
+      return astFactory.createSimpleTypeDeclaration(-2)
+    } else {
+      return astFactory.createSimpleTypeDeclaration(type.kind)
+    }
+  }
+}
 
-let main = (fileResolver: FileResolver) => {
+let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) => {
   let documentRegistry = ts.createDocumentRegistry();
+
   let host= new SomeLanguageServiceHost(fileResolver);
   host.register("./ast/common/test/data/simplest_var.declarations.d.ts");
 
   let languageService = ts.createLanguageService(host, documentRegistry);
 
-
   var program = languageService.getProgram();
 
   if (program != null) {
-    let fileName = "./ast/common/test/data/simplest_var.declarations.d.ts";
-    var sourceFile = program.getSourceFile(fileName);
+    let fileName = "./ast/common/test/data/simplest_var.declarations.d.ts"
+    var sourceFile = program.getSourceFile(fileName)
 
     if (sourceFile != null) {
-      console.log(sourceFile.text);
+
+      for (let statement of sourceFile.statements) {
+        const variableStatment = statement as ts.VariableStatement;
+
+        for (let declaration of variableStatment.declarationList.declarations) {
+
+          tree.root.declarations.push({
+            name: declaration.name.getText(),
+            type: resolveType(astFactory, declaration.type)
+          })
+        }
+      }
     }
   }
 }

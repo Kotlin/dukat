@@ -4,7 +4,7 @@ import java.io.FileReader
 import javax.script.Invocable
 import javax.script.ScriptEngineManager
 
-actual fun translator(fileResolver: FileResolver) {
+actual fun translator(astTree: AstTree, fileResolver: FileResolver) {
     val engineManager = ScriptEngineManager()
     var engine = engineManager.getEngineByName("nashorn")
     engine.eval("var global = this;")
@@ -14,11 +14,11 @@ actual fun translator(fileResolver: FileResolver) {
     engine.eval(FileReader("./ts/build/ts/converter.js"));
 
     val invocable = engine as Invocable
-    invocable.invokeFunction("main", fileResolver)
+    invocable.invokeFunction("main", astTree, AstFactory(), fileResolver)
 }
 
 
 
 fun main() {
-    translator(FileResolver())
+    translator(AstTree(DocumentRoot()), FileResolver())
 }
