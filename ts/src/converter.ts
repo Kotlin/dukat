@@ -75,12 +75,31 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 
 function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) {
   if (type == undefined) {
-    return astFactory.createSimpleTypeDeclaration(-1)
+    return astFactory.createSimpleTypeDeclaration("__NO_TYPE__")
   } else {
-    if (type.kind == 167) {
-      return astFactory.createSimpleTypeDeclaration(-2)
+    if (type.kind == ts.SyntaxKind.ArrayType) {
+      return astFactory.createSimpleTypeDeclaration("__ARRAY__")
     } else {
-      return astFactory.createSimpleTypeDeclaration(type.kind)
+      if (type.kind == ts.SyntaxKind.TypeReference) {
+        let typeReferenceNode = type as ts.TypeReferenceNode
+        if (typeof typeReferenceNode.typeArguments != "undefined") {
+            let params = typeReferenceNode.typeArguments
+              .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
+
+            return astFactory.createGenericTypeDeclaration(typeReferenceNode.typeName.getText(), params)
+        } else {
+            return astFactory.createSimpleTypeDeclaration("xxx")
+        }
+      } else if (type.kind == ts.SyntaxKind.StringKeyword) {
+        return astFactory.createSimpleTypeDeclaration("string")
+      } else if (type.kind == ts.SyntaxKind.BooleanKeyword) {
+        return astFactory.createSimpleTypeDeclaration("boolean")
+      } else if (type.kind == ts.SyntaxKind.NumberKeyword) {
+        return astFactory.createSimpleTypeDeclaration("number")
+      }
+      else {
+        return astFactory.createSimpleTypeDeclaration("__UNKNOWN__")
+      }
     }
   }
 }
@@ -105,7 +124,6 @@ let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) =
         const variableStatment = statement as ts.VariableStatement;
 
         for (let declaration of variableStatment.declarationList.declarations) {
-
           tree.root.declarations.push({
             name: declaration.name.getText(),
             type: resolveType(astFactory, declaration.type)

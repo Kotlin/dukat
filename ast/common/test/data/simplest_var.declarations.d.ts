@@ -1,5 +1,3 @@
-
-
 declare var a: string;
 declare var b: number;
 declare var c: boolean;

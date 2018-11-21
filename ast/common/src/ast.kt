@@ -6,7 +6,12 @@ interface AstNode
 
 interface TypeDeclaration
 
-class SimpleTypeDeclaration(val value: Int): TypeDeclaration
+open class SimpleTypeDeclaration(
+        val value: String,
+        val params: Array<TypeDeclaration>
+): TypeDeclaration {
+    fun isGeneric() = params.isNotEmpty()
+}
 
 class VariableDeclaration(
         val name: String,
@@ -23,5 +28,8 @@ class AstTree(val root: DocumentRoot) {
 
 class AstFactory {
     @JsName("createSimpleTypeDeclaration")
-    fun createSimpleTypeDeclaration(value: Int) = SimpleTypeDeclaration(value)
+    fun createSimpleTypeDeclaration(value: String) = SimpleTypeDeclaration(value, arrayOf())
+
+    @JsName("createGenericTypeDeclaration")
+    fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = SimpleTypeDeclaration(value, params)
 }

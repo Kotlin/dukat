@@ -6,6 +6,8 @@ declare class VariableDeclaration {
   type: TypeDeclaration;
 }
 
+
+
 declare class DocumentRoot extends AstNode {
   declarations: VariableDeclaration[]
 }
@@ -18,10 +20,10 @@ declare class AstTree {
 declare interface TypeDeclaration {}
 
 declare class SimpleTypeDeclaration implements TypeDeclaration {
-  constructor(value: number);
+  constructor(value: string)
 }
 
-
 declare class AstFactory {
-  createSimpleTypeDeclaration(value: number): SimpleTypeDeclaration;
+  createSimpleTypeDeclaration(value: string): SimpleTypeDeclaration;
+  createGenericTypeDeclaration(value: string, params: Array<SimpleTypeDeclaration>): SimpleTypeDeclaration;
 }
