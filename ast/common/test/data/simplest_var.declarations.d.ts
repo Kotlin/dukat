@@ -33,3 +33,7 @@ declare var f1: Array<boolean>;
 
 declare var g: Number;
 declare var h: String;
+
+
+declare const ax: (string | null) | number
+declare const bx: (string | null) | (number | undefined)

@@ -8,13 +8,22 @@ interface AstNode {
     fun copy(): AstNode;
 }
 
-interface TypeDeclaration
+interface TypeDeclaration : AstNode;
 
 open class SimpleTypeDeclaration(
         val value: String,
         val params: Array<TypeDeclaration>
 ): TypeDeclaration {
     fun isGeneric() = params.isNotEmpty()
+
+    override fun children(): Iterable<AstNode> {
+        return params.asIterable()
+    }
+
+    override fun copy(): AstNode {
+        val params = children().map { it.copy() as TypeDeclaration }
+        return SimpleTypeDeclaration(value, params.toTypedArray())
+    }
 }
 
 class VariableDeclaration(
@@ -25,7 +34,7 @@ class VariableDeclaration(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun copy() = VariableDeclaration(name, type)
+    override fun copy() = VariableDeclaration(name, type.copy() as TypeDeclaration)
 }
 
 class DocumentRoot(val declarations: Array<VariableDeclaration> = arrayOf()): AstNode {

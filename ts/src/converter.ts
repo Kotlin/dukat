@@ -97,8 +97,12 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
 
             return astFactory.createGenericTypeDeclaration(typeReferenceNode.typeName.getText(), params)
         } else {
-            return astFactory.createTypeDeclaration("xxx")
+            return astFactory.createTypeDeclaration(typeReferenceNode.typeName.getText())
         }
+      } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
+        let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
+        return resolveType(astFactory, parenthesizedTypeNode.type);
+        return astFactory.createTypeDeclaration("__PARENTHESIZED__")
       } else if (type.kind == ts.SyntaxKind.NullKeyword) {
         return astFactory.createTypeDeclaration("null")
       } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
