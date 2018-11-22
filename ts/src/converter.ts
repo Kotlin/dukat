@@ -73,12 +73,15 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 }
 
 
-function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) {
+function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
   if (type == undefined) {
-    return astFactory.createSimpleTypeDeclaration("__NO_TYPE__")
+    return astFactory.createSimpleTypeDeclaration("__NO_TYPE__F")
   } else {
-    if (type.kind == ts.SyntaxKind.ArrayType) {
-      return astFactory.createSimpleTypeDeclaration("__ARRAY__")
+    if (ts.isArrayTypeNode(type)) {
+      let arrayType = type as ts.ArrayTypeNode;
+      return astFactory.createGenericTypeDeclaration("@@ArraySugar", [
+        resolveType(astFactory, arrayType.elementType)
+      ] as Array<TypeDeclaration>)
     } else {
       if (type.kind == ts.SyntaxKind.TypeReference) {
         let typeReferenceNode = type as ts.TypeReferenceNode
@@ -124,10 +127,11 @@ let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) =
         const variableStatment = statement as ts.VariableStatement;
 
         for (let declaration of variableStatment.declarationList.declarations) {
-          tree.root.declarations.push({
-            name: declaration.name.getText(),
-            type: resolveType(astFactory, declaration.type)
-          })
+
+          tree.root.declarations.push(astFactory.declareVariable(
+            declaration.name.getText(),
+            resolveType(astFactory, declaration.type)
+          ))
         }
       }
     }
