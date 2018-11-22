@@ -54,8 +54,8 @@ class AstFactory {
     @JsName("declareVariable")
     fun declareVriable(name: String, type: TypeDeclaration) = VariableDeclaration(name, type)
 
-    @JsName("createSimpleTypeDeclaration")
-    fun createSimpleTypeDeclaration(value: String) = SimpleTypeDeclaration(value, arrayOf())
+    @JsName("createTypeDeclaration")
+    fun createTypeDeclaration(value: String) = SimpleTypeDeclaration(value, arrayOf())
 
     @JsName("createGenericTypeDeclaration")
     fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = SimpleTypeDeclaration(value, params)

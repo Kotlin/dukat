@@ -26,6 +26,6 @@ declare class SimpleTypeDeclaration implements TypeDeclaration {
 
 declare class AstFactory {
   declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
-  createSimpleTypeDeclaration(value: string): SimpleTypeDeclaration;
+  createTypeDeclaration(value: string): SimpleTypeDeclaration;
   createGenericTypeDeclaration(value: string, params: Array<SimpleTypeDeclaration>): SimpleTypeDeclaration;
 }

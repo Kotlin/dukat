@@ -75,7 +75,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 
 function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
   if (type == undefined) {
-    return astFactory.createSimpleTypeDeclaration("__NO_TYPE__F")
+    return astFactory.createTypeDeclaration("__NO_TYPE__")
   } else {
     if (ts.isArrayTypeNode(type)) {
       let arrayType = type as ts.ArrayTypeNode;
@@ -83,7 +83,13 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
         resolveType(astFactory, arrayType.elementType)
       ] as Array<TypeDeclaration>)
     } else {
-      if (type.kind == ts.SyntaxKind.TypeReference) {
+      if (ts.isUnionTypeNode(type)) {
+        let unionTypeNode = type as ts.UnionTypeNode;
+        let params = unionTypeNode.types
+                      .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
+
+        return astFactory.createGenericTypeDeclaration("@@Union",params)
+      } else if (type.kind == ts.SyntaxKind.TypeReference) {
         let typeReferenceNode = type as ts.TypeReferenceNode
         if (typeof typeReferenceNode.typeArguments != "undefined") {
             let params = typeReferenceNode.typeArguments
@@ -91,17 +97,22 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
 
             return astFactory.createGenericTypeDeclaration(typeReferenceNode.typeName.getText(), params)
         } else {
-            return astFactory.createSimpleTypeDeclaration("xxx")
+            return astFactory.createTypeDeclaration("xxx")
         }
+      } else if (type.kind == ts.SyntaxKind.NullKeyword) {
+        return astFactory.createTypeDeclaration("null")
+      } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
+        return astFactory.createTypeDeclaration("undefined")
       } else if (type.kind == ts.SyntaxKind.StringKeyword) {
-        return astFactory.createSimpleTypeDeclaration("string")
+        return astFactory.createTypeDeclaration("string")
       } else if (type.kind == ts.SyntaxKind.BooleanKeyword) {
-        return astFactory.createSimpleTypeDeclaration("boolean")
+        return astFactory.createTypeDeclaration("boolean")
       } else if (type.kind == ts.SyntaxKind.NumberKeyword) {
-        return astFactory.createSimpleTypeDeclaration("number")
+        return astFactory.createTypeDeclaration("number")
       }
       else {
-        return astFactory.createSimpleTypeDeclaration("__UNKNOWN__")
+        console.log("UNKNOWN ", type.kind)
+        return astFactory.createTypeDeclaration("__UNKNOWN__")
       }
     }
   }
