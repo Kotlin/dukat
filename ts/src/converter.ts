@@ -2,6 +2,7 @@
 /// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
 
+
 if (typeof ts == "undefined") {
   (global as any).ts = require("typescript/lib/tsserverlibrary");
 }
@@ -122,7 +123,7 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
   }
 }
 
-let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) => {
+function main(astFactory: AstFactory, fileResolver: FileResolver)  {
   let documentRegistry = ts.createDocumentRegistry();
 
   let host= new SomeLanguageServiceHost(fileResolver);
@@ -132,6 +133,8 @@ let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) =
 
   var program = languageService.getProgram();
 
+  var declarations: Declaration[] = [];
+
   if (program != null) {
     let fileName = "./ast/common/test/data/simplest_var.declarations.d.ts"
     var sourceFile = program.getSourceFile(fileName)
@@ -139,18 +142,48 @@ let main = (tree: AstTree, astFactory: AstFactory, fileResolver: FileResolver) =
     if (sourceFile != null) {
 
       for (let statement of sourceFile.statements) {
-        const variableStatment = statement as ts.VariableStatement;
+        if (ts.isVariableStatement(statement)) {
+          const variableStatment = statement as ts.VariableStatement;
 
-        for (let declaration of variableStatment.declarationList.declarations) {
+          for (let declaration of variableStatment.declarationList.declarations) {
 
-          tree.root.declarations.push(astFactory.declareVariable(
-            declaration.name.getText(),
-            resolveType(astFactory, declaration.type)
-          ))
+            declarations.push(astFactory.declareVariable(
+              declaration.name.getText(),
+              resolveType(astFactory, declaration.type)
+            ));
+          }
+        } else if (ts.isClassDeclaration(statement)) {
+          const classDeclaration = statement as ts.ClassDeclaration;
+          if (classDeclaration.name != undefined) {
+            declarations.push(astFactory.declareVariable(
+              classDeclaration.name.getText(),
+              astFactory.createTypeDeclaration("@@CLASS")
+            ))
+          }
+
+        } else if (ts.isFunctionDeclaration(statement)) {
+          const functionDeclaration = statement as ts.FunctionDeclaration;
+
+          let parameterDeclarations = functionDeclaration.parameters.map(
+            param => astFactory.createParameterDeclaration(param.name.getText(), resolveType(astFactory, param.type))
+          );
+
+          if (functionDeclaration.name != null) {
+            declarations.push(
+              astFactory.createFunctionDeclaration(
+                functionDeclaration.name.escapedText.toString(),
+                parameterDeclarations
+              )
+            )
+          }
+        } else {
+          console.log("SKIPPING ", statement.kind);
         }
       }
     }
   }
+
+  return astFactory.createAstTree(declarations)
 }
 
 

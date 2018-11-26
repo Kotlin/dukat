@@ -19,25 +19,21 @@ fun translateType(declaration: TypeDeclaration): String {
 }
 
 fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
-    var declarations = mutableListOf<VariableDeclaration>()
 
-    for (child in node.children()) {
-        if (child is VariableDeclaration) {
-            val type = child.type
-
-            if (type is SimpleTypeDeclaration) {
-                if (type.value == "@@ArraySugar") {
-                    declarations.add(VariableDeclaration(child.name, SimpleTypeDeclaration("Array", type.params)))
-                } else {
-                    declarations.add(child.copy())
+    return node.copy { declaration ->
+        when (declaration) {
+            is VariableDeclaration -> when (declaration.type) {
+                is SimpleTypeDeclaration -> {
+                    if (declaration.type.value == "@@ArraySugar") {
+                        VariableDeclaration(declaration.name, SimpleTypeDeclaration("Array", declaration.type.params))
+                    } else null
                 }
-            } else {
-                throw Exception("Unkown ast type")
+                else -> null
             }
+            is FunctionDeclaration -> null
+            else -> throw Exception("Unknown AST type")
         }
     }
-
-    return DocumentRoot(declarations)
 }
 
 
@@ -68,16 +64,14 @@ private fun findNullableType(type: SimpleTypeDeclaration): SimpleTypeDeclaration
 private fun lowerNullableType(node: VariableDeclaration, type: TypeDeclaration) : TypeDeclaration {
     if (type is SimpleTypeDeclaration) {
         val nullableType = findNullableType(type)
+
         if (nullableType != null) {
             return SimpleTypeDeclaration(
                     nullableType.value + "?",
-                    nullableType.params.map { lowerNullableType(node, it.copy() as TypeDeclaration) }.toTypedArray()
+                    nullableType.params.map { lowerNullableType(node, it.copy()) }.toTypedArray()
             )
         } else {
-            return SimpleTypeDeclaration(
-                    type.value,
-                    type.params.map { lowerNullableType(node, it.copy() as TypeDeclaration) }.toTypedArray()
-            )
+            return type.copy()
         }
     } else {
         throw Exception("Unknown AST type")
@@ -85,16 +79,13 @@ private fun lowerNullableType(node: VariableDeclaration, type: TypeDeclaration) 
 }
 
 private fun lowerNullable(node: DocumentRoot): DocumentRoot {
-    var declarations = mutableListOf<VariableDeclaration>()
-
-    for (child in node.children()) {
-        if (child is VariableDeclaration) {
-            val typeResolved = lowerNullableType(child, child.type)
-            declarations.add(VariableDeclaration(child.name, typeResolved))
+    val nodeCopy = node.copy { child ->
+        when (child) {
+            is VariableDeclaration -> VariableDeclaration(child.name, lowerNullableType(child, child.type))
+            else -> null
         }
     }
-
-    return DocumentRoot(declarations)
+    return nodeCopy
 }
 
 fun compile(originalTree: AstTree) {
@@ -109,6 +100,10 @@ fun compile(originalTree: AstTree) {
         if (child is VariableDeclaration) {
             val declaration = child
             res.add("export var ${declaration.name}: ${translateType(declaration.type)}")
+        } else if (child is FunctionDeclaration) {
+            val declaration = child
+            var params = declaration.parameters.map { it.name + ": " + translateType(it.type) }.joinToString(", ")
+            res.add("external fun ${declaration.name}(${params}) = definedExternally")
         }
     }
 

@@ -1,3 +1,16 @@
+declare function foo(): void;
+declare function foo2(a: number): void;
+declare function foo3(b: number): string;
+declare function foo3(c: number, d: string): string;
+
+declare class Foo {
+  constructor();
+}
+//
+// declare class Bar {
+//   constructor(a: number);
+// }
+
 declare var a: string;
 declare var b: number;
 declare var c: boolean;
