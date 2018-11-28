@@ -23,9 +23,7 @@ declare class AstTree {
 }
 
 
-declare interface TypeDeclaration {}
-
-declare class SimpleTypeDeclaration implements TypeDeclaration {
+declare class TypeDeclaration {
   constructor(value: string)
 }
 
@@ -35,7 +33,7 @@ declare class AstFactory {
   declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
   createParameterDeclaration(name: string, type: TypeDeclaration): ParameterDeclaration;
   createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
-  createTypeDeclaration(value: string): SimpleTypeDeclaration;
-  createGenericTypeDeclaration(value: string, params: Array<SimpleTypeDeclaration>): SimpleTypeDeclaration;
+  createTypeDeclaration(value: string): TypeDeclaration;
+  createGenericTypeDeclaration(value: string, params: Array<TypeDeclaration>): TypeDeclaration;
   createAstTree(declarations: Declaration[]): AstTree;
 }

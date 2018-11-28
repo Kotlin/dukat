@@ -13,12 +13,10 @@ interface WithChildren<T> {
     fun children(): Iterable<T>
 }
 
-interface TypeDeclaration : Declaration, CopyAs<TypeDeclaration>;
-
-open class SimpleTypeDeclaration(
+open class TypeDeclaration(
         val value: String,
         val params: Array<TypeDeclaration>
-): TypeDeclaration, WithChildren<TypeDeclaration> {
+): CopyAs<TypeDeclaration>, WithChildren<TypeDeclaration> {
     fun isGeneric() = params.isNotEmpty()
 
     override fun children(): Iterable<TypeDeclaration> {
@@ -27,7 +25,7 @@ open class SimpleTypeDeclaration(
 
     override fun copy(): TypeDeclaration {
         val params = children().map { it.copy() }
-        return SimpleTypeDeclaration(value, params.toTypedArray())
+        return TypeDeclaration(value, params.toTypedArray())
     }
 }
 
@@ -109,10 +107,10 @@ class AstFactory {
     fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration) = FunctionDeclaration(name, parameters, type)
 
     @JsName("createTypeDeclaration")
-    fun createTypeDeclaration(value: String) = SimpleTypeDeclaration(value, arrayOf())
+    fun createTypeDeclaration(value: String) = TypeDeclaration(value, arrayOf())
 
     @JsName("createGenericTypeDeclaration")
-    fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = SimpleTypeDeclaration(value, params)
+    fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = TypeDeclaration(value, params)
 
     @JsName("createParameterDeclaration")
     fun createParameterDeclaration(name: String, type: TypeDeclaration) = ParameterDeclaration(name, type)

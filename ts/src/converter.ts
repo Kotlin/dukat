@@ -114,8 +114,9 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
         return astFactory.createTypeDeclaration("boolean")
       } else if (type.kind == ts.SyntaxKind.NumberKeyword) {
         return astFactory.createTypeDeclaration("number")
-      }
-      else {
+      } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
+        return astFactory.createTypeDeclaration("any")
+      } else {
         console.log("UNKNOWN ", type.kind)
         return astFactory.createTypeDeclaration("__UNKNOWN__")
       }
