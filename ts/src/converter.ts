@@ -52,7 +52,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions): string {
-    return "./ts/node_modules/typescript/lib/lib.d.ts";
+    return "./build/resources/typescript/lib/lib.d.ts";
   }
 
   getCurrentDirectory(): string {
@@ -76,7 +76,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
 
 function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
   if (type == undefined) {
-    return astFactory.createTypeDeclaration("__NO_TYPE__")
+    return astFactory.createTypeDeclaration("Unit")
   } else {
     if (ts.isArrayTypeNode(type)) {
       let arrayType = type as ts.ArrayTypeNode;
@@ -123,11 +123,11 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
   }
 }
 
-function main(astFactory: AstFactory, fileResolver: FileResolver)  {
+function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
   let documentRegistry = ts.createDocumentRegistry();
 
   let host= new SomeLanguageServiceHost(fileResolver);
-  host.register("./ast/common/test/data/simplest_var.declarations.d.ts");
+  host.register(fileName);
 
   let languageService = ts.createLanguageService(host, documentRegistry);
 
@@ -136,7 +136,6 @@ function main(astFactory: AstFactory, fileResolver: FileResolver)  {
   var declarations: Declaration[] = [];
 
   if (program != null) {
-    let fileName = "./ast/common/test/data/simplest_var.declarations.d.ts"
     var sourceFile = program.getSourceFile(fileName)
 
     if (sourceFile != null) {
@@ -172,7 +171,8 @@ function main(astFactory: AstFactory, fileResolver: FileResolver)  {
             declarations.push(
               astFactory.createFunctionDeclaration(
                 functionDeclaration.name.escapedText.toString(),
-                parameterDeclarations
+                parameterDeclarations,
+                resolveType(astFactory, functionDeclaration.type)
               )
             )
           }

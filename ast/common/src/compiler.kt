@@ -88,12 +88,11 @@ private fun lowerNullable(node: DocumentRoot): DocumentRoot {
     return nodeCopy
 }
 
-fun compile(originalTree: AstTree) {
 
+fun compile(originalTree: AstTree): String {
     var docRoot = lowerNativeArray(originalTree.root)
     docRoot = lowerNullable(docRoot)
 
-    println("from compiler:")
     var res = mutableListOf<String>();
 
     for (child in docRoot.children()) {
@@ -103,9 +102,14 @@ fun compile(originalTree: AstTree) {
         } else if (child is FunctionDeclaration) {
             val declaration = child
             var params = declaration.parameters.map { it.name + ": " + translateType(it.type) }.joinToString(", ")
-            res.add("external fun ${declaration.name}(${params}) = definedExternally")
+            var returnType = translateType(child.type)
+            res.add("external fun ${declaration.name}(${params}): ${returnType} = definedExternally")
         }
     }
 
-    print(res.joinToString("\n"))
+    return res.joinToString("\n")
+}
+
+fun compile(fileName: String, translator: (fileName: String) -> AstTree): String {
+    return compile(translator(fileName))
 }

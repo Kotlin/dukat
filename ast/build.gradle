@@ -3,6 +3,29 @@ plugins {
 }
 
 
+task copyJvmResources() {
+  dependsOn = [':ts:build']
+
+  doLast {
+    copy {
+      from "${project(":ts").buildDir}/ts/"
+      include "**/*.js"
+      into "${project.buildDir}/resources"
+    }
+
+    copy {
+      from "${project(":ts").projectDir}/node_modules/requirejs/require.js"
+      into "${project.buildDir}/resources"
+    }
+
+    copy {
+      from "${project(":ts").projectDir}/node_modules/typescript/lib"
+      into "${project.buildDir}/resources/typescript/lib"
+    }
+  }
+}
+
+
 kotlin {
   targets {
     fromPreset(presets.jvm, 'jvm') {
@@ -32,19 +55,47 @@ kotlin {
       }
     }
 
+    commonTest {
+      kotlin.srcDir("common/test")
+
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+        implementation 'org.jetbrains.kotlin:kotlin-test-common'
+        implementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+      }
+    }
+
     jvmMain {
       kotlin.srcDir("jvm/src")
+      resources.srcDir("$project.buildDir/resources")
+
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
       }
     }
 
+    jvmTest {
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-test'
+        implementation 'org.jetbrains.kotlin:kotlin-test-junit'
+      }
+    }
+
     jsMain {
       kotlin.srcDir("js/src")
+
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
       }
     }
+
+    jsTest {
+      kotlin.srcDirs += ["common/src", "js/src"]
+      dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-test-js'
+      }
+    }
+
   }
 }
 

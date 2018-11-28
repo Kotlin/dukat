@@ -34,7 +34,7 @@ declare class FunctionDeclaration {}
 declare class AstFactory {
   declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
   createParameterDeclaration(name: string, type: TypeDeclaration): ParameterDeclaration;
-  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>): FunctionDeclaration;
+  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
   createTypeDeclaration(value: string): SimpleTypeDeclaration;
   createGenericTypeDeclaration(value: string, params: Array<SimpleTypeDeclaration>): SimpleTypeDeclaration;
   createAstTree(declarations: Declaration[]): AstTree;

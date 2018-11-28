@@ -49,10 +49,11 @@ class ParameterDeclaration(
 
 class FunctionDeclaration(
         val name: String,
-        val parameters: Array<ParameterDeclaration>
+        val parameters: Array<ParameterDeclaration>,
+        val type: TypeDeclaration
 ): Declaration, CopyAs<FunctionDeclaration> {
     override fun copy(): FunctionDeclaration {
-        return FunctionDeclaration(name, parameters.map { it.copy() }.toTypedArray())
+        return FunctionDeclaration(name, parameters.map { it.copy() }.toTypedArray(), type)
     }
 }
 
@@ -105,7 +106,7 @@ class AstFactory {
     fun declareVariable(name: String, type: TypeDeclaration) = VariableDeclaration(name, type)
 
     @JsName("createFunctionDeclaration")
-    fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>) = FunctionDeclaration(name, parameters)
+    fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration) = FunctionDeclaration(name, parameters, type)
 
     @JsName("createTypeDeclaration")
     fun createTypeDeclaration(value: String) = SimpleTypeDeclaration(value, arrayOf())
