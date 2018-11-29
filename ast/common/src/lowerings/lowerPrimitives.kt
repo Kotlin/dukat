@@ -8,6 +8,8 @@ private fun lowerType(type: TypeDeclaration): TypeDeclaration {
         "any" -> TypeDeclaration("Any", arrayOf())
         "boolean" -> TypeDeclaration("Boolean", arrayOf())
         "string" -> TypeDeclaration("String", arrayOf())
+
+        "number" -> TypeDeclaration("Number", arrayOf())
         else -> type.copy()
     }
 }
