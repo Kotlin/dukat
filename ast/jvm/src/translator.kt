@@ -11,9 +11,7 @@ fun getEngine(): ScriptEngine {
     val engineManager = ScriptEngineManager()
     var engine = engineManager.getEngineByName("nashorn")
 
-    engine.eval("var global = this;")
-    engine.eval(FileReader("build/resources/jvm/Set.js"));
-    engine.eval(FileReader("build/resources/require.js"));
+    engine.eval("var global = this; var Set = Java.type('org.jetbrains.dukat.nashorn.Set');");
     engine.eval(FileReader("build/resources/typescript/lib/tsserverlibrary.js"))
     engine.eval(FileReader("build/resources/converter.js"));
 

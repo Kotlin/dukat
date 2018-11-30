@@ -14,11 +14,6 @@ task copyJvmResources() {
     }
 
     copy {
-      from "${project(":ts").projectDir}/node_modules/requirejs/require.js"
-      into "${project.buildDir}/resources"
-    }
-
-    copy {
       from "${project(":ts").projectDir}/node_modules/typescript/lib"
       into "${project.buildDir}/resources/typescript/lib"
     }
@@ -71,6 +66,7 @@ kotlin {
 
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+        implementation(project(":nashorn"))
       }
     }
 

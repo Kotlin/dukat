@@ -28,4 +28,5 @@ gradle.ext {
 
 
 include 'ast'
+include 'nashorn'
 include 'ts'
