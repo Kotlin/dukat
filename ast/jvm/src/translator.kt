@@ -26,15 +26,8 @@ actual fun createTranslator(): (fileName: String) -> AstTree {
     return {fileName -> invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as AstTree}
 }
 
-actual fun translator(fileName: String): AstTree {
-    val engine = getEngine()
-
-    val invocable = engine as Invocable
-    return invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as AstTree
-}
-
 
 fun main() {
-    val astTree = translator("./ast/common/test/data/simplest_var.declarations.d.ts")
+    val astTree = createTranslator()("./ast/common/test/data/simplest_var.declarations.d.ts")
     println(compile(astTree))
 }
