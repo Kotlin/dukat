@@ -90,7 +90,10 @@ kotlin {
     }
 
     jsTest {
-      kotlin.srcDirs += ["common/src", "js/src"]
+      kotlin.srcDirs += [
+          commonMain.kotlin.srcDirs,
+          jsMain.kotlin.srcDirs
+      ]
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-test-js'
       }
