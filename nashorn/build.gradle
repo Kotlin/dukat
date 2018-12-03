@@ -1,7 +1,7 @@
 plugins {
-  id("kotlin")
+  id("java")
 }
 
 sourceSets {
-  main.kotlin.srcDirs = ['src']
+  main.java.srcDirs = ['src']
 }

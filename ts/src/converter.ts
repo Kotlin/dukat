@@ -52,7 +52,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions): string {
-    return "./build/resources/typescript/lib/lib.d.ts";
+    return "";
   }
 
   getCurrentDirectory(): string {
