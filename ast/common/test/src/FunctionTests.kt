@@ -18,8 +18,8 @@ class FunctionTests {
     }
 
     @Test
-    fun testMe() {
-        assertContentEquals("./common/test/data/functions.d.ts", "./common/test/data/functions.dukat")
+    fun testFunctions() {
+        assertContentEquals("./common/test/data/functions.d.ts", "./common/test/data/functions.kt")
     }
 
 }

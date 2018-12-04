@@ -51,7 +51,8 @@ kotlin {
     }
 
     commonTest {
-      kotlin.srcDir("common/test")
+      kotlin.srcDir("common/test/src")
+      resources.srcDir("$project.buildDir/data")
 
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
