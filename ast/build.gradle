@@ -79,18 +79,12 @@ kotlin {
     }
 
     jsMain {
-      kotlin.srcDir("js/src")
-
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
       }
     }
 
     jsTest {
-      kotlin.srcDirs += [
-          commonMain.kotlin.srcDirs,
-          jsMain.kotlin.srcDirs
-      ]
       dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-test-js'
       }

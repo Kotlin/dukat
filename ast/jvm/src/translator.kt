@@ -9,7 +9,7 @@ import javax.script.ScriptEngineManager
 
 fun getEngine(resolver: ContentResolver): ScriptEngine {
     val engineManager = ScriptEngineManager()
-    var engine = engineManager.getEngineByName("nashorn")
+    val engine = engineManager.getEngineByName("nashorn")
 
     engine.eval("var global = this; var Set = Java.type('org.jetbrains.dukat.nashorn.Set');")
 
