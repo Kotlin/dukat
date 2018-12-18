@@ -19,7 +19,8 @@ class FunctionTests {
 
     @Test
     fun testFunctions() {
-        assertContentEquals("./common/test/data/functions.d.ts", "./common/test/data/functions.kt")
+        assertContentEquals("./common/test/data/functions.d.ts", "./common/test/data/functions.d.kt")
+        assertContentEquals("./common/test/data/functionsWithDefaultArguments.d.ts", "./common/test/data/functionsWithDefaultArguments.d.kt")
     }
 
 }
