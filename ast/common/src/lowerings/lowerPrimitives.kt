@@ -21,13 +21,11 @@ private fun lowerType(parameters: Array<ParameterDeclaration>): Array<ParameterD
 }
 
 fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
-    return node.copy { declaration ->
-        when (declaration) {
-            is VariableDeclaration -> VariableDeclaration(declaration.name, lowerType(declaration.type))
+    val loweredDeclarations = node.declarations.map { declaration -> when(declaration) {
+        is VariableDeclaration -> VariableDeclaration(declaration.name, lowerType(declaration.type))
+        is FunctionDeclaration -> FunctionDeclaration(declaration.name, lowerType(declaration.parameters.toTypedArray()), lowerType(declaration.type))
+        else -> declaration.copy() as Declaration
+    }}
 
-            //TODO: here we actually need to copy parameters - this is something I don't like about current implementation
-            is FunctionDeclaration -> FunctionDeclaration(declaration.name, lowerType(declaration.parameters), lowerType(declaration.type))
-            else -> null
-        }
-    }
+    return node.copy(declarations = loweredDeclarations)
 }

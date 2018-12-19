@@ -17,17 +17,19 @@ fun translateType(declaration: TypeDeclaration): String {
 
 fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
 
-    return node.copy { declaration ->
-        when (declaration) {
-            is VariableDeclaration -> {
-                if (declaration.type.value == "@@ArraySugar") {
-                    VariableDeclaration(declaration.name, TypeDeclaration("Array", declaration.type.params))
-                } else null
+    val loweredDeclarations = node.declarations.map { declaration -> when(declaration) {
+        is VariableDeclaration -> {
+            if (declaration.type.value == "@@ArraySugar") {
+                VariableDeclaration(declaration.name, TypeDeclaration("Array", declaration.type.params))
+            } else {
+                declaration.copy()
             }
-            is FunctionDeclaration -> null
-            else -> throw Exception("Unknown AST type")
         }
-    }
+        else -> declaration.copy() as Declaration
+    }}
+
+
+    return node.copy(declarations = loweredDeclarations)
 }
 
 
@@ -66,13 +68,13 @@ private fun lowerNullableType(node: VariableDeclaration, type: TypeDeclaration) 
 }
 
 private fun lowerNullable(node: DocumentRoot): DocumentRoot {
-    val nodeCopy = node.copy { child ->
-        when (child) {
-            is VariableDeclaration -> VariableDeclaration(child.name, lowerNullableType(child, child.type))
-            else -> null
-        }
-    }
-    return nodeCopy
+
+    val loweredDeclarations = node.declarations.map { declaration -> when(declaration) {
+        is VariableDeclaration -> VariableDeclaration(declaration.name, lowerNullableType(declaration, declaration.type))
+        else -> declaration.copy() as Declaration
+    }}
+
+    return node.copy(declarations = loweredDeclarations)
 }
 
 
@@ -81,16 +83,16 @@ fun compile(originalTree: AstTree): String {
     docRoot = lowerNullable(docRoot)
     docRoot = lowerPrimitives(docRoot)
 
-    var res = mutableListOf<String>();
+    val res = mutableListOf<String>()
 
-    for (child in docRoot.children()) {
+    for (child in docRoot.declarations) {
         if (child is VariableDeclaration) {
             val declaration = child
             res.add("export var ${declaration.name}: ${translateType(declaration.type)}")
         } else if (child is FunctionDeclaration) {
             val declaration = child
-            var params = declaration.parameters.map { it.name + ": " + translateType(it.type) }.joinToString(", ")
-            var returnType = translateType(child.type)
+            val params = declaration.parameters.map { it.name + ": " + translateType(it.type) }.joinToString(", ")
+            val returnType = translateType(child.type)
             res.add("external fun ${declaration.name}(${params}): ${returnType} = definedExternally")
         }
     }

@@ -2,102 +2,52 @@ package org.jetbrains.dukat.ast
 
 import kotlin.js.JsName
 
-interface AstNode {
-}
-
-interface CopyAs<T> {
-    fun copy(): T
-}
-
-interface WithChildren<T> {
-    fun children(): Iterable<T>
-}
-
-open class TypeDeclaration(
-        val value: String,
-        val params: Array<TypeDeclaration>
-): CopyAs<TypeDeclaration>, WithChildren<TypeDeclaration> {
-    fun isGeneric() = params.isNotEmpty()
-
-    override fun children(): Iterable<TypeDeclaration> {
-        return params.asIterable()
-    }
-
-    override fun copy(): TypeDeclaration {
-        val params = children().map { it.copy() }
-        return TypeDeclaration(value, params.toTypedArray())
-    }
-}
+interface AstNode
 
 interface Declaration: AstNode
 
-class VariableDeclaration(
-        val name: String,
-        val type: TypeDeclaration
-): Declaration, CopyAs<VariableDeclaration> {
-    override fun copy() = VariableDeclaration(name, type.copy())
+data class TypeDeclaration(
+        val value: String,
+        val params: List<TypeDeclaration>
+) {
+    constructor(value: String, params: Array<TypeDeclaration>) : this(value, params.toList())
+    fun isGeneric() = params.isNotEmpty()
 }
 
-class ParameterDeclaration(
+data class VariableDeclaration(
+        val name: String,
+        val type: TypeDeclaration
+): Declaration
+
+data class ParameterDeclaration(
     val name: String,
     val type: TypeDeclaration
-): Declaration, CopyAs<ParameterDeclaration> {
-    override fun copy() = ParameterDeclaration(name, type)
+): Declaration {
 }
 
-class FunctionDeclaration(
+data class FunctionDeclaration(
         val name: String,
-        val parameters: Array<ParameterDeclaration>,
+        val parameters: List<ParameterDeclaration>,
         val type: TypeDeclaration
-): Declaration, CopyAs<FunctionDeclaration> {
-    override fun copy(): FunctionDeclaration {
-        return FunctionDeclaration(name, parameters.map { it.copy() }.toTypedArray(), type)
+): Declaration {
+    constructor(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): this(name, parameters.toList(), type)
+}
+
+fun AstNode.copy() : AstNode {
+    return when (this) {
+        is VariableDeclaration -> copy()
+        is FunctionDeclaration -> copy()
+        else -> throw Exception("Can not copy ${this}")
     }
 }
 
-class DocumentRoot(
-        val declarations: Array<Declaration> = arrayOf()
-): AstNode, CopyAs<DocumentRoot>, WithChildren<Declaration> {
-
-    constructor(declarations: List<Declaration>) : this(declarations.toTypedArray())
-
-    override fun children(): Iterable<Declaration> {
-        return declarations.asIterable()
-    }
-
-    override fun copy(): DocumentRoot {
-        return copy {declaration ->
-            when (declaration) {
-                is VariableDeclaration -> declaration.copy()
-                is FunctionDeclaration -> declaration.copy()
-                else -> null
-            }
-        }
-    }
-
-    fun copy(transform: (declaration: Declaration) -> Declaration?): DocumentRoot {
-        val decl = mutableListOf<Declaration>()
-        for (declaration in declarations) {
-            val transformedDeclaration = transform(declaration)
-            if (transformedDeclaration != null) {
-                decl.add(transformedDeclaration)
-            } else {
-                if (declaration is CopyAs<*>) {
-                    decl.add(declaration.copy() as Declaration)
-                } else {
-                    throw Exception("Only copyable declarations are allowed")
-                }
-            }
-        }
-
-        return DocumentRoot(decl)
-    }
+data class DocumentRoot(
+        val declarations: List<Declaration> = emptyList()
+): AstNode {
+    constructor(declarations: Array<Declaration>) : this(declarations.toList())
 }
 
-
-class AstTree(val root: DocumentRoot) {
-}
-
+class AstTree(val root: DocumentRoot)
 
 class AstFactory {
     @JsName("declareVariable")
