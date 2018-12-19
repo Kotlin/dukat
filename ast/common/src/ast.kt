@@ -11,8 +11,9 @@ data class TypeDeclaration(
         val params: List<TypeDeclaration>
 ) {
     constructor(value: String, params: Array<TypeDeclaration>) : this(value, params.toList())
-    fun isGeneric() = params.isNotEmpty()
 }
+
+fun TypeDeclaration.isGeneric() = params.isNotEmpty()
 
 data class VariableDeclaration(
         val name: String,
