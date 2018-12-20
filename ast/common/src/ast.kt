@@ -13,17 +13,20 @@ data class TypeDeclaration(
     constructor(value: String, params: Array<TypeDeclaration>) : this(value, params.toList())
 }
 
-fun TypeDeclaration.isGeneric() = params.isNotEmpty()
+data class ParameterDeclaration(
+        val name: String,
+        val type: TypeDeclaration
+): Declaration
 
 data class VariableDeclaration(
         val name: String,
         val type: TypeDeclaration
 ): Declaration
 
-data class ParameterDeclaration(
-    val name: String,
-    val type: TypeDeclaration
-): Declaration {
+data class DocumentRoot(
+        val declarations: List<Declaration> = emptyList()
+): AstNode {
+    constructor(declarations: Array<Declaration>) : this(declarations.toList())
 }
 
 data class FunctionDeclaration(
@@ -34,18 +37,15 @@ data class FunctionDeclaration(
     constructor(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): this(name, parameters.toList(), type)
 }
 
+fun TypeDeclaration.isGeneric() = params.isNotEmpty()
+
+
 fun AstNode.copy() : AstNode {
     return when (this) {
         is VariableDeclaration -> copy()
         is FunctionDeclaration -> copy()
         else -> throw Exception("Can not copy ${this}")
     }
-}
-
-data class DocumentRoot(
-        val declarations: List<Declaration> = emptyList()
-): AstNode {
-    constructor(declarations: Array<Declaration>) : this(declarations.toList())
 }
 
 class AstTree(val root: DocumentRoot)

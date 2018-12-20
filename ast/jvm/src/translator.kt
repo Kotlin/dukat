@@ -1,10 +1,8 @@
 package org.jetbrains.dukat.ast
 
-import java.io.FileReader
 import javax.script.Invocable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
-
 
 
 fun getEngine(resolver: ContentResolver): ScriptEngine {
@@ -20,9 +18,9 @@ fun getEngine(resolver: ContentResolver): ScriptEngine {
 }
 
 fun prodResourceResolver(fileName: String): String {
-    val fileNameResolved = when(fileName) {
+    val fileNameResolved = when (fileName) {
         "tsserverlibrary.js" -> "../ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "converter.js" ->  "../ts/build/ts/converter.js"
+        "converter.js" -> "../ts/build/ts/converter.js"
         else -> fileName
     }
 
@@ -30,9 +28,9 @@ fun prodResourceResolver(fileName: String): String {
 }
 
 fun localResourceResolver(fileName: String): String {
-    val fileNameResolved = when(fileName) {
+    val fileNameResolved = when (fileName) {
         "tsserverlibrary.js" -> "ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "converter.js" ->  "ts/build/ts/converter.js"
+        "converter.js" -> "ts/build/ts/converter.js"
         else -> fileName
     }
 
@@ -40,10 +38,10 @@ fun localResourceResolver(fileName: String): String {
 }
 
 
-fun createTranslatorFactory(resourceResolver: ContentResolver): (fileName: String) -> AstTree  {
+fun createTranslatorFactory(resourceResolver: ContentResolver): (fileName: String) -> AstTree {
     val engine = getEngine(resourceResolver)
     val invocable = engine as Invocable
-    return {fileName -> invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as AstTree}
+    return { fileName -> invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as AstTree }
 }
 
 actual fun createTranslator() = createTranslatorFactory(::prodResourceResolver)

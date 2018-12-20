@@ -42,7 +42,7 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
     this.knownFiles.forEach((v1, v2, s) => {
       let item = v1;
       res.push(item);
-    })
+    });
 
     return res;
   }
@@ -91,7 +91,7 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
 
         return astFactory.createGenericTypeDeclaration("@@Union",params)
       } else if (type.kind == ts.SyntaxKind.TypeReference) {
-        let typeReferenceNode = type as ts.TypeReferenceNode
+        let typeReferenceNode = type as ts.TypeReferenceNode;
         if (typeof typeReferenceNode.typeArguments != "undefined") {
             let params = typeReferenceNode.typeArguments
               .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
@@ -103,7 +103,6 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
       } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
         let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
         return resolveType(astFactory, parenthesizedTypeNode.type);
-        return astFactory.createTypeDeclaration("__PARENTHESIZED__")
       } else if (type.kind == ts.SyntaxKind.NullKeyword) {
         return astFactory.createTypeDeclaration("null")
       } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
@@ -117,7 +116,7 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
       } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
         return astFactory.createTypeDeclaration("any")
       } else {
-        console.log("UNKNOWN ", type.kind)
+        console.log("UNKNOWN ", type.kind);
         return astFactory.createTypeDeclaration("__UNKNOWN__")
       }
     }
@@ -137,7 +136,7 @@ function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: stri
   var declarations: Declaration[] = [];
 
   if (program != null) {
-    var sourceFile = program.getSourceFile(fileName)
+    var sourceFile = program.getSourceFile(fileName);
 
     if (sourceFile != null) {
 
