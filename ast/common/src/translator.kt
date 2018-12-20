@@ -1,3 +1,5 @@
 package org.jetbrains.dukat.ast
 
-expect fun createTranslator(): (fileName: String) -> AstTree;
+import org.jetbrains.dukat.ast.model.DocumentRoot
+
+expect fun createTranslator(): (fileName: String) -> DocumentRoot;

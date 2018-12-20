@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.ast
 
+import org.jetbrains.dukat.ast.model.AstFactory
+import org.jetbrains.dukat.ast.model.DocumentRoot
 import javax.script.Invocable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
@@ -38,10 +40,10 @@ fun localResourceResolver(fileName: String): String {
 }
 
 
-fun createTranslatorFactory(resourceResolver: ContentResolver): (fileName: String) -> AstTree {
+fun createTranslatorFactory(resourceResolver: ContentResolver): (fileName: String) -> DocumentRoot {
     val engine = getEngine(resourceResolver)
     val invocable = engine as Invocable
-    return { fileName -> invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as AstTree }
+    return { fileName -> invocable.invokeFunction("main", AstFactory(), FileResolver(), fileName) as DocumentRoot }
 }
 
 actual fun createTranslator() = createTranslatorFactory(::prodResourceResolver)

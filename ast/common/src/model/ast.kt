@@ -1,54 +1,56 @@
-package org.jetbrains.dukat.ast
+package org.jetbrains.dukat.ast.model
 
 import kotlin.js.JsName
 
+
 interface AstNode
 
-interface Declaration: AstNode
+interface Declaration : AstNode
+
 
 data class TypeDeclaration(
         val value: String,
         val params: List<TypeDeclaration>
-) {
+) : Declaration {
     constructor(value: String, params: Array<TypeDeclaration>) : this(value, params.toList())
 }
+
+fun TypeDeclaration.isGeneric() = params.isNotEmpty()
 
 data class ParameterDeclaration(
         val name: String,
         val type: TypeDeclaration
-): Declaration
+) : Declaration
 
 data class VariableDeclaration(
         val name: String,
         val type: TypeDeclaration
-): Declaration
-
-data class DocumentRoot(
-        val declarations: List<Declaration> = emptyList()
-): AstNode {
-    constructor(declarations: Array<Declaration>) : this(declarations.toList())
-}
+) : Declaration
 
 data class FunctionDeclaration(
         val name: String,
         val parameters: List<ParameterDeclaration>,
         val type: TypeDeclaration
-): Declaration {
-    constructor(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): this(name, parameters.toList(), type)
+) : Declaration {
+    constructor(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration) : this(name, parameters.toList(), type)
 }
 
-fun TypeDeclaration.isGeneric() = params.isNotEmpty()
+
+data class DocumentRoot(
+        val declarations: List<Declaration> = emptyList()
+) : Declaration {
+    constructor(declarations: Array<Declaration>) : this(declarations.toList())
+}
 
 
-fun AstNode.copy() : AstNode {
+fun AstNode.duplicate(): AstNode {
     return when (this) {
         is VariableDeclaration -> copy()
         is FunctionDeclaration -> copy()
+        is TypeDeclaration -> copy()
         else -> throw Exception("Can not copy ${this}")
     }
 }
-
-class AstTree(val root: DocumentRoot)
 
 class AstFactory {
     @JsName("declareVariable")
@@ -66,6 +68,6 @@ class AstFactory {
     @JsName("createParameterDeclaration")
     fun createParameterDeclaration(name: String, type: TypeDeclaration) = ParameterDeclaration(name, type)
 
-    @JsName("createAstTree")
-    fun createAstTree(declarations: Array<Declaration>) = AstTree(DocumentRoot(declarations))
+    @JsName("createDocumentRoot")
+    fun createDocumentRoot(declarations: Array<Declaration>) = DocumentRoot(declarations)
 }

@@ -183,7 +183,7 @@ function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: stri
     }
   }
 
-  return astFactory.createAstTree(declarations)
+  return astFactory.createDocumentRoot(declarations)
 }
 
 

@@ -31,15 +31,15 @@ kotlin {
       }
     }
 
-    fromPreset(presets.js, 'js') {
-      compilations.all {
-        tasks[compileKotlinTaskName].kotlinOptions {
-          metaInfo = false
-          sourceMap = true
-          moduleKind = 'commonjs'
-        }
-      }
-    }
+//    fromPreset(presets.js, 'js') {
+//      compilations.all {
+//        tasks[compileKotlinTaskName].kotlinOptions {
+//          metaInfo = false
+//          sourceMap = true
+//          moduleKind = 'commonjs'
+//        }
+//      }
+//    }
   }
 
   sourceSets {
@@ -78,17 +78,17 @@ kotlin {
       }
     }
 
-    jsMain {
-      dependencies {
-        implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
-      }
-    }
-
-    jsTest {
-      dependencies {
-        implementation 'org.jetbrains.kotlin:kotlin-test-js'
-      }
-    }
+//    jsMain {
+//      dependencies {
+//        implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+//      }
+//    }
+//
+//    jsTest {
+//      dependencies {
+//        implementation 'org.jetbrains.kotlin:kotlin-test-js'
+//      }
+//    }
 
   }
 }

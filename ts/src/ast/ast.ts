@@ -35,5 +35,5 @@ declare class AstFactory {
   createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
   createTypeDeclaration(value: string): TypeDeclaration;
   createGenericTypeDeclaration(value: string, params: Array<TypeDeclaration>): TypeDeclaration;
-  createAstTree(declarations: Declaration[]): AstTree;
+  createDocumentRoot(declarations: Declaration[]): DocumentRoot;
 }

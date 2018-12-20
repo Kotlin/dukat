@@ -1,6 +1,12 @@
 package org.jetbrains.dukat.ast.lowerings
 
-import org.jetbrains.dukat.ast.*
+import org.jetbrains.dukat.ast.model.Declaration
+import org.jetbrains.dukat.ast.model.DocumentRoot
+import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.duplicate
 
 
 private fun lowerType(type: TypeDeclaration): TypeDeclaration {
@@ -21,11 +27,13 @@ private fun lowerType(parameters: Array<ParameterDeclaration>): Array<ParameterD
 }
 
 fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
-    val loweredDeclarations = node.declarations.map { declaration -> when(declaration) {
-        is VariableDeclaration -> VariableDeclaration(declaration.name, lowerType(declaration.type))
-        is FunctionDeclaration -> FunctionDeclaration(declaration.name, lowerType(declaration.parameters.toTypedArray()), lowerType(declaration.type))
-        else -> declaration.copy() as Declaration
-    }}
+    val loweredDeclarations = node.declarations.map { declaration ->
+        when (declaration) {
+            is VariableDeclaration -> VariableDeclaration(declaration.name, lowerType(declaration.type))
+            is FunctionDeclaration -> FunctionDeclaration(declaration.name, lowerType(declaration.parameters.toTypedArray()), lowerType(declaration.type))
+            else -> declaration.duplicate() as Declaration
+        }
+    }
 
     return node.copy(declarations = loweredDeclarations)
 }
