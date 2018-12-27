@@ -1,9 +1,0 @@
-{
-  "name": "org.jetbrains.dukat.ast",
-  "private": true,
-  "version": "1.0.0",
-  "dependencies": {
-    "kotlin": "^1.3.10"
-  }
-  "license": "UNLICENSED"
-}

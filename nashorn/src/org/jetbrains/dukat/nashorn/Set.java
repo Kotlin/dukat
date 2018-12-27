@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nashorn;
 
 import java.util.HashSet;
-import java.util.List;
 
 public class Set<T> {
     public int size = 0;

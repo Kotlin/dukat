@@ -14,7 +14,7 @@ pluginManagement {
     eachPlugin {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
-        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
+        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20-eap-52")
       } else if (pluginId == 'com.google.protobuf') {
          useModule("com.google.protobuf:protobuf-gradle-plugin:0.8.7")
       }
@@ -23,10 +23,12 @@ pluginManagement {
 }
 
 gradle.ext {
-  kotlinVersion = "1.3.10"
+  kotlinVersion = "1.3.20-eap-52" 
 }
 
-
 include 'ast'
+include 'compiler'
+include 'interop'
+include 'j2v8'
 include 'nashorn'
 include 'ts'

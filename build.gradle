@@ -3,6 +3,10 @@ allprojects {
     gradlePluginPortal()
     mavenCentral()
     jcenter()
+    maven {
+      url "https://dl.bintray.com/kotlin/kotlin-eap"
+    }
+
   }
 
 
@@ -27,3 +31,8 @@ allprojects {
 
 }
 
+
+//dependencies {
+//  testCompile "junit:junit:4.12"
+//  testCompile 'org.jetbrains.kotlin:kotlin-test-junit5'
+//}

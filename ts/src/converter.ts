@@ -8,11 +8,16 @@ if (typeof ts == "undefined") {
 }
 
 declare function print(...arg: any[]): void;
+declare function println(arg: String): void;
+declare class AstFactoryV8 extends AstFactory {}
+declare class FileResolverV8 implements FileResolver {
+  resolve(fileName: string): string;
+}
 
 if (typeof console == "undefined") {
   (global as any).console = {
     log: (...arg: any[]) => {
-      print(arg);
+      print(String(arg));
     }
   }
 }
@@ -116,14 +121,24 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
       } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
         return astFactory.createTypeDeclaration("any")
       } else {
-        console.log("UNKNOWN ", type.kind);
         return astFactory.createTypeDeclaration("__UNKNOWN__")
       }
     }
   }
 }
 
+
 function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
+
+  if (astFactory == null) {
+    astFactory = new AstFactoryV8();
+  }
+
+  if (fileResolver == null) {
+    fileResolver = new FileResolverV8();
+  }
+
+
   let documentRegistry = ts.createDocumentRegistry();
 
   let host= new SomeLanguageServiceHost(fileResolver);

@@ -1,0 +1,25 @@
+plugins {
+  id("kotlin")
+}
+
+sourceSets {
+  main.kotlin.srcDirs = ['src']
+  test.kotlin.srcDirs = ['test/src']
+  test.resources.srcDirs = ['test/data']
+}
+
+dependencies {
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+
+  implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
+
+  implementation(project(":ast"))
+
+  implementation(project(":nashorn"))
+  implementation(project(":j2v8"))
+
+  testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
+  testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+  testImplementation 'org.jetbrains.kotlin:kotlin-test'
+  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+}
