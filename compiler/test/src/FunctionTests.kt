@@ -29,19 +29,21 @@ class FunctionTests {
     }
 
 
-    private fun assertContentEquals(fileNameSource: String, fileNameTarget: String) {
+    private fun assertContentEquals(name: String) {
 
         val resourceDirectory = File("./test/data")
+        val fileNameSource = resourceDirectory.resolve("${name}.d.ts").absolutePath
+        val fileNameTarget = resourceDirectory.resolve("${name}.d.kt")
 
         assertEquals(
-                compile(resourceDirectory.resolve(fileNameSource).absolutePath, translator),
-                resourceDirectory.resolve(fileNameTarget).readText()
+                compile(fileNameSource, translator),
+                fileNameTarget.readText()
         )
     }
 
     @Test
     fun testFunctions() {
-        assertContentEquals("functions.d.ts", "functions.d.kt")
+        assertContentEquals("functions")
     }
 
 }
