@@ -1,8 +1,8 @@
-import org.jetbrains.dukat.compiler.FileResolver
 import org.jetbrains.dukat.compiler.Translator
 import org.jetbrains.dukat.compiler.compile
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.junit.BeforeClass
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,15 +31,17 @@ class FunctionTests {
 
     private fun assertContentEquals(fileNameSource: String, fileNameTarget: String) {
 
+        val resourceDirectory = File("./test/data")
+
         assertEquals(
-                compile(fileNameSource, translator),
-                FileResolver().resolve(fileNameTarget).trimEnd()
+                compile(resourceDirectory.resolve(fileNameSource).absolutePath, translator),
+                resourceDirectory.resolve(fileNameTarget).readText()
         )
     }
 
     @Test
     fun testFunctions() {
-        assertContentEquals("./test/data/functions.d.ts", "./test/data/functions.d.kt")
+        assertContentEquals("functions.d.ts", "functions.d.kt")
     }
 
 }

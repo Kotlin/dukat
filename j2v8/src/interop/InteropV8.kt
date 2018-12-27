@@ -20,7 +20,7 @@ class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, Int
     private fun createParams(vararg p: Any?): V8Array {
         val params = V8Array(runtime)
 
-        p.forEach {println(it is V8Object); when {
+        p.forEach {when {
             it == null -> params.pushNull()
             it is Int -> params.push(it)
             it is Double -> params.push(it)
