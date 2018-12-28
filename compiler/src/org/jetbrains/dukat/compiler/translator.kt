@@ -3,9 +3,9 @@ package org.jetbrains.dukat.compiler
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.AstFactory
-import org.jetbrains.dukat.ast.DocumentRoot
 import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
+import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.toAst
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
@@ -36,10 +36,11 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
 
     interopRuntime
             .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
+            .method("createExpression", InteropV8Signature.V8OBJECT, InteropV8Signature.STRING)
             .method("createTypeDeclaration", InteropV8Signature.STRING)
             .method("createGenericTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
-            .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
+            .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createDocumentRoot", InteropV8Signature.V8ARRAY)
 

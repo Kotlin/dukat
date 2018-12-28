@@ -50,3 +50,9 @@ declare var h: String;
 
 declare const ax: (string | null) | number
 declare const bx: (string | null) | (number | undefined)
+
+declare function withOneAny(a: any = 0): any;
+declare function withOneString(s: string = "foobar"): string;
+declare function withOneStringAndOptional(s: string = "something", settings?: JQueryAjaxSettings): boolean;
+declare function withOneStringAndOptional(s: boolean = true): boolean;
+declare function withOneStringAndOptional(s: boolean = false): boolean;

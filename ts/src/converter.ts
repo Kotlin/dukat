@@ -16,8 +16,8 @@ declare class FileResolverV8 implements FileResolver {
 
 if (typeof console == "undefined") {
   (global as any).console = {
-    log: (...arg: any[]) => {
-      print(String(arg));
+    log: (...args: any[]) => {
+      println(args.map(it => String(it)).join(", "));
     }
   }
 }
@@ -78,6 +78,13 @@ class SomeLanguageServiceHost implements ts.LanguageServiceHost {
   }
 }
 
+function createUnionType(astFactory: AstFactory, params: Array<TypeDeclaration>) {
+  return astFactory.createGenericTypeDeclaration("@@Union",params);
+}
+
+function createNullableType(astFactory: AstFactory, type: TypeDeclaration) {
+  return createUnionType(astFactory, [type, astFactory.createTypeDeclaration("null")])
+}
 
 function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
   if (type == undefined) {
@@ -94,7 +101,7 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
         let params = unionTypeNode.types
                       .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
 
-        return astFactory.createGenericTypeDeclaration("@@Union",params)
+        return createUnionType(astFactory, params)
       } else if (type.kind == ts.SyntaxKind.TypeReference) {
         let typeReferenceNode = type as ts.TypeReferenceNode;
         if (typeof typeReferenceNode.typeArguments != "undefined") {
@@ -127,6 +134,30 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
   }
 }
 
+
+function createParamDeclaration(astFactory: AstFactory, param: ts.ParameterDeclaration) : ParameterDeclaration {
+
+  let initializer = null;
+  if (param.initializer != null) {
+    initializer = astFactory.createExpression(
+        astFactory.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
+        param.initializer.getText()
+    )
+  } else if (param.questionToken != null) {
+      initializer = astFactory.createExpression(
+          astFactory.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
+          "null"
+      )
+  }
+
+  let paramType = resolveType(astFactory, param.type);
+
+  return astFactory.createParameterDeclaration(
+      param.name.getText(),
+      param.questionToken ? createNullableType(astFactory, paramType) : paramType,
+      initializer
+  )
+}
 
 function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
 
@@ -179,7 +210,7 @@ function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: stri
           const functionDeclaration = statement as ts.FunctionDeclaration;
 
           let parameterDeclarations = functionDeclaration.parameters.map(
-            param => astFactory.createParameterDeclaration(param.name.getText(), resolveType(astFactory, param.type))
+              param => createParamDeclaration(astFactory, param)
           );
 
           if (functionDeclaration.name != null) {

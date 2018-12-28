@@ -1,16 +1,18 @@
 package org.jetbrains.dukat.ast
 
-interface AstNodeFactory<T> {
-    fun declareVariable(name: String, type: TypeDeclaration): T
-    fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): T
-    fun createTypeDeclaration(value: String): T
-    fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>): T
-    fun createParameterDeclaration(name: String, type: TypeDeclaration): T
-    fun createDocumentRoot(declarations: Array<Declaration>): T
-}
+import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.Declaration
+import org.jetbrains.dukat.ast.model.DocumentRoot
+import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.VariableDeclaration
 
 class AstFactory: AstNodeFactory<AstNode> {
     override fun declareVariable(name: String, type: TypeDeclaration) = VariableDeclaration(name, type)
+
+    override fun createExpresson(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
 
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration) = FunctionDeclaration(name, parameters, type)
 
@@ -18,7 +20,8 @@ class AstFactory: AstNodeFactory<AstNode> {
 
     override fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = TypeDeclaration(value, params)
 
-    override fun createParameterDeclaration(name: String, type: TypeDeclaration) = ParameterDeclaration(name, type)
+    override fun createParameterDeclaration(name: String, type: TypeDeclaration, initializer: Expression?)
+            = ParameterDeclaration(name, type, initializer)
 
     override fun createDocumentRoot(declarations: Array<Declaration>) = DocumentRoot(declarations)
 }

@@ -1,12 +1,14 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.Declaration
-import org.jetbrains.dukat.ast.DocumentRoot
-import org.jetbrains.dukat.ast.FunctionDeclaration
-import org.jetbrains.dukat.ast.TypeDeclaration
-import org.jetbrains.dukat.ast.VariableDeclaration
-import org.jetbrains.dukat.ast.duplicate
-import org.jetbrains.dukat.ast.isGeneric
+import org.jetbrains.dukat.ast.model.Declaration
+import org.jetbrains.dukat.ast.model.DocumentRoot
+import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 
 fun translateType(declaration: TypeDeclaration): String {
     val res = mutableListOf<String>(declaration.value)
@@ -40,52 +42,23 @@ fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
 }
 
 
-private fun findNullableType(type: TypeDeclaration): TypeDeclaration? {
-    if (type.value != "@@Union") {
-        return null
-    }
 
-    val params = type.params.filter {
-        when (it.value) {
-            "undefined" -> false
-            "null" -> false
-            else -> true
+private fun ParameterDeclaration.toStringRepresentation(): String {
+    var res = name + ": " + translateType(type)
+
+    initializer?.let {
+        if (it.kind.value == "@@DEFINED_EXTERNALLY") {
+            res += " = definedExternally"
+
+            it.meta?.let { meta ->
+                res += " /* ${meta} */"
+            }
+
         }
     }
 
-    if (params.size == 1) {
-        return params[0]
-    } else {
-        return null
-    }
+    return res
 }
-
-
-private fun lowerNullableType(node: VariableDeclaration, type: TypeDeclaration): TypeDeclaration {
-    val nullableType = findNullableType(type)
-
-    if (nullableType != null) {
-        return TypeDeclaration(
-                nullableType.value + "?",
-                nullableType.params.map { lowerNullableType(node, it.copy()) }.toTypedArray()
-        )
-    } else {
-        return type.duplicate() as TypeDeclaration
-    }
-}
-
-private fun lowerNullable(node: DocumentRoot): DocumentRoot {
-
-    val loweredDeclarations = node.declarations.map { declaration ->
-        when (declaration) {
-            is VariableDeclaration -> VariableDeclaration(declaration.name, lowerNullableType(declaration, declaration.type))
-            else -> declaration.duplicate() as Declaration
-        }
-    }
-
-    return node.copy(declarations = loweredDeclarations)
-}
-
 
 fun compile(documentRoot: DocumentRoot): String {
     var docRoot = lowerNativeArray(documentRoot)
@@ -100,7 +73,9 @@ fun compile(documentRoot: DocumentRoot): String {
             res.add("export var ${declaration.name}: ${translateType(declaration.type)}")
         } else if (child is FunctionDeclaration) {
             val declaration = child
-            val params = declaration.parameters.map { it.name + ": " + translateType(it.type) }.joinToString(", ")
+            val params = declaration.parameters
+                    .map(ParameterDeclaration::toStringRepresentation)
+                    .joinToString(", ")
             val returnType = translateType(child.type)
             res.add("external fun ${declaration.name}(${params}): ${returnType} = definedExternally")
         }

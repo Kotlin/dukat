@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.Declaration
-import org.jetbrains.dukat.ast.DocumentRoot
-import org.jetbrains.dukat.ast.FunctionDeclaration
-import org.jetbrains.dukat.ast.ParameterDeclaration
-import org.jetbrains.dukat.ast.TypeDeclaration
-import org.jetbrains.dukat.ast.VariableDeclaration
-import org.jetbrains.dukat.ast.duplicate
+import org.jetbrains.dukat.ast.model.Declaration
+import org.jetbrains.dukat.ast.model.DocumentRoot
+import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.duplicate
 
 private fun lowerType(type: TypeDeclaration): TypeDeclaration {
     return when (type.value) {
@@ -20,16 +20,16 @@ private fun lowerType(type: TypeDeclaration): TypeDeclaration {
 }
 
 private fun lowerType(parameters: Array<ParameterDeclaration>): Array<ParameterDeclaration> {
-    return parameters.map { parameter ->
-        ParameterDeclaration(parameter.name, lowerType(parameter.type))
-    }.toTypedArray()
+    return parameters.map { parameter -> parameter.copy(type = lowerType(parameter.type))}.toTypedArray()
 }
 
 fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> VariableDeclaration(declaration.name, lowerType(declaration.type))
-            is FunctionDeclaration -> FunctionDeclaration(declaration.name, lowerType(declaration.parameters.toTypedArray()), lowerType(declaration.type))
+            is FunctionDeclaration ->
+                FunctionDeclaration(
+                        declaration.name, lowerType(declaration.parameters.toTypedArray()), lowerType(declaration.type))
             else -> declaration.duplicate() as Declaration
         }
     }

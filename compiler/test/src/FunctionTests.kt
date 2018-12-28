@@ -37,13 +37,18 @@ class FunctionTests {
 
         assertEquals(
                 compile(fileNameSource, translator),
-                fileNameTarget.readText()
+                fileNameTarget.readText().trimEnd()
         )
     }
 
     @Test
     fun testFunctions() {
         assertContentEquals("functions")
+    }
+
+    @Test
+    fun testFunctionsWithDefaultArguments() {
+        assertContentEquals("functionsWithDefaultArguments")
     }
 
 }

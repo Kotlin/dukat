@@ -4,9 +4,10 @@ import com.eclipsesource.v8.Releasable
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.jetbrains.dukat.ast.AstNode
-import org.jetbrains.dukat.ast.ParameterDeclaration
-import org.jetbrains.dukat.ast.TypeDeclaration
+import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.toAst
 
 private fun V8Object.toMap(): Map<String, Any?> = V8ObjectUtils.toMap(this)
@@ -28,6 +29,9 @@ private fun V8Array.toArray(): Array<Map<String, Any?>> {
 }
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
+
+    fun createExpression(kind: V8Object, meta: String) = astFactory.createExpresson(kind.toAst() as TypeDeclaration, meta)
+
     fun declareVariable(name: String, type: V8Object): V8Object = astFactory.declareVariable(name, type.toAst() as TypeDeclaration)
 
     fun createFunctionDeclaration(name: String, parameters: V8Array, type: V8Object): V8Object {
@@ -44,9 +48,13 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
     fun createTypeDeclaration(value: String) = astFactory.createTypeDeclaration(value)
 
-    fun createGenericTypeDeclaration(value: String, params: V8Array) = astFactory.createGenericTypeDeclaration(value, params.toArray().map {type -> type.toAst() as TypeDeclaration}.toTypedArray())
+    fun createGenericTypeDeclaration(value: String, params: V8Array) = astFactory.createGenericTypeDeclaration(value, params.toArray().map {type -> type.toAst() as TypeDeclaration }.toTypedArray())
 
-    fun createParameterDeclaration(name: String, type: V8Object) = astFactory.createParameterDeclaration(name, type.toAst() as TypeDeclaration)
+    fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?) =
+            astFactory.createParameterDeclaration(
+                    name, type.toAst() as TypeDeclaration,
+                    if (initializer == null) null else initializer.toAst() as Expression
+            )
 
     fun createDocumentRoot(declarations: V8Array) =
             astFactory.createDocumentRoot(declarations.toArray().map(Map<String, Any?>::toAst).toTypedArray())
