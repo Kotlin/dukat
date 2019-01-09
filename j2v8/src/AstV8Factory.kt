@@ -30,7 +30,7 @@ private fun V8Array.toArray(): Array<Map<String, Any?>> {
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
-    fun createExpression(kind: V8Object, meta: String) = astFactory.createExpresson(kind.toAst() as TypeDeclaration, meta)
+    fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst() as TypeDeclaration, meta)
 
     fun declareVariable(name: String, type: V8Object): V8Object = astFactory.declareVariable(name, type.toAst() as TypeDeclaration)
 
@@ -46,9 +46,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
     }
 
 
-    fun createTypeDeclaration(value: String) = astFactory.createTypeDeclaration(value)
-
-    fun createGenericTypeDeclaration(value: String, params: V8Array) = astFactory.createGenericTypeDeclaration(value, params.toArray().map {type -> type.toAst() as TypeDeclaration }.toTypedArray())
+    fun createTypeDeclaration(value: String, params: V8Array) = astFactory.createTypeDeclaration(value, params.toArray().map { type -> type.toAst() as TypeDeclaration }.toTypedArray())
 
     fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?) =
             astFactory.createParameterDeclaration(

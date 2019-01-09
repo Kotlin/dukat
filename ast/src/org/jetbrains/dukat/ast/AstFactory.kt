@@ -12,13 +12,11 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 class AstFactory: AstNodeFactory<AstNode> {
     override fun declareVariable(name: String, type: TypeDeclaration) = VariableDeclaration(name, type)
 
-    override fun createExpresson(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
+    override fun createExpression(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
 
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration) = FunctionDeclaration(name, parameters, type)
 
-    override fun createTypeDeclaration(value: String) = TypeDeclaration(value, arrayOf())
-
-    override fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>) = TypeDeclaration(value, params)
+    override fun createTypeDeclaration(value: String, params: Array<TypeDeclaration>) = TypeDeclaration(value, params)
 
     override fun createParameterDeclaration(name: String, type: TypeDeclaration, initializer: Expression?)
             = ParameterDeclaration(name, type, initializer)

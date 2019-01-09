@@ -14,6 +14,7 @@ class FunctionTests {
 
         init {
             translator = createV8Translator()
+//            translator = createNashornTranslator()
         }
 
         @BeforeClass

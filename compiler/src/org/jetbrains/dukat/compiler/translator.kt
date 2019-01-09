@@ -19,7 +19,7 @@ fun createNashornInterop(resolver: ContentResolver): InteropNashorn {
     engine.eval("var global = this; var Set = Java.type('org.jetbrains.dukat.nashorn.Set');")
 
     engine.eval(resolver("tsserverlibrary.js"))
-    engine.eval(resolver("converter.js"))
+    engine.eval(resolver("dukat-ast-builder.js"))
 
     return engine
 }
@@ -29,7 +29,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
     val interopRuntime = InteropV8()
 
     interopRuntime.eval(resolver("tsserverlibrary.js"))
-    interopRuntime.eval(resolver("converter.js"))
+    interopRuntime.eval(resolver("dukat-ast-builder.js"))
 
     interopRuntime.proxy(System.out).method("println", InteropV8Signature.STRING)
     interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
@@ -37,8 +37,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
     interopRuntime
             .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
             .method("createExpression", InteropV8Signature.V8OBJECT, InteropV8Signature.STRING)
-            .method("createTypeDeclaration", InteropV8Signature.STRING)
-            .method("createGenericTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
+            .method("createTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
             .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
@@ -55,7 +54,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
 fun prodResourceResolver(fileName: String): String {
     val fileNameResolved = when (fileName) {
         "tsserverlibrary.js" -> "../ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "converter.js" -> "../ts/build/ts/converter.js"
+        "dukat-ast-builder.js" -> "../ts/build/ts/dukat-ast-builder.js"
         else -> fileName
     }
 
@@ -65,7 +64,7 @@ fun prodResourceResolver(fileName: String): String {
 fun localResourceResolver(fileName: String): String {
     val fileNameResolved = when (fileName) {
         "tsserverlibrary.js" -> "ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "converter.js" -> "ts/build/ts/converter.js"
+        "dukat-ast-builder.js" -> "../ts/build/ts/dukat-ast-builder.js"
         else -> fileName
     }
 

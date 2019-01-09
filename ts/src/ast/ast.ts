@@ -1,46 +1,51 @@
-
 declare interface AstNode {
 }
 
 
-declare interface Declaration extends AstNode {}
+declare interface Declaration extends AstNode {
+}
 
 declare class VariableDeclaration implements Declaration {
-  name: String;
-  type: TypeDeclaration;
+    name: String;
+    type: TypeDeclaration;
 }
 
 declare class Expression implements Declaration {
-  kind: TypeDeclaration;
-  meta: String;
+    kind: TypeDeclaration;
+    meta: String;
 }
 
 declare class ParameterDeclaration implements Declaration {
-  name: String;
-  type: TypeDeclaration
+    name: String;
+    type: TypeDeclaration
 }
 
 declare class DocumentRoot implements AstNode {
-  declarations: Declaration[]
+    declarations: Declaration[]
 }
 
 declare class AstTree {
-  root: DocumentRoot
+    root: DocumentRoot
 }
 
 
 declare class TypeDeclaration {
-  constructor(value: string)
+    constructor(value: string)
 }
 
-declare class FunctionDeclaration {}
+declare class FunctionDeclaration {
+}
 
-declare class AstFactory {
-  createExpression(kind: TypeDeclaration, meta: String): Expression;
-  declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null): ParameterDeclaration;
-  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
-  createTypeDeclaration(value: string): TypeDeclaration;
-  createGenericTypeDeclaration(value: string, params: Array<TypeDeclaration>): TypeDeclaration;
-  createDocumentRoot(declarations: Declaration[]): DocumentRoot;
+declare interface AstFactory {
+    createExpression(kind: TypeDeclaration, meta: String): Expression;
+
+    declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
+
+    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null): ParameterDeclaration;
+
+    createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
+
+    createTypeDeclaration(value: string, params: Array<TypeDeclaration>): TypeDeclaration;
+
+    createDocumentRoot(declarations: Declaration[]): DocumentRoot;
 }

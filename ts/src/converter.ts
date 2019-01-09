@@ -1,15 +1,13 @@
 /// <reference path="../node_modules/typescript/lib/typescriptServices.d.ts"/>
 /// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
-
-
 if (typeof ts == "undefined") {
   (global as any).ts = require("typescript/lib/tsserverlibrary");
 }
 
 declare function print(...arg: any[]): void;
 declare function println(arg: String): void;
-declare class AstFactoryV8 extends AstFactory {}
+
 declare class FileResolverV8 implements FileResolver {
   resolve(fileName: string): string;
 }
@@ -22,77 +20,18 @@ if (typeof console == "undefined") {
   }
 }
 
-import fromString = ts.ScriptSnapshot.fromString;
 
 interface FileResolver {
   resolve(fileName: string): string;
 }
 
-class SomeLanguageServiceHost implements ts.LanguageServiceHost {
-
-  constructor(
-    public fileResolver: FileResolver,
-    private knownFiles = new Set<string>(),
-    private currentDirectory: string = "",
-  ) {
-  }
-
-  getCompilationSettings(): ts.CompilerOptions {
-    return ts.getDefaultCompilerOptions();
-  }
-
-  getScriptFileNames(): string[] {
-    var res: string[] = [];
-
-    this.knownFiles.forEach((v1, v2, s) => {
-      let item = v1;
-      res.push(item);
-    });
-
-    return res;
-  }
-
-  getScriptVersion(fileName: string): string {
-    return "0";
-  }
-
-  getDefaultLibFileName(options: ts.CompilerOptions): string {
-    return "";
-  }
-
-  getCurrentDirectory(): string {
-    return this.currentDirectory;
-  }
-
-  getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
-    var contents = this.fileResolver.resolve(fileName);
-    return fromString(contents);
-  }
-
-  log(message: string): void {
-    console.log(message);
-  }
-
-  register(knownFile: string) {
-    this.knownFiles.add(knownFile);
-  }
-}
-
-function createUnionType(astFactory: AstFactory, params: Array<TypeDeclaration>) {
-  return astFactory.createGenericTypeDeclaration("@@Union",params);
-}
-
-function createNullableType(astFactory: AstFactory, type: TypeDeclaration) {
-  return createUnionType(astFactory, [type, astFactory.createTypeDeclaration("null")])
-}
-
-function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
+function resolveType(astFactory: TypescriptAstFactory, type: ts.TypeNode | undefined) : TypeDeclaration {
   if (type == undefined) {
     return astFactory.createTypeDeclaration("Unit")
   } else {
     if (ts.isArrayTypeNode(type)) {
       let arrayType = type as ts.ArrayTypeNode;
-      return astFactory.createGenericTypeDeclaration("@@ArraySugar", [
+      return astFactory.createTypeDeclaration("@@ArraySugar", [
         resolveType(astFactory, arrayType.elementType)
       ] as Array<TypeDeclaration>)
     } else {
@@ -101,14 +40,14 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
         let params = unionTypeNode.types
                       .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
 
-        return createUnionType(astFactory, params)
+        return astFactory.createUnionType(params)
       } else if (type.kind == ts.SyntaxKind.TypeReference) {
         let typeReferenceNode = type as ts.TypeReferenceNode;
         if (typeof typeReferenceNode.typeArguments != "undefined") {
             let params = typeReferenceNode.typeArguments
               .map(argumentType => resolveType(astFactory, argumentType)) as Array<TypeDeclaration>;
 
-            return astFactory.createGenericTypeDeclaration(typeReferenceNode.typeName.getText(), params)
+            return astFactory.createTypeDeclaration(typeReferenceNode.typeName.getText(), params)
         } else {
             return astFactory.createTypeDeclaration(typeReferenceNode.typeName.getText())
         }
@@ -135,7 +74,7 @@ function resolveType(astFactory: AstFactory, type: ts.TypeNode | undefined) : Ty
 }
 
 
-function createParamDeclaration(astFactory: AstFactory, param: ts.ParameterDeclaration) : ParameterDeclaration {
+function createParamDeclaration(astFactory: TypescriptAstFactory, param: ts.ParameterDeclaration) : ParameterDeclaration {
 
   let initializer = null;
   if (param.initializer != null) {
@@ -154,16 +93,16 @@ function createParamDeclaration(astFactory: AstFactory, param: ts.ParameterDecla
 
   return astFactory.createParameterDeclaration(
       param.name.getText(),
-      param.questionToken ? createNullableType(astFactory, paramType) : paramType,
+      param.questionToken ? astFactory.createNullableType(paramType) : paramType,
       initializer
   )
 }
 
-function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
+function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
 
-  if (astFactory == null) {
-    astFactory = new AstFactoryV8();
-  }
+  let astFactory: TypescriptAstFactory = nativeAstFactory == null ?
+              new TypescriptAstFactory(new AstFactoryV8()) : new TypescriptAstFactory(nativeAstFactory);
+
 
   if (fileResolver == null) {
     fileResolver = new FileResolverV8();
@@ -172,7 +111,8 @@ function main(astFactory: AstFactory, fileResolver: FileResolver, fileName: stri
 
   let documentRegistry = ts.createDocumentRegistry();
 
-  let host= new SomeLanguageServiceHost(fileResolver);
+
+  let host= new DukatLanguageServiceHost(fileResolver);
   host.register(fileName);
 
   let languageService = ts.createLanguageService(host, documentRegistry);

@@ -13,7 +13,7 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
 
-    override fun createExpresson(kind: TypeDeclaration, meta: String?) = toV8(astFactory.createExpresson(kind, meta))
+    override fun createExpression(kind: TypeDeclaration, meta: String?) = toV8(astFactory.createExpression(kind, meta))
 
     override fun declareVariable(name: String, type: TypeDeclaration)
         = toV8(astFactory.declareVariable(name, type))
@@ -21,10 +21,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: TypeDeclaration)
         = toV8(astFactory.createFunctionDeclaration(name, parameters, type))
 
-    override fun createTypeDeclaration(value: String) = toV8(astFactory.createTypeDeclaration(value))
-
-    override fun createGenericTypeDeclaration(value: String, params: Array<TypeDeclaration>)
-        = toV8(astFactory.createGenericTypeDeclaration(value, params))
+    override fun createTypeDeclaration(value: String, params: Array<TypeDeclaration>)
+        = toV8(astFactory.createTypeDeclaration(value, params))
 
     override fun createParameterDeclaration(name: String, type: TypeDeclaration, initializer: Expression?)
         = toV8(astFactory.createParameterDeclaration(name, type, initializer))
