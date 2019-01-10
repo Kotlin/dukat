@@ -23,6 +23,9 @@ fun translateType(declaration: ParameterValue): String {
             }
             res.add("<" + paramsList.joinToString(", ") + ">")
         }
+        if (declaration.nullable) {
+            res.add("?")
+        }
         return res.joinToString("")
     } else if (declaration is FunctionTypeDeclaration){
         val res = mutableListOf("(")

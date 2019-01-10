@@ -40,7 +40,7 @@ private fun ParameterDeclaration.lowerType() : ParameterDeclaration {
 fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
-            is VariableDeclaration -> VariableDeclaration(declaration.name, declaration.type.lowerType() as TypeDeclaration)
+            is VariableDeclaration -> VariableDeclaration(declaration.name, declaration.type.lowerType())
             is FunctionDeclaration ->
                 declaration.copy(
                         parameters = declaration.parameters.map { param -> param.lowerType() },

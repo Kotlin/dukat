@@ -33,9 +33,9 @@ private fun ParameterValue.lowerNullableType(): ParameterValue {
 
     copyNullableType()?.let { parameterValue ->
         if (parameterValue is TypeDeclaration) {
-            return TypeDeclaration(
-                    parameterValue.value + "?",
-                    parameterValue.params.map { it.lowerNullableType()}.toTypedArray()
+            return parameterValue.copy(
+                params = parameterValue.params.map { it.lowerNullableType()},
+                nullable = true
             )
         } else if (parameterValue is FunctionTypeDeclaration) {
             return parameterValue.copy(nullable = true)        }
