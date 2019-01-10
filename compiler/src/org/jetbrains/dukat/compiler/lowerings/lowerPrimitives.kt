@@ -10,19 +10,19 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 
-private fun lower(value: String): TypeDeclaration? {
+private fun TypeDeclaration.lowerType(): TypeDeclaration {
     return when(value) {
-        "any" -> TypeDeclaration("Any", arrayOf())
-        "boolean" -> TypeDeclaration("Boolean", arrayOf())
-        "string" -> TypeDeclaration("String", arrayOf())
-        "number" -> TypeDeclaration("Number", arrayOf())
-        else -> null
+        "any" -> copy(value = "Any")
+        "boolean" -> copy(value = "Boolean")
+        "string" -> copy(value = "String")
+        "number" -> copy(value = "Number")
+        else -> copy()
     }
 }
 
 private fun ParameterValue.lowerType() : ParameterValue {
     if (this is TypeDeclaration) {
-        return  lower(value) ?: copy()
+        return  lowerType()
     } else if (this is FunctionTypeDeclaration) {
         return copy(
             parameters = parameters.map { param -> param.lowerType() },
@@ -37,25 +37,15 @@ private fun ParameterDeclaration.lowerType() : ParameterDeclaration {
    return copy(type = type.lowerType())
 }
 
-private fun FunctionDeclaration.lowerParamsType() : List<ParameterDeclaration> {
-    return parameters.map { parameter ->
-        if (parameter is ParameterDeclaration) {
-            parameter.lowerType()
-        } else {
-            throw Exception("can not lower primitivies for unknown param type ${parameter}")
-        }
-    }
-}
-
 fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> VariableDeclaration(declaration.name, declaration.type.lowerType() as TypeDeclaration)
             is FunctionDeclaration ->
-                FunctionDeclaration(
-                        declaration.name, declaration.lowerParamsType(), if (declaration.type is TypeDeclaration) {
-                    (declaration.type as TypeDeclaration).lowerType()
-                } else {throw Exception("can not lowe primitive ${declaration}")})
+                declaration.copy(
+                        parameters = declaration.parameters.map { param -> param.lowerType() },
+                        type = declaration.type.lowerType()
+                    )
             else -> declaration.duplicate()
         }
     }
