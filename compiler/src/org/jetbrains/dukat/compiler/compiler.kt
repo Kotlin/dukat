@@ -3,23 +3,44 @@ package org.jetbrains.dukat.compiler
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 
-fun translateType(declaration: TypeDeclaration): String {
-    val res = mutableListOf<String>(declaration.value)
-    if (declaration.isGeneric()) {
-        val paramsList = mutableListOf<String>()
-        for (param in declaration.params) {
-            paramsList.add(translateType(param))
+fun translateType(declaration: ParameterValue): String {
+
+    if (declaration is TypeDeclaration) {
+        val res = mutableListOf(declaration.value)
+        if (declaration.isGeneric()) {
+            val paramsList = mutableListOf<String>()
+            for (param in declaration.params) {
+                paramsList.add(translateType(param))
+            }
+            res.add("<" + paramsList.joinToString(", ") + ">")
         }
-        res.add("<" + paramsList.joinToString(", ") + ">")
+        return res.joinToString("")
+    } else if (declaration is FunctionTypeDeclaration){
+        val res = mutableListOf("(")
+        val paramsList = mutableListOf<String>()
+        for (param in declaration.parameters) {
+            paramsList.add(param.name + ": " + translateType(param.type))
+//            paramsList.add(param.toString())
+        }
+        res.add(paramsList.joinToString(", ") + ")")
+        res.add(" -> ${translateType(declaration.type)}")
+        var translated =  res.joinToString("")
+        if (declaration.nullable) {
+            translated = "(${translated})?"
+        }
+        return translated
+    } else {
+      throw Exception("failed to translateType ${declaration}")
     }
-    return res.joinToString("")
 }
 
 fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
@@ -33,7 +54,7 @@ fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
                     declaration.copy()
                 }
             }
-            else -> declaration.duplicate() as Declaration
+            else -> declaration.duplicate<Declaration>()
         }
     }
 
@@ -44,20 +65,25 @@ fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
 
 
 private fun ParameterDeclaration.toStringRepresentation(): String {
-    var res = name + ": " + translateType(type)
 
-    initializer?.let {
-        if (it.kind.value == "@@DEFINED_EXTERNALLY") {
-            res += " = definedExternally"
+    if (this is ParameterDeclaration) {
+        var res = name + ": " + translateType(type)
 
-            it.meta?.let { meta ->
-                res += " /* ${meta} */"
+        initializer?.let {
+            if (it.kind.value == "@@DEFINED_EXTERNALLY") {
+                res += " = definedExternally"
+
+                it.meta?.let { meta ->
+                    res += " /* ${meta} */"
+                }
+
             }
-
         }
-    }
 
-    return res
+        return res
+    } else {
+        throw Exception("unknown parameter declaration")
+    }
 }
 
 fun compile(documentRoot: DocumentRoot): String {

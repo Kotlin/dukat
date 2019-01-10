@@ -15,9 +15,11 @@ declare class Expression implements Declaration {
     meta: String;
 }
 
-declare class ParameterDeclaration implements Declaration {
-    name: String;
-    type: TypeDeclaration
+declare interface ParameterValue extends Declaration {}
+
+declare class ParameterDeclaration {
+  name: String;
+  type: ParameterValue;
 }
 
 declare class DocumentRoot implements AstNode {
@@ -29,23 +31,11 @@ declare class AstTree {
 }
 
 
-declare class TypeDeclaration {
-    constructor(value: string)
+declare class TypeDeclaration implements ParameterValue {
+    constructor(value: string, params: Array<ParameterValue>);
 }
 
 declare class FunctionDeclaration {
 }
 
-declare interface AstFactory {
-    createExpression(kind: TypeDeclaration, meta: String): Expression;
-
-    declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
-
-    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null): ParameterDeclaration;
-
-    createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration): FunctionDeclaration;
-
-    createTypeDeclaration(value: string, params: Array<TypeDeclaration>): TypeDeclaration;
-
-    createDocumentRoot(declarations: Declaration[]): DocumentRoot;
-}
+declare class FunctionTypeDeclaration implements ParameterValue {}

@@ -1,55 +1,73 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
-private fun findNullableType(type: TypeDeclaration): TypeDeclaration? {
-    if (type.value != "@@Union") {
-        return null
-    }
+private fun ParameterValue.copyNullableType(): ParameterValue? {
+    if (this is TypeDeclaration) {
+        if (value != "@@Union") {
+            return null
+        }
 
-    val params = type.params.filter {
-        when (it.value) {
-            "undefined" -> false
-            "null" -> false
-            else -> true
+        val params = params.filter { param ->
+            param != TypeDeclaration("undefined", emptyList()) &&
+                  param != TypeDeclaration("null", emptyList())
+        }
+
+        if (params.size == 1) {
+            val nullableType = params[0]
+            return nullableType.duplicate()
         }
     }
 
-    if (params.size == 1) {
-        return params[0]
-    } else {
-        return null
-    }
+    return null
 }
 
-private fun lowerNullableType(type: TypeDeclaration): TypeDeclaration {
-    val nullableType = findNullableType(type)
+private fun ParameterValue.lowerNullableType(): ParameterValue {
 
-    if (nullableType != null) {
-        return TypeDeclaration(
-                nullableType.value + "?",
-                nullableType.params.map { lowerNullableType(it.copy()) }.toTypedArray()
-        )
-    } else {
-        return type.duplicate() as TypeDeclaration
+    copyNullableType()?.let { parameterValue ->
+        if (parameterValue is TypeDeclaration) {
+            return TypeDeclaration(
+                    parameterValue.value + "?",
+                    parameterValue.params.map { it.lowerNullableType()}.toTypedArray()
+            )
+        } else if (parameterValue is FunctionTypeDeclaration) {
+            return parameterValue.copy(nullable = true)        }
     }
+
+    return duplicate()
 }
 
+
+private fun ParameterDeclaration.lowerNullableType() : ParameterDeclaration {
+    if (type is TypeDeclaration) {
+        return copy(type = (type as TypeDeclaration).lowerNullableType())
+    } else if (type is FunctionTypeDeclaration) {
+        return duplicate()
+    } else {
+        throw Exception("can not lower nullables for unknown param type ${type}")
+    }
+}
 
 fun lowerNullable(node: DocumentRoot): DocumentRoot {
 
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
-            is VariableDeclaration -> declaration.copy(type = lowerNullableType(declaration.type))
-            is FunctionDeclaration -> declaration.copy(parameters = declaration.parameters.map { param ->
-                param.copy(type = lowerNullableType(param.type))
+            is VariableDeclaration -> declaration.copy(type = declaration.type.lowerNullableType() as TypeDeclaration)
+            is FunctionDeclaration -> declaration.copy(parameters = declaration.parameters.map { parameter ->
+                if (parameter is ParameterDeclaration) {
+                    parameter.lowerNullableType()
+                } else {
+                    throw Exception("can not lower nullables for unknown param type ${parameter}")
+                }
             })
-            else -> declaration.duplicate() as Declaration
+            else -> declaration.duplicate()
         }
     }
 

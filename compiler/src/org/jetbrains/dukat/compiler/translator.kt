@@ -41,6 +41,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
             .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
+            .method("createFunctionTypeDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createDocumentRoot", InteropV8Signature.V8ARRAY)
 
     interopRuntime
@@ -64,7 +65,7 @@ fun prodResourceResolver(fileName: String): String {
 fun localResourceResolver(fileName: String): String {
     val fileNameResolved = when (fileName) {
         "tsserverlibrary.js" -> "ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "dukat-ast-builder.js" -> "../ts/build/ts/dukat-ast-builder.js"
+        "dukat-ast-builder.js" -> "ts/build/ts/dukat-ast-builder.js"
         else -> fileName
     }
 
@@ -75,7 +76,7 @@ fun localResourceResolver(fileName: String): String {
 fun createV8TranslatorFactory(interop: InteropEngine): (fileName: String) -> DocumentRoot {
     return { fileName ->
         val result = interop.callFunction<V8Object>("main", null, null, fileName)
-        (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst() as DocumentRoot
+        (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
     }
 }
 
@@ -95,7 +96,7 @@ class TranslatorV8(private val engine: InteropV8) : Translator {
 
     override fun translateFile(fileName: String): DocumentRoot {
         val result = engine.callFunction<V8Object>("main", null, null, fileName)
-        return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst() as DocumentRoot
+        return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
     }
 
     override fun release() {
@@ -121,10 +122,11 @@ fun createNashornTranslator(resolver: ContentResolver = ::prodResourceResolver)
 fun createTranslator() = createNashornTranslator(::prodResourceResolver)
 
 fun main() {
-    val v8Translator = createV8Translator(::localResourceResolver)
+    val translator = createV8Translator(::localResourceResolver)
+//    val translator = createNashornTranslator(::localResourceResolver)
 
-    val astTree = v8Translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
+    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
 
     println(compile(astTree))
-    v8Translator.release()
+    translator.release()
 }

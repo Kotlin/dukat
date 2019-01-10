@@ -1,17 +1,25 @@
 package org.jetbrains.dukat.ast
 
+import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 
-private fun Map<String, Any?>.parameterDeclarationToAst() : ParameterDeclaration {
+@Suppress("UNCHECKED_CAST")
+private fun Map<String, Any?>.getEntity(key: String) = get(key) as Map<String, Any?>?
 
-    val initializer = get("initializer")?.let {
-        val expression = (it as Map<String, Any?>).toAst()
+@Suppress("UNCHECKED_CAST")
+private fun Map<String, Any?>.getEntitiesList(key: String) = get(key) as List<Map<String, Any?>>
+
+private fun Map<String, Any?>.getInitializerExpression(): Expression? {
+    return getEntity("initializer")?.let {
+        val expression = (it as Map<String, Any?>).toAst<Declaration>()
 
         if (expression is Expression) {
             if (expression.kind.value == "@@DEFINED_EXTERNALLY") {
@@ -19,20 +27,22 @@ private fun Map<String, Any?>.parameterDeclarationToAst() : ParameterDeclaration
             } else throw Exception("unkown initializer")
         } else null
     }
-
-    return ParameterDeclaration(
-            get("name") as String,
-            (get("type") as Map<String, Any>).toAst() as TypeDeclaration,
-            initializer
-    )
 }
 
-fun Map<String, Any?>.toAst(): Declaration {
+private fun Map<String, Any?>.parameterDeclarationToAst() =
+        ParameterDeclaration(
+                get("name") as String,
+                (getEntity("type"))!!.toAst(),
+                getInitializerExpression()
+        )
+
+@Suppress("UNCHECKED_CAST")
+fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = AstReflectionType.valueOf(get("reflection") as String)
     val res: Declaration
     if (reflectionType == AstReflectionType.EXPRESSION_DECLARATION) {
         res = Expression(
-                (get("kind") as Map<String, Any?>).toAst() as TypeDeclaration,
+                (getEntity("kind"))!!.toAst(),
                 get("meta") as String
         )
     } else if (reflectionType == AstReflectionType.TYPE_DECLARATION) {
@@ -40,25 +50,30 @@ fun Map<String, Any?>.toAst(): Declaration {
             get("value") as String
         } else {
             throw Exception("failed to create type declaration from ${this}")
-        }, (get("params") as List<Map<String, Any?>>).map { it.toAst() as TypeDeclaration })
+        }, getEntitiesList("params").map { it.toAst<ParameterValue>() })
     } else if (reflectionType == AstReflectionType.FUNCTION_DECLARATION) {
         res = FunctionDeclaration(
                 get("name") as String,
-                (get("parameters") as List<Map<String, Any?>>).map { it.toAst() as ParameterDeclaration },
-                (get("type") as Map<String, Any?>).toAst() as TypeDeclaration
+                getEntitiesList("parameters").map { it.toAst<ParameterDeclaration>() },
+                getEntity("type")!!.toAst<ParameterValue>()
         )
-    } else if (reflectionType == AstReflectionType.PARAMETER_DECLARATION) {
+    } else if (reflectionType == AstReflectionType.FUNCTION_TYPE_DECLARATION) {
+        res = FunctionTypeDeclaration(
+                getEntitiesList("parameters").map { it.toAst<ParameterDeclaration>() },
+                getEntity("type")!!.toAst()
+        )
+    } else if (reflectionType == AstReflectionType.PARAM_TYPE_DECLARATION) {
         res = parameterDeclarationToAst()
     } else if (reflectionType == AstReflectionType.VARIABLE_DECLARATION) {
-        res = VariableDeclaration(get("name") as String, (get("type") as Map<String, Any>).toAst() as TypeDeclaration)
+        res = VariableDeclaration(get("name") as String, getEntity("type")!!.toAst())
     } else if (reflectionType == AstReflectionType.DOCUMENT_ROOT) {
-        res = DocumentRoot((get("declarations") as List<Map<String, Any?>>).map {
-            it.toAst()
+        res = DocumentRoot(getEntitiesList("declarations").map {
+            it.toAst<Declaration>()
         })
     } else {
         println(this.get("reflection"))
         throw Exception("failed to create declaration from mapper: ${this}")
     }
 
-    return res
+    return res as T
 }

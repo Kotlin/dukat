@@ -111,7 +111,6 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
 
   let documentRegistry = ts.createDocumentRegistry();
 
-
   let host= new DukatLanguageServiceHost(fileResolver);
   host.register(fileName);
 
@@ -134,7 +133,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
 
             declarations.push(astFactory.declareVariable(
               declaration.name.getText(),
-              resolveType(astFactory, declaration.type)
+              astFactory.resolveType(declaration.type)
             ));
           }
         } else if (ts.isClassDeclaration(statement)) {
@@ -150,7 +149,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
           const functionDeclaration = statement as ts.FunctionDeclaration;
 
           let parameterDeclarations = functionDeclaration.parameters.map(
-              param => createParamDeclaration(astFactory, param)
+              param => astFactory.createParamDeclaration(param)
           );
 
           if (functionDeclaration.name != null) {
@@ -158,7 +157,8 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
               astFactory.createFunctionDeclaration(
                 functionDeclaration.name.escapedText.toString(),
                 parameterDeclarations,
-                resolveType(astFactory, functionDeclaration.type)
+                  functionDeclaration.type ?
+                    astFactory.resolveType(functionDeclaration.type) : astFactory.createTypeDeclaration("Unit")
               )
             )
           }

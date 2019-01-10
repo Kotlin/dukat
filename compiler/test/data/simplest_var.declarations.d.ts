@@ -3,6 +3,11 @@ declare function foo2(a: number): void;
 declare function foo3(b: number): string;
 declare function foo3(c: number, d: string): string;
 
+declare function foofun(a: () => void): void;
+declare function foofun2(a: (n: number) => void): void;
+
+declare function foofun3(f?: (a) => boolean): boolean;
+
 declare class Foo {
   constructor();
 }

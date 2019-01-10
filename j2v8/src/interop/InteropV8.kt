@@ -40,6 +40,7 @@ class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, Int
         return res
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> callFunction(name: String, vararg params: Any?): T {
         val result = runtime.executeFunction(name, createParams(*params)) as T
 

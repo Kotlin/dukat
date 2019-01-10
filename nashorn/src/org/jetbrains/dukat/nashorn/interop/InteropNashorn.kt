@@ -12,6 +12,7 @@ class InteropNashorn : InteropEngine {
         myEngine.eval(script)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> callFunction(name: String, vararg params: Any?): T {
         val invocable = myEngine as Invocable
         return invocable.invokeFunction(name, *params) as T

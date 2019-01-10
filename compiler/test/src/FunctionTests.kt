@@ -1,7 +1,6 @@
 import org.jetbrains.dukat.compiler.Translator
 import org.jetbrains.dukat.compiler.compile
 import org.jetbrains.dukat.compiler.createV8Translator
-import org.junit.BeforeClass
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,16 +16,6 @@ class FunctionTests {
 //            translator = createNashornTranslator()
         }
 
-        @BeforeClass
-        @JvmStatic
-        fun setup() {
-        }
-
-        @BeforeClass
-        @JvmStatic
-        fun teardown() {
-            //translator.release()
-        }
     }
 
 
@@ -51,5 +40,11 @@ class FunctionTests {
     fun testFunctionsWithDefaultArguments() {
         assertContentEquals("functionsWithDefaultArguments")
     }
+
+    @Test
+    fun functionsWithOptionalFunctionType() {
+        assertContentEquals("functionsWithOptionalFunctionType")
+    }
+
 
 }
