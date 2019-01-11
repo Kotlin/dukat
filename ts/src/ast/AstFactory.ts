@@ -14,7 +14,7 @@ declare interface AstFactory {
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
 
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
-    createTypeParam(name: string): TypeParameter;
+    createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 
     createDocumentRoot(declarations: Declaration[]): DocumentRoot;
 }

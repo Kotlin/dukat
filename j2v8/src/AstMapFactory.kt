@@ -26,5 +26,5 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
 
     override fun createDocumentRoot(declarations: Array<Declaration>) = astFactory.createDocumentRoot(declarations).astToMap()
 
-    override fun createTypeParam(name: String) = astFactory.createTypeParam(name).astToMap()
+    override fun createTypeParam(name: String, constraints: Array<ParameterValue>) = astFactory.createTypeParam(name, constraints).astToMap()
 }

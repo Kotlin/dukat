@@ -9,7 +9,12 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 private fun FunctionDeclaration.lowerNativeArray(): FunctionDeclaration {
-    return copy(parameters = parameters.map { parameter -> parameter.copy(type = parameter.type.lowerNativeArray()) })
+    return copy(
+        parameters = parameters.map { parameter -> parameter.copy(type = parameter.type.lowerNativeArray()) },
+        typeParameters = typeParameters.map {typeParameter ->
+                            typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> constraint.lowerNativeArray() })
+                        }
+    )
 }
 
 private fun List<ParameterValue>.lowerNativeArray() = map { param -> param.lowerNativeArray() }

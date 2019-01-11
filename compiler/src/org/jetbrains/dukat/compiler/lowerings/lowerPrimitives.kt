@@ -46,7 +46,10 @@ fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
             is FunctionDeclaration ->
                 declaration.copy(
                         parameters = declaration.parameters.map { param -> param.lowerType() },
-                        type = declaration.type.lowerType()
+                        type = declaration.type.lowerType(),
+                        typeParameters = declaration.typeParameters.map {typeParameter ->
+                            typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> constraint.lowerType() })
+                        }
                     )
             else -> declaration.duplicate()
         }

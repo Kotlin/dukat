@@ -36,5 +36,5 @@ class AstFactory: AstNodeFactory<AstNode> {
 
     override fun createDocumentRoot(declarations: Array<Declaration>) = DocumentRoot(declarations)
 
-    override fun createTypeParam(name: String) = TypeParameter(name)
+    override fun createTypeParam(name: String, constraints: Array<ParameterValue>) = TypeParameter(name, constraints)
 }

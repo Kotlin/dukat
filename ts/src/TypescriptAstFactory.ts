@@ -43,8 +43,8 @@ class TypescriptAstFactory implements AstFactory {
         return this.createTypeDeclaration("@@Vararg", [type]);
     }
 
-    createTypeParam(name: string): TypeParameter {
-        return this.astFactory.createTypeParam(name);
+    createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter {
+        return this.astFactory.createTypeParam(name, constraints);
     }
 
 

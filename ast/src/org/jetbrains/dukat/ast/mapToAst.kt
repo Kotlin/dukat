@@ -76,7 +76,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
             it.toAst<Declaration>()
         })
     } else if (reflectionType == AstReflectionType.TYPE_PARAM) {
-        res = TypeParameter(get("name") as String)
+        res = TypeParameter(get("name") as String, mapEntities("constraints") { it.toAst<ParameterValue>() })
     } else {
         println(this.get("reflection"))
         throw Exception("failed to create declaration from mapper: ${this}")

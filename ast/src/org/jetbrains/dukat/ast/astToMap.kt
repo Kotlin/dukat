@@ -28,7 +28,11 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
-        is TypeParameter -> mapOf("reflection" to AstReflectionType.TYPE_PARAM.toString(), "name" to name)
+        is TypeParameter -> mapOf(
+                "reflection" to AstReflectionType.TYPE_PARAM.toString(),
+                "name" to name,
+                "constraints" to constraints.map(AstNode::astToMap)
+        )
         is TypeDeclaration -> mapOf("reflection" to AstReflectionType.TYPE_DECLARATION.toString(), "value" to value, "params" to params.map(AstNode::astToMap))
         is VariableDeclaration -> mapOf("reflection" to AstReflectionType.VARIABLE_DECLARATION.toString(), "name" to name, "type" to type.astToMap())
         is ParameterDeclaration -> toMap()

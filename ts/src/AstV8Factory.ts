@@ -6,5 +6,5 @@ declare class AstFactoryV8 implements AstFactory {
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
     declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
-    createTypeParam(name: string): TypeParameter;
+    createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 }

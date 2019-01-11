@@ -68,5 +68,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
     fun createDocumentRoot(declarations: V8Array) =
             astFactory.createDocumentRoot(declarations.toArray().map{declaration -> declaration.toAst<Declaration>()}.toTypedArray())
 
-    fun createTypeParam(name: String) = astFactory.createTypeParam(name)
+    fun createTypeParam(name: String, constraints: V8Array) = astFactory
+            .createTypeParam(name, constraints.toArray()
+            .map { constraint -> constraint.toAst<ParameterValue>()}.toTypedArray())
 }

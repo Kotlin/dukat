@@ -150,9 +150,12 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
 
           let typeParameterDeclarations: Array<TypeParameter> = [];
           if (functionDeclaration.typeParameters) {
-            typeParameterDeclarations = functionDeclaration.typeParameters.map(typeParam =>
-                astFactory.createTypeParam(typeParam.name.getText())
-            );
+            typeParameterDeclarations = functionDeclaration.typeParameters.map(typeParam => {
+              const constraint = typeParam.constraint;
+              return astFactory.createTypeParam(typeParam.name.getText(), constraint ? [
+                  astFactory.resolveType(constraint)
+              ] : [])
+            });
           }
 
           let parameterDeclarations = functionDeclaration.parameters.map(

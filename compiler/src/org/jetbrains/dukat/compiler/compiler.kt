@@ -94,7 +94,14 @@ fun compile(documentRoot: DocumentRoot): String {
                     if (child.typeParameters.isEmpty()) {
                         ""
                     } else {
-                        " <" + child.typeParameters.map { typeParameter -> typeParameter.name }.joinToString(", ") + ">"
+                        " <" + child.typeParameters.map { typeParameter ->
+                            val constraintDescription = if (typeParameter.constraints.isEmpty()) {
+                                ""
+                            } else {
+                                " : ${translateType(typeParameter.constraints[0])}"
+                            }
+                            typeParameter.name + constraintDescription
+                        }.joinToString(", ") + ">"
                     }
             res.add("external fun${typeParams} ${declaration.name}(${params}): ${returnType} = definedExternally")
         }
