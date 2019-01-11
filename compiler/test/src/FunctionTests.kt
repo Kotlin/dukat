@@ -33,32 +33,32 @@ class FunctionTests {
 
     @Test
     fun testFunctions() {
-        assertContentEquals("functions")
+        assertContentEquals("topLevelMembers/functions/functions")
     }
 
     @Test
     fun testFunctionsWithDefaultArguments() {
-        assertContentEquals("functionsWithDefaultArguments")
+        assertContentEquals("topLevelMembers/functions/functionsWithDefaultArguments")
     }
 
     @Test
     fun functionsWithOptionalFunctionType() {
-        assertContentEquals("functionsWithOptionalFunctionType")
+        assertContentEquals("topLevelMembers/functions/functionsWithOptionalFunctionType")
     }
 
     @Test
     fun functionsWithOptionalParameter() {
-        assertContentEquals("functionsWithOptionalParameter")
+        assertContentEquals("topLevelMembers/functions/functionsWithOptionalParameter")
     }
 
     @Test
     fun functionsWithOptionalParameter2() {
-        assertContentEquals("functionsWithOptionalParameter")
+        assertContentEquals("topLevelMembers/functions/functionsWithOptionalParameter")
     }
 
     @Test
     fun functionsWithVararg() {
-        assertContentEquals("functionsWithVararg")
+        assertContentEquals("topLevelMembers/functions/functionsWithVararg")
     }
 
 }
