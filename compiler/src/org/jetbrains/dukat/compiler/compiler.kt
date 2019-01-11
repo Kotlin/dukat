@@ -82,14 +82,21 @@ fun compile(documentRoot: DocumentRoot): String {
     for (child in docRoot.declarations) {
         if (child is VariableDeclaration) {
             val declaration = child
-            res.add("export var ${declaration.name}: ${translateType(declaration.type)}")
+            res.add("external var ${declaration.name}: ${translateType(declaration.type)} = definedExternally")
         } else if (child is FunctionDeclaration) {
             val declaration = child
             val params = declaration.parameters
                     .map(ParameterDeclaration::toStringRepresentation)
                     .joinToString(", ")
             val returnType = translateType(child.type)
-            res.add("external fun ${declaration.name}(${params}): ${returnType} = definedExternally")
+
+            val typeParams =
+                    if (child.typeParameters.isEmpty()) {
+                        ""
+                    } else {
+                        " <" + child.typeParameters.map { typeParameter -> typeParameter.name }.joinToString(", ") + ">"
+                    }
+            res.add("external fun${typeParams} ${declaration.name}(${params}): ${returnType} = definedExternally")
         }
     }
 

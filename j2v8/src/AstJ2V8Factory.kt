@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.TypeParameter
 
 class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFactory<Map<String, Any?>> = AstMapFactory()) : AstNodeFactory<V8Object> {
 
@@ -19,8 +20,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun declareVariable(name: String, type: TypeDeclaration)
         = toV8(astFactory.declareVariable(name, type))
 
-    override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue)
-        = toV8(astFactory.createFunctionDeclaration(name, parameters, type))
+    override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>)
+        = toV8(astFactory.createFunctionDeclaration(name, parameters, type, typeParameters))
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue)
         = toV8(astFactory.createFunctionTypeDeclaration(parameters, type))
@@ -33,4 +34,6 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     override fun createDocumentRoot(declarations: Array<Declaration>)
         = toV8(astFactory.createDocumentRoot(declarations))
+
+    override fun createTypeParam(name: String) = toV8(astFactory.createTypeParam(name))
 }

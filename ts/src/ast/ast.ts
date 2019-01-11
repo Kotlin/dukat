@@ -27,7 +27,12 @@ declare class DocumentRoot implements AstNode {
 }
 
 declare class AstTree {
-    root: DocumentRoot
+    root: DocumentRoot;
+}
+
+
+declare class TypeParameter {
+    name: String;
 }
 
 

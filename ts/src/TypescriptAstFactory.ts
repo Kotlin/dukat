@@ -11,8 +11,8 @@ class TypescriptAstFactory implements AstFactory {
         return this.astFactory.createExpression(kind, meta);
     }
 
-    createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionDeclaration {
-        return this.astFactory.createFunctionDeclaration(name, parameters, type);
+    createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration {
+        return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams);
     }
 
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration {
@@ -42,6 +42,11 @@ class TypescriptAstFactory implements AstFactory {
     createVarargType(type: ParameterValue) : ParameterValue {
         return this.createTypeDeclaration("@@Vararg", [type]);
     }
+
+    createTypeParam(name: string): TypeParameter {
+        return this.astFactory.createTypeParam(name);
+    }
+
 
     resolveType(type: ts.TypeNode | undefined) : ParameterValue {
         if (type == undefined) {

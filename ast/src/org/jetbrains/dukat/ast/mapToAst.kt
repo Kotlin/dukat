@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 
 @Suppress("UNCHECKED_CAST")
@@ -16,6 +17,9 @@ private fun Map<String, Any?>.getEntity(key: String) = get(key) as Map<String, A
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getEntitiesList(key: String) = get(key) as List<Map<String, Any?>>
+
+private fun <T:Declaration> Map<String, Any?>.mapEntities(key: String, mapper: (Map<String, Any?>) -> T) =
+        getEntitiesList(key).map(mapper)
 
 private fun Map<String, Any?>.getInitializerExpression(): Expression? {
     return getEntity("initializer")?.let {
@@ -50,16 +54,17 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
             get("value") as String
         } else {
             throw Exception("failed to create type declaration from ${this}")
-        }, getEntitiesList("params").map { it.toAst<ParameterValue>() })
+        }, mapEntities("params") { it.toAst<ParameterValue>() })
     } else if (reflectionType == AstReflectionType.FUNCTION_DECLARATION) {
         res = FunctionDeclaration(
                 get("name") as String,
-                getEntitiesList("parameters").map { it.toAst<ParameterDeclaration>() },
-                getEntity("type")!!.toAst<ParameterValue>()
+                mapEntities("parameters") { it.toAst<ParameterDeclaration>() },
+                getEntity("type")!!.toAst(),
+                mapEntities("typeParameters") { it.toAst<TypeParameter>() }
         )
     } else if (reflectionType == AstReflectionType.FUNCTION_TYPE_DECLARATION) {
         res = FunctionTypeDeclaration(
-                getEntitiesList("parameters").map { it.toAst<ParameterDeclaration>() },
+                mapEntities("parameters") { it.toAst<ParameterDeclaration>() },
                 getEntity("type")!!.toAst()
         )
     } else if (reflectionType == AstReflectionType.PARAM_TYPE_DECLARATION) {
@@ -67,9 +72,11 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
     } else if (reflectionType == AstReflectionType.VARIABLE_DECLARATION) {
         res = VariableDeclaration(get("name") as String, getEntity("type")!!.toAst())
     } else if (reflectionType == AstReflectionType.DOCUMENT_ROOT) {
-        res = DocumentRoot(getEntitiesList("declarations").map {
+        res = DocumentRoot(mapEntities("declarations") {
             it.toAst<Declaration>()
         })
+    } else if (reflectionType == AstReflectionType.TYPE_PARAM) {
+        res = TypeParameter(get("name") as String)
     } else {
         println(this.get("reflection"))
         throw Exception("failed to create declaration from mapper: ${this}")

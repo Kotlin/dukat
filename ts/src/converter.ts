@@ -148,6 +148,13 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
         } else if (ts.isFunctionDeclaration(statement)) {
           const functionDeclaration = statement as ts.FunctionDeclaration;
 
+          let typeParameterDeclarations: Array<TypeParameter> = [];
+          if (functionDeclaration.typeParameters) {
+            typeParameterDeclarations = functionDeclaration.typeParameters.map(typeParam =>
+                astFactory.createTypeParam(typeParam.name.getText())
+            );
+          }
+
           let parameterDeclarations = functionDeclaration.parameters.map(
               param => astFactory.createParamDeclaration(param)
           );
@@ -158,7 +165,8 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                 functionDeclaration.name.escapedText.toString(),
                 parameterDeclarations,
                   functionDeclaration.type ?
-                    astFactory.resolveType(functionDeclaration.type) : astFactory.createTypeDeclaration("Unit")
+                    astFactory.resolveType(functionDeclaration.type) : astFactory.createTypeDeclaration("Unit"),
+                typeParameterDeclarations
               )
             )
           }

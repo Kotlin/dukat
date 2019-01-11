@@ -5,10 +5,16 @@ declare interface AstFactory {
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
 
-    createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionDeclaration;
+    createFunctionDeclaration(
+        name: string,
+        parameters: Array<ParameterDeclaration>,
+        type: ParameterValue,
+        typeParams: Array<TypeParameter>
+    ): FunctionDeclaration;
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
 
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
+    createTypeParam(name: string): TypeParameter;
 
     createDocumentRoot(declarations: Declaration[]): DocumentRoot;
 }
