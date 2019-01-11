@@ -3,6 +3,6 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(FunctionTests::class)
-class DukatTestSuite {
+class MinimalTestSuite {
 
 }

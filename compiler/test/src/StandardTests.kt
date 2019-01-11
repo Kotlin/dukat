@@ -4,7 +4,7 @@ import org.jetbrains.dukat.compiler.createV8Translator
 import java.io.File
 import kotlin.test.assertEquals
 
-open class DukatTests {
+open class StandardTests {
     companion object {
         val translator: Translator
 

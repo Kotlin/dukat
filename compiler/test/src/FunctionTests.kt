@@ -1,7 +1,7 @@
 import kotlin.test.Test
 
 
-class FunctionTests : DukatTests() {
+class FunctionTests : StandardTests() {
     @Test
     fun testFunctions() {
         assertContentEquals("topLevelMembers/functions/functions")
