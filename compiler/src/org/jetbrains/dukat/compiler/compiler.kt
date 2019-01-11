@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
@@ -8,9 +7,10 @@ import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
-import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
+import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
 fun translateType(declaration: ParameterValue): String {
 
@@ -27,50 +27,32 @@ fun translateType(declaration: ParameterValue): String {
             res.add("?")
         }
         return res.joinToString("")
-    } else if (declaration is FunctionTypeDeclaration){
+    } else if (declaration is FunctionTypeDeclaration) {
         val res = mutableListOf("(")
         val paramsList = mutableListOf<String>()
         for (param in declaration.parameters) {
             paramsList.add(param.name + ": " + translateType(param.type))
-//            paramsList.add(param.toString())
         }
         res.add(paramsList.joinToString(", ") + ")")
         res.add(" -> ${translateType(declaration.type)}")
-        var translated =  res.joinToString("")
+        var translated = res.joinToString("")
         if (declaration.nullable) {
             translated = "(${translated})?"
         }
         return translated
     } else {
-      throw Exception("failed to translateType ${declaration}")
+        throw Exception("failed to translateType ${declaration}")
     }
 }
-
-fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
-
-    val loweredDeclarations = node.declarations.map { declaration ->
-        when (declaration) {
-            is VariableDeclaration -> {
-                if (declaration.type.value == "@@ArraySugar") {
-                    VariableDeclaration(declaration.name, TypeDeclaration("Array", declaration.type.params))
-                } else {
-                    declaration.copy()
-                }
-            }
-            else -> declaration.duplicate<Declaration>()
-        }
-    }
-
-
-    return node.copy(declarations = loweredDeclarations)
-}
-
 
 
 private fun ParameterDeclaration.toStringRepresentation(): String {
 
     if (this is ParameterDeclaration) {
         var res = name + ": " + translateType(type)
+        if (type.vararg) {
+            res = "vararg $res"
+        }
 
         initializer?.let {
             if (it.kind.value == "@@DEFINED_EXTERNALLY") {
@@ -93,6 +75,7 @@ fun compile(documentRoot: DocumentRoot): String {
     var docRoot = lowerNativeArray(documentRoot)
     docRoot = lowerNullable(docRoot)
     docRoot = lowerPrimitives(docRoot)
+    docRoot = lowerVarargs(docRoot)
 
     val res = mutableListOf<String>()
 

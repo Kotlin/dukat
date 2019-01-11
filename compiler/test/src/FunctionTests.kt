@@ -51,4 +51,14 @@ class FunctionTests {
         assertContentEquals("functionsWithOptionalParameter")
     }
 
+    @Test
+    fun functionsWithOptionalParameter2() {
+        assertContentEquals("functionsWithOptionalParameter")
+    }
+
+    @Test
+    fun functionsWithVararg() {
+        assertContentEquals("functionsWithVararg")
+    }
+
 }

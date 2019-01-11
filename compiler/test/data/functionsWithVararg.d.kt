@@ -1,5 +1,3 @@
-package functionsWithVararg
-
 external fun withVarargWithoutTypeAnnotation(vararg a: Any): Unit = definedExternally
 external fun withVarargAny(vararg a: Any): Any = definedExternally
 external fun withVarargNumber(vararg s: Number): String = definedExternally

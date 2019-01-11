@@ -35,10 +35,13 @@ class TypescriptAstFactory implements AstFactory {
         return this.createTypeDeclaration("@@Union", params);
     }
 
-    createNullableType(type: TypeDeclaration) {
+    createNullableType(type: TypeDeclaration) : ParameterValue {
         return this.createUnionType([type, this.createTypeDeclaration("null")])
     }
 
+    createVarargType(type: ParameterValue) : ParameterValue {
+        return this.createTypeDeclaration("@@Vararg", [type]);
+    }
 
     resolveType(type: ts.TypeNode | undefined) : ParameterValue {
         if (type == undefined) {
@@ -111,10 +114,16 @@ class TypescriptAstFactory implements AstFactory {
         }
 
         let paramType = this.resolveType(param.type);
+        if (param.questionToken) {
+            paramType = this.createNullableType(paramType);
+        }
+        if (param.dotDotDotToken) {
+            paramType = this.createVarargType(paramType);
+        }
 
         return this.createParameterDeclaration(
             param.name.getText(),
-            param.questionToken ? this.createNullableType(paramType) : paramType,
+            paramType,
             initializer
         )
     }

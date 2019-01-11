@@ -1,3 +1,5 @@
 package org.jetbrains.dukat.ast.model
 
-interface ParameterValue : Declaration
+interface ParameterValue : Declaration {
+    val vararg: Boolean
+}

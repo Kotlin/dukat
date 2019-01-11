@@ -10,13 +10,15 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 
+private fun List<ParameterValue>.lowerType() = map { param -> param.lowerType() }
+
 private fun TypeDeclaration.lowerType(): TypeDeclaration {
     return when(value) {
-        "any" -> copy(value = "Any")
-        "boolean" -> copy(value = "Boolean")
-        "string" -> copy(value = "String")
-        "number" -> copy(value = "Number")
-        else -> copy()
+        "any" -> copy(value = "Any", params = params.lowerType())
+        "boolean" -> copy(value = "Boolean", params = params.lowerType())
+        "string" -> copy(value = "String", params = params.lowerType())
+        "number" -> copy(value = "Number", params = params.lowerType())
+        else -> copy(params = params.lowerType())
     }
 }
 
