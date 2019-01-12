@@ -14,7 +14,7 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
     override fun createExpression(kind: TypeDeclaration, meta: String?) = astFactory.createExpression(kind, meta).astToMap()
 
-    override fun declareVariable(name: String, type: TypeDeclaration) = astFactory.declareVariable(name, type).astToMap()
+    override fun declareVariable(name: String, type: ParameterValue) = astFactory.declareVariable(name, type).astToMap()
 
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>): Map<String, Any?> = astFactory.createFunctionDeclaration(name, parameters, type, typeParameters).astToMap()
 

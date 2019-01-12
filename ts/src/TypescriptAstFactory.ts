@@ -27,7 +27,7 @@ class TypescriptAstFactory implements AstFactory {
         return this.astFactory.createParameterDeclaration(name, type, initializer);
     }
 
-    declareVariable(value: string, type: TypeDeclaration): VariableDeclaration {
+    declareVariable(value: string, type: ParameterValue): VariableDeclaration {
         return this.astFactory.declareVariable(value, type);
     }
 

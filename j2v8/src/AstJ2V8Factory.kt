@@ -17,7 +17,7 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = toV8(astFactory.createExpression(kind, meta))
 
-    override fun declareVariable(name: String, type: TypeDeclaration)
+    override fun declareVariable(name: String, type: ParameterValue)
         = toV8(astFactory.declareVariable(name, type))
 
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>)

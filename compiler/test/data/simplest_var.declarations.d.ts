@@ -1,3 +1,9 @@
+var a = 10;
+declare var withOptionalArguments: (num?: number, s?: string) => boolean;
+declare var withoutArguments: () => void;
+declare var withOneArgument: (withOutType) => string;
+declare var withManyArguments: (num: number, s: string, a: any) => boolean;
+
 declare function withoutArgumentsReturnsT<T>(): T;
 declare function withOneT<T>(a: T): any;
 declare function returnsT<T>(s: string): T;

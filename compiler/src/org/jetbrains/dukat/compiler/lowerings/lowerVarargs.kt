@@ -50,7 +50,7 @@ fun lowerVarargs(node: DocumentRoot): DocumentRoot {
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> {
-                declaration.copy(type = declaration.type.lowerVarargs() as TypeDeclaration)
+                declaration.copy(type = declaration.type.lowerVarargs())
             }
             is FunctionDeclaration -> {
                 declaration.copy(parameters = declaration.parameters.map {param -> param.copy(type = param.type.lowerVarargs())})

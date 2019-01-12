@@ -38,7 +38,7 @@ fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
     val loweredDeclarations = node.declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> {
-                declaration.copy(type = declaration.type.lowerNativeArray() as TypeDeclaration)
+                declaration.copy(type = declaration.type.lowerNativeArray() )
             }
             is FunctionDeclaration -> {
                 declaration.lowerNativeArray()

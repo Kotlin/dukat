@@ -129,12 +129,15 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
         if (ts.isVariableStatement(statement)) {
           const variableStatment = statement as ts.VariableStatement;
 
-          for (let declaration of variableStatment.declarationList.declarations) {
+          const hasModifiers = variableStatment.modifiers != undefined;
 
-            declarations.push(astFactory.declareVariable(
-              declaration.name.getText(),
-              astFactory.resolveType(declaration.type)
-            ));
+          if (hasModifiers) {
+            for (let declaration of variableStatment.declarationList.declarations) {
+              declarations.push(astFactory.declareVariable(
+                  declaration.name.getText(),
+                  astFactory.resolveType(declaration.type)
+              ));
+            }
           }
         } else if (ts.isClassDeclaration(statement)) {
           const classDeclaration = statement as ts.ClassDeclaration;

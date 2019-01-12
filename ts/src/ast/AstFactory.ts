@@ -1,7 +1,7 @@
 declare interface AstFactory {
     createExpression(kind: TypeDeclaration, meta: String): Expression;
 
-    declareVariable(value: string, type: TypeDeclaration): VariableDeclaration;
+    declareVariable(value: string, type: ParameterValue): VariableDeclaration;
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
 

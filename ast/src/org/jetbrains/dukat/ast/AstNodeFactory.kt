@@ -9,7 +9,7 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 
 interface AstNodeFactory<T> {
     fun createExpression(kind: TypeDeclaration, meta: String?): T
-    fun declareVariable(name: String, type: TypeDeclaration): T
+    fun declareVariable(name: String, type: ParameterValue): T
     fun createFunctionDeclaration(
             name: String, parameters:
             Array<ParameterDeclaration>,

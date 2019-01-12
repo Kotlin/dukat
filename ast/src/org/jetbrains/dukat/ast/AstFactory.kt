@@ -14,7 +14,7 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 
 class AstFactory: AstNodeFactory<AstNode> {
 
-    override fun declareVariable(name: String, type: TypeDeclaration) = VariableDeclaration(name, type)
+    override fun declareVariable(name: String, type: ParameterValue) = VariableDeclaration(name, type)
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
 

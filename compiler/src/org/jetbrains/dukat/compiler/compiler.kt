@@ -31,7 +31,11 @@ fun translateType(declaration: ParameterValue): String {
         val res = mutableListOf("(")
         val paramsList = mutableListOf<String>()
         for (param in declaration.parameters) {
-            paramsList.add(param.name + ": " + translateType(param.type))
+            var paramSerializerd = param.name + ": " + translateType(param.type)
+            if (param.type.nullable) {
+                paramSerializerd += " /*= null*/"
+            }
+            paramsList.add(paramSerializerd)
         }
         res.add(paramsList.joinToString(", ") + ")")
         res.add(" -> ${translateType(declaration.type)}")
@@ -47,28 +51,23 @@ fun translateType(declaration: ParameterValue): String {
 
 
 private fun ParameterDeclaration.toStringRepresentation(): String {
-
-    if (this is ParameterDeclaration) {
-        var res = name + ": " + translateType(type)
-        if (type.vararg) {
-            res = "vararg $res"
-        }
-
-        initializer?.let {
-            if (it.kind.value == "@@DEFINED_EXTERNALLY") {
-                res += " = definedExternally"
-
-                it.meta?.let { meta ->
-                    res += " /* ${meta} */"
-                }
-
-            }
-        }
-
-        return res
-    } else {
-        throw Exception("unknown parameter declaration")
+    var res = name + ": " + translateType(type)
+    if (type.vararg) {
+        res = "vararg $res"
     }
+
+    initializer?.let {
+        if (it.kind.value == "@@DEFINED_EXTERNALLY") {
+            res += " = definedExternally"
+
+            it.meta?.let { meta ->
+                res += " /* ${meta} */"
+            }
+
+        }
+    }
+
+    return res
 }
 
 fun compile(documentRoot: DocumentRoot): String {
