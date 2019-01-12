@@ -3,6 +3,8 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-    TopLevelMembersSuite::class
+        FunctionTests::class,
+        GenericsTests::class,
+        VariablesTests::class
 )
 class TopLevelMembersSuite
