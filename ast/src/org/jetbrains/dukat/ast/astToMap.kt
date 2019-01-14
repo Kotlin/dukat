@@ -1,10 +1,12 @@
 package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
@@ -28,6 +30,18 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
+        is ClassDeclaration -> mapOf(
+                "reflection" to AstReflectionType.CLASS_DECLARATION.toString(),
+                "name" to name,
+                "members" to members.map(AstNode::astToMap),
+                "typeParameters" to typeParameters.map(AstNode::astToMap)
+        )
+        is InterfaceDeclaration -> mapOf(
+                "reflection" to AstReflectionType.INTERFACE_DECLARATION.toString(),
+                "name" to name,
+                "members" to members.map(AstNode::astToMap),
+                "typeParameters" to typeParameters.map(AstNode::astToMap)
+        )
         is TypeParameter -> mapOf(
                 "reflection" to AstReflectionType.TYPE_PARAM.toString(),
                 "name" to name,

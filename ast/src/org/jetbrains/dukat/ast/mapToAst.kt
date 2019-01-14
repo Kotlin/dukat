@@ -1,11 +1,14 @@
 package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -23,7 +26,7 @@ private fun <T:Declaration> Map<String, Any?>.mapEntities(key: String, mapper: (
 
 private fun Map<String, Any?>.getInitializerExpression(): Expression? {
     return getEntity("initializer")?.let {
-        val expression = (it as Map<String, Any?>).toAst<Declaration>()
+        val expression = it.toAst<Declaration>()
 
         if (expression is Expression) {
             if (expression.kind.value == "@@DEFINED_EXTERNALLY") {
@@ -77,6 +80,18 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         })
     } else if (reflectionType == AstReflectionType.TYPE_PARAM) {
         res = TypeParameter(get("name") as String, mapEntities("constraints") { it.toAst<ParameterValue>() })
+    } else if (reflectionType == AstReflectionType.CLASS_DECLARATION) {
+        res = ClassDeclaration(
+                get("name") as String,
+                mapEntities("members") {it.toAst<MemberDeclaration>()},
+                mapEntities("typeParameters") {it.toAst<TypeParameter>()}
+        )
+    } else if (reflectionType == AstReflectionType.INTERFACE_DECLARATION) {
+        res = InterfaceDeclaration(
+                get("name") as String,
+                mapEntities("members") {it.toAst<MemberDeclaration>()},
+                mapEntities("typeParameters") {it.toAst<TypeParameter>()}
+        )
     } else {
         println(this.get("reflection"))
         throw Exception("failed to create declaration from mapper: ${this}")

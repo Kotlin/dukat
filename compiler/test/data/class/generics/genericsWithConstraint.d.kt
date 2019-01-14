@@ -1,5 +1,3 @@
-package genericsWithConstraint
-
 external open class Foo<T : Bar> {
     open var varT: T = definedExternally
     open fun withoutArgumentsReturnsT(): T = definedExternally

@@ -1,4 +1,7 @@
 declare interface AstFactory {
+    createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): ClassDeclaration;
+    createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): InterfaceDeclaration;
+
     createExpression(kind: TypeDeclaration, meta: String): Expression;
 
     declareVariable(value: string, type: ParameterValue): VariableDeclaration;

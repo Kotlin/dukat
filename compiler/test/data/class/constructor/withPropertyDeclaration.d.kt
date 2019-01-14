@@ -1,5 +1,3 @@
-package withPropertyDeclaration
-
 external open class Foo(x: Any) {
     open var x: Any = definedExternally
 }

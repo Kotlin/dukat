@@ -2,12 +2,15 @@ package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 
 interface AstNodeFactory<T> {
+    fun createClassDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>): T
+    fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>): T
     fun createExpression(kind: TypeDeclaration, meta: String?): T
     fun declareVariable(name: String, type: ParameterValue): T
     fun createFunctionDeclaration(

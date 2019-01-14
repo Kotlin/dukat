@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -15,6 +17,9 @@ private fun FunctionDeclaration.lowerNativeArray(): FunctionDeclaration {
                             typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> constraint.lowerNativeArray() })
                         }
     )
+}
+private fun VariableDeclaration.lowerNativeArray() : VariableDeclaration {
+    return copy(type = type.lowerNativeArray())
 }
 
 private fun List<ParameterValue>.lowerNativeArray() = map { param -> param.lowerNativeArray() }
@@ -33,9 +38,19 @@ private fun ParameterValue.lowerNativeArray(): ParameterValue {
     }
 }
 
-fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
+private fun MemberDeclaration.lowerNativeArray() : MemberDeclaration {
+    if (this is FunctionDeclaration) {
+        return lowerNativeArray()
+    } else if (this is VariableDeclaration) {
+        return lowerNativeArray()
+    } else {
+        throw Exception("can not lower member declaration ${this}")
+    }
+}
 
-    val loweredDeclarations = node.declarations.map { declaration ->
+fun DocumentRoot.lowerNativeArray(): DocumentRoot {
+
+    val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> {
                 declaration.copy(type = declaration.type.lowerNativeArray() )
@@ -43,10 +58,16 @@ fun lowerNativeArray(node: DocumentRoot): DocumentRoot {
             is FunctionDeclaration -> {
                 declaration.lowerNativeArray()
             }
+            is ClassDeclaration -> {
+                declaration.copy(
+                        members = declaration.members.map { member -> member.lowerNativeArray() },
+                        primaryConstructor = declaration.primaryConstructor?.lowerNativeArray()
+                    )
+            }
             else -> declaration.duplicate()
         }
     }
 
 
-    return node.copy(declarations = loweredDeclarations)
+    return copy(declarations = loweredDeclarations)
 }

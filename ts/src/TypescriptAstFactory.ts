@@ -7,8 +7,67 @@ class TypescriptAstFactory implements AstFactory {
         return this.astFactory.createDocumentRoot(declarations);
     }
 
+    createClassDeclaration(name: String, members: Array<MemberDeclaration> = [], typeParams: Array<TypeParameter> = []): ClassDeclaration {
+        return this.astFactory.createClassDeclaration(name, members, typeParams);
+    }
+
+    createInterfaceDeclaration(name: String, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): InterfaceDeclaration {
+        return this.astFactory.createInterfaceDeclaration(name, members, typeParams);
+    }
+
+
     createExpression(kind: TypeDeclaration, meta: String): Expression {
         return this.astFactory.createExpression(kind, meta);
+    }
+
+
+    convertVariable(nativeVariableDeclaration: ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration) : VariableDeclaration | null {
+
+        if (ts.isNumericLiteral(nativeVariableDeclaration.name)) {
+            return this.astFactory.declareVariable(
+                "`" + nativeVariableDeclaration.name.getText() + "`",
+                this.resolveType(nativeVariableDeclaration.type)
+            );
+        } else if (ts.isIdentifier(nativeVariableDeclaration.name)) {
+            return this.astFactory.declareVariable(
+                nativeVariableDeclaration.name.getText(),
+                this.resolveType(nativeVariableDeclaration.type)
+            );
+        }
+
+        return null;
+    }
+
+    convertTypeParams(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<TypeParameter> {
+        let typeParameterDeclarations: Array<TypeParameter> = [];
+
+        if (nativeTypeDeclarations) {
+            typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
+                const constraint = typeParam.constraint;
+                return this.createTypeParam(typeParam.name.getText(), constraint ? [
+                    this.resolveType(constraint)
+                ] : [])
+            });
+        }
+
+        return typeParameterDeclarations;
+    }
+
+    convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : FunctionDeclaration  {
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
+
+        let parameterDeclarations = functionDeclaration.parameters
+            .map(
+            param => this.createParamDeclaration(param)
+            );
+
+        return this.createFunctionDeclaration(
+            functionDeclaration.name ? functionDeclaration.name.getText() : "",
+            parameterDeclarations,
+            functionDeclaration.type ?
+                this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+            typeParameterDeclarations
+        )
     }
 
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration {

@@ -5,7 +5,15 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
-declare class VariableDeclaration implements Declaration {
+declare interface MemberDeclaration extends Declaration {}
+
+declare class ClassDeclaration implements Declaration {
+    name: String;
+}
+
+declare class InterfaceDeclaration implements Declaration {}
+
+declare class VariableDeclaration implements MemberDeclaration {
     name: String;
     type: TypeDeclaration;
 }
@@ -40,7 +48,6 @@ declare class TypeDeclaration implements ParameterValue {
     constructor(value: string, params: Array<ParameterValue>);
 }
 
-declare class FunctionDeclaration {
-}
+declare class FunctionDeclaration implements MemberDeclaration {}
 
 declare class FunctionTypeDeclaration implements ParameterValue {}

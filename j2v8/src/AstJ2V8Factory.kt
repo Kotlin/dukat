@@ -6,6 +6,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.AstNodeFactory
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -14,6 +15,19 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFactory<Map<String, Any?>> = AstMapFactory()) : AstNodeFactory<V8Object> {
 
     fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
+
+    override fun createClassDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>
+    )
+        = toV8(astFactory.createClassDeclaration(name, members, typeParameters))
+
+    override fun createInterfaceDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>
+    ) = toV8(astFactory.createInterfaceDeclaration(name, members, typeParameters))
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = toV8(astFactory.createExpression(kind, meta))
 

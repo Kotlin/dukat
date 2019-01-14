@@ -1,5 +1,3 @@
-package withNumberAsName
-
 external interface IBar
 external open class Foo {
     open var `200`: String = definedExternally

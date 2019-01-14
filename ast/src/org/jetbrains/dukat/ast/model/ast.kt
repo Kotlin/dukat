@@ -3,8 +3,10 @@ package org.jetbrains.dukat.ast.model
 fun TypeDeclaration.isGeneric() = params.isNotEmpty()
 
 @Suppress("UNCHECKED_CAST")
-fun <T:AstNode> AstNode.duplicate(): T {
+fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
+        is ClassDeclaration -> copy() as T
+        is InterfaceDeclaration -> copy() as T
         is VariableDeclaration -> copy() as T
         is FunctionDeclaration -> copy() as T
         is TypeDeclaration -> copy() as T

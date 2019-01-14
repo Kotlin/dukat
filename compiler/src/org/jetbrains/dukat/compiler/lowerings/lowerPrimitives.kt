@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.compiler
 
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -39,8 +41,31 @@ private fun ParameterDeclaration.lowerType() : ParameterDeclaration {
    return copy(type = type.lowerType())
 }
 
-fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
-    val loweredDeclarations = node.declarations.map { declaration ->
+private fun FunctionDeclaration.lowerType() : FunctionDeclaration {
+    return copy(
+            parameters = parameters.map { param -> param.lowerType() },
+            type = type.lowerType()
+    )
+}
+
+private fun VariableDeclaration.lowerType() : VariableDeclaration {
+    return copy(
+            type = type.lowerType()
+    )
+}
+
+private fun MemberDeclaration.lowerType() : MemberDeclaration {
+    if (this is FunctionDeclaration) {
+        return lowerType()
+    } else if (this is VariableDeclaration) {
+        return lowerType()
+    } else {
+        throw Exception("can not lower type for ${this}")
+    }
+}
+
+fun DocumentRoot.lowerPrimitives(): DocumentRoot {
+    val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> VariableDeclaration(declaration.name, declaration.type.lowerType())
             is FunctionDeclaration ->
@@ -51,9 +76,14 @@ fun lowerPrimitives(node: DocumentRoot): DocumentRoot {
                             typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> constraint.lowerType() })
                         }
                     )
+            is ClassDeclaration ->
+                    declaration.copy(
+                            members = declaration.members.map { declaration -> declaration.lowerType() },
+                            primaryConstructor = declaration.primaryConstructor?.lowerType()
+                    )
             else -> declaration.duplicate()
         }
     }
 
-    return node.copy(declarations = loweredDeclarations)
+    return copy(declarations = loweredDeclarations)
 }

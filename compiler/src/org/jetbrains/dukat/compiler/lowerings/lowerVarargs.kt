@@ -1,14 +1,16 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
-private fun ParameterValue.extractVarargType() : ParameterValue? {
+private fun ParameterValue.extractVarargType(): ParameterValue? {
     if (this is TypeDeclaration) {
         if (value == "Array") {
             return params[0]
@@ -44,20 +46,33 @@ private fun ParameterValue.lowerVarargs(): ParameterValue {
     }
 }
 
+private fun MemberDeclaration.lowerVarargs(): MemberDeclaration {
+    if (this is FunctionDeclaration) {
+        return copy(parameters = parameters.map { param -> param.copy(type = param.type.lowerVarargs()) })
+    } else if (this is VariableDeclaration) {
+        return copy(type = type.lowerVarargs())
+    } else {
+        throw Exception("failed to lowerVarargs for ${this}")
+    }
+}
 
-fun lowerVarargs(node: DocumentRoot): DocumentRoot {
+fun DocumentRoot.lowerVarargs(): DocumentRoot {
 
-    val loweredDeclarations = node.declarations.map { declaration ->
+    val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> {
                 declaration.copy(type = declaration.type.lowerVarargs())
             }
             is FunctionDeclaration -> {
-                declaration.copy(parameters = declaration.parameters.map {param -> param.copy(type = param.type.lowerVarargs())})
+                declaration.copy(parameters = declaration.parameters.map { param -> param.copy(type = param.type.lowerVarargs()) })
             }
+            is ClassDeclaration -> declaration.copy(
+                    members = declaration.members.map { member -> member.lowerVarargs() },
+                    primaryConstructor = declaration.primaryConstructor?.let {it as FunctionDeclaration}
+            )
             else -> declaration.duplicate()
         }
     }
 
-    return node.copy(declarations = loweredDeclarations)
+    return copy(declarations = loweredDeclarations)
 }

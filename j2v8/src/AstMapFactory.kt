@@ -6,12 +6,25 @@ import org.jetbrains.dukat.ast.astToMap
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
+    override fun createClassDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>
+    ) = astFactory.createClassDeclaration(name, members, typeParameters).astToMap()
+
+    override fun createInterfaceDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>
+    ) = astFactory.createInterfaceDeclaration(name, members, typeParameters).astToMap()
+
     override fun createExpression(kind: TypeDeclaration, meta: String?) = astFactory.createExpression(kind, meta).astToMap()
 
     override fun declareVariable(name: String, type: ParameterValue) = astFactory.declareVariable(name, type).astToMap()

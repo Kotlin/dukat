@@ -36,6 +36,8 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
 
     interopRuntime
             .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
+            .method("createClassDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
+            .method("createInterfaceDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createExpression", InteropV8Signature.V8OBJECT, InteropV8Signature.STRING)
             .method("createTypeParam", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("createTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
@@ -124,7 +126,6 @@ fun createTranslator() = createNashornTranslator(::prodResourceResolver)
 
 fun main() {
     val translator = createV8Translator(::localResourceResolver)
-//    val translator = createNashornTranslator(::localResourceResolver)
 
     val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
 

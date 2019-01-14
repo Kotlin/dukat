@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -68,20 +70,39 @@ private fun ParameterDeclaration.lowerNullableType(): ParameterDeclaration {
     }
 }
 
-fun lowerNullable(node: DocumentRoot): DocumentRoot {
+private fun MemberDeclaration.lowerNullable() : MemberDeclaration {
+    if (this is FunctionDeclaration) {
+        return lowerNullable()
+    } else if (this is VariableDeclaration) {
+        return lowerNullable()
+    } else {
+        throw Exception("can not null member declaration ${this}")
+    }
+}
 
-    val loweredDeclarations = node.declarations.map { declaration ->
+private fun FunctionDeclaration.lowerNullable() = copy(
+        parameters = parameters.map { parameter ->
+            parameter.lowerNullableType()
+        },
+        type = type.lowerNullableType()
+)
+
+
+private fun VariableDeclaration.lowerNullable() = copy(type = type.lowerNullableType())
+
+fun DocumentRoot.lowerNullable(): DocumentRoot {
+
+    val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
-            is VariableDeclaration -> declaration.copy(type = declaration.type.lowerNullableType())
-            is FunctionDeclaration -> declaration.copy(
-                    parameters = declaration.parameters.map { parameter ->
-                        parameter.lowerNullableType()
-                    },
-                    type = declaration.type.lowerNullableType()
+            is VariableDeclaration -> declaration.lowerNullable()
+            is FunctionDeclaration -> declaration.lowerNullable()
+            is ClassDeclaration -> declaration.copy(
+                    members = declaration.members.map { member -> member.lowerNullable() },
+                    primaryConstructor = declaration.primaryConstructor?.lowerNullable()
             )
             else -> declaration.duplicate()
         }
     }
 
-    return node.copy(declarations = loweredDeclarations)
+    return copy(declarations = loweredDeclarations)
 }

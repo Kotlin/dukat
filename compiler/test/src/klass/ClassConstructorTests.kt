@@ -6,4 +6,9 @@ class ClassConstructorTests : StandardTests() {
         assertContentEquals("class/constructor/simple")
     }
 
+    @Test
+    fun testWithPropertyDeclaration() {
+        assertContentEquals("class/constructor/withPropertyDeclaration")
+    }
+
 }

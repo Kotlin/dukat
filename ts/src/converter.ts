@@ -141,41 +141,76 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
           }
         } else if (ts.isClassDeclaration(statement)) {
           const classDeclaration = statement as ts.ClassDeclaration;
+
           if (classDeclaration.name != undefined) {
-            declarations.push(astFactory.declareVariable(
-              classDeclaration.name.getText(),
-              astFactory.createTypeDeclaration("@@CLASS")
-            ))
+
+            let members: Array<MemberDeclaration> = [];
+
+            if (classDeclaration.members) {
+
+              for (let memberDeclaration of classDeclaration.members) {
+                if (memberDeclaration.kind == ts.SyntaxKind.PropertyDeclaration) {
+                    let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
+                    let convertedVariable = astFactory.convertVariable(
+                        propertyDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
+                    );
+                    if (convertedVariable != null) {
+                      members.push(convertedVariable);
+                    }
+                } else if (memberDeclaration.kind == ts.SyntaxKind.MethodDeclaration) {
+                  let functionDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration);
+                  if (ts.isIdentifier(functionDeclaration.name)) {
+                    members.push(astFactory.convertFunctionDeclaration(functionDeclaration));
+                  }
+                } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
+                  let constructor = memberDeclaration as ts.ConstructorDeclaration;
+
+                  let params: Array<ParameterDeclaration> = [];
+
+                  for (let parameter of constructor.parameters) {
+                    if (parameter.modifiers) {
+                      let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
+                      if (isField) {
+                        let convertedVariable = astFactory.convertVariable(
+                            parameter as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
+                        );
+                        if (convertedVariable != null) {
+                          members.push(convertedVariable);
+                        }
+                      }
+                    }
+
+                    params.push(astFactory.createParamDeclaration(parameter));
+                  }
+
+
+                  let functionDeclaration = astFactory.createFunctionDeclaration("@@CONSTRUCTOR",
+                      params,
+                      astFactory.createTypeDeclaration("______")
+                      , astFactory.convertTypeParams(constructor.typeParameters));
+                  members.push(functionDeclaration);
+                }
+              }
+            }
+
+            declarations.push(
+                astFactory.createClassDeclaration(
+                    classDeclaration.name.getText(),
+                    members,
+                    astFactory.convertTypeParams(classDeclaration.typeParameters)
+                )
+            );
           }
 
         } else if (ts.isFunctionDeclaration(statement)) {
-          const functionDeclaration = statement as ts.FunctionDeclaration;
-
-          let typeParameterDeclarations: Array<TypeParameter> = [];
-          if (functionDeclaration.typeParameters) {
-            typeParameterDeclarations = functionDeclaration.typeParameters.map(typeParam => {
-              const constraint = typeParam.constraint;
-              return astFactory.createTypeParam(typeParam.name.getText(), constraint ? [
-                  astFactory.resolveType(constraint)
-              ] : [])
-            });
-          }
-
-          let parameterDeclarations = functionDeclaration.parameters.map(
-              param => astFactory.createParamDeclaration(param)
-          );
-
-          if (functionDeclaration.name != null) {
+            declarations.push(astFactory.convertFunctionDeclaration(statement as (ts.FunctionDeclaration & ts.MethodDeclaration)))
+        } else if (ts.isInterfaceDeclaration(statement)) {
+            let interfaceDeclaration = statement as ts.InterfaceDeclaration;
             declarations.push(
-              astFactory.createFunctionDeclaration(
-                functionDeclaration.name.escapedText.toString(),
-                parameterDeclarations,
-                  functionDeclaration.type ?
-                    astFactory.resolveType(functionDeclaration.type) : astFactory.createTypeDeclaration("Unit"),
-                typeParameterDeclarations
-              )
+                astFactory.createInterfaceDeclaration(
+                    interfaceDeclaration.name.getText(), [],[]
+                )
             )
-          }
         } else {
           console.log("SKIPPING ", statement.kind);
         }

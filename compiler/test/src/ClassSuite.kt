@@ -3,6 +3,10 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-        ClassConstructorTests::class
+        //ClassConventionsTests::class,
+        ClassConstructorTests::class,
+        ClassGenericTests::class,
+        ClassMethodsTests::class,
+        ClassVariablesTests::class
 )
 class ClassSuite
