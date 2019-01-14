@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -71,7 +72,7 @@ private fun ParameterDeclaration.lowerNullableType(): ParameterDeclaration {
 }
 
 private fun MemberDeclaration.lowerNullable() : MemberDeclaration {
-    if (this is FunctionDeclaration) {
+    if (this is MethodDeclaration) {
         return lowerNullable()
     } else if (this is VariableDeclaration) {
         return lowerNullable()
@@ -81,6 +82,13 @@ private fun MemberDeclaration.lowerNullable() : MemberDeclaration {
 }
 
 private fun FunctionDeclaration.lowerNullable() = copy(
+        parameters = parameters.map { parameter ->
+            parameter.lowerNullableType()
+        },
+        type = type.lowerNullableType()
+)
+
+private fun MethodDeclaration.lowerNullable() = copy(
         parameters = parameters.map { parameter ->
             parameter.lowerNullableType()
         },

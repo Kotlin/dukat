@@ -149,7 +149,27 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
             if (classDeclaration.members) {
 
               for (let memberDeclaration of classDeclaration.members) {
-                if (memberDeclaration.kind == ts.SyntaxKind.PropertyDeclaration) {
+                if (memberDeclaration.kind == ts.SyntaxKind.IndexSignature) {
+                  let indexSignatureDeclaration = memberDeclaration as ts.IndexSignatureDeclaration;
+
+                  let typeParameterDeclarations: Array<TypeParameter> = astFactory.convertTypeParams(indexSignatureDeclaration.typeParameters);
+                  let parameterDeclarations = indexSignatureDeclaration.parameters
+                      .map(
+                          param => astFactory.createParamDeclaration(param)
+                      );
+
+                  members.push(astFactory.createMethodDeclaration(
+                      "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
+                  ));
+
+                  parameterDeclarations.push(
+                      astFactory.createParameterDeclaration("value", astFactory.resolveType(indexSignatureDeclaration.type), null)
+                  );
+                  
+                  members.push(astFactory.createMethodDeclaration(
+                      "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
+                  ));
+                } else if (memberDeclaration.kind == ts.SyntaxKind.PropertyDeclaration) {
                     let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
                     let convertedVariable = astFactory.convertVariable(
                         propertyDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
@@ -159,8 +179,9 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                     }
                 } else if (memberDeclaration.kind == ts.SyntaxKind.MethodDeclaration) {
                   let functionDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration);
-                  if (ts.isIdentifier(functionDeclaration.name)) {
-                    members.push(astFactory.convertFunctionDeclaration(functionDeclaration));
+                  let convertedFunctionDeclaration = astFactory.convertMethodDeclaration(functionDeclaration);
+                  if (convertedFunctionDeclaration != null) {
+                    members.push(convertedFunctionDeclaration);
                   }
                 } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
                   let constructor = memberDeclaration as ts.ConstructorDeclaration;
@@ -184,7 +205,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                   }
 
 
-                  let functionDeclaration = astFactory.createFunctionDeclaration("@@CONSTRUCTOR",
+                  let functionDeclaration = astFactory.createMethodDeclaration("@@CONSTRUCTOR",
                       params,
                       astFactory.createTypeDeclaration("______")
                       , astFactory.convertTypeParams(constructor.typeParameters));
@@ -203,7 +224,10 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
           }
 
         } else if (ts.isFunctionDeclaration(statement)) {
-            declarations.push(astFactory.convertFunctionDeclaration(statement as (ts.FunctionDeclaration & ts.MethodDeclaration)))
+          let convertedFunctionDeclaration = astFactory.convertFunctionDeclaration(statement as (ts.FunctionDeclaration & ts.MethodDeclaration));
+          if (convertedFunctionDeclaration != null) {
+            declarations.push(convertedFunctionDeclaration)
+          }
         } else if (ts.isInterfaceDeclaration(statement)) {
             let interfaceDeclaration = statement as ts.InterfaceDeclaration;
             declarations.push(

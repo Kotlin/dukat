@@ -49,5 +49,6 @@ declare class TypeDeclaration implements ParameterValue {
 }
 
 declare class FunctionDeclaration implements MemberDeclaration {}
+declare class MethodDeclaration implements MemberDeclaration {}
 
 declare class FunctionTypeDeclaration implements ParameterValue {}

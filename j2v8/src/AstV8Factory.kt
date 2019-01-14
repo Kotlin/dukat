@@ -63,6 +63,19 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
         )
     }
 
+    fun createMethodDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, operator: Boolean): V8Object {
+        val params = parameters.toArray().map { it.toAst<ParameterDeclaration>()}
+        val typeParams = typeParameters.toArray().map { it.toAst<TypeParameter>()}
+
+        return astFactory.createMethodDeclaration(
+                name,
+                params,
+                type.toAst(),
+                typeParams,
+                operator
+        )
+    }
+
     fun createFunctionTypeDeclaration(parameters: V8Array, type: V8Object): V8Object {
         val res = parameters.toArray().map { it.toAst<ParameterDeclaration>() }
 

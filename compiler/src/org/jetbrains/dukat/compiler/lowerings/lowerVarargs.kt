@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -47,7 +48,7 @@ private fun ParameterValue.lowerVarargs(): ParameterValue {
 }
 
 private fun MemberDeclaration.lowerVarargs(): MemberDeclaration {
-    if (this is FunctionDeclaration) {
+    if (this is MethodDeclaration) {
         return copy(parameters = parameters.map { param -> param.copy(type = param.type.lowerVarargs()) })
     } else if (this is VariableDeclaration) {
         return copy(type = type.lowerVarargs())
@@ -68,7 +69,7 @@ fun DocumentRoot.lowerVarargs(): DocumentRoot {
             }
             is ClassDeclaration -> declaration.copy(
                     members = declaration.members.map { member -> member.lowerVarargs() },
-                    primaryConstructor = declaration.primaryConstructor?.let {it as FunctionDeclaration}
+                    primaryConstructor = declaration.primaryConstructor?.let { it as MethodDeclaration}
             )
             else -> declaration.duplicate()
         }

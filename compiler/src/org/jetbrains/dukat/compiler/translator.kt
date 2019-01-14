@@ -44,6 +44,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
             .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY)
+            .method("createMethodDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN)
             .method("createFunctionTypeDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createDocumentRoot", InteropV8Signature.V8ARRAY)
 

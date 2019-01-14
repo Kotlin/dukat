@@ -5,7 +5,7 @@ data class FunctionDeclaration(
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValue,
         val typeParameters: List<TypeParameter>
-) : MemberDeclaration {
+) : Declaration {
     constructor(
             name: String,
             parameters: Array<ParameterDeclaration>,

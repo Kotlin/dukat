@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -18,6 +19,16 @@ private fun FunctionDeclaration.lowerNativeArray(): FunctionDeclaration {
                         }
     )
 }
+
+private fun MethodDeclaration.lowerNativeArray(): MethodDeclaration {
+    return copy(
+            parameters = parameters.map { parameter -> parameter.copy(type = parameter.type.lowerNativeArray()) },
+            typeParameters = typeParameters.map {typeParameter ->
+                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> constraint.lowerNativeArray() })
+            }
+    )
+}
+
 private fun VariableDeclaration.lowerNativeArray() : VariableDeclaration {
     return copy(type = type.lowerNativeArray())
 }
@@ -39,7 +50,7 @@ private fun ParameterValue.lowerNativeArray(): ParameterValue {
 }
 
 private fun MemberDeclaration.lowerNativeArray() : MemberDeclaration {
-    if (this is FunctionDeclaration) {
+    if (this is MethodDeclaration) {
         return lowerNativeArray()
     } else if (this is VariableDeclaration) {
         return lowerNativeArray()

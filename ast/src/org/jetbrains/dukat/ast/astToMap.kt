@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
@@ -56,6 +57,14 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "parameters" to parameters.map(AstNode::astToMap),
                 "typeParameters" to typeParameters.map(AstNode::astToMap)
         )
+        is MethodDeclaration ->
+            mapOf("reflection" to AstReflectionType.METHOD_DECLARATION.toString(),
+                    "name" to name,
+                    "type" to type.astToMap(),
+                    "parameters" to parameters.map(AstNode::astToMap),
+                    "typeParameters" to typeParameters.map(AstNode::astToMap),
+                    "operator" to operator
+            )
         is FunctionTypeDeclaration -> mapOf("reflection" to AstReflectionType.FUNCTION_TYPE_DECLARATION.toString(), "type" to type.astToMap(), "parameters" to parameters.map(AstNode::astToMap))
         is DocumentRoot -> mapOf("reflection" to AstReflectionType.DOCUMENT_ROOT.toString(), "declarations" to declarations.map(AstNode::astToMap))
         is Expression -> mapOf("reflection" to AstReflectionType.EXPRESSION_DECLARATION.toString(), "kind" to kind.astToMap(), "meta" to meta)

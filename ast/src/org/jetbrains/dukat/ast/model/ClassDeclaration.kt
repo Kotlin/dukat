@@ -4,5 +4,5 @@ data class ClassDeclaration(
         val name: String,
         val members: List<MemberDeclaration>,
         val typeParameters: List<TypeParameter>,
-        val primaryConstructor: FunctionDeclaration? = null
+        val primaryConstructor: MethodDeclaration? = null
 ) : Declaration

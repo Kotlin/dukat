@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -65,6 +66,14 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntity("type")!!.toAst(),
                 mapEntities("typeParameters") { it.toAst<TypeParameter>() }
         )
+    } else if (reflectionType == AstReflectionType.METHOD_DECLARATION) {
+            res = MethodDeclaration(
+                    get("name") as String,
+                    mapEntities("parameters") { it.toAst<ParameterDeclaration>() },
+                    getEntity("type")!!.toAst(),
+                    mapEntities("typeParameters") { it.toAst<TypeParameter>() },
+                    get("operator") as Boolean
+            )
     } else if (reflectionType == AstReflectionType.FUNCTION_TYPE_DECLARATION) {
         res = FunctionTypeDeclaration(
                 mapEntities("parameters") { it.toAst<ParameterDeclaration>() },

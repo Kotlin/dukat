@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -38,6 +39,14 @@ class AstFactory : AstNodeFactory<AstNode> {
             type: ParameterValue,
             typeParameters: Array<TypeParameter>
     ) = FunctionDeclaration(name, parameters, type, typeParameters)
+
+    override fun createMethodDeclaration(
+            name: String,
+            parameters: List<ParameterDeclaration>,
+            type: ParameterValue,
+            typeParameters: List<TypeParameter>,
+            operator: Boolean
+    ) = MethodDeclaration(name, parameters, type, typeParameters, operator)
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue) = FunctionTypeDeclaration(parameters, type)
 

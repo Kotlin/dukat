@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -48,6 +49,13 @@ private fun FunctionDeclaration.lowerType() : FunctionDeclaration {
     )
 }
 
+private fun MethodDeclaration.lowerType() : MethodDeclaration {
+    return copy(
+            parameters = parameters.map { param -> param.lowerType() },
+            type = type.lowerType()
+    )
+}
+
 private fun VariableDeclaration.lowerType() : VariableDeclaration {
     return copy(
             type = type.lowerType()
@@ -55,7 +63,7 @@ private fun VariableDeclaration.lowerType() : VariableDeclaration {
 }
 
 private fun MemberDeclaration.lowerType() : MemberDeclaration {
-    if (this is FunctionDeclaration) {
+    if (this is MethodDeclaration) {
         return lowerType()
     } else if (this is VariableDeclaration) {
         return lowerType()

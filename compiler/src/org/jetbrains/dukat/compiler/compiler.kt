@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
+import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
@@ -17,7 +18,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
-private fun ParameterValue.translate() : String {
+private fun ParameterValue.translate(): String {
     if (this is TypeDeclaration) {
         val res = mutableListOf(value)
         if (isGeneric()) {
@@ -54,7 +55,6 @@ private fun ParameterValue.translate() : String {
 }
 
 
-
 private fun ParameterDeclaration.translate(): String {
     var res = name + ": " + type.translate()
     if (type.vararg) {
@@ -75,7 +75,7 @@ private fun ParameterDeclaration.translate(): String {
     return res
 }
 
-private fun translateTypeParameters(typeParameters: List<TypeParameter>) : String {
+private fun translateTypeParameters(typeParameters: List<TypeParameter>): String {
     if (typeParameters.isEmpty()) {
         return ""
     } else {
@@ -90,7 +90,7 @@ private fun translateTypeParameters(typeParameters: List<TypeParameter>) : Strin
     }
 }
 
-private fun translateParameters(parameters: List<ParameterDeclaration>) : String {
+private fun translateParameters(parameters: List<ParameterDeclaration>): String {
     return parameters
             .map(ParameterDeclaration::translate)
             .joinToString(", ")
@@ -104,20 +104,45 @@ private fun FunctionDeclaration.translate(parent: ClassDeclaration? = null): Str
         typeParams = " " + typeParams
     }
 
-    val modifier  = if (parent != null) { "open" } else { "external" }
-    return ("${modifier} fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
+    return ("external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
-private fun VariableDeclaration.translate(parent: ClassDeclaration? = null) : String {
-    val modifier  = if (parent != null) { "open" } else { "external" }
+private fun MethodDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
+    val returnType = type.translate()
+
+    var typeParams = translateTypeParameters(typeParameters)
+    if (typeParams.isNotEmpty()) {
+        typeParams = " " + typeParams
+    }
+
+    val operatorModifier = if (operator) " operator" else ""
+    val annotation = if (operator) {
+        if (name == "set") {
+            "@nativeSetter"
+        } else if (name == "get") {
+            "@nativeGetter"
+        } else null
+    } else null
+    return listOf(
+            annotation,
+            "open${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally"
+    ).filterNotNull()
+}
+
+private fun VariableDeclaration.translate(parent: ClassDeclaration? = null): String {
+    val modifier = if (parent != null) {
+        "open"
+    } else {
+        "external"
+    }
     return "${modifier} var ${name}: ${type.translate()} = definedExternally"
 }
 
-private fun MemberDeclaration.translate(parent: ClassDeclaration? = null) : String {
-    if (this is FunctionDeclaration) {
+private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
+    if (this is MethodDeclaration) {
         return translate(parent)
     } else if (this is VariableDeclaration) {
-        return translate(parent)
+        return listOf(translate(parent))
     } else {
         throw Exception("can not translate ${this}")
     }
@@ -139,7 +164,7 @@ fun compile(documentRoot: DocumentRoot): String {
         } else if (child is FunctionDeclaration) {
             res.add(child.translate())
         } else if (child is ClassDeclaration) {
-            var primaryConstructor: FunctionDeclaration? = child.primaryConstructor
+            val primaryConstructor = child.primaryConstructor
 
             val classDeclaration = "external open class ${child.name}${translateTypeParameters(child.typeParameters)}"
             val params = if (primaryConstructor == null) "" else
@@ -150,7 +175,7 @@ fun compile(documentRoot: DocumentRoot): String {
             val members = child.members
             if (members.isNotEmpty()) {
                 res[res.size - 1] += " {"
-                res.addAll(members.map { "    " + it.translate(child) })
+                res.addAll(members.flatMap { it.translate(child) }.map({ "    " + it }))
                 res.add("}")
             }
         } else if (child is InterfaceDeclaration) {

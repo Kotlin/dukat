@@ -1,5 +1,3 @@
-package indexSignature
-
 external open class Foo {
     @nativeGetter
     open operator fun get(n: Number): Bar? = definedExternally

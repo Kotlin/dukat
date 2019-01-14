@@ -20,6 +20,15 @@ interface AstNodeFactory<T> {
             typeParameters: Array<TypeParameter>
     ): T
 
+
+    fun createMethodDeclaration(
+            name: String, parameters:
+            List<ParameterDeclaration>,
+            type: ParameterValue,
+            typeParameters: List<TypeParameter>,
+            operator: Boolean
+    ): T
+
     fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): T
     fun createParameterDeclaration(name: String, type: ParameterValue, initializer: Expression?): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValue>): T

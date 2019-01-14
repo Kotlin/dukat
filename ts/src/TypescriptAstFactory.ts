@@ -53,7 +53,7 @@ class TypescriptAstFactory implements AstFactory {
         return typeParameterDeclarations;
     }
 
-    convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : FunctionDeclaration  {
+    convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : FunctionDeclaration | null  {
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
         let parameterDeclarations = functionDeclaration.parameters
@@ -61,14 +61,47 @@ class TypescriptAstFactory implements AstFactory {
             param => this.createParamDeclaration(param)
             );
 
-        return this.createFunctionDeclaration(
-            functionDeclaration.name ? functionDeclaration.name.getText() : "",
-            parameterDeclarations,
-            functionDeclaration.type ?
-                this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
-            typeParameterDeclarations
-        )
+
+        if (ts.isIdentifier(functionDeclaration.name)) {
+            return this.createFunctionDeclaration(
+                functionDeclaration.name ? functionDeclaration.name.getText() : "",
+                parameterDeclarations,
+                functionDeclaration.type ?
+                    this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+                typeParameterDeclarations
+            );
+        }
+
+        return null;
     }
+
+    convertMethodDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : MethodDeclaration | null  {
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
+
+        let parameterDeclarations = functionDeclaration.parameters
+            .map(
+                param => this.createParamDeclaration(param)
+            );
+
+
+        if (ts.isIdentifier(functionDeclaration.name)) {
+            return this.createMethodDeclaration(
+                functionDeclaration.name ? functionDeclaration.name.getText() : "",
+                parameterDeclarations,
+                functionDeclaration.type ?
+                    this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+                typeParameterDeclarations, false
+            );
+        }
+
+        return null;
+    }
+
+
+    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, operator: boolean = false): MethodDeclaration {
+        return this.astFactory.createMethodDeclaration(name, parameters, type, typeParams, operator);
+    }
+
 
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration {
         return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams);
