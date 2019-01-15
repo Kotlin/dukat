@@ -29,5 +29,5 @@ declare interface AstFactory {
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 
-    createDocumentRoot(declarations: Declaration[]): DocumentRoot;
+    createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot;
 }

@@ -1,7 +1,7 @@
 declare class AstFactoryV8 implements AstFactory {
     createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): ClassDeclaration;
     createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
-    createDocumentRoot(declarations: Declaration[]): DocumentRoot;
+    createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot;
     createExpression(kind: TypeDeclaration, meta: String): Expression;
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration;
     createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, operator: boolean): MethodDeclaration;

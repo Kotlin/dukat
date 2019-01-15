@@ -97,8 +97,8 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
                     if (initializer == null) null else initializer.toAst<Expression>()
             )
 
-    fun createDocumentRoot(declarations: V8Array) =
-            astFactory.createDocumentRoot(declarations.toArray().map{declaration -> declaration.toAst<Declaration>()}.toTypedArray())
+    fun createDocumentRoot(packageName: String, declarations: V8Array) =
+            astFactory.createDocumentRoot(packageName, declarations.toArray().map{declaration -> declaration.toAst<Declaration>()}.toTypedArray())
 
     fun createTypeParam(name: String, constraints: V8Array) = astFactory
             .createTypeParam(name, constraints.toArray()

@@ -75,7 +75,11 @@ fun AstNode.astToMap(): Map<String, Any?> {
                     "operator" to operator
             )
         is FunctionTypeDeclaration -> mapOf("reflection" to AstReflectionType.FUNCTION_TYPE_DECLARATION.toString(), "type" to type.astToMap(), "parameters" to parameters.map(AstNode::astToMap))
-        is DocumentRoot -> mapOf("reflection" to AstReflectionType.DOCUMENT_ROOT.toString(), "declarations" to declarations.map(AstNode::astToMap))
+        is DocumentRoot -> mapOf(
+                "reflection" to AstReflectionType.DOCUMENT_ROOT.toString(),
+                "packageName" to packageName,
+                "declarations" to declarations.map(AstNode::astToMap)
+        )
         is Expression -> mapOf("reflection" to AstReflectionType.EXPRESSION_DECLARATION.toString(), "kind" to kind.astToMap(), "meta" to meta)
         else -> throw Exception("can not map ${this}")
     }

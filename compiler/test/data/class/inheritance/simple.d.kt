@@ -1,3 +1,5 @@
+package simple
+
 external open class BaseJQueryEventObject : Event {
     open var data: Any = definedExternally
     open var delegateTarget: Element = definedExternally

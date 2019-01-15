@@ -1,3 +1,5 @@
+package genericOptionalMethods
+
 external interface Foo<T> {
     val methodWithOutArgs: (() -> Unit)? get() = definedExternally
     val <A> methodWithString: ((s: A) -> T)? get() = definedExternally

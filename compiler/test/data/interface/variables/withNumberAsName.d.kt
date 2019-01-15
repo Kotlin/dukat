@@ -1,3 +1,5 @@
+package withNumberAsName
+
 external interface IBar
 external interface IFoo {
     var `200`: String

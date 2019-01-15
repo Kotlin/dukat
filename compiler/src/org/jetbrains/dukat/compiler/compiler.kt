@@ -214,7 +214,15 @@ fun compile(documentRoot: DocumentRoot): String {
             .lowerPrimitives()
             .lowerVarargs()
 
+
+    if (documentRoot.declarations.isEmpty()) {
+        return "// NO DECLARATIONS"
+    }
+
+
     val res = mutableListOf<String>()
+    res.add("package " + docRoot.packageName)
+    res.add("")
 
     for (child in docRoot.declarations) {
         if (child is VariableDeclaration) {

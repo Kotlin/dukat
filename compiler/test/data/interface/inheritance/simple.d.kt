@@ -1,3 +1,5 @@
+package simple
+
 external interface BaseJQueryEventObject : Event {
     var data: Any
     var delegateTarget: Element

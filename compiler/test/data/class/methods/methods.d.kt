@@ -1,3 +1,5 @@
+package methods
+
 external open class Foo {
     open fun methodWithOutArgs(): Unit = definedExternally
     open fun methodWithString(s: String): String = definedExternally

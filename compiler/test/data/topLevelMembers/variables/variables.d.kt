@@ -1,3 +1,5 @@
+package variables
+
 external var varWithoutTypeAnnotation: Any = definedExternally
 external var varAsAny: Any = definedExternally
 external var varAsNumber: Number = definedExternally

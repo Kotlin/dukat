@@ -1,3 +1,5 @@
+package generics
+
 external fun <T> withoutArgumentsReturnsT(): T = definedExternally
 external fun <T> withOneT(a: T): Any = definedExternally
 external fun <T> returnsT(s: String): T = definedExternally

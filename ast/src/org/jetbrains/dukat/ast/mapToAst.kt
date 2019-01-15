@@ -93,7 +93,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("setter") as Boolean
         )
     } else if (reflectionType == AstReflectionType.DOCUMENT_ROOT) {
-        res = DocumentRoot(mapEntities("declarations") {
+        res = DocumentRoot(get("packageName") as String, mapEntities("declarations") {
             it.toAst<Declaration>()
         })
     } else if (reflectionType == AstReflectionType.TYPE_PARAM) {

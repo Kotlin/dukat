@@ -1,3 +1,5 @@
+package variablesAsArray
+
 external var varAsArrayOfAny: Array<Any> = definedExternally
 external var varAsArrayOfNumber: Array<Number> = definedExternally
 external var varAsGenericArrayOfNumber: Array<Number> = definedExternally

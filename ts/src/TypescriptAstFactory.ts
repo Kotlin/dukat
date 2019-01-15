@@ -3,8 +3,8 @@ class TypescriptAstFactory implements AstFactory {
     constructor(private astFactory: AstFactory) {
     }
 
-    createDocumentRoot(declarations: Declaration[]): DocumentRoot {
-        return this.astFactory.createDocumentRoot(declarations);
+    createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot {
+        return this.astFactory.createDocumentRoot(packageName, declarations);
     }
 
     createClassDeclaration(name: String, members: Array<MemberDeclaration> = [], typeParams: Array<TypeParameter> = []): ClassDeclaration {

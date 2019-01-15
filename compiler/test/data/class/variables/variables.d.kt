@@ -1,3 +1,5 @@
+package variables
+
 external open class Foo {
     open var varWithoutTypeAnnotation: Any = definedExternally
     open var varAsAny: Any = definedExternally

@@ -1,3 +1,5 @@
+package generics
+
 external open class Foo<T> {
     open var varT: T = definedExternally
     open fun withoutArgumentsReturnsT(): T = definedExternally

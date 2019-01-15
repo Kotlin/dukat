@@ -3,22 +3,22 @@ import org.junit.Test
 
 class InterfaceOptionsTests : StandardTests() {
     @Test
-    fun testOptionalMethods() {
+    fun optionalMethods() {
         assertContentEquals("interface/optional/optionalMethods")
     }
 
     @Test
-    fun testOptionalMethodsWithOptionalFunctionType() {
+    fun optionalMethodsWithOptionalFunctionType() {
         assertContentEquals("interface/optional/optionalMethodsWithOptionalFunctionType")
     }
 
     @Test
-    fun testOptionalVariables() {
+    fun optionalVariables() {
         assertContentEquals("interface/optional/optionalVariables")
     }
 
     @Test
-    fun testOptionalVariablesAsFunctionType() {
+    fun optionalVariablesAsFunctionType() {
         assertContentEquals("interface/optional/optionalVariablesAsFunctionType")
     }
     

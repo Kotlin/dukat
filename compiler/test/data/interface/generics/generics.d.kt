@@ -1,3 +1,5 @@
+package generics
+
 external interface ComponentSpec<P, S>
 external interface Foo<T> {
     var varT: T
