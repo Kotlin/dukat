@@ -6,6 +6,7 @@ fun TypeDeclaration.isGeneric() = params.isNotEmpty()
 fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
         is ClassDeclaration -> copy() as T
+        is DocumentRoot -> copy() as T
         is InterfaceDeclaration -> copy() as T
         is VariableDeclaration -> copy() as T
         is FunctionDeclaration -> copy() as T

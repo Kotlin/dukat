@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/typescript/lib/typescriptServices.d.ts"/>
 /// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
+
 if (typeof ts == "undefined") {
   (global as any).ts = require("typescript/lib/tsserverlibrary");
 }
@@ -73,40 +74,9 @@ function resolveType(astFactory: TypescriptAstFactory, type: ts.TypeNode | undef
   }
 }
 
-function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
-
-  let astFactory: TypescriptAstFactory = nativeAstFactory == null ?
-              new TypescriptAstFactory(new AstFactoryV8()) : new TypescriptAstFactory(nativeAstFactory);
-
-
-  if (fileResolver == null) {
-    fileResolver = new FileResolverV8();
-  }
-
-
-  let documentRegistry = ts.createDocumentRegistry();
-
-  let host= new DukatLanguageServiceHost(fileResolver);
-  host.register(fileName);
-
-  let languageService = ts.createLanguageService(host, documentRegistry);
-
-  var program = languageService.getProgram();
-
-  if (program == null) {
-    throw new Error(`failed to create languageService ${fileName}`)
-  }
-
+function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.Node>) : Array<Declaration> {
   var declarations: Declaration[] = [];
-
-  var sourceFile = program.getSourceFile(fileName);
-
-  if (sourceFile == null) {
-    throw new Error(`failed to resolve ${fileName}`)
-  }
-
-
-  for (let statement of sourceFile.statements) {
+  for (let statement of statements) {
     if (ts.isVariableStatement(statement)) {
       const variableStatment = statement as ts.VariableStatement;
 
@@ -151,13 +121,13 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                   "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
               ));
             } else if (ts.isPropertyDeclaration(memberDeclaration)) {
-                let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
-                let convertedVariable = astFactory.convertVariable(
-                    propertyDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
-                );
-                if (convertedVariable != null) {
-                  members.push(convertedVariable);
-                }
+              let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
+              let convertedVariable = astFactory.convertVariable(
+                  propertyDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
+              );
+              if (convertedVariable != null) {
+                members.push(convertedVariable);
+              }
             } else if (ts.isMethodDeclaration(memberDeclaration)) {
               let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
               let convertedMethodDeclaration = astFactory.convertMethodDeclaration(methodDeclaration);
@@ -210,102 +180,148 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
         declarations.push(convertedFunctionDeclaration)
       }
     } else if (ts.isInterfaceDeclaration(statement)) {
-        let interfaceDeclaration = statement as ts.InterfaceDeclaration;
-        let parentEntities: Array<InterfaceDeclaration> = [];
+      let interfaceDeclaration = statement as ts.InterfaceDeclaration;
+      let parentEntities: Array<InterfaceDeclaration> = [];
 
-        if (interfaceDeclaration.heritageClauses) {
-          for (let heritageClause of interfaceDeclaration.heritageClauses) {
-            for (let type of heritageClause.types) {
-              let typeParams: Array<TypeParameter> = [];
+      if (interfaceDeclaration.heritageClauses) {
+        for (let heritageClause of interfaceDeclaration.heritageClauses) {
+          for (let type of heritageClause.types) {
+            let typeParams: Array<TypeParameter> = [];
 
-              if (type.typeArguments) {
-                for (let typeArgument of type.typeArguments) {
-                  let value = (astFactory.resolveType(typeArgument) as any).value;
-                  typeParams.push(astFactory.createTypeParam(value, []))
-                }
+            if (type.typeArguments) {
+              for (let typeArgument of type.typeArguments) {
+                let value = (astFactory.resolveType(typeArgument) as any).value;
+                typeParams.push(astFactory.createTypeParam(value, []))
               }
-
-
-              parentEntities.push(
-                  astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams)
-              );
             }
+
+
+            parentEntities.push(
+                astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams)
+            );
           }
         }
+      }
 
-        let members: Array<MemberDeclaration> = [];
-        interfaceDeclaration.members.map(member => {
+      let members: Array<MemberDeclaration> = [];
+      interfaceDeclaration.members.map(member => {
 
-          if (ts.isMethodSignature(member)) {
-            let methodDeclaration = member as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
+        if (ts.isMethodSignature(member)) {
+          let methodDeclaration = member as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
 
-            if (methodDeclaration.questionToken) {
-                members.push(astFactory.convertMethodSignatureToPropertyDeclaration(methodDeclaration));
-            } else {
-              let convertedMethodDeclaration = astFactory.convertMethodDeclaration(methodDeclaration);
-              if (convertedMethodDeclaration != null) {
-                members.push(convertedMethodDeclaration);
-              }
+          if (methodDeclaration.questionToken) {
+            members.push(astFactory.convertMethodSignatureToPropertyDeclaration(methodDeclaration));
+          } else {
+            let convertedMethodDeclaration = astFactory.convertMethodDeclaration(methodDeclaration);
+            if (convertedMethodDeclaration != null) {
+              members.push(convertedMethodDeclaration);
             }
-          } else if (ts.isPropertySignature(member)) {
-            let propertyDeclaration: PropertyDeclaration;
-            if (member.questionToken) {
-              propertyDeclaration = astFactory.declareProperty(
-                  astFactory.convertName(member.name) as string,
-                  astFactory.createNullableType(astFactory.resolveType(member.type)),
-                  [], true, true)
-            } else {
-              propertyDeclaration = astFactory.declareProperty(astFactory.convertName(member.name) as string, astFactory.resolveType(member.type));
-            }
-            members.push(
-                propertyDeclaration
-            );
-          } else if (ts.isIndexSignatureDeclaration(member)) {
-            let indexSignatureDeclaration = member as ts.IndexSignatureDeclaration;
-
-            let typeParameterDeclarations: Array<TypeParameter> = astFactory.convertTypeParams(indexSignatureDeclaration.typeParameters);
-            let parameterDeclarations = indexSignatureDeclaration.parameters
-                .map(
-                    param => astFactory.convertParameterDeclaration(param)
-                );
-
-            members.push(astFactory.createMethodDeclaration(
-                "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
-            ));
-
-            parameterDeclarations.push(
-                astFactory.createParameterDeclaration("value", astFactory.resolveType(indexSignatureDeclaration.type), null)
-            );
-
-            members.push(astFactory.createMethodDeclaration(
-                "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
-            ));
-          } else if (ts.isCallSignatureDeclaration(member)) {
-
-            members.push(
-                astFactory.createMethodDeclaration(
-                    "invoke",
-                    astFactory.convertParameterDeclarations(member.parameters),
-                    member.type ? astFactory.resolveType(member.type) : astFactory.createTypeDeclaration("Unit"),
-                    astFactory.convertTypeParams(member.typeParameters),
-                    true
-                )
-            );
           }
-        });
+        } else if (ts.isPropertySignature(member)) {
+          let propertyDeclaration: PropertyDeclaration;
+          if (member.questionToken) {
+            propertyDeclaration = astFactory.declareProperty(
+                astFactory.convertName(member.name) as string,
+                astFactory.createNullableType(astFactory.resolveType(member.type)),
+                [], true, true)
+          } else {
+            propertyDeclaration = astFactory.declareProperty(astFactory.convertName(member.name) as string, astFactory.resolveType(member.type));
+          }
+          members.push(
+              propertyDeclaration
+          );
+        } else if (ts.isIndexSignatureDeclaration(member)) {
+          let indexSignatureDeclaration = member as ts.IndexSignatureDeclaration;
 
-        declarations.push(
-            astFactory.createInterfaceDeclaration(
-                interfaceDeclaration.name.getText(),
-                members,
-                astFactory.convertTypeParams(interfaceDeclaration.typeParameters),
-                parentEntities
-            )
-        )
+          let typeParameterDeclarations: Array<TypeParameter> = astFactory.convertTypeParams(indexSignatureDeclaration.typeParameters);
+          let parameterDeclarations = indexSignatureDeclaration.parameters
+              .map(
+                  param => astFactory.convertParameterDeclaration(param)
+              );
+
+          members.push(astFactory.createMethodDeclaration(
+              "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
+          ));
+
+          parameterDeclarations.push(
+              astFactory.createParameterDeclaration("value", astFactory.resolveType(indexSignatureDeclaration.type), null)
+          );
+
+          members.push(astFactory.createMethodDeclaration(
+              "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
+          ));
+        } else if (ts.isCallSignatureDeclaration(member)) {
+
+          members.push(
+              astFactory.createMethodDeclaration(
+                  "invoke",
+                  astFactory.convertParameterDeclarations(member.parameters),
+                  member.type ? astFactory.resolveType(member.type) : astFactory.createTypeDeclaration("Unit"),
+                  astFactory.convertTypeParams(member.typeParameters),
+                  true
+              )
+          );
+        }
+      });
+
+      declarations.push(
+          astFactory.createInterfaceDeclaration(
+              interfaceDeclaration.name.getText(),
+              members,
+              astFactory.convertTypeParams(interfaceDeclaration.typeParameters),
+              parentEntities
+          )
+      )
+    } else if (ts.isModuleDeclaration(statement)) {
+      let moduleDeclaration = statement as ts.ModuleDeclaration;
+
+      if (moduleDeclaration.body) {
+        let moduleStatements: Array<ts.Node> = [];
+        moduleDeclaration.body.forEachChild(statement => moduleStatements.push(statement));
+        let moduleDeclarations = getDeclarations(astFactory, moduleStatements);
+        declarations.push(astFactory.createDocumentRoot(moduleDeclaration.name.getText(), moduleDeclarations));
+      }
+
     } else {
       console.log("SKIPPING ", statement.kind);
     }
+
   }
+
+  return declarations;
+}
+
+function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
+
+  let astFactory: TypescriptAstFactory = nativeAstFactory == null ?
+              new TypescriptAstFactory(new AstFactoryV8()) : new TypescriptAstFactory(nativeAstFactory);
+
+
+  if (fileResolver == null) {
+    fileResolver = new FileResolverV8();
+  }
+
+
+  let documentRegistry = ts.createDocumentRegistry();
+
+  let host= new DukatLanguageServiceHost(fileResolver);
+  host.register(fileName);
+
+  let languageService = ts.createLanguageService(host, documentRegistry);
+
+  var program = languageService.getProgram();
+
+  if (program == null) {
+    throw new Error(`failed to create languageService ${fileName}`)
+  }
+
+  var sourceFile = program.getSourceFile(fileName);
+
+  if (sourceFile == null) {
+    throw new Error(`failed to resolve ${fileName}`)
+  }
+
+  var declarations: Declaration[] = getDeclarations(astFactory, sourceFile.statements as any);
 
   // TODO: don't remeber how it's done in ts2kt, need to refresh my memories
   let packageNameFragments = sourceFile.fileName.split("/");

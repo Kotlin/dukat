@@ -206,7 +206,7 @@ private fun MemberDeclaration.translateSignature(): List<String> {
     }
 }
 
-fun compile(documentRoot: DocumentRoot): String {
+fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null): String {
     val docRoot = documentRoot
             .lowerConstructors()
             .lowerNativeArray()
@@ -221,11 +221,20 @@ fun compile(documentRoot: DocumentRoot): String {
 
 
     val res = mutableListOf<String>()
-    res.add("package " + docRoot.packageName)
+    var packageName = docRoot.packageName
+    if (parent != null) {
+        res.add("")
+        res.add("// ------------------------------------------------------------------------------------------")
+        res.add("@file:JsQualifier(\"${packageName}\")")
+        packageName  = "${parent.packageName}.${packageName}"
+    }
+    res.add("package " + packageName)
     res.add("")
 
     for (child in docRoot.declarations) {
-        if (child is VariableDeclaration) {
+        if (child is DocumentRoot) {
+            res.add(compile(child, docRoot))
+        } else if (child is VariableDeclaration) {
             res.add(child.translate())
         } else if (child is FunctionDeclaration) {
             res.add(child.translate())
