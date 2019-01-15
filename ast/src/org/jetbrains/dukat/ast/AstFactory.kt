@@ -18,18 +18,15 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
     override fun createClassDeclaration(
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameter>
     ) = ClassDeclaration(name, members, typeParameters)
 
-    override fun createInterfaceDeclaration(
-            name: String,
-            members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>,
-            parentEntities: List<InterfaceDeclaration>
-    ) = InterfaceDeclaration(name, members, typeParameters, parentEntities)
+    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>, parentEntities: List<InterfaceDeclaration>)
+        = InterfaceDeclaration(name, members, typeParameters, parentEntities)
 
     override fun declareVariable(name: String, type: ParameterValue) = VariableDeclaration(name, type)
     override fun declareProperty(
@@ -38,7 +35,7 @@ class AstFactory : AstNodeFactory<AstNode> {
             parameters: List<TypeParameter>,
             getter: Boolean,
             setter: Boolean
-    ) = PropertyDeclaration(name, type, parameters, getter, setter)
+    ) = PropertyDeclaration(name, type, parameters, getter, setter, false)
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
 
@@ -54,8 +51,9 @@ class AstFactory : AstNodeFactory<AstNode> {
             parameters: List<ParameterDeclaration>,
             type: ParameterValue,
             typeParameters: List<TypeParameter>,
+            override: Boolean,
             operator: Boolean
-    ) = MethodDeclaration(name, parameters, type, typeParameters, operator)
+    ) = MethodDeclaration(name, parameters, type, typeParameters, override, operator)
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue) = FunctionTypeDeclaration(parameters, type)
 

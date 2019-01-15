@@ -4,12 +4,12 @@ import org.junit.Test
 
 class GenericsTests : StandardTests() {
     @Test
-    fun testGenerics() {
+    fun generics() {
         assertContentEquals("topLevelMembers/generics/generics")
     }
 
     @Test
-    fun testGenericsWithConstraint() {
+    fun genericsWithConstraint() {
         assertContentEquals("topLevelMembers/generics/genericsWithConstraint")
     }
 }

@@ -4,17 +4,17 @@ import org.junit.Test
 
 class ClassInheritanceTests : StandardTests() {
     @Test
-    fun testOverrides() {
+    fun overrides() {
         assertContentEquals("class/inheritance/overrides")
     }
 
     @Test
-    fun testSimple() {
+    fun simple() {
         assertContentEquals("class/inheritance/simple")
     }
 
     @Test
-    fun testWithGeneric() {
+    fun withGeneric() {
         assertContentEquals("class/inheritance/withGeneric")
     }
 

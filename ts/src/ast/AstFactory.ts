@@ -21,6 +21,7 @@ declare interface AstFactory {
         parameters: Array<ParameterDeclaration>,
         type: ParameterValue,
         typeParams: Array<TypeParameter>,
+        override: boolean,
         operator: boolean
     ): MethodDeclaration;
 

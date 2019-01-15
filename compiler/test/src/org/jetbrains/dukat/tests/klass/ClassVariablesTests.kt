@@ -3,17 +3,17 @@ import org.junit.Test
 
 class ClassVariablesTests : StandardTests() {
     @Test
-    fun testComputedName() {
+    fun computedName() {
         assertContentEquals("class/variables/varComputedname")
     }
 
     @Test
-    fun testVariables() {
+    fun variables() {
         assertContentEquals("class/variables/variables")
     }
 
     @Test
-    fun withNumberAsName() {
+    fun numberAsName() {
         assertContentEquals("class/variables/withNumberAsName")
     }
 

@@ -5,5 +5,6 @@ data class PropertyDeclaration(
         val type: ParameterValue,
         val typeParameters: List<TypeParameter>,
         val getter: Boolean,
-        val setter: Boolean
+        val setter: Boolean,
+        val override: Boolean
 ) : MemberDeclaration

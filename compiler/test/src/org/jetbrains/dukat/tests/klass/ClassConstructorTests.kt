@@ -3,12 +3,12 @@ import org.junit.Test
 
 class ClassConstructorTests : StandardTests() {
     @Test
-    fun testSimple() {
+    fun simple() {
         assertContentEquals("class/constructor/simple")
     }
 
     @Test
-    fun testWithPropertyDeclaration() {
+    fun withPropertyDeclaration() {
         assertContentEquals("class/constructor/withPropertyDeclaration")
     }
 

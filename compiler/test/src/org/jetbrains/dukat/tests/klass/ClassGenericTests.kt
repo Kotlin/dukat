@@ -3,12 +3,12 @@ import org.junit.Test
 
 class ClassGenericTests : StandardTests() {
     @Test
-    fun testGenerics() {
+    fun generics() {
         assertContentEquals("class/generics/generics")
     }
 
     @Test
-    fun testGenericsWithConstraint() {
+    fun genericsWithConstraint() {
         assertContentEquals("class/generics/genericsWithConstraint")
     }
 

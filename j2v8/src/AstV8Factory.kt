@@ -15,7 +15,7 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.toAst
 
 private fun V8Object.toMap(): Map<String, Any?> = V8ObjectUtils.toMap(this)
-private fun <T:AstNode> V8Object.toAst(): T = toMap().toAst()
+private fun <T : AstNode> V8Object.toAst(): T = toMap().toAst()
 
 private fun V8Array.toArray(): Array<Map<String, Any?>> {
     val res = mutableListOf<Map<String, Any?>>()
@@ -34,30 +34,28 @@ private fun V8Array.toArray(): Array<Map<String, Any?>> {
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
-    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array) : V8Object
-            = astFactory.createClassDeclaration(
+
+    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array): V8Object = astFactory.createClassDeclaration(
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },
-            typeParameters.toArray().map {typeParameter -> typeParameter.toAst<TypeParameter>() }
+            typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameter>() }
     )
 
-    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array) : V8Object
-            = astFactory.createInterfaceDeclaration(
+    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createInterfaceDeclaration(
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },
-            typeParameters.toArray().map {typeParameter -> typeParameter.toAst<TypeParameter>() },
-            parentEntities.toArray().map {parentEntity -> parentEntity.toAst<InterfaceDeclaration>()}
+            typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameter>() },
+            parentEntities.toArray().map { parentEntity -> parentEntity.toAst<InterfaceDeclaration>() }
     )
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta)
 
     fun declareVariable(name: String, type: V8Object): V8Object = astFactory.declareVariable(name, type.toAst())
-    fun declareProperty(name: String, type: V8Object, typeParameters: V8Array, getter: Boolean, setter: Boolean): V8Object
-            = astFactory.declareProperty(name, type.toAst(), typeParameters.toArray().map { it.toAst<TypeParameter>()}, getter, setter)
+    fun declareProperty(name: String, type: V8Object, typeParameters: V8Array, getter: Boolean, setter: Boolean): V8Object = astFactory.declareProperty(name, type.toAst(), typeParameters.toArray().map { it.toAst<TypeParameter>() }, getter, setter)
 
     fun createFunctionDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array): V8Object {
-        val params = parameters.toArray().map { it.toAst<ParameterDeclaration>()}
-        val typeParams = typeParameters.toArray().map { it.toAst<TypeParameter>()}
+        val params = parameters.toArray().map { it.toAst<ParameterDeclaration>() }
+        val typeParams = typeParameters.toArray().map { it.toAst<TypeParameter>() }
 
         return astFactory.createFunctionDeclaration(
                 name,
@@ -67,15 +65,22 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
         )
     }
 
-    fun createMethodDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, operator: Boolean): V8Object {
-        val params = parameters.toArray().map { it.toAst<ParameterDeclaration>()}
-        val typeParams = typeParameters.toArray().map { it.toAst<TypeParameter>()}
+    fun createMethodDeclaration(
+            name: String, parameters:
+            V8Array, type: V8Object,
+            typeParameters: V8Array,
+            override: Boolean,
+            operator: Boolean
+    ): V8Object {
+        val params = parameters.toArray().map { it.toAst<ParameterDeclaration>() }
+        val typeParams = typeParameters.toArray().map { it.toAst<TypeParameter>() }
 
         return astFactory.createMethodDeclaration(
                 name,
                 params,
                 type.toAst(),
                 typeParams,
+                override,
                 operator
         )
     }
@@ -98,9 +103,9 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             )
 
     fun createDocumentRoot(packageName: String, declarations: V8Array) =
-            astFactory.createDocumentRoot(packageName, declarations.toArray().map{declaration -> declaration.toAst<Declaration>()}.toTypedArray())
+            astFactory.createDocumentRoot(packageName, declarations.toArray().map { declaration -> declaration.toAst<Declaration>() }.toTypedArray())
 
     fun createTypeParam(name: String, constraints: V8Array) = astFactory
             .createTypeParam(name, constraints.toArray()
-            .map { constraint -> constraint.toAst<ParameterValue>()}.toTypedArray())
+                    .map { constraint -> constraint.toAst<ParameterValue>() }.toTypedArray())
 }

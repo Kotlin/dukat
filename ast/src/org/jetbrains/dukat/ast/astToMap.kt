@@ -57,7 +57,8 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "name" to name, "type" to type.astToMap(),
                 "typeParameters" to typeParameters.map(AstNode::astToMap),
                 "getter" to getter,
-                "setter" to setter
+                "setter" to setter,
+                "override" to override
         )
         is ParameterDeclaration -> toMap()
         is FunctionDeclaration -> mapOf("reflection" to AstReflectionType.FUNCTION_DECLARATION.toString(),
@@ -72,6 +73,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
                     "type" to type.astToMap(),
                     "parameters" to parameters.map(AstNode::astToMap),
                     "typeParameters" to typeParameters.map(AstNode::astToMap),
+                    "override" to override,
                     "operator" to operator
             )
         is FunctionTypeDeclaration -> mapOf("reflection" to AstReflectionType.FUNCTION_TYPE_DECLARATION.toString(), "type" to type.astToMap(), "parameters" to parameters.map(AstNode::astToMap))

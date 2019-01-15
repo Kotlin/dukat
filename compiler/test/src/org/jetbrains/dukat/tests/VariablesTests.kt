@@ -4,22 +4,22 @@ import org.junit.Test
 
 class VariablesTests : StandardTests() {
     @Test
-    fun testVariables() {
+    fun variables() {
         assertContentEquals("topLevelMembers/variables/variables")
     }
 
     @Test
-    fun testVariableAsFunctionType() {
+    fun variableAsFunctionType() {
         assertContentEquals("topLevelMembers/variables/variableAsFunctionType")
     }
 
     @Test
-    fun testVariablesAsArray() {
+    fun variablesAsArray() {
         assertContentEquals("topLevelMembers/variables/variablesAsArray")
     }
 
     @Test
-    fun testVariablesWithoutDeclare() {
+    fun variablesWithoutDeclare() {
         assertContentEquals("topLevelMembers/variables/variablesWithoutDeclare")
     }
 }

@@ -7,7 +7,6 @@ import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.toAst
-import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
@@ -45,7 +44,7 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
             .method("declareProperty", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.BOOLEAN)
             .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY)
-            .method("createMethodDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN)
+            .method("createMethodDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.BOOLEAN)
             .method("createFunctionTypeDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createDocumentRoot", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
 
@@ -78,19 +77,6 @@ fun localResourceResolver(fileName: String): String {
 }
 
 
-fun createV8TranslatorFactory(interop: InteropEngine): (fileName: String) -> DocumentRoot {
-    return { fileName ->
-        val result = interop.callFunction<V8Object>("main", null, null, fileName)
-        (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
-    }
-}
-
-
-fun createNashornTranslatorFactory(engine: InteropEngine): (fileName: String) -> DocumentRoot {
-    return { fileName -> engine.callFunction<DocumentRoot>("main", AstFactory(), FileResolver(), fileName) }
-}
-
-
 interface Translator {
     fun translateFile(fileName: String): DocumentRoot
     fun release()
@@ -118,11 +104,9 @@ class TranslatorNashorn(private val engine: InteropNashorn) : Translator {
 }
 
 
-fun createV8Translator(resolver: ContentResolver = ::prodResourceResolver)
-        = TranslatorV8(createV8Interop(resolver))
+fun createV8Translator(resolver: ContentResolver = ::prodResourceResolver) = TranslatorV8(createV8Interop(resolver))
 
-fun createNashornTranslator(resolver: ContentResolver = ::prodResourceResolver)
-        = TranslatorNashorn(createNashornInterop(resolver))
+fun createNashornTranslator(resolver: ContentResolver = ::prodResourceResolver) = TranslatorNashorn(createNashornInterop(resolver))
 
 fun createTranslator() = createNashornTranslator(::prodResourceResolver)
 

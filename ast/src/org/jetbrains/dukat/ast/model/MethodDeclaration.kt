@@ -5,5 +5,6 @@ data class MethodDeclaration (
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValue,
         val typeParameters: List<TypeParameter>,
+        val override: Boolean,
         val operator: Boolean
 ) : MemberDeclaration

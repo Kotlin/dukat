@@ -37,8 +37,13 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>): Map<String, Any?>
             = astFactory.createFunctionDeclaration(name, parameters, type, typeParameters).astToMap()
 
-    override fun createMethodDeclaration(name: String, parameters: List<ParameterDeclaration>, type: ParameterValue, typeParameters: List<TypeParameter>, operator: Boolean): Map<String, Any?>
-            = astFactory.createMethodDeclaration(name, parameters, type, typeParameters, operator).astToMap()
+    override fun createMethodDeclaration(
+            name: String,
+            parameters: List<ParameterDeclaration>,
+            type: ParameterValue, typeParameters: List<TypeParameter>,
+            override: Boolean,
+            operator: Boolean
+    )= astFactory.createMethodDeclaration(name, parameters, type, typeParameters, override, operator).astToMap()
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue) = astFactory.createFunctionTypeDeclaration(parameters, type).astToMap()
 

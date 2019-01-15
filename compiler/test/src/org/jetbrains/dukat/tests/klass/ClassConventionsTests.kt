@@ -3,7 +3,7 @@ import org.junit.Test
 
 class ClassConventionsTests : StandardTests() {
     @Test
-    fun testIndexSignature() {
+    fun indexSignature() {
         assertContentEquals("class/conventions/indexSignature")
     }
 }

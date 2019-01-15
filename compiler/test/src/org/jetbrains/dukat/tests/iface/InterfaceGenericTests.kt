@@ -3,17 +3,17 @@ import org.junit.Test
 
 class InterfaceGenericTests : StandardTests() {
     @Test
-    fun testGenerics() {
+    fun generics() {
         assertContentEquals("interface/generics/generics")
     }
 
     @Test
-    fun testGenericsWithConstraint() {
+    fun genericsWithConstraint() {
         assertContentEquals("interface/generics/genericsWithConstraint")
     }
 
     @Test
-    fun testGenericOptionalMethods() {
+    fun genericOptionalMethods() {
         assertContentEquals("interface/generics/genericOptionalMethods")
     }
 

@@ -3,12 +3,12 @@ import org.junit.Test
 
 class InterfaceConventionsTests : StandardTests() {
     @Test
-    fun testCallSignature() {
+    fun signature() {
         assertContentEquals("interface/conventions/callSignature")
     }
 
     @Test
-    fun testIndexSignature() {
+    fun indexSignature() {
         assertContentEquals("interface/conventions/indexSignature")
     }
 }

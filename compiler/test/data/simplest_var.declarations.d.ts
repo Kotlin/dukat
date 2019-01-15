@@ -1,8 +1,21 @@
-declare namespace foo {
-  interface Bar {
-    name?: string;
-  }
+interface Foo {
+  bar();
+  bar(a:number);
+  baz: any
 }
+
+interface Boo extends Foo {
+  bar();
+  bar(a:number);
+  bar(a: string);
+  baz: number
+}
+
+// declare namespace foo {
+//   interface Bar {
+//     name?: string;
+//   }
+// }
 
 // declare interface IFoo {
 //   200: string;

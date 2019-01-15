@@ -3,13 +3,12 @@ import org.junit.Test
 
 class ClassMethodsTests : StandardTests() {
     @Test
-    fun testMethods() {
+    fun methods() {
         assertContentEquals("class/methods/methods")
     }
 
-
     @Test
-    fun testWithComputedName() {
+    fun withComputedName() {
         assertContentEquals("class/methods/methodWithComputedName")
     }
 

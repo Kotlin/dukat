@@ -48,8 +48,15 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>)
         = toV8(astFactory.createFunctionDeclaration(name, parameters, type, typeParameters))
 
-    override fun createMethodDeclaration(name: String, parameters: List<ParameterDeclaration>, type: ParameterValue, typeParameters: List<TypeParameter>, operator: Boolean)
-        = toV8(astFactory.createMethodDeclaration(name, parameters, type, typeParameters, operator))
+    override fun createMethodDeclaration(
+            name: String,
+            parameters: List<ParameterDeclaration>,
+            type: ParameterValue,
+            typeParameters: List<TypeParameter>,
+            override: Boolean,
+            operator: Boolean
+    )
+        = toV8(astFactory.createMethodDeclaration(name, parameters, type, typeParameters, override, operator))
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue)
         = toV8(astFactory.createFunctionTypeDeclaration(parameters, type))

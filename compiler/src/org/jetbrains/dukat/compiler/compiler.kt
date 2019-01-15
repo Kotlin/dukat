@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler
 
+import org.jetbrains.dukat.ast.AstContext
 import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
@@ -15,8 +16,10 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
+import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
+import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
 private fun ParameterValue.translate(): String {
@@ -153,11 +156,13 @@ private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<
 private fun VariableDeclaration.translateSignature() = "var ${this.name}: ${this.type.translate()}"
 private fun PropertyDeclaration.translateSignature(): String {
     val varModifier = if (getter && !setter) "val" else "var"
+    val overrideClause = if (override) "override " else ""
+
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
-    var res =  "${varModifier}${typeParams} ${this.name}: ${this.type.translate()}"
+    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${this.type.translate()}"
     if (getter) {
         res += " get() = definedExternally"
     }
@@ -167,7 +172,7 @@ private fun PropertyDeclaration.translateSignature(): String {
     return res
 }
 
-private fun MethodDeclaration.translateSignature() : List<String> {
+private fun MethodDeclaration.translateSignature(): List<String> {
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
@@ -186,11 +191,11 @@ private fun MethodDeclaration.translateSignature() : List<String> {
 
     val returnsUnit = type == TypeDeclaration("Unit", emptyArray())
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
-
+    val overrideClause = if (override) "override " else ""
 
     return listOf(
             annotation,
-            "${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
+            "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
     ).filterNotNull()
 }
 
@@ -206,13 +211,28 @@ private fun MemberDeclaration.translateSignature(): List<String> {
     }
 }
 
-fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null): String {
+private fun DocumentRoot.updateContext(astContext: AstContext) : DocumentRoot {
+    for (declaration in declarations) {
+        if (declaration is InterfaceDeclaration) {
+            astContext.registerInterface(declaration)
+        }
+    }
+
+    return this
+}
+
+fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
+    val myAstContext = astContext ?: AstContext()
+
     val docRoot = documentRoot
             .lowerConstructors()
             .lowerNativeArray()
             .lowerNullable()
             .lowerPrimitives()
             .lowerVarargs()
+            .updateContext(myAstContext)
+            .lowerInheritance(myAstContext)
+            .lowerOverrides()
 
 
     if (documentRoot.declarations.isEmpty()) {
@@ -226,45 +246,45 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null): String {
         res.add("")
         res.add("// ------------------------------------------------------------------------------------------")
         res.add("@file:JsQualifier(\"${packageName}\")")
-        packageName  = "${parent.packageName}.${packageName}"
+        packageName = "${parent.packageName}.${packageName}"
     }
     res.add("package " + packageName)
     res.add("")
 
-    for (child in docRoot.declarations) {
-        if (child is DocumentRoot) {
-            res.add(compile(child, docRoot))
-        } else if (child is VariableDeclaration) {
-            res.add(child.translate())
-        } else if (child is FunctionDeclaration) {
-            res.add(child.translate())
-        } else if (child is ClassDeclaration) {
-            val primaryConstructor = child.primaryConstructor
+    for (declaration in docRoot.declarations) {
+        if (declaration is DocumentRoot) {
+            res.add(compile(declaration, docRoot, myAstContext))
+        } else if (declaration is VariableDeclaration) {
+            res.add(declaration.translate())
+        } else if (declaration is FunctionDeclaration) {
+            res.add(declaration.translate())
+        } else if (declaration is ClassDeclaration) {
+            val primaryConstructor = declaration.primaryConstructor
 
-            val classDeclaration = "external open class ${child.name}${translateTypeParameters(child.typeParameters)}"
+            val classDeclaration = "external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}"
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-            val hasMembers = child.members.isNotEmpty()
+            val hasMembers = declaration.members.isNotEmpty()
             res.add(classDeclaration + params + if (hasMembers) " {" else "")
 
-            val members = child.members
+            val members = declaration.members
             if (hasMembers) {
-                res.addAll(members.flatMap { it.translate(child) }.map({ "    " + it }))
+                res.addAll(members.flatMap { it.translate(declaration) }.map({ "    " + it }))
                 res.add("}")
             }
 
-        } else if (child is InterfaceDeclaration) {
-            val hasMembers = child.members.isNotEmpty()
-            val parents = if (child.parentEntities.isNotEmpty()) {
-                " : " + child.parentEntities.map {
-                    parentEntity -> "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
+        } else if (declaration is InterfaceDeclaration) {
+            val hasMembers = declaration.members.isNotEmpty()
+            val parents = if (declaration.parentEntities.isNotEmpty()) {
+                " : " + declaration.parentEntities.map { parentEntity ->
+                    "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
                 }.joinToString(", ")
             } else ""
-            res.add("external interface ${child.name}${translateTypeParameters(child.typeParameters)}${parents}" + if (hasMembers) " {" else "")
+            res.add("external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (hasMembers) " {" else "")
 
             if (hasMembers) {
-                res.addAll(child.members.flatMap { it.translateSignature() }.map { "    " + it })
+                res.addAll(declaration.members.flatMap { it.translateSignature() }.map { "    " + it })
                 res.add("}")
             }
 

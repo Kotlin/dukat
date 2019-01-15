@@ -110,7 +110,7 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
                   );
 
               members.push(astFactory.createMethodDeclaration(
-                  "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
+                  "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, false, true
               ));
 
               parameterDeclarations.push(
@@ -118,7 +118,7 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
               );
 
               members.push(astFactory.createMethodDeclaration(
-                  "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
+                  "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, false, true
               ));
             } else if (ts.isPropertyDeclaration(memberDeclaration)) {
               let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
@@ -240,7 +240,7 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
               );
 
           members.push(astFactory.createMethodDeclaration(
-              "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
+              "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
           ));
 
           parameterDeclarations.push(
@@ -248,7 +248,7 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
           );
 
           members.push(astFactory.createMethodDeclaration(
-              "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
+              "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, false, true
           ));
         } else if (ts.isCallSignatureDeclaration(member)) {
 
@@ -258,6 +258,7 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
                   astFactory.convertParameterDeclarations(member.parameters),
                   member.type ? astFactory.resolveType(member.type) : astFactory.createTypeDeclaration("Unit"),
                   astFactory.convertTypeParams(member.typeParameters),
+                  false,
                   true
               )
           );

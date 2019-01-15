@@ -17,6 +17,7 @@ interface AstNodeFactory<T> {
             typeParameters: List<TypeParameter>,
             parentEntities: List<InterfaceDeclaration>
     ): T
+
     fun createExpression(kind: TypeDeclaration, meta: String?): T
     fun declareVariable(name: String, type: ParameterValue): T
     fun declareProperty(
@@ -39,6 +40,7 @@ interface AstNodeFactory<T> {
             List<ParameterDeclaration>,
             type: ParameterValue,
             typeParameters: List<TypeParameter>,
+            override: Boolean,
             operator: Boolean
     ): T
 

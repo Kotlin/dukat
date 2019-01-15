@@ -4,12 +4,12 @@ import org.junit.Test
 
 class InterfaceInheritanceTests : StandardTests() {
     @Test
-    fun testSimple() {
+    fun simple() {
         assertContentEquals("interface/inheritance/simple")
     }
 
     @Test
-    fun testWithGeneric() {
+    fun withGeneric() {
         assertContentEquals("class/inheritance/withGeneric")
     }
 

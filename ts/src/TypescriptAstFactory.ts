@@ -95,7 +95,7 @@ class TypescriptAstFactory implements AstFactory {
                 parameterDeclarations,
                 functionDeclaration.type ?
                     this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
-                typeParameterDeclarations, false
+                typeParameterDeclarations, false, false
             );
         }
 
@@ -103,8 +103,8 @@ class TypescriptAstFactory implements AstFactory {
     }
 
 
-    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, operator: boolean = false): MethodDeclaration {
-        return this.astFactory.createMethodDeclaration(name, parameters, type, typeParams, operator);
+    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, override: boolean = false, operator: boolean = false): MethodDeclaration {
+        return this.astFactory.createMethodDeclaration(name, parameters, type, typeParams, override, operator);
     }
 
 

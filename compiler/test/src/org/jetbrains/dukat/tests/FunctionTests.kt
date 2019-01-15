@@ -5,12 +5,12 @@ import kotlin.test.Test
 
 class FunctionTests : StandardTests() {
     @Test
-    fun testFunctions() {
+    fun functions() {
         assertContentEquals("topLevelMembers/functions/functions")
     }
 
     @Test
-    fun testFunctionsWithDefaultArguments() {
+    fun functionsWithDefaultArguments() {
         assertContentEquals("topLevelMembers/functions/functionsWithDefaultArguments")
     }
 

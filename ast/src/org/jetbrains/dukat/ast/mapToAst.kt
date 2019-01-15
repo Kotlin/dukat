@@ -73,6 +73,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                     mapEntities("parameters") { it.toAst<ParameterDeclaration>() },
                     getEntity("type")!!.toAst(),
                     mapEntities("typeParameters") { it.toAst<TypeParameter>() },
+                    get("override") as Boolean,
                     get("operator") as Boolean
             )
     } else if (reflectionType == AstReflectionType.FUNCTION_TYPE_DECLARATION) {
@@ -90,7 +91,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntity("type")!!.toAst(),
                 mapEntities("typeParameters") {it.toAst<TypeParameter>()},
                 get("getter") as Boolean,
-                get("setter") as Boolean
+                get("setter") as Boolean,
+                get("override") as Boolean
         )
     } else if (reflectionType == AstReflectionType.DOCUMENT_ROOT) {
         res = DocumentRoot(get("packageName") as String, mapEntities("declarations") {
