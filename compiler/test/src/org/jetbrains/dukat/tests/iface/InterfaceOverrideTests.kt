@@ -3,22 +3,22 @@ import org.junit.Test
 
 class InterfaceOverrideTests : StandardTests() {
     @Test
-    fun tesAnyMembers() {
+    fun anyMembers() {
         assertContentEquals("interface/override/anyMembers")
     }
 
     @Test
-    fun testInModule() {
+    fun inModule() {
         assertContentEquals("interface/override/inModule")
     }
 
     @Test
-    fun testJustOverload() {
+    fun justOverload() {
         assertContentEquals("interface/override/justOverload")
     }
 
     @Test
-    fun testSimple() {
+    fun simple() {
         assertContentEquals("interface/override/simple")
     }
 }
