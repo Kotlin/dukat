@@ -4,9 +4,11 @@ import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
@@ -52,6 +54,8 @@ private fun MemberDeclaration.lowerVarargs(): MemberDeclaration {
         return copy(parameters = parameters.map { param -> param.copy(type = param.type.lowerVarargs()) })
     } else if (this is VariableDeclaration) {
         return copy(type = type.lowerVarargs())
+    } else if (this is PropertyDeclaration) {
+        return copy(type = type.lowerVarargs())
     } else {
         throw Exception("failed to lowerVarargs for ${this}")
     }
@@ -71,6 +75,11 @@ fun DocumentRoot.lowerVarargs(): DocumentRoot {
                     members = declaration.members.map { member -> member.lowerVarargs() },
                     primaryConstructor = declaration.primaryConstructor?.let { it as MethodDeclaration}
             )
+            is InterfaceDeclaration -> {
+                declaration.copy(
+                        members = declaration.members.map { member -> member.lowerVarargs() }
+                )
+            }
             else -> declaration.duplicate()
         }
     }

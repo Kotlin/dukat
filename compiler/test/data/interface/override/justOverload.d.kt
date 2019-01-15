@@ -1,5 +1,3 @@
-package justOverload
-
 external interface Foo {
     fun bar(a: Number)
 }

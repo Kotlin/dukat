@@ -1,3 +1,4 @@
+import org.jetbrains.dukat.tests.StandardTests
 import org.junit.Test
 
 class ClassConventionsTests : StandardTests() {

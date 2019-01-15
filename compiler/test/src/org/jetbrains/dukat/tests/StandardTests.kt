@@ -1,3 +1,5 @@
+package org.jetbrains.dukat.tests
+
 import org.jetbrains.dukat.compiler.Translator
 import org.jetbrains.dukat.compiler.compile
 import org.jetbrains.dukat.compiler.createV8Translator

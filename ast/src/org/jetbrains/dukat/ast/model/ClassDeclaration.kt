@@ -5,4 +5,4 @@ data class ClassDeclaration(
         val members: List<MemberDeclaration>,
         val typeParameters: List<TypeParameter>,
         val primaryConstructor: MethodDeclaration? = null
-) : Declaration
+) : ClassLikeDeclaration

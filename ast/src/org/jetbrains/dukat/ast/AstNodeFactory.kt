@@ -2,6 +2,7 @@ package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
@@ -10,9 +11,21 @@ import org.jetbrains.dukat.ast.model.TypeParameter
 
 interface AstNodeFactory<T> {
     fun createClassDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>): T
-    fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>): T
+    fun createInterfaceDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<InterfaceDeclaration>
+    ): T
     fun createExpression(kind: TypeDeclaration, meta: String?): T
     fun declareVariable(name: String, type: ParameterValue): T
+    fun declareProperty(
+            name: String,
+            type: ParameterValue,
+            parameters: List<TypeParameter>,
+            getter: Boolean,
+            setter: Boolean
+    ): T
     fun createFunctionDeclaration(
             name: String, parameters:
             Array<ParameterDeclaration>,

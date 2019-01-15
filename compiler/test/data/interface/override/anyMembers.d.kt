@@ -1,5 +1,3 @@
-package anyMembers
-
 external interface ExpectedOverrides {
     override fun equals(a: Any)
     override fun hashCode(): Number

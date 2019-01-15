@@ -1,3 +1,5 @@
+package org.jetbrains.dukat.tests
+
 import kotlin.test.Test
 
 

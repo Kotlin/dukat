@@ -4,10 +4,12 @@ import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
@@ -56,16 +58,15 @@ private fun MethodDeclaration.lowerType() : MethodDeclaration {
     )
 }
 
-private fun VariableDeclaration.lowerType() : VariableDeclaration {
-    return copy(
-            type = type.lowerType()
-    )
-}
+private fun VariableDeclaration.lowerType() = copy(type = type.lowerType())
+private fun PropertyDeclaration.lowerType() = copy(type = type.lowerType())
 
 private fun MemberDeclaration.lowerType() : MemberDeclaration {
     if (this is MethodDeclaration) {
         return lowerType()
     } else if (this is VariableDeclaration) {
+        return lowerType()
+    } else if (this is PropertyDeclaration) {
         return lowerType()
     } else {
         throw Exception("can not lower type for ${this}")
@@ -89,6 +90,11 @@ fun DocumentRoot.lowerPrimitives(): DocumentRoot {
                             members = declaration.members.map { declaration -> declaration.lowerType() },
                             primaryConstructor = declaration.primaryConstructor?.lowerType()
                     )
+            is InterfaceDeclaration -> {
+                declaration.copy(
+                        members = declaration.members.map { member -> member.lowerType() }
+                )
+            }
             else -> declaration.duplicate()
         }
     }

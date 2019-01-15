@@ -6,6 +6,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.AstNodeFactory
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
@@ -26,13 +27,23 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>
-    ) = toV8(astFactory.createInterfaceDeclaration(name, members, typeParameters))
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<InterfaceDeclaration>
+    ) = toV8(astFactory.createInterfaceDeclaration(name, members, typeParameters, parentEntities))
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = toV8(astFactory.createExpression(kind, meta))
 
     override fun declareVariable(name: String, type: ParameterValue)
         = toV8(astFactory.declareVariable(name, type))
+
+    override fun declareProperty(
+            name: String,
+            type: ParameterValue,
+            parameters: List<TypeParameter>,
+            getter: Boolean,
+            setter: Boolean
+    )
+            = toV8(astFactory.declareProperty(name, type, parameters, getter, setter))
 
     override fun createFunctionDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParameters: Array<TypeParameter>)
         = toV8(astFactory.createFunctionDeclaration(name, parameters, type, typeParameters))

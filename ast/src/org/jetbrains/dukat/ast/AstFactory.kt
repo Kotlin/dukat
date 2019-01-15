@@ -12,6 +12,7 @@ import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -26,10 +27,18 @@ class AstFactory : AstNodeFactory<AstNode> {
     override fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>
-    ) = InterfaceDeclaration(name, members, typeParameters)
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<InterfaceDeclaration>
+    ) = InterfaceDeclaration(name, members, typeParameters, parentEntities)
 
     override fun declareVariable(name: String, type: ParameterValue) = VariableDeclaration(name, type)
+    override fun declareProperty(
+            name: String,
+            type: ParameterValue,
+            parameters: List<TypeParameter>,
+            getter: Boolean,
+            setter: Boolean
+    ) = PropertyDeclaration(name, type, parameters, getter, setter)
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = Expression(kind, meta)
 

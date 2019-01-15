@@ -1,5 +1,3 @@
-package variables
-
 external interface Foo {
     var varWithoutTypeAnnotation: Any
     var varAsAny: Any

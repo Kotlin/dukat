@@ -1,5 +1,3 @@
-package genericsWithConstraint
-
 external interface Foo<T : Bar> {
     var varT: T
     fun withoutArgumentsReturnsT(): T

@@ -1,10 +1,11 @@
 declare interface AstFactory {
     createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): ClassDeclaration;
-    createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): InterfaceDeclaration;
+    createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: String): Expression;
 
     declareVariable(value: string, type: ParameterValue): VariableDeclaration;
+    declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter>, getter: boolean, setter: boolean): PropertyDeclaration;
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
 

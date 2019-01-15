@@ -73,31 +73,6 @@ function resolveType(astFactory: TypescriptAstFactory, type: ts.TypeNode | undef
   }
 }
 
-
-function createParamDeclaration(astFactory: TypescriptAstFactory, param: ts.ParameterDeclaration) : ParameterDeclaration {
-
-  let initializer = null;
-  if (param.initializer != null) {
-    initializer = astFactory.createExpression(
-        astFactory.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
-        param.initializer.getText()
-    )
-  } else if (param.questionToken != null) {
-      initializer = astFactory.createExpression(
-          astFactory.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
-          "null"
-      )
-  }
-
-  let paramType = resolveType(astFactory, param.type);
-
-  return astFactory.createParameterDeclaration(
-      param.name.getText(),
-      param.questionToken ? astFactory.createNullableType(paramType) : paramType,
-      initializer
-  )
-}
-
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
 
   let astFactory: TypescriptAstFactory = nativeAstFactory == null ?
@@ -149,13 +124,13 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
             if (classDeclaration.members) {
 
               for (let memberDeclaration of classDeclaration.members) {
-                if (memberDeclaration.kind == ts.SyntaxKind.IndexSignature) {
+                if (ts.isIndexSignatureDeclaration(memberDeclaration)) {
                   let indexSignatureDeclaration = memberDeclaration as ts.IndexSignatureDeclaration;
 
                   let typeParameterDeclarations: Array<TypeParameter> = astFactory.convertTypeParams(indexSignatureDeclaration.typeParameters);
                   let parameterDeclarations = indexSignatureDeclaration.parameters
                       .map(
-                          param => astFactory.createParamDeclaration(param)
+                          param => astFactory.convertParameterDeclaration(param)
                       );
 
                   members.push(astFactory.createMethodDeclaration(
@@ -165,11 +140,11 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                   parameterDeclarations.push(
                       astFactory.createParameterDeclaration("value", astFactory.resolveType(indexSignatureDeclaration.type), null)
                   );
-                  
+
                   members.push(astFactory.createMethodDeclaration(
                       "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
                   ));
-                } else if (memberDeclaration.kind == ts.SyntaxKind.PropertyDeclaration) {
+                } else if (ts.isPropertyDeclaration(memberDeclaration)) {
                     let propertyDeclaration = memberDeclaration as ts.PropertyDeclaration;
                     let convertedVariable = astFactory.convertVariable(
                         propertyDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
@@ -177,11 +152,11 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                     if (convertedVariable != null) {
                       members.push(convertedVariable);
                     }
-                } else if (memberDeclaration.kind == ts.SyntaxKind.MethodDeclaration) {
-                  let functionDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration);
-                  let convertedFunctionDeclaration = astFactory.convertMethodDeclaration(functionDeclaration);
-                  if (convertedFunctionDeclaration != null) {
-                    members.push(convertedFunctionDeclaration);
+                } else if (ts.isMethodDeclaration(memberDeclaration)) {
+                  let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
+                  let convertedMethodDeclaration = astFactory.convertMethodDeclaration(methodDeclaration);
+                  if (convertedMethodDeclaration != null) {
+                    members.push(convertedMethodDeclaration);
                   }
                 } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
                   let constructor = memberDeclaration as ts.ConstructorDeclaration;
@@ -201,7 +176,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
                       }
                     }
 
-                    params.push(astFactory.createParamDeclaration(parameter));
+                    params.push(astFactory.convertParameterDeclaration(parameter));
                   }
 
 
@@ -230,9 +205,95 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
           }
         } else if (ts.isInterfaceDeclaration(statement)) {
             let interfaceDeclaration = statement as ts.InterfaceDeclaration;
+            let parentEntities: Array<InterfaceDeclaration> = [];
+
+            if (interfaceDeclaration.heritageClauses) {
+              for (let heritageClause of interfaceDeclaration.heritageClauses) {
+                for (let type of heritageClause.types) {
+                  let typeParams: Array<TypeParameter> = [];
+
+                  if (type.typeArguments) {
+                    for (let typeArgument of type.typeArguments) {
+                      let value = (astFactory.resolveType(typeArgument) as any).value;
+                      typeParams.push(astFactory.createTypeParam(value, []))
+                    }
+                  }
+
+
+                  parentEntities.push(
+                      astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams)
+                  );
+                }
+              }
+            }
+
+            let members: Array<MemberDeclaration> = [];
+            interfaceDeclaration.members.map(member => {
+
+              if (ts.isMethodSignature(member)) {
+                let methodDeclaration = member as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
+
+                if (methodDeclaration.questionToken) {
+                    members.push(astFactory.convertMethodSignatureToPropertyDeclaration(methodDeclaration));
+                } else {
+                  let convertedMethodDeclaration = astFactory.convertMethodDeclaration(methodDeclaration);
+                  if (convertedMethodDeclaration != null) {
+                    members.push(convertedMethodDeclaration);
+                  }
+                }
+              } else if (ts.isPropertySignature(member)) {
+                let propertyDeclaration: PropertyDeclaration;
+                if (member.questionToken) {
+                  propertyDeclaration = astFactory.declareProperty(
+                      astFactory.convertName(member.name) as string,
+                      astFactory.createNullableType(astFactory.resolveType(member.type)),
+                      [], true, true)
+                } else {
+                  propertyDeclaration = astFactory.declareProperty(astFactory.convertName(member.name) as string, astFactory.resolveType(member.type));
+                }
+                members.push(
+                    propertyDeclaration
+                );
+              } else if (ts.isIndexSignatureDeclaration(member)) {
+                let indexSignatureDeclaration = member as ts.IndexSignatureDeclaration;
+
+                let typeParameterDeclarations: Array<TypeParameter> = astFactory.convertTypeParams(indexSignatureDeclaration.typeParameters);
+                let parameterDeclarations = indexSignatureDeclaration.parameters
+                    .map(
+                        param => astFactory.convertParameterDeclaration(param)
+                    );
+
+                members.push(astFactory.createMethodDeclaration(
+                    "get", parameterDeclarations, astFactory.createNullableType(astFactory.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, true
+                ));
+
+                parameterDeclarations.push(
+                    astFactory.createParameterDeclaration("value", astFactory.resolveType(indexSignatureDeclaration.type), null)
+                );
+
+                members.push(astFactory.createMethodDeclaration(
+                    "set", parameterDeclarations, astFactory.createTypeDeclaration("Unit"), typeParameterDeclarations, true
+                ));
+              } else if (ts.isCallSignatureDeclaration(member)) {
+
+                members.push(
+                    astFactory.createMethodDeclaration(
+                        "invoke",
+                        astFactory.convertParameterDeclarations(member.parameters),
+                        member.type ? astFactory.resolveType(member.type) : astFactory.createTypeDeclaration("Unit"),
+                        astFactory.convertTypeParams(member.typeParameters),
+                        true
+                    )
+                );
+              }
+            });
+
             declarations.push(
                 astFactory.createInterfaceDeclaration(
-                    interfaceDeclaration.name.getText(), [],[]
+                    interfaceDeclaration.name.getText(),
+                    members,
+                    astFactory.convertTypeParams(interfaceDeclaration.typeParameters),
+                    parentEntities
                 )
             )
         } else {

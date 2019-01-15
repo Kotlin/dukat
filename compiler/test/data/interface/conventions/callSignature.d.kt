@@ -1,5 +1,3 @@
-package callSignature
-
 external interface Foo {
     @nativeInvoke
     operator fun invoke()

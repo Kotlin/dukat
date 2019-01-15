@@ -7,6 +7,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
@@ -40,16 +41,19 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             typeParameters.toArray().map {typeParameter -> typeParameter.toAst<TypeParameter>() }
     )
 
-    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array) : V8Object
+    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array) : V8Object
             = astFactory.createInterfaceDeclaration(
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },
-            typeParameters.toArray().map {typeParameter -> typeParameter.toAst<TypeParameter>() }
+            typeParameters.toArray().map {typeParameter -> typeParameter.toAst<TypeParameter>() },
+            parentEntities.toArray().map {parentEntity -> parentEntity.toAst<InterfaceDeclaration>()}
     )
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta)
 
     fun declareVariable(name: String, type: V8Object): V8Object = astFactory.declareVariable(name, type.toAst())
+    fun declareProperty(name: String, type: V8Object, typeParameters: V8Array, getter: Boolean, setter: Boolean): V8Object
+            = astFactory.declareProperty(name, type.toAst(), typeParameters.toArray().map { it.toAst<TypeParameter>()}, getter, setter)
 
     fun createFunctionDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array): V8Object {
         val params = parameters.toArray().map { it.toAst<ParameterDeclaration>()}

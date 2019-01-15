@@ -1,5 +1,3 @@
-package simple
-
 external interface Foo {
     fun bar()
     fun bar(a: Number)

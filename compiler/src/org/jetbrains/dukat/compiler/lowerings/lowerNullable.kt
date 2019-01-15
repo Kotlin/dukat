@@ -4,10 +4,12 @@ import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
@@ -76,6 +78,8 @@ private fun MemberDeclaration.lowerNullable() : MemberDeclaration {
         return lowerNullable()
     } else if (this is VariableDeclaration) {
         return lowerNullable()
+    } else if (this is PropertyDeclaration) {
+        return lowerNullable()
     } else {
         throw Exception("can not null member declaration ${this}")
     }
@@ -97,6 +101,7 @@ private fun MethodDeclaration.lowerNullable() = copy(
 
 
 private fun VariableDeclaration.lowerNullable() = copy(type = type.lowerNullableType())
+private fun PropertyDeclaration.lowerNullable() = copy(type = type.lowerNullableType())
 
 fun DocumentRoot.lowerNullable(): DocumentRoot {
 
@@ -108,6 +113,11 @@ fun DocumentRoot.lowerNullable(): DocumentRoot {
                     members = declaration.members.map { member -> member.lowerNullable() },
                     primaryConstructor = declaration.primaryConstructor?.lowerNullable()
             )
+            is InterfaceDeclaration -> {
+                declaration.copy(
+                        members = declaration.members.map { member -> member.lowerNullable() }
+                )
+            }
             else -> declaration.duplicate()
         }
     }

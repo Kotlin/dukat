@@ -12,6 +12,7 @@ import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -83,6 +84,14 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         res = parameterDeclarationToAst()
     } else if (reflectionType == AstReflectionType.VARIABLE_DECLARATION) {
         res = VariableDeclaration(get("name") as String, getEntity("type")!!.toAst())
+    } else if (reflectionType == AstReflectionType.PROPERTY_DECLARATION) {
+        res = PropertyDeclaration(
+                get("name") as String,
+                getEntity("type")!!.toAst(),
+                mapEntities("typeParameters") {it.toAst<TypeParameter>()},
+                get("getter") as Boolean,
+                get("setter") as Boolean
+        )
     } else if (reflectionType == AstReflectionType.DOCUMENT_ROOT) {
         res = DocumentRoot(mapEntities("declarations") {
             it.toAst<Declaration>()
@@ -99,7 +108,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         res = InterfaceDeclaration(
                 get("name") as String,
                 mapEntities("members") {it.toAst<MemberDeclaration>()},
-                mapEntities("typeParameters") {it.toAst<TypeParameter>()}
+                mapEntities("typeParameters") {it.toAst<TypeParameter>()},
+                mapEntities("parentEntities") { it.toAst<InterfaceDeclaration>() }
         )
     } else {
         println(this.get("reflection"))

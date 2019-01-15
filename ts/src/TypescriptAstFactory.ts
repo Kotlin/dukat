@@ -11,8 +11,8 @@ class TypescriptAstFactory implements AstFactory {
         return this.astFactory.createClassDeclaration(name, members, typeParams);
     }
 
-    createInterfaceDeclaration(name: String, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): InterfaceDeclaration {
-        return this.astFactory.createInterfaceDeclaration(name, members, typeParams);
+    createInterfaceDeclaration(name: String, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration> = []): InterfaceDeclaration {
+        return this.astFactory.createInterfaceDeclaration(name, members, typeParams, parentEntities);
     }
 
 
@@ -21,16 +21,21 @@ class TypescriptAstFactory implements AstFactory {
     }
 
 
-    convertVariable(nativeVariableDeclaration: ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration) : VariableDeclaration | null {
+    convertName(name: ts.BindingName | ts.PropertyName) : string | null {
+        if (ts.isNumericLiteral(name)) {
+            return "`" + name.getText() + "`";
+        } else if (ts.isIdentifier(name)) {
+            return name.getText();
+        }
+        return null
+    }
 
-        if (ts.isNumericLiteral(nativeVariableDeclaration.name)) {
+    convertVariable(nativeVariableDeclaration: ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration) : VariableDeclaration | null {
+        let name = this.convertName(nativeVariableDeclaration.name);
+
+        if (name != null) {
             return this.astFactory.declareVariable(
-                "`" + nativeVariableDeclaration.name.getText() + "`",
-                this.resolveType(nativeVariableDeclaration.type)
-            );
-        } else if (ts.isIdentifier(nativeVariableDeclaration.name)) {
-            return this.astFactory.declareVariable(
-                nativeVariableDeclaration.name.getText(),
+                name,
                 this.resolveType(nativeVariableDeclaration.type)
             );
         }
@@ -58,7 +63,7 @@ class TypescriptAstFactory implements AstFactory {
 
         let parameterDeclarations = functionDeclaration.parameters
             .map(
-            param => this.createParamDeclaration(param)
+            param => this.convertParameterDeclaration(param)
             );
 
 
@@ -75,12 +80,12 @@ class TypescriptAstFactory implements AstFactory {
         return null;
     }
 
-    convertMethodDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : MethodDeclaration | null  {
+    convertMethodDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature) : MethodDeclaration | null  {
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
         let parameterDeclarations = functionDeclaration.parameters
             .map(
-                param => this.createParamDeclaration(param)
+                param => this.convertParameterDeclaration(param)
             );
 
 
@@ -121,6 +126,10 @@ class TypescriptAstFactory implements AstFactory {
 
     declareVariable(value: string, type: ParameterValue): VariableDeclaration {
         return this.astFactory.declareVariable(value, type);
+    }
+
+    declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], getter: boolean = false, setter: boolean = false): PropertyDeclaration {
+        return this.astFactory.declareProperty(value, type, typeParams, getter, setter);
     }
 
     createUnionType(params: Array<TypeDeclaration>) {
@@ -186,7 +195,7 @@ class TypescriptAstFactory implements AstFactory {
                 } else if (type.kind == ts.SyntaxKind.FunctionType) {
                     const functionDeclaration = type as ts.FunctionTypeNode;
                     let parameterDeclarations = functionDeclaration.parameters.map(
-                        param => this.createParamDeclaration(param)
+                        param => this.convertParameterDeclaration(param)
                     );
                     return this.createFunctionTypeDeclaration(parameterDeclarations, this.resolveType(functionDeclaration.type))
                 } else {
@@ -196,7 +205,27 @@ class TypescriptAstFactory implements AstFactory {
         }
     }
 
-    createParamDeclaration(param: ts.ParameterDeclaration) : ParameterDeclaration {
+    convertParameterDeclarations(parameters: ts.NodeArray<ts.ParameterDeclaration>) : Array<ParameterDeclaration> {
+        return parameters.map(parameter => this.convertParameterDeclaration(parameter));
+    }
+
+    convertMethodSignatureToPropertyDeclaration(methodSignature: ts.MethodSignature) : PropertyDeclaration {
+        let parameterDeclarations = this.convertParameterDeclarations(methodSignature.parameters);
+
+        let functionTypeDeclaration = this.createFunctionTypeDeclaration(
+            parameterDeclarations,
+            methodSignature.type ? this.resolveType(methodSignature.type) : this.createTypeDeclaration("Unit")
+        );
+
+        return this.declareProperty(
+            this.convertName(methodSignature.name) as string,
+            this.createNullableType(functionTypeDeclaration),
+            this.convertTypeParams(methodSignature.typeParameters),
+            true
+        );
+    }
+
+    convertParameterDeclaration(param: ts.ParameterDeclaration) : ParameterDeclaration {
         let initializer = null;
         if (param.initializer != null) {
             initializer = this.createExpression(

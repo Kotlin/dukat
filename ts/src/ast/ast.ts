@@ -1,3 +1,4 @@
+
 declare interface AstNode {
 }
 
@@ -16,6 +17,12 @@ declare class InterfaceDeclaration implements Declaration {}
 declare class VariableDeclaration implements MemberDeclaration {
     name: String;
     type: TypeDeclaration;
+}
+
+declare class PropertyDeclaration implements MemberDeclaration {
+    name: string;
+    type: TypeDeclaration;
+    immmutable: boolean;
 }
 
 declare class Expression implements Declaration {

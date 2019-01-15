@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.MemberDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -148,6 +149,63 @@ private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<
     }
 }
 
+
+private fun VariableDeclaration.translateSignature() = "var ${this.name}: ${this.type.translate()}"
+private fun PropertyDeclaration.translateSignature(): String {
+    val varModifier = if (getter && !setter) "val" else "var"
+    var typeParams = translateTypeParameters(typeParameters)
+    if (typeParams.isNotEmpty()) {
+        typeParams = " " + typeParams
+    }
+    var res =  "${varModifier}${typeParams} ${this.name}: ${this.type.translate()}"
+    if (getter) {
+        res += " get() = definedExternally"
+    }
+    if (setter) {
+        res += "; set(value) = definedExternally"
+    }
+    return res
+}
+
+private fun MethodDeclaration.translateSignature() : List<String> {
+    var typeParams = translateTypeParameters(typeParameters)
+    if (typeParams.isNotEmpty()) {
+        typeParams = " " + typeParams
+    }
+
+    val operatorModifier = if (operator) "operator " else ""
+    val annotation = if (operator) {
+        if (name == "set") {
+            "@nativeSetter"
+        } else if (name == "get") {
+            "@nativeGetter"
+        } else if (name == "invoke") {
+            "@nativeInvoke"
+        } else null
+    } else null
+
+    val returnsUnit = type == TypeDeclaration("Unit", emptyArray())
+    val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
+
+
+    return listOf(
+            annotation,
+            "${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
+    ).filterNotNull()
+}
+
+private fun MemberDeclaration.translateSignature(): List<String> {
+    if (this is VariableDeclaration) {
+        return listOf(translateSignature())
+    } else if (this is MethodDeclaration) {
+        return translateSignature()
+    } else if (this is PropertyDeclaration) {
+        return listOf(translateSignature())
+    } else {
+        throw Exception("can not translate singature ${this}")
+    }
+}
+
 fun compile(documentRoot: DocumentRoot): String {
     val docRoot = documentRoot
             .lowerConstructors()
@@ -170,16 +228,29 @@ fun compile(documentRoot: DocumentRoot): String {
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-            res.add(classDeclaration + params)
+            val hasMembers = child.members.isNotEmpty()
+            res.add(classDeclaration + params + if (hasMembers) " {" else "")
 
             val members = child.members
-            if (members.isNotEmpty()) {
-                res[res.size - 1] += " {"
+            if (hasMembers) {
                 res.addAll(members.flatMap { it.translate(child) }.map({ "    " + it }))
                 res.add("}")
             }
+
         } else if (child is InterfaceDeclaration) {
-            res.add("external interface ${child.name}")
+            val hasMembers = child.members.isNotEmpty()
+            val parents = if (child.parentEntities.isNotEmpty()) {
+                " : " + child.parentEntities.map {
+                    parentEntity -> "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
+                }.joinToString(", ")
+            } else ""
+            res.add("external interface ${child.name}${translateTypeParameters(child.typeParameters)}${parents}" + if (hasMembers) " {" else "")
+
+            if (hasMembers) {
+                res.addAll(child.members.flatMap { it.translateSignature() }.map { "    " + it })
+                res.add("}")
+            }
+
         }
     }
 

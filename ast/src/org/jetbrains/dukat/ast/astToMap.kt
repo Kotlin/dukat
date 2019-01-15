@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.MethodDeclaration
 import org.jetbrains.dukat.ast.model.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
@@ -41,7 +42,8 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "reflection" to AstReflectionType.INTERFACE_DECLARATION.toString(),
                 "name" to name,
                 "members" to members.map(AstNode::astToMap),
-                "typeParameters" to typeParameters.map(AstNode::astToMap)
+                "typeParameters" to typeParameters.map(AstNode::astToMap),
+                "parentEntities" to parentEntities.map(AstNode::astToMap)
         )
         is TypeParameter -> mapOf(
                 "reflection" to AstReflectionType.TYPE_PARAM.toString(),
@@ -50,6 +52,13 @@ fun AstNode.astToMap(): Map<String, Any?> {
         )
         is TypeDeclaration -> mapOf("reflection" to AstReflectionType.TYPE_DECLARATION.toString(), "value" to value, "params" to params.map(AstNode::astToMap))
         is VariableDeclaration -> mapOf("reflection" to AstReflectionType.VARIABLE_DECLARATION.toString(), "name" to name, "type" to type.astToMap())
+        is PropertyDeclaration -> mapOf(
+                "reflection" to AstReflectionType.PROPERTY_DECLARATION.toString(),
+                "name" to name, "type" to type.astToMap(),
+                "typeParameters" to typeParameters.map(AstNode::astToMap),
+                "getter" to getter,
+                "setter" to setter
+        )
         is ParameterDeclaration -> toMap()
         is FunctionDeclaration -> mapOf("reflection" to AstReflectionType.FUNCTION_DECLARATION.toString(),
                 "name" to name,

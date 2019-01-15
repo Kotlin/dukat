@@ -1,5 +1,3 @@
-package indexSignature
-
 external interface Foo {
     @nativeGetter
     operator fun get(n: Number): Bar?

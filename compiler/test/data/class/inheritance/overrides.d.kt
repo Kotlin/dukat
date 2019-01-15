@@ -1,5 +1,3 @@
-package overrides
-
 external interface Shape
 external interface Box : Shape
 external interface BaseEvent {
