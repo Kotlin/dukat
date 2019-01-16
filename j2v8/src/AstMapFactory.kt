@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.ast.j2v8
 
-import org.jetbrains.dukat.ast.AstFactory
-import org.jetbrains.dukat.ast.AstNodeFactory
 import org.jetbrains.dukat.ast.astToMap
+import org.jetbrains.dukat.ast.factory.AstFactory
+import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression

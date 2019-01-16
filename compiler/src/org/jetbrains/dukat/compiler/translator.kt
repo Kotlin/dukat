@@ -2,7 +2,7 @@ package org.jetbrains.dukat.compiler
 
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.jetbrains.dukat.ast.AstFactory
+import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.ast.model.DocumentRoot

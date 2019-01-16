@@ -3,7 +3,7 @@ package org.jetbrains.dukat.ast.j2v8
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.jetbrains.dukat.ast.AstNodeFactory
+import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast
+package org.jetbrains.dukat.ast.factory
 
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
