@@ -5,7 +5,4 @@ data class FunctionTypeDeclaration(
         val type: ParameterValue,
         override var nullable: Boolean = false,
         override var vararg: Boolean = false
-) : ParameterValue {
-    constructor(parameters: Array<ParameterDeclaration>, type: ParameterValue) : this(
-            parameters.toList(), type)
-}
+) : ParameterValue

@@ -46,7 +46,7 @@ class AstFactory : AstNodeFactory<AstNode> {
             parameters: Array<ParameterDeclaration>,
             type: ParameterValue,
             typeParameters: Array<TypeParameter>
-    ) = FunctionDeclaration(name, parameters, type, typeParameters)
+    ) = FunctionDeclaration(name, parameters.toList(), type, typeParameters.toList())
 
     override fun createMethodDeclaration(
             name: String,
@@ -57,13 +57,13 @@ class AstFactory : AstNodeFactory<AstNode> {
             operator: Boolean
     ) = MethodDeclaration(name, parameters, type, typeParameters, override, operator)
 
-    override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue) = FunctionTypeDeclaration(parameters, type)
+    override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue) = FunctionTypeDeclaration(parameters.toList(), type)
 
     override fun createTypeDeclaration(value: String, params: Array<ParameterValue>) = TypeDeclaration(value, params)
 
     override fun createParameterDeclaration(name: String, type: ParameterValue, initializer: Expression?) = ParameterDeclaration(name, type, initializer)
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>) = DocumentRoot(packageName, declarations)
+    override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>) = DocumentRoot(packageName, declarations.toList())
 
-    override fun createTypeParam(name: String, constraints: Array<ParameterValue>) = TypeParameter(name, constraints)
+    override fun createTypeParam(name: String, constraints: Array<ParameterValue>) = TypeParameter(name, constraints.toList())
 }

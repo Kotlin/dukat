@@ -116,7 +116,6 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 mapEntities("parentEntities") { it.toAst<InterfaceDeclaration>() }
         )
     } else {
-        println(this.get("reflection"))
         throw Exception("failed to create declaration from mapper: ${this}")
     }
 
