@@ -38,13 +38,13 @@ private fun ParameterValue.lowerNullableType(): ParameterValue {
                 }
 
                 if (params.size == 1) {
-                    val nullable =  params[0]
-                    if (nullable is TypeDeclaration) {
-                        return nullable.lowerNullableType(true)
-                    } else if (nullable is FunctionTypeDeclaration) {
-                        return nullable.lowerNullableType(true)
+                    val nullableType =  params[0]
+                    if (nullableType is TypeDeclaration) {
+                        return nullableType.lowerNullableType(true)
+                    } else if (nullableType is FunctionTypeDeclaration) {
+                        return nullableType.lowerNullableType(true)
                     } else {
-                        throw Exception("can not lower nullables for unknown param type ${nullable}")
+                        throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
                 } else lowerNullableType()
             } else {
