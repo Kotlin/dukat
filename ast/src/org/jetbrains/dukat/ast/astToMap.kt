@@ -36,7 +36,8 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "reflection" to AstReflectionType.CLASS_DECLARATION.toString(),
                 "name" to name,
                 "members" to members.map(AstNode::astToMap),
-                "typeParameters" to typeParameters.map(AstNode::astToMap)
+                "typeParameters" to typeParameters.map(AstNode::astToMap),
+                "parentEntities" to parentEntities.map(AstNode::astToMap)
         )
         is InterfaceDeclaration -> mapOf(
                 "reflection" to AstReflectionType.INTERFACE_DECLARATION.toString(),

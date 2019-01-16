@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.astToMap
 import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
@@ -17,8 +18,9 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
     override fun createClassDeclaration(
             name: String,
             members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>
-    ) = astFactory.createClassDeclaration(name, members, typeParameters).astToMap()
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<ClassLikeDeclaration>
+    ) = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities).astToMap()
 
     override fun createInterfaceDeclaration(
             name: String,

@@ -4,6 +4,7 @@ import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
@@ -20,9 +21,10 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createClassDeclaration(
             name: String,
             members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<ClassLikeDeclaration>
     )
-        = toV8(astFactory.createClassDeclaration(name, members, typeParameters))
+        = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities))
 
     override fun createInterfaceDeclaration(
             name: String,

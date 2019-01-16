@@ -7,8 +7,8 @@ class TypescriptAstFactory implements AstFactory {
         return this.astFactory.createDocumentRoot(packageName, declarations);
     }
 
-    createClassDeclaration(name: String, members: Array<MemberDeclaration> = [], typeParams: Array<TypeParameter> = []): ClassDeclaration {
-        return this.astFactory.createClassDeclaration(name, members, typeParams);
+    createClassDeclaration(name: String, members: Array<MemberDeclaration> = [], typeParams: Array<TypeParameter> = [], parentEntities: Array<InterfaceDeclaration> = []): ClassDeclaration {
+        return this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities);
     }
 
     createInterfaceDeclaration(name: String, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration> = []): InterfaceDeclaration {

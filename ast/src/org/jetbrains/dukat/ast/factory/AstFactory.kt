@@ -2,6 +2,7 @@ package org.jetbrains.dukat.ast.factory
 
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.ClassDeclaration
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.Expression
@@ -22,8 +23,9 @@ class AstFactory : AstNodeFactory<AstNode> {
     override fun createClassDeclaration(
             name: String,
             members: List<MemberDeclaration>,
-            typeParameters: List<TypeParameter>
-    ) = ClassDeclaration(name, members, typeParameters)
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<ClassLikeDeclaration>
+    ) = ClassDeclaration(name, members, typeParameters, parentEntities)
 
     override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>, parentEntities: List<InterfaceDeclaration>)
         = InterfaceDeclaration(name, members, typeParameters, parentEntities)

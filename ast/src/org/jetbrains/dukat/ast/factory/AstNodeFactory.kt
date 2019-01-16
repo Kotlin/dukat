@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.factory
 
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
@@ -10,7 +11,12 @@ import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 
 interface AstNodeFactory<T> {
-    fun createClassDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>): T
+    fun createClassDeclaration(
+            name: String,
+            members: List<MemberDeclaration>,
+            typeParameters: List<TypeParameter>,
+            parentEntities: List<ClassLikeDeclaration>
+    ): T
     fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,

@@ -2,6 +2,7 @@ package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.ClassDeclaration
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.Expression
@@ -104,7 +105,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         res = ClassDeclaration(
                 get("name") as String,
                 mapEntities("members") {it.toAst<MemberDeclaration>()},
-                mapEntities("typeParameters") {it.toAst<TypeParameter>()}
+                mapEntities("typeParameters") {it.toAst<TypeParameter>()},
+                mapEntities("parentEntities") {it.toAst<ClassLikeDeclaration>()}
         )
     } else if (reflectionType == AstReflectionType.INTERFACE_DECLARATION) {
         res = InterfaceDeclaration(

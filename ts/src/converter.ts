@@ -92,10 +92,32 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
       }
     } else if (ts.isClassDeclaration(statement)) {
       const classDeclaration = statement as ts.ClassDeclaration;
+      let parentEntities: Array<ClassLikeDeclaration> = [];
 
       if (classDeclaration.name != undefined) {
 
         let members: Array<MemberDeclaration> = [];
+
+        if (classDeclaration.heritageClauses) {
+          for (let heritageClause of classDeclaration.heritageClauses) {
+            for (let type of heritageClause.types) {
+              let typeParams: Array<TypeParameter> = [];
+
+              if (type.typeArguments) {
+                for (let typeArgument of type.typeArguments) {
+                  let value = (astFactory.resolveType(typeArgument) as any).value;
+                  typeParams.push(astFactory.createTypeParam(value, []))
+                }
+              }
+
+
+              parentEntities.push(
+                  astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams)
+              );
+            }
+          }
+        }
+
 
         if (classDeclaration.members) {
 
@@ -169,7 +191,8 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
             astFactory.createClassDeclaration(
                 classDeclaration.name.getText(),
                 members,
-                astFactory.convertTypeParams(classDeclaration.typeParameters)
+                astFactory.convertTypeParams(classDeclaration.typeParameters),
+                parentEntities
             )
         );
       }

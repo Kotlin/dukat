@@ -50,6 +50,7 @@ declare class TypeParameter {
     name: String;
 }
 
+type ClassLikeDeclaration = ClassDeclaration | InterfaceDeclaration
 
 declare class TypeDeclaration implements ParameterValue {
     constructor(value: string, params: Array<ParameterValue>);

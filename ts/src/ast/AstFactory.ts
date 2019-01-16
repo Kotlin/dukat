@@ -1,5 +1,5 @@
 declare interface AstFactory {
-    createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>): ClassDeclaration;
+    createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>): ClassDeclaration;
     createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: String): Expression;

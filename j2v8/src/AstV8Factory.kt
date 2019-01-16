@@ -5,6 +5,7 @@ import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.model.AstNode
+import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.Expression
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
@@ -35,10 +36,11 @@ private fun V8Array.toArray(): Array<Map<String, Any?>> {
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
 
-    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array): V8Object = astFactory.createClassDeclaration(
+    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createClassDeclaration(
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },
-            typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameter>() }
+            typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameter>() },
+            parentEntities.toArray().map { typeParameter -> typeParameter.toAst<ClassLikeDeclaration>() }
     )
 
     fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createInterfaceDeclaration(

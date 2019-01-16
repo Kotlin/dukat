@@ -261,7 +261,13 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
         } else if (declaration is ClassDeclaration) {
             val primaryConstructor = declaration.primaryConstructor
 
-            val classDeclaration = "external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}"
+            val parents = if (declaration.parentEntities.isNotEmpty()) {
+                " : " + declaration.parentEntities.map { parentEntity ->
+                    "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
+                }.joinToString(", ")
+            } else ""
+
+            val classDeclaration = "external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}"
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 

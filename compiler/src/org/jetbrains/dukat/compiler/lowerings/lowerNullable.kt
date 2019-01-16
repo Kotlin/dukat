@@ -1,126 +1,49 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.VariableDeclaration
-import org.jetbrains.dukat.ast.model.duplicate
-
-private fun FunctionTypeDeclaration.lowerNullableType(nullable: Boolean = false) = copy(
-        nullable = nullable,
-        parameters =  parameters.map { parameter ->
-            parameter.lowerNullableType()
-        },
-        type = type.lowerNullableType()
-)
 
 
-private fun TypeDeclaration.lowerNullableType(nullable: Boolean = false) = copy(
-    nullable = nullable,
-    params = params.map { it.lowerNullableType() }
-)
+private class LowerNullable : ParameterValueLowering() {
 
-private fun ParameterValue.lowerNullableType(): ParameterValue {
-    return when (this) {
-        is TypeDeclaration -> {
-            if (value == "@@Union") {
-                val params = params.filter { param ->
-                    param != TypeDeclaration("undefined", emptyList()) &&
-                            param != TypeDeclaration("null", emptyList())
-                }
-
-                if (params.size == 1) {
-                    val nullableType =  params[0]
-                    if (nullableType is TypeDeclaration) {
-                        return nullableType.lowerNullableType(true)
-                    } else if (nullableType is FunctionTypeDeclaration) {
-                        return nullableType.lowerNullableType(true)
-                    } else {
-                        throw Exception("can not lower nullables for unknown param type ${nullableType}")
+    override fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
+        return when (declaration) {
+            is TypeDeclaration -> {
+                if (declaration.value == "@@Union") {
+                    val params = declaration.params.filter { param ->
+                        param != TypeDeclaration("undefined", emptyList()) &&
+                                param != TypeDeclaration("null", emptyList())
                     }
-                } else lowerNullableType()
-            } else {
-                lowerNullableType()
+
+                    if (params.size == 1) {
+                        val nullableType = params[0]
+                        if (nullableType is TypeDeclaration) {
+                            val res = lowerTypeDeclaration(nullableType)
+                            res.nullable = true
+                            return res
+                        } else if (nullableType is FunctionTypeDeclaration) {
+                            val res = lowerFunctionTypeDeclaration(nullableType)
+                            res.nullable = true
+                            return res
+                        } else {
+                            throw Exception("can not lower nullables for unknown param type ${nullableType}")
+                        }
+                    } else lowerTypeDeclaration(declaration)
+                } else {
+                    return lowerTypeDeclaration(declaration)
+                }
             }
+            is FunctionTypeDeclaration -> {
+                return lowerFunctionTypeDeclaration(declaration)
+            }
+            else -> throw Exception("can not lower nullables for unknown param type ${this}")
         }
-        is FunctionTypeDeclaration -> {
-            lowerNullableType()
-        }
-        else -> throw Exception("can not lower nullables for unknown param type ${this}")
+
     }
 }
-
-
-private fun ParameterDeclaration.lowerNullableType(): ParameterDeclaration {
-    if (type is TypeDeclaration) {
-        return copy(type = type.lowerNullableType())
-    } else if (type is FunctionTypeDeclaration) {
-        val functionTypeDeclaration = type as FunctionTypeDeclaration
-        return copy(type = functionTypeDeclaration.copy(
-                parameters = functionTypeDeclaration.parameters.map { parameter -> parameter.lowerNullableType() },
-                type = functionTypeDeclaration.type.lowerNullableType()
-        ))
-    } else {
-        throw Exception("can not lower nullables for unknown param type ${type}")
-    }
-}
-
-private fun MemberDeclaration.lowerNullable() : MemberDeclaration {
-    if (this is MethodDeclaration) {
-        return lowerNullable()
-    } else if (this is VariableDeclaration) {
-        return lowerNullable()
-    } else if (this is PropertyDeclaration) {
-        return lowerNullable()
-    } else {
-        throw Exception("can not null member declaration ${this}")
-    }
-}
-
-private fun FunctionDeclaration.lowerNullable() = copy(
-        parameters = parameters.map { parameter ->
-            parameter.lowerNullableType()
-        },
-        type = type.lowerNullableType()
-)
-
-private fun MethodDeclaration.lowerNullable() = copy(
-        parameters = parameters.map { parameter ->
-            parameter.lowerNullableType()
-        },
-        type = type.lowerNullableType()
-)
-
-
-private fun VariableDeclaration.lowerNullable() = copy(type = type.lowerNullableType())
-private fun PropertyDeclaration.lowerNullable() = copy(type = type.lowerNullableType())
 
 fun DocumentRoot.lowerNullable(): DocumentRoot {
-
-    val loweredDeclarations = declarations.map { declaration ->
-        when (declaration) {
-            is VariableDeclaration -> declaration.lowerNullable()
-            is FunctionDeclaration -> declaration.lowerNullable()
-            is ClassDeclaration -> declaration.copy(
-                    members = declaration.members.map { member -> member.lowerNullable() },
-                    primaryConstructor = declaration.primaryConstructor?.lowerNullable()
-            )
-            is InterfaceDeclaration -> {
-                declaration.copy(
-                        members = declaration.members.map { member -> member.lowerNullable() }
-                )
-            }
-            else -> declaration.duplicate()
-        }
-    }
-
-    return copy(declarations = loweredDeclarations)
+    return LowerNullable().lower(this)
 }
