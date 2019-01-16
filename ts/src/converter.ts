@@ -301,7 +301,8 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
 
       if (moduleDeclaration.body) {
         let moduleStatements: Array<ts.Node> = [];
-        moduleDeclaration.body.forEachChild(statement => moduleStatements.push(statement));
+        //moduleDeclaration.body.forEachChild(statement => moduleStatements.push(statement));
+        collectChildren(moduleDeclaration.body, moduleStatements);
         let moduleDeclarations = getDeclarations(astFactory, moduleStatements);
         declarations.push(astFactory.createDocumentRoot(moduleDeclaration.name.getText(), moduleDeclarations));
       }
@@ -313,6 +314,13 @@ function getDeclarations(astFactory: TypescriptAstFactory, statements: Array<ts.
   }
 
   return declarations;
+}
+
+function collectChildren(node: ts.Node, acc: Array<ts.Node>) {
+    node.forEachChild(statement => {
+      acc.push(statement);
+      statement.forEachChild(subStatement => collectChildren(subStatement, acc))
+    });
 }
 
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {

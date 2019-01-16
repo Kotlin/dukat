@@ -243,16 +243,23 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
     val res = mutableListOf<String>()
     var packageName = docRoot.packageName
     if (parent != null) {
-        res.add("")
-        res.add("// ------------------------------------------------------------------------------------------")
         res.add("@file:JsQualifier(\"${packageName}\")")
         packageName = "${parent.packageName}.${packageName}"
+        res.add("package " + packageName)
+        res.add("")
+    } else {
+        if (docRoot.declarations[0] !is DocumentRoot) {
+            res.add("package " + packageName)
+            res.add("")
+        }
     }
-    res.add("package " + packageName)
-    res.add("")
 
     for (declaration in docRoot.declarations) {
         if (declaration is DocumentRoot) {
+            if (res.isNotEmpty()) {
+                res.add("")
+                res.add("// ------------------------------------------------------------------------------------------")
+            }
             res.add(compile(declaration, docRoot, myAstContext))
         } else if (declaration is VariableDeclaration) {
             res.add(declaration.translate())
