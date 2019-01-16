@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tests
 
 import ClassSuite
 import InterfaceSuite
+import org.jetbrains.dukat.tests.objectType.ObjectTypeTests
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 
@@ -9,6 +10,7 @@ import org.junit.runners.Suite
 @Suite.SuiteClasses(
     InterfaceSuite::class,
     ClassSuite::class,
-    TopLevelMembersSuite::class
+    TopLevelMembersSuite::class,
+    ObjectTypeTests::class
 )
 class MinimalTestSuite
