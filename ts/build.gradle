@@ -8,6 +8,7 @@ task build(type: NodeTask) {
   outputs.dir("./build/ts")
 
   script = file("./node_modules/typescript/bin/tsc")
+
   args = ["-p", "tsconfig.json"]
 }
 
