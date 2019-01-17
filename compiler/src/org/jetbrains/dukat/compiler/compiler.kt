@@ -17,10 +17,28 @@ import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
+import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
+
+private fun ParameterValue.translateMeta(): String {
+
+    meta?.asIntersection()?.let { parameterValue ->
+        return " /* " + parameterValue.params.map { parameterValue ->
+            if (parameterValue is TypeDeclaration) {
+                parameterValue.value
+            } else ""
+        }.joinToString(" & ") + " */"
+    }
+
+    if (nullable) {
+        return " /*= null*/"
+    }
+
+    return ""
+}
 
 private fun ParameterValue.translate(): String {
     if (this is TypeDeclaration) {
@@ -40,11 +58,8 @@ private fun ParameterValue.translate(): String {
         val res = mutableListOf("(")
         val paramsList = mutableListOf<String>()
         for (param in parameters) {
-            var paramSerializerd = param.name + ": " + param.type.translate()
-            if (param.type.nullable) {
-                paramSerializerd += " /*= null*/"
-            }
-            paramsList.add(paramSerializerd)
+            var paramSerialized = param.name + ": " + param.type.translate() + param.type.translateMeta()
+            paramsList.add(paramSerialized)
         }
         res.add(paramsList.joinToString(", ") + ")")
         res.add(" -> ${type.translate()}")
@@ -65,15 +80,17 @@ private fun ParameterDeclaration.translate(): String {
         res = "vararg $res"
     }
 
-    initializer?.let {
-        if (it.kind.value == "@@DEFINED_EXTERNALLY") {
+
+    if (initializer != null) {
+        if (initializer!!.kind.value == "@@DEFINED_EXTERNALLY") {
             res += " = definedExternally"
 
-            it.meta?.let { meta ->
+            initializer!!.meta?.let { meta ->
                 res += " /* ${meta} */"
             }
-
         }
+    } else {
+        res += type.translateMeta()
     }
 
     return res
@@ -139,7 +156,7 @@ private fun VariableDeclaration.translate(parent: ClassDeclaration? = null): Str
     } else {
         "external"
     }
-    return "${modifier} var ${name}: ${type.translate()} = definedExternally"
+    return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
@@ -230,6 +247,7 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
             .lowerNullable()
             .lowerPrimitives()
             .lowerVarargs()
+            .lowerIntersectionType()
             .updateContext(myAstContext)
             .lowerInheritance(myAstContext)
             .lowerOverrides()

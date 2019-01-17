@@ -22,7 +22,7 @@ class AstConverter {
         if (name != null) {
             return this.astFactory.declareVariable(
                 name,
-                this.resolveType(nativeVariableDeclaration.type)
+                this.convertType(nativeVariableDeclaration.type)
             );
         }
 
@@ -36,7 +36,7 @@ class AstConverter {
             typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
                 const constraint = typeParam.constraint;
                 return this.astFactory.createTypeParam(typeParam.name.getText(), constraint ? [
-                    this.resolveType(constraint)
+                    this.convertType(constraint)
                 ] : [])
             });
         }
@@ -58,7 +58,7 @@ class AstConverter {
                 functionDeclaration.name ? functionDeclaration.name.getText() : "",
                 parameterDeclarations,
                 functionDeclaration.type ?
-                    this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+                    this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
                 typeParameterDeclarations
             );
         }
@@ -80,7 +80,7 @@ class AstConverter {
                 functionDeclaration.name ? functionDeclaration.name.getText() : "",
                 parameterDeclarations,
                 functionDeclaration.type ?
-                    this.resolveType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+                    this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
                 typeParameterDeclarations, false, false
             );
         }
@@ -109,6 +109,10 @@ class AstConverter {
         return this.createTypeDeclaration("@@Union", params);
     }
 
+    createIntersectionType(params: Array<TypeDeclaration>) {
+        return this.createTypeDeclaration("@@Intersection", params);
+    }
+
     createNullableType(type: TypeDeclaration) : ParameterValue {
         return this.createUnionType([type, this.createTypeDeclaration("null")])
     }
@@ -117,7 +121,7 @@ class AstConverter {
         return this.createTypeDeclaration("@@Vararg", [type]);
     }
 
-    resolveType(type: ts.TypeNode | undefined) : ParameterValue {
+    convertType(type: ts.TypeNode | undefined) : ParameterValue {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
@@ -126,20 +130,26 @@ class AstConverter {
             } else if (ts.isArrayTypeNode(type)) {
                 let arrayType = type as ts.ArrayTypeNode;
                 return this.createTypeDeclaration("@@ArraySugar", [
-                    this.resolveType(arrayType.elementType)
+                    this.convertType(arrayType.elementType)
                 ] as Array<TypeDeclaration>)
             } else {
                 if (ts.isUnionTypeNode(type)) {
                     let unionTypeNode = type as ts.UnionTypeNode;
                     let params = unionTypeNode.types
-                        .map(argumentType => this.resolveType(argumentType)) as Array<TypeDeclaration>;
+                        .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
                     return this.createUnionType(params)
+                } else if (ts.isIntersectionTypeNode(type)) {
+                    let intersectionTypeNode = type as ts.IntersectionTypeNode;
+                    let params = intersectionTypeNode.types
+                        .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
+
+                    return this.createIntersectionType(params);
                 } else if (type.kind == ts.SyntaxKind.TypeReference) {
                     let typeReferenceNode = type as ts.TypeReferenceNode;
                     if (typeof typeReferenceNode.typeArguments != "undefined") {
                         let params = typeReferenceNode.typeArguments
-                            .map(argumentType => this.resolveType(argumentType)) as Array<TypeDeclaration>;
+                            .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
                         return this.createTypeDeclaration(typeReferenceNode.typeName.getText(), params)
                     } else {
@@ -147,7 +157,7 @@ class AstConverter {
                     }
                 } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
                     let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
-                    return this.resolveType(parenthesizedTypeNode.type);
+                    return this.convertType(parenthesizedTypeNode.type);
                 } else if (type.kind == ts.SyntaxKind.NullKeyword) {
                     return this.createTypeDeclaration("null")
                 } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
@@ -165,7 +175,7 @@ class AstConverter {
                     let parameterDeclarations = functionDeclaration.parameters.map(
                         param => this.convertParameterDeclaration(param)
                     );
-                    return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.resolveType(functionDeclaration.type))
+                    return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
                 } else {
                     return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
                 }
@@ -182,7 +192,7 @@ class AstConverter {
 
         let functionTypeDeclaration = this.astFactory.createFunctionTypeDeclaration(
             parameterDeclarations,
-            methodSignature.type ? this.resolveType(methodSignature.type) : this.createTypeDeclaration("Unit")
+            methodSignature.type ? this.convertType(methodSignature.type) : this.createTypeDeclaration("Unit")
         );
 
         return this.createProperty(
@@ -207,7 +217,7 @@ class AstConverter {
             )
         }
 
-        let paramType = this.resolveType(param.type);
+        let paramType = this.convertType(param.type);
         if (param.questionToken) {
             paramType = this.createNullableType(paramType);
         }
@@ -234,7 +244,7 @@ class AstConverter {
                     for (let declaration of variableStatment.declarationList.declarations) {
                         declarations.push(this.astFactory.declareVariable(
                             declaration.name.getText(),
-                            this.resolveType(declaration.type)
+                            this.convertType(declaration.type)
                         ));
                     }
                 }
@@ -253,7 +263,7 @@ class AstConverter {
 
                                 if (type.typeArguments) {
                                     for (let typeArgument of type.typeArguments) {
-                                        let value = (this.resolveType(typeArgument) as any).value;
+                                        let value = (this.convertType(typeArgument) as any).value;
                                         typeParams.push(this.astFactory.createTypeParam(value, []))
                                     }
                                 }
@@ -280,11 +290,11 @@ class AstConverter {
                                     );
 
                                 members.push(this.createMethodDeclaration(
-                                    "get", parameterDeclarations, this.createNullableType(this.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, false, true
+                                    "get", parameterDeclarations, this.createNullableType(this.convertType(indexSignatureDeclaration.type)), typeParameterDeclarations, false, true
                                 ));
 
                                 parameterDeclarations.push(
-                                    this.createParameterDeclaration("value", this.resolveType(indexSignatureDeclaration.type), null)
+                                    this.createParameterDeclaration("value", this.convertType(indexSignatureDeclaration.type), null)
                                 );
 
                                 members.push(this.createMethodDeclaration(
@@ -361,7 +371,7 @@ class AstConverter {
 
                             if (type.typeArguments) {
                                 for (let typeArgument of type.typeArguments) {
-                                    let value = (this.resolveType(typeArgument) as any).value;
+                                    let value = (this.convertType(typeArgument) as any).value;
                                     typeParams.push(this.astFactory.createTypeParam(value, []))
                                 }
                             }
@@ -393,10 +403,10 @@ class AstConverter {
                         if (member.questionToken) {
                             propertyDeclaration = this.createProperty(
                                 this.convertName(member.name) as string,
-                                this.createNullableType(this.resolveType(member.type)),
+                                this.createNullableType(this.convertType(member.type)),
                                 [], true, true)
                         } else {
-                            propertyDeclaration = this.createProperty(this.convertName(member.name) as string, this.resolveType(member.type));
+                            propertyDeclaration = this.createProperty(this.convertName(member.name) as string, this.convertType(member.type));
                         }
                         members.push(
                             propertyDeclaration
@@ -411,11 +421,11 @@ class AstConverter {
                             );
 
                         members.push(this.createMethodDeclaration(
-                            "get", parameterDeclarations, this.createNullableType(this.resolveType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
+                            "get", parameterDeclarations, this.createNullableType(this.convertType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
                         ));
 
                         parameterDeclarations.push(
-                            this.createParameterDeclaration("value", this.resolveType(indexSignatureDeclaration.type), null)
+                            this.createParameterDeclaration("value", this.convertType(indexSignatureDeclaration.type), null)
                         );
 
                         members.push(this.createMethodDeclaration(
@@ -427,7 +437,7 @@ class AstConverter {
                             this.createMethodDeclaration(
                                 "invoke",
                                 this.convertParameterDeclarations(member.parameters),
-                                member.type ? this.resolveType(member.type) : this.createTypeDeclaration("Unit"),
+                                member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
                                 this.convertTypeParams(member.typeParameters),
                                 false,
                                 true
