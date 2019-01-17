@@ -121,7 +121,7 @@ class AstConverter {
         return this.createTypeDeclaration("@@Vararg", [type]);
     }
 
-    convertType(type: ts.TypeNode | undefined) : ParameterValue {
+    convertType(type: ts.TypeNode | ts.TypeElement | undefined) : ParameterValue {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
@@ -232,6 +232,101 @@ class AstConverter {
         )
     }
 
+    convertTypeElementToMemberDeclaration(node: ts.TypeElement) : MemberDeclaration | null {
+        let methodDeclaration = node as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
+
+        if (methodDeclaration.questionToken) {
+            return this.convertMethodSignatureToPropertyDeclaration(methodDeclaration)
+        } else {
+            let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
+            if (convertedMethodDeclaration != null) {
+                return convertedMethodDeclaration
+            }
+        }
+
+        return null
+    }
+
+    convertTypeElementToPropertyDeclaration(node: ts.PropertySignature) : MemberDeclaration  {
+        let propertyDeclaration: PropertyDeclaration;
+        if (node.questionToken) {
+            propertyDeclaration = this.createProperty(
+                this.convertName(node.name) as string,
+                this.createNullableType(this.convertType(node.type)),
+                [], true, true)
+        } else {
+            propertyDeclaration = this.createProperty(this.convertName(node.name) as string, this.convertType(node.type));
+        }
+
+        return propertyDeclaration;
+    }
+
+    convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration) : Array<MemberDeclaration> {
+        let res: Array<MemberDeclaration> = [];
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
+        let parameterDeclarations = indexSignatureDeclaration.parameters
+            .map(
+                param => this.convertParameterDeclaration(param)
+            );
+
+        res.push(this.createMethodDeclaration(
+            "get", parameterDeclarations, this.createNullableType(this.convertType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
+        ));
+
+        parameterDeclarations.push(
+            this.createParameterDeclaration("value", this.convertType(indexSignatureDeclaration.type), null)
+        );
+
+        res.push(this.createMethodDeclaration(
+            "set", parameterDeclarations, this.createTypeDeclaration("Unit"), typeParameterDeclarations, false, true
+        ));
+
+        return res;
+    }
+
+    convertTypeElementToMemberDeclarations(member: ts.TypeElement) : Array<MemberDeclaration> {
+        let  res: Array<MemberDeclaration> = [];
+        if (ts.isMethodSignature(member)) {
+            let methodDeclaration = this.convertTypeElementToMemberDeclaration(member);
+            if (methodDeclaration) {
+                res.push(methodDeclaration);
+            }
+        } else if (ts.isPropertySignature(member)) {
+            res.push(
+                this.convertTypeElementToPropertyDeclaration(member)
+            );
+        } else if (ts.isIndexSignatureDeclaration(member)) {
+            this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
+                res.push(member)
+            );
+        } else if (ts.isCallSignatureDeclaration(member)) {
+
+            res.push(
+                this.createMethodDeclaration(
+                    "invoke",
+                    this.convertParameterDeclarations(member.parameters),
+                    member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+                    this.convertTypeParams(member.typeParameters),
+                    false,
+                    true
+                )
+            );
+        }
+
+        return res;
+    }
+
+    convertAllTypeElementToMemberDeclarations(members: ts.NodeArray<ts.TypeElement>) : Array<MemberDeclaration> {
+        let res: Array<MemberDeclaration> = [];
+        members.map(member => {
+            this.convertTypeElementToMemberDeclarations(member).map(memberDeclaration => {
+                res.push(memberDeclaration);
+            });
+        });
+
+        return res;
+    }
+
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
@@ -247,6 +342,17 @@ class AstConverter {
                             this.convertType(declaration.type)
                         ));
                     }
+                }
+            } else if (ts.isTypeAliasDeclaration(statement)) {
+                let typeAliasDeclaration = statement as ts.TypeAliasDeclaration;
+                if (ts.isTypeLiteralNode(typeAliasDeclaration.type)) {
+                    let typeLiteral = typeAliasDeclaration.type as ts.TypeLiteralNode;
+                    declarations.push(this.astFactory.createInterfaceDeclaration(
+                        typeAliasDeclaration.name.getText(),
+                        this.convertAllTypeElementToMemberDeclarations(typeLiteral.members),
+                        this.convertTypeParams(typeAliasDeclaration.typeParameters),
+                        []
+                    ));
                 }
             } else if (ts.isClassDeclaration(statement)) {
                 const classDeclaration = statement as ts.ClassDeclaration;
@@ -384,72 +490,10 @@ class AstConverter {
                     }
                 }
 
-                let members: Array<MemberDeclaration> = [];
-                interfaceDeclaration.members.map(member => {
-
-                    if (ts.isMethodSignature(member)) {
-                        let methodDeclaration = member as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
-
-                        if (methodDeclaration.questionToken) {
-                            members.push(this.convertMethodSignatureToPropertyDeclaration(methodDeclaration));
-                        } else {
-                            let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
-                            if (convertedMethodDeclaration != null) {
-                                members.push(convertedMethodDeclaration);
-                            }
-                        }
-                    } else if (ts.isPropertySignature(member)) {
-                        let propertyDeclaration: PropertyDeclaration;
-                        if (member.questionToken) {
-                            propertyDeclaration = this.createProperty(
-                                this.convertName(member.name) as string,
-                                this.createNullableType(this.convertType(member.type)),
-                                [], true, true)
-                        } else {
-                            propertyDeclaration = this.createProperty(this.convertName(member.name) as string, this.convertType(member.type));
-                        }
-                        members.push(
-                            propertyDeclaration
-                        );
-                    } else if (ts.isIndexSignatureDeclaration(member)) {
-                        let indexSignatureDeclaration = member as ts.IndexSignatureDeclaration;
-
-                        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
-                        let parameterDeclarations = indexSignatureDeclaration.parameters
-                            .map(
-                                param => this.convertParameterDeclaration(param)
-                            );
-
-                        members.push(this.createMethodDeclaration(
-                            "get", parameterDeclarations, this.createNullableType(this.convertType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
-                        ));
-
-                        parameterDeclarations.push(
-                            this.createParameterDeclaration("value", this.convertType(indexSignatureDeclaration.type), null)
-                        );
-
-                        members.push(this.createMethodDeclaration(
-                            "set", parameterDeclarations, this.createTypeDeclaration("Unit"), typeParameterDeclarations, false, true
-                        ));
-                    } else if (ts.isCallSignatureDeclaration(member)) {
-
-                        members.push(
-                            this.createMethodDeclaration(
-                                "invoke",
-                                this.convertParameterDeclarations(member.parameters),
-                                member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
-                                this.convertTypeParams(member.typeParameters),
-                                false,
-                                true
-                            )
-                        );
-                    }
-                });
-
                 declarations.push(
                     this.astFactory.createInterfaceDeclaration(
                         interfaceDeclaration.name.getText(),
-                        members,
+                        this.convertAllTypeElementToMemberDeclarations(interfaceDeclaration.members),
                         this.convertTypeParams(interfaceDeclaration.typeParameters),
                         parentEntities
                     )
