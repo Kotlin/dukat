@@ -36,3 +36,6 @@ dependencies {
   testImplementation "org.junit.platform:junit-platform-runner:1.4.0-M1"
   testImplementation "org.junit.platform:junit-platform-suite-api:1.4.0-M1"
 }
+
+
+compileKotlin.dependsOn = [':ts:build']
