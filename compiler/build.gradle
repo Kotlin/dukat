@@ -29,9 +29,6 @@ dependencies {
 
 
   testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.0"
-  
-//  testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
-//  testImplementation "org.junit.vintage:junit-vintage-engine:5.4.0-M1"
 
   testImplementation "org.junit.platform:junit-platform-runner:1.4.0-M1"
   testImplementation "org.junit.platform:junit-platform-suite-api:1.4.0-M1"

@@ -48,7 +48,8 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 
 @Suppress("UNCHECKED_CAST")
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
-    val reflectionType = AstReflectionType.valueOf(get("reflection") as String)
+    val reflectionMarker = get("reflection") as String
+    val reflectionType = AstReflectionType.valueOf(reflectionMarker)
     val res: Declaration
     if (reflectionType == AstReflectionType.EXPRESSION_DECLARATION) {
         res = Expression(
@@ -101,7 +102,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         })
     } else if (reflectionType == AstReflectionType.TYPE_PARAM) {
         res = TypeParameter(get("name") as String, mapEntities("constraints") { it.toAst<ParameterValue>() })
-    } else if (reflectionType == AstReflectionType.CLASS_DECLARATION) {
+    } else if (reflectionMarker == "CLASS_DECLARATION") {
         res = ClassDeclaration(
                 get("name") as String,
                 mapEntities("members") {it.toAst<MemberDeclaration>()},
