@@ -239,6 +239,14 @@ private fun DocumentRoot.updateContext(astContext: AstContext) : DocumentRoot {
     return this
 }
 
+private fun unquote(name: String): String {
+    return name.replace("(?:^\")|(?:\"$)".toRegex(), "")
+}
+
+private fun escapePackageName(name: String): String {
+    return name.replace("/".toRegex(), ".").replace("_".toRegex(), "_")
+}
+
 fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
     val myAstContext = astContext ?: AstContext()
 
@@ -263,8 +271,9 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
     val res = mutableListOf<String>()
     var packageName = docRoot.packageName
     if (parent != null) {
-        res.add("@file:JsQualifier(\"${packageName}\")")
-        packageName = "${parent.packageName}.${packageName}"
+        val unquotedPackageName = unquote(packageName)
+        res.add("@file:JsQualifier(\"$unquotedPackageName\")")
+        packageName = "${parent.packageName}.${escapePackageName(unquotedPackageName)}"
         res.add("package " + packageName)
         res.add("")
     } else {
