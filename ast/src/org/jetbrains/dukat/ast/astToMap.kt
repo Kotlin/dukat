@@ -13,14 +13,13 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
-import kotlin.reflect.KClass
 
 
 private fun ParameterDeclaration.toMap(): Map<String, Any?> {
     val map = mapOf(
             "name" to name,
             "type" to type.astToMap()
-    ).reflectAs(ParameterDeclaration::class).toMutableMap()
+    ).reflectAs(this).toMutableMap()
 
     initializer?.let {
         map.set("initializer", it.astToMap())
@@ -29,10 +28,9 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
     return map
 }
 
-
-private fun Map<String, *>.reflectAs(reflection: KClass<*>): Map<String, *> {
+private fun Map<String, *>.reflectAs(reflection: Any): Map<String, *> {
     val map = toMutableMap()
-    map.put("reflection", reflection.simpleName)
+    map.put("reflection", reflection::class.simpleName)
     return map
 }
 
@@ -46,39 +44,39 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "members" to members.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "parentEntities" to parentEntities.astToMap()
-        ).reflectAs(ClassDeclaration::class)
+        ).reflectAs(this)
         is InterfaceDeclaration -> mapOf(
                 "name" to name,
                 "members" to members.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "parentEntities" to parentEntities.astToMap()
-        ).reflectAs(InterfaceDeclaration::class)
+        ).reflectAs(this)
         is TypeParameter -> mapOf(
                 "name" to name,
                 "constraints" to constraints.astToMap()
-        ).reflectAs(TypeParameter::class)
+        ).reflectAs(this)
         is TypeDeclaration -> mapOf(
                 "value" to value,
                 "params" to params.astToMap()
-        ).reflectAs(TypeDeclaration::class)
+        ).reflectAs(this)
         is VariableDeclaration -> mapOf(
                 "name" to name,
                 "type" to type.astToMap()
-        ).reflectAs(VariableDeclaration::class)
+        ).reflectAs(this)
         is PropertyDeclaration -> mapOf(
                 "name" to name, "type" to type.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "getter" to getter,
                 "setter" to setter,
                 "override" to override
-        ).reflectAs(PropertyDeclaration::class)
+        ).reflectAs(this)
         is ParameterDeclaration -> toMap()
         is FunctionDeclaration -> mapOf(
                 "name" to name,
                 "type" to type.astToMap(),
                 "parameters" to parameters.astToMap(),
                 "typeParameters" to typeParameters.astToMap()
-        ).reflectAs(FunctionDeclaration::class)
+        ).reflectAs(this)
         is MethodDeclaration ->
             mapOf(
                     "name" to name,
@@ -87,17 +85,17 @@ fun AstNode.astToMap(): Map<String, Any?> {
                     "typeParameters" to typeParameters.astToMap(),
                     "override" to override,
                     "operator" to operator
-            ).reflectAs(MethodDeclaration::class)
+            ).reflectAs(this)
         is FunctionTypeDeclaration -> mapOf(
                 "type" to type.astToMap(),
-                "parameters" to parameters.astToMap()).reflectAs(FunctionTypeDeclaration::class)
+                "parameters" to parameters.astToMap()).reflectAs(this)
         is DocumentRoot -> mapOf(
                 "packageName" to packageName,
                 "declarations" to declarations.astToMap()
-        ).reflectAs(DocumentRoot::class)
+        ).reflectAs(this)
         is Expression -> (mapOf(
                 "kind" to kind.astToMap(),
-                "meta" to meta)).reflectAs(Expression::class)
+                "meta" to meta)).reflectAs(this)
         else -> throw Exception("can not map ${this}")
     }
 }
