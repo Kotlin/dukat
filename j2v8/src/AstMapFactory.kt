@@ -22,6 +22,9 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
             parentEntities: List<ClassLikeDeclaration>
     ) = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities).astToMap()
 
+    override fun createObjectLiteral(members: List<MemberDeclaration>) =
+            astFactory.createObjectLiteral(members).astToMap()
+
     override fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,

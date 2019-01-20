@@ -1,5 +1,7 @@
 declare interface AstFactory {
     createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>): ClassDeclaration;
+
+    createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral
     createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: String): Expression;

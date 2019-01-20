@@ -26,6 +26,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     )
         = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities))
 
+    override fun createObjectLiteral(members: List<MemberDeclaration>) = toV8(astFactory.createObjectLiteral(members))
+
     override fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,

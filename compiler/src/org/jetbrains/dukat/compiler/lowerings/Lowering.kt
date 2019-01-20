@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
+import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
@@ -38,11 +39,11 @@ interface Lowering {
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
         if (declaration is MethodDeclaration) {
-            return this.lowerMethodDeclaration(declaration)
+            return lowerMethodDeclaration(declaration)
         } else if (declaration is VariableDeclaration) {
-            return this.lowerVariableDeclaration(declaration)
+            return lowerVariableDeclaration(declaration)
         } else if (declaration is PropertyDeclaration) {
-            return this.lowerPropertyDeclaration(declaration)
+            return lowerPropertyDeclaration(declaration)
         } else {
             throw Exception("can not lower unknown MemberDeclaration subtype ${this} : ${declaration}")
         }
@@ -56,17 +57,24 @@ interface Lowering {
         } else throw Exception("can not lower unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
     }
 
-    fun lower(documenRoot: DocumentRoot): DocumentRoot {
-        val loweredDeclarations = documenRoot.declarations.map { declaration ->
-            when (declaration) {
-                is VariableDeclaration -> lowerVariableDeclaration(declaration)
-                is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-                is ClassDeclaration -> lowerClassDeclaration(declaration)
-                is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
-                else -> declaration.duplicate()
-            }
+    fun lowerDeclaration(declaration: Declaration) : Declaration {
+        return when (declaration) {
+            is VariableDeclaration -> lowerVariableDeclaration(declaration)
+            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
+            is ClassDeclaration -> lowerClassDeclaration(declaration)
+            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            else -> declaration.duplicate()
         }
+    }
 
-        return documenRoot.copy(declarations = loweredDeclarations)
+    fun lowerDeclarations(declarations: List<Declaration>) : List<Declaration> {
+        return declarations.map { declaration ->
+            lowerDeclaration(declaration)
+        }
+    }
+
+    fun lower(documenRoot: DocumentRoot): DocumentRoot {
+
+        return documenRoot.copy(declarations = lowerDeclarations(documenRoot.declarations))
     }
 }

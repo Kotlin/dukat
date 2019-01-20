@@ -43,6 +43,8 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             parentEntities.toArray().map { typeParameter -> typeParameter.toAst<ClassLikeDeclaration>() }
     )
 
+    fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toArray().map { method -> method.toAst<MemberDeclaration>() })
+
     fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createInterfaceDeclaration(
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },

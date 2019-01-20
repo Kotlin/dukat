@@ -176,6 +176,8 @@ class AstConverter {
                         param => this.convertParameterDeclaration(param)
                     );
                     return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
+                } else if (ts.isTypeLiteralNode(type))  {
+                    return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
                 } else {
                     return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
                 }
@@ -369,6 +371,12 @@ class AstConverter {
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
             typeParams,
             []
+        );
+    }
+
+    convertTypeLiteralToObjectLiteralDeclaration(typeLiteral: ts.TypeLiteralNode): ObjectLiteral {
+        return this.astFactory.createObjectLiteral(
+            this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members)
         );
     }
 

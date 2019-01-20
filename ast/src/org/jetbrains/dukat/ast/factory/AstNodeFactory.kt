@@ -17,6 +17,9 @@ interface AstNodeFactory<T> {
             typeParameters: List<TypeParameter>,
             parentEntities: List<ClassLikeDeclaration>
     ): T
+
+    fun createObjectLiteral(members: List<MemberDeclaration>): T
+
     fun createInterfaceDeclaration(
             name: String,
             members: List<MemberDeclaration>,

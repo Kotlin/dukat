@@ -20,6 +20,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
+import org.jetbrains.dukat.compiler.lowerings.lowerObjectLiterals
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
@@ -242,6 +243,7 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
     val myAstContext = astContext ?: AstContext()
 
     val docRoot = documentRoot
+            .lowerObjectLiterals()
             .lowerConstructors()
             .lowerNativeArray()
             .lowerNullable()

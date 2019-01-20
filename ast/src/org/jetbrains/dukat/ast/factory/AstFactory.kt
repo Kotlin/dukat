@@ -17,6 +17,7 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 class AstFactory : AstNodeFactory<AstNode> {
 
@@ -26,6 +27,8 @@ class AstFactory : AstNodeFactory<AstNode> {
             typeParameters: List<TypeParameter>,
             parentEntities: List<ClassLikeDeclaration>
     ) = ClassDeclaration(name, members, typeParameters, parentEntities)
+
+    override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteral(members)
 
     override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameter>, parentEntities: List<InterfaceDeclaration>)
         = InterfaceDeclaration(name, members, typeParameters, parentEntities)

@@ -17,6 +17,7 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getEntity(key: String) = get(key) as Map<String, Any?>?
@@ -115,6 +116,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 mapEntities("typeParameters") {it.toAst<TypeParameter>()},
                 mapEntities("parentEntities") { it.toAst<InterfaceDeclaration>() }
         )
+    } else if (reflectionType == ObjectLiteral::class.simpleName) {
+        res = ObjectLiteral(mapEntities("members") {it.toAst<MemberDeclaration>()})
     } else {
         throw Exception("failed to create declaration from mapper: ${this}")
     }

@@ -14,6 +14,8 @@ declare class ClassDeclaration implements Declaration {
 
 declare class InterfaceDeclaration implements Declaration {}
 
+declare class ObjectLiteral implements ParameterValue {};
+
 declare class VariableDeclaration implements MemberDeclaration {
     name: String;
     type: TypeDeclaration;

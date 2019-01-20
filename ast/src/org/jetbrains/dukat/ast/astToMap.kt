@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 
 private fun ParameterDeclaration.toMap(): Map<String, Any?> {
@@ -62,6 +63,9 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is VariableDeclaration -> mapOf(
                 "name" to name,
                 "type" to type.astToMap()
+        ).reflectAs(this)
+        is ObjectLiteral -> mapOf(
+                "members" to members.astToMap()
         ).reflectAs(this)
         is PropertyDeclaration -> mapOf(
                 "name" to name, "type" to type.astToMap(),
