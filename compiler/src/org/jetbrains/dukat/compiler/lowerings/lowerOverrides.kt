@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.Declaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
@@ -18,9 +19,31 @@ private fun InterfaceDeclaration.allParentMethods() : List<MethodDeclaration> {
 }
 
 @Suppress("UNCHECKED_CAST")
+private fun ClassDeclaration.allParentMethods() : List<MethodDeclaration> {
+    return parentEntities.flatMap { parentEntity ->
+        if (parentEntity is InterfaceDeclaration) {
+            parentEntity.members.filter {member -> member is MethodDeclaration} + parentEntity.allParentMethods()
+        } else if (parentEntity is ClassDeclaration) {
+            parentEntity.members.filter {member -> member is MethodDeclaration} + parentEntity.allParentMethods()
+        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+    } as List<MethodDeclaration>
+}
+
+@Suppress("UNCHECKED_CAST")
 private fun InterfaceDeclaration.allParentProperties() : List<PropertyDeclaration> {
     return parentEntities.flatMap { parentEntity ->
         parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
+    } as List<PropertyDeclaration>
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun ClassDeclaration.allParentProperties() : List<PropertyDeclaration> {
+    return parentEntities.flatMap { parentEntity ->
+        if (parentEntity is InterfaceDeclaration) {
+            parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
+        } else if (parentEntity is ClassDeclaration) {
+            parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
+        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
     } as List<PropertyDeclaration>
 }
 
@@ -97,6 +120,15 @@ fun DocumentRoot.lowerOverrides(): DocumentRoot {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is InterfaceDeclaration -> {
+                val allParentMethods = declaration.allParentMethods()
+                val allParentProperties = declaration.allParentProperties()
+
+                declaration.copy(
+                        members = declaration.members.map {member ->
+                            member.lowerOverrides(allParentMethods, allParentProperties)}
+                )
+            }
+            is ClassDeclaration -> {
                 val allParentMethods = declaration.allParentMethods()
                 val allParentProperties = declaration.allParentProperties()
 

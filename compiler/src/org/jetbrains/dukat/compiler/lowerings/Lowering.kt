@@ -40,8 +40,6 @@ interface Lowering {
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
         if (declaration is MethodDeclaration) {
             return lowerMethodDeclaration(declaration)
-        } else if (declaration is VariableDeclaration) {
-            return lowerVariableDeclaration(declaration)
         } else if (declaration is PropertyDeclaration) {
             return lowerPropertyDeclaration(declaration)
         } else {

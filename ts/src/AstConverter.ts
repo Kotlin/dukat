@@ -29,6 +29,19 @@ class AstConverter {
         return null;
     }
 
+    convertPropertyDeclaration(nativePropertyDeclaration: ts.PropertyDeclaration) : PropertyDeclaration | null {
+        let name = this.convertName(nativePropertyDeclaration.name);
+
+        if (name != null) {
+            return this.astFactory.declareProperty(
+                name,
+                this.convertType(nativePropertyDeclaration.type), [], false, false,
+            );
+        }
+
+        return null;
+    }
+
     convertTypeParams(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<TypeParameter> {
         let typeParameterDeclarations: Array<TypeParameter> = [];
 
@@ -342,11 +355,11 @@ class AstConverter {
                     members.push(member);
                 });
             } else if (ts.isPropertyDeclaration(memberDeclaration)) {
-                let convertedVariable = this.convertVariable(
-                    memberDeclaration as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
+                let propertyDeclaration = this.convertPropertyDeclaration(
+                    memberDeclaration as ts.PropertyDeclaration
                 );
-                if (convertedVariable != null) {
-                    members.push(convertedVariable);
+                if (propertyDeclaration != null) {
+                    members.push(propertyDeclaration);
                 }
             } else if (ts.isMethodDeclaration(memberDeclaration)) {
                 let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
@@ -447,6 +460,9 @@ class AstConverter {
 
                     if (classDeclaration.heritageClauses) {
                         for (let heritageClause of classDeclaration.heritageClauses) {
+
+                            let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
+
                             for (let type of heritageClause.types) {
                                 let typeParams: Array<TypeParameter> = [];
 
@@ -457,10 +473,15 @@ class AstConverter {
                                     }
                                 }
 
-
-                                parentEntities.push(
-                                    this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
-                                );
+                                if (extending) {
+                                    parentEntities.push(
+                                        this.astFactory.createClassDeclaration(type.expression.getText(), [], typeParams, [])
+                                    );
+                                } else {
+                                    parentEntities.push(
+                                        this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
+                                    );
+                                }
                             }
                         }
                     }

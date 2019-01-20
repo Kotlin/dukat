@@ -145,9 +145,12 @@ private fun MethodDeclaration.translate(parent: ClassDeclaration? = null): List<
             "@nativeGetter"
         } else null
     } else null
+
+    val overrideClause = if (override) "override" else "open"
+
     return listOf(
             annotation,
-            "open${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally"
+            "${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally"
     ).filterNotNull()
 }
 
@@ -160,10 +163,15 @@ private fun VariableDeclaration.translate(parent: ClassDeclaration? = null): Str
     return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
+private fun PropertyDeclaration.translate(parent: ClassDeclaration? = null): String {
+    val modifier = if (override) "override" else "open"
+    return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
+}
+
 private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
     if (this is MethodDeclaration) {
         return translate(parent)
-    } else if (this is VariableDeclaration) {
+    } else if (this is PropertyDeclaration) {
         return listOf(translate(parent))
     } else {
         throw Exception("can not translate ${this}")
@@ -218,9 +226,7 @@ private fun MethodDeclaration.translateSignature(): List<String> {
 }
 
 private fun MemberDeclaration.translateSignature(): List<String> {
-    if (this is VariableDeclaration) {
-        return listOf(translateSignature())
-    } else if (this is MethodDeclaration) {
+    if (this is MethodDeclaration) {
         return translateSignature()
     } else if (this is PropertyDeclaration) {
         return listOf(translateSignature())
@@ -233,6 +239,9 @@ private fun DocumentRoot.updateContext(astContext: AstContext) : DocumentRoot {
     for (declaration in declarations) {
         if (declaration is InterfaceDeclaration) {
             astContext.registerInterface(declaration)
+        }
+        if (declaration is ClassDeclaration) {
+            astContext.registerClass(declaration)
         }
     }
 
