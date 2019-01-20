@@ -22,6 +22,8 @@ dependencies {
   implementation(project(":nashorn"))
   implementation(project(":j2v8"))
 
+  runtime 'org.jetbrains.kotlin:kotlin-reflect'
+
   testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
   testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
   testImplementation 'org.jetbrains.kotlin:kotlin-test'

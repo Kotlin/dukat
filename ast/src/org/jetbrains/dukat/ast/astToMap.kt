@@ -13,13 +13,14 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
+import kotlin.reflect.KClass
 
 
 private fun ParameterDeclaration.toMap(): Map<String, Any?> {
-    val map = mutableMapOf(
+    val map = mapOf(
             "name" to name,
             "type" to type.astToMap()
-    ).reflectAs(AstReflectionType.PARAM_TYPE_DECLARATION)
+    ).reflectAs(ParameterDeclaration::class).toMutableMap()
 
     initializer?.let {
         map.set("initializer", it.astToMap())
@@ -29,9 +30,10 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
 }
 
 
-private fun MutableMap<String, Any>.reflectAs(astReflectionType: AstReflectionType): MutableMap<String, Any> {
-    this.put("reflection", astReflectionType.toString())
-    return this
+private fun Map<String, *>.reflectAs(reflection: KClass<*>): Map<String, *> {
+    val map = toMutableMap()
+    map.put("reflection", reflection.simpleName)
+    return map
 }
 
 private fun List<AstNode>.astToMap() = this.map(AstNode::astToMap)
@@ -39,63 +41,63 @@ private fun List<AstNode>.astToMap() = this.map(AstNode::astToMap)
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
-        is ClassDeclaration -> mutableMapOf(
+        is ClassDeclaration -> mapOf(
                 "name" to name,
                 "members" to members.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "parentEntities" to parentEntities.astToMap()
-        ).reflectAs(AstReflectionType.CLASS_DECLARATION)
-        is InterfaceDeclaration -> mutableMapOf(
+        ).reflectAs(ClassDeclaration::class)
+        is InterfaceDeclaration -> mapOf(
                 "name" to name,
                 "members" to members.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "parentEntities" to parentEntities.astToMap()
-        ).reflectAs(AstReflectionType.INTERFACE_DECLARATION)
-        is TypeParameter -> mutableMapOf(
+        ).reflectAs(InterfaceDeclaration::class)
+        is TypeParameter -> mapOf(
                 "name" to name,
                 "constraints" to constraints.astToMap()
-        ).reflectAs(AstReflectionType.TYPE_PARAM)
-        is TypeDeclaration -> mutableMapOf(
+        ).reflectAs(TypeParameter::class)
+        is TypeDeclaration -> mapOf(
                 "value" to value,
                 "params" to params.astToMap()
-        ).reflectAs(AstReflectionType.TYPE_DECLARATION)
-        is VariableDeclaration -> mutableMapOf(
+        ).reflectAs(TypeDeclaration::class)
+        is VariableDeclaration -> mapOf(
                 "name" to name,
                 "type" to type.astToMap()
-        ).reflectAs(AstReflectionType.VARIABLE_DECLARATION)
-        is PropertyDeclaration -> mutableMapOf(
+        ).reflectAs(VariableDeclaration::class)
+        is PropertyDeclaration -> mapOf(
                 "name" to name, "type" to type.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
                 "getter" to getter,
                 "setter" to setter,
                 "override" to override
-        ).reflectAs(AstReflectionType.PROPERTY_DECLARATION)
+        ).reflectAs(PropertyDeclaration::class)
         is ParameterDeclaration -> toMap()
-        is FunctionDeclaration -> mutableMapOf(
+        is FunctionDeclaration -> mapOf(
                 "name" to name,
                 "type" to type.astToMap(),
                 "parameters" to parameters.astToMap(),
                 "typeParameters" to typeParameters.astToMap()
-        ).reflectAs(AstReflectionType.FUNCTION_DECLARATION)
+        ).reflectAs(FunctionDeclaration::class)
         is MethodDeclaration ->
-            mutableMapOf(
+            mapOf(
                     "name" to name,
                     "type" to type.astToMap(),
                     "parameters" to parameters.astToMap(),
                     "typeParameters" to typeParameters.astToMap(),
                     "override" to override,
                     "operator" to operator
-            ).reflectAs(AstReflectionType.METHOD_DECLARATION)
-        is FunctionTypeDeclaration -> mutableMapOf(
+            ).reflectAs(MethodDeclaration::class)
+        is FunctionTypeDeclaration -> mapOf(
                 "type" to type.astToMap(),
-                "parameters" to parameters.astToMap()).reflectAs(AstReflectionType.FUNCTION_TYPE_DECLARATION)
-        is DocumentRoot -> mutableMapOf(
+                "parameters" to parameters.astToMap()).reflectAs(FunctionTypeDeclaration::class)
+        is DocumentRoot -> mapOf(
                 "packageName" to packageName,
                 "declarations" to declarations.astToMap()
-        ).reflectAs(AstReflectionType.DOCUMENT_ROOT)
-        is Expression -> (mutableMapOf(
+        ).reflectAs(DocumentRoot::class)
+        is Expression -> (mapOf(
                 "kind" to kind.astToMap(),
-                "meta" to meta) as MutableMap<String, Any>).reflectAs(AstReflectionType.EXPRESSION_DECLARATION)
+                "meta" to meta)).reflectAs(Expression::class)
         else -> throw Exception("can not map ${this}")
     }
 }
