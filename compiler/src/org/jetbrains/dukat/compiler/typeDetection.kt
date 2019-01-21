@@ -10,3 +10,12 @@ fun ParameterValue.asIntersection(): TypeDeclaration? {
 
     return null
 }
+
+
+fun ParameterValue.asSelfReference() : TypeDeclaration? {
+    if ((this is TypeDeclaration) && (value == "@@SELF_REFERENCE")) {
+        return this
+    }
+
+    return null
+}

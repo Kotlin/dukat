@@ -12,6 +12,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerObjectLiterals
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
+import org.jetbrains.dukat.compiler.lowerings.lowerSelfReference
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
 private fun DocumentRoot.updateContext(astContext: AstContext): DocumentRoot {
@@ -45,6 +46,7 @@ interface InputTranslator {
                 .lowerPrimitives()
                 .lowerVarargs()
                 .lowerIntersectionType()
+                .lowerSelfReference()
                 .updateContext(myAstContext)
                 .lowerInheritance(myAstContext)
                 .lowerOverrides()

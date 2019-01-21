@@ -191,6 +191,8 @@ class AstConverter {
                     return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
                 } else if (ts.isTypeLiteralNode(type))  {
                     return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
+                } else if (ts.isThisTypeNode(type)){
+                    return this.createTypeDeclaration("@@SELF_REFERENCE")
                 } else {
                     return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
                 }

@@ -35,6 +35,15 @@ private fun ParameterValue.translateMeta(): String {
     return ""
 }
 
+private fun ParameterValue.translateSignatureMeta(): String {
+
+    meta?.asSelfReference()?.let {
+        return " /* this */"
+    }
+
+    return ""
+}
+
 private fun ParameterValue.translate(): String {
     if (this is TypeDeclaration) {
         val res = mutableListOf(value)
@@ -175,7 +184,7 @@ private fun PropertyDeclaration.translateSignature(): String {
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
-    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${this.type.translate()}"
+    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${type.translate()}${type.translateSignatureMeta()}"
     if (getter) {
         res += " get() = definedExternally"
     }
@@ -208,7 +217,7 @@ private fun MethodDeclaration.translateSignature(): List<String> {
 
     return listOf(
             annotation,
-            "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
+            "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}${type.translateSignatureMeta()}"
     ).filterNotNull()
 }
 
