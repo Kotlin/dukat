@@ -29,7 +29,7 @@ class AstConverter {
         return null;
     }
 
-    convertPropertyDeclaration(nativePropertyDeclaration: ts.PropertyDeclaration) : PropertyDeclaration | null {
+    convertPropertyDeclaration(nativePropertyDeclaration: (ts.PropertyDeclaration | ts.ParameterDeclaration)) : PropertyDeclaration | null {
         let name = this.convertName(nativePropertyDeclaration.name);
 
         if (name != null) {
@@ -404,8 +404,8 @@ class AstConverter {
             if (parameter.modifiers) {
                 let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
                 if (isField) {
-                    let convertedVariable = this.convertVariable(
-                        parameter as (ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration)
+                    let convertedVariable = this.convertPropertyDeclaration(
+                        parameter as ts.ParameterDeclaration
                     );
                     if (convertedVariable != null) {
                         res.push(convertedVariable);
