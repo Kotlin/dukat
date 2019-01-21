@@ -16,6 +16,7 @@ import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 interface Lowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
@@ -28,12 +29,15 @@ interface Lowering {
     fun lowerMethodDeclaration(declaration: MethodDeclaration): MethodDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameter): TypeParameter
+    fun lowerObjectLiteral(declaration: ObjectLiteral): ObjectLiteral
 
     fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
         if (declaration is TypeDeclaration) {
             return lowerTypeDeclaration(declaration)
         } else if (declaration is FunctionTypeDeclaration) {
             return lowerFunctionTypeDeclaration(declaration)
+        } else if (declaration is ObjectLiteral) {
+            return lowerObjectLiteral(declaration)
         } else throw Exception("can not lower unknown ParameterValue subtype:  ${this} : ${declaration}")
     }
 

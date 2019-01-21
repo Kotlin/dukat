@@ -10,8 +10,13 @@ import org.jetbrains.dukat.ast.model.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 abstract class ParameterValueLowering : Lowering {
+    override fun lowerObjectLiteral(declaration: ObjectLiteral): ObjectLiteral {
+        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member) })
+    }
+
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> parameter.copy(type = lowerParameterValue(parameter.type)) },
