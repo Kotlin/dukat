@@ -118,7 +118,7 @@ private fun translateParameters(parameters: List<ParameterDeclaration>): String 
             .joinToString(", ")
 }
 
-private fun FunctionDeclaration.translate(parent: ClassDeclaration? = null): String {
+private fun FunctionDeclaration.translate(): String {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -154,13 +154,8 @@ private fun MethodDeclaration.translate(parent: ClassDeclaration? = null): List<
     ).filterNotNull()
 }
 
-private fun VariableDeclaration.translate(parent: ClassDeclaration? = null): String {
-    val modifier = if (parent != null) {
-        "open"
-    } else {
-        "external"
-    }
-    return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
+private fun VariableDeclaration.translate(): String {
+    return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun PropertyDeclaration.translate(parent: ClassDeclaration? = null): String {
