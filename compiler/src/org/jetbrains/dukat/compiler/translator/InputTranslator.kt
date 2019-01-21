@@ -22,6 +22,9 @@ private fun DocumentRoot.updateContext(astContext: AstContext): DocumentRoot {
         if (declaration is ClassDeclaration) {
             astContext.registerClass(declaration)
         }
+        if (declaration is DocumentRoot) {
+            declaration.updateContext(astContext)
+        }
     }
 
     return this

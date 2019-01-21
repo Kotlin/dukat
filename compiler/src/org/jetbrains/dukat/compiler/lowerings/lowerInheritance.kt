@@ -31,7 +31,10 @@ fun DocumentRoot.lowerInheritance(astContext: AstContext): DocumentRoot {
                     }
 
             declaration.copy(parentEntities = resolvedParentEntities)
-        } else declaration.duplicate<Declaration>()
+        } else if (declaration is DocumentRoot) {
+            declaration.lowerInheritance(astContext)
+        }
+        else declaration.duplicate<Declaration>()
     }
 
     return copy(declarations = declarations)

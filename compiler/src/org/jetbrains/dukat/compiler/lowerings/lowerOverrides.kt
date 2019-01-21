@@ -137,6 +137,9 @@ fun DocumentRoot.lowerOverrides(): DocumentRoot {
                             member.lowerOverrides(allParentMethods, allParentProperties)}
                 )
             }
+            is DocumentRoot -> {
+                declaration.lowerOverrides()
+            }
             else -> declaration.duplicate<Declaration>()
         }
     }
