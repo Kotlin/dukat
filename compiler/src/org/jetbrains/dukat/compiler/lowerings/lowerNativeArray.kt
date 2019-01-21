@@ -14,5 +14,5 @@ private class NativeArrayLowering : ParameterValueLowering() {
 }
 
 fun DocumentRoot.lowerNativeArray(): DocumentRoot {
-    return NativeArrayLowering().lower(this)
+    return NativeArrayLowering().lowerDocumentRoot(this)
 }

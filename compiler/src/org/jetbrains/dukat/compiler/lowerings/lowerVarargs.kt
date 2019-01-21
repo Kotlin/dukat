@@ -42,5 +42,5 @@ class LoweringVarags : ParameterValueLowering() {
 }
 
 fun DocumentRoot.lowerVarargs(): DocumentRoot {
-    return LoweringVarags().lower(this)
+    return LoweringVarags().lowerDocumentRoot(this)
 }

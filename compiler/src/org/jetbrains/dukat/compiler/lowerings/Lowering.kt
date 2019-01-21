@@ -38,7 +38,7 @@ interface Lowering {
             return lowerFunctionTypeDeclaration(declaration)
         } else if (declaration is ObjectLiteral) {
             return lowerObjectLiteral(declaration)
-        } else throw Exception("can not lower unknown ParameterValue subtype:  ${this} : ${declaration}")
+        } else throw Exception("can not lowerDocumentRoot unknown ParameterValue subtype:  ${this} : ${declaration}")
     }
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
@@ -47,7 +47,7 @@ interface Lowering {
         } else if (declaration is PropertyDeclaration) {
             return lowerPropertyDeclaration(declaration)
         } else {
-            throw Exception("can not lower unknown MemberDeclaration subtype ${this} : ${declaration}")
+            throw Exception("can not lowerDocumentRoot unknown MemberDeclaration subtype ${this} : ${declaration}")
         }
     }
 
@@ -56,7 +56,7 @@ interface Lowering {
             return lowerInterfaceDeclaration(declaration)
         } else if (declaration is ClassDeclaration) {
             return lowerClassDeclaration(declaration)
-        } else throw Exception("can not lower unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
+        } else throw Exception("can not lowerDocumentRoot unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
     }
 
     fun lowerDeclaration(declaration: Declaration) : Declaration {
@@ -65,6 +65,7 @@ interface Lowering {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is ClassDeclaration -> lowerClassDeclaration(declaration)
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            is DocumentRoot -> lowerDocumentRoot(declaration)
             else -> declaration.duplicate()
         }
     }
@@ -75,8 +76,7 @@ interface Lowering {
         }
     }
 
-    fun lower(documenRoot: DocumentRoot): DocumentRoot {
-
+    fun lowerDocumentRoot(documenRoot: DocumentRoot): DocumentRoot {
         return documenRoot.copy(declarations = lowerDeclarations(documenRoot.declarations))
     }
 }

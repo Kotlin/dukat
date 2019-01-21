@@ -15,14 +15,8 @@ import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.TypeParameter
 import org.jetbrains.dukat.ast.model.VariableDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
-import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
-import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
-import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
-import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
-import org.jetbrains.dukat.compiler.lowerings.lowerNullable
-import org.jetbrains.dukat.compiler.lowerings.lowerObjectLiterals
-import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
-import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
+import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
 
 private fun ParameterValue.translateMeta(): String {
 
@@ -228,18 +222,6 @@ private fun MemberDeclaration.translateSignature(): List<String> {
     }
 }
 
-private fun DocumentRoot.updateContext(astContext: AstContext) : DocumentRoot {
-    for (declaration in declarations) {
-        if (declaration is InterfaceDeclaration) {
-            astContext.registerInterface(declaration)
-        }
-        if (declaration is ClassDeclaration) {
-            astContext.registerClass(declaration)
-        }
-    }
-
-    return this
-}
 
 private fun unquote(name: String): String {
     return name.replace("(?:^\")|(?:\"$)".toRegex(), "")
@@ -249,40 +231,17 @@ private fun escapePackageName(name: String): String {
     return name.replace("/".toRegex(), ".").replace("_".toRegex(), "_")
 }
 
-fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
-    val myAstContext = astContext ?: AstContext()
-
-    val docRoot = documentRoot
-            .lowerObjectLiterals()
-            .lowerConstructors()
-            .lowerNativeArray()
-            .lowerNullable()
-            .lowerPrimitives()
-            .lowerVarargs()
-            .lowerIntersectionType()
-            .updateContext(myAstContext)
-            .lowerInheritance(myAstContext)
-            .lowerOverrides()
-
-
-    if (documentRoot.declarations.isEmpty()) {
-        return "// NO DECLARATIONS"
+fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentDeclaration: DocumentRoot? = null) {
+    if (docRoot.declarations.isEmpty()) {
+        res.add("// NO DECLARATIONS")
+        return
     }
 
+    val packageName = if (parentDeclaration == null) unquote(docRoot.packageName) else "${unquote(parentDeclaration.packageName)}.${unquote(docRoot.packageName)}"
 
-    val res = mutableListOf<String>()
-    var packageName = docRoot.packageName
-    if (parent != null) {
-        val unquotedPackageName = unquote(packageName)
-        res.add("@file:JsQualifier(\"$unquotedPackageName\")")
-        packageName = "${parent.packageName}.${escapePackageName(unquotedPackageName)}"
-        res.add("package " + packageName)
+    if (docRoot.declarations[0] !is DocumentRoot) {
+        res.add("package " + escapePackageName(packageName))
         res.add("")
-    } else {
-        if (docRoot.declarations[0] !is DocumentRoot) {
-            res.add("package " + packageName)
-            res.add("")
-        }
     }
 
     for (declaration in docRoot.declarations) {
@@ -291,7 +250,8 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
                 res.add("")
                 res.add("// ------------------------------------------------------------------------------------------")
             }
-            res.add(compile(declaration, docRoot, myAstContext))
+            res.add("@file:JsQualifier(\"${unquote(declaration.packageName)}\")")
+            processDeclarations(declaration, res, docRoot)
         } else if (declaration is VariableDeclaration) {
             res.add(declaration.translate())
         } else if (declaration is FunctionDeclaration) {
@@ -334,10 +294,21 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
 
         }
     }
+}
 
+fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
+    val res = mutableListOf<String>()
+    processDeclarations(documentRoot, res);
     return res.joinToString("\n")
 }
 
-fun compile(fileName: String, translator: Translator): String {
-    return compile(translator.translateFile(fileName))
+fun output(fileName: String, translator: InputTranslator): String {
+    val documentRoot =
+            translator.lower(translator.translateFile(fileName))
+    return compile(documentRoot)
+}
+
+fun outputWithVisitor(fileName: String, translator: InputTranslator): String {
+    val documentRoot = translator.lower(translator.translateFile(fileName))
+    return PrintStreamVisitor().output(documentRoot)
 }

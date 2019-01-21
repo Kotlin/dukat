@@ -28,7 +28,7 @@ private class LowerNullable : ParameterValueLowering() {
                             res.nullable = true
                             return res
                         } else {
-                            throw Exception("can not lower nullables for unknown param type ${nullableType}")
+                            throw Exception("can not lowerDocumentRoot nullables for unknown param type ${nullableType}")
                         }
                     } else lowerTypeDeclaration(declaration)
                 } else {
@@ -38,12 +38,12 @@ private class LowerNullable : ParameterValueLowering() {
             is FunctionTypeDeclaration -> {
                 return lowerFunctionTypeDeclaration(declaration)
             }
-            else -> throw Exception("can not lower nullables for unknown param type ${this}")
+            else -> throw Exception("can not lowerDocumentRoot nullables for unknown param type ${this}")
         }
 
     }
 }
 
 fun DocumentRoot.lowerNullable(): DocumentRoot {
-    return LowerNullable().lower(this)
+    return LowerNullable().lowerDocumentRoot(this)
 }

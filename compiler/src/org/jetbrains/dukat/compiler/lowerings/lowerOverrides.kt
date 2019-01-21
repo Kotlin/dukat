@@ -112,7 +112,7 @@ private fun MemberDeclaration.lowerOverrides(
         val override =  allSuperProperties.any { superMethod -> isOverriding(superMethod) }
         return copy(override = override)
     } else {
-        throw Exception("can not lower overrides for ${this}")
+        throw Exception("can not lowerDocumentRoot overrides for ${this}")
     }
 }
 

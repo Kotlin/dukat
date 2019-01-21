@@ -31,5 +31,5 @@ private class PrimitiveClassLowering : ParameterValueLowering() {
 }
 
 fun DocumentRoot.lowerPrimitives(): DocumentRoot {
-    return PrimitiveClassLowering().lower(this)
+    return PrimitiveClassLowering().lowerDocumentRoot(this)
 }

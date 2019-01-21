@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.toAst
+import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
@@ -77,14 +78,7 @@ fun localResourceResolver(fileName: String): String {
     return fileContent(fileNameResolved)
 }
 
-
-interface Translator {
-    fun translateFile(fileName: String): DocumentRoot
-    fun release()
-}
-
-
-class TranslatorV8(private val engine: InteropV8) : Translator {
+class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
     override fun translateFile(fileName: String): DocumentRoot {
         val result = engine.callFunction<V8Object>("main", null, null, fileName)
@@ -96,7 +90,7 @@ class TranslatorV8(private val engine: InteropV8) : Translator {
     }
 }
 
-class TranslatorNashorn(private val engine: InteropNashorn) : Translator {
+class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
     override fun translateFile(fileName: String): DocumentRoot {
         return engine.callFunction<DocumentRoot>("main", AstFactory(), FileResolver(), fileName)
     }

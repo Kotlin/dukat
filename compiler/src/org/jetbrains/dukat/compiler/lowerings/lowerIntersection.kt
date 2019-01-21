@@ -17,5 +17,5 @@ private class LowerIntersection : ParameterValueLowering() {
 }
 
 fun DocumentRoot.lowerIntersectionType(): DocumentRoot {
-    return LowerIntersection().lower(this)
+    return LowerIntersection().lowerDocumentRoot(this)
 }
