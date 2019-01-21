@@ -21,9 +21,7 @@ private class LowerObjectLiterals : ParameterValueLowering() {
     private fun generateInterface(objectLiteral: ObjectLiteral): InterfaceDeclaration {
         val interfaceDeclaration =
                 InterfaceDeclaration("`T$${myGeneratedInterfaces.size}`", objectLiteral.members, emptyList(), emptyList())
-        println("INTERFACE ${interfaceDeclaration}")
         val alreadyExistingInterface = findIdenticalInterface(interfaceDeclaration)
-        println("ALREADY EXISTING ${interfaceDeclaration}")
         if (alreadyExistingInterface != null) {
             return alreadyExistingInterface
         } else {
@@ -36,8 +34,11 @@ private class LowerObjectLiterals : ParameterValueLowering() {
         return if (declaration is ObjectLiteral) {
 
             val generatedInterface = generateInterface(declaration)
-
-            TypeDeclaration(generatedInterface.name, emptyList())
+            if (generatedInterface.members.isEmpty()) {
+                TypeDeclaration("Any", emptyList())
+            } else {
+                TypeDeclaration(generatedInterface.name, emptyList())
+            }
         } else super.lowerParameterValue(declaration)
     }
 
