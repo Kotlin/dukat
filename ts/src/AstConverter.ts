@@ -57,7 +57,7 @@ class AstConverter {
         return typeParameterDeclarations;
     }
 
-    convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : FunctionDeclaration | null  {
+    convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration) : FunctionDeclaration | null  {
         if (!this.nodeIsExportDeclaration(functionDeclaration)) {
             return null;
         }
@@ -69,6 +69,10 @@ class AstConverter {
                 (param, count) => this.convertParameterDeclaration(param, count)
             );
 
+
+        if (!functionDeclaration.name) {
+            return null;
+        }
 
         if (ts.isIdentifier(functionDeclaration.name)) {
             return this.astFactory.createFunctionDeclaration(
@@ -533,7 +537,7 @@ class AstConverter {
                 }
 
             } else if (ts.isFunctionDeclaration(statement)) {
-                let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement as (ts.FunctionDeclaration & ts.MethodDeclaration));
+                let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
                 if (convertedFunctionDeclaration != null) {
                     declarations.push(convertedFunctionDeclaration)
                 }
