@@ -78,7 +78,7 @@ private fun ParameterValue.translate(): String {
 }
 
 
-private fun ParameterDeclaration.translate(): String {
+private fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate()
     if (type.vararg) {
         res = "vararg $res"
@@ -86,11 +86,14 @@ private fun ParameterDeclaration.translate(): String {
 
 
     if (initializer != null) {
-        if (initializer!!.kind.value == "@@DEFINED_EXTERNALLY") {
-            res += " = definedExternally"
+        if (needsMeta) {
 
-            initializer!!.meta?.let { meta ->
-                res += " /* ${meta} */"
+            if (initializer!!.kind.value == "@@DEFINED_EXTERNALLY") {
+                res += " = definedExternally"
+
+                initializer!!.meta?.let { meta ->
+                    res += " /* ${meta} */"
+                }
             }
         }
     } else {
@@ -115,9 +118,9 @@ private fun translateTypeParameters(typeParameters: List<TypeParameter>): String
     }
 }
 
-private fun translateParameters(parameters: List<ParameterDeclaration>): String {
+private fun translateParameters(parameters: List<ParameterDeclaration>, needsMeta: Boolean = true): String {
     return parameters
-            .map(ParameterDeclaration::translate)
+            .map { parameter -> parameter.translate(needsMeta) }
             .joinToString(", ")
 }
 
@@ -153,7 +156,7 @@ private fun MethodDeclaration.translate(): List<String> {
 
     return listOf(
             annotation,
-            "${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally"
+            "${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType} = definedExternally"
     ).filterNotNull()
 }
 
