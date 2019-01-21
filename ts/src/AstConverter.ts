@@ -58,6 +58,10 @@ class AstConverter {
     }
 
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration) : FunctionDeclaration | null  {
+        if (!this.nodeIsExportDeclaration(functionDeclaration)) {
+            return null;
+        }
+
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
         let parameterDeclarations = functionDeclaration.parameters
@@ -448,12 +452,10 @@ class AstConverter {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
             if (ts.isVariableDeclaration(statement)) {
-                if (this.nodeIsExportDeclaration(statement)) {
-                    declarations.push(this.astFactory.declareVariable(
-                        statement.name.getText(),
-                        this.convertType(statement.type)
-                    ));
-                }
+                declarations.push(this.astFactory.declareVariable(
+                    statement.name.getText(),
+                    this.convertType(statement.type)
+                ));
             } else if (ts.isVariableStatement(statement)) {
                 if (this.nodeIsExportDeclaration(statement)) {
                     for (let declaration of statement.declarationList.declarations) {
