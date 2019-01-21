@@ -28,7 +28,9 @@ private fun ParameterValue.translateMeta(): String {
         }.joinToString(" & ") + " */"
     }
 
-    if (nullable) {
+    val skipNullableAnnotation = (this is TypeDeclaration) && (this.value == "Nothing" )
+    if (nullable && !skipNullableAnnotation) {
+        //TODO: consider rethinking this restriction
         return " /*= null*/"
     }
 

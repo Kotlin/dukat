@@ -19,9 +19,17 @@ private fun mapPrimitiveValue(value: String): String {
 
 private class PrimitiveClassLowering : ParameterValueLowering() {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
+        var value = mapPrimitiveValue(declaration.value)
+        var nullable = declaration.nullable
+        if ((value == "undefined") || (value == "null")) {
+            value = "Nothing"
+            nullable = true
+        }
+
         return  declaration.copy(
-                value =  mapPrimitiveValue(declaration.value),
-                params = declaration.params.map { lowerParameterValue(it) }
+                value = value,
+                params = declaration.params.map { lowerParameterValue(it) },
+                nullable = nullable
         )
     }
 
