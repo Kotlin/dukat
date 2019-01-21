@@ -6,14 +6,30 @@ import org.jetbrains.dukat.ast.model.ParameterValue
 import org.jetbrains.dukat.ast.model.TypeDeclaration
 import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
+private fun InterfaceDeclaration.isIdentical(otherInterface: InterfaceDeclaration): Boolean {
+    return members == otherInterface.members
+}
+
 private class LowerObjectLiterals : ParameterValueLowering() {
 
     private val myGeneratedInterfaces = mutableListOf<InterfaceDeclaration>()
 
+    private fun findIdenticalInterface(interfaceDeclaration: InterfaceDeclaration): InterfaceDeclaration? {
+        return myGeneratedInterfaces.find { it -> interfaceDeclaration.isIdentical(it) }
+    }
+
     private fun generateInterface(objectLiteral: ObjectLiteral): InterfaceDeclaration {
-        val interfaceDeclaration = InterfaceDeclaration("`T$${myGeneratedInterfaces.size}`", objectLiteral.members, emptyList(), emptyList())
-        myGeneratedInterfaces.add(interfaceDeclaration)
-        return interfaceDeclaration
+        val interfaceDeclaration =
+                InterfaceDeclaration("`T$${myGeneratedInterfaces.size}`", objectLiteral.members, emptyList(), emptyList())
+        println("INTERFACE ${interfaceDeclaration}")
+        val alreadyExistingInterface = findIdenticalInterface(interfaceDeclaration)
+        println("ALREADY EXISTING ${interfaceDeclaration}")
+        if (alreadyExistingInterface != null) {
+            return alreadyExistingInterface
+        } else {
+            myGeneratedInterfaces.add(interfaceDeclaration)
+            return interfaceDeclaration
+        }
     }
 
     override fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
