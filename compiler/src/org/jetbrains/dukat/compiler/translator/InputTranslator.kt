@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.ClassDeclaration
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.model.InterfaceDeclaration
 import org.jetbrains.dukat.compiler.lowerPrimitives
+import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
@@ -44,6 +45,7 @@ interface InputTranslator {
                 .lowerNativeArray()
                 .lowerNullable()
                 .lowerPrimitives()
+                .escapeIdentificators()
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerSelfReference()
