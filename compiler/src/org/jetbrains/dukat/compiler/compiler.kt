@@ -129,7 +129,7 @@ private fun FunctionDeclaration.translate(): String {
     return ("external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
-private fun MethodDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
+private fun MethodDeclaration.translate(): List<String> {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -158,23 +158,21 @@ private fun VariableDeclaration.translate(): String {
     return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
-private fun PropertyDeclaration.translate(parent: ClassDeclaration? = null): String {
+private fun PropertyDeclaration.translate(): String {
     val modifier = if (override) "override" else "open"
     return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
-private fun MemberDeclaration.translate(parent: ClassDeclaration? = null): List<String> {
+private fun MemberDeclaration.translate(): List<String> {
     if (this is MethodDeclaration) {
-        return translate(parent)
+        return translate()
     } else if (this is PropertyDeclaration) {
-        return listOf(translate(parent))
+        return listOf(translate())
     } else {
         throw Exception("can not translate ${this}")
     }
 }
 
-
-private fun VariableDeclaration.translateSignature() = "var ${this.name}: ${this.type.translate()}"
 private fun PropertyDeclaration.translateSignature(): String {
     val varModifier = if (getter && !setter) "val" else "var"
     val overrideClause = if (override) "override " else ""
@@ -316,7 +314,7 @@ fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext
 
             val members = declaration.members
             if (hasMembers) {
-                res.addAll(members.flatMap { it.translate(declaration) }.map({ "    " + it }))
+                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
                 res.add("}")
             }
 
