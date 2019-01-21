@@ -62,7 +62,7 @@ class AstConverter {
 
         let parameterDeclarations = functionDeclaration.parameters
             .map(
-            param => this.convertParameterDeclaration(param)
+                (param, count) => this.convertParameterDeclaration(param, count)
             );
 
 
@@ -84,7 +84,7 @@ class AstConverter {
 
         let parameterDeclarations = functionDeclaration.parameters
             .map(
-                param => this.convertParameterDeclaration(param)
+                (param, count) => this.convertParameterDeclaration(param, count)
             );
 
 
@@ -186,7 +186,7 @@ class AstConverter {
                 } else if (type.kind == ts.SyntaxKind.FunctionType) {
                     const functionDeclaration = type as ts.FunctionTypeNode;
                     let parameterDeclarations = functionDeclaration.parameters.map(
-                        param => this.convertParameterDeclaration(param)
+                        (param, count) => this.convertParameterDeclaration(param, count)
                     );
                     return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
                 } else if (ts.isTypeLiteralNode(type))  {
@@ -201,7 +201,7 @@ class AstConverter {
     }
 
     convertParameterDeclarations(parameters: ts.NodeArray<ts.ParameterDeclaration>) : Array<ParameterDeclaration> {
-        return parameters.map(parameter => this.convertParameterDeclaration(parameter));
+        return parameters.map((parameter, count) => this.convertParameterDeclaration(parameter, count));
     }
 
     convertMethodSignatureToPropertyDeclaration(methodSignature: ts.MethodSignature) : PropertyDeclaration {
@@ -220,7 +220,7 @@ class AstConverter {
         );
     }
 
-    convertParameterDeclaration(param: ts.ParameterDeclaration) : ParameterDeclaration {
+    convertParameterDeclaration(param: ts.ParameterDeclaration, index: number) : ParameterDeclaration {
         let initializer = null;
         if (param.initializer != null) {
             initializer = this.astFactory.createExpression(
@@ -242,8 +242,10 @@ class AstConverter {
             paramType = this.createVarargType(paramType);
         }
 
+        let name = ts.isIdentifier(param.name) ? param.name.getText() : `__${index}`;
+
         return this.createParameterDeclaration(
-            param.name.getText(),
+            name,
             paramType,
             initializer
         )
@@ -283,7 +285,7 @@ class AstConverter {
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
         let parameterDeclarations = indexSignatureDeclaration.parameters
             .map(
-                param => this.convertParameterDeclaration(param)
+                (param, count) => this.convertParameterDeclaration(param, count)
             );
 
         res.push(this.createMethodDeclaration(
@@ -406,7 +408,7 @@ class AstConverter {
 
         let res: Array<MemberDeclaration> = [];
 
-        for (let parameter of constructor.parameters) {
+        constructor.parameters.forEach((parameter, count) => {
             if (parameter.modifiers) {
                 let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
                 if (isField) {
@@ -419,9 +421,8 @@ class AstConverter {
                 }
             }
 
-            params.push(this.convertParameterDeclaration(parameter));
-        }
-
+            params.push(this.convertParameterDeclaration(parameter, count));
+        });
 
         res.push(this.createMethodDeclaration("@@CONSTRUCTOR",
             params,
