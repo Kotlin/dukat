@@ -12,6 +12,7 @@ private fun mapPrimitiveValue(value: String): String {
         "boolean" -> "Boolean"
         "string" -> "String"
         "number" -> "Number"
+        "Object" -> "Any"
         else -> value
     }
 }
