@@ -19,7 +19,7 @@ abstract class ParameterValueLowering : Lowering {
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> parameter.copy(type = lowerParameterValue(parameter.type)) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
                 },
