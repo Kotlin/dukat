@@ -107,7 +107,9 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("name") as String,
                 mapEntities("members") {it.toAst<MemberDeclaration>()},
                 mapEntities("typeParameters") {it.toAst<TypeParameter>()},
-                mapEntities("parentEntities") {it.toAst<ClassLikeDeclaration>()}
+                mapEntities("parentEntities") {it.toAst<ClassLikeDeclaration>()},
+                null,
+                mapEntities("staticMembers") {it.toAst<MemberDeclaration>()}
         )
     } else if (reflectionType == InterfaceDeclaration::class.simpleName) {
         res = InterfaceDeclaration(

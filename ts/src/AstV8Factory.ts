@@ -1,5 +1,5 @@
 declare class AstFactoryV8 implements AstFactory {
-    createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>): ClassDeclaration;
+    createClassDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, staticMembers: Array<MemberDeclaration>): ClassDeclaration;
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
     createInterfaceDeclaration(name: String, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
     createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot;

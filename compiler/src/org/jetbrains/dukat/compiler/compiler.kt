@@ -135,7 +135,7 @@ private fun FunctionDeclaration.translate(): String {
     return ("external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
-private fun MethodDeclaration.translate(): List<String> {
+private fun MethodDeclaration.translate(isStatic: Boolean = false): List<String> {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -152,7 +152,7 @@ private fun MethodDeclaration.translate(): List<String> {
         } else null
     } else null
 
-    val overrideClause = if (override) "override" else "open"
+    val overrideClause = if (override) "override" else if (!isStatic) "open" else ""
 
     return listOf(
             annotation,
@@ -169,9 +169,9 @@ private fun PropertyDeclaration.translate(): String {
     return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
-private fun MemberDeclaration.translate(): List<String> {
+private fun MemberDeclaration.translate(isStatic: Boolean = false): List<String> {
     if (this is MethodDeclaration) {
-        return translate()
+        return translate(isStatic)
     } else if (this is PropertyDeclaration) {
         return listOf(translate())
     } else {
@@ -282,11 +282,22 @@ fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentD
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
             val hasMembers = declaration.members.isNotEmpty()
-            res.add(classDeclaration + params + if (hasMembers) " {" else "")
+            val hasStaticMembers = declaration.staticMembers.isNotEmpty()
+            val isBlock = hasMembers || hasStaticMembers
 
-            val members = declaration.members
+            res.add(classDeclaration + params + if (isBlock) " {" else "")
+
+            if (hasStaticMembers) {
+                res.add("    companion object {")
+                res.addAll(declaration.staticMembers.flatMap { it.translate(true) }.map({ "       ${it}" }))
+                res.add("    }")
+            }
+
             if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
+                res.addAll(declaration.members.flatMap { it.translate() }.map({ "    " + it }))
+            }
+
+            if (isBlock) {
                 res.add("}")
             }
 

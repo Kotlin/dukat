@@ -36,11 +36,12 @@ private fun V8Array.toArray(): Array<Map<String, Any?>> {
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
 
-    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createClassDeclaration(
+    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, staticMembers: V8Array): V8Object = astFactory.createClassDeclaration(
             name,
-            members.toArray().map { method -> method.toAst<MemberDeclaration>() },
+            members.toArray().map { member -> member.toAst<MemberDeclaration>() },
             typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameter>() },
-            parentEntities.toArray().map { typeParameter -> typeParameter.toAst<ClassLikeDeclaration>() }
+            parentEntities.toArray().map { typeParameter -> typeParameter.toAst<ClassLikeDeclaration>() },
+            staticMembers.toArray().map { staticMember -> staticMember.toAst<MemberDeclaration>() }
     )
 
     fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toArray().map { method -> method.toAst<MemberDeclaration>() })

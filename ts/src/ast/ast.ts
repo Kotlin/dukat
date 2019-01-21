@@ -6,7 +6,10 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
-declare interface MemberDeclaration extends Declaration {}
+
+declare interface MemberDeclaration extends Declaration {
+    metaIsStatic: boolean;
+}
 
 declare class ClassDeclaration implements Declaration {
     name: String;
@@ -14,9 +17,9 @@ declare class ClassDeclaration implements Declaration {
 
 declare class InterfaceDeclaration implements Declaration {}
 
-declare class ObjectLiteral implements ParameterValue {};
+declare class ObjectLiteral implements ParameterValue {}
 
-declare class VariableDeclaration implements MemberDeclaration {
+declare class VariableDeclaration implements Declaration {
     name: String;
     type: TypeDeclaration;
 }
@@ -25,6 +28,7 @@ declare class PropertyDeclaration implements MemberDeclaration {
     name: string;
     type: TypeDeclaration;
     immmutable: boolean;
+    metaIsStatic: boolean;
 }
 
 declare class Expression implements Declaration {
@@ -58,7 +62,10 @@ declare class TypeDeclaration implements ParameterValue {
     constructor(value: string, params: Array<ParameterValue>);
 }
 
-declare class FunctionDeclaration implements MemberDeclaration {}
-declare class MethodDeclaration implements MemberDeclaration {}
+declare class FunctionDeclaration implements Declaration {}
+declare class MethodDeclaration implements MemberDeclaration {
+    metaIsStatic: boolean;
+
+}
 
 declare class FunctionTypeDeclaration implements ParameterValue {}

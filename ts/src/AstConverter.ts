@@ -344,7 +344,7 @@ class AstConverter {
         return res;
     }
 
-    convertClassElementsToClassDeclarations(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) {
+    convertClassElementsToClassDeclarations(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) : Array<MemberDeclaration> {
         if (classDeclarationMembers == null) {
             return [];
         }
@@ -367,6 +367,10 @@ class AstConverter {
                 let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
                 let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
                 if (convertedMethodDeclaration != null) {
+                    let isStatic = methodDeclaration.modifiers ?
+                        methodDeclaration.modifiers.some(member => member.kind == ts.SyntaxKind.StaticKeyword) : false;
+
+                    convertedMethodDeclaration.metaIsStatic = isStatic;
                     members.push(convertedMethodDeclaration);
                 }
             } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
@@ -477,7 +481,7 @@ class AstConverter {
 
                                 if (extending) {
                                     parentEntities.push(
-                                        this.astFactory.createClassDeclaration(type.expression.getText(), [], typeParams, [])
+                                        this.astFactory.createClassDeclaration(type.expression.getText(), [], typeParams, [], [])
                                     );
                                 } else {
                                     parentEntities.push(
@@ -489,8 +493,14 @@ class AstConverter {
                     }
 
                     let members: Array<MemberDeclaration> = [];
+                    let staticMembers: Array<MemberDeclaration> = [];
+
                     this.convertClassElementsToClassDeclarations(classDeclaration.members).forEach(member => {
-                        members.push(member);
+                        if (member.metaIsStatic) {
+                            staticMembers.push(member);
+                        } else {
+                            members.push(member);
+                        }
                     });
 
                     declarations.push(
@@ -498,7 +508,8 @@ class AstConverter {
                             classDeclaration.name.getText(),
                             members,
                             this.convertTypeParams(classDeclaration.typeParameters),
-                            parentEntities
+                            parentEntities,
+                            staticMembers
                         )
                     );
                 }

@@ -44,7 +44,8 @@ fun AstNode.astToMap(): Map<String, Any?> {
                 "name" to name,
                 "members" to members.astToMap(),
                 "typeParameters" to typeParameters.astToMap(),
-                "parentEntities" to parentEntities.astToMap()
+                "parentEntities" to parentEntities.astToMap(),
+                "staticMembers" to staticMembers.astToMap()
         ).reflectAs(this)
         is InterfaceDeclaration -> mapOf(
                 "name" to name,

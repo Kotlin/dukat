@@ -5,5 +5,6 @@ data class ClassDeclaration(
         val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameter>,
         val parentEntities: List<ClassLikeDeclaration>,
-        val primaryConstructor: MethodDeclaration? = null
+        val primaryConstructor: MethodDeclaration? = null,
+        val staticMembers: List<MemberDeclaration>
 ) : ClassLikeDeclaration

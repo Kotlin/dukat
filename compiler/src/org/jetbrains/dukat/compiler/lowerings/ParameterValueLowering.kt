@@ -80,6 +80,7 @@ abstract class ParameterValueLowering : Lowering {
     override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                staticMembers = declaration.staticMembers.map { member -> lowerMemberDeclaration(member) },
                 primaryConstructor = declaration.primaryConstructor?.let { lowerMethodDeclaration(it) },
                 parentEntities = declaration.parentEntities.map { parentEntity -> lowerClassLikeDeclaration(parentEntity) },
                 typeParameters = declaration.typeParameters.map {
