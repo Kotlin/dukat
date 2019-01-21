@@ -440,13 +440,22 @@ class AstConverter {
         return node.modifiers ? node.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.ExportKeyword) : false;
     }
 
+    private nodeIsExportDeclaration(node: ts.Node): boolean {
+        return this.hasDeclareModifier(node) || this.hasExportModifier(node);
+    }
+
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
-            if (ts.isVariableStatement(statement)) {
-                const shouldBeExported = this.hasDeclareModifier(statement) || this.hasExportModifier(statement);
-
-                if (shouldBeExported) {
+            if (ts.isVariableDeclaration(statement)) {
+                if (this.nodeIsExportDeclaration(statement)) {
+                    declarations.push(this.astFactory.declareVariable(
+                        statement.name.getText(),
+                        this.convertType(statement.type)
+                    ));
+                }
+            } else if (ts.isVariableStatement(statement)) {
+                if (this.nodeIsExportDeclaration(statement)) {
                     for (let declaration of statement.declarationList.declarations) {
                         declarations.push(this.astFactory.declareVariable(
                             declaration.name.getText(),
