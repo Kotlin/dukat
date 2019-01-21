@@ -432,16 +432,22 @@ class AstConverter {
         return res;
     }
 
+    private hasDeclareModifier(node: ts.Node): boolean {
+        return node.modifiers ? node.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.DeclareKeyword) : false;
+    }
+
+    private hasExportModifier(node: ts.Node): boolean {
+        return node.modifiers ? node.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.ExportKeyword) : false;
+    }
+
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
             if (ts.isVariableStatement(statement)) {
-                const variableStatment = statement as ts.VariableStatement;
+                const shouldBeExported = this.hasDeclareModifier(statement) || this.hasExportModifier(statement);
 
-                const hasModifiers = variableStatment.modifiers != undefined;
-
-                if (hasModifiers) {
-                    for (let declaration of variableStatment.declarationList.declarations) {
+                if (shouldBeExported) {
+                    for (let declaration of statement.declarationList.declarations) {
                         declarations.push(this.astFactory.declareVariable(
                             declaration.name.getText(),
                             this.convertType(declaration.type)
