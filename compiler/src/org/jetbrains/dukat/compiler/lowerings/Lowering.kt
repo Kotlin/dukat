@@ -32,31 +32,28 @@ interface Lowering {
     fun lowerObjectLiteral(declaration: ObjectLiteral): ObjectLiteral
 
     fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
-        if (declaration is TypeDeclaration) {
-            return lowerTypeDeclaration(declaration)
-        } else if (declaration is FunctionTypeDeclaration) {
-            return lowerFunctionTypeDeclaration(declaration)
-        } else if (declaration is ObjectLiteral) {
-            return lowerObjectLiteral(declaration)
-        } else throw Exception("can not lowerDocumentRoot unknown ParameterValue subtype:  ${this} : ${declaration}")
+        return when (declaration) {
+            is TypeDeclaration -> lowerTypeDeclaration(declaration)
+            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
+            is ObjectLiteral -> lowerObjectLiteral(declaration)
+            else -> throw Exception("can not lowerDocumentRoot unknown ParameterValue subtype:  ${this} : ${declaration}")
+        }
     }
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
-        if (declaration is MethodDeclaration) {
-            return lowerMethodDeclaration(declaration)
-        } else if (declaration is PropertyDeclaration) {
-            return lowerPropertyDeclaration(declaration)
-        } else {
-            throw Exception("can not lowerDocumentRoot unknown MemberDeclaration subtype ${this} : ${declaration}")
+        return when (declaration) {
+            is MethodDeclaration -> lowerMethodDeclaration(declaration)
+            is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
+            else -> throw Exception("can not lowerDocumentRoot unknown MemberDeclaration subtype ${this} : ${declaration}")
         }
     }
 
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
-        if (declaration is InterfaceDeclaration) {
-            return lowerInterfaceDeclaration(declaration)
-        } else if (declaration is ClassDeclaration) {
-            return lowerClassDeclaration(declaration)
-        } else throw Exception("can not lowerDocumentRoot unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
+        return when (declaration) {
+            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            is ClassDeclaration -> lowerClassDeclaration(declaration)
+            else -> throw Exception("can not lowerDocumentRoot unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
+        }
     }
 
     fun lowerDeclaration(declaration: Declaration) : Declaration {
