@@ -247,7 +247,6 @@ private fun escapePackageName(name: String): String {
 
 fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentDeclaration: DocumentRoot? = null) {
     if (docRoot.declarations.isEmpty()) {
-        res.add("// NO DECLARATIONS")
         return
     }
 
@@ -264,8 +263,12 @@ fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentD
                 res.add("")
                 res.add("// ------------------------------------------------------------------------------------------")
             }
-            res.add("@file:JsQualifier(\"${unquote(declaration.packageName)}\")")
-            processDeclarations(declaration, res, docRoot)
+            val children = mutableListOf<String>()
+            processDeclarations(declaration, children, docRoot)
+            if (children.isNotEmpty()) {
+                res.add("@file:JsQualifier(\"${unquote(declaration.packageName)}\")")
+            }
+            res.addAll(children)
         } else if (declaration is VariableDeclaration) {
             res.add(declaration.translate())
         } else if (declaration is FunctionDeclaration) {
@@ -323,7 +326,11 @@ fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentD
 
 fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
     val res = mutableListOf<String>()
-    processDeclarations(documentRoot, res);
+    processDeclarations(documentRoot, res)
+
+    if (res.isEmpty()) {
+        res.add("// NO DECLARATIONS")
+    }
     return res.joinToString("\n")
 }
 
