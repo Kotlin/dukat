@@ -1,8 +1,9 @@
 plugins {
+  id "java"
   id "com.moowork.node" version "1.2.0"
 }
 
-task build(type: NodeTask) {
+task compileTs(type: NodeTask) {
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   outputs.dir("./build/ts")
@@ -13,4 +14,31 @@ task build(type: NodeTask) {
 }
 
 
+task createJar(type: Zip) {
+  dependsOn = [compileTs]
+  baseName 'dukatts'
+  extension 'jar'
+  destinationDir file("${project.buildDir}/jar")
 
+  from('build/ts') {
+    into 'js'
+  }
+
+  from("${project.projectDir}/node_modules/typescript/lib/tsserverlibrary.js") {
+    into 'ts'
+  }
+}
+
+configurations {
+  dukatTsResources
+}
+
+configurations.default.extendsFrom(configurations.dukatTsResources)
+
+
+artifacts {
+  dukatTsResources(createJar.archivePath) {
+    builtBy createJar
+    type "jar"
+  }
+}

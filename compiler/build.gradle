@@ -4,6 +4,8 @@ plugins {
 
 sourceSets {
   main.kotlin.srcDirs = ['src']
+  //main.resources.srcDirs = ["${project.buildDir}/resources"]
+
   test.kotlin.srcDirs = ['test/src']
   test.resources.srcDirs = ['test/data']
 }
@@ -34,7 +36,23 @@ dependencies {
 
   testImplementation "org.junit.platform:junit-platform-runner:1.4.0-M1"
   testImplementation "org.junit.platform:junit-platform-suite-api:1.4.0-M1"
+
+
+  compile(project(path: ':ts', configuration: 'dukatTsResources'))
 }
 
 
-compileKotlin.dependsOn = [':ts:build']
+processResources{
+  from(zipTree(configurations.compile.find {it.name == "dukatts.jar"})) {
+    into "/"
+  }
+}
+
+
+task propagateToIdeaRuntime(type: Copy) {
+  dependsOn = [":ts:createJar"]
+  from(zipTree(configurations.compile.find {it.name == "dukatts.jar"}))
+  into "out/production/resources/"
+}
+
+compileTestKotlin.dependsOn = ["propagateToIdeaRuntime"]

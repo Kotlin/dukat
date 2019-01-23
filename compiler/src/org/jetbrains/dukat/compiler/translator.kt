@@ -8,28 +8,40 @@ import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.ast.model.DocumentRoot
 import org.jetbrains.dukat.ast.toAst
 import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 
 
-fun createNashornInterop(resolver: ContentResolver): InteropNashorn {
+private fun readResource(name: String): String {
+    println("READING RESOURCE ${name}")
+    val resourceAsStream = object {}::class.java.classLoader.getResourceAsStream(name)
+    return resourceAsStream.bufferedReader().readText()
+}
+
+
+private fun InteropEngine.loadAstBuilder() {
+    eval(readResource("ts/tsserverlibrary.js"))
+    eval(readResource("js/dukat-ast-builder.js"))
+}
+
+
+private fun createNashornInterop(): InteropNashorn {
     val engine = InteropNashorn()
 
     engine.eval("var global = this; var Set = Java.type('org.jetbrains.dukat.nashorn.Set');")
 
-    engine.eval(resolver("tsserverlibrary.js"))
-    engine.eval(resolver("dukat-ast-builder.js"))
+    engine.loadAstBuilder()
 
     return engine
 }
 
 
-fun createV8Interop(resolver: ContentResolver): InteropV8 {
+private fun createV8Interop(): InteropV8 {
     val interopRuntime = InteropV8()
 
-    interopRuntime.eval(resolver("tsserverlibrary.js"))
-    interopRuntime.eval(resolver("dukat-ast-builder.js"))
+    interopRuntime.loadAstBuilder()
 
     interopRuntime.proxy(System.out).method("println", InteropV8Signature.STRING)
     interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
@@ -58,26 +70,6 @@ fun createV8Interop(resolver: ContentResolver): InteropV8 {
     return interopRuntime
 }
 
-fun prodResourceResolver(fileName: String): String {
-    val fileNameResolved = when (fileName) {
-        "tsserverlibrary.js" -> "../ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "dukat-ast-builder.js" -> "../ts/build/ts/dukat-ast-builder.js"
-        else -> fileName
-    }
-
-    return fileContent(fileNameResolved)
-}
-
-fun localResourceResolver(fileName: String): String {
-    val fileNameResolved = when (fileName) {
-        "tsserverlibrary.js" -> "ts/node_modules/typescript/lib/tsserverlibrary.js"
-        "dukat-ast-builder.js" -> "ts/build/ts/dukat-ast-builder.js"
-        else -> fileName
-    }
-
-    return fileContent(fileNameResolved)
-}
-
 class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
     override fun translateFile(fileName: String): DocumentRoot {
@@ -92,24 +84,34 @@ class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
 class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
     override fun translateFile(fileName: String): DocumentRoot {
-        return engine.callFunction<DocumentRoot>("main", AstFactory(), FileResolver(), fileName)
+        return engine.callFunction("main", AstFactory(), FileResolver(), fileName)
     }
 
     override fun release() {}
 }
 
 
-fun createV8Translator(resolver: ContentResolver = ::prodResourceResolver) = TranslatorV8(createV8Interop(resolver))
+fun createV8Translator() = TranslatorV8(createV8Interop())
+fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
 
-fun createNashornTranslator(resolver: ContentResolver = ::prodResourceResolver) = TranslatorNashorn(createNashornInterop(resolver))
-
-fun createTranslator() = createNashornTranslator(::prodResourceResolver)
 
 fun main() {
-    val translator = createV8Translator(::localResourceResolver)
 
-    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
-
-    println(compile(astTree))
-    translator.release()
+    println("===============")
+//    println(readResource("js/dukat-ast-builder.js"))
+    try {
+        println(readResource("ts/tsserverlibrary.js"))
+    } catch (e: Exception) {
+        println(e)
+    }
+    try {
+        println(readResource("js/dukat-ast-builder.js"))
+    } catch (e: Exception) {
+    }
+//    val translator = createV8Translator()
+//
+//    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
+//
+//    println(compile(astTree))
+//    translator.release()
 }
