@@ -1,12 +1,13 @@
 package org.jetbrains.dukat.ast
 
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 
-private fun TypeAliasDeclaration.canSusbtitute(iface: InterfaceDeclaration): Boolean {
-    return (aliasName == iface.name) && (typeParameters == iface.typeParameters)
+private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
+    return (aliasName == heritageClause.name) && (typeParameters == heritageClause.typeArguments)
 }
 
 class AstContext {
@@ -26,9 +27,9 @@ class AstContext {
         myTypeAliasDeclaration.add(typeAlias)
     }
 
-    fun resolveTypeAlias(iface: InterfaceDeclaration): ParameterValueDeclaration? {
+    fun resolveTypeAlias(heritageClause: HeritageClauseDeclaration): ParameterValueDeclaration? {
         myTypeAliasDeclaration.forEach { typeAlias ->
-            if (typeAlias.canSusbtitute(iface)) {
+            if (typeAlias.canSusbtitute(heritageClause)) {
                 return typeAlias.typeReference
             }
         }

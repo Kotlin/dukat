@@ -2,7 +2,7 @@ package org.jetbrains.dukat.ast.factory
 
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
@@ -17,7 +17,7 @@ interface AstNodeFactory<T> {
 
     fun createHeritageClauseDeclaration(
             name: String,
-            typeArguments: List<String>,
+            typeArguments: List<TokenDeclaration>,
             extending: Boolean
     ): T
 
@@ -52,7 +52,7 @@ interface AstNodeFactory<T> {
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<InterfaceDeclaration>
+            parentEntities: List<HeritageClauseDeclaration>
     ): T
 
     fun createExpression(kind: TypeDeclaration, meta: String?): T

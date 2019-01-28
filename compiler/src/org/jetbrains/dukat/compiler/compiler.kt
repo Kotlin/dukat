@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
@@ -126,6 +127,15 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterDeclaratio
         }.joinToString(", ") + ">"
     }
 }
+
+private fun translateTypeArguments(typeParameters: List<TokenDeclaration>): String {
+    if (typeParameters.isEmpty()) {
+        return ""
+    } else {
+        return "<" + typeParameters.map{it.value}.joinToString(", ") + ">"
+    }
+}
+
 
 private fun translateParameters(parameters: List<ParameterDeclaration>, needsMeta: Boolean = true): String {
     return parameters
@@ -316,7 +326,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
+                    "${parentEntity.name}${translateTypeArguments(parentEntity.typeArguments)}"
                 }.joinToString(", ")
             } else ""
             res.add("external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (hasMembers) " {" else "")

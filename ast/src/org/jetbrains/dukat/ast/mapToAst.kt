@@ -66,7 +66,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
             get(HeritageClauseDeclaration::name.name) as String,
-            get(HeritageClauseDeclaration::typeArguments.name) as List<String>,
+            mapEntities(HeritageClauseDeclaration::typeArguments.name) { it.toAst<TokenDeclaration>() },
             get(HeritageClauseDeclaration::extending.name) as Boolean
         )
         TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
@@ -146,7 +146,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("name") as String,
                 mapEntities("members") { it.toAst<MemberDeclaration>() },
                 mapEntities("typeParameters") { it.toAst<TypeParameterDeclaration>() },
-                mapEntities("parentEntities") { it.toAst<InterfaceDeclaration>() }
+                mapEntities("parentEntities") { it.toAst<HeritageClauseDeclaration>() }
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(mapEntities("members") { it.toAst<MemberDeclaration>() })
         else -> throw Exception("failed to create declaration from mapper: ${this}")

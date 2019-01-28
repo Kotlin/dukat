@@ -6,7 +6,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
@@ -46,7 +46,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
     fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
             name,
-            typeArguments.asIterator().asSequence().map { it as String }.toList(),
+            typeArguments.toArray().map { it.toAst<TokenDeclaration>() },
             extending
     )
 
@@ -98,7 +98,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             name,
             members.toArray().map { method -> method.toAst<MemberDeclaration>() },
             typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameterDeclaration>() },
-            parentEntities.toArray().map { parentEntity -> parentEntity.toAst<InterfaceDeclaration>() }
+            parentEntities.toArray().map { parentEntity -> parentEntity.toAst<HeritageClauseDeclaration>() }
     )
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta)

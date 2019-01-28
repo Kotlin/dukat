@@ -597,17 +597,21 @@ class AstConverter {
                         for (let type of heritageClause.types) {
 
                             if (ts.isExpressionWithTypeArguments(type)) {
-                                let typeParams: Array<TypeParameter> = [];
+                                let typeArguments: Array<TokenDeclaration> = [];
 
                                 if (type.typeArguments) {
                                     for (let typeArgument of type.typeArguments) {
                                         let value = (this.convertType(typeArgument) as any).value;
-                                        typeParams.push(this.astFactory.createTypeParam(value, []))
+                                        typeArguments.push(this.astFactory.createTokenDeclaration(value))
                                     }
                                 }
 
                                 parentEntities.push(
-                                    this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
+                                    this.astFactory.createHeritageClauseDeclaration(
+                                        type.expression.getText(),
+                                        typeArguments,
+                                        false
+                                    )
                                 );
                             }
                         }

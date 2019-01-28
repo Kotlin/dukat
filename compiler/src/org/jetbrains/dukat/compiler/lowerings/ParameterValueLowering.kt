@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
@@ -86,7 +87,14 @@ interface ParameterValueLowering : Lowering {
 
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
-                parentEntities = declaration.parentEntities.map { parentEntity -> lowerInterfaceDeclaration(parentEntity) },
+                parentEntities = declaration.parentEntities.map { heritageClause ->
+                    //TODO: to introduce heritage visitor
+                    val typeArguments = heritageClause.typeArguments.map {
+                        val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(it.value, emptyList())) as TypeDeclaration
+                        TokenDeclaration(lowerParameterDeclaration.value)
+                    }
+                    heritageClause.copy(typeArguments = typeArguments)
+                },
                 typeParameters = declaration.typeParameters.map {
                     typeParameter -> lowerTypeParameter(typeParameter)
                 }

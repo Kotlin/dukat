@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
@@ -19,7 +19,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
     override fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).astToMap()
 
-    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean)
         =  astFactory.createHeritageClauseDeclaration(name, typeArguments, extending).astToMap()
 
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
@@ -54,8 +54,8 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<InterfaceDeclaration>
-    ) = astFactory.createInterfaceDeclaration(name, members, typeParameters, parentEntities).astToMap()
+            parentEntities: List<HeritageClauseDeclaration>
+    ): Map<String, Any?> = astFactory.createInterfaceDeclaration(name, members, typeParameters, parentEntities).astToMap()
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = astFactory.createExpression(kind, meta).astToMap()
 

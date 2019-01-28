@@ -31,7 +31,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 
-    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean)
         = HeritageClauseDeclaration(name, typeArguments, extending)
 
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
@@ -61,7 +61,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 
-    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<InterfaceDeclaration>) = InterfaceDeclaration(name, members, typeParameters, parentEntities)
+    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities)
 
     override fun declareVariable(name: String, type: ParameterValueDeclaration) = VariableDeclaration(name, type)
     override fun declareProperty(

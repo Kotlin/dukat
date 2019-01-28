@@ -40,7 +40,7 @@ interface DeclarationVisitor {
 
     fun visitInterfaceDeclaration(declaration: InterfaceDeclaration) {
         declaration.members.forEach { member -> visitMemberDeclaration(member) }
-        declaration.parentEntities.forEach { parentEntity -> visitInterfaceDeclaration(parentEntity) }
+        //declaration.parentEntities.forEach { parentEntity -> visitInterfaceDeclaration(parentEntity) }
         declaration.typeParameters.forEach {
             typeParameter -> visitTypeParameter(typeParameter)
         }
