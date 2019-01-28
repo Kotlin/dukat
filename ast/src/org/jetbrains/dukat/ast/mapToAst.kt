@@ -16,6 +16,7 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
@@ -60,6 +61,9 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
+        TokenDeclaration::class.simpleName -> TokenDeclaration(
+           get("value") as String
+        )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
             get(HeritageClauseDeclaration::name.name) as String,
             get(HeritageClauseDeclaration::typeArguments.name) as List<String>,
@@ -67,7 +71,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
             get("aliasName") as String,
-            mapEntities("typeParameters") { it.toAst<TypeParameterDeclaration>() },
+            mapEntities("typeParameters") { it.toAst<TokenDeclaration>() },
             getEntity("typeReference")!!.toAst()
         )
         StringTypeDeclaration::class.simpleName -> StringTypeDeclaration(

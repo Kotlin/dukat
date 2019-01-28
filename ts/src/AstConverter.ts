@@ -60,6 +60,18 @@ class AstConverter {
         return typeParameterDeclarations;
     }
 
+    convertTypeParamsToTokens(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<TokenDeclaration> {
+        let typeParameterDeclarations: Array<TokenDeclaration> = [];
+
+        if (nativeTypeDeclarations) {
+            typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
+                return this.astFactory.createTokenDeclaration(typeParam.name.getText())
+            });
+        }
+
+        return typeParameterDeclarations;
+    }
+
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration) : FunctionDeclaration | null  {
         if (!this.nodeIsExportDeclaration(functionDeclaration)) {
             return null;
@@ -481,7 +493,7 @@ class AstConverter {
     private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): TypeAliasDeclaration {
         return this.astFactory.createTypeAliasDeclaration(
             declaration.name.getText(),
-            this.convertTypeParams(declaration.typeParameters),
+            this.convertTypeParamsToTokens(declaration.typeParameters),
             this.convertType(declaration.type)
         )
     }

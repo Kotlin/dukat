@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
@@ -41,30 +42,30 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
-    fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean)
-        = astFactory.createHeritageClauseDeclaration(
+    fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value)
+
+    fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
             name,
-            typeArguments.asIterator().asSequence().map {it as String}.toList(),
+            typeArguments.asIterator().asSequence().map { it as String }.toList(),
             extending
     )
 
-    fun createTypeAliasDeclaration(aliasName: String, typeParameters: V8Array, typeReference: V8Object)
-            = astFactory.createTypeAliasDeclaration(
-                aliasName,
-                typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameterDeclaration>() },
-                typeReference.toAst()
-            )
+    fun createTypeAliasDeclaration(aliasName: String, typeParameters: V8Array, typeReference: V8Object) = astFactory.createTypeAliasDeclaration(
+            aliasName,
+            typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TokenDeclaration>() },
+            typeReference.toAst()
+    )
 
 
     fun createStringTypeDeclaration(tokens: V8Array): V8Object {
         return astFactory.createStringTypeDeclaration(
-            tokens.asIterator().asSequence().map { it as String}.toList()
+                tokens.asIterator().asSequence().map { it as String }.toList()
         )
     }
 
     fun createIndexSignatureDeclaration(indexType: V8Array, returnType: V8Object): V8Object {
         return astFactory.createIndexSignatureDeclaration(
-                indexType.toArray().map { it.toAst<ParameterDeclaration>()},
+                indexType.toArray().map { it.toAst<ParameterDeclaration>() },
                 returnType.toAst()
         )
     }
@@ -79,7 +80,6 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
                 typeParams
         )
     }
-
 
 
     fun createModifierDeclaration(token: String) = astFactory.createModifierDeclaration(token)
@@ -142,7 +142,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
         )
     }
 
-    fun createMethodSignatureDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, optional: Boolean,  modifiers: V8Array): V8Object {
+    fun createMethodSignatureDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, optional: Boolean, modifiers: V8Array): V8Object {
         val params = parameters.toArray().map { it.toAst<ParameterDeclaration>() }.toTypedArray()
         val typeParams = typeParameters.toArray().map { it.toAst<TypeParameterDeclaration>() }.toTypedArray()
         val modifiersParams = modifiers.toArray().map { it.toAst<ModifierDeclaration>() }

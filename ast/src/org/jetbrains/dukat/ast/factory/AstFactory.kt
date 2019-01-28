@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
@@ -28,10 +29,12 @@ import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
 
+    override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
+
     override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
         = HeritageClauseDeclaration(name, typeArguments, extending)
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
         = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
 
     override fun createStringTypeDeclaration(tokens: List<String>)

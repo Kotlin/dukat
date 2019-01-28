@@ -48,6 +48,7 @@ private fun createV8Interop(): InteropV8 {
 
     interopRuntime
             .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
+            .method("createTokenDeclaration", InteropV8Signature.STRING)
             .method("createHeritageClauseDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN)
             .method("createTypeAliasDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createStringTypeDeclaration", InteropV8Signature.V8ARRAY)

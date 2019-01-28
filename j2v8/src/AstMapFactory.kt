@@ -10,17 +10,19 @@ import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
+    override fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).astToMap()
 
     override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
         =  astFactory.createHeritageClauseDeclaration(name, typeArguments, extending).astToMap()
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
         = astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference).astToMap()
 
     override fun createStringTypeDeclaration(tokens: List<String>)

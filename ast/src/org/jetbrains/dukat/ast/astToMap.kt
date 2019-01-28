@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
@@ -62,6 +63,7 @@ private fun List<KProperty0<*>>.convert(reflection: Any) =
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
+        is TokenDeclaration -> listOf(::value).convert(this)
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
         is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)

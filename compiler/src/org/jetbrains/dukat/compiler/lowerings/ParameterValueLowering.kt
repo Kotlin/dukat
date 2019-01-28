@@ -94,12 +94,7 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
-        return declaration.copy(
-            typeParameters = declaration.typeParameters.map { typeParameter ->
-                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
-            },
-            typeReference = lowerParameterValue(declaration.typeReference)
-        )
+        return declaration
     }
 
     fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {

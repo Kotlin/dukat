@@ -1,7 +1,8 @@
 declare interface AstFactory {
+    createTokenDeclaration(value: string): TokenDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<string>, extending: boolean): HeritageClauseDeclaration
 
-    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TypeParameter>, typeReference: ParameterValue): TypeAliasDeclaration;
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
 
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;

@@ -6,12 +6,15 @@ import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 interface AstNodeFactory<T> {
+    fun createTokenDeclaration(value: String): T
+
     fun createHeritageClauseDeclaration(
             name: String,
             typeArguments: List<String>,
@@ -20,7 +23,7 @@ interface AstNodeFactory<T> {
 
     fun createTypeAliasDeclaration(
             aliasName: String,
-            typeParameters: List<TypeParameterDeclaration>,
+            typeParameters: List<TokenDeclaration>,
             typeReference: ParameterValueDeclaration
     ): T
 

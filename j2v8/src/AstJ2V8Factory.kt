@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
@@ -19,10 +20,12 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     private fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
 
+    override fun createTokenDeclaration(value: String) = toV8(astFactory.createTokenDeclaration(value))
+
     override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
         =   toV8(astFactory.createHeritageClauseDeclaration(name, typeArguments, extending))
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
         = toV8(astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference))
 
     override fun createStringTypeDeclaration(tokens: List<String>) =
