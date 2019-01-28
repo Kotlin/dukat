@@ -1,21 +1,21 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.Declaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
+import org.jetbrains.dukat.ast.model.declaration.Declaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
-fun DocumentRoot.lowerConstructors(): DocumentRoot {
+fun DocumentRootDeclaration.lowerConstructors(): DocumentRootDeclaration {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is ClassDeclaration -> {
-                var primaryConstructor: MethodDeclaration? = null
+                var primaryConstructor: ConstructorDeclaration? = null
 
                 var members: MutableList<MemberDeclaration> = emptyList<MemberDeclaration>().toMutableList()
                 for (member in declaration.members) {
-                    if ((member is MethodDeclaration) && (member.name == "@@CONSTRUCTOR")) {
+                    if ((member is ConstructorDeclaration)) {
                         if (primaryConstructor == null) {
                             primaryConstructor = member
                         } else {
@@ -27,7 +27,7 @@ fun DocumentRoot.lowerConstructors(): DocumentRoot {
                     }
                 }
 
-                declaration.copy(members = members, primaryConstructor =  primaryConstructor)
+                declaration.copy(members = members, primaryConstructor = primaryConstructor)
             }
             else -> declaration.duplicate<Declaration>()
         }

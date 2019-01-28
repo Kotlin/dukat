@@ -35,7 +35,10 @@ class AstConverter {
         if (name != null) {
             return this.astFactory.declareProperty(
                 name,
-                this.convertType(nativePropertyDeclaration.type), [], false, false,
+                this.convertType(nativePropertyDeclaration.type),
+                [],
+                false,
+                this.convertModifiers(nativePropertyDeclaration.modifiers)
             );
         }
 
@@ -80,29 +83,47 @@ class AstConverter {
                 parameterDeclarations,
                 functionDeclaration.type ?
                     this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
-                typeParameterDeclarations
+                typeParameterDeclarations,
+                []
             );
         }
 
         return null;
     }
 
-    convertMethodDeclaration(functionDeclaration: ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature) : MethodDeclaration | null  {
-        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
+    convertModifiers(nativeModifiers: ts.NodeArray<ts.Modifier> | undefined): Array<ModifierDeclaration> {
+        var res: Array<ModifierDeclaration> = [];
 
-        let parameterDeclarations = functionDeclaration.parameters
+        if (nativeModifiers) {
+            nativeModifiers.forEach(modifier => {
+                if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
+                    res.push(this.astFactory.createModifierDeclaration("STATIC"));
+                }
+            });
+        }
+
+        return res;
+    }
+
+
+    convertMethodSignatureDeclaration(declaration: ts.MethodSignature) : MethodSignatureDeclaration | null  {
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(declaration.typeParameters);
+
+        let parameterDeclarations = declaration.parameters
             .map(
                 (param, count) => this.convertParameterDeclaration(param, count)
             );
 
 
-        if (ts.isIdentifier(functionDeclaration.name)) {
-            return this.createMethodDeclaration(
-                functionDeclaration.name ? functionDeclaration.name.getText() : "",
+        if (ts.isIdentifier(declaration.name)) {
+            return this.astFactory.createMethodSignatureDeclaration(
+                declaration.name ? declaration.name.getText() : "",
                 parameterDeclarations,
-                functionDeclaration.type ?
-                    this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
-                typeParameterDeclarations, false, false
+                declaration.type ?
+                    this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
+                typeParameterDeclarations,
+                !!declaration.questionToken,
+                this.convertModifiers(declaration.modifiers)
             );
         }
 
@@ -110,8 +131,32 @@ class AstConverter {
     }
 
 
-    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, override: boolean = false, operator: boolean = false): MethodDeclaration {
-        return this.astFactory.createMethodDeclaration(name, parameters, type, typeParams, override, operator);
+    convertMethodDeclaration(declaration: ts.MethodSignature) : FunctionDeclaration | null  {
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(declaration.typeParameters);
+
+        let parameterDeclarations = declaration.parameters
+            .map(
+                (param, count) => this.convertParameterDeclaration(param, count)
+            );
+
+
+        if (ts.isIdentifier(declaration.name)) {
+            return this.createMethodDeclaration(
+                declaration.name ? declaration.name.getText() : "",
+                parameterDeclarations,
+                declaration.type ?
+                    this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
+                typeParameterDeclarations,
+                this.convertModifiers(declaration.modifiers)
+            );
+        }
+
+        return null;
+    }
+
+
+    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): FunctionDeclaration {
+        return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers);
     }
 
     private createTypeDeclaration(value: string, params: Array<ParameterValue> = []): TypeDeclaration {
@@ -122,8 +167,8 @@ class AstConverter {
         return this.astFactory.createParameterDeclaration(name, type, initializer);
     }
 
-    private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], getter: boolean = false, setter: boolean = false): PropertyDeclaration {
-        return this.astFactory.declareProperty(value, type, typeParams, getter, setter);
+    private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
+        return this.astFactory.declareProperty(value, type, typeParams, optional, []);
     }
 
     createUnionType(params: Array<TypeDeclaration>) {
@@ -201,6 +246,10 @@ class AstConverter {
                     return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
                 } else if (ts.isThisTypeNode(type)){
                     return this.createTypeDeclaration("@@SELF_REFERENCE")
+                } else if (ts.isLiteralTypeNode(type)) {
+                    return this.astFactory.createStringTypeDeclaration([
+                        type.literal.getText()
+                    ])
                 } else {
                     return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
                 }
@@ -259,62 +308,50 @@ class AstConverter {
         )
     }
 
-    convertTypeElementToMemberDeclaration(node: ts.TypeElement) : MemberDeclaration | null {
-        let methodDeclaration = node as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
+    convertTypeElementToMethoSignatureDeclaration(methodDeclaration: ts.MethodSignature) : MethodSignatureDeclaration | null {
+        let convertedMethodDeclaration = this.convertMethodSignatureDeclaration(methodDeclaration);
+        if (convertedMethodDeclaration != null) {
+            return convertedMethodDeclaration
+        }
 
-        if (methodDeclaration.questionToken) {
-            return this.convertMethodSignatureToPropertyDeclaration(methodDeclaration)
-        } else {
-            let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
-            if (convertedMethodDeclaration != null) {
-                return convertedMethodDeclaration
-            }
+        return null;
+    }
+
+    convertTypeElementToMemberDeclaration(methodDeclaration: ts.MethodSignature) : MemberDeclaration | null {
+        let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
+        if (convertedMethodDeclaration != null) {
+            return convertedMethodDeclaration
         }
 
         return null;
     }
 
     convertPropertySignature(node: ts.PropertySignature) : MemberDeclaration  {
-        let propertyDeclaration: PropertyDeclaration;
-        if (node.questionToken) {
-            propertyDeclaration = this.createProperty(
-                this.convertName(node.name) as string,
-                this.createNullableType(this.convertType(node.type)),
-                [], true, true)
-        } else {
-            propertyDeclaration = this.createProperty(this.convertName(node.name) as string, this.convertType(node.type));
-        }
-
-        return propertyDeclaration;
+         return this.createProperty(this.convertName(node.name) as string, this.convertType(node.type), [], !!node.questionToken);
     }
 
     convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration) : Array<MemberDeclaration> {
         let res: Array<MemberDeclaration> = [];
-        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
+        //let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
         let parameterDeclarations = indexSignatureDeclaration.parameters
             .map(
                 (param, count) => this.convertParameterDeclaration(param, count)
             );
 
-        res.push(this.createMethodDeclaration(
-            "get", parameterDeclarations, this.createNullableType(this.convertType(indexSignatureDeclaration.type)), typeParameterDeclarations, false,true
-        ));
-
-        parameterDeclarations.push(
-            this.createParameterDeclaration("value", this.convertType(indexSignatureDeclaration.type), null)
+        res.push(
+            this.astFactory.createIndexSignatureDeclaration(
+                parameterDeclarations,
+                this.convertType(indexSignatureDeclaration.type)
+            )
         );
-
-        res.push(this.createMethodDeclaration(
-            "set", parameterDeclarations, this.createTypeDeclaration("Unit"), typeParameterDeclarations, false, true
-        ));
 
         return res;
     }
 
-    convertTypeElementToMemberDeclarations(member: ts.TypeElement) : Array<MemberDeclaration> {
+    convertTypeElementToInterfaceMemberDeclarations(member: ts.TypeElement) : Array<MemberDeclaration> {
         let  res: Array<MemberDeclaration> = [];
         if (ts.isMethodSignature(member)) {
-            let methodDeclaration = this.convertTypeElementToMemberDeclaration(member);
+            let methodDeclaration = this.convertTypeElementToMethoSignatureDeclaration(member);
             if (methodDeclaration) {
                 res.push(methodDeclaration);
             }
@@ -327,15 +364,11 @@ class AstConverter {
                 res.push(member)
             );
         } else if (ts.isCallSignatureDeclaration(member)) {
-
             res.push(
-                this.createMethodDeclaration(
-                    "invoke",
+                this.astFactory.createCallSignatureDeclaration(
                     this.convertParameterDeclarations(member.parameters),
                     member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
-                    this.convertTypeParams(member.typeParameters),
-                    false,
-                    true
+                    this.convertTypeParams(member.typeParameters)
                 )
             );
         }
@@ -346,7 +379,7 @@ class AstConverter {
     convertMembersToInterfaceMemberDeclarations(members: ts.NodeArray<ts.TypeElement>) : Array<MemberDeclaration> {
         let res: Array<MemberDeclaration> = [];
         members.map(member => {
-            this.convertTypeElementToMemberDeclarations(member).map(memberDeclaration => {
+            this.convertTypeElementToInterfaceMemberDeclarations(member).map(memberDeclaration => {
                 res.push(memberDeclaration);
             });
         });
@@ -380,7 +413,6 @@ class AstConverter {
                     let isStatic = methodDeclaration.modifiers ?
                         methodDeclaration.modifiers.some(member => member.kind == ts.SyntaxKind.StaticKeyword) : false;
 
-                    convertedMethodDeclaration.metaIsStatic = isStatic;
                     members.push(convertedMethodDeclaration);
                 }
             } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
@@ -394,7 +426,7 @@ class AstConverter {
     }
 
 
-    convertTypeLiteralToInterfaceDeclaration(name: String, typeLiteral: ts.TypeLiteralNode, typeParams: Array<TypeParameter> = []): InterfaceDeclaration {
+    convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: Array<TypeParameter> = []): InterfaceDeclaration {
         return this.astFactory.createInterfaceDeclaration(
             name,
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
@@ -409,14 +441,13 @@ class AstConverter {
         );
     }
 
-    convertConstructorDeclaration(memberDeclaration: ts.ConstructorDeclaration): Array<MemberDeclaration> {
-        let constructor = memberDeclaration as ts.ConstructorDeclaration;
+    convertConstructorDeclaration(constructorDeclaration: ts.ConstructorDeclaration): Array<MemberDeclaration> {
 
         let params: Array<ParameterDeclaration> = [];
 
         let res: Array<MemberDeclaration> = [];
 
-        constructor.parameters.forEach((parameter, count) => {
+        constructorDeclaration.parameters.forEach((parameter, count) => {
             if (parameter.modifiers) {
                 let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
                 if (isField) {
@@ -432,9 +463,10 @@ class AstConverter {
             params.push(this.convertParameterDeclaration(parameter, count));
         });
 
-        res.push(this.createMethodDeclaration("@@CONSTRUCTOR",
+        res.push(this.astFactory.createConstructorDeclaration(
             params,
-            this.createTypeDeclaration("______"), this.convertTypeParams(constructor.typeParameters))
+            this.createTypeDeclaration("______"),
+            this.convertTypeParams(constructorDeclaration.typeParameters), this.convertModifiers(constructorDeclaration.modifiers))
         );
 
         return res;
@@ -518,7 +550,8 @@ class AstConverter {
                     let staticMembers: Array<MemberDeclaration> = [];
 
                     this.convertClassElementsToClassDeclarations(classDeclaration.members).forEach(member => {
-                        if (member.metaIsStatic) {
+                        //if (member.metaIsStatic) {
+                        if (false) {
                             staticMembers.push(member);
                         } else {
                             members.push(member);

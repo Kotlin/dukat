@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.TypeParameter
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 
 
@@ -17,7 +17,7 @@ private fun mapPrimitiveValue(value: String): String {
     }
 }
 
-private class PrimitiveClassLowering : ParameterValueLowering() {
+private class PrimitiveClassLowering : ParameterValueLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
         var value = mapPrimitiveValue(declaration.value)
         var nullable = declaration.nullable
@@ -33,11 +33,11 @@ private class PrimitiveClassLowering : ParameterValueLowering() {
         )
     }
 
-    override fun lowerTypeParameter(declaration: TypeParameter): TypeParameter {
+    override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(name = mapPrimitiveValue(declaration.name))
     }
 }
 
-fun DocumentRoot.lowerPrimitives(): DocumentRoot {
+fun DocumentRootDeclaration.lowerPrimitives(): DocumentRootDeclaration {
     return PrimitiveClassLowering().lowerDocumentRoot(this)
 }

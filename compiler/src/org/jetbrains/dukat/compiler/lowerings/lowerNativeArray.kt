@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
-private class NativeArrayLowering : ParameterValueLowering() {
+private class NativeArrayLowering : ParameterValueLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
         if (declaration.value == "@@ArraySugar") {
             return declaration.copy(value = "Array", params = declaration.params.map { param -> lowerParameterValue(param) })
@@ -13,6 +13,6 @@ private class NativeArrayLowering : ParameterValueLowering() {
     }
 }
 
-fun DocumentRoot.lowerNativeArray(): DocumentRoot {
+fun DocumentRootDeclaration.lowerNativeArray(): DocumentRootDeclaration {
     return NativeArrayLowering().lowerDocumentRoot(this)
 }

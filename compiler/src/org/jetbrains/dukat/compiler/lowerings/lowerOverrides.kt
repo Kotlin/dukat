@@ -1,53 +1,53 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.Declaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.Declaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
 @Suppress("UNCHECKED_CAST")
-private fun InterfaceDeclaration.allParentMethods() : List<MethodDeclaration> {
+private fun InterfaceDeclaration.allParentMethods() : List<MethodNode> {
     return parentEntities.flatMap { parentEntity ->
-        parentEntity.members.filter {member -> member is MethodDeclaration} + parentEntity.allParentMethods()
-    } as List<MethodDeclaration>
+        parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods()
+    } as List<MethodNode>
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun ClassDeclaration.allParentMethods() : List<MethodDeclaration> {
-    return parentEntities.flatMap { parentEntity ->
-        if (parentEntity is InterfaceDeclaration) {
-            parentEntity.members.filter {member -> member is MethodDeclaration} + parentEntity.allParentMethods()
-        } else if (parentEntity is ClassDeclaration) {
-            parentEntity.members.filter {member -> member is MethodDeclaration} + parentEntity.allParentMethods()
-        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
-    } as List<MethodDeclaration>
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun InterfaceDeclaration.allParentProperties() : List<PropertyDeclaration> {
-    return parentEntities.flatMap { parentEntity ->
-        parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
-    } as List<PropertyDeclaration>
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun ClassDeclaration.allParentProperties() : List<PropertyDeclaration> {
+private fun ClassDeclaration.allParentMethods() : List<MethodNode> {
     return parentEntities.flatMap { parentEntity ->
         if (parentEntity is InterfaceDeclaration) {
-            parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
+            parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods()
         } else if (parentEntity is ClassDeclaration) {
-            parentEntity.members.filter {member -> member is PropertyDeclaration} + parentEntity.allParentProperties()
+            parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods()
         } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
-    } as List<PropertyDeclaration>
+    } as List<MethodNode>
 }
 
-private fun MethodDeclaration.isOverriding(otherMethodDeclaration: MethodDeclaration): Boolean {
+@Suppress("UNCHECKED_CAST")
+private fun InterfaceDeclaration.allParentProperties() : List<PropertyNode> {
+    return parentEntities.flatMap { parentEntity ->
+        parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties()
+    } as List<PropertyNode>
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun ClassDeclaration.allParentProperties() : List<PropertyNode> {
+    return parentEntities.flatMap { parentEntity ->
+        if (parentEntity is InterfaceDeclaration) {
+            parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties()
+        } else if (parentEntity is ClassDeclaration) {
+            parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties()
+        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+    } as List<PropertyNode>
+}
+
+private fun MethodNode.isOverriding(otherMethodDeclaration: MethodNode): Boolean {
     if (name != otherMethodDeclaration.name) {
         return false
     }
@@ -65,12 +65,12 @@ private fun MethodDeclaration.isOverriding(otherMethodDeclaration: MethodDeclara
             .all { it }
 }
 
-private fun PropertyDeclaration.isOverriding(otherPropertyDeclaration: PropertyDeclaration) : Boolean {
+private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode) : Boolean {
     return type.isOverriding(otherPropertyDeclaration.type)
 }
 
 
-private fun MethodDeclaration.isSpecialCase() : Boolean {
+private fun MethodNode.isSpecialCase() : Boolean {
 
     if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeDeclaration("Any", emptyArray()))) {
         return true
@@ -87,13 +87,13 @@ private fun MethodDeclaration.isSpecialCase() : Boolean {
     return false
 }
 
-private fun ParameterValue.isOverriding(otherParameterValue: ParameterValue): Boolean {
+private fun ParameterValueDeclaration.isOverriding(otherParameterValue: ParameterValueDeclaration): Boolean {
     //TODO: we need to do this the right way
     if (this == otherParameterValue) {
         return true
     }
 
-    if (otherParameterValue == TypeDeclaration("Any", emptyArray())) {
+    if (otherParameterValue == TypeDeclaration("Any", emptyList(), false, false, null)) {
         return true
     }
 
@@ -101,22 +101,24 @@ private fun ParameterValue.isOverriding(otherParameterValue: ParameterValue): Bo
 }
 
 private fun MemberDeclaration.lowerOverrides(
-        allSuperDeclarations: List<MethodDeclaration>,
-        allSuperProperties: List<PropertyDeclaration>
+        allSuperDeclarations: List<MethodNode>,
+        allSuperProperties: List<PropertyNode>
 ) : MemberDeclaration {
-    if (this is MethodDeclaration) {
+
+    return if (this is MethodNode) {
         val override =
                 allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
-        return copy(override = override)
-    } else if (this is PropertyDeclaration) {
-        val override =  allSuperProperties.any { superMethod -> isOverriding(superMethod) }
-        return copy(override = override)
-    } else {
-        throw Exception("can not lowerDocumentRoot overrides for ${this}")
-    }
+         copy(override = override)
+    } else if (this is PropertyNode) {
+        val override =  allSuperProperties.any {
+            superMethod ->
+            isOverriding(superMethod)
+        }
+        copy(override = override)
+    } else this
 }
 
-fun DocumentRoot.lowerOverrides(): DocumentRoot {
+fun DocumentRootDeclaration.lowerOverrides(): DocumentRootDeclaration {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is InterfaceDeclaration -> {
@@ -137,7 +139,7 @@ fun DocumentRoot.lowerOverrides(): DocumentRoot {
                             member.lowerOverrides(allParentMethods, allParentProperties)}
                 )
             }
-            is DocumentRoot -> {
+            is DocumentRootDeclaration -> {
                 declaration.lowerOverrides()
             }
             else -> declaration.duplicate<Declaration>()

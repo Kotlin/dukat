@@ -1,58 +1,48 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.Declaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.TypeParameter
-import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.Declaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
-import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
 
 interface Lowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration
     fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration
-    fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
-    fun lowerMethodDeclaration(declaration: MethodDeclaration): MethodDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
-    fun lowerTypeParameter(declaration: TypeParameter): TypeParameter
-    fun lowerObjectLiteral(declaration: ObjectLiteral): ObjectLiteral
+    fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
+    fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration
+    fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
 
-    fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
+    fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
-            is ObjectLiteral -> lowerObjectLiteral(declaration)
-            else -> throw Exception("can not lowerDocumentRoot unknown ParameterValue subtype:  ${this} : ${declaration}")
+            is ObjectLiteralDeclaration -> lowerObjectLiteral(declaration)
+            else -> throw Exception("can not lowerParameterValue unknown ParameterValueDeclaration subtype:  ${this} : ${declaration}")
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
-        return when (declaration) {
-            is MethodDeclaration -> lowerMethodDeclaration(declaration)
-            is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
-            else -> throw Exception("can not lowerDocumentRoot unknown MemberDeclaration subtype ${this} : ${declaration}")
-        }
-    }
 
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
         return when (declaration) {
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is ClassDeclaration -> lowerClassDeclaration(declaration)
-            else -> throw Exception("can not lowerDocumentRoot unknown ClassLikeDeclaraion subtype ${this} : ${declaration}")
+            else -> declaration
         }
     }
 
@@ -62,7 +52,7 @@ interface Lowering {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is ClassDeclaration -> lowerClassDeclaration(declaration)
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
-            is DocumentRoot -> lowerDocumentRoot(declaration)
+            is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
             else -> declaration.duplicate()
         }
     }
@@ -73,7 +63,7 @@ interface Lowering {
         }
     }
 
-    fun lowerDocumentRoot(documenRoot: DocumentRoot): DocumentRoot {
+    fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
         return documenRoot.copy(declarations = lowerDeclarations(documenRoot.declarations))
     }
 }

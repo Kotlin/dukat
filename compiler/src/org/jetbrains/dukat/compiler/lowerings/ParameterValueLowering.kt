@@ -1,19 +1,50 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.TypeParameter
-import org.jetbrains.dukat.ast.model.VariableDeclaration
-import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
-abstract class ParameterValueLowering : Lowering {
-    override fun lowerObjectLiteral(declaration: ObjectLiteral): ObjectLiteral {
+interface ParameterValueLowering : Lowering {
+
+    fun lowerMethodNode(declaration: MethodNode): MethodNode {
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                },
+                type = lowerParameterValue(declaration.type)
+        )
+    }
+
+    fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
+        return declaration.copy(
+                type = lowerParameterValue(declaration.type),
+                typeParameters = declaration.typeParameters.map {typeParameter -> lowerTypeParameter(typeParameter) }
+        )
+    }
+
+    override fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
+        return when (declaration) {
+            is MethodNode -> lowerMethodNode(declaration)
+            is PropertyNode -> lowerPropertyNode(declaration)
+            else -> {
+                println("[WARN] skipping ${declaration}")
+                declaration
+            }
+        }
+    }
+
+    override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration {
         return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member) })
     }
 
@@ -27,14 +58,7 @@ abstract class ParameterValueLowering : Lowering {
         )
     }
 
-    override fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration {
-        return declaration.copy(
-                type = lowerParameterValue(declaration.type),
-                typeParameters = declaration.typeParameters.map {typeParameter -> lowerTypeParameter(typeParameter) }
-            )
-    }
-
-    override fun lowerTypeParameter(declaration: TypeParameter): TypeParameter {
+    override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(constraints = declaration.constraints.map {constraint -> lowerParameterValue(constraint)})
     }
 
@@ -53,16 +77,6 @@ abstract class ParameterValueLowering : Lowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    override fun lowerMethodDeclaration(declaration: MethodDeclaration): MethodDeclaration {
-        return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
-                typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
-                },
-                type = lowerParameterValue(declaration.type)
-        )
-    }
-
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
@@ -77,11 +91,21 @@ abstract class ParameterValueLowering : Lowering {
         )
     }
 
+    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                },
+                type = lowerParameterValue(declaration.type)
+        )
+    }
+
     override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 staticMembers = declaration.staticMembers.map { member -> lowerMemberDeclaration(member) },
-                primaryConstructor = declaration.primaryConstructor?.let { lowerMethodDeclaration(it) },
+                primaryConstructor = declaration.primaryConstructor?.let { lowerConstructorDeclaration(it) },
                 parentEntities = declaration.parentEntities.map { parentEntity -> lowerClassLikeDeclaration(parentEntity) },
                 typeParameters = declaration.typeParameters.map {
                     typeParameter -> lowerTypeParameter(typeParameter)

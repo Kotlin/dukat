@@ -5,7 +5,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
-import org.jetbrains.dukat.ast.model.DocumentRoot
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.toAst
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
@@ -48,6 +48,9 @@ private fun createV8Interop(): InteropV8 {
 
     interopRuntime
             .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
+            .method("createStringTypeDeclaration", InteropV8Signature.V8ARRAY)
+            .method("createIndexSignatureDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
+            .method("createModifierDeclaration", InteropV8Signature.STRING)
             .method("createClassDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createObjectLiteral", InteropV8Signature.V8ARRAY)
             .method("createInterfaceDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
@@ -55,10 +58,12 @@ private fun createV8Interop(): InteropV8 {
             .method("createTypeParam", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("createTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
-            .method("declareProperty", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.BOOLEAN)
+            .method("declareProperty", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.V8ARRAY)
             .method("createParameterDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8OBJECT)
-            .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY)
-            .method("createMethodDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.BOOLEAN)
+            .method("createCallSignatureDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY)
+            .method("createMethodSignatureDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.V8ARRAY)
+            .method("createConstructorDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
+            .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createFunctionTypeDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createDocumentRoot", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
 
@@ -72,7 +77,7 @@ private fun createV8Interop(): InteropV8 {
 
 class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
-    override fun translateFile(fileName: String): DocumentRoot {
+    override fun translateFile(fileName: String): DocumentRootDeclaration {
         val result = engine.callFunction<V8Object>("main", null, null, fileName)
         return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
     }
@@ -83,7 +88,7 @@ class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 }
 
 class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
-    override fun translateFile(fileName: String): DocumentRoot {
+    override fun translateFile(fileName: String): DocumentRootDeclaration {
         return engine.callFunction("main", AstFactory(), FileResolver(), fileName)
     }
 
@@ -96,22 +101,10 @@ fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
 
 
 fun main() {
+    val translator = createV8Translator()
 
-    println("===============")
-//    println(readResource("js/dukat-ast-builder.js"))
-    try {
-        println(readResource("ts/tsserverlibrary.js"))
-    } catch (e: Exception) {
-        println(e)
-    }
-    try {
-        println(readResource("js/dukat-ast-builder.js"))
-    } catch (e: Exception) {
-    }
-//    val translator = createV8Translator()
-//
-//    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
-//
-//    println(compile(astTree))
-//    translator.release()
+    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
+
+    println(compile(astTree))
+    translator.release()
 }

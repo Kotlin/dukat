@@ -1,14 +1,14 @@
 package org.jetbrains.dukat.compiler.visitor
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-class PrintStreamVisitor(): Visitor {
+class PrintStreamVisitor(): DeclarationVisitor {
     private val myOutputStream = ByteArrayOutputStream()
     private val myPrintStream = PrintStream(myOutputStream)
 
@@ -19,7 +19,7 @@ class PrintStreamVisitor(): Visitor {
         myPrintStream.println()
     }
 
-    override fun visitParameterValue(declaration: ParameterValue) {
+    override fun visitParameterValue(declaration: ParameterValueDeclaration) {
         if (declaration is TypeDeclaration) {
             myPrintStream.print(declaration.value)
         } else if (declaration is FunctionTypeDeclaration) {
@@ -27,7 +27,7 @@ class PrintStreamVisitor(): Visitor {
         }
     }
 
-    fun output(document: DocumentRoot): String {
+    fun output(document: DocumentRootDeclaration): String {
         visitDocumentRoot(document)
         return String(myOutputStream.toByteArray(), Charsets.UTF_8)
     }

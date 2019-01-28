@@ -1,3 +1,9 @@
+/* TODO */
+declare class D {
+  baz(animal: "dog" | "cat" | "parrot"): number
+}
+
+
 interface Foo {
   bar();
   bar(a:number);

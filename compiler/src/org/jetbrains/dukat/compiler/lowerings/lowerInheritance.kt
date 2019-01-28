@@ -1,15 +1,15 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.Declaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.Declaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 
 @Suppress("UNCHECKED_CAST")
-fun DocumentRoot.lowerInheritance(astContext: AstContext): DocumentRoot {
+fun DocumentRootDeclaration.lowerInheritance(astContext: AstContext): DocumentRootDeclaration {
     val declarations = declarations.map { declaration ->
         if (declaration is InterfaceDeclaration) {
             val resolvedParentEntities = declaration.parentEntities
@@ -31,7 +31,7 @@ fun DocumentRoot.lowerInheritance(astContext: AstContext): DocumentRoot {
                     }
 
             declaration.copy(parentEntities = resolvedParentEntities)
-        } else if (declaration is DocumentRoot) {
+        } else if (declaration is DocumentRootDeclaration) {
             declaration.lowerInheritance(astContext)
         }
         else declaration.duplicate<Declaration>()

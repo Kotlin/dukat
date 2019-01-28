@@ -1,14 +1,14 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 
-private class LowerNullable : ParameterValueLowering() {
+private class LowerNullable : ParameterValueLowering {
 
-    override fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> {
                 if (declaration.value == "@@Union") {
@@ -44,6 +44,6 @@ private class LowerNullable : ParameterValueLowering() {
     }
 }
 
-fun DocumentRoot.lowerNullable(): DocumentRoot {
+fun DocumentRootDeclaration.lowerNullable(): DocumentRootDeclaration {
     return LowerNullable().lowerDocumentRoot(this)
 }

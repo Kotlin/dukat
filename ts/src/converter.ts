@@ -13,10 +13,14 @@ declare class FileResolverV8 implements FileResolver {
   resolve(fileName: string): string;
 }
 
+
+
 if (typeof console == "undefined") {
   (global as any).console = {
     log: (...args: any[]) => {
-      println(args.map(it => String(it)).join(", "));
+      if (typeof println == "function") {
+        println(args.map(it => String(it)).join(", "));
+      }
     }
   }
 }

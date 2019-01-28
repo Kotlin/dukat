@@ -1,24 +1,25 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.TypeParameter
-import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
 
-private fun ParameterValue.translateMeta(): String {
+private fun ParameterValueDeclaration.translateMeta(): String {
 
     meta?.asIntersection()?.let { parameterValue ->
         return " /* " + parameterValue.params.map { parameterValue ->
@@ -28,16 +29,22 @@ private fun ParameterValue.translateMeta(): String {
         }.joinToString(" & ") + " */"
     }
 
-    val skipNullableAnnotation = (this is TypeDeclaration) && (this.value == "Nothing" )
+    val skipNullableAnnotation = (this is TypeDeclaration) && (this.value == "Nothing")
     if (nullable && !skipNullableAnnotation) {
         //TODO: consider rethinking this restriction
         return " /*= null*/"
     }
 
+    if (meta is StringTypeDeclaration) {
+        (meta as StringTypeDeclaration)?.let {
+            return " /* ${it.tokens.joinToString("|")} */"
+        }
+    }
+
     return ""
 }
 
-private fun ParameterValue.translateSignatureMeta(): String {
+private fun ParameterValueDeclaration.translateSignatureMeta(): String {
 
     meta?.asSelfReference()?.let {
         return " /* this */"
@@ -46,7 +53,7 @@ private fun ParameterValue.translateSignatureMeta(): String {
     return ""
 }
 
-private fun ParameterValue.translate(): String {
+private fun ParameterValueDeclaration.translate(): String {
     if (this is TypeDeclaration) {
         val res = mutableListOf(value)
         if (isGeneric()) {
@@ -105,7 +112,7 @@ private fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     return res
 }
 
-private fun translateTypeParameters(typeParameters: List<TypeParameter>): String {
+private fun translateTypeParameters(typeParameters: List<TypeParameterDeclaration>): String {
     if (typeParameters.isEmpty()) {
         return ""
     } else {
@@ -137,7 +144,7 @@ private fun FunctionDeclaration.translate(): String {
     return ("external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
-private fun MethodDeclaration.translate(isStatic: Boolean = false): List<String> {
+private fun MethodNode.translate(): List<String> {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -146,44 +153,36 @@ private fun MethodDeclaration.translate(isStatic: Boolean = false): List<String>
     }
 
     val operatorModifier = if (operator) " operator" else ""
-    val annotation = if (operator) {
-        if (name == "set") {
-            "@nativeSetter"
-        } else if (name == "get") {
-            "@nativeGetter"
-        } else null
-    } else null
+    val annotations = annotations.map { "@${it.name}" }
 
-    val overrideClause = if (override) "override" else if (!isStatic) "open" else ""
+    val overrideClause = if (override) "override" else if (!static) "open" else ""
 
-    return listOf(
-            annotation,
-            "${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType} = definedExternally"
-    ).filterNotNull()
+    return annotations.toMutableList() + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType} = definedExternally")
 }
 
 private fun VariableDeclaration.translate(): String {
     return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
-private fun PropertyDeclaration.translate(): String {
-    val modifier = if (override) "override" else "open"
+private fun PropertyNode.translate(): String {
+    val modifier = if (override) "override" else if (!static) "open" else ""
     return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun MemberDeclaration.translate(isStatic: Boolean = false): List<String> {
-    if (this is MethodDeclaration) {
-        return translate(isStatic)
-    } else if (this is PropertyDeclaration) {
+    if (this is MethodNode) {
+        return translate()
+    } else if (this is PropertyNode) {
         return listOf(translate())
     } else {
         throw Exception("can not translate ${this}")
     }
 }
 
-private fun PropertyDeclaration.translateSignature(): String {
+private fun PropertyNode.translateSignature(): String {
     val varModifier = if (getter && !setter) "val" else "var"
     val overrideClause = if (override) "override " else ""
+
 
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
@@ -199,37 +198,34 @@ private fun PropertyDeclaration.translateSignature(): String {
     return res
 }
 
-private fun MethodDeclaration.translateSignature(): List<String> {
+private fun MethodNode.translateSignature(): List<String> {
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
 
     val operatorModifier = if (operator) "operator " else ""
-    val annotation = if (operator) {
-        if (name == "set") {
-            "@nativeSetter"
-        } else if (name == "get") {
-            "@nativeGetter"
-        } else if (name == "invoke") {
-            "@nativeInvoke"
-        } else null
-    } else null
+    val annotations = annotations.map { "@${it.name}" }
 
     val returnsUnit = type == TypeDeclaration("Unit", emptyArray())
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
     val overrideClause = if (override) "override " else ""
 
-    return listOf(
-            annotation,
-            "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}${type.translateSignatureMeta()}"
-    ).filterNotNull()
+    val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}${type.translateSignatureMeta()}"
+    return if (annotations.isEmpty()) {
+        listOf(
+                methodNodeTranslation
+        )
+    } else annotations.toMutableList() + listOf(methodNodeTranslation)
+
+
+
 }
 
 private fun MemberDeclaration.translateSignature(): List<String> {
-    if (this is MethodDeclaration) {
+    if (this is MethodNode) {
         return translateSignature()
-    } else if (this is PropertyDeclaration) {
+    } else if (this is PropertyNode) {
         return listOf(translateSignature())
     } else {
         throw Exception("can not translate singature ${this}")
@@ -245,20 +241,27 @@ private fun escapePackageName(name: String): String {
     return name.replace("/".toRegex(), ".").replace("_".toRegex(), "_")
 }
 
-fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentDeclaration: DocumentRoot? = null) {
+private fun MemberDeclaration.isStatic() = when(this) {
+    is MethodNode -> static
+    is PropertyNode -> static
+    else -> false
+}
+
+
+fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<String>, parentDeclaration: DocumentRootDeclaration? = null) {
     if (docRoot.declarations.isEmpty()) {
         return
     }
 
     val packageName = if (parentDeclaration == null) unquote(docRoot.packageName) else "${unquote(parentDeclaration.packageName)}.${unquote(docRoot.packageName)}"
 
-    if (docRoot.declarations[0] !is DocumentRoot) {
+    if (docRoot.declarations[0] !is DocumentRootDeclaration) {
         res.add("package " + escapePackageName(packageName))
         res.add("")
     }
 
     for (declaration in docRoot.declarations) {
-        if (declaration is DocumentRoot) {
+        if (declaration is DocumentRootDeclaration) {
             if (res.isNotEmpty()) {
                 res.add("")
                 res.add("// ------------------------------------------------------------------------------------------")
@@ -286,20 +289,23 @@ fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentD
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-            val hasMembers = declaration.members.isNotEmpty()
-            val hasStaticMembers = declaration.staticMembers.isNotEmpty()
+            val staticMembers = declaration.members.filter { it.isStatic() }
+            val members = declaration.members.filter { !it.isStatic() }
+
+            val hasMembers = members.isNotEmpty()
+            val hasStaticMembers = staticMembers.isNotEmpty()
             val isBlock = hasMembers || hasStaticMembers
 
             res.add(classDeclaration + params + if (isBlock) " {" else "")
 
-            if (hasStaticMembers) {
+            if (staticMembers.isNotEmpty()) {
                 res.add("    companion object {")
-                res.addAll(declaration.staticMembers.flatMap { it.translate(true) }.map({ "       ${it}" }))
+                res.addAll(staticMembers.flatMap { it.translate(true) }.map({ "       ${it}" }))
                 res.add("    }")
             }
 
             if (hasMembers) {
-                res.addAll(declaration.members.flatMap { it.translate() }.map({ "    " + it }))
+                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
             }
 
             if (isBlock) {
@@ -324,7 +330,7 @@ fun processDeclarations(docRoot: DocumentRoot, res: MutableList<String>, parentD
     }
 }
 
-fun compile(documentRoot: DocumentRoot, parent: DocumentRoot? = null, astContext: AstContext? = null): String {
+fun compile(documentRoot: DocumentRootDeclaration, parent: DocumentRootDeclaration? = null, astContext: AstContext? = null): String {
     val res = mutableListOf<String>()
     processDeclarations(documentRoot, res)
 

@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
@@ -16,7 +16,7 @@ private fun escapeIdentificator(identificator: String): String {
     }
 }
 
-private class EscapeIdentificators : ParameterValueLowering() {
+private class EscapeIdentificators : ParameterValueLowering {
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
@@ -25,11 +25,11 @@ private class EscapeIdentificators : ParameterValueLowering() {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 
-    override fun lowerMethodDeclaration(declaration: MethodDeclaration): MethodDeclaration {
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 }
 
-fun DocumentRoot.escapeIdentificators(): DocumentRoot {
+fun DocumentRootDeclaration.escapeIdentificators(): DocumentRootDeclaration {
     return EscapeIdentificators().lowerDocumentRoot(this)
 }

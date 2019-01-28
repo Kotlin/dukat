@@ -1,6 +1,6 @@
-package org.jetbrains.dukat.ast.model
+package org.jetbrains.dukat.ast.model.declaration
 
-data class DocumentRoot(
+data class DocumentRootDeclaration(
         val packageName: String,
         val declarations: List<Declaration> = emptyList()
 ) : Declaration

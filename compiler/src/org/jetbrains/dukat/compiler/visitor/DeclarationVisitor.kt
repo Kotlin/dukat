@@ -1,23 +1,24 @@
 package org.jetbrains.dukat.compiler.visitor
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.Declaration
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.MemberDeclaration
-import org.jetbrains.dukat.ast.model.MethodDeclaration
-import org.jetbrains.dukat.ast.model.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.TypeParameter
-import org.jetbrains.dukat.ast.model.VariableDeclaration
-import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.Declaration
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
-interface Visitor {
+interface DeclarationVisitor {
+
+
     fun visitVariableDeclaration(declaration: VariableDeclaration) {
         visitParameterValue(declaration.type)
     }
@@ -30,7 +31,7 @@ interface Visitor {
 
     fun visitClassDeclaration(declaration: ClassDeclaration) {
         declaration.members.forEach { member -> visitMemberDeclaration(member) }
-        declaration.primaryConstructor?.let { visitMethodDeclaration(it) }
+        //declaration.primaryConstructor?.let { visitFunctionDeclaration(it) }
         declaration.parentEntities.forEach { parentEntity -> visitClassLikeDeclaration(parentEntity) }
         declaration.typeParameters.forEach {
             typeParameter -> visitTypeParameter(typeParameter)
@@ -59,40 +60,33 @@ interface Visitor {
         visitParameterValue(declaration.type)
     }
 
-    fun visitMethodDeclaration(declaration: MethodDeclaration) {
-        declaration.parameters.forEach { parameter -> visitParameterValue(parameter.type) }
-        declaration.typeParameters.forEach { typeParameter ->
-            typeParameter.constraints.forEach { constraint -> visitParameterValue(constraint) }
-        }
-        visitParameterValue(declaration.type)
-    }
-
     fun visitParameterDeclaration(declaration: ParameterDeclaration) {
         visitParameterValue(declaration.type)
     }
 
-    fun visitTypeParameter(declaration: TypeParameter) {
+    fun visitTypeParameter(declaration: TypeParameterDeclaration) {
         declaration.constraints.forEach {constraint -> visitParameterValue(constraint)}
     }
 
-    fun visitObjectLiteral(declaration: ObjectLiteral) {
+    fun visitObjectLiteral(declaration: ObjectLiteralDeclaration) {
         throw Exception("Object literals supposed not to be in AST tree passed to translation")
     }
 
-    fun visitParameterValue(declaration: ParameterValue) {
+    fun visitParameterValue(declaration: ParameterValueDeclaration) {
         if (declaration is TypeDeclaration) {
             return visitTypeDeclaration(declaration)
         } else if (declaration is FunctionTypeDeclaration) {
             return visitFunctionTypeDeclaration(declaration)
-        } else if (declaration is ObjectLiteral) {
+        } else if (declaration is ObjectLiteralDeclaration) {
             return visitObjectLiteral(declaration)
-        } else throw Exception("can not visit unknown ParameterValue subtype:  ${this} : ${declaration}")
+        } else throw Exception("can not visit unknown ParameterValueDeclaration subtype:  ${this} : ${declaration}")
     }
 
     fun visitMemberDeclaration(declaration: MemberDeclaration) {
-        if (declaration is MethodDeclaration) {
-            return visitMethodDeclaration(declaration)
-        } else if (declaration is PropertyDeclaration) {
+//        if (declaration is MethodSignatureDeclaration) {
+//            return visitMethodDeclaration(declaration)
+//        } else if (declaration is PropertyDeclaration) {
+        if (declaration is PropertyDeclaration) {
             return visitPropertyDeclaration(declaration)
         } else {
             throw Exception("can not visit unknown MemberDeclaration subtype ${this} : ${declaration}")
@@ -117,7 +111,7 @@ interface Visitor {
         }
     }
 
-    fun visitDocumentRoot(documenRoot: DocumentRoot) {
+    fun visitDocumentRoot(documenRoot: DocumentRootDeclaration) {
         documenRoot.declarations.forEach() { declaration ->
             visitDeclaration(declaration)
         }

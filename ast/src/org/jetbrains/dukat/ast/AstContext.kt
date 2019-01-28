@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.ast
 
-import org.jetbrains.dukat.ast.model.ClassDeclaration
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 
 class AstContext {
     private val myInterfaces: MutableMap<String, InterfaceDeclaration> = mutableMapOf()

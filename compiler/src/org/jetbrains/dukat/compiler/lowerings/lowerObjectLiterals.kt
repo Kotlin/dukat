@@ -1,16 +1,16 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.ParameterValue
-import org.jetbrains.dukat.ast.model.TypeDeclaration
-import org.jetbrains.dukat.ast.model.extended.ObjectLiteral
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 private fun InterfaceDeclaration.isIdentical(otherInterface: InterfaceDeclaration): Boolean {
     return members == otherInterface.members
 }
 
-private class LowerObjectLiterals : ParameterValueLowering() {
+private class LowerObjectLiterals : ParameterValueLowering {
 
     private val myGeneratedInterfaces = mutableListOf<InterfaceDeclaration>()
 
@@ -18,7 +18,7 @@ private class LowerObjectLiterals : ParameterValueLowering() {
         return myGeneratedInterfaces.find { it -> interfaceDeclaration.isIdentical(it) }
     }
 
-    private fun generateInterface(objectLiteral: ObjectLiteral): InterfaceDeclaration {
+    private fun generateInterface(objectLiteral: ObjectLiteralDeclaration): InterfaceDeclaration {
         val interfaceDeclaration =
                 InterfaceDeclaration("`T$${myGeneratedInterfaces.size}`", objectLiteral.members, emptyList(), emptyList())
         val alreadyExistingInterface = findIdenticalInterface(interfaceDeclaration)
@@ -30,8 +30,8 @@ private class LowerObjectLiterals : ParameterValueLowering() {
         }
     }
 
-    override fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
-        return if (declaration is ObjectLiteral) {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return if (declaration is ObjectLiteralDeclaration) {
 
             val generatedInterface = generateInterface(declaration)
             if (generatedInterface.members.isEmpty()) {
@@ -42,11 +42,11 @@ private class LowerObjectLiterals : ParameterValueLowering() {
         } else super.lowerParameterValue(declaration)
     }
 
-    override fun lowerDocumentRoot(documenRoot: DocumentRoot): DocumentRoot {
+    override fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
         return documenRoot.copy(declarations = listOf(myGeneratedInterfaces, lowerDeclarations(documenRoot.declarations)).flatten())
     }
 }
 
-fun DocumentRoot.lowerObjectLiterals(): DocumentRoot {
+fun DocumentRootDeclaration.lowerObjectLiterals(): DocumentRootDeclaration {
     return LowerObjectLiterals().lowerDocumentRoot(this)
 }

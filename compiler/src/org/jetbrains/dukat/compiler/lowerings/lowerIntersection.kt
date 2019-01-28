@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.DocumentRoot
-import org.jetbrains.dukat.ast.model.ParameterValue
+import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.compiler.asIntersection
 
-private class LowerIntersection : ParameterValueLowering() {
-    override fun lowerParameterValue(declaration: ParameterValue): ParameterValue {
+private class LowerIntersection : ParameterValueLowering {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         declaration.asIntersection()?.let {
             val firstIntersectionType = it.params[0]
             firstIntersectionType.meta = it.copy()
@@ -16,6 +16,6 @@ private class LowerIntersection : ParameterValueLowering() {
     }
 }
 
-fun DocumentRoot.lowerIntersectionType(): DocumentRoot {
+fun DocumentRootDeclaration.lowerIntersectionType(): DocumentRootDeclaration {
     return LowerIntersection().lowerDocumentRoot(this)
 }
