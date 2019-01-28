@@ -93,7 +93,7 @@ private fun ParameterValueDeclaration.isOverriding(otherParameterValue: Paramete
         return true
     }
 
-    if (otherParameterValue == TypeDeclaration("Any", emptyList(), false, false, null)) {
+    if (otherParameterValue == TypeDeclaration("Any", emptyList(), false, null)) {
         return true
     }
 

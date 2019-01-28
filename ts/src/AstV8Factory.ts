@@ -12,7 +12,7 @@ declare class AstFactoryV8 implements AstFactory {
     createMethodSignatureDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MethodSignatureDeclaration;
     createModifierDeclaration(name: string): ModifierDeclaration;
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
-    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
+    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean): ParameterDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;

@@ -154,10 +154,11 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
     fun createTypeDeclaration(value: String, params: V8Array) = astFactory.createTypeDeclaration(value, params.toArray().map { type -> type.toAst<ParameterValueDeclaration>() }.toTypedArray())
 
-    fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?) =
+    fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?, vararg: Boolean) =
             astFactory.createParameterDeclaration(
                     name, type.toAst(),
-                    if (initializer == null) null else initializer.toAst<ExpressionDeclaration>()
+                    if (initializer == null) null else initializer.toAst<ExpressionDeclaration>(),
+                    vararg
             )
 
     fun createDocumentRoot(packageName: String, declarations: V8Array) =

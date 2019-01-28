@@ -21,7 +21,12 @@ declare interface AstFactory {
         modifiers: Array<ModifierDeclaration>
     ): PropertyDeclaration;
 
-    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration;
+    createParameterDeclaration(
+        name: string,
+        type: ParameterValue,
+        initializer: Expression | null,
+        vararg: boolean
+    ): ParameterDeclaration;
 
     createConstructorDeclaration(
         parameters: Array<ParameterDeclaration>,

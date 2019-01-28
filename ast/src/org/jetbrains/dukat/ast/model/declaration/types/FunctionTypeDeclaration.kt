@@ -6,6 +6,5 @@ data class FunctionTypeDeclaration(
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         override var nullable: Boolean = false,
-        override var vararg: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
 ) : ParameterValueDeclaration

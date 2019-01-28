@@ -163,8 +163,8 @@ class AstConverter {
         return this.astFactory.createTypeDeclaration(value, params);
     }
 
-    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null): ParameterDeclaration {
-        return this.astFactory.createParameterDeclaration(name, type, initializer);
+    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean): ParameterDeclaration {
+        return this.astFactory.createParameterDeclaration(name, type, initializer, vararg);
     }
 
     private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
@@ -181,10 +181,6 @@ class AstConverter {
 
     createNullableType(type: TypeDeclaration) : ParameterValue {
         return this.createUnionType([type, this.createTypeDeclaration("null")])
-    }
-
-    createVarargType(type: ParameterValue) : ParameterValue {
-        return this.createTypeDeclaration("@@Vararg", [type]);
     }
 
     convertType(type: ts.TypeNode | ts.TypeElement | undefined) : ParameterValue {
@@ -295,16 +291,14 @@ class AstConverter {
         if (param.questionToken) {
             paramType = this.createNullableType(paramType);
         }
-        if (param.dotDotDotToken) {
-            paramType = this.createVarargType(paramType);
-        }
 
         let name = ts.isIdentifier(param.name) ? param.name.getText() : `__${index}`;
 
         return this.createParameterDeclaration(
             name,
             paramType,
-            initializer
+            initializer,
+            !!param.dotDotDotToken
         )
     }
 

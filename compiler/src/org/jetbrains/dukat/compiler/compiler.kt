@@ -89,7 +89,7 @@ private fun ParameterValueDeclaration.translate(): String {
 
 private fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate()
-    if (type.vararg) {
+    if (vararg) {
         res = "vararg $res"
     }
 

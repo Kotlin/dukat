@@ -88,7 +88,7 @@ private fun IndexSignatureDeclaration.convert(owner: ClassLikeDeclaration): List
             ),
             MethodNode(
                     "set",
-                    indexTypes.toMutableList() + listOf(ParameterDeclaration("value", returnType, null)),
+                    indexTypes.toMutableList() + listOf(ParameterDeclaration("value", returnType, null, false)),
                     TypeDeclaration("Unit", emptyList()),
                     emptyList(),
                     owner,
@@ -109,7 +109,6 @@ private fun MethodSignatureDeclaration.convert(owner: ClassLikeDeclaration): Mem
                         parameters,
                         type,
                         true,
-                        false,
                         null
                 ),
                 typeParameters,

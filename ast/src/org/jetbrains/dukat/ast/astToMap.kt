@@ -23,10 +23,12 @@ import kotlin.reflect.KProperty0
 
 
 private fun ParameterDeclaration.toMap(): Map<String, Any?> {
-    val map = mapOf(
-            "name" to name,
-            "type" to type.astToMap()
-    ).reflectAs(this).toMutableMap()
+    val map = listOf(
+            ::name,
+            ::type,
+            ::vararg
+    ).convert(this).toMutableMap()
+
 
     initializer?.let {
         map.set("initializer", it.astToMap())

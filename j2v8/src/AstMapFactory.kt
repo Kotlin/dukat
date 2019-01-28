@@ -81,7 +81,7 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
 
     override fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>) = astFactory.createTypeDeclaration(value, params).astToMap()
 
-    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?) = astFactory.createParameterDeclaration(name, type, initializer).astToMap()
+    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean) = astFactory.createParameterDeclaration(name, type, initializer, vararg).astToMap()
 
     override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>) = astFactory.createDocumentRoot(packageName, declarations).astToMap()
 

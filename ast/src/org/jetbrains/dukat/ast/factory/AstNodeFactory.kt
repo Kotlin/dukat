@@ -75,7 +75,11 @@ interface AstNodeFactory<T> {
     ): T
 
     fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration): T
-    fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?): T
+    fun createParameterDeclaration(
+            name: String, type: ParameterValueDeclaration,
+            initializer: ExpressionDeclaration?,
+            vararg: Boolean
+    ): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<Declaration>): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T

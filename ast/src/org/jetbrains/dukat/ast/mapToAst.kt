@@ -49,7 +49,8 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
         ParameterDeclaration(
                 get("name") as String,
                 (getEntity("type"))!!.toAst(),
-                getInitializerExpression()
+                getInitializerExpression(),
+                get("vararg") as Boolean
         )
 
 @Suppress("UNCHECKED_CAST")
