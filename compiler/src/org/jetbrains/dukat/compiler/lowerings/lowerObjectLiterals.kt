@@ -43,7 +43,7 @@ private class LowerObjectLiterals : ParameterValueLowering {
     }
 
     override fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
-        return documenRoot.copy(declarations = listOf(myGeneratedInterfaces, lowerDeclarations(documenRoot.declarations)).flatten())
+        return documenRoot.copy(declarations = listOf(myGeneratedInterfaces, lowerTopLevelDeclarations(documenRoot.declarations)).flatten())
     }
 }
 

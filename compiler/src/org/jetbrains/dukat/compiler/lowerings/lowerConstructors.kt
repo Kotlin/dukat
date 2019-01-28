@@ -2,9 +2,9 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 fun DocumentRootDeclaration.lowerConstructors(): DocumentRootDeclaration {
@@ -29,7 +29,9 @@ fun DocumentRootDeclaration.lowerConstructors(): DocumentRootDeclaration {
 
                 declaration.copy(members = members, primaryConstructor = primaryConstructor)
             }
-            else -> declaration.duplicate<Declaration>()
+            else -> {
+                declaration.duplicate<TopLevelDeclaration>()
+            }
         }
     }
 

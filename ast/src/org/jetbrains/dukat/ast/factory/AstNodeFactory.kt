@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.ast.factory
 
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -9,9 +8,16 @@ import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 interface AstNodeFactory<T> {
+    fun createTypeAliasDeclaration(
+            aliasName: String,
+            typeParameters: List<TypeParameterDeclaration>,
+            typeReference: ParameterValueDeclaration
+    ): T
+
     fun createStringTypeDeclaration(tokens: List<String>): T;
     fun createIndexSignatureDeclaration(indexTypes: List<ParameterDeclaration>, returnType: ParameterValueDeclaration): T
 
@@ -81,6 +87,6 @@ interface AstNodeFactory<T> {
             vararg: Boolean
     ): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
-    fun createDocumentRoot(packageName: String, declarations: Array<Declaration>): T
+    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T
 }

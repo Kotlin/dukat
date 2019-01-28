@@ -5,7 +5,6 @@ import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -13,6 +12,7 @@ import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.toAst
 
 private fun V8Object.toMap(): Map<String, Any?> = V8ObjectUtils.toMap(this)
@@ -40,6 +40,14 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
 
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
+
+    fun createTypeAliasDeclaration(aliasName: String, typeParameters: V8Array, typeReference: V8Object)
+            = astFactory.createTypeAliasDeclaration(
+                aliasName,
+                typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameterDeclaration>() },
+                typeReference.toAst()
+            )
+
 
     fun createStringTypeDeclaration(tokens: V8Array): V8Object {
         return astFactory.createStringTypeDeclaration(
@@ -162,7 +170,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             )
 
     fun createDocumentRoot(packageName: String, declarations: V8Array) =
-            astFactory.createDocumentRoot(packageName, declarations.toArray().map { declaration -> declaration.toAst<Declaration>() }.toTypedArray())
+            astFactory.createDocumentRoot(packageName, declarations.toArray().map { declaration -> declaration.toAst<TopLevelDeclaration>() }.toTypedArray())
 
     fun createTypeParam(name: String, constraints: V8Array) = astFactory
             .createTypeParam(name, constraints.toArray()

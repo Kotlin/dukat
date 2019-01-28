@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.ast.model.declaration
 
-interface ClassLikeDeclaration : Declaration {
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
+
+interface ClassLikeDeclaration : TopLevelDeclaration {
     val name: String
     val typeParameters: List<TypeParameterDeclaration>
 }

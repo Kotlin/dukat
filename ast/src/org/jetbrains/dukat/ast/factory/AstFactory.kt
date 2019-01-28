@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
@@ -15,6 +14,7 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
@@ -22,9 +22,13 @@ import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+        = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
 
     override fun createStringTypeDeclaration(tokens: List<String>)
         = StringTypeDeclaration(tokens)
@@ -85,7 +89,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean) = ParameterDeclaration(name, type, initializer, vararg)
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>) = DocumentRootDeclaration(packageName, declarations.toList())
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>) = DocumentRootDeclaration(packageName, declarations.toList())
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 }

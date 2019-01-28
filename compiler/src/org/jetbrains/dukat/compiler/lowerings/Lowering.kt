@@ -2,17 +2,18 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
@@ -27,6 +28,7 @@ interface Lowering {
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
+    fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
@@ -46,24 +48,25 @@ interface Lowering {
         }
     }
 
-    fun lowerDeclaration(declaration: Declaration) : Declaration {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration) : TopLevelDeclaration {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is ClassDeclaration -> lowerClassDeclaration(declaration)
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
+            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
             else -> declaration.duplicate()
         }
     }
 
-    fun lowerDeclarations(declarations: List<Declaration>) : List<Declaration> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>) : List<TopLevelDeclaration> {
         return declarations.map { declaration ->
-            lowerDeclaration(declaration)
+            lowerTopLevelDeclaration(declaration)
         }
     }
 
     fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
-        return documenRoot.copy(declarations = lowerDeclarations(documenRoot.declarations))
+        return documenRoot.copy(declarations = lowerTopLevelDeclarations(documenRoot.declarations))
     }
 }

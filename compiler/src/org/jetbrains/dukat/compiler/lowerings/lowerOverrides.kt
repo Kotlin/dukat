@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -142,7 +141,7 @@ fun DocumentRootDeclaration.lowerOverrides(): DocumentRootDeclaration {
             is DocumentRootDeclaration -> {
                 declaration.lowerOverrides()
             }
-            else -> declaration.duplicate<Declaration>()
+            else -> declaration.duplicate()
         }
     }
 

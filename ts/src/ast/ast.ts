@@ -6,6 +6,7 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
+declare interface TypeAliasDeclaration extends Declaration {}
 declare interface IndexSignatureDeclaration extends ParameterValue {}
 declare interface StringTypeDeclaration
     extends ParameterValue {}

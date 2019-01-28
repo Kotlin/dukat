@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -13,9 +12,12 @@ import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+        = astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference).astToMap()
 
     override fun createStringTypeDeclaration(tokens: List<String>)
         = astFactory.createStringTypeDeclaration(tokens).astToMap()
@@ -83,7 +85,7 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
 
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean) = astFactory.createParameterDeclaration(name, type, initializer, vararg).astToMap()
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>) = astFactory.createDocumentRoot(packageName, declarations).astToMap()
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>) = astFactory.createDocumentRoot(packageName, declarations).astToMap()
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = astFactory.createTypeParam(name, constraints).astToMap()
 }

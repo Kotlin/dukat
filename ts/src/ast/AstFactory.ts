@@ -1,4 +1,5 @@
 declare interface AstFactory {
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TypeParameter>, typeReference: ParameterValue): TypeAliasDeclaration;
 
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;

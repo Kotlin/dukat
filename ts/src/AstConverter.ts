@@ -420,11 +420,11 @@ class AstConverter {
     }
 
 
-    convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: Array<TypeParameter> = []): InterfaceDeclaration {
+    convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): InterfaceDeclaration {
         return this.astFactory.createInterfaceDeclaration(
             name,
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
-            typeParams,
+            this.convertTypeParams(typeParams),
             []
         );
     }
@@ -478,6 +478,14 @@ class AstConverter {
         return this.hasDeclareModifier(node) || this.hasExportModifier(node);
     }
 
+    private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): TypeAliasDeclaration {
+        return this.astFactory.createTypeAliasDeclaration(
+            declaration.name.getText(),
+            this.convertTypeParams(declaration.typeParameters),
+            this.convertType(declaration.type)
+        )
+    }
+
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
@@ -496,15 +504,16 @@ class AstConverter {
                     }
                 }
             } else if (ts.isTypeAliasDeclaration(statement)) {
-                let typeAliasDeclaration = statement as ts.TypeAliasDeclaration;
-                if (ts.isTypeLiteralNode(typeAliasDeclaration.type)) {
+                if (ts.isTypeLiteralNode(statement.type)) {
                     declarations.push(
                         this.convertTypeLiteralToInterfaceDeclaration(
-                            typeAliasDeclaration.name.getText(),
-                            typeAliasDeclaration.type as ts.TypeLiteralNode,
-                            this.convertTypeParams(typeAliasDeclaration.typeParameters)
+                            statement.name.getText(),
+                            statement.type as ts.TypeLiteralNode,
+                            statement.typeParameters
                         )
                     );
+                } else {
+                    declarations.push(this.convertTypeAliasDeclaration(statement));
                 }
             } else if (ts.isClassDeclaration(statement)) {
                 const classDeclaration = statement as ts.ClassDeclaration;
@@ -575,19 +584,21 @@ class AstConverter {
                 if (interfaceDeclaration.heritageClauses) {
                     for (let heritageClause of interfaceDeclaration.heritageClauses) {
                         for (let type of heritageClause.types) {
-                            let typeParams: Array<TypeParameter> = [];
 
-                            if (type.typeArguments) {
-                                for (let typeArgument of type.typeArguments) {
-                                    let value = (this.convertType(typeArgument) as any).value;
-                                    typeParams.push(this.astFactory.createTypeParam(value, []))
+                            if (ts.isExpressionWithTypeArguments(type)) {
+                                let typeParams: Array<TypeParameter> = [];
+
+                                if (type.typeArguments) {
+                                    for (let typeArgument of type.typeArguments) {
+                                        let value = (this.convertType(typeArgument) as any).value;
+                                        typeParams.push(this.astFactory.createTypeParam(value, []))
+                                    }
                                 }
+
+                                parentEntities.push(
+                                    this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
+                                );
                             }
-
-
-                            parentEntities.push(
-                                this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
-                            );
                         }
                     }
                 }

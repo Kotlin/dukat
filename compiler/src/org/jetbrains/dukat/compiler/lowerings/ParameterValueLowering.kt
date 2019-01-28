@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
@@ -82,12 +83,22 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
+
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 parentEntities = declaration.parentEntities.map { parentEntity -> lowerInterfaceDeclaration(parentEntity) },
                 typeParameters = declaration.typeParameters.map {
                     typeParameter -> lowerTypeParameter(typeParameter)
                 }
+        )
+    }
+
+    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
+        return declaration.copy(
+            typeParameters = declaration.typeParameters.map { typeParameter ->
+                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+            },
+            typeReference = lowerParameterValue(declaration.typeReference)
         )
     }
 

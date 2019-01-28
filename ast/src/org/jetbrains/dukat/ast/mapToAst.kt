@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
@@ -22,6 +23,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 @Suppress("UNCHECKED_CAST")
@@ -57,6 +59,11 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
+        TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
+            get("aliasName") as String,
+            mapEntities("typeParameters") { it.toAst<TypeParameterDeclaration>() },
+            getEntity("typeReference")!!.toAst()
+        )
         StringTypeDeclaration::class.simpleName -> StringTypeDeclaration(
                 get(StringTypeDeclaration::tokens.name) as List<String>
         )
@@ -114,7 +121,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 mapEntities("modifiers") {it.toAst<ModifierDeclaration>()}
         )
         DocumentRootDeclaration::class.simpleName -> DocumentRootDeclaration(get("packageName") as String, mapEntities("declarations") {
-            it.toAst<Declaration>()
+            it.toAst<TopLevelDeclaration>()
         })
         TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(get("name") as String, mapEntities("constraints") { it.toAst<ParameterValueDeclaration>() })
         ClassDeclaration::class.simpleName -> ClassDeclaration(

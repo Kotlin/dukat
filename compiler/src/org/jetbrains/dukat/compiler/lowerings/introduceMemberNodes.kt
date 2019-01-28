@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
+import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
@@ -141,6 +142,7 @@ private class LowerFunctionsInClassLike : Lowering {
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration) = declaration
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration) = declaration
     override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration) = declaration
+    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): List<MemberDeclaration> {
         return when (declaration) {

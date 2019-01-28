@@ -5,7 +5,6 @@ import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -13,11 +12,15 @@ import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFactory<Map<String, Any?>> = AstMapFactory()) : AstNodeFactory<V8Object> {
 
     private fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
+
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
+        = toV8(astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference))
 
     override fun createStringTypeDeclaration(tokens: List<String>) =
             toV8(astFactory.createStringTypeDeclaration(tokens))
@@ -88,7 +91,7 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean)
         = toV8(astFactory.createParameterDeclaration(name, type, initializer, vararg))
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<Declaration>)
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>)
         = toV8(astFactory.createDocumentRoot(packageName, declarations))
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = toV8(astFactory.createTypeParam(name, constraints))

@@ -1,4 +1,5 @@
 declare class AstFactoryV8 implements AstFactory {
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TypeParameter>, typeReference: ParameterValue): TypeAliasDeclaration;
     createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration;
     createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, staticMembers: Array<MemberDeclaration>): ClassDeclaration;
     createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot;

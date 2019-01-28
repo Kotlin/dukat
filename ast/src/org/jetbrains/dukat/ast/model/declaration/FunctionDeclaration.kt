@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ast.model.declaration
 
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 
 data class FunctionDeclaration(
         val name: String,
@@ -8,4 +9,4 @@ data class FunctionDeclaration(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
         val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration
+) : MemberDeclaration, TopLevelDeclaration

@@ -2,9 +2,9 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.AstContext
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 
@@ -34,7 +34,7 @@ fun DocumentRootDeclaration.lowerInheritance(astContext: AstContext): DocumentRo
         } else if (declaration is DocumentRootDeclaration) {
             declaration.lowerInheritance(astContext)
         }
-        else declaration.duplicate<Declaration>()
+        else declaration.duplicate<TopLevelDeclaration>()
     }
 
     return copy(declarations = declarations)
