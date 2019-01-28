@@ -10,7 +10,6 @@ import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.introduceMemberNodes
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
-import org.jetbrains.dukat.compiler.lowerings.lowerInheritance
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
@@ -60,9 +59,8 @@ interface InputTranslator {
                 .lowerIntersectionType()
                 .lowerSelfReference()
                 .updateContext(myAstContext)
-                .lowerInheritance(myAstContext)
                 .lowerTypeAliases(myAstContext)
-                .lowerOverrides()
+                .lowerOverrides(myAstContext)
 
     }
 }
