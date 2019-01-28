@@ -12,6 +12,12 @@ import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 interface AstNodeFactory<T> {
+    fun createHeritageClauseDeclaration(
+            name: String,
+            typeArguments: List<String>,
+            extending: Boolean
+    ): T
+
     fun createTypeAliasDeclaration(
             aliasName: String,
             typeParameters: List<TypeParameterDeclaration>,
@@ -54,7 +60,7 @@ interface AstNodeFactory<T> {
             parameters: List<TypeParameterDeclaration>,
             optional: Boolean,
             modifiers: List<ModifierDeclaration>
-            ): T
+    ): T
 
     fun createConstructorDeclaration(
             parameters: List<ParameterDeclaration>,
@@ -86,6 +92,7 @@ interface AstNodeFactory<T> {
             initializer: ExpressionDeclaration?,
             vararg: Boolean
     ): T
+
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T

@@ -16,6 +16,10 @@ import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
+
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
+        =  astFactory.createHeritageClauseDeclaration(name, typeArguments, extending).astToMap()
+
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
         = astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference).astToMap()
 

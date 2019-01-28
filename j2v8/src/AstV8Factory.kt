@@ -41,6 +41,13 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
+    fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean)
+        = astFactory.createHeritageClauseDeclaration(
+            name,
+            typeArguments.asIterator().asSequence().map {it as String}.toList(),
+            extending
+    )
+
     fun createTypeAliasDeclaration(aliasName: String, typeParameters: V8Array, typeReference: V8Object)
             = astFactory.createTypeAliasDeclaration(
                 aliasName,

@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
@@ -59,6 +60,11 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
+        HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
+            get(HeritageClauseDeclaration::name.name) as String,
+            get(HeritageClauseDeclaration::typeArguments.name) as List<String>,
+            get(HeritageClauseDeclaration::extending.name) as Boolean
+        )
         TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
             get("aliasName") as String,
             mapEntities("typeParameters") { it.toAst<TypeParameterDeclaration>() },

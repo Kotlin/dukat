@@ -553,7 +553,6 @@ class AstConverter {
                     let staticMembers: Array<MemberDeclaration> = [];
 
                     this.convertClassElementsToClassDeclarations(classDeclaration.members).forEach(member => {
-                        //if (member.metaIsStatic) {
                         if (false) {
                             staticMembers.push(member);
                         } else {

@@ -1,4 +1,6 @@
 declare interface AstFactory {
+    createHeritageClauseDeclaration(name: string, typeArguments: Array<string>, extending: boolean): HeritageClauseDeclaration
+
     createTypeAliasDeclaration(aliasName: string, typeParams: Array<TypeParameter>, typeReference: ParameterValue): TypeAliasDeclaration;
 
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;

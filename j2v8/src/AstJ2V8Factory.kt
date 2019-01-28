@@ -19,6 +19,9 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     private fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
 
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
+        =   toV8(astFactory.createHeritageClauseDeclaration(name, typeArguments, extending))
+
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
         = toV8(astFactory.createTypeAliasDeclaration(aliasName, typeParameters, typeReference))
 

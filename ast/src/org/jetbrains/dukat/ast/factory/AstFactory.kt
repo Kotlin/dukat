@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
+import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
@@ -26,6 +27,9 @@ import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<String>, extending: Boolean)
+        = HeritageClauseDeclaration(name, typeArguments, extending)
 
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TypeParameterDeclaration>, typeReference: ParameterValueDeclaration)
         = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
