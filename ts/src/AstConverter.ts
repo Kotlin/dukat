@@ -175,24 +175,17 @@ class AstConverter {
         return this.astFactory.createTypeDeclaration(value, params);
     }
 
-    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean): ParameterDeclaration {
-        return this.astFactory.createParameterDeclaration(name, type, initializer, vararg);
+    createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+        return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
     }
 
     private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
         return this.astFactory.declareProperty(value, type, typeParams, optional, []);
     }
 
-    createUnionType(params: Array<TypeDeclaration>) {
-        return this.createTypeDeclaration("@@Union", params);
-    }
 
     createIntersectionType(params: Array<TypeDeclaration>) {
         return this.createTypeDeclaration("@@Intersection", params);
-    }
-
-    createNullableType(type: TypeDeclaration) : ParameterValue {
-        return this.createUnionType([type, this.createTypeDeclaration("null")])
     }
 
     convertType(type: ts.TypeNode | ts.TypeElement | undefined) : ParameterValue {
@@ -212,7 +205,7 @@ class AstConverter {
                     let params = unionTypeNode.types
                         .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
-                    return this.createUnionType(params)
+                    return this.astFactory.createUnionTypeDeclaration(params)
                 } else if (ts.isIntersectionTypeNode(type)) {
                     let intersectionTypeNode = type as ts.IntersectionTypeNode;
                     let params = intersectionTypeNode.types
@@ -269,22 +262,6 @@ class AstConverter {
         return parameters.map((parameter, count) => this.convertParameterDeclaration(parameter, count));
     }
 
-    convertMethodSignatureToPropertyDeclaration(methodSignature: ts.MethodSignature) : PropertyDeclaration {
-        let parameterDeclarations = this.convertParameterDeclarations(methodSignature.parameters);
-
-        let functionTypeDeclaration = this.astFactory.createFunctionTypeDeclaration(
-            parameterDeclarations,
-            methodSignature.type ? this.convertType(methodSignature.type) : this.createTypeDeclaration("Unit")
-        );
-
-        return this.createProperty(
-            this.convertName(methodSignature.name) as string,
-            this.createNullableType(functionTypeDeclaration),
-            this.convertTypeParams(methodSignature.typeParameters),
-            true
-        );
-    }
-
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number) : ParameterDeclaration {
         let initializer = null;
         if (param.initializer != null) {
@@ -300,9 +277,6 @@ class AstConverter {
         }
 
         let paramType = this.convertType(param.type);
-        if (param.questionToken) {
-            paramType = this.createNullableType(paramType);
-        }
 
         let name = ts.isIdentifier(param.name) ? param.name.getText() : `__${index}`;
 
@@ -310,7 +284,8 @@ class AstConverter {
             name,
             paramType,
             initializer,
-            !!param.dotDotDotToken
+            !!param.dotDotDotToken,
+            !!param.questionToken
         )
     }
 

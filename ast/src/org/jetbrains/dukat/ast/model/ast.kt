@@ -8,9 +8,18 @@ import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 fun TypeDeclaration.isGeneric() = params.isNotEmpty()
+
+fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
+    return when (this) {
+        is TypeDeclaration -> copy(nullable = true)
+        is FunctionTypeDeclaration -> copy(nullable = true)
+        else -> throw Exception("makeNullable does not recognize type ${this}")
+    }
+}
 
 @Suppress("UNCHECKED_CAST")
 fun <T: AstNode> AstNode.duplicate(): T {

@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 
 interface Lowering {
@@ -27,6 +28,7 @@ interface Lowering {
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration
+    fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
 
@@ -35,6 +37,7 @@ interface Lowering {
             is TypeDeclaration -> lowerTypeDeclaration(declaration)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is ObjectLiteralDeclaration -> lowerObjectLiteral(declaration)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
             else -> throw Exception("can not lowerParameterValue unknown ParameterValueDeclaration subtype:  ${this} : ${declaration}")
         }
     }

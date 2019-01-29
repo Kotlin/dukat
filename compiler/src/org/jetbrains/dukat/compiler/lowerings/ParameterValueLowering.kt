@@ -13,8 +13,10 @@ import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+
 
 interface ParameterValueLowering : Lowering {
 
@@ -62,6 +64,10 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(constraints = declaration.constraints.map {constraint -> lowerParameterValue(constraint)})
+    }
+
+    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {

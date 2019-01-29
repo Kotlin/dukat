@@ -18,11 +18,12 @@ import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-
 
 private fun FunctionDeclaration.isStatic() =
         modifiers.find { it.token == "STATIC" } != null
@@ -31,13 +32,6 @@ private fun PropertyDeclaration.isStatic() =
         modifiers.find { it.token == "STATIC" } != null
 
 
-private fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
-    return when (this) {
-        is TypeDeclaration -> copy(nullable = true)
-        is FunctionTypeDeclaration -> copy(nullable = true)
-        else -> throw Exception("makeNullable does not recognize type ${this}")
-    }
-}
 
 private fun PropertyDeclaration.convert(owner: ClassLikeDeclaration): PropertyNode {
     return PropertyNode(
@@ -89,7 +83,7 @@ private fun IndexSignatureDeclaration.convert(owner: ClassLikeDeclaration): List
             ),
             MethodNode(
                     "set",
-                    indexTypes.toMutableList() + listOf(ParameterDeclaration("value", returnType, null, false)),
+                    indexTypes.toMutableList() + listOf(ParameterDeclaration("value", returnType, null, false, false)),
                     TypeDeclaration("Unit", emptyList()),
                     emptyList(),
                     owner,
@@ -143,6 +137,7 @@ private class LowerFunctionsInClassLike : Lowering {
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration) = declaration
     override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration) = declaration
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
+    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration) = declaration
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): List<MemberDeclaration> {
         return when (declaration) {

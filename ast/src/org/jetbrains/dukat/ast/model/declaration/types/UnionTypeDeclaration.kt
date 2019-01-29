@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.ast.model.declaration.types
 
 data class UnionTypeDeclaration(
-        val name: String,
         val params: List<ParameterValueDeclaration>,
 
         override var nullable: Boolean = false,

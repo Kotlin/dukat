@@ -7,5 +7,6 @@ data class ParameterDeclaration(
         val type: ParameterValueDeclaration,
         val initializer: ExpressionDeclaration?,
 
-        val vararg: Boolean
+        val vararg: Boolean,
+        val optional: Boolean
 ) : Declaration

@@ -92,10 +92,10 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration) = FunctionTypeDeclaration(parameters.toList(), type)
 
-    override fun createUnionDeclaration(value: String, params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(value, params)
+    override fun createUnionDeclaration(params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(params)
     override fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>) = TypeDeclaration(value, params)
 
-    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean) = ParameterDeclaration(name, type, initializer, vararg)
+    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean) = ParameterDeclaration(name, type, initializer, vararg, optional)
 
     override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>) = DocumentRootDeclaration(packageName, declarations.toList())
 

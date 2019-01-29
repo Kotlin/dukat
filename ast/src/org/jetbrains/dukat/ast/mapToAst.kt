@@ -55,7 +55,8 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
                 get("name") as String,
                 (getEntity("type")),
                 getInitializerExpression(),
-                get("vararg") as Boolean
+                get("vararg") as Boolean,
+                get("optional") as Boolean
         )
 
 @Suppress("UNCHECKED_CAST")
@@ -63,7 +64,6 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
-            get("name") as String,
             getEntities("params")
         )
         TokenDeclaration::class.simpleName -> TokenDeclaration(

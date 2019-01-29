@@ -30,7 +30,8 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
     val map = listOf(
             ::name,
             ::type,
-            ::vararg
+            ::vararg,
+            ::optional
     ).convert(this).toMutableMap()
 
 
@@ -64,28 +65,28 @@ private fun List<KProperty0<*>>.convert(reflection: Any) =
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
-        is TokenDeclaration -> listOf(::value).convert(this)
-        is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
-        is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
-        is StringTypeDeclaration -> listOf(::tokens).convert(this)
-        is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::staticMembers).convert(this)
-        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities).convert(this)
-        is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
-        is TypeDeclaration -> listOf(::value, ::params).convert(this)
-        is VariableDeclaration -> listOf(::name, ::type).convert(this)
-        is ObjectLiteralDeclaration -> listOf(::members).convert(this)
-        is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
-        is ParameterDeclaration -> toMap()
-        is ModifierDeclaration -> listOf(::token).convert(this)
-        is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
-        is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
-        is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is DocumentRootDeclaration -> listOf(::packageName, ::declarations).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
-        is UnionTypeDeclaration -> listOf(::name, ::params).convert(this)
+        is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
+        is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
+        is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
+        is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
+        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities).convert(this)
+        is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
+        is ModifierDeclaration -> listOf(::token).convert(this)
+        is ObjectLiteralDeclaration -> listOf(::members).convert(this)
+        is ParameterDeclaration -> toMap()
+        is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
+        is StringTypeDeclaration -> listOf(::tokens).convert(this)
+        is TokenDeclaration -> listOf(::value).convert(this)
+        is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
+        is TypeDeclaration -> listOf(::value, ::params).convert(this)
+        is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
+        is UnionTypeDeclaration -> listOf(::params).convert(this)
+        is VariableDeclaration -> listOf(::name, ::type).convert(this)
         else -> throw Exception("can not map ${this}")
     }
 }

@@ -29,7 +29,8 @@ declare interface AstFactory {
         name: string,
         type: ParameterValue,
         initializer: Expression | null,
-        vararg: boolean
+        vararg: boolean,
+        optional: boolean
     ): ParameterDeclaration;
 
     createConstructorDeclaration(
@@ -72,7 +73,7 @@ declare interface AstFactory {
 
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
 
-    createUnionDeclaration(name: string, params: Array<ParameterValue>): UnionTypeDeclatation;
+    createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 

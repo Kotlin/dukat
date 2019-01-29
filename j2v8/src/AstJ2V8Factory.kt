@@ -89,14 +89,14 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration)
         = toV8(astFactory.createFunctionTypeDeclaration(parameters, type))
 
-    override fun createUnionDeclaration(value: String, params: List<ParameterValueDeclaration>)
-            = toV8(astFactory.createUnionDeclaration(value, params))
+    override fun createUnionDeclaration(params: List<ParameterValueDeclaration>)
+            = toV8(astFactory.createUnionDeclaration(params))
 
     override fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>)
         = toV8(astFactory.createTypeDeclaration(value, params))
 
-    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean)
-        = toV8(astFactory.createParameterDeclaration(name, type, initializer, vararg))
+    override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean)
+        = toV8(astFactory.createParameterDeclaration(name, type, initializer, vararg, optional))
 
     override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>)
         = toV8(astFactory.createDocumentRoot(packageName, declarations))

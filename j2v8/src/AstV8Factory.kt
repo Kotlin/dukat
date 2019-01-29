@@ -166,14 +166,15 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
         )
     }
 
-    fun createUnionDeclaration(name: String, params: V8Array) = astFactory.createUnionDeclaration(name, params.toArray().map { type -> type.toAst<ParameterValueDeclaration>() })
+    fun createUnionTypeDeclaration(params: V8Array) = astFactory.createUnionDeclaration(params.toArray().map { type -> type.toAst<ParameterValueDeclaration>() })
     fun createTypeDeclaration(value: String, params: V8Array) = astFactory.createTypeDeclaration(value, params.toArray().map { type -> type.toAst<ParameterValueDeclaration>() }.toTypedArray())
 
-    fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?, vararg: Boolean) =
+    fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?, vararg: Boolean, optional: Boolean) =
             astFactory.createParameterDeclaration(
                     name, type.toAst(),
                     if (initializer == null) null else initializer.toAst<ExpressionDeclaration>(),
-                    vararg
+                    vararg,
+                    optional
             )
 
     fun createDocumentRoot(packageName: String, declarations: V8Array) =
