@@ -498,6 +498,39 @@ class AstConverter {
         )
     }
 
+    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
+        let parentEntities: Array<HeritageClauseDeclaration> = [];
+
+
+            if (heritageClauses) {
+                for (let heritageClause of heritageClauses) {
+
+                    let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
+
+                    for (let type of heritageClause.types) {
+                        let typeArguments: Array<TokenDeclaration> = [];
+
+                        if (type.typeArguments) {
+                            for (let typeArgument of type.typeArguments) {
+                                let value = (this.convertType(typeArgument) as any).value;
+                                typeArguments.push(this.astFactory.createTokenDeclaration(value))
+                            }
+                        }
+
+                        parentEntities.push(
+                            this.astFactory.createHeritageClauseDeclaration(
+                                type.expression.getText(),
+                                typeArguments,
+                                extending
+                            )
+                        );
+                    }
+                }
+            }
+
+        return  parentEntities
+    }
+
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
@@ -529,37 +562,8 @@ class AstConverter {
                 }
             } else if (ts.isClassDeclaration(statement)) {
                 const classDeclaration = statement as ts.ClassDeclaration;
-                let parentEntities: Array<ClassLikeDeclaration> = [];
 
                 if (classDeclaration.name != undefined) {
-
-                    if (classDeclaration.heritageClauses) {
-                        for (let heritageClause of classDeclaration.heritageClauses) {
-
-                            let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
-
-                            for (let type of heritageClause.types) {
-                                let typeParams: Array<TypeParameter> = [];
-
-                                if (type.typeArguments) {
-                                    for (let typeArgument of type.typeArguments) {
-                                        let value = (this.convertType(typeArgument) as any).value;
-                                        typeParams.push(this.astFactory.createTypeParam(value, []))
-                                    }
-                                }
-
-                                if (extending) {
-                                    parentEntities.push(
-                                        this.astFactory.createClassDeclaration(type.expression.getText(), [], typeParams, [], [])
-                                    );
-                                } else {
-                                    parentEntities.push(
-                                        this.astFactory.createInterfaceDeclaration(type.expression.getText(), [], typeParams, [])
-                                    );
-                                }
-                            }
-                        }
-                    }
 
                     let members: Array<MemberDeclaration> = [];
                     let staticMembers: Array<MemberDeclaration> = [];
@@ -577,7 +581,7 @@ class AstConverter {
                             classDeclaration.name.getText(),
                             members,
                             this.convertTypeParams(classDeclaration.typeParameters),
-                            parentEntities,
+                            this.convertHeritageClauses(classDeclaration.heritageClauses),
                             staticMembers
                         )
                     );
@@ -592,38 +596,12 @@ class AstConverter {
                 let interfaceDeclaration = statement as ts.InterfaceDeclaration;
                 let parentEntities: Array<InterfaceDeclaration> = [];
 
-                if (interfaceDeclaration.heritageClauses) {
-                    for (let heritageClause of interfaceDeclaration.heritageClauses) {
-                        for (let type of heritageClause.types) {
-
-                            if (ts.isExpressionWithTypeArguments(type)) {
-                                let typeArguments: Array<TokenDeclaration> = [];
-
-                                if (type.typeArguments) {
-                                    for (let typeArgument of type.typeArguments) {
-                                        let value = (this.convertType(typeArgument) as any).value;
-                                        typeArguments.push(this.astFactory.createTokenDeclaration(value))
-                                    }
-                                }
-
-                                parentEntities.push(
-                                    this.astFactory.createHeritageClauseDeclaration(
-                                        type.expression.getText(),
-                                        typeArguments,
-                                        false
-                                    )
-                                );
-                            }
-                        }
-                    }
-                }
-
                 declarations.push(
                     this.astFactory.createInterfaceDeclaration(
                         interfaceDeclaration.name.getText(),
                         this.convertMembersToInterfaceMemberDeclarations(interfaceDeclaration.members),
                         this.convertTypeParams(interfaceDeclaration.typeParameters),
-                        parentEntities
+                        this.convertHeritageClauses(interfaceDeclaration.heritageClauses)
                     )
                 )
             } else if (ts.isModuleDeclaration(statement)) {

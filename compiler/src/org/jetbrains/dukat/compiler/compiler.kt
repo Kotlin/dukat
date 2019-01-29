@@ -291,7 +291,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
 
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name}${translateTypeParameters(parentEntity.typeParameters)}"
+                    "${parentEntity.name}${translateTypeArguments(parentEntity.typeArguments)}"
                 }.joinToString(", ")
             } else ""
 

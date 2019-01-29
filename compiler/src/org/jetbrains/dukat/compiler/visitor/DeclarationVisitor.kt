@@ -32,7 +32,7 @@ interface DeclarationVisitor {
     fun visitClassDeclaration(declaration: ClassDeclaration) {
         declaration.members.forEach { member -> visitMemberDeclaration(member) }
         //declaration.primaryConstructor?.let { visitFunctionDeclaration(it) }
-        declaration.parentEntities.forEach { parentEntity -> visitClassLikeDeclaration(parentEntity) }
+//        declaration.parentEntities.forEach { parentEntity -> visitClassLikeDeclaration(parentEntity) }
         declaration.typeParameters.forEach {
             typeParameter -> visitTypeParameter(typeParameter)
         }

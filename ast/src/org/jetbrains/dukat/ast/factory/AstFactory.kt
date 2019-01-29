@@ -3,7 +3,6 @@ package org.jetbrains.dukat.ast.factory
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
@@ -55,9 +54,9 @@ class AstFactory : AstNodeFactory<AstNode> {
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<ClassLikeDeclaration>,
+            parentEntities: List<HeritageClauseDeclaration>,
             staticMembers: List<MemberDeclaration>
-    ) = ClassDeclaration(name, members, typeParameters, parentEntities, null, staticMembers)
+    ): AstNode = ClassDeclaration(name, members, typeParameters, parentEntities, null, staticMembers)
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 

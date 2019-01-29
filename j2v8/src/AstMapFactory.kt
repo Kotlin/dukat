@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.astToMap
 import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.ast.model.AstNode
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -43,9 +42,9 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<ClassLikeDeclaration>,
+            parentEntities: List<HeritageClauseDeclaration>,
             staticMembers: List<MemberDeclaration>
-    ) = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers).astToMap()
+    ): Map<String, Any?> = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers).astToMap()
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) =
             astFactory.createObjectLiteral(members).astToMap()

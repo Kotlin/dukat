@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.factory
 
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -42,7 +41,7 @@ interface AstNodeFactory<T> {
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<ClassLikeDeclaration>,
+            parentEntities: List<HeritageClauseDeclaration>,
             staticMembers: List<MemberDeclaration>
     ): T
 

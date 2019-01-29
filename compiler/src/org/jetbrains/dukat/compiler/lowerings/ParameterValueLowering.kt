@@ -120,7 +120,14 @@ interface ParameterValueLowering : Lowering {
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 staticMembers = declaration.staticMembers.map { member -> lowerMemberDeclaration(member) },
                 primaryConstructor = declaration.primaryConstructor?.let { lowerConstructorDeclaration(it) },
-                parentEntities = declaration.parentEntities.map { parentEntity -> lowerClassLikeDeclaration(parentEntity) },
+                parentEntities = declaration.parentEntities.map { heritageClause ->
+                    //TODO: to introduce heritage visitor
+                    val typeArguments = heritageClause.typeArguments.map {
+                        val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(it.value, emptyList())) as TypeDeclaration
+                        TokenDeclaration(lowerParameterDeclaration.value)
+                    }
+                    heritageClause.copy(typeArguments = typeArguments)
+                },
                 typeParameters = declaration.typeParameters.map {
                     typeParameter -> lowerTypeParameter(typeParameter)
                 }

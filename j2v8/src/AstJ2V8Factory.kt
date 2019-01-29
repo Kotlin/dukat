@@ -4,7 +4,6 @@ import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -46,10 +45,9 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<ClassLikeDeclaration>,
+            parentEntities: List<HeritageClauseDeclaration>,
             staticMembers: List<MemberDeclaration>
-    )
-        = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers))
+    ): V8Object = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers))
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = toV8(astFactory.createObjectLiteral(members))
 

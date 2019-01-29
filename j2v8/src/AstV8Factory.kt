@@ -4,7 +4,6 @@ import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.model.AstNode
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -88,7 +87,7 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
             name,
             members.toArray().map { member -> member.toAst<MemberDeclaration>() },
             typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameterDeclaration>() },
-            parentEntities.toArray().map { typeParameter -> typeParameter.toAst<ClassLikeDeclaration>() },
+            parentEntities.toArray().map { typeParameter -> typeParameter.toAst<HeritageClauseDeclaration>() },
             staticMembers.toArray().map { staticMember -> staticMember.toAst<MemberDeclaration>() }
     )
 

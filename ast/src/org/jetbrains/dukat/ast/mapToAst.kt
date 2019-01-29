@@ -3,7 +3,6 @@ package org.jetbrains.dukat.ast
 import org.jetbrains.dukat.ast.model.AstNode
 import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.Declaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
@@ -138,7 +137,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("name") as String,
                 mapEntities("members") { it.toAst<MemberDeclaration>() },
                 mapEntities("typeParameters") { it.toAst<TypeParameterDeclaration>() },
-                mapEntities("parentEntities") { it.toAst<ClassLikeDeclaration>() },
+                mapEntities("parentEntities") { it.toAst<HeritageClauseDeclaration>() },
                 null,
                 mapEntities("staticMembers") { it.toAst<MemberDeclaration>() }
         )
