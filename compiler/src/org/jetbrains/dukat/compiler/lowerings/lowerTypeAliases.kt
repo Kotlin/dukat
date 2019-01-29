@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.AstContext
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
+import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLowering {
@@ -20,6 +21,17 @@ private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLower
         }
 
         return declaration.copy(parentEntities = parentEntitiesRemapped)
+    }
+
+    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+        val resolved = astContext.resolveTypeAlias(declaration.type)
+        val type = if (resolved is TypeDeclaration) {
+            resolved
+        } else {
+            declaration.type
+        }
+
+        return declaration.copy(type = type)
     }
 }
 

@@ -5,9 +5,14 @@ import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 
 private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
     return (aliasName == heritageClause.name) && (typeParameters == heritageClause.typeArguments)
+}
+
+private fun TypeAliasDeclaration.canSusbtitute(type: TypeDeclaration): Boolean {
+    return (aliasName == type.value)
 }
 
 class AstContext {
@@ -34,6 +39,18 @@ class AstContext {
             }
         }
 
+        return null
+    }
+
+    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+        if (type is TypeDeclaration) {
+            myTypeAliasDeclaration.forEach { typeAlias ->
+                if (typeAlias.canSusbtitute(type)) {
+                    return typeAlias.typeReference
+                }
+            }
+
+        }
         return null
     }
 
