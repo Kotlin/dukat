@@ -17,6 +17,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerObjectLiterals
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerSelfReference
 import org.jetbrains.dukat.compiler.lowerings.lowerTypeAliases
+import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 
 private fun DocumentRootDeclaration.updateContext(astContext: AstContext): DocumentRootDeclaration {
@@ -47,12 +48,13 @@ interface InputTranslator {
         val myAstContext = AstContext()
 
         return documentRoot
+                .lowerObjectLiterals()
                 .introduceMemberNodes()
                 .eliminateStringType()
-                .lowerObjectLiterals()
                 .lowerConstructors()
                 .lowerNativeArray()
                 .lowerNullable()
+                .lowerUnionType()
                 .lowerPrimitives()
                 .escapeIdentificators()
                 .lowerVarargs()

@@ -34,7 +34,7 @@ private class LowerNullable : ParameterValueLowering {
                         res.nullable = true
                         return res
                     } else {
-                        throw Exception("can not lowerDocumentRoot nullables for unknown param type ${nullableType}")
+                        throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
                 } else lowerUnionTypeDeclation(declaration)
             }
@@ -44,7 +44,7 @@ private class LowerNullable : ParameterValueLowering {
             is TypeDeclaration -> {
                 return lowerTypeDeclaration(declaration)
             }
-            else -> throw Exception("can not lowerDocumentRoot nullables for unknown param type ${this}")
+            else -> declaration
         }
 
     }

@@ -39,7 +39,7 @@ private class LowerObjectLiterals : ParameterValueLowering {
             } else {
                 TypeDeclaration(generatedInterface.name, emptyList())
             }
-        } else super.lowerParameterValue(declaration)
+        } else declaration
     }
 
     override fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {

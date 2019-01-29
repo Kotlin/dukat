@@ -17,6 +17,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 
 interface Lowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
@@ -38,6 +39,7 @@ interface Lowering {
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is ObjectLiteralDeclaration -> lowerObjectLiteral(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
+            is DynamicTypeNode -> declaration
             else -> throw Exception("can not lowerParameterValue unknown ParameterValueDeclaration subtype:  ${this} : ${declaration}")
         }
     }

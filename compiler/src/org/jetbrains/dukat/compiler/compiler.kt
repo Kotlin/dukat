@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.compiler.translator.InputTranslator
@@ -82,8 +83,11 @@ private fun ParameterValueDeclaration.translate(): String {
             translated = "(${translated})?"
         }
         return translated
+    } else if (this is DynamicTypeNode) {
+        return "dynamic"
     } else {
-        throw Exception("failed to translateType ${this}")
+        return "failed to translateType ${this}"
+        //throw Exception("failed to translateType ${this}")
     }
 }
 

@@ -138,6 +138,7 @@ private class LowerFunctionsInClassLike : Lowering {
     override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration) = declaration
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
     override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration) = declaration
+    override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): List<MemberDeclaration> {
         return when (declaration) {
@@ -159,8 +160,6 @@ private class LowerFunctionsInClassLike : Lowering {
             else -> listOf(lowerMemberDeclaration(declaration))
         }
     }
-
-    override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
         return declaration.copy(
