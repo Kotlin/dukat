@@ -89,6 +89,9 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration)
         = toV8(astFactory.createFunctionTypeDeclaration(parameters, type))
 
+    override fun createUnionDeclaration(value: String, params: List<ParameterValueDeclaration>)
+            = toV8(astFactory.createUnionDeclaration(value, params))
+
     override fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>)
         = toV8(astFactory.createTypeDeclaration(value, params))
 

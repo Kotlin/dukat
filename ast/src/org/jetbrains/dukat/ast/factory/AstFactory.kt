@@ -25,6 +25,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
 
@@ -91,6 +92,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration) = FunctionTypeDeclaration(parameters.toList(), type)
 
+    override fun createUnionDeclaration(value: String, params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(value, params)
     override fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>) = TypeDeclaration(value, params)
 
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean) = ParameterDeclaration(name, type, initializer, vararg)

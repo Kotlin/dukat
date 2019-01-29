@@ -72,6 +72,7 @@ declare interface AstFactory {
 
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
 
+    createUnionDeclaration(name: string, params: Array<ParameterValue>): UnionTypeDeclatation;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 

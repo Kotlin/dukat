@@ -17,6 +17,7 @@ declare class AstFactoryV8 implements AstFactory {
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean): ParameterDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
+    createUnionDeclaration(name: string, params: Array<ParameterValue>): UnionTypeDeclatation;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
     declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration;

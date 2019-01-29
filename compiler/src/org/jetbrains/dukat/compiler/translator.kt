@@ -59,6 +59,7 @@ private fun createV8Interop(): InteropV8 {
             .method("createInterfaceDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createExpression", InteropV8Signature.V8OBJECT, InteropV8Signature.STRING)
             .method("createTypeParam", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
+            .method("createUnionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("createTypeDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
             .method("declareVariable", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT)
             .method("declareProperty", InteropV8Signature.STRING, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.BOOLEAN, InteropV8Signature.V8ARRAY)

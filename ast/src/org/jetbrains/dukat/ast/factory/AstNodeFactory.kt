@@ -95,6 +95,7 @@ interface AstNodeFactory<T> {
             vararg: Boolean
     ): T
 
+    fun createUnionDeclaration(value: String, params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T

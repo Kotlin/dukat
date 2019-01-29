@@ -22,6 +22,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import kotlin.reflect.KProperty0
 
 
@@ -84,6 +85,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is DocumentRootDeclaration -> listOf(::packageName, ::declarations).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
+        is UnionTypeDeclaration -> listOf(::name, ::params).convert(this)
         else -> throw Exception("can not map ${this}")
     }
 }
