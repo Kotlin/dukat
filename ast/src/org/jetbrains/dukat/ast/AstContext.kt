@@ -46,10 +46,18 @@ class AstContext {
         if (type is TypeDeclaration) {
             myTypeAliasDeclaration.forEach { typeAlias ->
                 if (typeAlias.canSusbtitute(type)) {
-                    return typeAlias.typeReference
+                    val typeReference = typeAlias.typeReference
+
+                    if (typeReference is TypeDeclaration) {
+                        val params  = typeReference.params.map {param ->
+                            resolveTypeAlias(param) ?: param
+                        }
+                        return typeReference.copy(params = params)
+                    }
+
+                    return typeReference
                 }
             }
-
         }
         return null
     }

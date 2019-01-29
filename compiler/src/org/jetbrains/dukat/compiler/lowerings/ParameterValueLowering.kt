@@ -102,7 +102,7 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
-        return declaration
+        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
     }
 
     fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
