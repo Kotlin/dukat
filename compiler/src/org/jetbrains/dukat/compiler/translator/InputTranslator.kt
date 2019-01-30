@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
+import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMemberNodes
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
@@ -49,6 +50,7 @@ interface InputTranslator {
         val myAstContext = AstContext()
 
         return documentRoot
+                .filterOutNonDeclarations()
                 .lowerObjectLiterals()
                 .introduceMemberNodes()
                 .eliminateStringType()

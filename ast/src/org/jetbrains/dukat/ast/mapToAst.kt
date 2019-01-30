@@ -143,7 +143,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("typeParameters"),
                 getEntities("parentEntities"),
                 null,
-                getEntities("staticMembers")
+                getEntities("staticMembers"),
+                getEntities("modifiers")
         )
         InterfaceDeclaration::class.simpleName -> InterfaceDeclaration(
                 get("name") as String,

@@ -83,12 +83,13 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
     fun createModifierDeclaration(token: String) = astFactory.createModifierDeclaration(token)
 
-    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, staticMembers: V8Array): V8Object = astFactory.createClassDeclaration(
+    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, staticMembers: V8Array, modifiers: V8Array): V8Object = astFactory.createClassDeclaration(
             name,
             members.toArray().map { member -> member.toAst<MemberDeclaration>() },
             typeParameters.toArray().map { typeParameter -> typeParameter.toAst<TypeParameterDeclaration>() },
             parentEntities.toArray().map { typeParameter -> typeParameter.toAst<HeritageClauseDeclaration>() },
-            staticMembers.toArray().map { staticMember -> staticMember.toAst<MemberDeclaration>() }
+            staticMembers.toArray().map { staticMember -> staticMember.toAst<MemberDeclaration>() },
+            modifiers.toArray().map { it.toAst<ModifierDeclaration>() }
     )
 
     fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toArray().map { method -> method.toAst<MemberDeclaration>() })

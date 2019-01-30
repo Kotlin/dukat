@@ -108,8 +108,11 @@ class AstConverter {
 
         if (nativeModifiers) {
             nativeModifiers.forEach(modifier => {
+
                 if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
                     res.push(this.astFactory.createModifierDeclaration("STATIC"));
+                } else if (modifier.kind == ts.SyntaxKind.DeclareKeyword) {
+                    res.push(this.astFactory.createModifierDeclaration("DECLARE"));
                 }
             });
         }
@@ -557,7 +560,8 @@ class AstConverter {
                             members,
                             this.convertTypeParams(classDeclaration.typeParameters),
                             this.convertHeritageClauses(classDeclaration.heritageClauses),
-                            staticMembers
+                            staticMembers,
+                            this.convertModifiers(classDeclaration.modifiers)
                         )
                     );
                 }

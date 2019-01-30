@@ -42,7 +42,8 @@ interface AstNodeFactory<T> {
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            staticMembers: List<MemberDeclaration>
+            staticMembers: List<MemberDeclaration>,
+            modifiers: List<ModifierDeclaration>
     ): T
 
     fun createObjectLiteral(members: List<MemberDeclaration>): T

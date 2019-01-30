@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
@@ -25,13 +26,8 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
-private fun FunctionDeclaration.isStatic() =
-        modifiers.find { it.token == "STATIC" } != null
-
-private fun PropertyDeclaration.isStatic() =
-        modifiers.find { it.token == "STATIC" } != null
-
-
+private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+private fun PropertyDeclaration.isStatic() =  modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
 private fun PropertyDeclaration.convert(owner: ClassLikeDeclaration): PropertyNode {
     return PropertyNode(

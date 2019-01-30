@@ -66,7 +66,7 @@ private fun List<KProperty0<*>>.convert(reflection: Any) =
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
-        is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::staticMembers).convert(this)
+        is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::staticMembers, ::modifiers).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
         is DocumentRootDeclaration -> listOf(::packageName, ::declarations).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
