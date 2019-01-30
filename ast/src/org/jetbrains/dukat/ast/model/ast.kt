@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 
 fun TypeDeclaration.isGeneric() = params.isNotEmpty()
 
@@ -17,6 +18,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
+        is UnionTypeDeclaration -> copy(nullable = true)
         else -> throw Exception("makeNullable does not recognize type ${this}")
     }
 }

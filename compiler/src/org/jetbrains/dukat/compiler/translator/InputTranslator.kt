@@ -19,6 +19,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerSelfReference
 import org.jetbrains.dukat.compiler.lowerings.lowerTypeAliases
 import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
+import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 
 private fun DocumentRootDeclaration.updateContext(astContext: AstContext): DocumentRootDeclaration {
     for (declaration in declarations) {
@@ -54,15 +55,16 @@ interface InputTranslator {
                 .lowerConstructors()
                 .lowerNativeArray()
                 .lowerNullable()
-                .lowerUnionType()
                 .lowerPrimitives()
                 .escapeIdentificators()
+                .lowerUnionType()
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerSelfReference()
                 .updateContext(myAstContext)
                 .lowerTypeAliases(myAstContext)
                 .lowerOverrides(myAstContext)
+                .specifyDynamicTypes()
 
     }
 }

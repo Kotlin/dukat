@@ -5,10 +5,12 @@ import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 
+
+
 private class LoweringUnionType : ParameterValueLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         if (declaration is UnionTypeDeclaration) {
-            return DynamicTypeNode("shalalal")
+            return DynamicTypeNode(declaration)
         }
         return declaration
     }

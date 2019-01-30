@@ -28,6 +28,7 @@ gradle.ext {
 
 include 'ast'
 include 'compiler'
+include 'itertools'
 include 'interop'
 include 'j2v8'
 include 'nashorn'
