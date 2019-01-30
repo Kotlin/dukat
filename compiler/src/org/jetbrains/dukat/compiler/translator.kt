@@ -54,7 +54,7 @@ private fun createV8Interop(): InteropV8 {
             .method("createStringTypeDeclaration", InteropV8Signature.V8ARRAY)
             .method("createIndexSignatureDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
             .method("createModifierDeclaration", InteropV8Signature.STRING)
-            .method("createClassDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
+            .method("createClassDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createObjectLiteral", InteropV8Signature.V8ARRAY)
             .method("createInterfaceDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createExpression", InteropV8Signature.V8OBJECT, InteropV8Signature.STRING)

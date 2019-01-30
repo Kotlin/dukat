@@ -56,9 +56,8 @@ class AstFactory : AstNodeFactory<AstNode> {
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            staticMembers: List<MemberDeclaration>,
             modifiers: List<ModifierDeclaration>
-    ): AstNode = ClassDeclaration(name, members, typeParameters, parentEntities, null, staticMembers, modifiers)
+    ): AstNode = ClassDeclaration(name, members, typeParameters, parentEntities, null, modifiers)
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 

@@ -11,18 +11,15 @@ import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
 import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
@@ -124,18 +121,17 @@ private fun MethodSignatureDeclaration.convert(owner: ClassLikeDeclaration): Mem
     }
 }
 
-private class LowerFunctionsInClassLike : Lowering {
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration) = declaration
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration) = declaration
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration) = declaration
-    override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration) = declaration
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration) = declaration
-    override fun lowerTypeParameter(declaration: TypeParameterDeclaration) = declaration
-    override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration) = declaration
-    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
-    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration) = declaration
-    override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
+private fun ClassDeclaration.convert() : ClassNode {
+    return ClassNode(
+        name,
+        members,
+        typeParameters,
+        parentEntities,
+        primaryConstructor
+    )
+}
 
+private class LowerDeclarationsToNodes {
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): List<MemberDeclaration> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -153,23 +149,42 @@ private class LowerFunctionsInClassLike : Lowering {
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(declaration.convert(owner))
             is IndexSignatureDeclaration -> declaration.convert(owner)
-            else -> listOf(lowerMemberDeclaration(declaration))
+            else -> listOf(declaration)
         }
     }
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
+    fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
         return declaration.copy(
                 members = declaration.members.flatMap { member -> lowerMemberDeclaration(member, declaration) }
         )
     }
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
+    fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
                 members = declaration.members.flatMap { member -> lowerMemberDeclaration(member, declaration) }
         )
+    }
+
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration) : TopLevelDeclaration {
+        return when (declaration) {
+            is ClassDeclaration -> lowerClassNode(declaration.convert())
+            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
+            else -> declaration
+        }
+    }
+
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
+        return declarations.map { declaration ->
+            lowerTopLevelDeclaration(declaration)
+        }
+    }
+
+    fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
+        return documenRoot.copy(declarations = lowerTopLevelDeclarations(documenRoot.declarations))
     }
 }
 
-fun DocumentRootDeclaration.introduceMemberNodes(): DocumentRootDeclaration {
-    return LowerFunctionsInClassLike().lowerDocumentRoot(this)
+fun DocumentRootDeclaration.introduceNodes(): DocumentRootDeclaration {
+    return LowerDeclarationsToNodes().lowerDocumentRoot(this)
 }

@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import cartesian
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
@@ -10,10 +9,11 @@ import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 
 fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
-    return params.map {param ->
+    return params.map { param ->
         val type = param.type
         if (type is DynamicTypeNode) {
             val projectedType = type.projectedType
@@ -40,7 +40,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> specifyDynamicParams(declaration)
-            is ClassDeclaration -> listOf(lowerClassDeclaration(declaration))
+            is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceDeclaration -> listOf(lowerInterfaceDeclaration(declaration))
             is DocumentRootDeclaration -> listOf(lowerDocumentRoot(declaration))
             is TypeAliasDeclaration -> listOf(lowerTypeAliasDeclaration(declaration))

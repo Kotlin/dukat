@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ast
 
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 
 private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
     return (aliasName == heritageClause.name) && (typeParameters == heritageClause.typeArguments)
@@ -17,15 +17,15 @@ private fun TypeAliasDeclaration.canSusbtitute(type: TypeDeclaration): Boolean {
 
 class AstContext {
     private val myInterfaces: MutableMap<String, InterfaceDeclaration> = mutableMapOf()
-    private val myClassDeclarations: MutableMap<String, ClassDeclaration> = mutableMapOf()
+    private val myClassNodes: MutableMap<String, ClassNode> = mutableMapOf()
     private val myTypeAliasDeclaration: MutableList<TypeAliasDeclaration> = mutableListOf()
 
     fun registerInterface(interfaceDeclaration: InterfaceDeclaration) {
         myInterfaces.put(interfaceDeclaration.name, interfaceDeclaration)
     }
 
-    fun registerClass(classDeclaration: ClassDeclaration) {
-        myClassDeclarations.put(classDeclaration.name, classDeclaration)
+    fun registerClass(classDeclaration: ClassNode) {
+        myClassNodes.put(classDeclaration.name, classDeclaration)
     }
 
     fun registerTypeAlias(typeAlias: TypeAliasDeclaration) {
@@ -64,7 +64,7 @@ class AstContext {
 
     fun resolveInterface(name: String): InterfaceDeclaration? = myInterfaces.get(name)
 
-    fun resolveClass(name: String): ClassDeclaration? {
-        return myClassDeclarations.get(name)
+    fun resolveClass(name: String): ClassNode? {
+        return myClassNodes.get(name)
     }
 }

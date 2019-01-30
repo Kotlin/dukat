@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -12,13 +11,14 @@ import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 
 interface IdentityLowering : Lowering {
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration = declaration
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration = declaration
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration = declaration
+    override fun lowerClassNode(declaration: ClassNode): ClassNode = declaration
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration = declaration
 

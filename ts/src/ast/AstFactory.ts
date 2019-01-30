@@ -9,7 +9,7 @@ declare interface AstFactory {
 
     createModifierDeclaration(name: string): ModifierDeclaration;
 
-    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, staticMembers: Array<MemberDeclaration>, modifiers: Array<ModifierDeclaration>): ClassDeclaration;
+    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>): ClassDeclaration;
 
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral
     createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;

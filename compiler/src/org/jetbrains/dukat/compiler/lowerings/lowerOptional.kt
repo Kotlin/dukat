@@ -13,6 +13,6 @@ private class LowerOptional : ParameterValueLowering {
 }
 
 fun DocumentRootDeclaration.lowerOptional(): DocumentRootDeclaration {
- //   return LowerFunctionsInClassLike().lowerDocumentRoot(this)
+ //   return LowerDeclarationsToNodes().lowerDocumentRoot(this)
     return this
 }

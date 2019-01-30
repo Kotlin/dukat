@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
@@ -15,6 +14,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -136,7 +136,7 @@ private fun translateTypeArguments(typeParameters: List<TokenDeclaration>): Stri
     if (typeParameters.isEmpty()) {
         return ""
     } else {
-        return "<" + typeParameters.map{it.value}.joinToString(", ") + ">"
+        return "<" + typeParameters.map { it.value }.joinToString(", ") + ">"
     }
 }
 
@@ -233,7 +233,6 @@ private fun MethodNode.translateSignature(): List<String> {
     } else annotations.toMutableList() + listOf(methodNodeTranslation)
 
 
-
 }
 
 private fun MemberDeclaration.translateSignature(): List<String> {
@@ -255,7 +254,7 @@ private fun escapePackageName(name: String): String {
     return name.replace("/".toRegex(), ".").replace("_".toRegex(), "_")
 }
 
-private fun MemberDeclaration.isStatic() = when(this) {
+private fun MemberDeclaration.isStatic() = when (this) {
     is MethodNode -> static
     is PropertyNode -> static
     else -> false
@@ -290,7 +289,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
             res.add(declaration.translate())
         } else if (declaration is FunctionDeclaration) {
             res.add(declaration.translate())
-        } else if (declaration is ClassDeclaration) {
+        } else if (declaration is ClassNode) {
             val primaryConstructor = declaration.primaryConstructor
 
             val parents = if (declaration.parentEntities.isNotEmpty()) {

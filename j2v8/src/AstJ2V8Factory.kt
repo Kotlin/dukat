@@ -46,9 +46,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            staticMembers: List<MemberDeclaration>,
             modifiers: List<ModifierDeclaration>
-    ): V8Object = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers, modifiers))
+    ): V8Object = toV8(astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, modifiers))
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = toV8(astFactory.createObjectLiteral(members))
 

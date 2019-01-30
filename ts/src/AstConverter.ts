@@ -542,25 +542,12 @@ class AstConverter {
                 const classDeclaration = statement as ts.ClassDeclaration;
 
                 if (classDeclaration.name != undefined) {
-
-                    let members: Array<MemberDeclaration> = [];
-                    let staticMembers: Array<MemberDeclaration> = [];
-
-                    this.convertClassElementsToClassDeclarations(classDeclaration.members).forEach(member => {
-                        if (false) {
-                            staticMembers.push(member);
-                        } else {
-                            members.push(member);
-                        }
-                    });
-
                     declarations.push(
                         this.astFactory.createClassDeclaration(
                             classDeclaration.name.getText(),
-                            members,
+                            this.convertClassElementsToClassDeclarations(classDeclaration.members),
                             this.convertTypeParams(classDeclaration.typeParameters),
                             this.convertHeritageClauses(classDeclaration.heritageClauses),
-                            staticMembers,
                             this.convertModifiers(classDeclaration.modifiers)
                         )
                     );

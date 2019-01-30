@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
@@ -14,6 +13,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
@@ -33,7 +33,7 @@ interface ParameterValueLowering : Lowering {
     fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
-                typeParameters = declaration.typeParameters.map {typeParameter -> lowerTypeParameter(typeParameter) }
+                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
     }
 
@@ -63,7 +63,7 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
-        return declaration.copy(constraints = declaration.constraints.map {constraint -> lowerParameterValue(constraint)})
+        return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
     }
 
     override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
@@ -101,8 +101,8 @@ interface ParameterValueLowering : Lowering {
                     }
                     heritageClause.copy(typeArguments = typeArguments)
                 },
-                typeParameters = declaration.typeParameters.map {
-                    typeParameter -> lowerTypeParameter(typeParameter)
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    lowerTypeParameter(typeParameter)
                 }
         )
     }
@@ -121,10 +121,9 @@ interface ParameterValueLowering : Lowering {
         )
     }
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
+    override fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
-                staticMembers = declaration.staticMembers.map { member -> lowerMemberDeclaration(member) },
                 primaryConstructor = declaration.primaryConstructor?.let { lowerConstructorDeclaration(it) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     //TODO: to introduce heritage visitor
@@ -134,8 +133,8 @@ interface ParameterValueLowering : Lowering {
                     }
                     heritageClause.copy(typeArguments = typeArguments)
                 },
-                typeParameters = declaration.typeParameters.map {
-                    typeParameter -> lowerTypeParameter(typeParameter)
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    lowerTypeParameter(typeParameter)
                 }
         )
     }

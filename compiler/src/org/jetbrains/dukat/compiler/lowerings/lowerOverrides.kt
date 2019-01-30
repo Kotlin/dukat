@@ -1,13 +1,13 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
@@ -15,42 +15,42 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 private fun InterfaceDeclaration.getKnownParents(astContext: AstContext) =
         parentEntities.map { astContext.resolveInterface(it.name) }.filterNotNull()
 
-private fun ClassDeclaration.getKnownParents(astContext: AstContext) =
+private fun ClassNode.getKnownParents(astContext: AstContext) =
         parentEntities.flatMap { listOf(astContext.resolveInterface(it.name), astContext.resolveClass(it.name)) }.filterNotNull()
 
 @Suppress("UNCHECKED_CAST")
-private fun InterfaceDeclaration.allParentMethods(astContext: AstContext) : List<MethodNode> {
+private fun InterfaceDeclaration.allParentMethods(astContext: AstContext): List<MethodNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+        parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
     } as List<MethodNode>
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun InterfaceDeclaration.allParentProperties(astContext: AstContext) : List<PropertyNode> {
+private fun InterfaceDeclaration.allParentProperties(astContext: AstContext): List<PropertyNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+        parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
     } as List<PropertyNode>
 }
 
 
 @Suppress("UNCHECKED_CAST")
-private fun ClassDeclaration.allParentMethods(astContext: AstContext) : List<MethodNode> {
+private fun ClassNode.allParentMethods(astContext: AstContext): List<MethodNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
         if (parentEntity is InterfaceDeclaration) {
-            parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-        } else if (parentEntity is ClassDeclaration) {
-            parentEntity.members.filter {member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+            parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+        } else if (parentEntity is ClassNode) {
+            parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
         } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
     } as List<MethodNode>
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun ClassDeclaration.allParentProperties(astContext: AstContext) : List<PropertyNode> {
+private fun ClassNode.allParentProperties(astContext: AstContext): List<PropertyNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
         if (parentEntity is InterfaceDeclaration) {
-            parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-        } else if (parentEntity is ClassDeclaration) {
-            parentEntity.members.filter {member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+            parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+        } else if (parentEntity is ClassNode) {
+            parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
         } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
     } as List<PropertyNode>
 }
@@ -69,16 +69,16 @@ private fun MethodNode.isOverriding(otherMethodDeclaration: MethodNode): Boolean
     }
 
     return parameters
-            .zip(otherMethodDeclaration.parameters) {a, b -> a.type.isOverriding(b.type)}
+            .zip(otherMethodDeclaration.parameters) { a, b -> a.type.isOverriding(b.type) }
             .all { it }
 }
 
-private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode) : Boolean {
+private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode): Boolean {
     return type.isOverriding(otherPropertyDeclaration.type)
 }
 
 
-private fun MethodNode.isSpecialCase() : Boolean {
+private fun MethodNode.isSpecialCase(): Boolean {
 
     if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeDeclaration("Any", emptyArray()))) {
         return true
@@ -111,15 +111,14 @@ private fun ParameterValueDeclaration.isOverriding(otherParameterValue: Paramete
 private fun MemberDeclaration.lowerOverrides(
         allSuperDeclarations: List<MethodNode>,
         allSuperProperties: List<PropertyNode>
-) : MemberDeclaration {
+): MemberDeclaration {
 
     return if (this is MethodNode) {
         val override =
                 allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
-         copy(override = override)
+        copy(override = override)
     } else if (this is PropertyNode) {
-        val override =  allSuperProperties.any {
-            superMethod ->
+        val override = allSuperProperties.any { superMethod ->
             isOverriding(superMethod)
         }
         copy(override = override)
@@ -134,17 +133,19 @@ fun DocumentRootDeclaration.lowerOverrides(astContext: AstContext): DocumentRoot
                 val allParentProperties = declaration.allParentProperties(astContext)
 
                 declaration.copy(
-                        members = declaration.members.map {member ->
-                            member.lowerOverrides(allParentMethods, allParentProperties)}
+                        members = declaration.members.map { member ->
+                            member.lowerOverrides(allParentMethods, allParentProperties)
+                        }
                 )
             }
-            is ClassDeclaration -> {
+            is ClassNode -> {
                 val allParentMethods = declaration.allParentMethods(astContext)
                 val allParentProperties = declaration.allParentProperties(astContext)
 
                 declaration.copy(
-                        members = declaration.members.map {member ->
-                            member.lowerOverrides(allParentMethods, allParentProperties)}
+                        members = declaration.members.map { member ->
+                            member.lowerOverrides(allParentMethods, allParentProperties)
+                        }
                 )
             }
             is DocumentRootDeclaration -> {

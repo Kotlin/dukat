@@ -43,9 +43,8 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            staticMembers: List<MemberDeclaration>,
             modifiers: List<ModifierDeclaration>
-    ): Map<String, Any?> = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, staticMembers, modifiers).astToMap()
+    ): Map<String, Any?> = astFactory.createClassDeclaration(name, members, typeParameters, parentEntities, modifiers).astToMap()
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) =
             astFactory.createObjectLiteral(members).astToMap()

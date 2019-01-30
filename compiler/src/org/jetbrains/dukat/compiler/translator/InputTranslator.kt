@@ -1,15 +1,15 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
-import org.jetbrains.dukat.compiler.lowerings.introduceMemberNodes
+import org.jetbrains.dukat.compiler.lowerings.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
@@ -27,7 +27,7 @@ private fun DocumentRootDeclaration.updateContext(astContext: AstContext): Docum
         if (declaration is InterfaceDeclaration) {
             astContext.registerInterface(declaration)
         }
-        if (declaration is ClassDeclaration) {
+        if (declaration is ClassNode) {
             astContext.registerClass(declaration)
         }
         if (declaration is DocumentRootDeclaration) {
@@ -52,7 +52,7 @@ interface InputTranslator {
         return documentRoot
                 .filterOutNonDeclarations()
                 .lowerObjectLiterals()
-                .introduceMemberNodes()
+                .introduceNodes()
                 .eliminateStringType()
                 .lowerConstructors()
                 .lowerNativeArray()

@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
@@ -17,12 +16,13 @@ import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 
 interface Lowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration
-    fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration
+    fun lowerClassNode(declaration: ClassNode): ClassNode
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
@@ -48,16 +48,16 @@ interface Lowering {
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
         return when (declaration) {
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
-            is ClassDeclaration -> lowerClassDeclaration(declaration)
+            is ClassNode -> lowerClassNode(declaration)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration) : TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-            is ClassDeclaration -> lowerClassDeclaration(declaration)
+            is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
@@ -65,7 +65,7 @@ interface Lowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>) : List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(declaration)
         }
