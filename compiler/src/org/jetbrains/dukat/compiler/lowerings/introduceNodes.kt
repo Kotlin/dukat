@@ -127,7 +127,7 @@ private fun ClassDeclaration.convert() : ClassNode {
         members,
         typeParameters,
         parentEntities,
-        primaryConstructor
+        null
     )
 }
 

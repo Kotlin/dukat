@@ -5,6 +5,5 @@ data class ClassDeclaration(
         val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
-        val primaryConstructor: ConstructorDeclaration? = null,
         val modifiers: List<ModifierDeclaration>
 ) : ClassLikeDeclaration
