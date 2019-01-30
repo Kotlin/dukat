@@ -10,9 +10,10 @@ import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 
-fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
+private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
     return params.map { param ->
         val type = param.type
         if (type is DynamicTypeNode) {
@@ -27,19 +28,39 @@ fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDec
 
 private class SpecifyDynamicTypesLowering : IdentityLowering {
 
-    fun specifyDynamicParams(declaration: FunctionDeclaration): List<FunctionDeclaration> {
-        val specifyParams = specifyArguments(declaration.parameters)
-        val listOfParams = cartesian(*specifyParams.toTypedArray())
+    fun generateParams(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
+        val specifyParams = specifyArguments(params)
+        return cartesian(*specifyParams.toTypedArray())
+    }
 
-        return listOfParams.map { params ->
+    fun generateFunctionDeclarations(declaration: FunctionDeclaration): List<FunctionDeclaration> {
+        return generateParams(declaration.parameters).map { params ->
             declaration.copy(parameters = params)
         }
+    }
+
+    fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
+        val hasDynamic = declaration.parameters.any { (it.type is DynamicTypeNode) }
+
+        return generateParams(declaration.parameters).map { params ->
+            declaration.copy(parameters = params, generated = hasDynamic)
+        }
+    }
+
+    override fun lowerClassNode(declaration: ClassNode): ClassNode {
+        val members = declaration.members.map {member ->
+            when(member) {
+                is ConstructorNode -> generateConstructors(member)
+                else -> listOf(member)
+            }
+        }.flatten()
+        return declaration.copy(members = members)
     }
 
     fun lowerTopLevelDeclarationList(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
-            is FunctionDeclaration -> specifyDynamicParams(declaration)
+            is FunctionDeclaration -> generateFunctionDeclarations(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceDeclaration -> listOf(lowerInterfaceDeclaration(declaration))
             is DocumentRootDeclaration -> listOf(lowerDocumentRoot(declaration))

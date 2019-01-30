@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
 import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
@@ -14,6 +13,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
@@ -41,6 +41,7 @@ interface ParameterValueLowering : Lowering {
         return when (declaration) {
             is MethodNode -> lowerMethodNode(declaration)
             is PropertyNode -> lowerPropertyNode(declaration)
+            is ConstructorNode -> lowerConstructorNode(declaration)
             else -> {
                 println("[WARN] skipping ${declaration}")
                 declaration
@@ -92,7 +93,8 @@ interface ParameterValueLowering : Lowering {
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
 
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members
+                = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     //TODO: to introduce heritage visitor
                     val typeArguments = heritageClause.typeArguments.map {
@@ -111,20 +113,18 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
     }
 
-    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
+    fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
-                },
-                type = lowerParameterValue(declaration.type)
+                }
         )
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
-                primaryConstructor = declaration.primaryConstructor?.let { lowerConstructorDeclaration(it) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     //TODO: to introduce heritage visitor
                     val typeArguments = heritageClause.typeArguments.map {

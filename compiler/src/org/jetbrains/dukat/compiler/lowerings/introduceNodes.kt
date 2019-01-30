@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
 import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
+import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
 import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
 import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
@@ -20,11 +21,12 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 
 private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-private fun PropertyDeclaration.isStatic() =  modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
 private fun PropertyDeclaration.convert(owner: ClassLikeDeclaration): PropertyNode {
     return PropertyNode(
@@ -54,7 +56,7 @@ private fun CallSignatureDeclaration.convert(owner: ClassLikeDeclaration): Metho
 }
 
 private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclaration {
-    return when(this) {
+    return when (this) {
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
         else -> duplicate()
@@ -121,13 +123,20 @@ private fun MethodSignatureDeclaration.convert(owner: ClassLikeDeclaration): Mem
     }
 }
 
-private fun ClassDeclaration.convert() : ClassNode {
+private fun ClassDeclaration.convert(): ClassNode {
     return ClassNode(
-        name,
-        members,
-        typeParameters,
-        parentEntities,
-        null
+            name,
+            members,
+            typeParameters,
+            parentEntities,
+            null
+    )
+}
+
+private fun ConstructorDeclaration.convert(owner: ClassLikeDeclaration): ConstructorNode {
+    return ConstructorNode(
+            parameters,
+            typeParameters
     )
 }
 
@@ -149,6 +158,7 @@ private class LowerDeclarationsToNodes {
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(declaration.convert(owner))
             is IndexSignatureDeclaration -> declaration.convert(owner)
+            is ConstructorDeclaration -> listOf(declaration.convert(owner))
             else -> listOf(declaration)
         }
     }
@@ -165,7 +175,7 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration) : TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
             is ClassDeclaration -> lowerClassNode(declaration.convert())
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)

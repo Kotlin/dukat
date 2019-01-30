@@ -54,7 +54,6 @@ interface InputTranslator {
                 .lowerObjectLiterals()
                 .introduceNodes()
                 .eliminateStringType()
-                .lowerConstructors()
                 .lowerNativeArray()
                 .lowerNullable()
                 .lowerPrimitives()
@@ -67,6 +66,6 @@ interface InputTranslator {
                 .lowerTypeAliases(myAstContext)
                 .lowerOverrides(myAstContext)
                 .specifyDynamicTypes()
-
+                .lowerConstructors()
     }
 }

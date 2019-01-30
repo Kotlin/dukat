@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
 import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -174,6 +175,11 @@ private fun MethodNode.translate(): List<String> {
     return annotations.toMutableList() + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType} = definedExternally")
 }
 
+private fun ConstructorNode.translate(): List<String> {
+    var typeParams = translateTypeParameters(typeParameters)
+    return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
+}
+
 private fun VariableDeclaration.translate(): String {
     return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
@@ -188,6 +194,8 @@ private fun MemberDeclaration.translate(isStatic: Boolean = false): List<String>
         return translate()
     } else if (this is PropertyNode) {
         return listOf(translate())
+    } else if (this is ConstructorNode) {
+        return translate()
     } else {
         throw Exception("can not translate ${this}")
     }
