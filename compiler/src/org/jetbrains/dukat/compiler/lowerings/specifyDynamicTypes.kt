@@ -12,7 +12,6 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
@@ -27,17 +26,6 @@ private fun specifyArguments(params: List<ParameterDeclaration>): List<List<Para
     }
 }
 
-private fun specifyReturnTypes(type: ParameterValueDeclaration): List<ParameterValueDeclaration> {
-        val type = type
-        return if (type is DynamicTypeNode) {
-            val projectedType = type.projectedType
-            if (projectedType is UnionTypeDeclaration) {
-                projectedType.params
-            } else listOf(type)
-        } else listOf(type)
-}
-
-
 private class SpecifyDynamicTypesLowering : IdentityLowering {
 
     fun generateParams(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
@@ -46,13 +34,9 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     fun generateFunctionDeclarations(declaration: FunctionDeclaration): List<FunctionDeclaration> {
-        val returnTypes = specifyReturnTypes(declaration.type)
-
         return generateParams(declaration.parameters).map { params ->
-            returnTypes.map {returnType ->
-                declaration.copy(parameters = params, type = returnType)
-            }
-        }.flatten()
+                declaration.copy(parameters = params)
+        }
     }
 
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
@@ -64,19 +48,25 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     fun generateMethods(declaration: MethodNode): List<MethodNode> {
-        val returnTypes = specifyReturnTypes(declaration.type)
-
         return generateParams(declaration.parameters).map { params ->
-            returnTypes.map {returnType ->
-                declaration.copy(parameters = params, type = returnType)
-            }
-        }.flatten()
+                declaration.copy(parameters = params)
+        }
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         val members = declaration.members.map {member ->
             when(member) {
                 is ConstructorNode -> generateConstructors(member)
+                is MethodNode -> generateMethods(member)
+                else -> listOf(member)
+            }
+        }.flatten()
+        return declaration.copy(members = members)
+    }
+
+    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
+        val members = declaration.members.map {member ->
+            when(member) {
                 is MethodNode -> generateMethods(member)
                 else -> listOf(member)
             }
