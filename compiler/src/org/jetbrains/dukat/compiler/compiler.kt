@@ -21,6 +21,7 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
@@ -85,13 +86,20 @@ private fun ParameterValueDeclaration.translate(): String {
         }
         return translated
     } else if (this is DynamicTypeNode) {
-        return "dynamic"
+        return translate()
     } else if (this is GeneratedInterfaceReferenceNode) {
         return name
     } else {
         return "failed to translateType ${this}"
-        //throw Exception("failed to translateType ${this}")
     }
+}
+
+private fun DynamicTypeNode.translate(): String {
+    val meta = if (projectedType is UnionTypeDeclaration) {
+        val metaBody = (projectedType as UnionTypeDeclaration).params.map { it.translate() }.joinToString(" | ")
+        "/* ${metaBody} */"
+    } else ""
+    return "dynamic ${meta}"
 }
 
 
