@@ -1,18 +1,18 @@
 package org.jetbrains.dukat.ast.j2v8
 
-import org.jetbrains.dukat.ast.astToMap
-import org.jetbrains.dukat.ast.factory.AstFactory
-import org.jetbrains.dukat.ast.factory.AstNodeFactory
 import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.converters.astToMap
+import org.jetbrains.dukat.tsmodel.factory.AstFactory
+import org.jetbrains.dukat.tsmodel.factory.AstNodeFactory
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 

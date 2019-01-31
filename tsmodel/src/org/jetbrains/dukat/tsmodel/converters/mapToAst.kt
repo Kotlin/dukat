@@ -1,10 +1,10 @@
-package org.jetbrains.dukat.ast
+package org.jetbrains.dukat.tsmodel.converters
 
 import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.astCommon.Declaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -68,17 +68,17 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
             getEntities("params")
         )
         TokenDeclaration::class.simpleName -> TokenDeclaration(
-           get("value") as String
+                get("value") as String
         )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
-            get(HeritageClauseDeclaration::name.name) as String,
-            getEntities(HeritageClauseDeclaration::typeArguments.name),
-            get(HeritageClauseDeclaration::extending.name) as Boolean
+                get(HeritageClauseDeclaration::name.name) as String,
+                getEntities(HeritageClauseDeclaration::typeArguments.name),
+                get(HeritageClauseDeclaration::extending.name) as Boolean
         )
         TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
-            get("aliasName") as String,
-            getEntities("typeParameters"),
-            getEntity("typeReference")
+                get("aliasName") as String,
+                getEntities("typeParameters"),
+                getEntity("typeReference")
         )
         StringTypeDeclaration::class.simpleName -> StringTypeDeclaration(
                 get(StringTypeDeclaration::tokens.name) as List<String>

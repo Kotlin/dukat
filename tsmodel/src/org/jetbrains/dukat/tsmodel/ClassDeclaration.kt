@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.tsmodel
 
+import org.jetbrains.dukat.astCommon.MemberDeclaration
+
 data class ClassDeclaration(
         override val name: String,
         val members: List<MemberDeclaration>,

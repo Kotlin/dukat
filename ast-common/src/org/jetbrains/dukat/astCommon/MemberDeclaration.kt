@@ -1,3 +1,3 @@
-package org.jetbrains.dukat.tsmodel
+package org.jetbrains.dukat.astCommon
 
 interface MemberDeclaration : Declaration

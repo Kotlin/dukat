@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast
+package org.jetbrains.dukat.tsmodel.converters
 
 import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
