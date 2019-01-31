@@ -4,11 +4,11 @@ import cartesian
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -33,7 +33,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
         return cartesian(*specifyParams.toTypedArray())
     }
 
-    fun generateFunctionDeclarations(declaration: FunctionDeclaration): List<FunctionDeclaration> {
+    fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
         return generateParams(declaration.parameters).map { params ->
                 declaration.copy(parameters = params)
         }
@@ -77,7 +77,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     fun lowerTopLevelDeclarationList(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
-            is FunctionDeclaration -> generateFunctionDeclarations(declaration)
+            is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
             is DocumentRootDeclaration -> listOf(lowerDocumentRoot(declaration))

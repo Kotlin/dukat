@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -12,7 +13,6 @@ import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -158,7 +158,7 @@ private fun translateParameters(parameters: List<ParameterDeclaration>, needsMet
             .joinToString(", ")
 }
 
-private fun FunctionDeclaration.translate(): String {
+private fun FunctionNode.translate(): String {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -305,7 +305,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
             res.addAll(children)
         } else if (declaration is VariableDeclaration) {
             res.add(declaration.translate())
-        } else if (declaration is FunctionDeclaration) {
+        } else if (declaration is FunctionNode) {
             res.add(declaration.translate())
         } else if (declaration is ClassNode) {
             val primaryConstructor = declaration.primaryConstructor

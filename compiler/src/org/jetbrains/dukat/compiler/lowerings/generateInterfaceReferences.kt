@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
@@ -16,8 +17,17 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
     private fun ParameterValueDeclaration.generateInterface(owner: ClassLikeNode): ParameterValueDeclaration {
         return when (this) {
             is ObjectLiteralDeclaration -> {
-                val referenceNode = astContext.registerObjectLiteralDeclaration(this)
-                owner.generatedReferenceNodes.add(referenceNode)
+                val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
+                referenceNode
+            }
+            else -> this
+        }
+    }
+
+    private fun ParameterValueDeclaration.generateInterface(owner: FunctionNode): ParameterValueDeclaration {
+        return when (this) {
+            is ObjectLiteralDeclaration -> {
+                val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
                 referenceNode
             }
             else -> this
@@ -37,6 +47,11 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
         return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration) })
     }
 
+    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
+        return declaration.copy(parameters = declaration.parameters.map { param ->
+            param.copy(type = param.type.generateInterface(declaration))
+        })
+    }
 }
 
 fun DocumentRootDeclaration.generateInterfaceReferences(astContext: AstContext): DocumentRootDeclaration {

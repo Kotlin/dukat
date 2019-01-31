@@ -2,9 +2,9 @@ package org.jetbrains.dukat.compiler.converters
 
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
@@ -13,7 +13,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
-fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLikeDeclaration): PropertyNode {
+fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLikeNode): PropertyNode {
     return PropertyNode(
             declaration.name,
             if (declaration.optional) declaration.type.makeNullable() else declaration.type,
@@ -28,7 +28,7 @@ fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLik
 }
 
 
-fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: ClassLikeDeclaration): List<MethodNode> {
+fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: ClassLikeNode): List<MethodNode> {
     return listOf(
             MethodNode(
                     "get",

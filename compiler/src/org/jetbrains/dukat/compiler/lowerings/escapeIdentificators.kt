@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
@@ -25,7 +25,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
+    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 }

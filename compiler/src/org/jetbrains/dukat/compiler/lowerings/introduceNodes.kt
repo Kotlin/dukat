@@ -2,8 +2,10 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -13,7 +15,6 @@ import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -28,7 +29,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
-private fun CallSignatureDeclaration.convert(owner: ClassLikeDeclaration): MethodNode {
+private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
     return MethodNode(
             "invoke",
             parameters,
@@ -50,8 +51,7 @@ private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclarati
 }
 
 
-
-private fun MethodSignatureDeclaration.convert(owner: ClassLikeDeclaration): MemberDeclaration {
+private fun MethodSignatureDeclaration.convert(owner: ClassLikeNode): MemberDeclaration {
     return if (optional) {
         PropertyNode(
                 name,
@@ -102,15 +102,25 @@ private fun InterfaceDeclaration.convert(): InterfaceNode {
     )
 }
 
-private fun ConstructorDeclaration.convert(owner: ClassLikeDeclaration): ConstructorNode {
+private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNode {
     return ConstructorNode(
             parameters,
             typeParameters
     )
 }
 
+private fun FunctionDeclaration.convert(): FunctionNode {
+    return FunctionNode(
+        name,
+        parameters,
+        type,
+        typeParameters,
+        mutableListOf()
+    )
+}
+
 private class LowerDeclarationsToNodes {
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): List<MemberDeclaration> {
+    fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeNode): List<MemberDeclaration> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
@@ -146,6 +156,7 @@ private class LowerDeclarationsToNodes {
 
     fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
+            is FunctionDeclaration -> declaration.convert()
             is ClassDeclaration -> lowerClassNode(declaration.convert())
             is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)

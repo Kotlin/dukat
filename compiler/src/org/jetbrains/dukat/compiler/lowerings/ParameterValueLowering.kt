@@ -2,11 +2,11 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -53,7 +53,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member) })
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
+    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->

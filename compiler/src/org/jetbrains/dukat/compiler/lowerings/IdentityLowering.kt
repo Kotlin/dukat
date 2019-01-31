@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -16,7 +16,7 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 interface IdentityLowering : Lowering {
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration = declaration
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration = declaration
+    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode = declaration
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode = declaration
 
