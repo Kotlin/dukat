@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLowering {
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {

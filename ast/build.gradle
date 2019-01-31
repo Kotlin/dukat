@@ -5,3 +5,8 @@ plugins {
 sourceSets {
     main.kotlin.srcDirs = ['src']
 }
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":tsmodel"))
+}

@@ -1,32 +1,33 @@
 package org.jetbrains.dukat.ast
 
-import org.jetbrains.dukat.ast.model.AstNode
-import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
-import org.jetbrains.dukat.ast.model.declaration.Declaration
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
+import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.TokenDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+
 
 @Suppress("UNCHECKED_CAST")
-private fun <T:AstNode> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
+private fun <T: AstNode> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getEntitiesList(key: String) = get(key) as List<Map<String, Any?>>

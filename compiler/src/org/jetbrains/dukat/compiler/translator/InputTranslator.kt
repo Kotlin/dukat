@@ -1,9 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
@@ -21,6 +18,9 @@ import org.jetbrains.dukat.compiler.lowerings.lowerTypeAliases
 import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 
 private fun DocumentRootDeclaration.updateContext(astContext: AstContext): DocumentRootDeclaration {
     for (declaration in declarations) {

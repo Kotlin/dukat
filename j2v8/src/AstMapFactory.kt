@@ -3,17 +3,18 @@ package org.jetbrains.dukat.ast.j2v8
 import org.jetbrains.dukat.ast.astToMap
 import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.factory.AstNodeFactory
-import org.jetbrains.dukat.ast.model.AstNode
-import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
+import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TokenDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
     override fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).astToMap()

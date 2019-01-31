@@ -1,18 +1,6 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.AstContext
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -21,6 +9,18 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TokenDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 

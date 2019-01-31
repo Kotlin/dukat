@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class PropertyNode(
         val name: String,

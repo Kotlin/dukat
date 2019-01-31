@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ast
 
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
     return (aliasName == heritageClause.name) && (typeParameters == heritageClause.typeArguments)

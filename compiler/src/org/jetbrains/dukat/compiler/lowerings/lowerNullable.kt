@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.makeNullable
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
 private class LowerNullable : ParameterValueLowering {

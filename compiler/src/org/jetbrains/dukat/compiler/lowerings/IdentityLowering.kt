@@ -1,17 +1,17 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface IdentityLowering : Lowering {
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration = declaration

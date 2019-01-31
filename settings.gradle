@@ -27,9 +27,11 @@ gradle.ext {
 }
 
 include 'ast'
+include 'ast-common'
 include 'compiler'
 include 'itertools'
 include 'interop'
 include 'j2v8'
 include 'nashorn'
 include 'ts'
+include 'tsmodel'

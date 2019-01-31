@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 private fun mapPrimitiveValue(value: String): String {

@@ -5,13 +5,13 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.factory.AstFactory
 import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
 import org.jetbrains.dukat.ast.toAst
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 
 
 private fun readResource(name: String): String {

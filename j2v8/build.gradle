@@ -10,6 +10,8 @@ dependencies {
   implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
 
   implementation(project(":ast"))
+  implementation(project(":ast-common"))
+  implementation(project(":tsmodel"))
 
   // TODO: if you make this implementation it's fail - I believe it's a bug
   compile(project(":interop"))

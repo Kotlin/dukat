@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.declaration.ClassLikeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
 data class ClassNode(
         override val name: String,

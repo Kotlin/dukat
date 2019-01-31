@@ -20,6 +20,8 @@ dependencies {
   implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
 
   implementation(project(":ast"))
+  implementation(project(":ast-common"))
+  implementation(project(":tsmodel"))
   implementation(project(":itertools"))
 
   implementation(project(":nashorn"))

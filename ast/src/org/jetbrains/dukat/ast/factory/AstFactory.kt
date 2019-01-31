@@ -1,47 +1,43 @@
 package org.jetbrains.dukat.ast.factory
 
-import org.jetbrains.dukat.ast.model.AstNode
-import org.jetbrains.dukat.ast.model.declaration.CallSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ClassDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ConstructorDeclaration
-import org.jetbrains.dukat.ast.model.declaration.DocumentRootDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ExpressionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.FunctionDeclaration
-import org.jetbrains.dukat.ast.model.declaration.HeritageClauseDeclaration
-import org.jetbrains.dukat.ast.model.declaration.InterfaceDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.MethodSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ModifierDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.PropertyDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TokenDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeAliasDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.VariableDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.FunctionTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.StringTypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TopLevelDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.TypeDeclaration
-import org.jetbrains.dukat.ast.model.declaration.types.UnionTypeDeclaration
+import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.TokenDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 
-    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean)
-        = HeritageClauseDeclaration(name, typeArguments, extending)
+    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration)
-        = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration) = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
 
-    override fun createStringTypeDeclaration(tokens: List<String>)
-        = StringTypeDeclaration(tokens)
+    override fun createStringTypeDeclaration(tokens: List<String>) = StringTypeDeclaration(tokens)
 
-    override fun createIndexSignatureDeclaration(indexTypes: List<ParameterDeclaration>, returnType: ParameterValueDeclaration)
-            = IndexSignatureDeclaration(indexTypes, returnType)
+    override fun createIndexSignatureDeclaration(indexTypes: List<ParameterDeclaration>, returnType: ParameterValueDeclaration) = IndexSignatureDeclaration(indexTypes, returnType)
 
     override fun createCallSignatureDeclaration(
             parameters: List<ParameterDeclaration>,
@@ -74,8 +70,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = ExpressionDeclaration(kind, meta)
 
-    override fun createConstructorDeclaration(parameters: List<ParameterDeclaration>, type: ParameterValueDeclaration, typeParameters: List<TypeParameterDeclaration>, modifiers: List<ModifierDeclaration>)
-        = ConstructorDeclaration(parameters, type, typeParameters, modifiers)
+    override fun createConstructorDeclaration(parameters: List<ParameterDeclaration>, type: ParameterValueDeclaration, typeParameters: List<TypeParameterDeclaration>, modifiers: List<ModifierDeclaration>) = ConstructorDeclaration(parameters, type, typeParameters, modifiers)
 
     override fun createFunctionDeclaration(
             name: String,
@@ -87,8 +82,7 @@ class AstFactory : AstNodeFactory<AstNode> {
         return FunctionDeclaration(name, parameters.toList(), type, typeParameters.toList(), modifiers)
     }
 
-    override fun createMethodSignatureDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration, typeParameters: Array<TypeParameterDeclaration>, optional: Boolean, modifiers: List<ModifierDeclaration>)
-        = MethodSignatureDeclaration(name, parameters.toList(), type, typeParameters.toList(), optional, modifiers)
+    override fun createMethodSignatureDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration, typeParameters: Array<TypeParameterDeclaration>, optional: Boolean, modifiers: List<ModifierDeclaration>) = MethodSignatureDeclaration(name, parameters.toList(), type, typeParameters.toList(), optional, modifiers)
 
     override fun createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration) = FunctionTypeDeclaration(parameters.toList(), type)
 

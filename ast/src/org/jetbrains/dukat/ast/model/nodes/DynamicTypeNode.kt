@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.declaration.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class DynamicTypeNode(
         val projectedType: ParameterValueDeclaration,

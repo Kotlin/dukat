@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.declaration.MemberDeclaration
-import org.jetbrains.dukat.ast.model.declaration.ParameterDeclaration
-import org.jetbrains.dukat.ast.model.declaration.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
 data class ConstructorNode(
         val parameters: List<ParameterDeclaration>,
