@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -20,7 +20,7 @@ interface IdentityLowering : Lowering {
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode = declaration
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration = declaration
+    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode = declaration
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration = declaration
 

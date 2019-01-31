@@ -12,7 +12,7 @@ data class MethodNode(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
 
-        val owner: ClassLikeDeclaration,
+        var owner: ClassLikeDeclaration,
         val static: Boolean,
         val override: Boolean,
         val operator: Boolean,

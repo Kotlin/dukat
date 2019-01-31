@@ -4,13 +4,15 @@ import cartesian
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
@@ -25,6 +27,16 @@ private fun specifyArguments(params: List<ParameterDeclaration>): List<List<Para
     }
 }
 
+private fun specifyReturnTypes(type: ParameterValueDeclaration): List<ParameterValueDeclaration> {
+        val type = type
+        return if (type is DynamicTypeNode) {
+            val projectedType = type.projectedType
+            if (projectedType is UnionTypeDeclaration) {
+                projectedType.params
+            } else listOf(type)
+        } else listOf(type)
+}
+
 
 private class SpecifyDynamicTypesLowering : IdentityLowering {
 
@@ -34,9 +46,13 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     fun generateFunctionDeclarations(declaration: FunctionDeclaration): List<FunctionDeclaration> {
+        val returnTypes = specifyReturnTypes(declaration.type)
+
         return generateParams(declaration.parameters).map { params ->
-            declaration.copy(parameters = params)
-        }
+            returnTypes.map {returnType ->
+                declaration.copy(parameters = params, type = returnType)
+            }
+        }.flatten()
     }
 
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
@@ -47,10 +63,21 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
         }
     }
 
+    fun generateMethods(declaration: MethodNode): List<MethodNode> {
+        val returnTypes = specifyReturnTypes(declaration.type)
+
+        return generateParams(declaration.parameters).map { params ->
+            returnTypes.map {returnType ->
+                declaration.copy(parameters = params, type = returnType)
+            }
+        }.flatten()
+    }
+
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         val members = declaration.members.map {member ->
             when(member) {
                 is ConstructorNode -> generateConstructors(member)
+                is MethodNode -> generateMethods(member)
                 else -> listOf(member)
             }
         }.flatten()
@@ -62,7 +89,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> generateFunctionDeclarations(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
-            is InterfaceDeclaration -> listOf(lowerInterfaceDeclaration(declaration))
+            is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
             is DocumentRootDeclaration -> listOf(lowerDocumentRoot(declaration))
             is TypeAliasDeclaration -> listOf(lowerTypeAliasDeclaration(declaration))
             else -> listOf(declaration)

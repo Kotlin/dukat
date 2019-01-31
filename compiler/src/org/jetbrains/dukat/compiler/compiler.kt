@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.AstContext
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
@@ -12,7 +13,6 @@ import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -86,6 +86,8 @@ private fun ParameterValueDeclaration.translate(): String {
         return translated
     } else if (this is DynamicTypeNode) {
         return "dynamic"
+    } else if (this is GeneratedInterfaceReferenceNode) {
+        return name
     } else {
         return "failed to translateType ${this}"
         //throw Exception("failed to translateType ${this}")
@@ -333,7 +335,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
                 res.add("}")
             }
 
-        } else if (declaration is InterfaceDeclaration) {
+        } else if (declaration is InterfaceNode) {
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->

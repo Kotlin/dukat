@@ -292,7 +292,7 @@ class AstConverter {
         )
     }
 
-    convertTypeElementToMethoSignatureDeclaration(methodDeclaration: ts.MethodSignature) : MethodSignatureDeclaration | null {
+    convertTypeElementToMethodSignatureDeclaration(methodDeclaration: ts.MethodSignature) : MethodSignatureDeclaration | null {
         let convertedMethodDeclaration = this.convertMethodSignatureDeclaration(methodDeclaration);
         if (convertedMethodDeclaration != null) {
             return convertedMethodDeclaration
@@ -335,7 +335,7 @@ class AstConverter {
     convertTypeElementToInterfaceMemberDeclarations(member: ts.TypeElement) : Array<MemberDeclaration> {
         let  res: Array<MemberDeclaration> = [];
         if (ts.isMethodSignature(member)) {
-            let methodDeclaration = this.convertTypeElementToMethoSignatureDeclaration(member);
+            let methodDeclaration = this.convertTypeElementToMethodSignatureDeclaration(member);
             if (methodDeclaration) {
                 res.push(methodDeclaration);
             }

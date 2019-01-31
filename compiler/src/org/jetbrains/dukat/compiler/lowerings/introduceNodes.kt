@@ -1,14 +1,16 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
-import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
+import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -18,7 +20,6 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
@@ -26,21 +27,6 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-
-private fun PropertyDeclaration.convert(owner: ClassLikeDeclaration): PropertyNode {
-    return PropertyNode(
-            name,
-            if (optional) type.makeNullable() else type,
-            typeParameters,
-
-            owner,
-            isStatic(),
-            false,
-            optional,
-            optional  // TODO: it's actually wrong
-    )
-}
 
 private fun CallSignatureDeclaration.convert(owner: ClassLikeDeclaration): MethodNode {
     return MethodNode(
@@ -63,32 +49,6 @@ private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclarati
     }
 }
 
-private fun IndexSignatureDeclaration.convert(owner: ClassLikeDeclaration): List<MethodNode> {
-    return listOf(
-            MethodNode(
-                    "get",
-                    indexTypes,
-                    returnType.makeNullable(),
-                    emptyList(),
-                    owner,
-                    false,
-                    false,
-                    true,
-                    listOf(AnnotationNode("nativeGetter"))
-            ),
-            MethodNode(
-                    "set",
-                    indexTypes.toMutableList() + listOf(ParameterDeclaration("value", returnType, null, false, false)),
-                    TypeDeclaration("Unit", emptyList()),
-                    emptyList(),
-                    owner,
-                    false,
-                    false,
-                    true,
-                    listOf(AnnotationNode("nativeSetter"))
-            )
-    )
-}
 
 
 private fun MethodSignatureDeclaration.convert(owner: ClassLikeDeclaration): MemberDeclaration {
@@ -133,6 +93,15 @@ private fun ClassDeclaration.convert(): ClassNode {
     )
 }
 
+private fun InterfaceDeclaration.convert(): InterfaceNode {
+    return InterfaceNode(
+            name,
+            members,
+            typeParameters,
+            parentEntities
+    )
+}
+
 private fun ConstructorDeclaration.convert(owner: ClassLikeDeclaration): ConstructorNode {
     return ConstructorNode(
             parameters,
@@ -156,14 +125,14 @@ private class LowerDeclarationsToNodes {
             ))
             is MethodSignatureDeclaration -> listOf(declaration.convert(owner))
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
-            is PropertyDeclaration -> listOf(declaration.convert(owner))
-            is IndexSignatureDeclaration -> declaration.convert(owner)
+            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
+            is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
             is ConstructorDeclaration -> listOf(declaration.convert(owner))
             else -> listOf(declaration)
         }
     }
 
-    fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
+    fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
         return declaration.copy(
                 members = declaration.members.flatMap { member -> lowerMemberDeclaration(member, declaration) }
         )
@@ -178,7 +147,7 @@ private class LowerDeclarationsToNodes {
     fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
             is ClassDeclaration -> lowerClassNode(declaration.convert())
-            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
             else -> declaration
         }

@@ -3,12 +3,12 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -23,7 +23,7 @@ interface Lowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration
     fun lowerClassNode(declaration: ClassNode): ClassNode
-    fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration
+    fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
@@ -40,14 +40,14 @@ interface Lowering {
             is ObjectLiteralDeclaration -> lowerObjectLiteral(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
             is DynamicTypeNode -> declaration
-            else -> throw Exception("can not lowerParameterValue unknown ParameterValueDeclaration subtype:  ${this} : ${declaration}")
+            else -> declaration
         }
     }
 
 
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
         return when (declaration) {
-            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
+            is InterfaceNode -> lowerInterfaceNode(declaration)
             is ClassNode -> lowerClassNode(declaration)
             else -> declaration
         }
@@ -58,7 +58,6 @@ interface Lowering {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
-            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
             else -> declaration.duplicate()
