@@ -12,6 +12,7 @@ import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 private class GenerateInterfaceReferences(private val astContext: AstContext) : IdentityLowering {
@@ -19,8 +20,12 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
     private fun ParameterValueDeclaration.generateInterface(owner: ClassLikeNode): ParameterValueDeclaration {
         return when (this) {
             is ObjectLiteralDeclaration -> {
-                val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
-                referenceNode
+                if (members.isEmpty()) {
+                    TypeDeclaration("Any", emptyList())
+                } else {
+                    val  referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
+                    referenceNode
+                }
             }
             else -> this
         }
@@ -29,8 +34,12 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
     private fun ParameterValueDeclaration.generateInterface(owner: FunctionNode): ParameterValueDeclaration {
         return when (this) {
             is ObjectLiteralDeclaration -> {
-                val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
-                referenceNode
+                if (members.isEmpty()) {
+                    TypeDeclaration("Any", emptyList())
+                } else {
+                    val  referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
+                    referenceNode
+                }
             }
             else -> this
         }
