@@ -14,5 +14,7 @@ data class PropertyNode(
         val override: Boolean,
 
         val getter: Boolean,
-        val setter: Boolean
+        val setter: Boolean,
+
+        val open: Boolean
 ) : MemberDeclaration

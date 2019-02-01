@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLowering {
@@ -23,7 +23,7 @@ private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLower
         return declaration.copy(parentEntities = parentEntitiesRemapped)
     }
 
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+    override fun lowerVariableNode(declaration: VariableNode): VariableNode {
         val resolved = astContext.resolveTypeAlias(declaration.type)
         val type = if (resolved is TypeDeclaration) {
             resolved

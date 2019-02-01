@@ -6,12 +6,12 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -86,7 +86,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+    override fun lowerVariableNode(declaration: VariableNode): VariableNode {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 

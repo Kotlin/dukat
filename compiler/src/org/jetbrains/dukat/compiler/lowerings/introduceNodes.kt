@@ -8,11 +8,15 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
+import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -22,8 +26,10 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -39,7 +45,9 @@ private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
             false,
             false,
             true,
-            listOf(AnnotationNode("nativeInvoke")))
+            listOf(AnnotationNode("nativeInvoke")),
+            true
+    )
 }
 
 private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclaration {
@@ -78,13 +86,14 @@ private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNod
 
 private fun FunctionDeclaration.convert(): FunctionNode {
     return FunctionNode(
-        name,
-        parameters,
-        type,
-        typeParameters,
-        mutableListOf()
+            name,
+            parameters,
+            type,
+            typeParameters,
+            mutableListOf()
     )
 }
+
 
 private class LowerDeclarationsToNodes {
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeNode): List<MemberDeclaration> {
@@ -98,7 +107,8 @@ private class LowerDeclarationsToNodes {
                     declaration.isStatic(),
                     false,
                     false,
-                    emptyList()
+                    emptyList(),
+                    true
             ))
             is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration, owner))
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
@@ -121,8 +131,34 @@ private class LowerDeclarationsToNodes {
         )
     }
 
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
+        return if (declaration.type is ObjectLiteralDeclaration) {
+            //TODO: don't forget to create owner
+            val objectNode = ObjectNode(
+                    declaration.name,
+                    (declaration.type as ObjectLiteralDeclaration).members.flatMap { member -> lowerMemberDeclaration(member, ROOT_CLASS_DECLARATION) },
+                    mutableListOf()
+            )
+
+
+            objectNode.copy(members = objectNode.members.map {
+                when (it) {
+                    is PropertyNode -> it.copy(owner = objectNode, open = false)
+                    is MethodNode -> it.copy(owner = objectNode, open = false)
+                    else -> it
+                }
+            })
+        } else {
+            VariableNode(
+                    declaration.name,
+                    declaration.type
+            )
+        }
+    }
+
     fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
+            is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> declaration.convert()
             is ClassDeclaration -> lowerClassNode(declaration.convert())
             is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())

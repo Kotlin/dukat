@@ -26,7 +26,9 @@ fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLik
             declaration.isStatic(),
             false,
             declaration.optional,
-            declaration.optional  // TODO: it's actually wrong
+            declaration.optional,  // TODO: it's actually wrong
+
+            true
     )
 }
 
@@ -42,7 +44,8 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     false,
                     true,
-                    listOf(AnnotationNode("nativeGetter"))
+                    listOf(AnnotationNode("nativeGetter")),
+                    true
             ),
             MethodNode(
                     "set",
@@ -53,7 +56,8 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     false,
                     true,
-                    listOf(AnnotationNode("nativeSetter"))
+                    listOf(AnnotationNode("nativeSetter")),
+                    true
             )
     )
 }
@@ -74,7 +78,8 @@ fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, o
                 false,
                 false,
                 true,
-                false
+                false,
+                true
         )
     } else {
         MethodNode(
@@ -86,7 +91,8 @@ fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, o
                 false, //TODO: remove static, we don't need it for MethodSignatures
                 false,
                 false,
-                emptyList()
+                emptyList(),
+                true
         )
     }
 }

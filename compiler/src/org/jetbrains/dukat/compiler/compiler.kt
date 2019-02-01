@@ -8,7 +8,9 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.compiler.visitor.PrintStreamVisitor
@@ -16,7 +18,6 @@ import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
@@ -180,7 +181,8 @@ private fun MethodNode.translate(): List<String> {
     val operatorModifier = if (operator) " operator" else ""
     val annotations = annotations.map { "@${it.name}" }
 
-    val overrideClause = if (override) "override" else if (!static) "open" else ""
+    val open = !static  &&  open
+    val overrideClause = if (override) "override" else if (open) "open" else ""
 
     return annotations.toMutableList() + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType} = definedExternally")
 }
@@ -190,16 +192,17 @@ private fun ConstructorNode.translate(): List<String> {
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
-private fun VariableDeclaration.translate(): String {
+private fun VariableNode.translate(): String {
     return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun PropertyNode.translate(): String {
-    val modifier = if (override) "override" else if (!static) "open" else ""
+    val open = !static  &&  open
+    val modifier = if (override) "override" else if (open) "open" else ""
     return "${modifier} var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
-private fun MemberDeclaration.translate(isStatic: Boolean = false): List<String> {
+private fun MemberDeclaration.translate(): List<String> {
     if (this is MethodNode) {
         return translate()
     } else if (this is PropertyNode) {
@@ -303,7 +306,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
                 res.add("@file:JsQualifier(\"${unquote(declaration.packageName)}\")")
             }
             res.addAll(children)
-        } else if (declaration is VariableDeclaration) {
+        } else if (declaration is VariableNode) {
             res.add(declaration.translate())
         } else if (declaration is FunctionNode) {
             res.add(declaration.translate())
@@ -331,9 +334,28 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
 
             if (staticMembers.isNotEmpty()) {
                 res.add("    companion object {")
-                res.addAll(staticMembers.flatMap { it.translate(true) }.map({ "       ${it}" }))
+                res.addAll(staticMembers.flatMap { it.translate() }.map({ "       ${it}" }))
                 res.add("    }")
             }
+
+            if (hasMembers) {
+                res.addAll(members.flatMap { it.translate() }.map({ "    $it" }))
+            }
+
+            if (isBlock) {
+                res.add("}")
+            }
+
+        } else if (declaration is ObjectNode) {
+
+            val classDeclaration = "external object ${declaration.name}"
+
+            val members = declaration.members
+
+            val hasMembers = members.isNotEmpty()
+            val isBlock = hasMembers
+
+            res.add(classDeclaration + if (isBlock) " {" else "")
 
             if (hasMembers) {
                 res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
@@ -342,8 +364,7 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
             if (isBlock) {
                 res.add("}")
             }
-
-        } else if (declaration is InterfaceNode) {
+        }  else if (declaration is InterfaceNode) {
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->

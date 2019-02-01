@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
@@ -21,7 +21,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+    override fun lowerVariableNode(declaration: VariableNode): VariableNode {
         return declaration.copy(name = escapeIdentificator(declaration.name))
     }
 

@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -12,7 +13,6 @@ import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -20,7 +20,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface Lowering {
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
+    fun lowerVariableNode(declaration: VariableNode): VariableNode
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
     fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
@@ -55,7 +55,7 @@ interface Lowering {
 
     fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(declaration)
+            is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration)

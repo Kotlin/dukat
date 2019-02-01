@@ -7,11 +7,11 @@ import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
@@ -76,7 +76,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
 
     fun lowerTopLevelDeclarationList(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
-            is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
+            is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))

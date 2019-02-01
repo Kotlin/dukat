@@ -2,6 +2,8 @@ package org.jetbrains.dukat.ast.model
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
@@ -31,10 +33,12 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
         is ClassDeclaration -> copy() as T
+        is ObjectNode -> copy() as T
         is DocumentRootDeclaration -> copy() as T
         is InterfaceDeclaration -> copy() as T
         is InterfaceNode -> copy() as T
         is VariableDeclaration -> copy() as T
+        is VariableNode -> copy() as T
         is FunctionDeclaration -> copy() as T
         is FunctionNode -> copy() as T
         is TypeDeclaration -> copy() as T
