@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -38,6 +39,11 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
 
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeNode): MemberDeclaration {
         return when (declaration) {
+            is ConstructorNode -> declaration.copy(
+                    parameters = declaration.parameters.map { param ->
+                        param.copy(type = param.type.generateInterface(owner))
+                    }
+            )
             is PropertyNode -> declaration.copy(type = declaration.type.generateInterface(owner))
             is MethodNode -> declaration.copy(
                     parameters = declaration.parameters.map { param ->
