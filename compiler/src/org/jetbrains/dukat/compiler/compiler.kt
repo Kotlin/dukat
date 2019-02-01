@@ -348,22 +348,20 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
 
         } else if (declaration is ObjectNode) {
 
-            val classDeclaration = "external object ${declaration.name}"
+            val objectNode = "external object ${declaration.name}"
 
             val members = declaration.members
 
             val hasMembers = members.isNotEmpty()
             val isBlock = hasMembers
 
-            res.add(classDeclaration + if (isBlock) " {" else "")
+            res.add(objectNode + " {")
 
             if (hasMembers) {
                 res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
             }
 
-            if (isBlock) {
-                res.add("}")
-            }
+            res.add("}")
         }  else if (declaration is InterfaceNode) {
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
