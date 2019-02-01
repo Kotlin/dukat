@@ -351,7 +351,6 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
                 }.joinToString(", ")
             } else ""
             res.add("external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (hasMembers) " {" else "")
-
             if (hasMembers) {
                 res.addAll(declaration.members.flatMap { it.translateSignature() }.map { "    " + it })
                 res.add("}")

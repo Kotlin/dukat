@@ -8,10 +8,10 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
+import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -47,39 +47,6 @@ private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclarati
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
         else -> duplicate()
-    }
-}
-
-
-private fun MethodSignatureDeclaration.convert(owner: ClassLikeNode): MemberDeclaration {
-    return if (optional) {
-        PropertyNode(
-                name,
-                FunctionTypeDeclaration(
-                        parameters,
-                        type,
-                        true,
-                        null
-                ),
-                typeParameters,
-                owner,
-                false,
-                false,
-                true,
-                false
-        )
-    } else {
-        MethodNode(
-                name,
-                parameters,
-                type,
-                typeParameters,
-                owner,
-                false, //TODO: remove static, we don't need it for MethodSignatures
-                false,
-                false,
-                emptyList()
-        )
     }
 }
 
@@ -133,7 +100,7 @@ private class LowerDeclarationsToNodes {
                     false,
                     emptyList()
             ))
-            is MethodSignatureDeclaration -> listOf(declaration.convert(owner))
+            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration, owner))
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)

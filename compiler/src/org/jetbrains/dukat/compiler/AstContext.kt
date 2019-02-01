@@ -9,9 +9,11 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
+import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
@@ -31,6 +33,7 @@ private fun MemberDeclaration.convert(owner: ClassLikeNode): List<MemberDeclarat
     return when (this) {
         is PropertyDeclaration -> listOf(convertPropertyDeclaration(this, ROOT_CLASS_DECLARATION))
         is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(this, ROOT_CLASS_DECLARATION)
+        is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(this, ROOT_CLASS_DECLARATION))
         else -> listOf(this)
     }
 }
@@ -112,7 +115,7 @@ class AstContext {
     fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, generatedReferences: MutableList<GeneratedInterfaceReferenceNode>): GeneratedInterfaceReferenceNode {
 
         val name = "`T$${myGeneratedInterfaces.size}`"
-        val interfaceDeclaration =
+        val interfaceNode =
                 InterfaceNode(
                         name,
                         declaration.members.map { member -> member.convert(ROOT_CLASS_DECLARATION) }.flatten(),
@@ -122,18 +125,18 @@ class AstContext {
 
 
         // TODO: this is a weak place and it's better to think about better solution
-        interfaceDeclaration.members.forEach() { member ->
+        interfaceNode.members.forEach() { member ->
             if (member is PropertyNode) {
-                member.owner = interfaceDeclaration
+                member.owner = interfaceNode
             } else if (member is MethodNode) {
-                member.owner = interfaceDeclaration
+                member.owner = interfaceNode
             }
         }
 
 
-        val identicalInterface = findIdenticalInterface(interfaceDeclaration)
+        val identicalInterface = findIdenticalInterface(interfaceNode)
         return if (identicalInterface == null) {
-            myGeneratedInterfaces.put(name, interfaceDeclaration)
+            myGeneratedInterfaces.put(name, interfaceNode)
             val referenceNode = GeneratedInterfaceReferenceNode(name)
             generatedReferences.add(referenceNode)
             referenceNode

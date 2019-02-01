@@ -5,9 +5,12 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -53,4 +56,37 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     listOf(AnnotationNode("nativeSetter"))
             )
     )
+}
+
+
+fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberDeclaration {
+    return if (declaration.optional) {
+        PropertyNode(
+                declaration.name,
+                FunctionTypeDeclaration(
+                        declaration.parameters,
+                        declaration.type,
+                        true,
+                        null
+                ),
+                declaration.typeParameters,
+                owner,
+                false,
+                false,
+                true,
+                false
+        )
+    } else {
+        MethodNode(
+                declaration.name,
+                declaration.parameters,
+                declaration.type,
+                declaration.typeParameters,
+                owner,
+                false, //TODO: remove static, we don't need it for MethodSignatures
+                false,
+                false,
+                emptyList()
+        )
+    }
 }
