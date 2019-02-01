@@ -108,11 +108,12 @@ class AstConverter {
 
         if (nativeModifiers) {
             nativeModifiers.forEach(modifier => {
-
                 if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
                     res.push(this.astFactory.createModifierDeclaration("STATIC"));
                 } else if (modifier.kind == ts.SyntaxKind.DeclareKeyword) {
                     res.push(this.astFactory.createModifierDeclaration("DECLARE"));
+                } else if (modifier.kind == ts.SyntaxKind.ExportKeyword) {
+                    res.push(this.astFactory.createModifierDeclaration("EXPORT"));
                 }
             });
         }

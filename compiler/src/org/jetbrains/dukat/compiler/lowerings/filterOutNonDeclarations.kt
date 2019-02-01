@@ -10,7 +10,8 @@ fun DocumentRootDeclaration.filterOutNonDeclarations(): DocumentRootDeclaration 
     val declarations = declarations.filter { declaration ->
         when (declaration) {
             is ClassDeclaration -> {
-                declaration.modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
+                declaration.modifiers.contains(ModifierDeclaration.EXPORT_KEYWORD) ||
+                        declaration.modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
             }
             else -> true
         }
