@@ -58,9 +58,12 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
     }
 
     override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
-        return declaration.copy(parameters = declaration.parameters.map { param ->
-            param.copy(type = param.type.generateInterface(declaration))
-        })
+        return declaration.copy(
+                parameters = declaration.parameters.map { param ->
+                    param.copy(type = param.type.generateInterface(declaration))
+                },
+                type = declaration.type.generateInterface(declaration)
+        )
     }
 }
 
