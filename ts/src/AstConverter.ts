@@ -552,14 +552,7 @@ class AstConverter {
                     )
                 )
             } else if (ts.isModuleDeclaration(statement)) {
-                if (statement.body) {
-                    let body = statement.body;
-                    if (ts.isModuleBlock(body)) {
-                        let moduleDeclarations = this.convertDeclarations(body.statements);
-                        declarations.push(this.createDocumentRoot(statement.name.getText(), moduleDeclarations));
-                    }
-                }
-
+                this.convertModule(statement).forEach(d => declarations.push(d));
             } else {
                 console.log("SKIPPING ", statement.kind);
             }
@@ -567,6 +560,19 @@ class AstConverter {
         }
 
         return declarations;
+    }
+
+
+    convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
+        var declarations: Declaration[] = [];
+        if (module.body) {
+            let body = module.body;
+            if (ts.isModuleBlock(body)) {
+                let moduleDeclarations = this.convertDeclarations(body.statements);
+                declarations.push(this.createDocumentRoot(module.name.getText(), moduleDeclarations));
+            }
+        }
+        return declarations
     }
 
 
