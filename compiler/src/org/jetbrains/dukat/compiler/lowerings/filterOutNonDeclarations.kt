@@ -14,20 +14,22 @@ private fun hasExportModifiers(modifiers: List<ModifierDeclaration>): Boolean {
 
 fun DocumentRootDeclaration.filterOutNonDeclarations(parent: DocumentRootDeclaration? = null): DocumentRootDeclaration {
 
+    val isSubModule = parent != null
+
     val declarations = declarations.map { declaration ->
         when (declaration) {
             is VariableDeclaration -> {
-                if (hasExportModifiers(declaration.modifiers)) {
+                if (isSubModule || hasExportModifiers(declaration.modifiers)) {
                     listOf(declaration)
                 } else emptyList()
             }
             is FunctionDeclaration -> {
-                if (hasExportModifiers(declaration.modifiers)) {
+                if (isSubModule || hasExportModifiers(declaration.modifiers)) {
                     listOf(declaration)
                 } else emptyList()
             }
             is ClassDeclaration -> {
-                if (hasExportModifiers(declaration.modifiers)) {
+                if (isSubModule || hasExportModifiers(declaration.modifiers)) {
                     listOf(declaration)
                 } else emptyList()
             }

@@ -570,6 +570,8 @@ class AstConverter {
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertDeclarations(body.statements);
                 declarations.push(this.createDocumentRoot(module.name.getText(), moduleDeclarations));
+            } else if (ts.isModuleDeclaration(body)) {
+                declarations.push(this.createDocumentRoot(module.name.getText(), this.convertModule(body)));
             }
         }
         return declarations
