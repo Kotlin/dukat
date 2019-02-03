@@ -22,7 +22,8 @@ class AstConverter {
         if (name != null) {
             return this.astFactory.declareVariable(
                 name,
-                this.convertType(nativeVariableDeclaration.type)
+                this.convertType(nativeVariableDeclaration.type),
+                this.convertModifiers(nativeVariableDeclaration.modifiers)
             );
         }
 
@@ -73,9 +74,6 @@ class AstConverter {
     }
 
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration) : FunctionDeclaration | null  {
-        if (!this.nodeIsExportDeclaration(functionDeclaration)) {
-            return null;
-        }
 
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
@@ -96,7 +94,7 @@ class AstConverter {
                 functionDeclaration.type ?
                     this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
                 typeParameterDeclarations,
-                []
+                this.convertModifiers(functionDeclaration.modifiers)
             );
         }
 
@@ -457,18 +455,6 @@ class AstConverter {
         return res;
     }
 
-    private hasDeclareModifier(node: ts.Node): boolean {
-        return node.modifiers ? node.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.DeclareKeyword) : false;
-    }
-
-    private hasExportModifier(node: ts.Node): boolean {
-        return node.modifiers ? node.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.ExportKeyword) : false;
-    }
-
-    private nodeIsExportDeclaration(node: ts.Node): boolean {
-        return this.hasDeclareModifier(node) || this.hasExportModifier(node);
-    }
-
     private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): TypeAliasDeclaration {
         return this.astFactory.createTypeAliasDeclaration(
             declaration.name.getText(),
@@ -513,19 +499,13 @@ class AstConverter {
     convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
-            if (ts.isVariableDeclaration(statement)) {
-                declarations.push(this.astFactory.declareVariable(
-                    statement.name.getText(),
-                    this.convertType(statement.type)
-                ));
-            } else if (ts.isVariableStatement(statement)) {
-                if (this.nodeIsExportDeclaration(statement)) {
-                    for (let declaration of statement.declarationList.declarations) {
-                        declarations.push(this.astFactory.declareVariable(
-                            declaration.name.getText(),
-                            this.convertType(declaration.type)
-                        ));
-                    }
+            if (ts.isVariableStatement(statement)) {
+                for (let declaration of statement.declarationList.declarations) {
+                    declarations.push(this.astFactory.declareVariable(
+                        declaration.name.getText(),
+                        this.convertType(declaration.type),
+                        this.convertModifiers(statement.modifiers)
+                    ));
                 }
             } else if (ts.isTypeAliasDeclaration(statement)) {
                 if (ts.isTypeLiteralNode(statement.type)) {

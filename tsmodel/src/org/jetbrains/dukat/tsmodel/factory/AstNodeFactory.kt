@@ -56,7 +56,7 @@ interface AstNodeFactory<T> {
     ): T
 
     fun createExpression(kind: TypeDeclaration, meta: String?): T
-    fun declareVariable(name: String, type: ParameterValueDeclaration): T
+    fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>): T
     fun declareProperty(
             name: String,
             type: ParameterValueDeclaration,

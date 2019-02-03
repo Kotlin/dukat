@@ -128,7 +128,11 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntity("type")
         )
         ParameterDeclaration::class.simpleName -> parameterDeclarationToAst()
-        VariableDeclaration::class.simpleName -> VariableDeclaration(get("name") as String, getEntity("type"))
+        VariableDeclaration::class.simpleName -> VariableDeclaration(
+                get("name") as String,
+                getEntity("type"),
+                getEntities("modifiers")
+        )
         PropertyDeclaration::class.simpleName -> PropertyDeclaration(
                 get("name") as String,
                 getEntity("type"),

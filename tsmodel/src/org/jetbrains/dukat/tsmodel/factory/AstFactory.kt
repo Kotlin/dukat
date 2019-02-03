@@ -59,7 +59,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities)
 
-    override fun declareVariable(name: String, type: ParameterValueDeclaration) = VariableDeclaration(name, type)
+    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>): AstNode = VariableDeclaration(name, type, modifiers)
     override fun declareProperty(
             name: String,
             type: ParameterValueDeclaration,

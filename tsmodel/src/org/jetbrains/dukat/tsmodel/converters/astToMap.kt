@@ -86,7 +86,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is TypeDeclaration -> listOf(::value, ::params).convert(this)
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
         is UnionTypeDeclaration -> listOf(::params).convert(this)
-        is VariableDeclaration -> listOf(::name, ::type).convert(this)
+        is VariableDeclaration -> listOf(::name, ::type, ::modifiers).convert(this)
         else -> throw Exception("can not map ${this}")
     }
 }

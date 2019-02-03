@@ -16,7 +16,7 @@ declare interface AstFactory {
 
     createExpression(kind: TypeDeclaration, meta: string): Expression;
 
-    declareVariable(value: string, type: ParameterValue): VariableDeclaration;
+    declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>): VariableDeclaration;
     declareProperty(
         value: string,
         type: ParameterValue,

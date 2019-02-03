@@ -102,7 +102,13 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta)
 
-    fun declareVariable(name: String, type: V8Object): V8Object = astFactory.declareVariable(name, type.toAst())
+    fun declareVariable(name: String, type: V8Object, modifiers: V8Array): V8Object =
+            astFactory.declareVariable(
+                    name,
+                    type.toAst(),
+                    modifiers.toArray().map { it.toAst<ModifierDeclaration>() }
+            )
+
     fun declareProperty(name: String, type: V8Object, typeParameters: V8Array, optional: Boolean, modifiers: V8Array): V8Object {
         return astFactory.declareProperty(
                 name,

@@ -59,7 +59,7 @@ class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory
 
     override fun createExpression(kind: TypeDeclaration, meta: String?) = astFactory.createExpression(kind, meta).astToMap()
 
-    override fun declareVariable(name: String, type: ParameterValueDeclaration) = astFactory.declareVariable(name, type).astToMap()
+    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>): Map<String, Any?> = astFactory.declareVariable(name, type, modifiers).astToMap()
 
     override fun declareProperty(name: String, type: ParameterValueDeclaration, parameters: List<TypeParameterDeclaration>, optional: Boolean, modifiers: List<ModifierDeclaration>)
             = astFactory.declareProperty(name, type, parameters, optional, modifiers).astToMap()

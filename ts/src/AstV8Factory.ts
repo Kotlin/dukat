@@ -21,5 +21,5 @@ declare class AstFactoryV8 implements AstFactory {
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
     declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration;
-    declareVariable(value: string, type: ParameterValue): VariableDeclaration;
+    declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>): VariableDeclaration;
 }
