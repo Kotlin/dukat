@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.compiler.asIntersection
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private class LowerIntersection : ParameterValueLowering {
@@ -16,6 +16,6 @@ private class LowerIntersection : ParameterValueLowering {
     }
 }
 
-fun DocumentRootDeclaration.lowerIntersectionType(): DocumentRootDeclaration {
+fun DocumentRootNode.lowerIntersectionType(): DocumentRootNode {
     return LowerIntersection().lowerDocumentRoot(this)
 }

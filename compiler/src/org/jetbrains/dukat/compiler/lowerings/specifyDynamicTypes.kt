@@ -3,13 +3,13 @@ package org.jetbrains.dukat.compiler.lowerings
 import cartesian
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -35,7 +35,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
 
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
         return generateParams(declaration.parameters).map { params ->
-                declaration.copy(parameters = params)
+            declaration.copy(parameters = params)
         }
     }
 
@@ -49,13 +49,13 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
 
     fun generateMethods(declaration: MethodNode): List<MethodNode> {
         return generateParams(declaration.parameters).map { params ->
-                declaration.copy(parameters = params)
+            declaration.copy(parameters = params)
         }
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
-        val members = declaration.members.map {member ->
-            when(member) {
+        val members = declaration.members.map { member ->
+            when (member) {
                 is ConstructorNode -> generateConstructors(member)
                 is MethodNode -> generateMethods(member)
                 else -> listOf(member)
@@ -65,8 +65,8 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-        val members = declaration.members.map {member ->
-            when(member) {
+        val members = declaration.members.map { member ->
+            when (member) {
                 is MethodNode -> generateMethods(member)
                 else -> listOf(member)
             }
@@ -80,7 +80,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
             is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
-            is DocumentRootDeclaration -> listOf(lowerDocumentRoot(declaration))
+            is DocumentRootNode -> listOf(lowerDocumentRoot(declaration))
             is TypeAliasDeclaration -> listOf(lowerTypeAliasDeclaration(declaration))
             else -> listOf(declaration)
         }
@@ -95,6 +95,6 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
 }
 
 
-fun DocumentRootDeclaration.specifyDynamicTypes(): DocumentRootDeclaration {
+fun DocumentRootNode.specifyDynamicTypes(): DocumentRootNode {
     return SpecifyDynamicTypesLowering().lowerDocumentRoot(this)
 }

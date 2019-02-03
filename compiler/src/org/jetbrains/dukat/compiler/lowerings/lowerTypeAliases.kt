@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.compiler.AstContext
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -35,6 +35,6 @@ private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLower
     }
 }
 
-fun DocumentRootDeclaration.lowerTypeAliases(astContext: AstContext): DocumentRootDeclaration {
+fun DocumentRootNode.lowerTypeAliases(astContext: AstContext): DocumentRootNode {
     return LowerTypeAliases(astContext).lowerDocumentRoot(this)
 }

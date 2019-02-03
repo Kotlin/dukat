@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
@@ -30,6 +30,6 @@ private class EscapeIdentificators : ParameterValueLowering {
     }
 }
 
-fun DocumentRootDeclaration.escapeIdentificators(): DocumentRootDeclaration {
+fun DocumentRootNode.escapeIdentificators(): DocumentRootNode {
     return EscapeIdentificators().lowerDocumentRoot(this)
 }

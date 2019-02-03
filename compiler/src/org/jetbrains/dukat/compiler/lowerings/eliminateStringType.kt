@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -14,6 +14,6 @@ private class EliminateStringType : ParameterValueLowering {
     }
 }
 
-fun DocumentRootDeclaration.eliminateStringType(): DocumentRootDeclaration {
+fun DocumentRootNode.eliminateStringType(): DocumentRootNode {
     return EliminateStringType().lowerDocumentRoot(this)
 }

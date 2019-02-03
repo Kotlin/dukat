@@ -107,8 +107,8 @@ fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
 fun main() {
     val translator = createV8Translator()
 
-    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
-
-    println(compile(astTree))
-    translator.release()
+//    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
+//
+//    println(compile(astTree))
+//    translator.release()
 }

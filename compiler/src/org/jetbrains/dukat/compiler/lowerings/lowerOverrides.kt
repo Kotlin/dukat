@@ -2,12 +2,12 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.AstContext
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -125,7 +125,7 @@ private fun MemberDeclaration.lowerOverrides(
     } else this
 }
 
-fun DocumentRootDeclaration.lowerOverrides(astContext: AstContext): DocumentRootDeclaration {
+fun DocumentRootNode.lowerOverrides(astContext: AstContext): DocumentRootNode {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is InterfaceNode -> {
@@ -148,7 +148,7 @@ fun DocumentRootDeclaration.lowerOverrides(astContext: AstContext): DocumentRoot
                         }
                 )
             }
-            is DocumentRootDeclaration -> {
+            is DocumentRootNode -> {
                 declaration.lowerOverrides(astContext)
             }
             else -> declaration.duplicate()

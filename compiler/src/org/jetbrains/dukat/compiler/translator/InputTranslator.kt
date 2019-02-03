@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.compiler.lowerPrimitives
@@ -23,7 +24,7 @@ import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 
-private fun DocumentRootDeclaration.updateContext(astContext: AstContext): DocumentRootDeclaration {
+private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
     for (declaration in declarations) {
         if (declaration is InterfaceNode) {
             astContext.registerInterface(declaration)
@@ -31,7 +32,7 @@ private fun DocumentRootDeclaration.updateContext(astContext: AstContext): Docum
         if (declaration is ClassNode) {
             astContext.registerClass(declaration)
         }
-        if (declaration is DocumentRootDeclaration) {
+        if (declaration is DocumentRootNode) {
             declaration.updateContext(astContext)
         }
 
@@ -47,7 +48,7 @@ interface InputTranslator {
     fun translateFile(fileName: String): DocumentRootDeclaration
     fun release()
 
-    fun lower(documentRoot: DocumentRootDeclaration): DocumentRootDeclaration {
+    fun lower(documentRoot: DocumentRootDeclaration): DocumentRootNode {
         val myAstContext = AstContext()
 
         return documentRoot

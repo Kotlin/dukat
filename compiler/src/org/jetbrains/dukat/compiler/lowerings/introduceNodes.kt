@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -162,22 +163,27 @@ private class LowerDeclarationsToNodes {
             is FunctionDeclaration -> declaration.convert()
             is ClassDeclaration -> lowerClassNode(declaration.convert())
             is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
-            is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
+            is DocumentRootDeclaration -> lowerDocumentRoot(declaration, null)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
-        return declarations.map { declaration ->
-            lowerTopLevelDeclaration(declaration)
+    fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
+        val docRoot = DocumentRootNode(
+                documenRoot.packageName,
+                documenRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) },
+                null
+        )
+
+        docRoot.declarations.forEach { declaration ->
+            if (declaration is DocumentRootNode) {
+                declaration.owner = docRoot
+            }
         }
-    }
 
-    fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
-        return documenRoot.copy(declarations = lowerTopLevelDeclarations(documenRoot.declarations))
+        return docRoot
     }
 }
 
-fun DocumentRootDeclaration.introduceNodes(): DocumentRootDeclaration {
-    return LowerDeclarationsToNodes().lowerDocumentRoot(this)
-}
+fun DocumentRootDeclaration.introduceNodes() = LowerDeclarationsToNodes().lowerDocumentRoot(this, null)
+

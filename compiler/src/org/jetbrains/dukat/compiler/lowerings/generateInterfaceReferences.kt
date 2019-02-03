@@ -3,13 +3,13 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.AstContext
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -23,7 +23,7 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
                 if (members.isEmpty()) {
                     TypeDeclaration("Any", emptyList())
                 } else {
-                    val  referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
+                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
                     referenceNode
                 }
             }
@@ -37,7 +37,7 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
                 if (members.isEmpty()) {
                     TypeDeclaration("Any", emptyList())
                 } else {
-                    val  referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
+                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.generatedReferenceNodes)
                     referenceNode
                 }
             }
@@ -82,6 +82,6 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
     }
 }
 
-fun DocumentRootDeclaration.generateInterfaceReferences(astContext: AstContext): DocumentRootDeclaration {
+fun DocumentRootNode.generateInterfaceReferences(astContext: AstContext): DocumentRootNode {
     return GenerateInterfaceReferences(astContext).lowerDocumentRoot(this)
 }

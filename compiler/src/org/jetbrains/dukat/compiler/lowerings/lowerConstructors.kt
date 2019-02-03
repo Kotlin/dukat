@@ -2,9 +2,9 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 
-fun DocumentRootDeclaration.lowerConstructors(): DocumentRootDeclaration {
+fun DocumentRootNode.lowerConstructors(): DocumentRootNode {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is ClassNode -> {

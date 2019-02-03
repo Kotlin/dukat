@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler
 
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -26,7 +26,7 @@ private class PrimitiveClassLowering : ParameterValueLowering {
             nullable = true
         }
 
-        return  declaration.copy(
+        return declaration.copy(
                 value = value,
                 params = declaration.params.map { lowerParameterValue(it) },
                 nullable = nullable
@@ -38,6 +38,6 @@ private class PrimitiveClassLowering : ParameterValueLowering {
     }
 }
 
-fun DocumentRootDeclaration.lowerPrimitives(): DocumentRootDeclaration {
+fun DocumentRootNode.lowerPrimitives(): DocumentRootNode {
     return PrimitiveClassLowering().lowerDocumentRoot(this)
 }

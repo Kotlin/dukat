@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -9,7 +10,6 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -58,7 +58,7 @@ interface Lowering {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
-            is DocumentRootDeclaration -> lowerDocumentRoot(declaration)
+            is DocumentRootNode -> lowerDocumentRoot(declaration)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
             else -> declaration.duplicate()
         }
@@ -70,7 +70,7 @@ interface Lowering {
         }
     }
 
-    fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration): DocumentRootDeclaration {
+    fun lowerDocumentRoot(documenRoot: DocumentRootNode): DocumentRootNode {
         return documenRoot.copy(declarations = lowerTopLevelDeclarations(documenRoot.declarations))
     }
 }

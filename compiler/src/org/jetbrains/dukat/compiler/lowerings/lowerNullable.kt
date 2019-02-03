@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -50,6 +50,6 @@ private class LowerNullable : ParameterValueLowering {
     }
 }
 
-fun DocumentRootDeclaration.lowerNullable(): DocumentRootDeclaration {
+fun DocumentRootNode.lowerNullable(): DocumentRootNode {
     return LowerNullable().lowerDocumentRoot(this)
 }
