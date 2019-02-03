@@ -303,7 +303,8 @@ fun processDeclarations(docRoot: DocumentRootDeclaration, res: MutableList<Strin
             val children = mutableListOf<String>()
             processDeclarations(declaration, children, docRoot)
             if (children.isNotEmpty()) {
-                res.add("@file:JsQualifier(\"${unquote(declaration.packageName)}\")")
+                val qualifier = if (declaration.packageName == unquote(declaration.packageName)) "JsQualifier" else "JsModule"
+                res.add("@file:${qualifier}(\"${unquote(declaration.packageName)}\")")
             }
             res.addAll(children)
         } else if (declaration is VariableNode) {
