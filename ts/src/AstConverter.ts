@@ -496,7 +496,7 @@ class AstConverter {
         return  parentEntities
     }
 
-    convertDeclarations(statements: Array<ts.Node>) : Array<Declaration> {
+    convertDeclarations(statements: ts.NodeArray<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
             if (ts.isVariableStatement(statement)) {
@@ -552,13 +552,12 @@ class AstConverter {
                     )
                 )
             } else if (ts.isModuleDeclaration(statement)) {
-                let moduleDeclaration = statement as ts.ModuleDeclaration;
-
-                if (moduleDeclaration.body) {
-                    let moduleStatements: Array<ts.Node> = [];
-                    collectChildren(moduleDeclaration.body, moduleStatements);
-                    let moduleDeclarations = this.convertDeclarations(moduleStatements);
-                    declarations.push(this.createDocumentRoot(moduleDeclaration.name.getText(), moduleDeclarations));
+                if (statement.body) {
+                    let body = statement.body;
+                    if (ts.isModuleBlock(body)) {
+                        let moduleDeclarations = this.convertDeclarations(body.statements);
+                        declarations.push(this.createDocumentRoot(statement.name.getText(), moduleDeclarations));
+                    }
                 }
 
             } else {

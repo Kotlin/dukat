@@ -30,14 +30,6 @@ interface FileResolver {
   resolve(fileName: string): string;
 }
 
-
-function collectChildren(node: ts.Node, acc: Array<ts.Node>) {
-    node.forEachChild(statement => {
-      acc.push(statement);
-      statement.forEachChild(subStatement => collectChildren(subStatement, acc))
-    });
-}
-
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string)  {
 
   let astConverter: AstConverter = nativeAstFactory == null ?
