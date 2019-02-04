@@ -271,7 +271,13 @@ private fun unquote(name: String): String {
 }
 
 private fun escapePackageName(name: String): String {
-    return name.replace("/".toRegex(), ".").replace("_".toRegex(), "_")
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
 }
 
 private fun MemberDeclaration.isStatic() = when (this) {
