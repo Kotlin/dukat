@@ -9,7 +9,7 @@ sourceSets {
 dependencies {
   implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
   implementation 'org.jodd:jodd-core:5.0.6'
-  compile 'org.jetbrains.kotlin:kotlin-reflect'
+  implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
 
   implementation(project(":ast"))
