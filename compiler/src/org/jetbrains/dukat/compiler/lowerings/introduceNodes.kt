@@ -171,11 +171,20 @@ private class LowerDeclarationsToNodes {
     }
 
     fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
+        val declarations = documenRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
+
+        val head = mutableListOf<TopLevelDeclaration>()
+        val tail = mutableListOf<TopLevelDeclaration>()
+        declarations.forEach { declaration ->
+            if (declaration is DocumentRootNode) tail.add(declaration) else head.add(declaration)
+        }
+
         val docRoot = DocumentRootNode(
                 documenRoot.packageName,
-                documenRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) },
+                head + tail,
                 null
         )
+
 
         docRoot.declarations.forEach { declaration ->
             if (declaration is DocumentRootNode) {
