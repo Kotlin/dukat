@@ -6,6 +6,10 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
+declare interface ExportAssignmentDeclaration extends Declaration {
+    name: string;
+}
+
 declare interface TokenDeclaration extends Declaration {
     value: string
 }

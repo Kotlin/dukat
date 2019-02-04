@@ -41,6 +41,7 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
 
 class AstV8Factory(private val astFactory: AstJ2V8Factory) {
 
+    fun createExportAssignmentDeclaration(name: String) = astFactory.createExportAssignmentDeclaration(name)
     fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value)
 
     fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(

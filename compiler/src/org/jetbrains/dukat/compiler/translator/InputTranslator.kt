@@ -9,6 +9,7 @@ import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.generateInterfaceReferences
+import org.jetbrains.dukat.compiler.lowerings.introduceDefaultExports
 import org.jetbrains.dukat.compiler.lowerings.introduceGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
@@ -54,6 +55,7 @@ interface InputTranslator {
         return documentRoot
                 .filterOutNonDeclarations()
                 .introduceNodes()
+                .introduceDefaultExports()
                 .generateInterfaceReferences(myAstContext)
                 .introduceGeneratedEntities(myAstContext)
                 .eliminateStringType()

@@ -13,6 +13,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 interface AstNodeFactory<T> {
+    fun createExportAssignmentDeclaration(name: String): T
+
     fun createTokenDeclaration(value: String): T
 
     fun createHeritageClauseDeclaration(

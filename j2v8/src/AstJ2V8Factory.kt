@@ -20,6 +20,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
 
     private fun toV8(node: Map<String, Any?>) = V8ObjectUtils.toV8Object(runtime, node)
 
+    override fun createExportAssignmentDeclaration(name: String) = toV8(astFactory.createExportAssignmentDeclaration(name))
+
     override fun createTokenDeclaration(value: String) = toV8(astFactory.createTokenDeclaration(value))
 
     override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean)

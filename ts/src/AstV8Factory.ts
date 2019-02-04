@@ -1,4 +1,5 @@
 declare class AstFactoryV8 implements AstFactory {
+    createExportAssignmentDeclaration(name: string): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
     createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;

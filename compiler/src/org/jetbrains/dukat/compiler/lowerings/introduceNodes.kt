@@ -46,7 +46,7 @@ private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
             false,
             false,
             true,
-            listOf(AnnotationNode("nativeInvoke")),
+            listOf(AnnotationNode("nativeInvoke", emptyList())),
             true
     )
 }
@@ -91,6 +91,7 @@ private fun FunctionDeclaration.convert(): FunctionNode {
             parameters,
             type,
             typeParameters,
+            mutableListOf(),
             mutableListOf()
     )
 }
@@ -152,7 +153,8 @@ private class LowerDeclarationsToNodes {
         } else {
             VariableNode(
                     declaration.name,
-                    declaration.type
+                    declaration.type,
+                    mutableListOf()
             )
         }
     }

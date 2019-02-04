@@ -5,5 +5,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableNode(
         val name: String,
-        val type: ParameterValueDeclaration
+        val type: ParameterValueDeclaration,
+
+        val annotations: MutableList<AnnotationNode>
 ) : TopLevelDeclaration

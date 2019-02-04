@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -32,6 +33,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 @Suppress("UNCHECKED_CAST")
 fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
+        is ExportAssignmentDeclaration -> copy() as T
         is ClassDeclaration -> copy() as T
         is ObjectNode -> copy() as T
         is DocumentRootDeclaration -> copy() as T

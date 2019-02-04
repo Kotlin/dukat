@@ -12,5 +12,6 @@ data class FunctionNode(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
 
-        val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>
+        val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
+        val annotations: MutableList<AnnotationNode>
 ) : MemberDeclaration, TopLevelDeclaration

@@ -44,7 +44,7 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     false,
                     true,
-                    listOf(AnnotationNode("nativeGetter")),
+                    listOf(AnnotationNode("nativeGetter", emptyList())),
                     true
             ),
             MethodNode(
@@ -56,7 +56,7 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     false,
                     true,
-                    listOf(AnnotationNode("nativeSetter")),
+                    listOf(AnnotationNode("nativeSetter", emptyList())),
                     true
             )
     )

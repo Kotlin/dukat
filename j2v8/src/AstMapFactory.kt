@@ -17,6 +17,9 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 class AstMapFactory(private val astFactory: AstNodeFactory<AstNode> = AstFactory()) : AstNodeFactory<Map<String, Any?>> {
+
+    override fun createExportAssignmentDeclaration(name: String) = astFactory.createExportAssignmentDeclaration(name).astToMap()
+
     override fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).astToMap()
 
     override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean)

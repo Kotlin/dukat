@@ -393,9 +393,6 @@ class AstConverter {
                 let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
                 let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
                 if (convertedMethodDeclaration != null) {
-                    let isStatic = methodDeclaration.modifiers ?
-                        methodDeclaration.modifiers.some(member => member.kind == ts.SyntaxKind.StaticKeyword) : false;
-
                     members.push(convertedMethodDeclaration);
                 }
             } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
@@ -520,16 +517,14 @@ class AstConverter {
                     declarations.push(this.convertTypeAliasDeclaration(statement));
                 }
             } else if (ts.isClassDeclaration(statement)) {
-                const classDeclaration = statement as ts.ClassDeclaration;
-
-                if (classDeclaration.name != undefined) {
+                if (statement.name != undefined) {
                     declarations.push(
                         this.astFactory.createClassDeclaration(
-                            classDeclaration.name.getText(),
-                            this.convertClassElementsToClassDeclarations(classDeclaration.members),
-                            this.convertTypeParams(classDeclaration.typeParameters),
-                            this.convertHeritageClauses(classDeclaration.heritageClauses),
-                            this.convertModifiers(classDeclaration.modifiers)
+                            statement.name.getText(),
+                            this.convertClassElementsToClassDeclarations(statement.members),
+                            this.convertTypeParams(statement.typeParameters),
+                            this.convertHeritageClauses(statement.heritageClauses),
+                            this.convertModifiers(statement.modifiers)
                         )
                     );
                 }
@@ -553,6 +548,13 @@ class AstConverter {
                 )
             } else if (ts.isModuleDeclaration(statement)) {
                 this.convertModule(statement).forEach(d => declarations.push(d));
+            } else if (ts.isExportAssignment(statement)) {
+                let expression = statement.expression;
+                if (ts.isIdentifier(expression)) {
+                    declarations.push(this.astFactory.createExportAssignmentDeclaration(expression.text))
+                } else {
+                    console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
+                }
             } else {
                 console.log("SKIPPING ", statement.kind);
             }

@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -158,6 +159,20 @@ private fun translateParameters(parameters: List<ParameterDeclaration>, needsMet
             .joinToString(", ")
 }
 
+private fun translateAnnotations(annotations: List<AnnotationNode>): String {
+    val annotations = annotations.map { annotationNode ->
+        var res = "@" + annotationNode.name
+        if (annotationNode.params.isNotEmpty()) {
+            res = res + "("  + annotationNode.params.joinToString(", "){ "\"${it}\"" } + ")"
+        }
+        res
+    }
+
+    val annotationTranslated = if (annotations.isEmpty()) "" else  annotations.joinToString("\n") + "\n"
+
+    return annotationTranslated
+}
+
 private fun FunctionNode.translate(): String {
     val returnType = type.translate()
 
@@ -166,7 +181,7 @@ private fun FunctionNode.translate(): String {
         typeParams = " " + typeParams
     }
 
-    return ("external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
+    return ("${translateAnnotations(annotations)}external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
 private fun MethodNode.translate(): List<String> {
@@ -192,7 +207,7 @@ private fun ConstructorNode.translate(): List<String> {
 }
 
 private fun VariableNode.translate(): String {
-    return "external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
+    return "${translateAnnotations(annotations)}external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun PropertyNode.translate(): String {
