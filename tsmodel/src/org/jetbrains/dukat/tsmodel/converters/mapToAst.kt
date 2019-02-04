@@ -140,7 +140,11 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("optional") as Boolean,
                 getEntities("modifiers")
         )
-        DocumentRootDeclaration::class.simpleName -> DocumentRootDeclaration(get("packageName") as String, getEntities("declarations"))
+        DocumentRootDeclaration::class.simpleName -> DocumentRootDeclaration(
+                get("packageName") as String,
+                getEntities("declarations"),
+                getEntities("modifiers")
+        )
         TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(get("name") as String, getEntities("constraints"))
         ClassDeclaration::class.simpleName -> ClassDeclaration(
                 get("name") as String,

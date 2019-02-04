@@ -69,7 +69,7 @@ private fun createV8Interop(): InteropV8 {
             .method("createConstructorDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createFunctionDeclaration", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
             .method("createFunctionTypeDeclaration", InteropV8Signature.V8ARRAY, InteropV8Signature.V8OBJECT)
-            .method("createDocumentRoot", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY)
+            .method("createDocumentRoot", InteropV8Signature.STRING, InteropV8Signature.V8ARRAY, InteropV8Signature.V8ARRAY)
 
     interopRuntime
             .proxy(interopRuntime.executeScript("FileResolverV8.prototype"), FileResolver())

@@ -183,8 +183,12 @@ class AstV8Factory(private val astFactory: AstJ2V8Factory) {
                     optional
             )
 
-    fun createDocumentRoot(packageName: String, declarations: V8Array) =
-            astFactory.createDocumentRoot(packageName, declarations.toArray().map { declaration -> declaration.toAst<TopLevelDeclaration>() }.toTypedArray())
+    fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array) =
+            astFactory.createDocumentRoot(
+                    packageName,
+                    declarations.toArray().map { declaration -> declaration.toAst<TopLevelDeclaration>() }.toTypedArray(),
+                    modifiers.toArray().map { it.toAst<ModifierDeclaration>() }
+            )
 
     fun createTypeParam(name: String, constraints: V8Array) = astFactory
             .createTypeParam(name, constraints.toArray()

@@ -98,8 +98,8 @@ class AstJ2V8Factory(private val runtime: V8, private val astFactory: AstNodeFac
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean)
         = toV8(astFactory.createParameterDeclaration(name, type, initializer, vararg, optional))
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>)
-        = toV8(astFactory.createDocumentRoot(packageName, declarations))
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>)
+        = toV8(astFactory.createDocumentRoot(packageName, declarations, modifiers))
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = toV8(astFactory.createTypeParam(name, constraints))
 }

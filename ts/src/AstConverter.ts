@@ -3,8 +3,8 @@ class AstConverter {
     constructor(private astFactory: AstFactory) {
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[]): DocumentRoot {
-        return this.astFactory.createDocumentRoot(packageName, declarations);
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>): DocumentRoot {
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -567,11 +567,12 @@ class AstConverter {
         var declarations: Declaration[] = [];
         if (module.body) {
             let body = module.body;
+            let modifiers = this.convertModifiers(module.modifiers);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertDeclarations(body.statements);
-                declarations.push(this.createDocumentRoot(module.name.getText(), moduleDeclarations));
+                declarations.push(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers));
             } else if (ts.isModuleDeclaration(body)) {
-                declarations.push(this.createDocumentRoot(module.name.getText(), this.convertModule(body)));
+                declarations.push(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers));
             }
         }
         return declarations

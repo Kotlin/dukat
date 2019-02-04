@@ -68,7 +68,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
-        is DocumentRootDeclaration -> listOf(::packageName, ::declarations).convert(this)
+        is DocumentRootDeclaration -> listOf(::packageName, ::declarations, ::modifiers).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
         is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)

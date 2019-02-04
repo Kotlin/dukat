@@ -65,7 +65,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
   // TODO: don't remeber how it's done in ts2kt, need to refresh my memories
   let packageNameFragments = sourceFile.fileName.split("/");
   let packageName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
-  return astConverter.createDocumentRoot(packageName, declarations)
+  return astConverter.createDocumentRoot(packageName, declarations, astConverter.convertModifiers(sourceFile.modifiers))
 }
 
 

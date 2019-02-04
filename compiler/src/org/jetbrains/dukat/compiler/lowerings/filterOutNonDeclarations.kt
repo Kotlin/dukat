@@ -34,7 +34,9 @@ fun DocumentRootDeclaration.filterOutNonDeclarations(parent: DocumentRootDeclara
                 } else emptyList()
             }
             is DocumentRootDeclaration -> {
-                listOf(declaration.filterOutNonDeclarations(this))
+                if (isSubModule || hasExportModifiers(declaration.modifiers)) {
+                    listOf(declaration.filterOutNonDeclarations(this))
+                } else emptyList()
             }
             else -> listOf(declaration)
         }
