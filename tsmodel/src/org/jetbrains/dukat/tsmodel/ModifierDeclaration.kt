@@ -7,5 +7,6 @@ data class ModifierDeclaration(val token: String) : Declaration {
         val DECLARE_KEYWORD = ModifierDeclaration("DECLARE")
         val STATIC_KEYWORD = ModifierDeclaration("STATIC")
         val EXPORT_KEYWORD = ModifierDeclaration("EXPORT")
+        val DEFAULT_KEYWORD = ModifierDeclaration("DEFAULT")
     }
 }

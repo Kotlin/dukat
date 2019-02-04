@@ -112,6 +112,8 @@ class AstConverter {
                     res.push(this.astFactory.createModifierDeclaration("DECLARE"));
                 } else if (modifier.kind == ts.SyntaxKind.ExportKeyword) {
                     res.push(this.astFactory.createModifierDeclaration("EXPORT"));
+                } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
+                    res.push(this.astFactory.createModifierDeclaration("DEFAULT"));
                 }
             });
         }
@@ -370,7 +372,7 @@ class AstConverter {
         return res;
     }
 
-    convertClassElementsToClassDeclarations(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) : Array<MemberDeclaration> {
+    convertClassElementsToClassMembers(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) : Array<MemberDeclaration> {
         if (classDeclarationMembers == null) {
             return [];
         }
@@ -521,7 +523,7 @@ class AstConverter {
                     declarations.push(
                         this.astFactory.createClassDeclaration(
                             statement.name.getText(),
-                            this.convertClassElementsToClassDeclarations(statement.members),
+                            this.convertClassElementsToClassMembers(statement.members),
                             this.convertTypeParams(statement.typeParameters),
                             this.convertHeritageClauses(statement.heritageClauses),
                             this.convertModifiers(statement.modifiers)

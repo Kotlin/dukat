@@ -34,6 +34,10 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
+private fun hasDefaultModifier(modifiers: List<ModifierDeclaration>): Boolean {
+    return modifiers.contains(ModifierDeclaration.DEFAULT_KEYWORD)
+}
+
 private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
 private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
@@ -86,13 +90,19 @@ private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNod
 }
 
 private fun FunctionDeclaration.convert(): FunctionNode {
+    val annotations = mutableListOf<AnnotationNode>()
+
+    if (hasDefaultModifier(modifiers)) {
+        annotations.add(AnnotationNode("JsName", listOf("default")))
+    }
+
     return FunctionNode(
             name,
             parameters,
             type,
             typeParameters,
             mutableListOf(),
-            mutableListOf()
+            annotations
     )
 }
 
