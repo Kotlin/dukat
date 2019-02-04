@@ -290,6 +290,7 @@ private fun escapePackageName(name: String): String {
             .replace("/".toRegex(), ".")
             .replace("-".toRegex(), "_")
             .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
             .replace("^var$".toRegex(), "`var`")
             .replace("^val$".toRegex(), "`val`")
             .replace("^interface$".toRegex(), "`interface`")
@@ -313,15 +314,7 @@ fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
     val containsSomethingExceptDocRoot = docRoot.declarations.any { it !is DocumentRootNode}
 
     if (containsSomethingExceptDocRoot) {
-        if (docRoot.owner != null) {
-            val needsQualifier = docRoot.packageName == unquote(docRoot.packageName)
-            val qualifier = if (needsQualifier) "JsQualifier" else "JsModule"
-            val qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
-            res.add("@file:${qualifier}(\"${qualifierName}\")")
-        }
-
-        val packageName = packageNames.joinToString(".") { escapePackageName(it) }
-        res.add("package ${packageName}")
+        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.fullPackageName}")
         res.add("")
     }
 

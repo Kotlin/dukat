@@ -36,10 +36,5 @@ fun DocumentRootNode.introduceDefaultExports(): DocumentRootNode {
         }
     }
 
-    val expressionDeclaration = declarations.find { it is ExportAssignmentDeclaration }
-    expressionDeclaration?.let {
-        println("EXPRESSION ${expressionDeclaration}")
-    }
-
     return this
 }

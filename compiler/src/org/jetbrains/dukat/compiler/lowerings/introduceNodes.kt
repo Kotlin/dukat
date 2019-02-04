@@ -191,8 +191,10 @@ private class LowerDeclarationsToNodes {
 
         val docRoot = DocumentRootNode(
                 documenRoot.packageName,
+                documenRoot.packageName,
                 head + tail,
-                null
+                null,
+                mutableListOf()
         )
 
 
