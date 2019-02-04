@@ -2,7 +2,6 @@ package org.jetbrains.dukat.compiler
 
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.jetbrains.dukat.ast.j2v8.AstJ2V8Factory
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
@@ -47,7 +46,7 @@ private fun createV8Interop(): InteropV8 {
     interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
 
     interopRuntime
-            .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstJ2V8Factory(interopRuntime.runtime)))
+            .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstFactory(), interopRuntime.runtime))
             .all()
 
     interopRuntime
