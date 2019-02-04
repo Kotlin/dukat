@@ -294,7 +294,6 @@ fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
 
     val parentDocRoots = generateSequence(docRoot) { it.owner }.asIterable().reversed()
     val packageNames = parentDocRoots.map { unquote(it.packageName) }
-    val packageName = packageNames.joinToString(".")
 
     val containsSomethingExceptDocRoot = docRoot.declarations.any { it !is DocumentRootNode}
 
@@ -306,7 +305,8 @@ fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
             res.add("@file:${qualifier}(\"${qualifierName}\")")
         }
 
-        res.add("package " + escapePackageName(packageName))
+        val packageName = packageNames.joinToString(".") { escapePackageName(it) }
+        res.add("package ${packageName}")
         res.add("")
     }
 
