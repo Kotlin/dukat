@@ -103,11 +103,12 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toAst()).toV8()
 
-    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array): V8Object = astFactory.createInterfaceDeclaration(
+    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, uid: String): V8Object = astFactory.createInterfaceDeclaration(
             name,
             members.toAst(),
             typeParameters.toAst(),
-            parentEntities.toAst()
+            parentEntities.toAst(),
+            uid
     ).toV8()
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta).toV8()

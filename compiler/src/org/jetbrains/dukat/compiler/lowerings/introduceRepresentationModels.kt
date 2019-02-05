@@ -15,8 +15,6 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
 
     val annotations = mutableListOf<AnnotationNode>()
 
-    println("SHOW ANNOTATION? ${packageName} ${showQualifierAnnotation}")
-
     if (showQualifierAnnotation) {
         val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
         annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifierName)))

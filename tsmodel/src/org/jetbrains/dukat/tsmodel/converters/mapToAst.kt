@@ -173,7 +173,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("name") as String,
                 getEntities("members"),
                 getEntities("typeParameters"),
-                getEntities("parentEntities")
+                getEntities("parentEntities"),
+                get("uid") as String
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(getEntities("members"))
         else -> throw Exception("failed to create declaration from mapper: ${this}")

@@ -10,6 +10,9 @@ data class InterfaceNode(
         val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
+        val annotations: MutableList<AnnotationNode>,
 
+        var owner: DocumentRootNode?,
+        val uid: String,
         override val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode> = mutableListOf()
 ) : ClassLikeDeclaration, ClassLikeNode

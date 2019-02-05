@@ -82,7 +82,10 @@ private fun InterfaceDeclaration.convert(): InterfaceNode {
             name,
             members,
             typeParameters,
-            parentEntities
+            parentEntities,
+            mutableListOf(),
+            null,
+            uid
     )
 }
 
@@ -218,6 +221,9 @@ private class LowerDeclarationsToNodes {
                 declaration.owner = docRoot
             }
             if (declaration is ClassNode) {
+                declaration.owner = docRoot
+            }
+            if (declaration is InterfaceNode) {
                 declaration.owner = docRoot
             }
         }

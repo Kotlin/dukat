@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -12,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelDeclaration> = mutableMapOf()): Map<String, TopLevelDeclaration> {
     docRoot.declarations.forEach { declaration ->
         when (declaration) {
+            is InterfaceNode -> map[declaration.uid] = declaration
             is ClassNode -> map[declaration.uid] = declaration
             is FunctionNode -> map[declaration.uid] = declaration
             is VariableNode -> map[declaration.uid] = declaration
@@ -54,6 +56,13 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                             entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
                             emptyList<TopLevelDeclaration>()
+                        }
+                        is InterfaceNode -> {
+                            entity.owner?.let { it.showQualifierAnnotation = false}
+
+                            entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            emptyList()
+
                         }
                         else -> listOf(declaration)
                     }

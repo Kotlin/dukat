@@ -71,7 +71,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 
-    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities)
+    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>, uid: String): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities, uid)
 
     override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): AstNode = VariableDeclaration(name, type, modifiers, uid)
     override fun declareProperty(

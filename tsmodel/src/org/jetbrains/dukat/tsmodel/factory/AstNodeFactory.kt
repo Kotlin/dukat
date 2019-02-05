@@ -61,7 +61,8 @@ interface AstNodeFactory<T> {
             name: String,
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
-            parentEntities: List<HeritageClauseDeclaration>
+            parentEntities: List<HeritageClauseDeclaration>,
+            uid: String
     ): T
 
     fun createExpression(kind: TypeDeclaration, meta: String?): T

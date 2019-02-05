@@ -80,7 +80,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
-        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities).convert(this)
+        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::uid).convert(this)
         is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
         is ModifierDeclaration -> listOf(::token).convert(this)
         is ObjectLiteralDeclaration -> listOf(::members).convert(this)

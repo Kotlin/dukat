@@ -408,7 +408,8 @@ class AstConverter {
             name,
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
             this.convertTypeParams(typeParams),
-            []
+            [],
+            this.exportContext.getUID(typeLiteral)
         );
     }
 
@@ -554,7 +555,8 @@ class AstConverter {
                         interfaceDeclaration.name.getText(),
                         this.convertMembersToInterfaceMemberDeclarations(interfaceDeclaration.members),
                         this.convertTypeParams(interfaceDeclaration.typeParameters),
-                        this.convertHeritageClauses(interfaceDeclaration.heritageClauses)
+                        this.convertHeritageClauses(interfaceDeclaration.heritageClauses),
+                        this.exportContext.getUID(interfaceDeclaration)
                     ), declarations
                 )
             } else if (ts.isModuleDeclaration(statement)) {

@@ -120,7 +120,10 @@ class AstContext {
                         name,
                         declaration.members.map { member -> member.convert(ROOT_CLASS_DECLARATION) }.flatten(),
                         emptyList(),
-                        emptyList()
+                        emptyList(),
+                        mutableListOf(),
+                        null,
+                        "__NO__UID__"
                 )
 
 
