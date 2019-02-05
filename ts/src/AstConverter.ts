@@ -9,8 +9,8 @@ class AstConverter {
         collection.push(declaration);
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>): DocumentRoot {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers);
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot {
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -567,13 +567,17 @@ class AstConverter {
                         let uid = this.exportContext.getUID(symbol.declarations[0]);
                         this.registerDeclaration(
                             this.astFactory.createExportAssignmentDeclaration(
-                                uid, this.convertModifiers(expression.modifiers)
+                                uid, !!statement.isExportEquals
                             ), declarations)
                     }
                 } else if (ts.isPropertyAccessExpression(expression)) {
                     let symbol = this.typeChecker.getSymbolAtLocation(expression);
                     if (symbol) {
-                        console.log(`${symbol.declarations[0].kind}`)
+                        let uid = this.exportContext.getUID(symbol.declarations[0]);
+                        this.registerDeclaration(
+                            this.astFactory.createExportAssignmentDeclaration(
+                                uid, !!statement.isExportEquals
+                            ), declarations)
                     }
                 } else {
                     console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
@@ -595,9 +599,9 @@ class AstConverter {
             let modifiers = this.convertModifiers(module.modifiers);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertDeclarations(body.statements);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, this.exportContext.getUID(module)), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers, this.exportContext.getUID(module)), declarations);
             }
         }
         return declarations

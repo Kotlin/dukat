@@ -19,7 +19,7 @@ interface AstNodeFactory<T> {
 
     fun createEnumTokenDeclaration(value: String, meta: String): T
 
-    fun createExportAssignmentDeclaration(name: String, modifiers: List<ModifierDeclaration>): T
+    fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean): T
 
     fun createTokenDeclaration(value: String): T
 
@@ -109,6 +109,6 @@ interface AstNodeFactory<T> {
 
     fun createUnionDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
-    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>): T
+    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T
 }

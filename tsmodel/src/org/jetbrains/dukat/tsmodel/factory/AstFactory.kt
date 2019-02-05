@@ -40,7 +40,7 @@ class AstFactory : AstNodeFactory<AstNode> {
         return EnumTokenDeclaration(value, meta)
     }
 
-    override fun createExportAssignmentDeclaration(name: String, modifiers: List<ModifierDeclaration>) = ExportAssignmentDeclaration(name, modifiers)
+    override fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = ExportAssignmentDeclaration(name, isExportEquals)
 
     override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 
@@ -106,7 +106,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean) = ParameterDeclaration(name, type, initializer, vararg, optional)
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>) = DocumentRootDeclaration(packageName, declarations.toList(), modifiers)
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String) = DocumentRootDeclaration(packageName, declarations.toList(), modifiers, uid)
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 }

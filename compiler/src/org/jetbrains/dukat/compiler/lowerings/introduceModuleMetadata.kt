@@ -31,7 +31,7 @@ fun DocumentRootNode.introduceModuleMetadata(): DocumentRootNode {
     if (owner != null) {
         val needsQualifier = packageName == unquote(packageName)
         val qualifier = if (needsQualifier) "JsQualifier" else "JsModule"
-        val qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
+        qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
 
         annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifierName)))
     }

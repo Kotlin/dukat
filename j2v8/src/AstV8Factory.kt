@@ -51,7 +51,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createEnumTokenDeclaration(value: String, meta: String): V8Object
         = astFactory.createEnumTokenDeclaration(value, meta).toV8()
 
-    fun createExportAssignmentDeclaration(name: String, modifiers: V8Array) = astFactory.createExportAssignmentDeclaration(name, modifiers.toAst()).toV8()
+    fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = astFactory.createExportAssignmentDeclaration(name, isExportEquals).toV8()
     fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).toV8()
 
     fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
@@ -182,11 +182,12 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
                     optional
             ).toV8()
 
-    fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array): V8Object =
+    fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array, uid: String): V8Object =
             astFactory.createDocumentRoot(
                     packageName,
                     declarations.toAst<TopLevelDeclaration>().toTypedArray(),
-                    modifiers.toAst()
+                    modifiers.toAst(),
+                    uid
             ).toV8()
 
     fun createTypeParam(name: String, constraints: V8Array): V8Object = astFactory

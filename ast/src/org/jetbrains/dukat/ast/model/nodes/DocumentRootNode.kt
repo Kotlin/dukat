@@ -8,5 +8,7 @@ data class DocumentRootNode(
         val declarations: List<TopLevelDeclaration> = emptyList(),
 
         var owner: DocumentRootNode?,
-        val annotations: MutableList<AnnotationNode>
+        val annotations: MutableList<AnnotationNode>,
+
+        var qualifierName: String = ""
 ) : TopLevelDeclaration

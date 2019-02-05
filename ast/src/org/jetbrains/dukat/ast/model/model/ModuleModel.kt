@@ -1,11 +1,10 @@
-package org.jetbrains.dukat.tsmodel
+package org.jetbrains.dukat.ast.model.model
 
+import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
-data class DocumentRootDeclaration(
+data class ModuleModel(
         val packageName: String,
         val declarations: List<TopLevelDeclaration> = emptyList(),
-
-        val modifiers: List<ModifierDeclaration>,
-        val uid: String
+        val annotations: MutableList<AnnotationNode>
 ) : TopLevelDeclaration

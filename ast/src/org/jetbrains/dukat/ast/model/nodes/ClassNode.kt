@@ -10,7 +10,10 @@ data class ClassNode(
         val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
-        val primaryConstructor: ConstructorNode? = null,
+        val primaryConstructor: ConstructorNode?,
 
-        override val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode> = mutableListOf()
+        var owner: DocumentRootNode?,
+        val uid: String,
+        override val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
+        val annotations: MutableList<AnnotationNode>
 ) : ClassLikeDeclaration, ClassLikeNode

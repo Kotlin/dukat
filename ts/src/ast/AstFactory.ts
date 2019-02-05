@@ -3,7 +3,7 @@ declare interface AstFactory {
     createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration
 
-    createExportAssignmentDeclaration(name: string, modifiers: Array<ModifierDeclaration>): ExportAssignmentDeclaration;
+    createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration
 
@@ -83,5 +83,5 @@ declare interface AstFactory {
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>): DocumentRoot;
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot;
 }

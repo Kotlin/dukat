@@ -37,10 +37,6 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-private fun hasDefaultModifier(modifiers: List<ModifierDeclaration>): Boolean {
-    return modifiers.contains(ModifierDeclaration.DEFAULT_KEYWORD)
-}
-
 private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
 private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
@@ -66,13 +62,18 @@ private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclarati
     }
 }
 
-private fun ClassDeclaration.convert(): ClassNode {
+private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
     return ClassNode(
             name,
             members,
             typeParameters,
             parentEntities,
-            null
+            null,
+
+            owner,
+            uid,
+            mutableListOf(),
+            mutableListOf()
     )
 }
 
@@ -102,7 +103,8 @@ private fun EnumDeclaration.convert(): EnumNode {
 private fun FunctionDeclaration.convert(): FunctionNode {
     val annotations = mutableListOf<AnnotationNode>()
 
-    if (hasDefaultModifier(modifiers)) {
+    val hasExport = ModifierDeclaration.hasExport(modifiers)
+    if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
         annotations.add(AnnotationNode("JsName", listOf("default")))
     }
 
@@ -113,6 +115,7 @@ private fun FunctionDeclaration.convert(): FunctionNode {
             typeParameters,
             mutableListOf(),
             annotations,
+            hasExport,
             uid
     )
 }
@@ -185,7 +188,7 @@ private class LowerDeclarationsToNodes {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> declaration.convert()
-            is ClassDeclaration -> lowerClassNode(declaration.convert())
+            is ClassDeclaration -> lowerClassNode(declaration.convert(null))
             is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration, null)
             is EnumDeclaration -> declaration.convert()
@@ -213,6 +216,9 @@ private class LowerDeclarationsToNodes {
 
         docRoot.declarations.forEach { declaration ->
             if (declaration is DocumentRootNode) {
+                declaration.owner = docRoot
+            }
+            if (declaration is ClassNode) {
                 declaration.owner = docRoot
             }
         }

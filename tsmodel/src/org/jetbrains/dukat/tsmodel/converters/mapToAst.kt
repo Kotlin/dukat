@@ -74,7 +74,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         EnumTokenDeclaration::class.simpleName -> EnumTokenDeclaration(get("value") as String, get("meta") as String)
         ExportAssignmentDeclaration::class.simpleName -> ExportAssignmentDeclaration(
                 get("name") as String,
-                getEntities("modifiers")
+                get("isExportEquals") as Boolean
         )
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
             getEntities("params")
@@ -157,7 +157,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         DocumentRootDeclaration::class.simpleName -> DocumentRootDeclaration(
                 get("packageName") as String,
                 getEntities("declarations"),
-                getEntities("modifiers")
+                getEntities("modifiers"),
+                get("uid") as String
         )
         TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(get("name") as String, getEntities("constraints"))
         ClassDeclaration::class.simpleName -> ClassDeclaration(

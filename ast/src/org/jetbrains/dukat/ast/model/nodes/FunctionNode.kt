@@ -15,5 +15,6 @@ data class FunctionNode(
         val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
         val annotations: MutableList<AnnotationNode>,
 
+        val isExport: Boolean,
         val uid: String
 ) : MemberDeclaration, TopLevelDeclaration
