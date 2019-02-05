@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -311,23 +311,20 @@ private fun MemberDeclaration.isStatic() = when (this) {
 }
 
 
-fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
+fun processDeclarations(docRoot: ModuleModel, res: MutableList<String>) {
     if (docRoot.declarations.isEmpty()) {
         return
     }
 
-    val parentDocRoots = generateSequence(docRoot) { it.owner }.asIterable().reversed()
-    val packageNames = parentDocRoots.map { unquote(it.packageName) }
-
-    val containsSomethingExceptDocRoot = docRoot.declarations.any { it !is DocumentRootNode}
+    val containsSomethingExceptDocRoot = docRoot.declarations.any { it !is ModuleModel}
 
     if (containsSomethingExceptDocRoot) {
-        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.fullPackageName}")
+        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.packageName}")
         res.add("")
     }
 
     for (declaration in docRoot.declarations) {
-        if (declaration is DocumentRootNode) {
+        if (declaration is ModuleModel) {
             if (res.isNotEmpty()) {
                 res.add("")
                 res.add("// ------------------------------------------------------------------------------------------")
@@ -410,7 +407,7 @@ fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
     }
 }
 
-fun compile(documentRoot: DocumentRootNode): String {
+fun compile(documentRoot: ModuleModel): String {
     val res = mutableListOf<String>()
     processDeclarations(documentRoot, res)
 

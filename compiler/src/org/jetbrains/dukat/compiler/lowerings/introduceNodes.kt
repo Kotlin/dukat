@@ -209,8 +209,7 @@ private class LowerDeclarationsToNodes {
                 documenRoot.packageName,
                 documenRoot.packageName,
                 head + tail,
-                null,
-                mutableListOf()
+                null
         )
 
 

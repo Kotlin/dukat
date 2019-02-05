@@ -49,6 +49,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                     val entity = uidTable.get(declaration.name)
                     when (entity) {
                         is ClassNode -> {
+
+                            entity.owner?.let { it.showQualifierAnnotation = false}
+
                             entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
                             emptyList<TopLevelDeclaration>()
                         }

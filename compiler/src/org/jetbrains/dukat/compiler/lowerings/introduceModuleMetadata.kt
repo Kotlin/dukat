@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 
 
@@ -28,13 +27,11 @@ fun DocumentRootNode.introduceModuleMetadata(): DocumentRootNode {
     val packageNameResolved = packageNames.joinToString(".") { escapePackageName(it) }
     fullPackageName = packageNameResolved
 
-    if (owner != null) {
-        val needsQualifier = packageName == unquote(packageName)
-        val qualifier = if (needsQualifier) "JsQualifier" else "JsModule"
-        qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
+    isQualifier = (packageName == unquote(packageName))
 
-        annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifierName)))
-    }
+    showQualifierAnnotation = owner != null
+    val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
+    qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
 
     declarations.forEach { declaration ->
         if (declaration is DocumentRootNode) {

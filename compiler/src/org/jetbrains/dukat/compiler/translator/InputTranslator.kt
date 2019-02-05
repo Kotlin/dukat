@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
+import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -13,6 +14,7 @@ import org.jetbrains.dukat.compiler.lowerings.introduceExports
 import org.jetbrains.dukat.compiler.lowerings.introduceGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.introduceModuleMetadata
 import org.jetbrains.dukat.compiler.lowerings.introduceNodes
+import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
@@ -50,7 +52,7 @@ interface InputTranslator {
     fun translateFile(fileName: String): DocumentRootDeclaration
     fun release()
 
-    fun lower(documentRoot: DocumentRootDeclaration): DocumentRootNode {
+    fun lower(documentRoot: DocumentRootDeclaration): ModuleModel {
         val myAstContext = AstContext()
 
         return documentRoot
@@ -74,5 +76,6 @@ interface InputTranslator {
                 .lowerOverrides(myAstContext)
                 .specifyDynamicTypes()
                 .lowerConstructors()
+                .introduceRepresentationModels()
     }
 }
