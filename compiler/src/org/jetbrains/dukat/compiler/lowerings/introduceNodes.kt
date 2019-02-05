@@ -63,6 +63,13 @@ private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclarati
 }
 
 private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
+
+    val annotations = mutableListOf<AnnotationNode>()
+
+    if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
+        annotations.add(AnnotationNode("JsName", listOf("default")))
+    }
+
     return ClassNode(
             name,
             members,
@@ -73,7 +80,7 @@ private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
             owner,
             uid,
             mutableListOf(),
-            mutableListOf()
+            annotations
     )
 }
 
