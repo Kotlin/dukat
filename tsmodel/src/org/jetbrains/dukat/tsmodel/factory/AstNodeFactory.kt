@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsmodel.factory
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -13,6 +14,11 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 interface AstNodeFactory<T> {
+
+    fun createEnumDeclaration(values: List<EnumTokenDeclaration>): T
+
+    fun createEnumTokenDeclaration(value: String, meta: String): T
+
     fun createExportAssignmentDeclaration(name: String): T
 
     fun createTokenDeclaration(value: String): T

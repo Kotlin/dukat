@@ -6,6 +6,15 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
+declare interface EnumDeclaration extends Declaration {
+    values: Array<EnumTokenDeclaration>
+}
+
+declare interface EnumTokenDeclaration extends Declaration {
+    value: string;
+    meta: string;
+}
+
 declare interface ExportAssignmentDeclaration extends Declaration {
     name: string;
 }

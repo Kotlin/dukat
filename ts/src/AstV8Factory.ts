@@ -1,4 +1,6 @@
 declare class AstFactoryV8 implements AstFactory {
+    createEnumDeclaration(values: Array<EnumTokenDeclaration>): EnumDeclaration;
+    createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
     createExportAssignmentDeclaration(name: string): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;

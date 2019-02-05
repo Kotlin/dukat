@@ -498,7 +498,12 @@ class AstConverter {
     convertDeclarations(statements: ts.NodeArray<ts.Node>) : Array<Declaration> {
         var declarations: Declaration[] = [];
         for (let statement of statements) {
-            if (ts.isVariableStatement(statement)) {
+            if (ts.isEnumDeclaration(statement)) {
+                let enumTokens = statement.members.map(member =>
+                    this.astFactory.createEnumTokenDeclaration(member.name.getText(), ""));
+
+                declarations.push(this.astFactory.createEnumDeclaration(enumTokens))
+            } else if (ts.isVariableStatement(statement)) {
                 for (let declaration of statement.declarationList.declarations) {
                     declarations.push(this.astFactory.declareVariable(
                         declaration.name.getText(),
