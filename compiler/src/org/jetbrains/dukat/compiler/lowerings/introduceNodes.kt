@@ -6,6 +6,8 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
+import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -22,6 +24,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -86,6 +89,13 @@ private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNod
     return ConstructorNode(
             parameters,
             typeParameters
+    )
+}
+
+private fun EnumDeclaration.convert(): EnumNode {
+    return EnumNode(
+        name = name,
+        values = values.map { value -> EnumTokenNode(value.value, value.value) }
     )
 }
 
@@ -176,6 +186,7 @@ private class LowerDeclarationsToNodes {
             is ClassDeclaration -> lowerClassNode(declaration.convert())
             is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration, null)
+            is EnumDeclaration -> declaration.convert()
             else -> declaration
         }
     }

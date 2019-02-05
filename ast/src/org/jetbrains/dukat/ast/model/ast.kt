@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model
 
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -34,6 +35,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 @Suppress("UNCHECKED_CAST")
 fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
+        is EnumNode -> copy() as T
         is EnumDeclaration -> copy() as T
         is ExportAssignmentDeclaration -> copy() as T
         is ClassDeclaration -> copy() as T

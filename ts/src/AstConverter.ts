@@ -502,7 +502,10 @@ class AstConverter {
                 let enumTokens = statement.members.map(member =>
                     this.astFactory.createEnumTokenDeclaration(member.name.getText(), ""));
 
-                declarations.push(this.astFactory.createEnumDeclaration(enumTokens))
+                declarations.push(this.astFactory.createEnumDeclaration(
+                    statement.name.getText(),
+                    enumTokens
+                ))
             } else if (ts.isVariableStatement(statement)) {
                 for (let declaration of statement.declarationList.declarations) {
                     declarations.push(this.astFactory.declareVariable(

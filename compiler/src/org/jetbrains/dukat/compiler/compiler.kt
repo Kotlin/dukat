@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -210,6 +211,13 @@ private fun VariableNode.translate(): String {
     return "${translateAnnotations(annotations)}external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
+private fun EnumNode.translate(): String {
+    val res = mutableListOf("external enum class ${name} {")
+    res.add(values.map {value -> "    ${value.value}" }.joinToString(",\n"))
+    res.add("}")
+    return res.joinToString("\n")
+}
+
 private fun PropertyNode.translate(): String {
     val open = !static && open
     val modifier = if (override) "override" else if (open) "open" else ""
@@ -328,6 +336,8 @@ fun processDeclarations(docRoot: DocumentRootNode, res: MutableList<String>) {
             processDeclarations(declaration, children)
             res.addAll(children)
         } else if (declaration is VariableNode) {
+            res.add(declaration.translate())
+        } else if (declaration is EnumNode) {
             res.add(declaration.translate())
         } else if (declaration is FunctionNode) {
             res.add(declaration.translate())

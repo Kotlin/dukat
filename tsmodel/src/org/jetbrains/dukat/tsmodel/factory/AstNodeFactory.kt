@@ -15,7 +15,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 interface AstNodeFactory<T> {
 
-    fun createEnumDeclaration(values: List<EnumTokenDeclaration>): T
+    fun createEnumDeclaration(name: String, values: List<EnumTokenDeclaration>): T
 
     fun createEnumTokenDeclaration(value: String, meta: String): T
 

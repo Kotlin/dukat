@@ -32,8 +32,8 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
 
-    override fun createEnumDeclaration(values: List<EnumTokenDeclaration>): AstNode {
-        return EnumDeclaration(values)
+    override fun createEnumDeclaration(name: String, values: List<EnumTokenDeclaration>): AstNode {
+        return EnumDeclaration(name, values)
     }
 
     override fun createEnumTokenDeclaration(value: String, meta: String): AstNode {

@@ -1,6 +1,6 @@
 declare interface AstFactory {
 
-    createEnumDeclaration(values: Array<EnumTokenDeclaration>): EnumDeclaration
+    createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration
 
     createExportAssignmentDeclaration(name: string): ExportAssignmentDeclaration;

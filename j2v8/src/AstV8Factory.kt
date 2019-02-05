@@ -45,8 +45,8 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     private fun AstNode.toV8() = V8ObjectUtils.toV8Object(runtime, astToMap())
 
-    fun createEnumDeclaration(values: V8Array): V8Object
-        =  astFactory.createEnumDeclaration(values.toAst()).toV8()
+    fun createEnumDeclaration(name: String, values: V8Array): V8Object
+        =  astFactory.createEnumDeclaration(name, values.toAst()).toV8()
 
     fun createEnumTokenDeclaration(value: String, meta: String): V8Object
         = astFactory.createEnumTokenDeclaration(value, meta).toV8()

@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
@@ -27,6 +29,13 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
         return declaration.copy(name = escapeIdentificator(declaration.name))
+    }
+
+    override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+        return when (declaration) {
+            is EnumNode -> declaration.copy(values = declaration.values.map {value -> value.copy(value = escapeIdentificator(value.value)) })
+            else -> declaration
+        }
     }
 }
 

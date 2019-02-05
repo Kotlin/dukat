@@ -68,7 +68,7 @@ private fun List<KProperty0<*>>.convert(reflection: Any) =
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
-        is EnumDeclaration -> listOf(::values).convert(this)
+        is EnumDeclaration -> listOf(::name, ::values).convert(this)
         is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
         is ExportAssignmentDeclaration -> listOf(::name).convert(this)
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)

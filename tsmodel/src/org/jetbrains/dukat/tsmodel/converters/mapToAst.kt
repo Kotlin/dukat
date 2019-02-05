@@ -68,6 +68,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
         EnumDeclaration::class.simpleName -> EnumDeclaration(
+            get("name") as String,
             getEntities("values")
         )
         EnumTokenDeclaration::class.simpleName -> EnumTokenDeclaration(get("value") as String, get("meta") as String)
