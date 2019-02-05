@@ -1,6 +1,6 @@
 class AstConverter {
 
-    constructor(private astFactory: AstFactory) {
+    constructor(private astFactory: AstFactory, private typeChecker: ts.TypeChecker) {
     }
 
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>): DocumentRoot {
