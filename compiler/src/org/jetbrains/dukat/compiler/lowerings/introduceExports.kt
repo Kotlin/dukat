@@ -54,13 +54,17 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                             entity.owner?.let { it.showQualifierAnnotation = false}
 
-                            entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            if (docRoot.owner != null) {
+                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            }
                             emptyList<TopLevelDeclaration>()
                         }
                         is InterfaceNode -> {
                             entity.owner?.let { it.showQualifierAnnotation = false}
 
-                            entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            if (docRoot.owner != null) {
+                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            }
                             emptyList()
 
                         }
