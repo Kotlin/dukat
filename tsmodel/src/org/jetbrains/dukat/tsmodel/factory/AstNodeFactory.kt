@@ -51,7 +51,8 @@ interface AstNodeFactory<T> {
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            modifiers: List<ModifierDeclaration>
+            modifiers: List<ModifierDeclaration>,
+            uid: String
     ): T
 
     fun createObjectLiteral(members: List<MemberDeclaration>): T
@@ -64,7 +65,7 @@ interface AstNodeFactory<T> {
     ): T
 
     fun createExpression(kind: TypeDeclaration, meta: String?): T
-    fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>): T
+    fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): T
     fun declareProperty(
             name: String,
             type: ParameterValueDeclaration,
@@ -85,7 +86,8 @@ interface AstNodeFactory<T> {
             parameters: Array<ParameterDeclaration>,
             type: ParameterValueDeclaration,
             typeParameters: Array<TypeParameterDeclaration>,
-            modifiers: List<ModifierDeclaration>
+            modifiers: List<ModifierDeclaration>,
+            uid: String
     ): T
 
     fun createMethodSignatureDeclaration(

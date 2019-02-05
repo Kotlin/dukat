@@ -72,11 +72,11 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
         is ExportAssignmentDeclaration -> listOf(::name).convert(this)
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
-        is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers).convert(this)
+        is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers, ::uid).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
         is DocumentRootDeclaration -> listOf(::packageName, ::declarations, ::modifiers).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
-        is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
+        is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers, ::uid).convert(this)
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
@@ -92,7 +92,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is TypeDeclaration -> listOf(::value, ::params).convert(this)
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
         is UnionTypeDeclaration -> listOf(::params).convert(this)
-        is VariableDeclaration -> listOf(::name, ::type, ::modifiers).convert(this)
+        is VariableDeclaration -> listOf(::name, ::type, ::modifiers, ::uid).convert(this)
         else -> throw Exception("can not map ${this}")
     }
 }

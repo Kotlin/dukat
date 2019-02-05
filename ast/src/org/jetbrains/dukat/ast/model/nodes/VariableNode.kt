@@ -7,5 +7,7 @@ data class VariableNode(
         val name: String,
         val type: ParameterValueDeclaration,
 
-        val annotations: MutableList<AnnotationNode>
+        val annotations: MutableList<AnnotationNode>,
+
+        val uid: String
 ) : TopLevelDeclaration

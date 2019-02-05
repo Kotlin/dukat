@@ -65,14 +65,15 @@ class AstFactory : AstNodeFactory<AstNode> {
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
-            modifiers: List<ModifierDeclaration>
-    ): AstNode = ClassDeclaration(name, members, typeParameters, parentEntities, modifiers)
+            modifiers: List<ModifierDeclaration>,
+            uid: String
+    ): AstNode = ClassDeclaration(name, members, typeParameters, parentEntities, modifiers, uid)
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 
     override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities)
 
-    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>): AstNode = VariableDeclaration(name, type, modifiers)
+    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): AstNode = VariableDeclaration(name, type, modifiers, uid)
     override fun declareProperty(
             name: String,
             type: ParameterValueDeclaration,
@@ -90,9 +91,10 @@ class AstFactory : AstNodeFactory<AstNode> {
             parameters: Array<ParameterDeclaration>,
             type: ParameterValueDeclaration,
             typeParameters: Array<TypeParameterDeclaration>,
-            modifiers: List<ModifierDeclaration>
+            modifiers: List<ModifierDeclaration>,
+            uid: String
     ): FunctionDeclaration {
-        return FunctionDeclaration(name, parameters.toList(), type, typeParameters.toList(), modifiers)
+        return FunctionDeclaration(name, parameters.toList(), type, typeParameters.toList(), modifiers, uid)
     }
 
     override fun createMethodSignatureDeclaration(name: String, parameters: Array<ParameterDeclaration>, type: ParameterValueDeclaration, typeParameters: Array<TypeParameterDeclaration>, optional: Boolean, modifiers: List<ModifierDeclaration>) = MethodSignatureDeclaration(name, parameters.toList(), type, typeParameters.toList(), optional, modifiers)

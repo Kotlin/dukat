@@ -124,7 +124,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("parameters"),
                 getEntity("type"),
                 getEntities("typeParameters"),
-                getEntities("modifiers")
+                getEntities("modifiers"),
+                get("uid") as String
         )
         MethodSignatureDeclaration::class.simpleName -> MethodSignatureDeclaration(
                 get(MethodSignatureDeclaration::name.name) as String,
@@ -142,7 +143,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         VariableDeclaration::class.simpleName -> VariableDeclaration(
                 get("name") as String,
                 getEntity("type"),
-                getEntities("modifiers")
+                getEntities("modifiers"),
+                get("uid") as String
         )
         PropertyDeclaration::class.simpleName -> PropertyDeclaration(
                 get("name") as String,
@@ -162,7 +164,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("members"),
                 getEntities("typeParameters"),
                 getEntities("parentEntities"),
-                getEntities("modifiers")
+                getEntities("modifiers"),
+                get("uid") as String
         )
         InterfaceDeclaration::class.simpleName -> InterfaceDeclaration(
                 get("name") as String,

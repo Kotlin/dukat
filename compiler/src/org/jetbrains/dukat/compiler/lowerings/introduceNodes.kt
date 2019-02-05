@@ -112,7 +112,8 @@ private fun FunctionDeclaration.convert(): FunctionNode {
             type,
             typeParameters,
             mutableListOf(),
-            annotations
+            annotations,
+            uid
     )
 }
 
@@ -174,7 +175,8 @@ private class LowerDeclarationsToNodes {
             VariableNode(
                     declaration.name,
                     declaration.type,
-                    mutableListOf()
+                    mutableListOf(),
+                    declaration.uid
             )
         }
     }

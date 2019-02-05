@@ -13,5 +13,7 @@ data class FunctionNode(
         val typeParameters: List<TypeParameterDeclaration>,
 
         val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
-        val annotations: MutableList<AnnotationNode>
+        val annotations: MutableList<AnnotationNode>,
+
+        val uid: String
 ) : MemberDeclaration, TopLevelDeclaration

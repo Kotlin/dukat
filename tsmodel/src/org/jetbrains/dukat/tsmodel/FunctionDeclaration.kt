@@ -9,5 +9,6 @@ data class FunctionDeclaration(
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
-        val modifiers: List<ModifierDeclaration>
+        val modifiers: List<ModifierDeclaration>,
+        val uid: String
 ) : MemberDeclaration, TopLevelDeclaration

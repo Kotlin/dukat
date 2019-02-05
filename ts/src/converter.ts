@@ -8,6 +8,8 @@ if (typeof ts == "undefined") {
 
 declare function print(...arg: any[]): void;
 
+declare function uid(): string;
+
 declare function println(arg: String): void;
 
 declare class FileResolverV8 implements FileResolver {
@@ -31,7 +33,6 @@ interface FileResolver {
 }
 
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string) {
-
     if (fileResolver == null) {
         fileResolver = new FileResolverV8();
     }

@@ -8,31 +8,31 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
 
 fun DocumentRootNode.introduceDefaultExports(): DocumentRootNode {
-    declarations.map {
-        when (it) {
-            is DocumentRootNode -> it.introduceDefaultExports()
+    declarations.map { declaration ->
+        when (declaration) {
+            is DocumentRootNode -> declaration.introduceDefaultExports()
 
             is ExportAssignmentDeclaration -> {
                 val defaultAnnotation = AnnotationNode("JsName", listOf("default"))
 
                 val functions = declarations.filterIsInstance(FunctionNode::class.java)
-                val function = functions.find { f -> f.name == it.name }
+                val function = functions.find { f -> f.uid == declaration.name }
 
                 if (function != null) {
                     function.annotations.add(defaultAnnotation)
                 } else {
                     val vars = declarations.filterIsInstance(VariableNode::class.java)
-                    val variable = vars.find { v -> v.name == it.name}
+                    val variable = vars.find { v -> v.uid == declaration.name}
 
                     if (variable != null) {
                         variable.annotations.add(defaultAnnotation)
                     }
                 }
 
-                it
+                declaration
             }
 
-            else -> it
+            else -> declaration
         }
     }
 

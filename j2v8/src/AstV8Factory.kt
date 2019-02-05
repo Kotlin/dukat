@@ -92,12 +92,13 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createModifierDeclaration(token: String): V8Object
             = astFactory.createModifierDeclaration(token).toV8()
 
-    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, modifiers: V8Array): V8Object = astFactory.createClassDeclaration(
+    fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, modifiers: V8Array, uid: String): V8Object = astFactory.createClassDeclaration(
             name,
             members.toAst(),
             typeParameters.toAst(),
             parentEntities.toAst(),
-            modifiers.toAst()
+            modifiers.toAst(),
+            uid
     ).toV8()
 
     fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toAst()).toV8()
@@ -111,11 +112,12 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     fun createExpression(kind: V8Object, meta: String) = astFactory.createExpression(kind.toAst(), meta).toV8()
 
-    fun declareVariable(name: String, type: V8Object, modifiers: V8Array): V8Object =
+    fun declareVariable(name: String, type: V8Object, modifiers: V8Array, uid: String): V8Object =
             astFactory.declareVariable(
                     name,
                     type.toAst(),
-                    modifiers.toAst()
+                    modifiers.toAst(),
+                    uid
             ).toV8()
 
     fun declareProperty(name: String, type: V8Object, typeParameters: V8Array, optional: Boolean, modifiers: V8Array): V8Object {
@@ -138,13 +140,14 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     }
 
 
-    fun createFunctionDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, modifiers: V8Array): V8Object {
+    fun createFunctionDeclaration(name: String, parameters: V8Array, type: V8Object, typeParameters: V8Array, modifiers: V8Array, uid: String): V8Object {
         return astFactory.createFunctionDeclaration(
                 name,
                 parameters.toAst<ParameterDeclaration>().toTypedArray(),
                 type.toAst(),
                 typeParameters.toAst<TypeParameterDeclaration>().toTypedArray(),
-                modifiers.toAst()
+                modifiers.toAst(),
+                uid
         ).toV8()
     }
 

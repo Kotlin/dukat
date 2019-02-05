@@ -1,6 +1,12 @@
 class AstConverter {
 
+    private exportContext = new ExportContext();
+
     constructor(private astFactory: AstFactory, private typeChecker: ts.TypeChecker) {
+    }
+
+    private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
+        collection.push(declaration);
     }
 
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>): DocumentRoot {
@@ -14,20 +20,6 @@ class AstConverter {
             return name.getText();
         }
         return null
-    }
-
-    convertVariable(nativeVariableDeclaration: ts.VariableDeclaration & ts.PropertyDeclaration & ts.ParameterDeclaration) : VariableDeclaration | null {
-        let name = this.convertName(nativeVariableDeclaration.name);
-
-        if (name != null) {
-            return this.astFactory.declareVariable(
-                name,
-                this.convertType(nativeVariableDeclaration.type),
-                this.convertModifiers(nativeVariableDeclaration.modifiers)
-            );
-        }
-
-        return null;
     }
 
     convertPropertyDeclaration(nativePropertyDeclaration: (ts.PropertyDeclaration | ts.ParameterDeclaration)) : PropertyDeclaration | null {
@@ -88,13 +80,15 @@ class AstConverter {
         }
 
         if (ts.isIdentifier(functionDeclaration.name)) {
+            let uid = this.exportContext.getUID(functionDeclaration);
             return this.astFactory.createFunctionDeclaration(
                 functionDeclaration.name ? functionDeclaration.name.getText() : "",
                 parameterDeclarations,
                 functionDeclaration.type ?
                     this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
                 typeParameterDeclarations,
-                this.convertModifiers(functionDeclaration.modifiers)
+                this.convertModifiers(functionDeclaration.modifiers),
+                uid
             );
         }
 
@@ -107,13 +101,13 @@ class AstConverter {
         if (nativeModifiers) {
             nativeModifiers.forEach(modifier => {
                 if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
-                    res.push(this.astFactory.createModifierDeclaration("STATIC"));
+                    this.registerDeclaration(this.astFactory.createModifierDeclaration("STATIC"), res);
                 } else if (modifier.kind == ts.SyntaxKind.DeclareKeyword) {
-                    res.push(this.astFactory.createModifierDeclaration("DECLARE"));
+                    this.registerDeclaration(this.astFactory.createModifierDeclaration("DECLARE"), res);
                 } else if (modifier.kind == ts.SyntaxKind.ExportKeyword) {
-                    res.push(this.astFactory.createModifierDeclaration("EXPORT"));
+                    this.registerDeclaration(this.astFactory.createModifierDeclaration("EXPORT"), res);
                 } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
-                    res.push(this.astFactory.createModifierDeclaration("DEFAULT"));
+                    this.registerDeclaration(this.astFactory.createModifierDeclaration("DEFAULT"), res);
                 }
             });
         }
@@ -172,7 +166,8 @@ class AstConverter {
 
 
     createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): FunctionDeclaration {
-        return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers);
+        // TODO: reintroduce method declaration
+        return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, "__NO_UID__");
     }
 
     private createTypeDeclaration(value: string, params: Array<ParameterValue> = []): TypeDeclaration {
@@ -323,11 +318,11 @@ class AstConverter {
                 (param, count) => this.convertParameterDeclaration(param, count)
             );
 
-        res.push(
+        this.registerDeclaration(
             this.astFactory.createIndexSignatureDeclaration(
                 parameterDeclarations,
                 this.convertType(indexSignatureDeclaration.type)
-            )
+            ), res
         );
 
         return res;
@@ -338,23 +333,23 @@ class AstConverter {
         if (ts.isMethodSignature(member)) {
             let methodDeclaration = this.convertTypeElementToMethodSignatureDeclaration(member);
             if (methodDeclaration) {
-                res.push(methodDeclaration);
+                this.registerDeclaration(methodDeclaration, res);
             }
         } else if (ts.isPropertySignature(member)) {
-            res.push(
-                this.convertPropertySignature(member)
+            this.registerDeclaration(
+                this.convertPropertySignature(member), res
             );
         } else if (ts.isIndexSignatureDeclaration(member)) {
             this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
-                res.push(member)
+                this.registerDeclaration(member, res)
             );
         } else if (ts.isCallSignatureDeclaration(member)) {
-            res.push(
+            this.registerDeclaration(
                 this.astFactory.createCallSignatureDeclaration(
                     this.convertParameterDeclarations(member.parameters),
                     member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
                     this.convertTypeParams(member.typeParameters)
-                )
+                ), res
             );
         }
 
@@ -365,14 +360,14 @@ class AstConverter {
         let res: Array<MemberDeclaration> = [];
         members.map(member => {
             this.convertTypeElementToInterfaceMemberDeclarations(member).map(memberDeclaration => {
-                res.push(memberDeclaration);
+                this.registerDeclaration(memberDeclaration, res);
             });
         });
 
         return res;
     }
 
-    convertClassElementsToClassMembers(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) : Array<MemberDeclaration> {
+    convertClassElementsToMembers(classDeclarationMembers: ts.NodeArray<ts.ClassElement> | null) : Array<MemberDeclaration> {
         if (classDeclarationMembers == null) {
             return [];
         }
@@ -382,24 +377,24 @@ class AstConverter {
         for (let memberDeclaration of classDeclarationMembers) {
             if (ts.isIndexSignatureDeclaration(memberDeclaration)) {
                 this.convertIndexSignature(memberDeclaration as ts.IndexSignatureDeclaration).map(member => {
-                    members.push(member);
+                    this.registerDeclaration(member, members);
                 });
             } else if (ts.isPropertyDeclaration(memberDeclaration)) {
                 let propertyDeclaration = this.convertPropertyDeclaration(
                     memberDeclaration as ts.PropertyDeclaration
                 );
                 if (propertyDeclaration != null) {
-                    members.push(propertyDeclaration);
+                    this.registerDeclaration(propertyDeclaration, members);
                 }
             } else if (ts.isMethodDeclaration(memberDeclaration)) {
                 let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
                 let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
                 if (convertedMethodDeclaration != null) {
-                    members.push(convertedMethodDeclaration);
+                    this.registerDeclaration(convertedMethodDeclaration, members);
                 }
             } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
                 this.convertConstructorDeclaration(memberDeclaration as ts.ConstructorDeclaration).map(member => {
-                    members.push(member);
+                    this.registerDeclaration(member, members);
                 });
             }
         }
@@ -437,18 +432,19 @@ class AstConverter {
                         parameter as ts.ParameterDeclaration
                     );
                     if (convertedVariable != null) {
-                        res.push(convertedVariable);
+                        this.registerDeclaration(convertedVariable, res);
                     }
                 }
             }
 
-            params.push(this.convertParameterDeclaration(parameter, count));
+            this.registerDeclaration(this.convertParameterDeclaration(parameter, count), params);
         });
 
-        res.push(this.astFactory.createConstructorDeclaration(
+        this.registerDeclaration(this.astFactory.createConstructorDeclaration(
             params,
             this.createTypeDeclaration("______"),
-            this.convertTypeParams(constructorDeclaration.typeParameters), this.convertModifiers(constructorDeclaration.modifiers))
+            this.convertTypeParams(constructorDeclaration.typeParameters), this.convertModifiers(constructorDeclaration.modifiers)),
+            res
         );
 
         return res;
@@ -477,16 +473,16 @@ class AstConverter {
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
                                 let value = (this.convertType(typeArgument) as any).value;
-                                typeArguments.push(this.astFactory.createTokenDeclaration(value))
+                                this.registerDeclaration(this.astFactory.createTokenDeclaration(value), typeArguments)
                             }
                         }
 
-                        parentEntities.push(
+                        this.registerDeclaration(
                             this.astFactory.createHeritageClauseDeclaration(
                                 type.expression.getText(),
                                 typeArguments,
                                 extending
-                            )
+                            ), parentEntities
                         );
                     }
                 }
@@ -502,66 +498,80 @@ class AstConverter {
                 let enumTokens = statement.members.map(member =>
                     this.astFactory.createEnumTokenDeclaration(member.name.getText(), ""));
 
-                declarations.push(this.astFactory.createEnumDeclaration(
+                this.registerDeclaration(this.astFactory.createEnumDeclaration(
                     statement.name.getText(),
                     enumTokens
-                ))
+                ), declarations)
             } else if (ts.isVariableStatement(statement)) {
                 for (let declaration of statement.declarationList.declarations) {
-                    declarations.push(this.astFactory.declareVariable(
+                    this.registerDeclaration(this.astFactory.declareVariable(
                         declaration.name.getText(),
                         this.convertType(declaration.type),
-                        this.convertModifiers(statement.modifiers)
-                    ));
+                        this.convertModifiers(statement.modifiers),
+                        this.exportContext.getUID(declaration)
+                    ), declarations);
                 }
             } else if (ts.isTypeAliasDeclaration(statement)) {
                 if (ts.isTypeLiteralNode(statement.type)) {
-                    declarations.push(
+                    this.registerDeclaration(
                         this.convertTypeLiteralToInterfaceDeclaration(
                             statement.name.getText(),
                             statement.type as ts.TypeLiteralNode,
                             statement.typeParameters
-                        )
+                        ), declarations
                     );
                 } else {
-                    declarations.push(this.convertTypeAliasDeclaration(statement));
+                    this.registerDeclaration(this.convertTypeAliasDeclaration(statement), declarations);
                 }
             } else if (ts.isClassDeclaration(statement)) {
                 if (statement.name != undefined) {
-                    declarations.push(
+
+                    let uid = this.exportContext.getUID(statement);
+
+                    this.registerDeclaration(
                         this.astFactory.createClassDeclaration(
                             statement.name.getText(),
-                            this.convertClassElementsToClassMembers(statement.members),
+                            this.convertClassElementsToMembers(statement.members),
                             this.convertTypeParams(statement.typeParameters),
                             this.convertHeritageClauses(statement.heritageClauses),
-                            this.convertModifiers(statement.modifiers)
-                        )
+                            this.convertModifiers(statement.modifiers),
+                            uid
+                        ), declarations
                     );
                 }
 
             } else if (ts.isFunctionDeclaration(statement)) {
                 let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
                 if (convertedFunctionDeclaration != null) {
-                    declarations.push(convertedFunctionDeclaration)
+                    this.registerDeclaration(convertedFunctionDeclaration, declarations)
                 }
             } else if (ts.isInterfaceDeclaration(statement)) {
                 let interfaceDeclaration = statement as ts.InterfaceDeclaration;
                 let parentEntities: Array<InterfaceDeclaration> = [];
 
-                declarations.push(
+                this.registerDeclaration(
                     this.astFactory.createInterfaceDeclaration(
                         interfaceDeclaration.name.getText(),
                         this.convertMembersToInterfaceMemberDeclarations(interfaceDeclaration.members),
                         this.convertTypeParams(interfaceDeclaration.typeParameters),
                         this.convertHeritageClauses(interfaceDeclaration.heritageClauses)
-                    )
+                    ), declarations
                 )
             } else if (ts.isModuleDeclaration(statement)) {
-                this.convertModule(statement).forEach(d => declarations.push(d));
+                this.convertModule(statement).forEach(d => this.registerDeclaration(d, declarations));
             } else if (ts.isExportAssignment(statement)) {
                 let expression = statement.expression;
                 if (ts.isIdentifier(expression)) {
-                    declarations.push(this.astFactory.createExportAssignmentDeclaration(expression.text))
+                    let symbol = this.typeChecker.getSymbolAtLocation(expression);
+                    if (symbol) {
+                        let uid = this.exportContext.getUID(symbol.declarations[0]);
+                        this.registerDeclaration(this.astFactory.createExportAssignmentDeclaration(uid), declarations)
+                    }
+                } else if (ts.isPropertyAccessExpression(expression)) {
+                    let symbol = this.typeChecker.getSymbolAtLocation(expression);
+                    if (symbol) {
+                        console.log(`${symbol.declarations[0].kind}`)
+                    }
                 } else {
                     console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
                 }
@@ -582,13 +592,12 @@ class AstConverter {
             let modifiers = this.convertModifiers(module.modifiers);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertDeclarations(body.statements);
-                declarations.push(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers));
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                declarations.push(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers));
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers), declarations);
             }
         }
         return declarations
     }
-
 
 }

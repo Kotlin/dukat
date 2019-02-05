@@ -14,14 +14,14 @@ declare interface AstFactory {
 
     createModifierDeclaration(name: string): ModifierDeclaration;
 
-    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>): ClassDeclaration;
+    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
 
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral
     createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: string): Expression;
 
-    declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>): VariableDeclaration;
+    declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, uid: String): VariableDeclaration;
     declareProperty(
         value: string,
         type: ParameterValue,
@@ -50,7 +50,8 @@ declare interface AstFactory {
         parameters: Array<ParameterDeclaration>,
         type: ParameterValue,
         typeParams: Array<TypeParameter>,
-        modifiers: Array<ModifierDeclaration>
+        modifiers: Array<ModifierDeclaration>,
+        uid: String
     ): FunctionDeclaration;
 
     createMethodSignatureDeclaration(

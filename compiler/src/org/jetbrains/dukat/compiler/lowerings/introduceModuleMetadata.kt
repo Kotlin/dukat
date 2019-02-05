@@ -3,6 +3,8 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 
+
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
 private fun escapePackageName(name: String): String {
     return name
             .replace("/".toRegex(), ".")

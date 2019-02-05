@@ -11,6 +11,7 @@ import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.converters.toAst
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
+import java.util.*
 
 
 private fun readResource(name: String): String {
@@ -25,17 +26,19 @@ private fun InteropEngine.loadAstBuilder() {
     eval(readResource("js/dukat-ast-builder.js"))
 }
 
-
 private fun createNashornInterop(): InteropNashorn {
     val engine = InteropNashorn()
 
-    engine.eval("var global = this; var Set = Java.type('org.jetbrains.dukat.nashorn.Set');")
+    engine.eval("""
+        var global = this;
+        var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
+        var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
+    """.trimIndent())
 
     engine.loadAstBuilder()
 
     return engine
 }
-
 
 private fun createV8Interop(): InteropV8 {
     val interopRuntime = InteropV8()
@@ -43,6 +46,11 @@ private fun createV8Interop(): InteropV8 {
     interopRuntime.loadAstBuilder()
 
     interopRuntime.proxy(System.out).method("println", InteropV8Signature.STRING)
+
+    interopRuntime.proxy(object {
+        fun uid() = UUID.randomUUID().toString()
+    }).method("uid")
+
     interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
 
     interopRuntime
