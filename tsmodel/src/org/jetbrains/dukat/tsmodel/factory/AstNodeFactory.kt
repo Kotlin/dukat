@@ -19,7 +19,7 @@ interface AstNodeFactory<T> {
 
     fun createEnumTokenDeclaration(value: String, meta: String): T
 
-    fun createExportAssignmentDeclaration(name: String): T
+    fun createExportAssignmentDeclaration(name: String, modifiers: List<ModifierDeclaration>): T
 
     fun createTokenDeclaration(value: String): T
 

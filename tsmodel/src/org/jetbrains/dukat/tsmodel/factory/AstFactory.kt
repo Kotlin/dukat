@@ -40,7 +40,7 @@ class AstFactory : AstNodeFactory<AstNode> {
         return EnumTokenDeclaration(value, meta)
     }
 
-    override fun createExportAssignmentDeclaration(name: String) = ExportAssignmentDeclaration(name)
+    override fun createExportAssignmentDeclaration(name: String, modifiers: List<ModifierDeclaration>) = ExportAssignmentDeclaration(name, modifiers)
 
     override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 

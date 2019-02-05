@@ -73,7 +73,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         EnumTokenDeclaration::class.simpleName -> EnumTokenDeclaration(get("value") as String, get("meta") as String)
         ExportAssignmentDeclaration::class.simpleName -> ExportAssignmentDeclaration(
-                get("name") as String
+                get("name") as String,
+                getEntities("modifiers")
         )
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
             getEntities("params")

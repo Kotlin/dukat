@@ -565,7 +565,10 @@ class AstConverter {
                     let symbol = this.typeChecker.getSymbolAtLocation(expression);
                     if (symbol) {
                         let uid = this.exportContext.getUID(symbol.declarations[0]);
-                        this.registerDeclaration(this.astFactory.createExportAssignmentDeclaration(uid), declarations)
+                        this.registerDeclaration(
+                            this.astFactory.createExportAssignmentDeclaration(
+                                uid, this.convertModifiers(expression.modifiers)
+                            ), declarations)
                     }
                 } else if (ts.isPropertyAccessExpression(expression)) {
                     let symbol = this.typeChecker.getSymbolAtLocation(expression);

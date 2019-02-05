@@ -3,7 +3,7 @@ declare interface AstFactory {
     createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration
 
-    createExportAssignmentDeclaration(name: string): ExportAssignmentDeclaration;
+    createExportAssignmentDeclaration(name: string, modifiers: Array<ModifierDeclaration>): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration
 
