@@ -190,6 +190,8 @@ private class LowerDeclarationsToNodes {
                     declaration.name,
                     declaration.type,
                     mutableListOf(),
+                    false,
+                    null,
                     declaration.uid
             )
         }
@@ -229,6 +231,9 @@ private class LowerDeclarationsToNodes {
                 declaration.owner = docRoot
             }
             if (declaration is FunctionNode) {
+                declaration.owner = docRoot
+            }
+            if (declaration is VariableNode) {
                 declaration.owner = docRoot
             }
         }

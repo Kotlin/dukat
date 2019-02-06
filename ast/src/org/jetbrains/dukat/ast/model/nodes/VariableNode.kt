@@ -9,5 +9,7 @@ data class VariableNode(
 
         val annotations: MutableList<AnnotationNode>,
 
+        var immutable: Boolean,
+        var owner: DocumentRootNode?,
         val uid: String
 ) : TopLevelDeclaration

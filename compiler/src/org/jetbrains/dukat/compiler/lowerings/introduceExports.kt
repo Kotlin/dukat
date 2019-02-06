@@ -33,6 +33,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
             is ExportAssignmentDeclaration -> {
                 val defaultAnnotation = AnnotationNode("JsName", listOf("default"))
 
+
                 if (!declaration.isExportEquals) {
                     uidTable.get(declaration.name)?.let { entity ->
                         when (entity) {
@@ -49,6 +50,8 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                     listOf(declaration)
                 } else {
                     val entity = uidTable.get(declaration.name)
+                    println("HERE!!! ${declaration} ${entity!!::class}")
+
                     when (entity) {
                         is ClassNode -> {
 
@@ -79,6 +82,17 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                             if (docRoot.owner != null) {
                                 entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            }
+                            emptyList()
+                        }
+                        is VariableNode -> {
+                            entity.owner?.let {
+                                turnOff.add(it.fullPackageName)
+                            }
+
+                            if (docRoot.owner != null) {
+                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                                entity.immutable = true
                             }
                             emptyList()
                         }

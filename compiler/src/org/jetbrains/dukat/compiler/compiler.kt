@@ -208,7 +208,8 @@ private fun ConstructorNode.translate(): List<String> {
 }
 
 private fun VariableNode.translate(): String {
-    return "${translateAnnotations(annotations)}external var ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
+    val variableKeyword = if (immutable) "val" else "var"
+    return "${translateAnnotations(annotations)}external ${variableKeyword} ${name}: ${type.translate()}${type.translateMeta()} = definedExternally"
 }
 
 private fun EnumNode.translate(): String {

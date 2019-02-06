@@ -565,6 +565,7 @@ class AstConverter {
                 let expression = statement.expression;
                 if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
                     let symbol = this.typeChecker.getSymbolAtLocation(expression);
+
                     if (symbol) {
 
                         if (symbol.flags & ts.SymbolFlags.Alias) {
