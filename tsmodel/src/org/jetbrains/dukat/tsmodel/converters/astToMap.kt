@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -68,13 +69,13 @@ private fun List<KProperty0<*>>.convert(reflection: Any) =
 
 fun AstNode.astToMap(): Map<String, Any?> {
     return when (this) {
-        is EnumDeclaration -> listOf(::name, ::values).convert(this)
-        is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
-        is ExportAssignmentDeclaration -> listOf(::name, ::isExportEquals).convert(this)
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers, ::uid).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
         is DocumentRootDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::uid).convert(this)
+        is EnumDeclaration -> listOf(::name, ::values).convert(this)
+        is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
+        is ExportAssignmentDeclaration -> listOf(::name, ::isExportEquals).convert(this)
         is ExpressionDeclaration -> listOf(::kind, ::meta).convert(this)
         is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers, ::uid).convert(this)
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
@@ -87,6 +88,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is ParameterDeclaration -> toMap()
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
+        is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)
         is TokenDeclaration -> listOf(::value).convert(this)
         is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
         is TypeDeclaration -> listOf(::value, ::params).convert(this)

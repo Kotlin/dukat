@@ -17,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -67,6 +68,8 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
+        ThisTypeDeclaration::class.simpleName -> ThisTypeDeclaration(
+        )
         EnumDeclaration::class.simpleName -> EnumDeclaration(
             get("name") as String,
             getEntities("values")

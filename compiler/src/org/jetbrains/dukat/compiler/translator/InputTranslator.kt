@@ -20,7 +20,7 @@ import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
-import org.jetbrains.dukat.compiler.lowerings.lowerSelfReference
+import org.jetbrains.dukat.compiler.lowerings.lowerThisType
 import org.jetbrains.dukat.compiler.lowerings.lowerTypeAliases
 import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
@@ -70,7 +70,7 @@ interface InputTranslator {
                 .lowerUnionType()
                 .lowerVarargs()
                 .lowerIntersectionType()
-                .lowerSelfReference()
+                .lowerThisType()
                 .updateContext(myAstContext)
                 .lowerTypeAliases(myAstContext)
                 .lowerOverrides(myAstContext)

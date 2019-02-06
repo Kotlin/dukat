@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -16,7 +15,7 @@ fun DocumentRootNode.introduceGeneratedEntities(astContext: AstContext): Documen
         } else if (declaration is DocumentRootNode) {
             listOf(declaration.introduceGeneratedEntities(astContext))
         } else {
-            listOf(declaration.duplicate())
+            listOf(declaration)
         }
     }.flatten()
 

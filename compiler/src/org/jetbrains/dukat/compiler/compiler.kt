@@ -14,6 +14,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetadata
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -51,9 +52,8 @@ private fun ParameterValueDeclaration.translateMeta(): String {
 }
 
 private fun ParameterValueDeclaration.translateSignatureMeta(): String {
-
-    meta?.asSelfReference()?.let {
-        return " /* this */"
+    when (this.meta) {
+        is ThisTypeInGeneratedInterfaceMetadata -> return " /* this */"
     }
 
     return ""
@@ -72,7 +72,7 @@ private fun ParameterValueDeclaration.translate(): String {
         if (nullable) {
             res.add("?")
         }
-        return res.joinToString("")
+        return res.joinToString("") + translateSignatureMeta()
     } else if (this is FunctionTypeDeclaration) {
         val res = mutableListOf("(")
         val paramsList = mutableListOf<String>()
@@ -246,7 +246,7 @@ private fun PropertyNode.translateSignature(): String {
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
-    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${type.translate()}${type.translateSignatureMeta()}"
+    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${type.translate()}"
     if (getter) {
         res += " get() = definedExternally"
     }
@@ -269,7 +269,7 @@ private fun MethodNode.translateSignature(): List<String> {
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
     val overrideClause = if (override) "override " else ""
 
-    val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}${type.translateSignatureMeta()}"
+    val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
     return if (annotations.isEmpty()) {
         listOf(
                 methodNodeTranslation

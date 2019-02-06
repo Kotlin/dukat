@@ -18,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -31,6 +32,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createThisTypeDeclaration(): AstNode {
+        return ThisTypeDeclaration()
+    }
 
     override fun createEnumDeclaration(name: String, values: List<EnumTokenDeclaration>): AstNode {
         return EnumDeclaration(name, values)

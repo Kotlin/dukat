@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetadata
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
@@ -15,6 +16,7 @@ import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -112,6 +114,26 @@ class AstContext {
         return null
     }
 
+
+    private fun ParameterValueDeclaration.lower() : ParameterValueDeclaration {
+        return when (this) {
+            is ThisTypeDeclaration -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetadata())
+            else -> this
+        }
+    }
+
+    private fun InterfaceNode.lower() : InterfaceNode {
+        val members = members.map { member ->
+            when (member) {
+                is PropertyNode -> member.copy(type = member.type.lower())
+                is MethodNode -> member.copy(type = member.type.lower())
+                else -> member
+            }
+        }
+
+        return copy(members = members)
+    }
+
     fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, generatedReferences: MutableList<GeneratedInterfaceReferenceNode>): GeneratedInterfaceReferenceNode {
 
         val name = "`T$${myGeneratedInterfaces.size}`"
@@ -124,7 +146,7 @@ class AstContext {
                         mutableListOf(),
                         null,
                         "__NO__UID__"
-                )
+                ).lower()
 
 
         // TODO: this is a weak place and it's better to think about better solution

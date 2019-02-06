@@ -245,7 +245,7 @@ class AstConverter {
                 } else if (ts.isTypeLiteralNode(type))  {
                     return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
                 } else if (ts.isThisTypeNode(type)){
-                    return this.createTypeDeclaration("@@SELF_REFERENCE")
+                    return this.astFactory.createThisTypeDeclaration()
                 } else if (ts.isLiteralTypeNode(type)) {
                     return this.astFactory.createStringTypeDeclaration([
                         type.literal.getText()

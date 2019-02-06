@@ -1,5 +1,7 @@
 declare interface AstFactory {
 
+    createThisTypeDeclaration(): ThisTypeDeclaration
+
     createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration
 

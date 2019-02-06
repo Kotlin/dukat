@@ -1,17 +1,15 @@
 declare class AstFactoryV8 implements AstFactory {
+    createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration;
+    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
+    createConstructorDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration;
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot;
     createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration;
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
-    createTokenDeclaration(value: string): TokenDeclaration;
-    createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
-    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
-    createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration;
-    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot;
     createExpression(kind: TypeDeclaration, meta: string): Expression;
-    createConstructorDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration;
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration;
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
+    createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;
     createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, uid: String): InterfaceDeclaration;
     createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration;
@@ -20,9 +18,12 @@ declare class AstFactoryV8 implements AstFactory {
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
-    createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
+    createThisTypeDeclaration(): ThisTypeDeclaration;
+    createTokenDeclaration(value: string): TokenDeclaration;
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
+    createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
     declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration;
     declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, uid: String): VariableDeclaration;
 }

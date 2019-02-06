@@ -6,7 +6,10 @@ declare interface AstNode {
 declare interface Declaration extends AstNode {
 }
 
-declare interface EnumDeclaration extends Declaration {
+declare interface ThisTypeDeclaration extends Declaration {
+}
+
+declare interface EnumDeclaration extends ParameterValue {
     values: Array<EnumTokenDeclaration>
 }
 
