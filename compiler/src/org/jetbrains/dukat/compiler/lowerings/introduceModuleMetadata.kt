@@ -16,7 +16,7 @@ private fun escapePackageName(name: String): String {
 }
 
 private fun unquote(name: String): String {
-    return name.replace("(?:^\")|(?:\"$)".toRegex(), "")
+    return name.replace("(?:^\"|\')|(?:\"|\'$)".toRegex(), "")
 }
 
 fun DocumentRootNode.introduceModuleMetadata(): DocumentRootNode {
