@@ -310,29 +310,12 @@ private fun MemberDeclaration.isStatic() = when (this) {
     else -> false
 }
 
+private fun processDeclarations(docRoot: ModuleModel ): List<String> {
+    val res: MutableList<String> = mutableListOf<String>()
 
-fun processDeclarations(docRoot: ModuleModel, res: MutableList<String>) {
-    if (docRoot.declarations.isEmpty()) {
-        return
-    }
-
-    val containsSomethingExceptDocRoot = docRoot.declarations.any { it !is ModuleModel}
-
-    if (containsSomethingExceptDocRoot) {
-        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.packageName}")
-        res.add("")
-    }
 
     for (declaration in docRoot.declarations) {
-        if (declaration is ModuleModel) {
-            if (res.isNotEmpty()) {
-                res.add("")
-                res.add("// ------------------------------------------------------------------------------------------")
-            }
-            val children = mutableListOf<String>()
-            processDeclarations(declaration, children)
-            res.addAll(children)
-        } else if (declaration is VariableNode) {
+        if (declaration is VariableNode) {
             res.add(declaration.translate())
         } else if (declaration is EnumNode) {
             res.add(declaration.translate())
@@ -405,16 +388,45 @@ fun processDeclarations(docRoot: ModuleModel, res: MutableList<String>) {
 
         }
     }
+
+    return res
+}
+
+
+
+private fun processModule(docRoot: ModuleModel): List<String> {
+    val res: MutableList<String> = mutableListOf<String>()
+    if (docRoot.declarations.isEmpty() && docRoot.sumbodules.isEmpty()) {
+        return res
+    }
+
+    val containsSomethingExceptDocRoot = docRoot.declarations.isNotEmpty()
+
+    if (containsSomethingExceptDocRoot) {
+        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.packageName}")
+        res.add("")
+    }
+
+    res.addAll(processDeclarations(docRoot))
+    return res
+
+}
+
+private fun translateModule(docRoot: ModuleModel): List<List<String>> {
+    val list = listOf(processModule(docRoot)) + docRoot.sumbodules.map { submodule -> translateModule(submodule) }.flatten()
+    return list.filter { it.isNotEmpty() }
 }
 
 fun compile(documentRoot: ModuleModel): String {
-    val res = mutableListOf<String>()
-    processDeclarations(documentRoot, res)
+    var res = translateModule(documentRoot).joinToString("""
 
-    if (res.isEmpty()) {
-        res.add("// NO DECLARATIONS")
+// ------------------------------------------------------------------------------------------
+""") { it.joinToString("\n") }
+
+    if (res == "") {
+        res = "// NO DECLARATIONS"
     }
-    return res.joinToString("\n")
+    return res
 }
 
 fun output(fileName: String, translator: InputTranslator): String {

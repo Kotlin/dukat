@@ -16,5 +16,7 @@ data class FunctionNode(
         val annotations: MutableList<AnnotationNode>,
 
         val isExport: Boolean,
+
+        var owner: DocumentRootNode?,
         val uid: String
 ) : MemberDeclaration, TopLevelDeclaration

@@ -126,6 +126,7 @@ private fun FunctionDeclaration.convert(): FunctionNode {
             mutableListOf(),
             annotations,
             hasExport,
+            null,
             uid
     )
 }
@@ -209,16 +210,10 @@ private class LowerDeclarationsToNodes {
     fun lowerDocumentRoot(documenRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
         val declarations = documenRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
 
-        val head = mutableListOf<TopLevelDeclaration>()
-        val tail = mutableListOf<TopLevelDeclaration>()
-        declarations.forEach { declaration ->
-            if (declaration is DocumentRootNode) tail.add(declaration) else head.add(declaration)
-        }
-
         val docRoot = DocumentRootNode(
                 documenRoot.packageName,
                 documenRoot.packageName,
-                head + tail,
+                declarations,
                 null
         )
 
@@ -231,6 +226,9 @@ private class LowerDeclarationsToNodes {
                 declaration.owner = docRoot
             }
             if (declaration is InterfaceNode) {
+                declaration.owner = docRoot
+            }
+            if (declaration is FunctionNode) {
                 declaration.owner = docRoot
             }
         }

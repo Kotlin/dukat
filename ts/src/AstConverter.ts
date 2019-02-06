@@ -563,25 +563,23 @@ class AstConverter {
                 this.convertModule(statement).forEach(d => this.registerDeclaration(d, declarations));
             } else if (ts.isExportAssignment(statement)) {
                 let expression = statement.expression;
-                if (ts.isIdentifier(expression)) {
+                if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
                     let symbol = this.typeChecker.getSymbolAtLocation(expression);
                     if (symbol) {
-                        let uid = this.exportContext.getUID(symbol.declarations[0]);
+
+                        if (symbol.flags & ts.SymbolFlags.Alias) {
+                             symbol = this.typeChecker.getAliasedSymbol(symbol);
+                        }
+
+                        let declaration = symbol.declarations[0];
+
+                        let uid = this.exportContext.getUID(declaration);
                         this.registerDeclaration(
                             this.astFactory.createExportAssignmentDeclaration(
                                 uid, !!statement.isExportEquals
                             ), declarations)
                     }
-                } else if (ts.isPropertyAccessExpression(expression)) {
-                    let symbol = this.typeChecker.getSymbolAtLocation(expression);
-                    if (symbol) {
-                        let uid = this.exportContext.getUID(symbol.declarations[0]);
-                        this.registerDeclaration(
-                            this.astFactory.createExportAssignmentDeclaration(
-                                uid, !!statement.isExportEquals
-                            ), declarations)
-                    }
-                } else {
+                }  else {
                     console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
                 }
             } else {

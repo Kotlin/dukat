@@ -24,11 +24,11 @@ fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelDec
     return map
 }
 
-fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelDeclaration>): DocumentRootNode {
+fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelDeclaration>, turnOff: MutableSet<String>): DocumentRootNode {
 
     val declarations = docRoot.declarations.map { declaration ->
         when (declaration) {
-            is DocumentRootNode -> listOf(introduceExportAnnotations(declaration, uidTable))
+            is DocumentRootNode -> listOf(introduceExportAnnotations(declaration, uidTable, turnOff))
 
             is ExportAssignmentDeclaration -> {
                 val defaultAnnotation = AnnotationNode("JsName", listOf("default"))
@@ -52,7 +52,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                     when (entity) {
                         is ClassNode -> {
 
-                            entity.owner?.let { it.showQualifierAnnotation = false}
+                            entity.owner?.let {
+                                turnOff.add(it.fullPackageName)
+                            }
 
                             if (docRoot.owner != null) {
                                 entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
@@ -60,13 +62,25 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                             emptyList<TopLevelDeclaration>()
                         }
                         is InterfaceNode -> {
-                            entity.owner?.let { it.showQualifierAnnotation = false}
+                            entity.owner?.let {
+                                turnOff.add(it.fullPackageName)
+                            }
 
                             if (docRoot.owner != null) {
                                 entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
                             }
                             emptyList()
 
+                        }
+                        is FunctionNode -> {
+                            entity.owner?.let {
+                                turnOff.add(it.fullPackageName)
+                            }
+
+                            if (docRoot.owner != null) {
+                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+                            }
+                            emptyList()
                         }
                         else -> listOf(declaration)
                     }
@@ -81,9 +95,28 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
     return docRoot.copy(declarations = declarations)
 }
 
+private fun DocumentRootNode.turnOff(turnOffData: MutableSet<String>): DocumentRootNode {
+    if (turnOffData.contains(fullPackageName)) {
+        showQualifierAnnotation = false
+    }
+
+    val declarations = declarations.map { declaration ->
+        when (declaration) {
+            is DocumentRootNode -> {
+            declaration.turnOff(turnOffData)
+            }
+            else -> declaration
+        }
+    }
+
+    return copy(declarations = declarations)
+}
+
 fun DocumentRootNode.introduceExports(): DocumentRootNode {
     val uidTable = buildUidTable(this)
-    val docRoot =  introduceExportAnnotations(this, uidTable)
+    val turnOffData = mutableSetOf<String>()
+    val docRoot =  introduceExportAnnotations(this, uidTable, turnOffData)
 
-    return docRoot
+
+    return docRoot.turnOff(turnOffData)
 }
