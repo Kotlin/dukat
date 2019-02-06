@@ -8,6 +8,7 @@ data class DocumentRootNode(
         val declarations: List<TopLevelDeclaration> = emptyList(),
 
         var owner: DocumentRootNode?,
+        var uid: String,
 
         var qualifierName: String = "",
         var isQualifier: Boolean = false,
