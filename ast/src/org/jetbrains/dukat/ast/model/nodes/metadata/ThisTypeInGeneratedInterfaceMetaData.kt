@@ -1,3 +1,3 @@
 package org.jetbrains.dukat.ast.model.nodes.metadata
 
-class ThisTypeInGeneratedInterfaceMetadata : MetaData
+class ThisTypeInGeneratedInterfaceMetaData : MetaData

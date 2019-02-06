@@ -7,7 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetadata
+import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
@@ -117,7 +117,7 @@ class AstContext {
 
     private fun ParameterValueDeclaration.lower() : ParameterValueDeclaration {
         return when (this) {
-            is ThisTypeDeclaration -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetadata())
+            is ThisTypeDeclaration -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
             else -> this
         }
     }

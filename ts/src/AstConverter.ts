@@ -184,7 +184,7 @@ class AstConverter {
 
 
     createIntersectionType(params: Array<TypeDeclaration>) {
-        return this.createTypeDeclaration("@@Intersection", params);
+        return this.astFactory.createIntersectionTypeDeclaration(params);
     }
 
     convertType(type: ts.TypeNode | ts.TypeElement | undefined) : ParameterValue {

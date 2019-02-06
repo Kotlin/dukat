@@ -1,18 +1,20 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.compiler.asIntersection
+import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private class LowerIntersection : ParameterValueLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        declaration.asIntersection()?.let {
-            val firstIntersectionType = it.params[0]
-            firstIntersectionType.meta = it.copy()
-            return lowerParameterValue(firstIntersectionType)
+        return when (declaration) {
+            is IntersectionTypeDeclaration -> {
+                val firstIntersectionType = declaration.params[0]
+                firstIntersectionType.meta = IntersectionMetadata(declaration.params)
+                return lowerParameterValue(firstIntersectionType)
+            }
+            else -> declaration
         }
-
-        return super.lowerParameterValue(declaration)
     }
 }
 

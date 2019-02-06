@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetadata
+import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -17,9 +17,9 @@ private class LowerThisType {
 
     private fun ClassLikeNode.convertToTypeSignature(): TypeDeclaration {
         return when(this) {
-           is InterfaceNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetadata())
-           is ClassNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetadata())
-           else -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetadata())
+           is InterfaceNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+           is ClassNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+           else -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 

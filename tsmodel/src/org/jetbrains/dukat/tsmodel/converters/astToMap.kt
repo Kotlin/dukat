@@ -23,6 +23,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -82,6 +83,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
         is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::uid).convert(this)
+        is IntersectionTypeDeclaration -> listOf(::params).convert(this)
         is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
         is ModifierDeclaration -> listOf(::token).convert(this)
         is ObjectLiteralDeclaration -> listOf(::members).convert(this)

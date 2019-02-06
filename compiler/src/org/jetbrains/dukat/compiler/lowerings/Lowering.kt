@@ -14,6 +14,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -30,6 +31,7 @@ interface Lowering {
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration
     fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
+    fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
 
@@ -39,6 +41,7 @@ interface Lowering {
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is ObjectLiteralDeclaration -> lowerObjectLiteral(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(declaration)
             is DynamicTypeNode -> declaration
             else -> declaration
         }

@@ -24,6 +24,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -78,6 +79,9 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         ExportAssignmentDeclaration::class.simpleName -> ExportAssignmentDeclaration(
                 get("name") as String,
                 get("isExportEquals") as Boolean
+        )
+        IntersectionTypeDeclaration::class.simpleName -> IntersectionTypeDeclaration(
+                getEntities("params")
         )
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
             getEntities("params")
