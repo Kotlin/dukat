@@ -13,11 +13,13 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -47,6 +49,13 @@ private fun ParameterValueDeclaration.translateSignatureMeta(): String {
         else -> ""
     }
 
+}
+
+private fun QualifiedNode.translate(): String {
+    val translateLeft = left.translate()
+    val translaterRight = right.translate()
+
+    return translateLeft + "." + translaterRight
 }
 
 private fun ParameterValueDeclaration.translate(): String {
@@ -82,6 +91,10 @@ private fun ParameterValueDeclaration.translate(): String {
         return translate()
     } else if (this is GeneratedInterfaceReferenceNode) {
         return name
+    } else if (this is QualifiedNode) {
+        return translate()
+    } else if (this is IdentifierDeclaration) {
+        return value
     } else {
         return "failed to translateType ${this}"
     }

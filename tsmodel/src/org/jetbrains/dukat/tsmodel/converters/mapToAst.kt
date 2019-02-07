@@ -12,11 +12,14 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -176,6 +179,13 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("modifiers"),
                 get("uid") as String
         )
+        ImportEqualsDeclaration::class.simpleName -> ImportEqualsDeclaration(
+            get("name") as String,
+            getEntity("moduleReference")
+        )
+        IdentifierDeclaration::class.simpleName -> IdentifierDeclaration(
+                get("value") as String
+        )
         InterfaceDeclaration::class.simpleName -> InterfaceDeclaration(
                 get("name") as String,
                 getEntities("members"),
@@ -184,6 +194,10 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("uid") as String
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(getEntities("members"))
+        QualifiedNamedDeclaration::class.simpleName -> QualifiedNamedDeclaration(
+           getEntity("left"),
+           getEntity("right")
+        )
         else -> throw Exception("failed to create declaration from mapper: ${this}")
     }
 

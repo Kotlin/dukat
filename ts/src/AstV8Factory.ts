@@ -10,14 +10,17 @@ declare class AstFactoryV8 implements AstFactory {
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration;
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
     createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
+    createIdentifierDeclaration(value: string): IdentifierDeclaration;
+    createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;
-    createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;
     createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, uid: String): InterfaceDeclaration;
+    createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;
     createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration;
     createMethodSignatureDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MethodSignatureDeclaration;
     createModifierDeclaration(name: string): ModifierDeclaration;
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration;
+    createQualifiedNameDeclaration(left: ParameterValue, right: ParameterValue): QualifierDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createThisTypeDeclaration(): ThisTypeDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;

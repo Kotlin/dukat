@@ -81,11 +81,13 @@ class AstConverter {
 
         if (ts.isIdentifier(functionDeclaration.name)) {
             let uid = this.exportContext.getUID(functionDeclaration);
+            let returnType = functionDeclaration.type ?
+                this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit");
+
             return this.astFactory.createFunctionDeclaration(
                 functionDeclaration.name ? functionDeclaration.name.getText() : "",
                 parameterDeclarations,
-                functionDeclaration.type ?
-                    this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit"),
+                returnType,
                 typeParameterDeclarations,
                 this.convertModifiers(functionDeclaration.modifiers),
                 uid
@@ -187,11 +189,26 @@ class AstConverter {
         return this.astFactory.createIntersectionTypeDeclaration(params);
     }
 
-    convertType(type: ts.TypeNode | ts.TypeElement | undefined) : ParameterValue {
+    convertEntityName(entityName: ts.EntityName) : ModuleReferenceDeclaration | null {
+        if (ts.isIdentifier(entityName)) {
+            return this.astFactory.createIdentifierDeclaration(entityName.text)
+        } else if (ts.isQualifiedName(entityName)) {
+            return this.astFactory.createQualifiedNameDeclaration(
+                this.convertEntityName(entityName.left) as ModuleReferenceDeclaration,
+                this.convertEntityName(entityName.right) as ModuleReferenceDeclaration
+            )
+        }
+
+        return null
+    }
+
+    convertType(type: ts.TypeNode | ts.TypeElement | ts.EntityName | undefined) : ParameterValue {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
-            if (type.kind == ts.SyntaxKind.VoidKeyword) {
+            if (ts.isIdentifier(type)) {
+              return this.astFactory.createIdentifierDeclaration(type.text)
+            } if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
             } else if (ts.isArrayTypeNode(type)) {
                 let arrayType = type as ts.ArrayTypeNode;
@@ -211,15 +228,22 @@ class AstConverter {
                         .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
                     return this.createIntersectionType(params);
-                } else if (type.kind == ts.SyntaxKind.TypeReference) {
-                    let typeReferenceNode = type as ts.TypeReferenceNode;
-                    if (typeof typeReferenceNode.typeArguments != "undefined") {
-                        let params = typeReferenceNode.typeArguments
-                            .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
+                } else if (ts.isTypeReferenceNode(type)) {
+                    if (type.typeArguments) {
+                        let params = type.typeArguments
+                            .map(argumentType => {
+                                return this.convertType(argumentType)
+                            }) as Array<TypeDeclaration>;
 
-                        return this.createTypeDeclaration(typeReferenceNode.typeName.getText(), params)
+                        return this.createTypeDeclaration(type.typeName.getText(), params)
                     } else {
-                        return this.createTypeDeclaration(typeReferenceNode.typeName.getText())
+                        if (ts.isQualifiedName(type.typeName)) {
+                            let entity = this.convertEntityName(type.typeName);
+                            if (entity) {
+                                return entity
+                            }
+                        }
+                        return this.createTypeDeclaration(type.typeName.getText())
                     }
                 } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
                     let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
@@ -583,6 +607,16 @@ class AstConverter {
                 }  else {
                     console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
                 }
+            } else if (ts.isImportEqualsDeclaration(statement)) {
+                if (ts.isEntityName(statement.moduleReference)) {
+                    let moduleReferenceDeclaration = this.convertEntityName(statement.moduleReference);
+                    this.registerDeclaration(this.astFactory.createImportEqualsDeclaration(
+                        statement.name.getText(),
+                        moduleReferenceDeclaration as ModuleReferenceDeclaration
+                    ), declarations)
+                } else {
+                    println(`[TS] skipping external module reference ${statement.moduleReference.getText()}`)
+                }
             } else {
                 console.log("SKIPPING ", statement.kind);
             }
@@ -598,11 +632,12 @@ class AstConverter {
         if (module.body) {
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
+            let uid = this.exportContext.getUID(module);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertDeclarations(body.statements);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, this.exportContext.getUID(module)), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, uid), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers, this.exportContext.getUID(module)), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers, uid), declarations);
             }
         }
         return declarations

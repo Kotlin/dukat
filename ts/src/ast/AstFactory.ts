@@ -1,9 +1,15 @@
 declare interface AstFactory {
 
-    createThisTypeDeclaration(): ThisTypeDeclaration
+    createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
 
-    createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration
-    createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration
+    createIdentifierDeclaration(value: string): IdentifierDeclaration;
+
+    createQualifiedNameDeclaration(left: ParameterValue, right: ParameterValue): QualifierDeclaration;
+
+    createThisTypeDeclaration(): ThisTypeDeclaration;
+
+    createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration;
+    createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
 
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;

@@ -5,7 +5,9 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -14,6 +16,12 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 interface AstNodeFactory<T> {
+
+    fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
+
+    fun createIdentifierDeclaration(value: String): T
+
+    fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: ParameterValueDeclaration): T
 
     fun createThisTypeDeclaration(): T
 

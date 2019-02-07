@@ -13,11 +13,15 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -33,6 +37,18 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration {
+        return ImportEqualsDeclaration(name, moduleReference)
+    }
+
+    override fun createIdentifierDeclaration(value: String): AstNode {
+        return IdentifierDeclaration(value)
+    }
+
+    override fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: ParameterValueDeclaration): AstNode {
+        return QualifiedNamedDeclaration(left, right)
+    }
 
     override fun createThisTypeDeclaration(): AstNode {
         return ThisTypeDeclaration()

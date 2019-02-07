@@ -14,6 +14,7 @@ import org.jetbrains.dukat.compiler.lowerings.introduceExports
 import org.jetbrains.dukat.compiler.lowerings.introduceGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.introduceModuleMetadata
 import org.jetbrains.dukat.compiler.lowerings.introduceNodes
+import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
@@ -59,6 +60,7 @@ interface InputTranslator {
                 .filterOutNonDeclarations()
                 .introduceNodes()
                 .introduceModuleMetadata()
+                .introduceQualifiedNode()
                 .introduceExports()
                 .generateInterfaceReferences(myAstContext)
                 .introduceGeneratedEntities(myAstContext)

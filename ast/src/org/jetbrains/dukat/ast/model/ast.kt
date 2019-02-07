@@ -11,6 +11,7 @@ import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -37,6 +38,7 @@ fun <T: AstNode> AstNode.duplicate(): T {
     return when (this) {
         is EnumNode -> copy() as T
         is EnumDeclaration -> copy() as T
+        is ImportEqualsDeclaration -> copy() as T
         is ExportAssignmentDeclaration -> copy() as T
         is ClassDeclaration -> copy() as T
         is ObjectNode -> copy() as T

@@ -26,6 +26,7 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -105,34 +106,47 @@ private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNod
 
 private fun EnumDeclaration.convert(): EnumNode {
     return EnumNode(
-        name = name,
-        values = values.map { value -> EnumTokenNode(value.value, value.value) }
-    )
-}
-
-private fun FunctionDeclaration.convert(): FunctionNode {
-    val annotations = mutableListOf<AnnotationNode>()
-
-    val hasExport = ModifierDeclaration.hasExport(modifiers)
-    if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
-        annotations.add(AnnotationNode("JsName", listOf("default")))
-    }
-
-    return FunctionNode(
-            name,
-            parameters,
-            type,
-            typeParameters,
-            mutableListOf(),
-            annotations,
-            hasExport,
-            null,
-            uid
+            name = name,
+            values = values.map { value -> EnumTokenNode(value.value, value.value) }
     )
 }
 
 
 private class LowerDeclarationsToNodes {
+
+    private fun FunctionDeclaration.convert(): FunctionNode {
+        val annotations = mutableListOf<AnnotationNode>()
+
+        val hasExport = ModifierDeclaration.hasExport(modifiers)
+        if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
+            annotations.add(AnnotationNode("JsName", listOf("default")))
+        }
+
+        return FunctionNode(
+                name,
+                parameters,
+                type,
+                typeParameters,
+                mutableListOf(),
+                annotations,
+                hasExport,
+                null,
+                uid
+        )
+    }
+
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberDeclaration {
+        val memberDeclaration = convertMethodSignatureDeclaration(declaration, owner)
+        return when (memberDeclaration) {
+            is PropertyNode -> memberDeclaration
+            is MethodNode -> memberDeclaration.copy(
+                    parameters = memberDeclaration.parameters,
+                    type = memberDeclaration.type
+            )
+            else -> memberDeclaration
+        }
+    }
+
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeNode): List<MemberDeclaration> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -147,7 +161,7 @@ private class LowerDeclarationsToNodes {
                     emptyList(),
                     true
             ))
-            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration, owner))
+            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner))
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
@@ -212,10 +226,19 @@ private class LowerDeclarationsToNodes {
     fun lowerDocumentRoot(documentRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
         val declarations = documentRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
 
+        val imports = mutableListOf<ImportEqualsDeclaration>()
+        val nonImports = mutableListOf<TopLevelDeclaration>()
+        declarations.forEach { declaration ->
+            if (declaration is ImportEqualsDeclaration) {
+                imports.add(declaration)
+            } else nonImports.add(declaration)
+        }
+
         val docRoot = DocumentRootNode(
                 documentRoot.packageName,
                 documentRoot.packageName,
-                declarations,
+                nonImports,
+                imports,
                 null,
                 documentRoot.uid
         )

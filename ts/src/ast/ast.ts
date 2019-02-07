@@ -3,10 +3,19 @@ declare interface AstNode {
 }
 
 
-declare interface Declaration extends AstNode {
+declare interface Declaration extends AstNode {}
+
+declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue {
+    left: ParameterValue,
+    right: ParameterValue
 }
 
-declare interface ThisTypeDeclaration extends Declaration {
+declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration {}
+declare interface ThisTypeDeclaration extends Declaration {}
+declare interface ModuleReferenceDeclaration extends Declaration {}
+
+declare interface ImportEqualsDeclaration extends Declaration {
+    name: string
 }
 
 declare interface EnumDeclaration extends ParameterValue {
