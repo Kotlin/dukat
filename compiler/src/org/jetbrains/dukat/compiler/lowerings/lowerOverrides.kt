@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
 private fun InterfaceNode.getKnownParents(astContext: AstContext) =
@@ -97,8 +99,16 @@ private fun MethodNode.isSpecialCase(): Boolean {
 
 private fun ParameterValueDeclaration.isOverriding(otherParameterValue: ParameterValueDeclaration): Boolean {
     //TODO: we need to do this the right way
+    println(otherParameterValue)
     if (this == otherParameterValue) {
         return true
+    }
+
+    if (otherParameterValue is DynamicTypeNode) {
+        val projectedType = otherParameterValue.projectedType
+        if (projectedType is UnionTypeDeclaration) {
+            return projectedType.params.any { isOverriding(it) }
+        }
     }
 
     if (otherParameterValue == TypeDeclaration("Any", emptyList(), false, null)) {
