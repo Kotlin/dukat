@@ -184,11 +184,12 @@ private class LowerDeclarationsToNodes {
     }
 
     fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
-        return if (declaration.type is ObjectLiteralDeclaration) {
+        val type = declaration.type
+        return if (type is ObjectLiteralDeclaration) {
             //TODO: don't forget to create owner
             val objectNode = ObjectNode(
                     declaration.name,
-                    (declaration.type as ObjectLiteralDeclaration).members.flatMap { member -> lowerMemberDeclaration(member, ROOT_CLASS_DECLARATION) },
+                    type.members.flatMap { member -> lowerMemberDeclaration(member, ROOT_CLASS_DECLARATION) },
                     mutableListOf()
             )
 
@@ -203,7 +204,7 @@ private class LowerDeclarationsToNodes {
         } else {
             VariableNode(
                     declaration.name,
-                    declaration.type,
+                    type,
                     mutableListOf(),
                     false,
                     null,

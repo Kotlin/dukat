@@ -203,7 +203,7 @@ private fun MethodNode.translate(): List<String> {
     val open = !static && open
     val overrideClause = if (override) "override" else if (open) "open" else ""
 
-    return annotations.toMutableList() + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType}${type.translateSignatureMeta()} = definedExternally")
+    return annotations + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType}${type.translateSignatureMeta()} = definedExternally")
 }
 
 private fun ConstructorNode.translate(): List<String> {
@@ -274,13 +274,7 @@ private fun MethodNode.translateSignature(): List<String> {
     val overrideClause = if (override) "override " else ""
 
     val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}"
-    return if (annotations.isEmpty()) {
-        listOf(
-                methodNodeTranslation
-        )
-    } else annotations.toMutableList() + listOf(methodNodeTranslation)
-
-
+    return annotations + listOf(methodNodeTranslation)
 }
 
 private fun MemberDeclaration.translateSignature(): List<String> {

@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.AstContext
@@ -62,6 +63,10 @@ private class GenerateInterfaceReferences(private val astContext: AstContext) : 
             )
             else -> declaration
         }
+    }
+
+    override fun lowerObjectNode(declaration: ObjectNode): ObjectNode {
+        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration) })
     }
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
