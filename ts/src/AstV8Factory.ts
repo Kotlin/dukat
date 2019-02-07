@@ -1,4 +1,5 @@
 declare class AstFactoryV8 implements AstFactory {
+    createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbol): PropertyAccessDeclaration;
     createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration;
     createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
     createConstructorDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration;
@@ -9,7 +10,7 @@ declare class AstFactoryV8 implements AstFactory {
     createExpression(kind: TypeDeclaration, meta: string): Expression;
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration;
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
-    createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
+    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
     createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;

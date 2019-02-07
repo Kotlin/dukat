@@ -18,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -93,7 +94,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("value") as String
         )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
-                get(HeritageClauseDeclaration::name.name) as String,
+                getEntity(HeritageClauseDeclaration::name.name),
                 getEntities(HeritageClauseDeclaration::typeArguments.name),
                 get(HeritageClauseDeclaration::extending.name) as Boolean
         )
@@ -137,6 +138,10 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("typeParameters"),
                 getEntities("modifiers"),
                 get("uid") as String
+        )
+        PropertyAccessDeclaration::class.simpleName -> PropertyAccessDeclaration(
+                getEntity("name"),
+                getEntity("expression")
         )
         MethodSignatureDeclaration::class.simpleName -> MethodSignatureDeclaration(
                 get(MethodSignatureDeclaration::name.name) as String,

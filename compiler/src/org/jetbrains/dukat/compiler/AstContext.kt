@@ -14,7 +14,10 @@ import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
 import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -23,8 +26,22 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
+
+
+// TODO: TypeAliases should be revisited
+private fun IdentifierDeclaration.translate() = value
+
+private fun HeritageSymbolDeclaration.translate(): String {
+    return when(this) {
+        is IdentifierDeclaration -> translate()
+        is PropertyAccessDeclaration ->  expression.translate() + "." + name.translate()
+        else -> throw Exception("unknown heritage clause ${this}")
+    }
+}
+
+
 private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
-    return (aliasName == heritageClause.name) && (typeParameters == heritageClause.typeArguments)
+    return aliasName == heritageClause.name.translate()
 }
 
 private fun TypeAliasDeclaration.canSusbtitute(type: TypeDeclaration): Boolean {
@@ -55,18 +72,18 @@ private fun areIdentical(aInterface: InterfaceNode, bInterface: InterfaceNode): 
 }
 
 class AstContext {
-    private val myInterfaces: MutableMap<String, InterfaceNode> = mutableMapOf()
-    private val myClassNodes: MutableMap<String, ClassNode> = mutableMapOf()
+    private val myInterfaces: MutableMap<HeritageSymbolDeclaration, InterfaceNode> = mutableMapOf()
+    private val myClassNodes: MutableMap<HeritageSymbolDeclaration, ClassNode> = mutableMapOf()
     private val myTypeAliasDeclaration: MutableList<TypeAliasDeclaration> = mutableListOf()
 
     private val myGeneratedInterfaces = mutableMapOf<String, InterfaceNode>()
 
     fun registerInterface(interfaceDeclaration: InterfaceNode) {
-        myInterfaces.put(interfaceDeclaration.name, interfaceDeclaration)
+        myInterfaces.put(IdentifierDeclaration(interfaceDeclaration.name), interfaceDeclaration)
     }
 
     fun registerClass(classDeclaration: ClassNode) {
-        myClassNodes.put(classDeclaration.name, classDeclaration)
+        myClassNodes.put(IdentifierDeclaration(classDeclaration.name), classDeclaration)
     }
 
     fun registerTypeAlias(typeAlias: TypeAliasDeclaration) {
@@ -180,9 +197,9 @@ class AstContext {
         return genInterfaces
     }
 
-    fun resolveInterface(name: String): InterfaceNode? = myInterfaces.get(name)
+    fun resolveInterface(name: HeritageSymbolDeclaration): InterfaceNode? = myInterfaces.get(name)
 
-    fun resolveClass(name: String): ClassNode? {
+    fun resolveClass(name: HeritageSymbolDeclaration): ClassNode? {
         return myClassNodes.get(name)
     }
 }

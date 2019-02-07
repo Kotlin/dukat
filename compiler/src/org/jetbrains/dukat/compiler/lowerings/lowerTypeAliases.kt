@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLowering {
@@ -14,7 +15,7 @@ private class LowerTypeAliases(val astContext: AstContext) : ParameterValueLower
             val resolved = astContext.resolveTypeAlias(parent)
 
             if (resolved is TypeDeclaration) {
-                HeritageClauseDeclaration(resolved.value, emptyList(), false)
+                HeritageClauseDeclaration(IdentifierDeclaration(resolved.value), emptyList(), false)
             } else {
                 parent
             }

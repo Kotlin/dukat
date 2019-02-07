@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -20,6 +21,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -37,6 +39,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbolDeclaration): PropertyAccessDeclaration {
+        return PropertyAccessDeclaration(name, expression)
+    }
 
     override fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration {
         return ImportEqualsDeclaration(name, moduleReference)
@@ -66,7 +72,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 
-    override fun createHeritageClauseDeclaration(name: String, typeArguments: List<TokenDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
+    override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<TokenDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
     override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration) = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
 

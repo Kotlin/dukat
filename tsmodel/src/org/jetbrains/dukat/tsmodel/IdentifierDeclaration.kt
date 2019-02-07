@@ -7,4 +7,4 @@ data class IdentifierDeclaration(
 
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration
+) : ParameterValueDeclaration, ModuleReferenceDeclaration, HeritageSymbolDeclaration

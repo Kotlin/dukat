@@ -5,11 +5,13 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -17,6 +19,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 interface AstNodeFactory<T> {
+
+    fun createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbolDeclaration): PropertyAccessDeclaration
 
     fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
 
@@ -35,7 +39,7 @@ interface AstNodeFactory<T> {
     fun createTokenDeclaration(value: String): T
 
     fun createHeritageClauseDeclaration(
-            name: String,
+            name: HeritageSymbolDeclaration,
             typeArguments: List<TokenDeclaration>,
             extending: Boolean
     ): T

@@ -66,8 +66,11 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = astFactory.createExportAssignmentDeclaration(name, isExportEquals).toV8()
     fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).toV8()
 
-    fun createHeritageClauseDeclaration(name: String, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
-            name,
+    fun createPropertyAccessDeclaration(name: V8Object, expression: V8Object)
+        = astFactory.createPropertyAccessDeclaration(name.toAst(), expression.toAst()).toV8()
+
+    fun createHeritageClauseDeclaration(name: V8Object, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
+            name.toAst(),
             typeArguments.toAst(),
             extending
     ).toV8()

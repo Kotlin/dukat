@@ -1,6 +1,8 @@
 declare interface AstFactory {
 
-    createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
+    createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbol): PropertyAccessDeclaration;
+
+    createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
 
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
 
@@ -13,7 +15,7 @@ declare interface AstFactory {
 
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
-    createHeritageClauseDeclaration(name: string, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration
+    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration
 
     createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
 

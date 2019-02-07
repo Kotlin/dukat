@@ -483,6 +483,23 @@ class AstConverter {
         )
     }
 
+    private convertPropertyAccessExpression(propertyAccessExpression: ts.PropertyAccessExpression): PropertyAccessDeclaration  {
+        let convertedExpression: HeritageSymbol | null;
+        if (ts.isIdentifier(propertyAccessExpression.expression)) {
+            convertedExpression = this.astFactory.createIdentifierDeclaration(propertyAccessExpression.expression.text)
+        } else if (ts.isPropertyAccessExpression(propertyAccessExpression.expression)) {
+            convertedExpression = this.convertPropertyAccessExpression(propertyAccessExpression.expression)
+        } else {
+            // TODO: we can not have errors to be honest
+            throw new Error("never supposed to be there")
+        }
+
+        return this.astFactory.createPropertyAccessDeclaration(
+            this.astFactory.createIdentifierDeclaration(propertyAccessExpression.name.text),
+            convertedExpression
+        )
+    }
+
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
@@ -502,13 +519,31 @@ class AstConverter {
                             }
                         }
 
-                        this.registerDeclaration(
-                            this.astFactory.createHeritageClauseDeclaration(
-                                type.expression.getText(),
-                                typeArguments,
-                                extending
-                            ), parentEntities
-                        );
+                        let expression = type.expression;
+
+                        if (ts.isPropertyAccessExpression(expression)) {
+                            let name = this.convertPropertyAccessExpression(expression);
+
+                            this.registerDeclaration(
+                                this.astFactory.createHeritageClauseDeclaration(
+                                    name,
+                                    typeArguments,
+                                    extending
+                                ), parentEntities
+                            );
+                        } else if (ts.isIdentifier(expression)) {
+                            let name = this.astFactory.createIdentifierDeclaration(expression.getText());
+
+                            this.registerDeclaration(
+                                this.astFactory.createHeritageClauseDeclaration(
+                                    name,
+                                    typeArguments,
+                                    extending
+                                ), parentEntities
+                            );
+                        }
+
+
                     }
                 }
             }

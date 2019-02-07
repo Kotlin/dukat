@@ -19,8 +19,10 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -309,6 +311,18 @@ private fun MemberDeclaration.isStatic() = when (this) {
     else -> false
 }
 
+private fun IdentifierDeclaration.translate() = value
+
+private fun HeritageSymbolDeclaration.translate(): String {
+    return when(this) {
+        is IdentifierDeclaration -> translate()
+        is PropertyAccessDeclaration -> expression.translate() + "." + name.translate()
+        else -> throw Exception("unknown heritage clause ${this}")
+    }
+}
+
+
+
 private fun processDeclarations(docRoot: ModuleModel): List<String> {
     val res: MutableList<String> = mutableListOf()
 
@@ -324,7 +338,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
 
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name}${translateTypeArguments(parentEntity.typeArguments)}"
+                    "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
                 }.joinToString(", ")
             } else ""
 
@@ -375,7 +389,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name}${translateTypeArguments(parentEntity.typeArguments)}"
+                    "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
                 }.joinToString(", ")
             } else ""
             res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (hasMembers) " {" else "")

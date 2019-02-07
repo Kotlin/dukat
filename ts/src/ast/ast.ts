@@ -5,12 +5,15 @@ declare interface AstNode {
 
 declare interface Declaration extends AstNode {}
 
+declare interface HeritageSymbol extends Declaration {}
+declare interface PropertyAccessDeclaration extends HeritageSymbol {}
+
 declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue {
     left: ParameterValue,
     right: ParameterValue
 }
 
-declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration {}
+declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, HeritageSymbol {}
 declare interface ThisTypeDeclaration extends Declaration {}
 declare interface ModuleReferenceDeclaration extends Declaration {}
 

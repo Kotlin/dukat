@@ -17,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -93,6 +94,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is ModifierDeclaration -> listOf(::token).convert(this)
         is ObjectLiteralDeclaration -> listOf(::members).convert(this)
         is ParameterDeclaration -> toMap()
+        is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
         is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
