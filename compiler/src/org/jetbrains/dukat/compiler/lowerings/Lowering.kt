@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
@@ -34,6 +35,7 @@ interface Lowering {
     fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
+    fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
@@ -63,6 +65,7 @@ interface Lowering {
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
             is DocumentRootNode -> lowerDocumentRoot(declaration)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
+            is ObjectNode -> lowerObjectNode(declaration)
             else -> declaration.duplicate()
         }
     }

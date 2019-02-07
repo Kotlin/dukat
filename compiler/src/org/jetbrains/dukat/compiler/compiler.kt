@@ -360,7 +360,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add(objectNode + " {")
 
             if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
+                res.addAll(members.flatMap { it.translate() }.map({ "   " + it }))
             }
 
             res.add("}")

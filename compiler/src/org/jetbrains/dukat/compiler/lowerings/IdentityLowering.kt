@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -30,6 +31,8 @@ interface IdentityLowering : Lowering {
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration = declaration
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration = declaration
+
+    override fun lowerObjectNode(declaration: ObjectNode) = declaration
 
     override fun lowerObjectLiteral(declaration: ObjectLiteralDeclaration): ObjectLiteralDeclaration = declaration
 
