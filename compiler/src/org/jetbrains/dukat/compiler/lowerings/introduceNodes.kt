@@ -30,6 +30,7 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -226,11 +227,11 @@ private class LowerDeclarationsToNodes {
     fun lowerDocumentRoot(documentRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
         val declarations = documentRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
 
-        val imports = mutableListOf<ImportEqualsDeclaration>()
+        val imports = mutableMapOf<String, ModuleReferenceDeclaration>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
         declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
-                imports.add(declaration)
+                imports.put(declaration.name, declaration.moduleReference)
             } else nonImports.add(declaration)
         }
 
