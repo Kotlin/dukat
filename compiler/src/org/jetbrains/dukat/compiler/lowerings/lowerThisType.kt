@@ -10,20 +10,26 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class LowerThisType {
 
+    private fun translateParams(typeParams: List<TypeParameterDeclaration>): List<TypeDeclaration> {
+        return typeParams.map { typeParam -> TypeDeclaration(typeParam.name, emptyList()) }
+    }
+
     private fun ClassLikeNode.convertToTypeSignature(): TypeDeclaration {
-        return when(this) {
-           is InterfaceNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
-           is ClassNode ->  TypeDeclaration(name, emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
-           else -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+
+        return when (this) {
+            is InterfaceNode -> TypeDeclaration(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeDeclaration(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+            else -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 
-    private fun ParameterValueDeclaration.lower(owner: ClassLikeNode) : ParameterValueDeclaration {
+    private fun ParameterValueDeclaration.lower(owner: ClassLikeNode): ParameterValueDeclaration {
         return when (this) {
             is ThisTypeDeclaration -> owner.convertToTypeSignature()
             else -> this
@@ -46,7 +52,7 @@ private class LowerThisType {
         return declaration.copy(members = declaration.members.map { lowerMemberNode(it, declaration) })
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration  {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
             is InterfaceNode -> lowerInterfaceNode(declaration)
             is ClassNode -> lowerClassNode(declaration)
@@ -54,7 +60,7 @@ private class LowerThisType {
         }
     }
 
-    fun lowerDocumentRoot(documentRootNode: DocumentRootNode) : DocumentRootNode {
+    fun lowerDocumentRoot(documentRootNode: DocumentRootNode): DocumentRootNode {
         return documentRootNode.copy(declarations = documentRootNode.declarations.map { lowerTopLevelDeclaration(it) })
     }
 }

@@ -50,6 +50,7 @@ private fun ParameterValueDeclaration.translateSignatureMeta(): String {
 }
 
 private fun ParameterValueDeclaration.translate(): String {
+
     if (this is TypeDeclaration) {
         val res = mutableListOf(value)
         if (isGeneric()) {
@@ -302,8 +303,7 @@ private fun MemberDeclaration.isStatic() = when (this) {
 }
 
 private fun processDeclarations(docRoot: ModuleModel): List<String> {
-    val res: MutableList<String> = mutableListOf<String>()
-
+    val res: MutableList<String> = mutableListOf()
 
     for (declaration in docRoot.declarations) {
         if (declaration is VariableNode) {
