@@ -4,7 +4,7 @@ declare interface AstFactory {
 
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
 
-    createQualifiedNameDeclaration(left: ParameterValue, right: ParameterValue): QualifierDeclaration;
+    createQualifiedNameDeclaration(left: ParameterValue, right: IdentifierDeclaration): QualifierDeclaration;
 
     createThisTypeDeclaration(): ThisTypeDeclaration;
 

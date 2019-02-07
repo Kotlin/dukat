@@ -46,7 +46,7 @@ class AstFactory : AstNodeFactory<AstNode> {
         return IdentifierDeclaration(value)
     }
 
-    override fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: ParameterValueDeclaration): AstNode {
+    override fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: IdentifierDeclaration): AstNode {
         return QualifiedNamedDeclaration(left, right)
     }
 

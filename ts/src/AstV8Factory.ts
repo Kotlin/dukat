@@ -20,7 +20,7 @@ declare class AstFactoryV8 implements AstFactory {
     createModifierDeclaration(name: string): ModifierDeclaration;
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral;
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration;
-    createQualifiedNameDeclaration(left: ParameterValue, right: ParameterValue): QualifierDeclaration;
+    createQualifiedNameDeclaration(left: ParameterValue, right: IdentifierDeclaration): QualifierDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createThisTypeDeclaration(): ThisTypeDeclaration;
     createTokenDeclaration(value: string): TokenDeclaration;
