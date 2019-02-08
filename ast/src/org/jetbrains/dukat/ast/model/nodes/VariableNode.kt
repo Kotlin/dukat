@@ -12,4 +12,4 @@ data class VariableNode(
         var immutable: Boolean,
         var owner: DocumentRootNode?,
         val uid: String
-) : TopLevelDeclaration
+) : TopLevelDeclaration, MergableNode

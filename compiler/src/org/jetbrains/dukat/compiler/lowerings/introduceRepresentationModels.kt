@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -45,7 +44,7 @@ private fun ClassNode.convertToClassModel() : ClassModel {
     )
 }
 
-private fun InterfaceNode.convertToInterfaceModel() : InterfaceModel {
+private fun org.jetbrains.dukat.ast.model.nodes.InterfaceNode.convertToInterfaceModel() : InterfaceModel {
     val staticMembers = mutableListOf<MemberDeclaration>()
     val ownMembers = mutableListOf<MemberDeclaration>()
 
@@ -74,7 +73,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
         when (declaration) {
             is DocumentRootNode -> declaration.introduceRepresentationModels()
             is ClassNode -> declaration.convertToClassModel()
-            is InterfaceNode -> declaration.convertToInterfaceModel()
+            is org.jetbrains.dukat.ast.model.nodes.InterfaceNode -> declaration.convertToInterfaceModel()
             else -> declaration
         }
     }
@@ -95,6 +94,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
 
     return ModuleModel(
         packageName = fullPackageName,
+        shortName = packageName,
         declarations = declarationsFiltered,
         annotations = annotations,
         sumbodules = submodules

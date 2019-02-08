@@ -386,16 +386,27 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add("}")
         } else if (declaration is InterfaceModel) {
             val hasMembers = declaration.members.isNotEmpty()
+            val staticMembers = declaration.companionObject.members
+
+            val isBlock = hasMembers || staticMembers.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
                     "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
                 }.joinToString(", ")
             } else ""
-            res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (hasMembers) " {" else "")
-            if (hasMembers) {
+            res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (isBlock) " {" else "")
+            if (isBlock) {
                 res.addAll(declaration.members.flatMap { it.translateSignature() }.map { "    " + it })
+
+                if (staticMembers.isNotEmpty()) {
+                    res.add("    companion object {")
+                    res.addAll(staticMembers.flatMap { it.translate() }.map({ "       ${it}" }))
+                    res.add("    }")
+                }
+
                 res.add("}")
             }
+
 
         }
     }
