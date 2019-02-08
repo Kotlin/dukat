@@ -1,10 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.model.ClassModel
+import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -43,11 +45,36 @@ private fun ClassNode.convertToClassModel() : ClassModel {
     )
 }
 
+private fun InterfaceNode.convertToInterfaceModel() : InterfaceModel {
+    val staticMembers = mutableListOf<MemberDeclaration>()
+    val ownMembers = mutableListOf<MemberDeclaration>()
+
+    members.forEach { member ->
+        if (member.isStatic()) {
+            staticMembers.add(member)
+        } else ownMembers.add(member)
+    }
+
+    return InterfaceModel(
+            name = name,
+            members = ownMembers,
+            companionObject = ObjectNode(
+                    "",
+                    staticMembers,
+                    mutableListOf()
+            ),
+            typeParameters = typeParameters,
+            parentEntities = parentEntities,
+            annotations = annotations
+    )
+}
+
 fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     val declarations = declarations.map {declaration ->
         when (declaration) {
             is DocumentRootNode -> declaration.introduceRepresentationModels()
             is ClassNode -> declaration.convertToClassModel()
+            is InterfaceNode -> declaration.convertToInterfaceModel()
             else -> declaration
         }
     }

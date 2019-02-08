@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.model.ClassModel
+import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -9,7 +10,6 @@ import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -384,7 +384,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             }
 
             res.add("}")
-        } else if (declaration is InterfaceNode) {
+        } else if (declaration is InterfaceModel) {
             val hasMembers = declaration.members.isNotEmpty()
             val parents = if (declaration.parentEntities.isNotEmpty()) {
                 " : " + declaration.parentEntities.map { parentEntity ->
