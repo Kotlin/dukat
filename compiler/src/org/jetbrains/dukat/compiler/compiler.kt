@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.isGeneric
+import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
@@ -333,7 +333,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add(declaration.translate())
         } else if (declaration is FunctionNode) {
             res.add(declaration.translate())
-        } else if (declaration is ClassNode) {
+        } else if (declaration is ClassModel) {
             val primaryConstructor = declaration.primaryConstructor
 
             val parents = if (declaration.parentEntities.isNotEmpty()) {
@@ -346,8 +346,8 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-            val staticMembers = declaration.members.filter { it.isStatic() }
-            val members = declaration.members.filter { !it.isStatic() }
+            val members = declaration.members
+            val staticMembers = declaration.companionObject.members
 
             val hasMembers = members.isNotEmpty()
             val hasStaticMembers = staticMembers.isNotEmpty()
@@ -376,7 +376,6 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             val members = declaration.members
 
             val hasMembers = members.isNotEmpty()
-            val isBlock = hasMembers
 
             res.add(objectNode + " {")
 
