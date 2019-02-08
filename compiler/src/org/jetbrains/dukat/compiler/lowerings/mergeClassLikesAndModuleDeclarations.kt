@@ -88,20 +88,20 @@ fun InterfaceModel.merge(interfaceModel: InterfaceModel): InterfaceModel {
 
 
 fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
-    val rawInterfaces = mutableMapOf<String, MutableList<InterfaceModel>>()
+    val interfacesInBucket = mutableMapOf<String, MutableList<InterfaceModel>>()
 
     val classes = mutableMapOf<String, ClassModel>()
 
     declarations.forEach { declaration ->
         if (declaration is InterfaceModel) {
-            rawInterfaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
+            interfacesInBucket.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         } else if (declaration is ClassModel) {
             classes.put(declaration.name, declaration)
         }
     }
 
 
-    val interfaces = rawInterfaces.mapValues { entry -> entry.value.reduceRight { interfaceModel, acc -> interfaceModel.merge(acc) } }.toMutableMap()
+    val interfaces = interfacesInBucket.mapValues { entry -> entry.value.reduceRight { interfaceModel, acc -> interfaceModel.merge(acc) } }.toMutableMap()
 
     val modulesToBeMergedWithInterfaces = mutableMapOf<String, MutableList<ModuleModel>>()
     val modulesToBeMergedWithClasses = mutableMapOf<String, MutableList<ModuleModel>>()
