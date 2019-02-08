@@ -606,16 +606,15 @@ class AstConverter {
                     this.registerDeclaration(convertedFunctionDeclaration, declarations)
                 }
             } else if (ts.isInterfaceDeclaration(statement)) {
-                let interfaceDeclaration = statement as ts.InterfaceDeclaration;
                 let parentEntities: Array<InterfaceDeclaration> = [];
 
                 this.registerDeclaration(
                     this.astFactory.createInterfaceDeclaration(
-                        interfaceDeclaration.name.getText(),
-                        this.convertMembersToInterfaceMemberDeclarations(interfaceDeclaration.members),
-                        this.convertTypeParams(interfaceDeclaration.typeParameters),
-                        this.convertHeritageClauses(interfaceDeclaration.heritageClauses),
-                        this.exportContext.getUID(interfaceDeclaration)
+                        statement.name.getText(),
+                        this.convertMembersToInterfaceMemberDeclarations(statement.members),
+                        this.convertTypeParams(statement.typeParameters),
+                        this.convertHeritageClauses(statement.heritageClauses),
+                        this.exportContext.getUID(statement)
                     ), declarations
                 )
             } else if (ts.isModuleDeclaration(statement)) {
