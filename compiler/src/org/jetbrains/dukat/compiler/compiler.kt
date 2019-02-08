@@ -355,15 +355,16 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
 
             res.add(classDeclaration + params + if (isBlock) " {" else "")
 
+            if (hasMembers) {
+                res.addAll(members.flatMap { it.translate() }.map({ "    $it" }))
+            }
+
             if (staticMembers.isNotEmpty()) {
                 res.add("    companion object {")
                 res.addAll(staticMembers.flatMap { it.translate() }.map({ "       ${it}" }))
                 res.add("    }")
             }
 
-            if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "    $it" }))
-            }
 
             if (isBlock) {
                 res.add("}")
