@@ -67,9 +67,9 @@ private fun ObjectNode.merge(ownerName: String, modulesToBeMerged: Map<String, M
     return copy(members = members)
 }
 
-private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<String, ClassLikeNode>, modulesToBeMerged: MutableMap<String, MutableList<ModuleModel>>) : List<ModuleModel> {
+private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<String, ClassLikeNode>, modulesToBeMerged: MutableMap<String, MutableList<ModuleModel>>): List<ModuleModel> {
 
-     return submodules.map { subModule ->
+    return submodules.map { subModule ->
         if ((context.containsKey(subModule.shortName)) && (subModule.canBeMerged())) {
             val bucket = modulesToBeMerged.getOrPut(subModule.shortName) { mutableListOf() }
             bucket.add(subModule)
@@ -79,40 +79,63 @@ private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<
 
 }
 
-fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
+fun InterfaceModel.merge(interfaceModel: InterfaceModel): InterfaceModel {
+    return copy(
+            members = members + interfaceModel.members,
+            companionObject = companionObject.copy(members = companionObject.members + interfaceModel.companionObject.members)
+    )
+}
 
-    val interfaces = mutableMapOf<String, InterfaceModel>()
+
+fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
+    val rawInterfaces = mutableMapOf<String, MutableList<InterfaceModel>>()
+
     val classes = mutableMapOf<String, ClassModel>()
 
     declarations.forEach { declaration ->
         if (declaration is InterfaceModel) {
-            interfaces.put(declaration.name, declaration)
+            rawInterfaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         } else if (declaration is ClassModel) {
             classes.put(declaration.name, declaration)
         }
     }
+
+
+    val interfaces = rawInterfaces.mapValues { entry -> entry.value.reduceRight { interfaceModel, acc -> interfaceModel.merge(acc) } }.toMutableMap()
 
     val modulesToBeMergedWithInterfaces = mutableMapOf<String, MutableList<ModuleModel>>()
     val modulesToBeMergedWithClasses = mutableMapOf<String, MutableList<ModuleModel>>()
 
     var resolvedSubmodules = collectModelsToBeMerged(sumbodules, interfaces, modulesToBeMergedWithInterfaces)
     resolvedSubmodules = collectModelsToBeMerged(resolvedSubmodules, classes, modulesToBeMergedWithClasses)
+            .map { moduleModel -> moduleModel.mergeClassLikesAndModuleDeclarations() }
 
-    val mergedDeclarations = declarations.map { declaration ->
-        when (declaration) {
-            is InterfaceModel -> {
-                declaration.copy(
-                        companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithInterfaces)
-                )
+    val mergedDeclarations = declarations
+            .map { declaration ->
+                when (declaration) {
+                    is InterfaceModel -> {
+                        val element = interfaces.remove(declaration.name)
+                        if (element != null) listOf(element) else emptyList()
+                    }
+                    else -> listOf(declaration)
+                }
             }
-            is ClassModel -> {
-                declaration.copy(
-                        companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithClasses)
-                )
+            .flatten()
+            .map { declaration ->
+                when (declaration) {
+                    is InterfaceModel -> {
+                        declaration.copy(
+                                companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithInterfaces)
+                        )
+                    }
+                    is ClassModel -> {
+                        declaration.copy(
+                                companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithClasses)
+                        )
+                    }
+                    else -> declaration
+                }
             }
-            else -> declaration
-        }
-    }
 
 
     return copy(declarations = mergedDeclarations, sumbodules = resolvedSubmodules)
