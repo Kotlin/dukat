@@ -28,7 +28,8 @@ private fun VariableNode.convert(): MemberDeclaration {
             override = false,
             getter = false,
             setter = false,
-            open = false
+            open = false,
+            definedExternally = true
     )
 }
 
@@ -43,7 +44,8 @@ private fun FunctionNode.convert(): MemberDeclaration {
             override = false,
             operator = false,
             annotations = annotations,
-            open = false
+            open = false,
+            definedExternally = true
     )
 }
 

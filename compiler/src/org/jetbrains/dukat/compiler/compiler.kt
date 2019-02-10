@@ -61,7 +61,6 @@ private fun QualifiedNode.translate(): String {
 }
 
 private fun ParameterValueDeclaration.translate(): String {
-
     if (this is TypeDeclaration) {
         val res = mutableListOf(value)
         if (isGeneric()) {
@@ -192,20 +191,24 @@ private fun FunctionNode.translate(): String {
 }
 
 private fun MethodNode.translate(): List<String> {
-    val returnType = type.translate()
+    val returnsUnit = type == TypeDeclaration("@@None", emptyArray())
+    val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
 
-    val operatorModifier = if (operator) " operator" else ""
+    val operatorModifier = if (operator) "operator " else ""
     val annotations = annotations.map { "@${it.name}" }
 
     val open = !static && open
-    val overrideClause = if (override) "override" else if (open) "open" else ""
+    val overrideClause = if (override) "override " else if (open) "open " else ""
 
-    return annotations + listOf("${overrideClause}${operatorModifier} fun${typeParams} ${name}(${translateParameters(parameters, !override)}): ${returnType}${type.translateSignatureMeta()} = definedExternally")
+    val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
+
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}${type.translateSignatureMeta()}${definedExternallyClause}")
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}${type.translateSignatureMeta()}${definedExternallyClause}")
 }
 
 private fun ConstructorNode.translate(): List<String> {
@@ -227,8 +230,10 @@ private fun EnumNode.translate(): String {
 
 private fun PropertyNode.translate(): String {
     val open = !static && open
-    val modifier = if (override) "override" else if (open) "open" else ""
-    return "${modifier} var ${name}: ${type.translate()}${type.translateSignatureMeta()} = definedExternally"
+    val modifier = if (override) "override " else if (open) "open " else ""
+
+    val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
+    return "${modifier}var ${name}: ${type.translate()}${type.translateSignatureMeta()}${definedExternallyClause}"
 }
 
 private fun MemberDeclaration.translate(): List<String> {
@@ -361,7 +366,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
 
             if (staticMembers.isNotEmpty()) {
                 res.add("    companion object {")
-                res.addAll(staticMembers.flatMap { it.translate() }.map({ "       ${it}" }))
+                res.addAll(staticMembers.flatMap { it.translate() }.map({ "        ${it}" }))
                 res.add("    }")
             }
 
@@ -381,7 +386,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add(objectNode + " {")
 
             if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "   " + it }))
+                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
             }
 
             res.add("}")
@@ -401,7 +406,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
 
                 if (staticMembers.isNotEmpty()) {
                     res.add("    companion object {")
-                    res.addAll(staticMembers.flatMap { it.translate() }.map({ "       ${it}" }))
+                    res.addAll(staticMembers.flatMap { it.translate() }.map({ "        ${it}" }))
                     res.add("    }")
                 }
 

@@ -19,7 +19,7 @@ data class ClassModel(
         val annotations: MutableList<AnnotationNode>
 
 
-) : ClassLikeNode {
+) : ClassLikeNode, ClassLikeModel {
     override val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>
         get() = throw Exception("this exists for historical reason and will be removed")
 }

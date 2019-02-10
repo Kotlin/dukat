@@ -28,6 +28,7 @@ fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLik
             declaration.optional,
             declaration.optional,  // TODO: it's actually wrong
 
+            true,
             true
     )
 }
@@ -45,6 +46,7 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     true,
                     listOf(AnnotationNode("nativeGetter", emptyList())),
+                    true,
                     true
             ),
             MethodNode(
@@ -57,6 +59,7 @@ fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, own
                     false,
                     true,
                     listOf(AnnotationNode("nativeSetter", emptyList())),
+                    true,
                     true
             )
     )
@@ -79,6 +82,7 @@ fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, o
                 false,
                 true,
                 false,
+                true,
                 true
         )
     } else {
@@ -92,6 +96,7 @@ fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, o
                 false,
                 false,
                 emptyList(),
+                true,
                 true
         )
     }

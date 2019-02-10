@@ -52,6 +52,7 @@ private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
             false,
             true,
             listOf(AnnotationNode("nativeInvoke", emptyList())),
+            true,
             true
     )
 }
@@ -160,6 +161,7 @@ private class LowerDeclarationsToNodes {
                     false,
                     false,
                     emptyList(),
+                    true,
                     true
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner))

@@ -17,5 +17,6 @@ data class MethodNode(
         val operator: Boolean,
         val annotations: List<AnnotationNode>,
 
-        val open: Boolean
+        val open: Boolean,
+        val definedExternally: Boolean
 ) : MemberDeclaration
