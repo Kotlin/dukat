@@ -10,7 +10,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
-            "object", "when", "val", "var", "as", "package", "fun", "when", "typealias", "typeof", "in"
+           "_", "object", "when", "val", "var", "as", "package", "fun", "when", "typealias", "typeof", "in"
     )
     return if (reservedWords.contains(identificator) || identificator.contains("$")) {
         "`${identificator}`"
