@@ -6,9 +6,9 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -31,7 +31,7 @@ interface Lowering {
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
+    fun lowerMemberNode(declaration: MemberNode): MemberNode
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 

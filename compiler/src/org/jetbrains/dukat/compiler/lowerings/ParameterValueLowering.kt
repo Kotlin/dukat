@@ -4,11 +4,11 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
@@ -39,7 +39,7 @@ interface ParameterValueLowering : Lowering {
         )
     }
 
-    override fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
+    override fun lowerMemberNode(declaration: MemberNode): MemberNode {
         return when (declaration) {
             is MethodNode -> lowerMethodNode(declaration)
             is PropertyNode -> lowerPropertyNode(declaration)
@@ -105,7 +105,7 @@ interface ParameterValueLowering : Lowering {
 
         return declaration.copy(
                 members
-                = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },
@@ -130,14 +130,14 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerObjectNode(declaration: ObjectNode): ObjectNode {
         return declaration.copy(
-            members = declaration.members.map { member -> lowerMemberDeclaration(member) }
+            members = declaration.members.map { member -> lowerMemberNode(member) }
         )
 
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },

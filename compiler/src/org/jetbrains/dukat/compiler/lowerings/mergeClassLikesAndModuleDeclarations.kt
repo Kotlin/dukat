@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -18,7 +19,7 @@ private fun ModuleModel.canBeMerged(): Boolean {
     return declarations.any { declaration -> declaration is MemberDeclaration }
 }
 
-private fun VariableNode.convert(): MemberDeclaration {
+private fun VariableNode.convert(): MemberNode {
     return PropertyNode(
             name = name,
             type = type,
@@ -33,7 +34,7 @@ private fun VariableNode.convert(): MemberDeclaration {
     )
 }
 
-private fun FunctionNode.convert(): MemberDeclaration {
+private fun FunctionNode.convert(): MemberNode {
     return MethodNode(
             name = name,
             parameters = parameters,
@@ -49,7 +50,7 @@ private fun FunctionNode.convert(): MemberDeclaration {
     )
 }
 
-private fun MergableNode.convert(): MemberDeclaration {
+private fun MergableNode.convert(): MemberNode {
     return when (this) {
         is FunctionNode -> convert()
         is VariableNode -> convert()

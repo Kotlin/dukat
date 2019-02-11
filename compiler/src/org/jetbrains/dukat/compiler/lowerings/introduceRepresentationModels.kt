@@ -7,22 +7,22 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
 
-private fun MemberDeclaration.isStatic() = when (this) {
+private fun MemberNode.isStatic() = when (this) {
     is MethodNode -> static
     is PropertyNode -> static
     else -> false
 }
 
 private fun ClassNode.convertToClassModel(): ClassModel {
-    val staticMembers = mutableListOf<MemberDeclaration>()
-    val ownMembers = mutableListOf<MemberDeclaration>()
+    val staticMembers = mutableListOf<MemberNode>()
+    val ownMembers = mutableListOf<MemberNode>()
 
     members.forEach { member ->
         if (member.isStatic()) {
@@ -45,8 +45,8 @@ private fun ClassNode.convertToClassModel(): ClassModel {
 }
 
 private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
-    val staticMembers = mutableListOf<MemberDeclaration>()
-    val ownMembers = mutableListOf<MemberDeclaration>()
+    val staticMembers = mutableListOf<MemberNode>()
+    val ownMembers = mutableListOf<MemberNode>()
 
     members.forEach { member ->
         if (member.isStatic()) {

@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -16,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -236,7 +236,7 @@ private fun PropertyNode.translate(): String {
     return "${modifier}var ${name}: ${type.translate()}${type.translateSignatureMeta()}${definedExternallyClause}"
 }
 
-private fun MemberDeclaration.translate(): List<String> {
+private fun MemberNode.translate(): List<String> {
     if (this is MethodNode) {
         return translate()
     } else if (this is PropertyNode) {
@@ -284,7 +284,7 @@ private fun MethodNode.translateSignature(): List<String> {
     return annotations + listOf(methodNodeTranslation)
 }
 
-private fun MemberDeclaration.translateSignature(): List<String> {
+private fun MemberNode.translateSignature(): List<String> {
     if (this is MethodNode) {
         return translateSignature()
     } else if (this is PropertyNode) {
@@ -310,12 +310,6 @@ private fun escapePackageName(name: String): String {
             .replace("^interface$".toRegex(), "`interface`")
 }
 
-private fun MemberDeclaration.isStatic() = when (this) {
-    is MethodNode -> static
-    is PropertyNode -> static
-    else -> false
-}
-
 private fun IdentifierDeclaration.translate() = value
 
 private fun HeritageSymbolDeclaration.translate(): String {
@@ -325,7 +319,6 @@ private fun HeritageSymbolDeclaration.translate(): String {
         else -> throw Exception("unknown heritage clause ${this}")
     }
 }
-
 
 
 private fun processDeclarations(docRoot: ModuleModel): List<String> {

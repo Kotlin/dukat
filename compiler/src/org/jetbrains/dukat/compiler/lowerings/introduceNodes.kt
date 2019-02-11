@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -10,15 +11,13 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
-import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
-import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
-import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -32,6 +31,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -44,6 +44,94 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 private class LowerDeclarationsToNodes {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+
+    private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+
+    fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLikeNode): PropertyNode {
+        return PropertyNode(
+                declaration.name,
+                if (declaration.optional) declaration.type.makeNullable() else declaration.type,
+                declaration.typeParameters,
+
+                owner,
+                declaration.isStatic(),
+                false,
+                declaration.optional,
+                declaration.optional,  // TODO: it's actually wrong
+
+                true,
+                true
+        )
+    }
+
+    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
+        return if (declaration.optional) {
+            PropertyNode(
+                    declaration.name,
+                    FunctionTypeDeclaration(
+                            declaration.parameters,
+                            declaration.type,
+                            true,
+                            null
+                    ),
+                    declaration.typeParameters,
+                    owner,
+                    false,
+                    false,
+                    true,
+                    false,
+                    true,
+                    true
+            )
+        } else {
+            MethodNode(
+                    declaration.name,
+                    declaration.parameters,
+                    declaration.type,
+                    declaration.typeParameters,
+                    owner,
+                    false, //TODO: remove static, we don't need it for MethodSignatures
+                    false,
+                    false,
+                    emptyList(),
+                    true,
+                    true
+            )
+        }
+    }
+
+
+    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: ClassLikeNode): List<MethodNode> {
+        return listOf(
+                MethodNode(
+                        "get",
+                        declaration.indexTypes,
+                        declaration.returnType.makeNullable(),
+                        emptyList(),
+                        owner,
+                        false,
+                        false,
+                        true,
+                        listOf(AnnotationNode("nativeGetter", emptyList())),
+                        true,
+                        true
+                ),
+                MethodNode(
+                        "set",
+                        declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false)),
+                        TypeDeclaration("Unit", emptyList()),
+                        emptyList(),
+                        owner,
+                        false,
+                        false,
+                        true,
+                        listOf(AnnotationNode("nativeSetter", emptyList())),
+                        true,
+                        true
+                )
+        )
+    }
+
 
     private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
         return MethodNode(
@@ -182,7 +270,7 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberDeclaration {
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
         val memberDeclaration = convertMethodSignatureDeclaration(declaration, owner)
         return when (memberDeclaration) {
             is PropertyNode -> memberDeclaration
@@ -190,11 +278,11 @@ private class LowerDeclarationsToNodes {
                     parameters = memberDeclaration.parameters,
                     type = memberDeclaration.type
             )
-            else -> memberDeclaration
+            else -> throw Exception("unkown method signature")
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberDeclaration): List<MemberDeclaration> {
+    fun lowerMemberDeclaration(declaration: MemberDeclaration): List<MemberNode> {
         val owner = ROOT_CLASS_DECLARATION
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -215,7 +303,7 @@ private class LowerDeclarationsToNodes {
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
             is ConstructorDeclaration -> listOf(declaration.convert(owner))
-            else -> listOf(declaration)
+            else -> throw Exception("unkown member declaration ${this}")
         }
     }
 

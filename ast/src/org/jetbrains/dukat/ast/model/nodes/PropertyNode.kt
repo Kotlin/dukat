@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -18,4 +17,4 @@ data class PropertyNode(
 
         val open: Boolean,
         val definedExternally: Boolean
-) : MemberDeclaration, MemberNode
+) : MemberNode

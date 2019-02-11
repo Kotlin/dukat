@@ -5,9 +5,9 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -118,10 +118,10 @@ private fun ParameterValueDeclaration.isOverriding(otherParameterValue: Paramete
     return false
 }
 
-private fun MemberDeclaration.lowerOverrides(
+private fun MemberNode.lowerOverrides(
         allSuperDeclarations: List<MethodNode>,
         allSuperProperties: List<PropertyNode>
-): MemberDeclaration {
+): MemberNode {
 
     return if (this is MethodNode) {
         val override =

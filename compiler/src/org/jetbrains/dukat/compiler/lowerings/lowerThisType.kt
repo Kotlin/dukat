@@ -4,10 +4,10 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -42,7 +42,7 @@ private class LowerThisType {
         }
     }
 
-    fun lowerMemberNode(member: MemberDeclaration, owner: ClassLikeNode): MemberDeclaration {
+    fun lowerMemberNode(member: MemberNode, owner: ClassLikeNode): MemberNode {
         return when (member) {
             is PropertyNode -> member.copy(type = member.type.lower(owner))
             is MethodNode -> member.copy(type = member.type.lower(owner))
