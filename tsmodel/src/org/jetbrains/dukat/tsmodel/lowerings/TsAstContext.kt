@@ -6,11 +6,11 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 
 private data class InterfaceDeclarationKey(
@@ -19,9 +19,23 @@ private data class InterfaceDeclarationKey(
         val parentEntities: List<HeritageClauseDeclaration>
 )
 
+private fun FunctionTypeDeclaration.anonimize(): FunctionTypeDeclaration {
+    return copy(parameters = parameters.map { parameter -> parameter.copy(name = "#") })
+}
+
 private fun GeneratedInterfaceDeclaration.key(): InterfaceDeclarationKey {
     return InterfaceDeclarationKey(
-        members = members,
+        members = members.map { member ->
+            when (member) {
+                is FunctionDeclaration -> member.copy(parameters = member.parameters.map { parameter -> parameter.copy(name = "#") })
+                is PropertyDeclaration -> member.copy(type = when(member.type) {
+                    is FunctionTypeDeclaration -> member.type.anonimize()
+                    else -> member.type
+                })
+                else -> member
+            }
+
+        },
         typeParameters = typeParameters,
         parentEntities = parentEntities
     )
@@ -32,9 +46,6 @@ private fun areIdentical(aInterface: GeneratedInterfaceDeclaration, bInterface: 
 }
 
 class TsAstContext {
-    private val myInterfaces: MutableMap<HeritageSymbolDeclaration, InterfaceDeclaration> = mutableMapOf()
-    private val myClassNodes: MutableMap<HeritageSymbolDeclaration, ClassDeclaration> = mutableMapOf()
-
     private val myGeneratedInterfaces = mutableMapOf<String, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
 
@@ -46,14 +57,6 @@ class TsAstContext {
         }
     }
 
-
-    fun registerInterface(interfaceDeclaration: InterfaceDeclaration) {
-        myInterfaces.put(IdentifierDeclaration(interfaceDeclaration.name), interfaceDeclaration)
-    }
-
-    fun registerClass(classDeclaration: ClassDeclaration) {
-        myClassNodes.put(IdentifierDeclaration(classDeclaration.name), classDeclaration)
-    }
 
     fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
 
