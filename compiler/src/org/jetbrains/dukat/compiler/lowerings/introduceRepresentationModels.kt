@@ -35,8 +35,7 @@ private fun ClassNode.convertToClassModel(): ClassModel {
             members = ownMembers,
             companionObject = ObjectNode(
                     "",
-                    staticMembers,
-                    mutableListOf()
+                    staticMembers
             ),
             primaryConstructor = primaryConstructor,
             typeParameters = typeParameters,
@@ -60,8 +59,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             members = ownMembers,
             companionObject = ObjectNode(
                     "",
-                    staticMembers,
-                    mutableListOf()
+                    staticMembers
             ),
             typeParameters = typeParameters,
             parentEntities = parentEntities,

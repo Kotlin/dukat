@@ -14,6 +14,5 @@ data class ClassNode(
 
         var owner: DocumentRootNode?,
         val uid: String,
-        override val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
         val annotations: MutableList<AnnotationNode>
 ) : ClassLikeDeclaration, ClassLikeNode

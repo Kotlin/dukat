@@ -19,4 +19,4 @@ data class FunctionNode(
 
         var owner: DocumentRootNode?,
         val uid: String
-) : MemberDeclaration, TopLevelDeclaration, MergableNode
+) : MemberDeclaration, TopLevelDeclaration, MergableNode, MemberNode

@@ -18,4 +18,4 @@ data class PropertyNode(
 
         val open: Boolean,
         val definedExternally: Boolean
-) : MemberDeclaration
+) : MemberDeclaration, MemberNode

@@ -2,6 +2,4 @@ package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
-interface ClassLikeNode : TopLevelDeclaration {
-    val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>
-}
+interface ClassLikeNode : TopLevelDeclaration

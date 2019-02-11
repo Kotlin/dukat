@@ -9,9 +9,7 @@ import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
-import org.jetbrains.dukat.compiler.lowerings.generateInterfaceReferences
 import org.jetbrains.dukat.compiler.lowerings.introduceExports
-import org.jetbrains.dukat.compiler.lowerings.introduceGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.introduceModuleMetadata
 import org.jetbrains.dukat.compiler.lowerings.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
@@ -31,6 +29,7 @@ import org.jetbrains.dukat.compiler.lowerings.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
 private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
     for (declaration in declarations) {
@@ -61,12 +60,11 @@ interface InputTranslator {
 
         return documentRoot
                 .filterOutNonDeclarations()
+                .generateInterfaceReferences()
                 .introduceNodes()
                 .introduceModuleMetadata()
                 .introduceQualifiedNode()
                 .introduceExports()
-                .generateInterfaceReferences(myAstContext)
-                .introduceGeneratedEntities(myAstContext)
                 .eliminateStringType()
                 .lowerNativeArray()
                 .lowerNullable()

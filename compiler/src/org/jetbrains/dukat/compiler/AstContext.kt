@@ -1,40 +1,27 @@
 package org.jetbrains.dukat.compiler
 
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.compiler.converters.convertIndexSignatureDeclaration
-import org.jetbrains.dukat.compiler.converters.convertMethodSignatureDeclaration
-import org.jetbrains.dukat.compiler.converters.convertPropertyDeclaration
-import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-
 
 
 // TODO: TypeAliases should be revisited
 private fun IdentifierDeclaration.translate() = value
 
 private fun HeritageSymbolDeclaration.translate(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierDeclaration -> translate()
-        is PropertyAccessDeclaration ->  expression.translate() + "." + name.translate()
+        is PropertyAccessDeclaration -> expression.translate() + "." + name.translate()
         else -> throw Exception("unknown heritage clause ${this}")
     }
 }
@@ -48,35 +35,10 @@ private fun TypeAliasDeclaration.canSusbtitute(type: TypeDeclaration): Boolean {
     return (aliasName == type.value)
 }
 
-private fun MemberDeclaration.convert(owner: ClassLikeNode): List<MemberDeclaration> {
-    return when (this) {
-        is PropertyDeclaration -> listOf(convertPropertyDeclaration(this, ROOT_CLASS_DECLARATION))
-        is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(this, ROOT_CLASS_DECLARATION)
-        is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(this, ROOT_CLASS_DECLARATION))
-        else -> listOf(this)
-    }
-}
-
-private fun MemberDeclaration.copyWithNoOwner() = when (this) {
-    is PropertyNode -> copy(owner = ROOT_CLASS_DECLARATION)
-    is MethodNode -> copy(owner = ROOT_CLASS_DECLARATION)
-    else -> this
-}
-
-private fun areIdentical(aInterface: InterfaceNode, bInterface: InterfaceNode): Boolean {
-
-    val aMembers = aInterface.members.map { it.copyWithNoOwner() }
-    val bMembers = bInterface.members.map { it.copyWithNoOwner() }
-
-    return aMembers == bMembers
-}
-
 class AstContext {
     private val myInterfaces: MutableMap<HeritageSymbolDeclaration, InterfaceNode> = mutableMapOf()
     private val myClassNodes: MutableMap<HeritageSymbolDeclaration, ClassNode> = mutableMapOf()
     private val myTypeAliasDeclaration: MutableList<TypeAliasDeclaration> = mutableListOf()
-
-    private val myGeneratedInterfaces = mutableMapOf<String, InterfaceNode>()
 
     fun registerInterface(interfaceDeclaration: InterfaceNode) {
         myInterfaces.put(IdentifierDeclaration(interfaceDeclaration.name), interfaceDeclaration)
@@ -120,26 +82,15 @@ class AstContext {
         return null
     }
 
-    fun findIdenticalInterface(interfaceNode: InterfaceNode): InterfaceNode? {
 
-        myGeneratedInterfaces.forEach { entry ->
-            if (areIdentical(interfaceNode, entry.value)) {
-                return entry.value
-            }
-        }
-
-        return null
-    }
-
-
-    private fun ParameterValueDeclaration.lower() : ParameterValueDeclaration {
+    private fun ParameterValueDeclaration.lower(): ParameterValueDeclaration {
         return when (this) {
             is ThisTypeDeclaration -> TypeDeclaration("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
             else -> this
         }
     }
 
-    private fun InterfaceNode.lower() : InterfaceNode {
+    private fun InterfaceNode.lower(): InterfaceNode {
         val members = members.map { member ->
             when (member) {
                 is PropertyNode -> member.copy(type = member.type.lower())
@@ -149,52 +100,6 @@ class AstContext {
         }
 
         return copy(members = members)
-    }
-
-    fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, generatedReferences: MutableList<GeneratedInterfaceReferenceNode>): GeneratedInterfaceReferenceNode {
-
-        val name = "`T$${myGeneratedInterfaces.size}`"
-        val interfaceNode =
-                InterfaceNode(
-                        name,
-                        declaration.members.map { member -> member.convert(ROOT_CLASS_DECLARATION) }.flatten(),
-                        emptyList(),
-                        emptyList(),
-                        mutableListOf(),
-                        null,
-                        "__NO__UID__"
-                ).lower()
-
-
-        // TODO: this is a weak place and it's better to think about better solution
-        interfaceNode.members.forEach() { member ->
-            if (member is PropertyNode) {
-                member.owner = interfaceNode
-            } else if (member is MethodNode) {
-                member.owner = interfaceNode
-            }
-        }
-
-
-        val identicalInterface = findIdenticalInterface(interfaceNode)
-        return if (identicalInterface == null) {
-            myGeneratedInterfaces.put(name, interfaceNode)
-            val referenceNode = GeneratedInterfaceReferenceNode(name)
-            generatedReferences.add(referenceNode)
-            referenceNode
-        } else {
-            GeneratedInterfaceReferenceNode(identicalInterface.name)
-        }
-    }
-
-    fun resolveGeneratedInterfacesFor(node: ClassLikeNode): List<InterfaceNode> {
-        val genInterfaces = node.generatedReferenceNodes.map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
-        return genInterfaces
-    }
-
-    fun resolveGeneratedInterfacesFor(node: FunctionNode): List<InterfaceNode> {
-        val genInterfaces = node.generatedReferenceNodes.map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
-        return genInterfaces
     }
 
     fun resolveInterface(name: HeritageSymbolDeclaration): InterfaceNode? = myInterfaces.get(name)

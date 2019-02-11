@@ -1,49 +1,47 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-interface ParameterValueLowering : Lowering {
+interface ParameterValueLowering : DeclarationLowering {
 
-    fun lowerMethodNode(declaration: MethodNode): MethodNode {
-        return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
-                typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
-                },
-                type = lowerParameterValue(declaration.type)
-        )
-    }
-
-    fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
+    fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
     }
 
+    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                }
+        )
+    }
+
+
     override fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
         return when (declaration) {
-            is MethodNode -> lowerMethodNode(declaration)
-            is PropertyNode -> lowerPropertyNode(declaration)
-            is ConstructorNode -> lowerConstructorNode(declaration)
+            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
+            is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
+            is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
             else -> {
                 println("[WARN] skipping ${declaration}")
                 declaration
@@ -51,7 +49,7 @@ interface ParameterValueLowering : Lowering {
         }
     }
 
-    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
@@ -88,7 +86,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    override fun lowerVariableNode(declaration: VariableNode): VariableNode {
+    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
@@ -101,7 +99,7 @@ interface ParameterValueLowering : Lowering {
     }
 
 
-    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
 
         return declaration.copy(
                 members
@@ -119,23 +117,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
     }
 
-    fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
-        return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
-                typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
-                }
-        )
-    }
-
-    override fun lowerObjectNode(declaration: ObjectNode): ObjectNode {
-        return declaration.copy(
-            members = declaration.members.map { member -> lowerMemberDeclaration(member) }
-        )
-
-    }
-
-    override fun lowerClassNode(declaration: ClassNode): ClassNode {
+    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->

@@ -9,4 +9,4 @@ data class ConstructorNode(
         val typeParameters: List<TypeParameterDeclaration>,
 
         val generated: Boolean = false
-) : MemberDeclaration
+) : MemberDeclaration, MemberNode

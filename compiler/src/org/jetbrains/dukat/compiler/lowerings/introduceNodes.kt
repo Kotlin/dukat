@@ -26,6 +26,7 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -39,82 +40,126 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-
-private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
-    return MethodNode(
-            "invoke",
-            parameters,
-            type,
-            typeParameters,
-            owner,
-            false,
-            false,
-            true,
-            listOf(AnnotationNode("nativeInvoke", emptyList())),
-            true,
-            true
-    )
-}
-
-private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclaration {
-    return when (this) {
-        is TypeDeclaration -> copy(nullable = true)
-        is FunctionTypeDeclaration -> copy(nullable = true)
-        else -> duplicate()
-    }
-}
-
-private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
-
-    val annotations = mutableListOf<AnnotationNode>()
-
-    if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
-        annotations.add(AnnotationNode("JsName", listOf("default")))
-    }
-
-    return ClassNode(
-            name,
-            members,
-            typeParameters,
-            parentEntities,
-            null,
-
-            owner,
-            uid,
-            mutableListOf(),
-            annotations
-    )
-}
-
-private fun InterfaceDeclaration.convert(): InterfaceNode {
-    return InterfaceNode(
-            name,
-            members,
-            typeParameters,
-            parentEntities,
-            mutableListOf(),
-            null,
-            uid
-    )
-}
-
-private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNode {
-    return ConstructorNode(
-            parameters,
-            typeParameters
-    )
-}
-
-private fun EnumDeclaration.convert(): EnumNode {
-    return EnumNode(
-            name = name,
-            values = values.map { value -> EnumTokenNode(value.value, value.value) }
-    )
-}
-
 
 private class LowerDeclarationsToNodes {
+
+    private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+
+    private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
+        return MethodNode(
+                "invoke",
+                parameters,
+                type,
+                typeParameters,
+                owner,
+                false,
+                false,
+                true,
+                listOf(AnnotationNode("nativeInvoke", emptyList())),
+                true,
+                true
+        )
+    }
+
+    private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclaration {
+        return when (this) {
+            is TypeDeclaration -> copy(nullable = true)
+            is FunctionTypeDeclaration -> copy(nullable = true)
+            else -> duplicate()
+        }
+    }
+
+    private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
+
+        val annotations = mutableListOf<AnnotationNode>()
+
+        if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
+            annotations.add(AnnotationNode("JsName", listOf("default")))
+        }
+
+        val declaration = ClassNode(
+                name,
+                members.flatMap { member -> lowerMemberDeclaration(member) },
+                typeParameters,
+                parentEntities,
+                null,
+
+                owner,
+                uid,
+                annotations
+        )
+
+        declaration.members.forEach { member ->
+            when (member) {
+                is PropertyNode -> member.copy(owner = declaration)
+                is MethodNode -> member.copy(owner = declaration)
+                else -> member
+            }
+        }
+
+        return declaration
+    }
+
+    private fun InterfaceDeclaration.convert(): InterfaceNode {
+        val declaration = InterfaceNode(
+                name,
+                members.flatMap { member -> lowerMemberDeclaration(member) },
+                typeParameters,
+                parentEntities,
+                mutableListOf(),
+                null,
+                uid
+        )
+
+
+        declaration.members.forEach { member ->
+            when (member) {
+                is PropertyNode -> member.copy(owner = declaration)
+                is MethodNode -> member.copy(owner = declaration)
+                else -> member
+            }
+        }
+
+        return declaration
+    }
+
+
+    private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
+        val declaration = InterfaceNode(
+                name,
+                members.flatMap { member -> lowerMemberDeclaration(member) },
+                typeParameters,
+                parentEntities,
+                mutableListOf(),
+                null,
+                InterfaceNode.AUTOGENERATED
+        )
+
+
+        declaration.members.forEach { member ->
+            when (member) {
+                is PropertyNode -> member.copy(owner = declaration)
+                is MethodNode -> member.copy(owner = declaration)
+            }
+        }
+
+        return declaration
+    }
+
+
+    private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNode {
+        return ConstructorNode(
+                parameters,
+                typeParameters
+        )
+    }
+
+    private fun EnumDeclaration.convert(): EnumNode {
+        return EnumNode(
+                name = name,
+                values = values.map { value -> EnumTokenNode(value.value, value.value) }
+        )
+    }
 
     private fun FunctionDeclaration.convert(): FunctionNode {
         val annotations = mutableListOf<AnnotationNode>()
@@ -149,7 +194,8 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeNode): List<MemberDeclaration> {
+    fun lowerMemberDeclaration(declaration: MemberDeclaration): List<MemberDeclaration> {
+        val owner = ROOT_CLASS_DECLARATION
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
@@ -173,28 +219,14 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-        return declaration.copy(
-                members = declaration.members.flatMap { member -> lowerMemberDeclaration(member, declaration) }
-        )
-    }
-
-    fun lowerClassNode(declaration: ClassNode): ClassNode {
-        return declaration.copy(
-                members = declaration.members.flatMap { member -> lowerMemberDeclaration(member, declaration) }
-        )
-    }
-
     fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
             //TODO: don't forget to create owner
             val objectNode = ObjectNode(
                     declaration.name,
-                    type.members.flatMap { member -> lowerMemberDeclaration(member, ROOT_CLASS_DECLARATION) },
-                    mutableListOf()
+                    type.members.flatMap { member -> lowerMemberDeclaration(member) }
             )
-
 
             objectNode.copy(members = objectNode.members.map {
                 when (it) {
@@ -219,8 +251,9 @@ private class LowerDeclarationsToNodes {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> declaration.convert()
-            is ClassDeclaration -> lowerClassNode(declaration.convert(null))
-            is InterfaceDeclaration -> lowerInterfaceNode(declaration.convert())
+            is ClassDeclaration -> declaration.convert(null)
+            is InterfaceDeclaration -> declaration.convert()
+            is GeneratedInterfaceDeclaration -> declaration.convert()
             is DocumentRootDeclaration -> lowerDocumentRoot(declaration, null)
             is EnumDeclaration -> declaration.convert()
             else -> declaration
