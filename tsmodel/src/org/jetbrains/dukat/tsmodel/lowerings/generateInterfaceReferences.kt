@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -23,7 +23,6 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private class GenerateInterfaceReferences(private val astContext: TsAstContext) : DeclarationLowering {
 
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration) = declaration
     override fun lowerTypeDeclaration(declaration: TypeDeclaration) = declaration
     override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration) = declaration
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration) = declaration
@@ -33,23 +32,13 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
     override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
 
-    private fun ClassLikeDeclaration.getUID(): String {
-        return when (this) {
-            is ClassDeclaration -> uid
-            is InterfaceDeclaration -> uid
-            else -> throw Exception("can not create uid for ${this}")
-        }
-    }
-
-    private fun FunctionDeclaration.getUID(): String = uid
-
-    private fun ParameterValueDeclaration.generateInterface(owner: ClassLikeDeclaration): ParameterValueDeclaration {
+    private fun ParameterValueDeclaration.generateInterface(ownerUID: String): ParameterValueDeclaration {
         return when (this) {
             is ObjectLiteralDeclaration -> {
                 if (members.isEmpty()) {
                     TypeDeclaration("Any", emptyList())
                 } else {
-                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.getUID())
+                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, ownerUID)
                     referenceNode
                 }
             }
@@ -57,40 +46,42 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
         }
     }
 
-    private fun ParameterValueDeclaration.generateInterface(owner: FunctionDeclaration): ParameterValueDeclaration {
-        return when (this) {
+    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+        return when(declaration.type) {
             is ObjectLiteralDeclaration -> {
-                if (members.isEmpty()) {
-                    TypeDeclaration("Any", emptyList())
-                } else {
-                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, owner.getUID())
-                    referenceNode
-                }
+                declaration.copy(type = declaration.type.copy(
+                        members = declaration.type.members.map { member -> lowerMemberDeclaration(member, declaration.uid) }
+                ))
             }
-            else -> this
+            else -> declaration
         }
     }
 
-
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: ClassLikeDeclaration): MemberDeclaration {
+    fun lowerMemberDeclaration(declaration: MemberDeclaration, ownerUid: String): MemberDeclaration {
         return when (declaration) {
+            is CallSignatureDeclaration -> declaration.copy(
+                    parameters = declaration.parameters.map { param ->
+                        param.copy(type = param.type.generateInterface(ownerUid))
+                    },
+                    type = declaration.type.generateInterface(ownerUid)
+            )
             is ConstructorDeclaration -> declaration.copy(
                     parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(owner))
+                        param.copy(type = param.type.generateInterface(ownerUid))
                     }
             )
-            is PropertyDeclaration -> declaration.copy(type = declaration.type.generateInterface(owner))
+            is PropertyDeclaration -> declaration.copy(type = declaration.type.generateInterface(ownerUid))
             is MethodSignatureDeclaration -> declaration.copy(
                     parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(owner))
+                        param.copy(type = param.type.generateInterface(ownerUid))
                     },
-                    type = declaration.type.generateInterface(owner)
+                    type = declaration.type.generateInterface(ownerUid)
             )
             is FunctionDeclaration -> declaration.copy(
                     parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(owner))
+                        param.copy(type = param.type.generateInterface(ownerUid))
                     },
-                    type = declaration.type.generateInterface(owner)
+                    type = declaration.type.generateInterface(ownerUid)
             )
 
             else -> declaration
@@ -98,19 +89,19 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
     }
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
-        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration) })
+        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration.uid) })
     }
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
-        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration) })
+        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration.uid) })
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { param ->
-                    param.copy(type = param.type.generateInterface(declaration))
+                    param.copy(type = param.type.generateInterface(declaration.uid))
                 },
-                type = declaration.type.generateInterface(declaration)
+                type = declaration.type.generateInterface(declaration.uid)
         )
     }
 }
