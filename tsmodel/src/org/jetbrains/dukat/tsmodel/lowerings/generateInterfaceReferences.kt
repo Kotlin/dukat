@@ -12,11 +12,12 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-private class GenerateInterfaceReferences(private val astContext: TsAstContext) : DeclarationLowering {
+private class GenerateInterfaceReferences(private val astContext: GeneratedInterfacesContext) : DeclarationLowering {
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration) = declaration
     override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration) = declaration
@@ -25,7 +26,6 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
     override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration) = declaration
     override fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration) = declaration
     override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
-    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
         return declaration.copy(members = declaration.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, declaration.typeParameters) })
@@ -35,12 +35,20 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
         return declaration.copy(members = declaration.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, declaration.typeParameters) })
     }
 
+    fun lowerParameterValue(declaration: ParameterValueDeclaration, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
+        return astContext.generateInterface(declaration, ownerUID, typeParameters)
+    }
+
+    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
+        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference, "${declaration.aliasName}_TYPE", emptyList()))
+    }
+
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { param ->
-                    param.copy(type =  astContext.generateInterface(param.type, declaration.uid, declaration.typeParameters))
+                    param.copy(type =  lowerParameterValue(param.type, declaration.uid, declaration.typeParameters))
                 },
-                type = astContext.generateInterface(declaration.type, declaration.uid, declaration.typeParameters)
+                type = lowerParameterValue(declaration.type, declaration.uid, declaration.typeParameters)
         )
     }
 
@@ -58,6 +66,6 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
 }
 
 fun DocumentRootDeclaration.generateInterfaceReferences(): DocumentRootDeclaration {
-    val astContext = TsAstContext()
+    val astContext = GeneratedInterfacesContext()
     return GenerateInterfaceReferences(astContext).lowerDocumentRoot(this).introduceGeneratedEntities(astContext)
 }

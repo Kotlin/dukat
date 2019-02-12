@@ -24,7 +24,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
             }
         }
 
-        return declaration.copy(parentEntities = parentEntitiesRemapped)
+        return super.lowerInterfaceNode(declaration.copy(parentEntities = parentEntitiesRemapped))
     }
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {

@@ -65,12 +65,13 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-        val members = declaration.members.map { member ->
+        //TODO: discuss whether we need this limitation at all
+        val members = declaration.members.flatMap { member ->
             when (member) {
                 is MethodNode -> generateMethods(member)
                 else -> listOf(member)
             }
-        }.flatten()
+        }
         return declaration.copy(members = members)
     }
 
