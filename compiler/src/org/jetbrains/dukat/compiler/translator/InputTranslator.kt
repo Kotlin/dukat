@@ -20,15 +20,14 @@ import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerThisType
-import org.jetbrains.dukat.compiler.lowerings.lowerTypeAliases
 import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 import org.jetbrains.dukat.compiler.lowerings.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.compiler.lowerings.mergeClassesAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
+import org.jetbrains.dukat.compiler.lowerings.typeAlias.lowerTypeAliases
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
 private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
@@ -41,10 +40,6 @@ private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRoot
         }
         if (declaration is DocumentRootNode) {
             declaration.updateContext(astContext)
-        }
-
-        if (declaration is TypeAliasDeclaration) {
-            astContext.registerTypeAlias(declaration)
         }
     }
 
@@ -75,7 +70,7 @@ interface InputTranslator {
                 .lowerIntersectionType()
                 .lowerThisType()
                 .updateContext(myAstContext)
-                .lowerTypeAliases(myAstContext)
+                .lowerTypeAliases()
                 .lowerOverrides(myAstContext)
                 .specifyDynamicTypes()
                 .lowerConstructors()
