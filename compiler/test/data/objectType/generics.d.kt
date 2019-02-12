@@ -18,8 +18,8 @@ external interface `T$2`<T> {
 }
 external interface `T$3`<T, S> {
     fun bar(a: Any): T
-    fun foo(t: String)
     fun foo(t: `T$2`<T>)
+    fun foo(t: String)
     var baz: Any? get() = definedExternally; set(value) = definedExternally
     var boo: S? get() = definedExternally; set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit

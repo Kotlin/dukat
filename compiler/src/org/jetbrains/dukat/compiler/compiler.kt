@@ -91,7 +91,7 @@ private fun ParameterValueDeclaration.translate(): String {
     } else if (this is DynamicTypeNode) {
         return translate()
     } else if (this is GeneratedInterfaceReferenceDeclaration) {
-        return name
+        return "${name}${translateTypeParameters(typeParameters)}"
     } else if (this is QualifiedNode) {
         return translate()
     } else if (this is IdentifierDeclaration) {

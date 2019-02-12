@@ -1,22 +1,17 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -32,78 +27,34 @@ private class GenerateInterfaceReferences(private val astContext: TsAstContext) 
     override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration) = declaration
 
-    private fun ParameterValueDeclaration.generateInterface(ownerUID: String): ParameterValueDeclaration {
-        return when (this) {
-            is ObjectLiteralDeclaration -> {
-                if (members.isEmpty()) {
-                    TypeDeclaration("Any", emptyList())
-                } else {
-                    val referenceNode = astContext.registerObjectLiteralDeclaration(this, ownerUID)
-                    referenceNode
-                }
-            }
-            else -> this
-        }
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
+        return declaration.copy(members = declaration.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, declaration.typeParameters) })
+    }
+
+    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
+        return declaration.copy(members = declaration.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, declaration.typeParameters) })
+    }
+
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
+        return declaration.copy(
+                parameters = declaration.parameters.map { param ->
+                    param.copy(type =  astContext.generateInterface(param.type, declaration.uid, declaration.typeParameters))
+                },
+                type = astContext.generateInterface(declaration.type, declaration.uid, declaration.typeParameters)
+        )
     }
 
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
-        return when(declaration.type) {
+        return when (declaration.type) {
             is ObjectLiteralDeclaration -> {
                 declaration.copy(type = declaration.type.copy(
-                        members = declaration.type.members.map { member -> lowerMemberDeclaration(member, declaration.uid) }
+                        members = declaration.type.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, emptyList()) }
                 ))
             }
             else -> declaration
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, ownerUid: String): MemberDeclaration {
-        return when (declaration) {
-            is CallSignatureDeclaration -> declaration.copy(
-                    parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(ownerUid))
-                    },
-                    type = declaration.type.generateInterface(ownerUid)
-            )
-            is ConstructorDeclaration -> declaration.copy(
-                    parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(ownerUid))
-                    }
-            )
-            is PropertyDeclaration -> declaration.copy(type = declaration.type.generateInterface(ownerUid))
-            is MethodSignatureDeclaration -> declaration.copy(
-                    parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(ownerUid))
-                    },
-                    type = declaration.type.generateInterface(ownerUid)
-            )
-            is FunctionDeclaration -> declaration.copy(
-                    parameters = declaration.parameters.map { param ->
-                        param.copy(type = param.type.generateInterface(ownerUid))
-                    },
-                    type = declaration.type.generateInterface(ownerUid)
-            )
-
-            else -> declaration
-        }
-    }
-
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
-        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration.uid) })
-    }
-
-    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
-        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, declaration.uid) })
-    }
-
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
-        return declaration.copy(
-                parameters = declaration.parameters.map { param ->
-                    param.copy(type = param.type.generateInterface(declaration.uid))
-                },
-                type = declaration.type.generateInterface(declaration.uid)
-        )
-    }
 }
 
 fun DocumentRootDeclaration.generateInterfaceReferences(): DocumentRootDeclaration {
