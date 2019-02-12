@@ -222,8 +222,12 @@ private fun VariableNode.translate(): String {
 }
 
 private fun EnumNode.translate(): String {
+    println("meta ${values}")
     val res = mutableListOf("external enum class ${name} {")
-    res.add(values.map { value -> "    ${value.value}" }.joinToString(",\n"))
+    res.add(values.map { value ->
+        val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
+        "    ${value.value}${metaClause}"
+    }.joinToString(",\n"))
     res.add("}")
     return res.joinToString("\n")
 }

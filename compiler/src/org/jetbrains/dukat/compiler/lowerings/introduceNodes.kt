@@ -245,7 +245,7 @@ private class LowerDeclarationsToNodes {
     private fun EnumDeclaration.convert(): EnumNode {
         return EnumNode(
                 name = name,
-                values = values.map { value -> EnumTokenNode(value.value, value.value) }
+                values = values.map { value -> EnumTokenNode(value.value, value.meta) }
         )
     }
 

@@ -556,7 +556,10 @@ class AstConverter {
         for (let statement of statements) {
             if (ts.isEnumDeclaration(statement)) {
                 let enumTokens = statement.members.map(member =>
-                    this.astFactory.createEnumTokenDeclaration(member.name.getText(), ""));
+                    this.astFactory.createEnumTokenDeclaration(
+                        member.name.getText(),
+                        member.initializer ? member.initializer.getText() : ""
+                    ));
 
                 this.registerDeclaration(this.astFactory.createEnumDeclaration(
                     statement.name.getText(),
