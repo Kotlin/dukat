@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.compiler.lowerPrimitives
-import org.jetbrains.dukat.compiler.lowerings.eliminateStringType
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceExports
@@ -28,6 +27,7 @@ import org.jetbrains.dukat.compiler.lowerings.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.lowerTypeAliases
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
 private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
@@ -56,11 +56,11 @@ interface InputTranslator {
         return documentRoot
                 .filterOutNonDeclarations()
                 .generateInterfaceReferences()
+                .eliminateStringType()
                 .introduceNodes()
                 .introduceModuleMetadata()
                 .introduceQualifiedNode()
                 .introduceExports()
-                .eliminateStringType()
                 .lowerNativeArray()
                 .lowerNullable()
                 .lowerPrimitives()

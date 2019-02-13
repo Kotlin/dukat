@@ -6,6 +6,7 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
@@ -18,7 +19,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-interface ParameterValueLowering : DeclarationLowering {
+interface DeclarationTypeLowering : DeclarationLowering {
 
     fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration {
         return declaration.copy(
@@ -42,11 +43,22 @@ interface ParameterValueLowering : DeclarationLowering {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
             is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
+            is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration)
             else -> {
                 println("[WARN] skipping ${declaration}")
                 declaration
             }
         }
+    }
+
+    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration {
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                },
+                type = lowerParameterValue(declaration.type)
+        )
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
@@ -101,9 +113,10 @@ interface ParameterValueLowering : DeclarationLowering {
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
 
+        println("interface ${declaration.name}")
+
         return declaration.copy(
-                members
-                = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },

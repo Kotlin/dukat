@@ -5,6 +5,7 @@ import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -26,6 +27,9 @@ private class GenerateInterfaceReferences(private val astContext: GeneratedInter
     override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration) = declaration
     override fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration) = declaration
     override fun lowerMemberDeclaration(declaration: MemberDeclaration) = declaration
+
+    // TODO: it looks like we haven't covered interface generattion for interface method signatures
+    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration) = declaration
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
         return declaration.copy(members = declaration.members.map { member -> astContext.lowerMemberDeclaration(member, declaration.uid, declaration.typeParameters) })
