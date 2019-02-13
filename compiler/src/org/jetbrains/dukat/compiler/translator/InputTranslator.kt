@@ -15,7 +15,6 @@ import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
 import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
-import org.jetbrains.dukat.compiler.lowerings.lowerNativeArray
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerThisType
@@ -27,6 +26,7 @@ import org.jetbrains.dukat.compiler.lowerings.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.lowerTypeAliases
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
@@ -57,11 +57,11 @@ interface InputTranslator {
                 .filterOutNonDeclarations()
                 .generateInterfaceReferences()
                 .eliminateStringType()
+                .desugarArrayDeclarations()
                 .introduceNodes()
                 .introduceModuleMetadata()
                 .introduceQualifiedNode()
                 .introduceExports()
-                .lowerNativeArray()
                 .lowerNullable()
                 .lowerPrimitives()
                 .escapeIdentificators()
