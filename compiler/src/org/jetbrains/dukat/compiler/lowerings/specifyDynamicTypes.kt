@@ -4,25 +4,21 @@ import cartesian
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
-    return params.map { param ->
-        val type = param.type
-        if (type is DynamicTypeNode) {
-            val projectedType = type.projectedType
-            if (projectedType is UnionTypeDeclaration) {
-                projectedType.params.map { param.copy(type = it) }
-            } else listOf(param)
-        } else listOf(param)
+    return params.map { parameterDeclaration ->
+        val type = parameterDeclaration.type
+        if (type is UnionTypeNode) {
+            type.params.map { parameterDeclaration.copy(type = it) }
+        } else listOf(parameterDeclaration)
     }
 }
 
@@ -40,7 +36,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
     }
 
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
-        val hasDynamic = declaration.parameters.any { (it.type is DynamicTypeNode) }
+        val hasDynamic = declaration.parameters.any { (it.type is UnionTypeNode) }
 
         return generateParams(declaration.parameters).map { params ->
             declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)

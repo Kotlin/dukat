@@ -3,11 +3,11 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -41,7 +41,7 @@ interface Lowering {
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(declaration)
-            is DynamicTypeNode -> declaration
+            is UnionTypeNode -> declaration
             else -> declaration
         }
     }

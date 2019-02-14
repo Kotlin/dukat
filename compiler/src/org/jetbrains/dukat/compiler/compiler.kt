@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -14,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
@@ -29,7 +29,6 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
@@ -88,7 +87,7 @@ private fun ParameterValueDeclaration.translate(): String {
             translated = "(${translated})?"
         }
         return translated
-    } else if (this is DynamicTypeNode) {
+    } else if (this is UnionTypeNode) {
         return translate()
     } else if (this is GeneratedInterfaceReferenceDeclaration) {
         return "${name}${translateTypeParameters(typeParameters)}"
@@ -101,11 +100,9 @@ private fun ParameterValueDeclaration.translate(): String {
     }
 }
 
-private fun DynamicTypeNode.translate(): String {
-    val meta = if (projectedType is UnionTypeDeclaration) {
-        val metaBody = (projectedType as UnionTypeDeclaration).params.map { it.translate() }.joinToString(" | ")
-        "/* ${metaBody} */"
-    } else ""
+private fun UnionTypeNode.translate(): String {
+    val metaBody = params.map { it.translate() }.joinToString(" | ")
+    val meta = "/* ${metaBody} */"
     return "dynamic ${meta}"
 }
 
@@ -317,7 +314,7 @@ private fun escapePackageName(name: String): String {
 private fun IdentifierDeclaration.translate() = value
 
 private fun HeritageSymbolDeclaration.translate(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierDeclaration -> translate()
         is PropertyAccessDeclaration -> expression.translate() + "." + name.translate()
         else -> throw Exception("unknown heritage clause ${this}")

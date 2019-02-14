@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
-import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
@@ -64,9 +64,8 @@ class TypeAliasContext {
                 // TODO: we can not make IntersectionMetadata data class since we'll end up in recursion - https://youtrack.jetbrains.com/issue/KT-29786
                 IntersectionMetadata(params = paramsResolved.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)} )
             }
-            is DynamicTypeNode -> {
-                val projectedTypeResolved = projectedType.specify(aliasParamsMap)
-                copy(projectedType = projectedTypeResolved)
+            is UnionTypeNode -> {
+                copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
             }
             is UnionTypeDeclaration -> {
                 copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
@@ -89,7 +88,7 @@ class TypeAliasContext {
 
                         if (typeReference is TypeDeclaration) {
                             return typeReference.specify(aliasParamsMap)
-                        } else if (typeReference is DynamicTypeNode) {
+                        } else if (typeReference is UnionTypeNode) {
                             return typeReference.specify(aliasParamsMap)
                         } else if (typeReference is FunctionTypeDeclaration) {
                             return typeReference.specify(aliasParamsMap)
@@ -99,16 +98,10 @@ class TypeAliasContext {
 
                 null
             }
-            is DynamicTypeNode -> {
-                when (type.projectedType) {
-                    is UnionTypeDeclaration -> {
-                        val unionTypeDeclaration = type.projectedType as UnionTypeDeclaration
-                        type.copy(projectedType = unionTypeDeclaration.copy(params = unionTypeDeclaration.params.map { param ->
-                            resolveTypeAlias(param)
-                        }))
-                    }
-                    else -> null
-                }
+            is UnionTypeNode -> {
+                type.copy(params = type.params.map { param ->
+                    resolveTypeAlias(param)
+                })
             }
             else -> null
         }
