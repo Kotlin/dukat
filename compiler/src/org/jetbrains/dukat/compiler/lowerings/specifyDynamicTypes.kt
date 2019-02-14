@@ -43,7 +43,7 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
         val hasDynamic = declaration.parameters.any { (it.type is DynamicTypeNode) }
 
         return generateParams(declaration.parameters).map { params ->
-            declaration.copy(parameters = params, generated = hasDynamic)
+            declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)
         }
     }
 
