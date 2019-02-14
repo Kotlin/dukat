@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -80,12 +81,11 @@ class TypeAliasContext {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 
-                        if (typeReference is TypeDeclaration) {
-                            return typeReference.specify(aliasParamsMap)
-                        } else if (typeReference is UnionTypeNode) {
-                            return typeReference.specify(aliasParamsMap)
-                        } else if (typeReference is FunctionTypeDeclaration) {
-                            return typeReference.specify(aliasParamsMap)
+                        when (typeReference) {
+                            is TypeDeclaration -> return typeReference.specify(aliasParamsMap)
+                            is UnionTypeNode -> return typeReference.specify(aliasParamsMap)
+                            is FunctionTypeDeclaration -> return typeReference.specify(aliasParamsMap)
+                            is GeneratedInterfaceReferenceDeclaration -> return typeReference
                         }
                     }
                 }

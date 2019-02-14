@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -71,6 +72,9 @@ class GeneratedInterfacesContext {
                 }
             }
             is UnionTypeDeclaration -> {
+                declaration.copy(params = declaration.params.map { param -> generateInterface(param, ownerUID, typeParameters) } )
+            }
+            is IntersectionTypeDeclaration -> {
                 declaration.copy(params = declaration.params.map { param -> generateInterface(param, ownerUID, typeParameters) } )
             }
             else -> declaration
