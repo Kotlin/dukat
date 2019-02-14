@@ -69,6 +69,22 @@ private class GenerateInterfaceReferences(private val astContext: GeneratedInter
         }
     }
 
+    override fun lowerDocumentRoot(documentRoot: DocumentRootDeclaration): DocumentRootDeclaration {
+        val declarations = documentRoot.declarations.map { declaration ->
+            when (declaration) {
+                !is TypeAliasDeclaration -> lowerTopLevelDeclaration(declaration)
+                else -> declaration
+            }
+        }.map {
+            declaration ->
+            when (declaration) {
+                is TypeAliasDeclaration -> lowerTopLevelDeclaration(declaration)
+                else -> declaration
+            }
+        }
+
+        return documentRoot.copy(declarations = declarations)
+    }
 }
 
 fun DocumentRootDeclaration.generateInterfaceReferences(): DocumentRootDeclaration {
