@@ -10,7 +10,6 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 // TODO: TypeAliases should be revisited
 private fun IdentifierDeclaration.translate() = value
@@ -33,7 +32,7 @@ class TypeAliasContext {
         return when (this) {
             is TypeDeclaration -> {
                 val paramsSpecified = params.map { param ->
-                     when(param) {
+                    when (param) {
                         is TypeDeclaration -> {
                             resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
                         }
@@ -62,16 +61,13 @@ class TypeAliasContext {
                     allParams
                 }
                 // TODO: we can not make IntersectionMetadata data class since we'll end up in recursion - https://youtrack.jetbrains.com/issue/KT-29786
-                IntersectionMetadata(params = paramsResolved.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)} )
+                IntersectionMetadata(params = paramsResolved.map { param -> resolveTypeAlias(param).specify(aliasParamsMap) })
             }
             is UnionTypeNode -> {
-                copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
-            }
-            is UnionTypeDeclaration -> {
-                copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
+                copy(params = params.map { param -> resolveTypeAlias(param).specify(aliasParamsMap) })
             }
             is FunctionTypeDeclaration -> {
-                copy(parameters = parameters.map {parameterDeclaration ->
+                copy(parameters = parameters.map { parameterDeclaration ->
                     parameterDeclaration.copy(type = resolveTypeAlias(parameterDeclaration.type).specify(aliasParamsMap))
                 }, type = resolveTypeAlias(type).specify(aliasParamsMap))
             }
