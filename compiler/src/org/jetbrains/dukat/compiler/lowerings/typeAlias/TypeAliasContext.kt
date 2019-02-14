@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
+import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -38,7 +39,20 @@ class TypeAliasContext {
                         else -> param
                     }
                 }
-                copy(params = paramsSpecified)
+
+                val valueAliasResolved = aliasParamsMap.get(value)
+
+                val valueResolved = if (valueAliasResolved is TypeDeclaration) {
+                    valueAliasResolved.value
+                } else value
+
+                // TODO: there's somewhere a
+
+                copy(value = valueResolved, params = paramsSpecified, meta = meta?.specify(aliasParamsMap))
+            }
+            is IntersectionMetadata -> {
+                // TODO: we can not make IntersectionMetadata data class since we'll end up in recursion - https://youtrack.jetbrains.com/issue/KT-29786
+                IntersectionMetadata(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)} )
             }
             is DynamicTypeNode -> {
                 val projectedTypeResolved = projectedType.specify(aliasParamsMap)
@@ -52,6 +66,7 @@ class TypeAliasContext {
     }
 
     private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+
         return when (type) {
             is TypeDeclaration -> {
                 if (aliasName == type.value) {
