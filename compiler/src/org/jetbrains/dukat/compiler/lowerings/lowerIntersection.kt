@@ -10,7 +10,8 @@ private class LowerIntersection : ParameterValueLowering {
         return when (declaration) {
             is IntersectionTypeDeclaration -> {
                 val firstIntersectionType = declaration.params[0]
-                firstIntersectionType.meta = IntersectionMetadata(declaration.params)
+                firstIntersectionType.meta =
+                        IntersectionMetadata(declaration.params)
                 return lowerParameterValue(firstIntersectionType)
             }
             else -> declaration

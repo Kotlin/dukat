@@ -52,8 +52,17 @@ class TypeAliasContext {
                 copy(value = valueResolved, params = paramsSpecified, meta = meta?.specify(aliasParamsMap))
             }
             is IntersectionMetadata -> {
+                val paramsResolved = if (params.isEmpty()) {
+                    params
+                } else {
+                    // IntersectionMetadata stores reference to param we've already specified
+                    val allParams = params.toMutableList()
+                    val firstParam = allParams.first()
+                    firstParam.meta = null
+                    allParams
+                }
                 // TODO: we can not make IntersectionMetadata data class since we'll end up in recursion - https://youtrack.jetbrains.com/issue/KT-29786
-                IntersectionMetadata(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)} )
+                IntersectionMetadata(params = paramsResolved.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)} )
             }
             is DynamicTypeNode -> {
                 val projectedTypeResolved = projectedType.specify(aliasParamsMap)
