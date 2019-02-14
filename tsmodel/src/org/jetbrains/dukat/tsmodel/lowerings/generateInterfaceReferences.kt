@@ -44,7 +44,9 @@ private class GenerateInterfaceReferences(private val astContext: GeneratedInter
     }
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
-        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference, "${declaration.aliasName}_TYPE", emptyList()))
+        // TODO: there's should be one way to declare params
+        val typeParams = declaration.typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter.value, emptyList()) }
+        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference, "${declaration.aliasName}_TYPE", typeParams))
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
