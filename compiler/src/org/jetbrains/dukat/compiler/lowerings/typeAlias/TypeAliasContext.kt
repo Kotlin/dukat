@@ -44,6 +44,9 @@ class TypeAliasContext {
                 val projectedTypeResolved = projectedType.specify(aliasParamsMap)
                 copy(projectedType = projectedTypeResolved)
             }
+            is UnionTypeDeclaration -> {
+                copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
+            }
             else -> this
         }
     }
@@ -57,7 +60,8 @@ class TypeAliasContext {
                             val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
                             return typeReference.specify(aliasParamsMap)
                         } else if (typeReference is DynamicTypeNode) {
-                            return typeReference.specify(emptyMap())
+                            val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
+                            return typeReference.specify(aliasParamsMap)
                         }
                     }
                 }
@@ -68,7 +72,9 @@ class TypeAliasContext {
                 when (type.projectedType) {
                     is UnionTypeDeclaration -> {
                         val unionTypeDeclaration = type.projectedType as UnionTypeDeclaration
-                        type.copy(projectedType = unionTypeDeclaration.copy(params = unionTypeDeclaration.params.map { resolveTypeAlias(it) }))
+                        type.copy(projectedType = unionTypeDeclaration.copy(params = unionTypeDeclaration.params.map { param ->
+                            resolveTypeAlias(param)
+                        }))
                     }
                     else -> null
                 }
@@ -94,6 +100,7 @@ class TypeAliasContext {
     }
 
     fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
+
 
         myTypeAliasDeclaration.forEach { typeAlias ->
             typeAlias.substitute(type)?.let {
