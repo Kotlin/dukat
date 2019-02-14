@@ -6,12 +6,13 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-private class LoweringUnionType : ParameterValueLowering {
+private class LoweringUnionType() : ParameterValueLowering {
+
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         if (declaration is UnionTypeDeclaration) {
-            return DynamicTypeNode(declaration)
+            return DynamicTypeNode(declaration.copy(params = declaration.params.map {param ->  lowerParameterValue(param)}))
         }
-        return declaration
+        return super.lowerParameterValue(declaration)
     }
 }
 

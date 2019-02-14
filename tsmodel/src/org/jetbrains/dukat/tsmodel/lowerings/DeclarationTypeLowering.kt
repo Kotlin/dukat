@@ -112,9 +112,6 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
-
-        println("interface ${declaration.name}")
-
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->

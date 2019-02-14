@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
-import org.jetbrains.dukat.tsmodel.GenericParamDeclaration
+import org.jetbrains.dukat.ast.model.nodes.DynamicTypeNode
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -8,6 +8,7 @@ import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 // TODO: TypeAliases should be revisited
 private fun IdentifierDeclaration.translate() = value
@@ -26,12 +27,54 @@ class TypeAliasContext {
         return aliasName == heritageClause.name.translate()
     }
 
-    private fun TypeAliasDeclaration.canSusbtitute(type: TypeDeclaration): Boolean {
-        if (aliasName == type.value) {
-            return true
+    private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
+        return when (this) {
+            is TypeDeclaration -> {
+                val paramsSpecified = params.map { param ->
+                     when(param) {
+                        is TypeDeclaration -> {
+                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
+                        }
+                        else -> param
+                    }
+                }
+                copy(params = paramsSpecified)
+            }
+            is DynamicTypeNode -> {
+                val projectedTypeResolved = projectedType.specify(aliasParamsMap)
+                copy(projectedType = projectedTypeResolved)
+            }
+            else -> this
         }
+    }
 
-        return false
+    private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+        return when (type) {
+            is TypeDeclaration -> {
+                if (aliasName == type.value) {
+                    if (typeParameters.size == type.params.size) {
+                        if (typeReference is TypeDeclaration) {
+                            val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
+                            return typeReference.specify(aliasParamsMap)
+                        } else if (typeReference is DynamicTypeNode) {
+                            return typeReference.specify(emptyMap())
+                        }
+                    }
+                }
+
+                null
+            }
+            is DynamicTypeNode -> {
+                when (type.projectedType) {
+                    is UnionTypeDeclaration -> {
+                        val unionTypeDeclaration = type.projectedType as UnionTypeDeclaration
+                        type.copy(projectedType = unionTypeDeclaration.copy(params = unionTypeDeclaration.params.map { resolveTypeAlias(it) }))
+                    }
+                    else -> null
+                }
+            }
+            else -> null
+        }
     }
 
     private val myTypeAliasDeclaration: MutableSet<TypeAliasDeclaration> = mutableSetOf()
@@ -50,30 +93,14 @@ class TypeAliasContext {
         return null
     }
 
-    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration? {
-        if (type is TypeDeclaration) {
+    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
 
-            val typeAlias = myTypeAliasDeclaration.firstOrNull { typeAlias -> typeAlias.canSusbtitute(type) }
-
-            if (typeAlias != null) {
-                val typeReference = typeAlias.typeReference
-
-                if (typeReference is TypeDeclaration) {
-                    val specifiedTypes = type.params.toMutableList()
-
-                    val params = typeReference.params.map { param ->
-                        if (param is GenericParamDeclaration) {
-                            specifiedTypes.removeAt(0)
-                        } else resolveTypeAlias(param) ?: param
-                    }
-
-                    return typeReference.copy(params = params)
-                }
-
-                return typeReference
+        myTypeAliasDeclaration.forEach { typeAlias ->
+            typeAlias.substitute(type)?.let {
+                return it
             }
-
         }
-        return null
+
+        return type
     }
 }
