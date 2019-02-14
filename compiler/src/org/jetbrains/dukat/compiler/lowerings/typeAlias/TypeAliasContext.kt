@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -61,21 +62,27 @@ class TypeAliasContext {
             is UnionTypeDeclaration -> {
                 copy(params = params.map {param -> resolveTypeAlias(param).specify(aliasParamsMap)})
             }
+            is FunctionTypeDeclaration -> {
+                copy(parameters = parameters.map {parameterDeclaration ->
+                    parameterDeclaration.copy(type = resolveTypeAlias(parameterDeclaration.type).specify(aliasParamsMap))
+                }, type = resolveTypeAlias(type).specify(aliasParamsMap))
+            }
             else -> this
         }
     }
 
     private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
-
         return when (type) {
             is TypeDeclaration -> {
                 if (aliasName == type.value) {
                     if (typeParameters.size == type.params.size) {
+                        val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
+
                         if (typeReference is TypeDeclaration) {
-                            val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
                             return typeReference.specify(aliasParamsMap)
                         } else if (typeReference is DynamicTypeNode) {
-                            val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
+                            return typeReference.specify(aliasParamsMap)
+                        } else if (typeReference is FunctionTypeDeclaration) {
                             return typeReference.specify(aliasParamsMap)
                         }
                     }
