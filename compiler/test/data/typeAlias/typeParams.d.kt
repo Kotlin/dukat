@@ -12,6 +12,6 @@ external fun listOfNumberOrString(a: List<dynamic /* Number | String */>): Unit 
 external var headers: Map<String, List<String>> = definedExternally
 external fun getHeaders(): Map<String, List<String>> = definedExternally
 external fun addHeaders(headers: Map<String, List<String>>): Unit = definedExternally
-external var someRef: dynamic /* String | (instance: T) -> Any */ = definedExternally
+external var someRef: dynamic /* String | (instance: Number) -> Any */ = definedExternally
 external fun addRef(ref: String): Unit = definedExternally
-external fun addRef(ref: (instance: T) -> Any): Unit = definedExternally
+external fun addRef(ref: (instance: Number) -> Any): Unit = definedExternally
