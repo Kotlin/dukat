@@ -25,23 +25,26 @@ interface Lowering {
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
     fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
-    fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
-    fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
+
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
-    fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
-    fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
     fun lowerMemberNode(declaration: MemberNode): MemberNode
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
+
+    fun lowerTypeDeclaration(declaration: TypeDeclaration): ParameterValueDeclaration
+    fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): ParameterValueDeclaration
+    fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): ParameterValueDeclaration
+    fun lowerUnionTypeNode(declaration: UnionTypeNode): ParameterValueDeclaration
+    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): ParameterValueDeclaration
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(declaration)
-            is UnionTypeNode -> declaration
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
+            is UnionTypeNode -> lowerUnionTypeNode(declaration)
             else -> declaration
         }
     }

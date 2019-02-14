@@ -71,7 +71,6 @@ interface InputTranslator {
                 .lowerThisType()
                 .updateContext(myAstContext)
                 .lowerOverrides(myAstContext)
-                .specifyDynamicTypes()
                 .resolveTypeAliases()
                 .specifyDynamicTypes()
                 .lowerConstructors()

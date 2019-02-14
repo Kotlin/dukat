@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -69,7 +70,11 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
-    override fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
+    override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    }
+
+    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 

@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -37,6 +38,16 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
+    fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration): CallSignatureDeclaration {
+        return declaration.copy(
+                type = lowerParameterValue(declaration.type),
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                }
+        )
+    }
+
 
     override fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
         return when (declaration) {
@@ -44,6 +55,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
             is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration)
+            is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
             else -> {
                 println("[WARN] skipping ${declaration}")
                 declaration

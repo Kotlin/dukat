@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -25,8 +26,24 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         return super.lowerInterfaceNode(declaration.copy(parentEntities = parentEntitiesRemapped))
     }
 
+    private fun ParameterValueDeclaration.unroll() : List<ParameterValueDeclaration> {
+        return when(this) {
+            is UnionTypeNode -> {
+                val paramsUnrolled = params.flatMap { param -> param.unroll() }
+                paramsUnrolled.toSet().toList()
+            }
+            else -> listOf(this)
+        }
+    }
+
+
+    override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
+        //println("LOWER UNION TYPE NODE ${declaration}")
+        return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll()))
+    }
+
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return context.resolveTypeAlias(declaration)
+        return super.lowerParameterValue(context.resolveTypeAlias(declaration))
     }
 
 }

@@ -46,8 +46,6 @@ class TypeAliasContext {
                     valueAliasResolved.value
                 } else value
 
-                // TODO: there's somewhere a
-
                 copy(value = valueResolved, params = paramsSpecified, meta = meta?.specify(aliasParamsMap))
             }
             is IntersectionMetadata -> {
@@ -121,12 +119,12 @@ class TypeAliasContext {
 
     fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
 
-
         myTypeAliasDeclaration.forEach { typeAlias ->
             typeAlias.substitute(type)?.let {
                 return it
             }
         }
+
 
         return type
     }
