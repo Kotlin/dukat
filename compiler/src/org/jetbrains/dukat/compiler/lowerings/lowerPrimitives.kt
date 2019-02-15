@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
@@ -19,6 +20,10 @@ private fun mapPrimitiveValue(value: String): String {
 
 private class PrimitiveClassLowering : ParameterValueLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
+        if (declaration == TypeDeclaration("Function", emptyList())) {
+            return TypeDeclaration("Function", listOf(TypeDeclaration("*", emptyList())))
+        }
+
         var value = mapPrimitiveValue(declaration.value)
         var nullable = declaration.nullable
         if ((value == "undefined") || (value == "null")) {
