@@ -31,6 +31,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -73,8 +74,8 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
 fun <T : AstNode> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
-        ThisTypeDeclaration::class.simpleName -> ThisTypeDeclaration(
-        )
+        TupleDeclaration::class.simpleName -> TupleDeclaration(getEntities("params"))
+        ThisTypeDeclaration::class.simpleName -> ThisTypeDeclaration()
         EnumDeclaration::class.simpleName -> EnumDeclaration(
             get("name") as String,
             getEntities("values")

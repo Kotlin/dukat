@@ -8,6 +8,8 @@ declare interface Declaration extends AstNode {}
 declare interface HeritageSymbol extends Declaration {}
 declare interface PropertyAccessDeclaration extends HeritageSymbol {}
 
+declare interface TupleDeclaration extends ParameterValue {}
+
 declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue {
     left: ParameterValue,
     right: ParameterValue

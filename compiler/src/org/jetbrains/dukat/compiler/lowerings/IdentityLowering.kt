@@ -12,6 +12,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -39,6 +40,8 @@ interface IdentityLowering : Lowering {
     override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration = declaration
 
     override fun lowerMemberNode(declaration: MemberNode): MemberNode = declaration
+
+    override fun lowerTupleDeclaration(declaration: TupleDeclaration) = declaration
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration = declaration
 

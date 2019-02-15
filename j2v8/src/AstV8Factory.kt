@@ -45,6 +45,9 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     private fun AstNode.toV8() = V8ObjectUtils.toV8Object(runtime, astToMap())
 
+    fun createTupleDeclaration(params: V8Array)
+        = astFactory.createTupleDeclaration(params.toAst()).toV8()
+
     fun createImportEqualsDeclaration(name: String, moduleReference: V8Object)
         =  astFactory.createImportEqualsDeclaration(name, moduleReference.toAst()).toV8()
 

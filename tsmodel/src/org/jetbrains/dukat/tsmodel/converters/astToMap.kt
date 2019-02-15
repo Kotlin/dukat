@@ -30,6 +30,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import kotlin.reflect.KProperty0
@@ -100,6 +101,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)
         is TokenDeclaration -> listOf(::value).convert(this)
+        is TupleDeclaration -> listOf(::params).convert(this)
         is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
         is TypeDeclaration -> listOf(::value, ::params).convert(this)
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)

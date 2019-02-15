@@ -20,6 +20,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 interface AstNodeFactory<T> {
 
+    fun createTupleDeclaration(params: List<ParameterValueDeclaration>): T
+
     fun createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbolDeclaration): PropertyAccessDeclaration
 
     fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration

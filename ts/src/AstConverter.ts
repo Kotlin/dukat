@@ -274,6 +274,8 @@ class AstConverter {
                     return this.astFactory.createStringTypeDeclaration([
                         type.literal.getText()
                     ])
+                } else if (ts.isTupleTypeNode(type)) {
+                    return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
                 } else {
                     return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
                 }

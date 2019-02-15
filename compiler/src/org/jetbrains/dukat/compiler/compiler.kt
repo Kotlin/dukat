@@ -28,6 +28,7 @@ import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclarat
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
@@ -93,6 +94,8 @@ private fun ParameterValueDeclaration.translate(): String {
         return "${name}${translateTypeParameters(typeParameters)}"
     } else if (this is QualifiedNode) {
         return translate()
+    } else if (this is TupleDeclaration) {
+        return translate()
     } else if (this is IdentifierDeclaration) {
         return value
     } else {
@@ -106,6 +109,11 @@ private fun UnionTypeNode.translate(): String {
     return "dynamic ${meta}"
 }
 
+private fun TupleDeclaration.translate(): String {
+    val metaBody = params.map { it.translate() }.joinToString(", ")
+    val meta = "/* JsTuple<${metaBody}> */"
+    return "dynamic ${meta}"
+}
 
 private fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate()
