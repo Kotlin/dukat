@@ -313,7 +313,8 @@ private class LowerDeclarationsToNodes {
             //TODO: don't forget to create owner
             val objectNode = ObjectNode(
                     declaration.name,
-                    type.members.flatMap { member -> lowerMemberDeclaration(member) }
+                    type.members.flatMap { member -> lowerMemberDeclaration(member) },
+                    emptyList()
             )
 
             objectNode.copy(members = objectNode.members.map {

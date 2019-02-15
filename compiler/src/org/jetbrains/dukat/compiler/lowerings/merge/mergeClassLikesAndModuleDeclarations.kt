@@ -1,6 +1,7 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ClassModel
+import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
@@ -8,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
@@ -58,7 +58,7 @@ private fun MergableNode.convert(): MemberNode {
     }
 }
 
-private fun ObjectNode.merge(ownerName: String, modulesToBeMerged: Map<String, MutableList<ModuleModel>>): ObjectNode {
+private fun CompanionObjectModel.merge(ownerName: String, modulesToBeMerged: Map<String, MutableList<ModuleModel>>): CompanionObjectModel {
     val members = members.toMutableList()
     modulesToBeMerged.getOrDefault(ownerName, mutableListOf()).forEach { module ->
         val submoduleDecls = module.declarations

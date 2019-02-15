@@ -20,9 +20,10 @@ import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerThisType
 import org.jetbrains.dukat.compiler.lowerings.lowerUnionType
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
-import org.jetbrains.dukat.compiler.lowerings.mergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.compiler.lowerings.mergeClassesAndInterfaces
-import org.jetbrains.dukat.compiler.lowerings.mergeModules
+import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassLikesAndModuleDeclarations
+import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassesAndInterfaces
+import org.jetbrains.dukat.compiler.lowerings.merge.mergeModules
+import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
@@ -78,5 +79,6 @@ interface InputTranslator {
                 .mergeModules()
                 .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()
+                .mergeVarsAndInterfaces()
     }
 }

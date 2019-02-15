@@ -2,6 +2,9 @@ package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.model.ClassModel
+import org.jetbrains.dukat.ast.model.model.DelegationModel
+import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
+import org.jetbrains.dukat.ast.model.model.HeritageNode
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
@@ -18,6 +21,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -328,6 +332,45 @@ private fun HeritageSymbolDeclaration.translate(): String {
     }
 }
 
+private fun translateHeritageClauses(parentEntities: List<HeritageClauseDeclaration>): String {
+    val parents = if (parentEntities.isNotEmpty()) {
+        " : " + parentEntities.map { parentEntity ->
+            "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
+        }.joinToString(", ")
+    } else ""
+
+    return parents
+}
+
+private fun ParameterValueDeclaration.translateAsHeritageClause(): String {
+    return when(this) {
+        is FunctionTypeDeclaration -> translate()
+        is TypeDeclaration -> {
+            val typeParams = if (params.isEmpty()) {
+                ""
+            } else {
+                "<${params.joinToString("::"){ it.translateAsHeritageClause() }}>"
+            }
+
+            "${value}${typeParams}"
+        }
+        else -> ""
+    }
+}
+
+private fun DelegationModel.translate() : String {
+    return when (this) {
+        is ClassModel -> name
+        is ExternalDelegationModel -> "definedExternally"
+        else -> ""
+    }
+}
+
+private fun HeritageNode.translateAsHeritageClause(): String {
+    val delegationClause = delegateTo?.let { " by ${it.translate()}" } ?: ""
+    return "${value.translateAsHeritageClause()}${delegationClause}"
+}
+
 
 private fun processDeclarations(docRoot: ModuleModel): List<String> {
     val res: MutableList<String> = mutableListOf()
@@ -342,12 +385,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
         } else if (declaration is ClassModel) {
             val primaryConstructor = declaration.primaryConstructor
 
-            val parents = if (declaration.parentEntities.isNotEmpty()) {
-                " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
-                }.joinToString(", ")
-            } else ""
-
+            val parents = translateHeritageClauses(declaration.parentEntities)
             val classDeclaration = "${translateAnnotations(declaration.annotations)}external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}"
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
@@ -395,18 +433,23 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             val hasMembers = declaration.members.isNotEmpty()
             val staticMembers = declaration.companionObject.members
 
-            val isBlock = hasMembers || staticMembers.isNotEmpty()
-            val parents = if (declaration.parentEntities.isNotEmpty()) {
-                " : " + declaration.parentEntities.map { parentEntity ->
-                    "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
-                }.joinToString(", ")
-            } else ""
+            val showCompanionObject = staticMembers.isNotEmpty() || declaration.companionObject.parentEntities.isNotEmpty()
+
+            val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
+            val parents = translateHeritageClauses(declaration.parentEntities)
+
             res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (isBlock) " {" else "")
             if (isBlock) {
                 res.addAll(declaration.members.flatMap { it.translateSignature() }.map { "    " + it })
 
-                if (staticMembers.isNotEmpty()) {
-                    res.add("    companion object {")
+                val parents = if (declaration.companionObject.parentEntities.isEmpty()) {
+                    ""
+                } else {
+                    " : ${declaration.companionObject.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
+                }
+
+                if (showCompanionObject) {
+                    res.add("    companion object${parents} {")
                     res.addAll(staticMembers.flatMap { it.translate() }.map({ "        ${it}" }))
                     res.add("    }")
                 }

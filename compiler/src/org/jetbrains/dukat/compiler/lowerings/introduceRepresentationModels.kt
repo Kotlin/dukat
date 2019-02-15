@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.model.ClassModel
+import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
@@ -9,7 +10,6 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
@@ -33,9 +33,10 @@ private fun ClassNode.convertToClassModel(): ClassModel {
     return ClassModel(
             name = name,
             members = ownMembers,
-            companionObject = ObjectNode(
+            companionObject = CompanionObjectModel(
                     "",
-                    staticMembers
+                    staticMembers,
+                    emptyList()
             ),
             primaryConstructor = primaryConstructor,
             typeParameters = typeParameters,
@@ -57,9 +58,10 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     return InterfaceModel(
             name = name,
             members = ownMembers,
-            companionObject = ObjectNode(
+            companionObject = CompanionObjectModel(
                     "",
-                    staticMembers
+                    staticMembers,
+                    emptyList()
             ),
             typeParameters = typeParameters,
             parentEntities = parentEntities,

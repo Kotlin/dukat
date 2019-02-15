@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ClassLikeModel
 import org.jetbrains.dukat.ast.model.model.ClassModel
