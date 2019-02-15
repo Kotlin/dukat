@@ -20,6 +20,9 @@ private class LowerQualifiedDeclarations(private val moduleNode: DocumentRootNod
                     else -> value
                 }
             }
+            is QualifiedNamedDeclaration -> {
+                QualifiedNode(resolve(value.left), value.right)
+            }
             else -> value
         }
     }
