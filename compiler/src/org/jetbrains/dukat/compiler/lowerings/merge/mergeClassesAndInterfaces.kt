@@ -69,16 +69,6 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
     )
 }
 
-private fun InterfaceModel.mergeWithClass(otherClass: ClassModel): ClassModel {
-    return otherClass.copy(
-            name = name,
-            typeParameters = typeParameters,
-            members = members + otherClass.members,
-            companionObject = companionObject.copy(members = companionObject.members + otherClass.companionObject.members),
-            parentEntities = parentEntities + otherClass.parentEntities
-    )
-}
-
 private fun InterfaceModel.mergeWithInterface(otherInterface: InterfaceModel): InterfaceModel {
     return otherInterface.copy(
             name = name,
@@ -97,7 +87,7 @@ private fun ClassLikeModel.merge(otherClassLike: ClassLikeModel): ClassLikeModel
             else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
         }
         is InterfaceModel -> when(otherClassLike) {
-            is ClassModel -> mergeWithClass(otherClassLike)
+            is ClassModel -> otherClassLike.mergeWithInterface(this)
             is InterfaceModel -> mergeWithInterface(otherClassLike)
             else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
         }
