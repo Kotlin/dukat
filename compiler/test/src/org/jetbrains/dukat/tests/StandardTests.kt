@@ -27,10 +27,19 @@ open class StandardTests {
 
         val resourceDirectory = File("./test/data")
         val fileNameSource = resourceDirectory.resolve("${name}.d.ts").absolutePath
-        val fileNameTarget = resourceDirectory.resolve("${name}.d.kt")
+        val targetShortName = "${name}.d.kt"
+        val fileNameTarget = resourceDirectory.resolve(targetShortName)
+
+        val output = output(fileNameSource, translator)
+        val outputDirectory = File("./build/tests/out")
+        output?.let {
+            val outputFile = outputDirectory.resolve(targetShortName)
+            outputFile.parentFile.mkdirs()
+            outputFile.writeText(output)
+        }
 
         assertEquals(
-                output(fileNameSource, translator),
+                output,
                 fileNameTarget.readText().trimEnd()
         )
     }
