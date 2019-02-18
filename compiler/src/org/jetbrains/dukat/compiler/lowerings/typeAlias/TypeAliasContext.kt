@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -9,7 +10,6 @@ import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
-import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 // TODO: TypeAliases should be revisited
@@ -65,7 +65,7 @@ class TypeAliasContext {
             is UnionTypeNode -> {
                 copy(params = params.map { param -> resolveTypeAlias(param).specify(aliasParamsMap) })
             }
-            is FunctionTypeDeclaration -> {
+            is FunctionTypeNode -> {
                 copy(parameters = parameters.map { parameterDeclaration ->
                     parameterDeclaration.copy(type = resolveTypeAlias(parameterDeclaration.type).specify(aliasParamsMap))
                 }, type = resolveTypeAlias(type).specify(aliasParamsMap))
@@ -84,7 +84,7 @@ class TypeAliasContext {
                         when (typeReference) {
                             is TypeNode -> return typeReference.specify(aliasParamsMap)
                             is UnionTypeNode -> return typeReference.specify(aliasParamsMap)
-                            is FunctionTypeDeclaration -> return typeReference.specify(aliasParamsMap)
+                            is FunctionTypeNode -> return typeReference.specify(aliasParamsMap)
                             is GeneratedInterfaceReferenceDeclaration -> return typeReference
                         }
                     }

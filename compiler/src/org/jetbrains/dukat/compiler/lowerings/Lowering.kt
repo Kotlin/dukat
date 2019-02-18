@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -15,7 +16,6 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -34,7 +34,7 @@ interface Lowering {
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
     fun lowerTypeNode(declaration: TypeNode): ParameterValueDeclaration
-    fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): ParameterValueDeclaration
+    fun lowerFunctionNode(declaration: FunctionTypeNode): ParameterValueDeclaration
     fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): ParameterValueDeclaration
     fun lowerUnionTypeNode(declaration: UnionTypeNode): ParameterValueDeclaration
     fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): ParameterValueDeclaration
@@ -43,7 +43,7 @@ interface Lowering {
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeNode -> lowerTypeNode(declaration)
-            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
+            is FunctionTypeNode -> lowerFunctionNode(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
             is UnionTypeNode -> lowerUnionTypeNode(declaration)

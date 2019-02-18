@@ -2,6 +2,7 @@ package org.jetbrains.dukat.ast.model
 
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -30,6 +31,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is TypeNode -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
+        is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
         else -> throw Exception("makeNullable does not recognize type ${this}")
     }

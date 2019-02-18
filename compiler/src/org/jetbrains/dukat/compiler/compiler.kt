@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -30,7 +31,6 @@ import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
-import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -78,7 +78,7 @@ private fun ParameterValueDeclaration.translate(): String {
             res.add("?")
         }
         return res.joinToString("")
-    } else if (this is FunctionTypeDeclaration) {
+    } else if (this is FunctionTypeNode) {
         val res = mutableListOf("(")
         val paramsList = mutableListOf<String>()
         for (param in parameters) {
@@ -344,7 +344,7 @@ private fun translateHeritageClauses(parentEntities: List<HeritageClauseDeclarat
 
 private fun ParameterValueDeclaration.translateAsHeritageClause(): String {
     return when (this) {
-        is FunctionTypeDeclaration -> translate()
+        is FunctionTypeNode -> translate()
         is TypeNode -> {
             val typeParams = if (params.isEmpty()) {
                 ""
