@@ -86,6 +86,14 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                                 turnOff.add(it.fullPackageName)
                             }
 
+                            //TODO: investigate how set annotations only at FunctionNode only
+                            docRoot.declarations.filterIsInstance(FunctionNode::class.java).forEach {
+                                if (it != entity) {
+                                    it.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
+
+                                }
+                            }
+
                             if (docRoot.owner != null) {
                                 entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
                             }
