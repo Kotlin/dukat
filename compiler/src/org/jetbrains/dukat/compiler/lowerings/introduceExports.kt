@@ -96,6 +96,11 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                                 turnOff.add(it.fullPackageName)
                             }
 
+
+                            if (docRoot.uid == entity.owner?.uid) {
+                                entity.name = docRoot.qualifierName
+                            }
+
                             if (docRoot.owner != null) {
                                 entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifierName)))
                                 entity.immutable = true
