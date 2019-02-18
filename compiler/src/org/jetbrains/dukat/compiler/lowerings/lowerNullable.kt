@@ -2,10 +2,10 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
@@ -19,14 +19,14 @@ private class LowerNullable : ParameterValueLowering {
         return when (declaration) {
             is UnionTypeDeclaration -> {
                 val params = declaration.params.filter { param ->
-                    param != TypeDeclaration("undefined", emptyList()) &&
-                            param != TypeDeclaration("null", emptyList())
+                    param != TypeNode("undefined", emptyList()) &&
+                            param != TypeNode("null", emptyList())
                 }
 
                 if (params.size == 1) {
                     val nullableType = params[0]
-                    if (nullableType is TypeDeclaration) {
-                        val res = lowerTypeDeclaration(nullableType)
+                    if (nullableType is TypeNode) {
+                        val res = lowerTypeNode(nullableType)
                         res.nullable = true
                         return res
                     } else if (nullableType is FunctionTypeDeclaration) {
@@ -36,13 +36,13 @@ private class LowerNullable : ParameterValueLowering {
                     } else {
                         throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
-                } else lowerUnionTypeDeclation(declaration)
+                } else lowerUnionTypeDeclaration(declaration)
             }
             is FunctionTypeDeclaration -> {
                 return lowerFunctionTypeDeclaration(declaration)
             }
-            is TypeDeclaration -> {
-                return lowerTypeDeclaration(declaration)
+            is TypeNode -> {
+                return lowerTypeNode(declaration)
             }
             else -> declaration
         }

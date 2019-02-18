@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -19,7 +20,6 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
@@ -68,7 +68,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
     }
 
-    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
+    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
@@ -84,7 +84,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
+    override fun lowerTypeNode(declaration: TypeNode): TypeNode {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
@@ -105,7 +105,7 @@ interface ParameterValueLowering : Lowering {
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
         val typeArguments = heritageClause.typeArguments.map {
-            val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(it.value, emptyList())) as TypeDeclaration
+            val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList())) as TypeNode
             TokenDeclaration(lowerParameterDeclaration.value)
         }
         return heritageClause.copy(typeArguments = typeArguments)
@@ -141,7 +141,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerObjectNode(declaration: ObjectNode): ObjectNode {
         return declaration.copy(
-            members = declaration.members.map { member -> lowerMemberNode(member) }
+                members = declaration.members.map { member -> lowerMemberNode(member) }
         )
 
     }

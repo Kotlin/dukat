@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
-    if (this is TypeDeclaration) {
+    if (this is TypeNode) {
         if (value == "Array") {
             return params[0]
         } else if (value == "Any") {

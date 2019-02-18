@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -13,7 +14,6 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface IdentityLowering : Lowering {
@@ -25,7 +25,7 @@ interface IdentityLowering : Lowering {
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode = declaration
 
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration = declaration
+    override fun lowerTypeNode(declaration: TypeNode): TypeNode = declaration
 
     override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration = declaration
 
@@ -37,7 +37,7 @@ interface IdentityLowering : Lowering {
 
     override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration = declaration
 
-    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration = declaration
+    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration = declaration
 
     override fun lowerMemberNode(declaration: MemberNode): MemberNode = declaration
 

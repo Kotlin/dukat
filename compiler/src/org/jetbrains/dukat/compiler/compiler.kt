@@ -16,6 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -33,11 +34,10 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
-    val skipNullableAnnotation = (this is TypeDeclaration) && (this.value == "Nothing")
+    val skipNullableAnnotation = (this is TypeNode) && (this.value == "Nothing")
     if (nullable && !skipNullableAnnotation) {
         //TODO: consider rethinking this restriction
         return " /*= null*/"
@@ -65,7 +65,7 @@ private fun QualifiedNode.translate(): String {
 }
 
 private fun ParameterValueDeclaration.translate(): String {
-    if (this is TypeDeclaration) {
+    if (this is TypeNode) {
         val res = mutableListOf(value)
         if (isGeneric()) {
             val paramsList = mutableListOf<String>()
@@ -200,7 +200,7 @@ private fun FunctionNode.translate(): String {
 }
 
 private fun MethodNode.translate(): List<String> {
-    val returnsUnit = type == TypeDeclaration("@@None", emptyArray())
+    val returnsUnit = type == TypeNode("@@None", emptyList())
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -288,7 +288,7 @@ private fun MethodNode.translateSignature(): List<String> {
     val operatorModifier = if (operator) "operator " else ""
     val annotations = annotations.map { "@${it.name}" }
 
-    val returnsUnit = type == TypeDeclaration("Unit", emptyArray())
+    val returnsUnit = type == TypeNode("Unit", emptyList())
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}${type.translateSignatureMeta()}"
     val overrideClause = if (override) "override " else ""
 
@@ -343,13 +343,13 @@ private fun translateHeritageClauses(parentEntities: List<HeritageClauseDeclarat
 }
 
 private fun ParameterValueDeclaration.translateAsHeritageClause(): String {
-    return when(this) {
+    return when (this) {
         is FunctionTypeDeclaration -> translate()
-        is TypeDeclaration -> {
+        is TypeNode -> {
             val typeParams = if (params.isEmpty()) {
                 ""
             } else {
-                "<${params.joinToString("::"){ it.translateAsHeritageClause() }}>"
+                "<${params.joinToString("::") { it.translateAsHeritageClause() }}>"
             }
 
             "${value}${typeParams}"
@@ -358,7 +358,7 @@ private fun ParameterValueDeclaration.translateAsHeritageClause(): String {
     }
 }
 
-private fun DelegationModel.translate() : String {
+private fun DelegationModel.translate(): String {
     return when (this) {
         is ClassModel -> name
         is ExternalDelegationModel -> "definedExternally"

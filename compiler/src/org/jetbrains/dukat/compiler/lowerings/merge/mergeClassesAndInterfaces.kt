@@ -6,10 +6,10 @@ import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private data class ClassLikeKey(
     val name: String,
@@ -43,9 +43,9 @@ private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
 }
 
 private fun ParameterValueDeclaration.substituteUnit(): ParameterValueDeclaration {
-    val returnsUnit = this == TypeDeclaration("Unit", emptyArray())
+    val returnsUnit = this == TypeNode("Unit", emptyList())
     return if (returnsUnit) {
-        TypeDeclaration("@@None", emptyArray())
+        TypeNode("@@None", emptyList())
     } else this
 }
 

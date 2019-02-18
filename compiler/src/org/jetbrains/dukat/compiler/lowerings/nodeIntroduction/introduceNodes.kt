@@ -1,6 +1,5 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
@@ -37,7 +36,6 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
@@ -147,14 +145,6 @@ private class LowerDeclarationsToNodes {
                 true,
                 true
         )
-    }
-
-    private fun ParameterValueDeclaration.convertNullable(): ParameterValueDeclaration {
-        return when (this) {
-            is TypeDeclaration -> copy(nullable = true)
-            is FunctionTypeDeclaration -> copy(nullable = true)
-            else -> duplicate()
-        }
     }
 
     private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {

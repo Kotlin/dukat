@@ -9,8 +9,6 @@ import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceExports
-import org.jetbrains.dukat.compiler.lowerings.introduceModuleMetadata
-import org.jetbrains.dukat.compiler.lowerings.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
@@ -24,6 +22,9 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassLikesAndModuleDecl
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
+import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceModuleMetadata
+import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceNodes
+import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
@@ -61,6 +62,7 @@ interface InputTranslator {
                 .desugarArrayDeclarations()
                 .introduceNodes()
                 .introduceModuleMetadata()
+                .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .introduceExports()
                 .lowerPrimitives()

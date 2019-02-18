@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -22,10 +23,11 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-fun TypeDeclaration.isGeneric() = params.isNotEmpty()
+fun TypeNode.isGeneric() = params.isNotEmpty()
 
 fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
+        is TypeNode -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
@@ -34,7 +36,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T: AstNode> AstNode.duplicate(): T {
+fun <T : AstNode> AstNode.duplicate(): T {
     return when (this) {
         is EnumNode -> copy() as T
         is EnumDeclaration -> copy() as T
@@ -50,6 +52,7 @@ fun <T: AstNode> AstNode.duplicate(): T {
         is FunctionDeclaration -> copy() as T
         is FunctionNode -> copy() as T
         is TypeDeclaration -> copy() as T
+        is TypeNode -> copy() as T
         is ParameterDeclaration -> copy() as T
         is FunctionTypeDeclaration -> copy() as T
         is TypeAliasDeclaration -> copy() as T

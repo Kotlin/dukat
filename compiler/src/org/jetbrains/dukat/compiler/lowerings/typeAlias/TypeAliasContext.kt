@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -10,7 +11,6 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 // TODO: TypeAliases should be revisited
 private fun IdentifierDeclaration.translate() = value
@@ -31,10 +31,10 @@ class TypeAliasContext {
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
         return when (this) {
-            is TypeDeclaration -> {
+            is TypeNode -> {
                 val paramsSpecified = params.map { param ->
                     when (param) {
-                        is TypeDeclaration -> {
+                        is TypeNode -> {
                             resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
                         }
                         else -> param
@@ -43,7 +43,7 @@ class TypeAliasContext {
 
                 val valueAliasResolved = aliasParamsMap.get(value)
 
-                val valueResolved = if (valueAliasResolved is TypeDeclaration) {
+                val valueResolved = if (valueAliasResolved is TypeNode) {
                     valueAliasResolved.value
                 } else value
 
@@ -76,13 +76,13 @@ class TypeAliasContext {
 
     private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
         return when (type) {
-            is TypeDeclaration -> {
+            is TypeNode -> {
                 if (aliasName == type.value) {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 
                         when (typeReference) {
-                            is TypeDeclaration -> return typeReference.specify(aliasParamsMap)
+                            is TypeNode -> return typeReference.specify(aliasParamsMap)
                             is UnionTypeNode -> return typeReference.specify(aliasParamsMap)
                             is FunctionTypeDeclaration -> return typeReference.specify(aliasParamsMap)
                             is GeneratedInterfaceReferenceDeclaration -> return typeReference

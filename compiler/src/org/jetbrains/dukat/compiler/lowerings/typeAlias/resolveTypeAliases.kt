@@ -2,13 +2,13 @@ package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLowering {
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
@@ -16,7 +16,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         val parentEntitiesRemapped = declaration.parentEntities.map { parent ->
             val resolved = context.resolveTypeAlias(parent)
 
-            if (resolved is TypeDeclaration) {
+            if (resolved is TypeNode) {
                 HeritageClauseDeclaration(IdentifierDeclaration(resolved.value), emptyList(), false)
             } else {
                 parent
