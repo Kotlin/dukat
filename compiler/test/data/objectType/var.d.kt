@@ -9,9 +9,9 @@ external object foo {
     var boo: String = definedExternally
     var show: (overrideChecks: Boolean) -> Unit = definedExternally
     @nativeInvoke
-    operator fun invoke(foo: `T$0`): Any
+    operator fun invoke(foo: `T$0`): Any = definedExternally
     @nativeGetter
-    operator fun get(s: String): Any?
+    operator fun get(s: String): Any? = definedExternally
     @nativeSetter
-    operator fun set(s: String, value: Any)
+    operator fun set(s: String, value: Any): Unit = definedExternally
 }
