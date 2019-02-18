@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.isGeneric
 import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.DelegationModel
 import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
-import org.jetbrains.dukat.ast.model.model.HeritageNode
+import org.jetbrains.dukat.ast.model.model.HeritageModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
@@ -12,10 +12,15 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
@@ -23,12 +28,8 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.compiler.translator.InputTranslator
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
-import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -55,6 +56,18 @@ private fun ParameterValueDeclaration.translateSignatureMeta(): String {
         else -> ""
     }
 
+}
+
+private fun IdentifierNode.translate(): String {
+    return value
+}
+
+private fun QualifiedLeftNode.translate() : String {
+    return when(this) {
+        is QualifiedNode -> translate()
+        is IdentifierNode -> translate()
+        else -> throw Exception("unknown ")
+    }
 }
 
 private fun QualifiedNode.translate(): String {
@@ -159,7 +172,7 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterDeclaratio
     }
 }
 
-private fun translateTypeArguments(typeParameters: List<TokenDeclaration>): String {
+private fun translateTypeArguments(typeParameters: List<IdentifierDeclaration>): String {
     if (typeParameters.isEmpty()) {
         return ""
     } else {
@@ -324,15 +337,15 @@ private fun escapePackageName(name: String): String {
 
 private fun IdentifierDeclaration.translate() = value
 
-private fun HeritageSymbolDeclaration.translate(): String {
+private fun HeritageSymbolNode.translate(): String {
     return when (this) {
-        is IdentifierDeclaration -> translate()
-        is PropertyAccessDeclaration -> expression.translate() + "." + name.translate()
+        is IdentifierNode -> translate()
+        is PropertyAccessNode -> expression.translate() + "." + name.translate()
         else -> throw Exception("unknown heritage clause ${this}")
     }
 }
 
-private fun translateHeritageClauses(parentEntities: List<HeritageClauseDeclaration>): String {
+private fun translateHeritageNodes(parentEntities: List<HeritageNode>): String {
     val parents = if (parentEntities.isNotEmpty()) {
         " : " + parentEntities.map { parentEntity ->
             "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
@@ -366,7 +379,7 @@ private fun DelegationModel.translate(): String {
     }
 }
 
-private fun HeritageNode.translateAsHeritageClause(): String {
+private fun HeritageModel.translateAsHeritageClause(): String {
     val delegationClause = delegateTo?.let { " by ${it.translate()}" } ?: ""
     return "${value.translateAsHeritageClause()}${delegationClause}"
 }
@@ -385,7 +398,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
         } else if (declaration is ClassModel) {
             val primaryConstructor = declaration.primaryConstructor
 
-            val parents = translateHeritageClauses(declaration.parentEntities)
+            val parents = translateHeritageNodes(declaration.parentEntities)
             val classDeclaration = "${translateAnnotations(declaration.annotations)}external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}"
             val params = if (primaryConstructor == null) "" else
                 if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
@@ -436,7 +449,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
             val showCompanionObject = staticMembers.isNotEmpty() || declaration.companionObject.parentEntities.isNotEmpty()
 
             val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
-            val parents = translateHeritageClauses(declaration.parentEntities)
+            val parents = translateHeritageNodes(declaration.parentEntities)
 
             res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (isBlock) " {" else "")
             if (isBlock) {

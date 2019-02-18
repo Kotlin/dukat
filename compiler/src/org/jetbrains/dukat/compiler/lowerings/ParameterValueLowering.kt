@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -12,9 +13,8 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -103,10 +103,10 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
+    fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList())) as TypeNode
-            TokenDeclaration(lowerParameterDeclaration.value)
+            IdentifierDeclaration(lowerParameterDeclaration.value)
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }
@@ -118,7 +118,7 @@ interface ParameterValueLowering : Lowering {
                 members
                 = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageClause(heritageClause)
+                    lowerHeritageNode(heritageClause)
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
@@ -150,7 +150,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageClause(heritageClause)
+                    lowerHeritageNode(heritageClause)
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)

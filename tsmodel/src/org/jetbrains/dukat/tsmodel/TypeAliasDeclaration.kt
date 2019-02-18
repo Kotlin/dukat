@@ -5,6 +5,6 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class TypeAliasDeclaration(
         val aliasName: String,
-        val typeParameters: List<TokenDeclaration>,
+        val typeParameters: List<IdentifierDeclaration>,
         val typeReference: ParameterValueDeclaration
 ): TopLevelDeclaration

@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -17,7 +17,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
             val resolved = context.resolveTypeAlias(parent)
 
             if (resolved is TypeNode) {
-                HeritageClauseDeclaration(IdentifierDeclaration(resolved.value), emptyList(), false)
+                HeritageNode(IdentifierNode(resolved.value), emptyList())
             } else {
                 parent
             }
@@ -26,8 +26,8 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         return super.lowerInterfaceNode(declaration.copy(parentEntities = parentEntitiesRemapped))
     }
 
-    private fun ParameterValueDeclaration.unroll() : List<ParameterValueDeclaration> {
-        return when(this) {
+    private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
+        return when (this) {
             is UnionTypeNode -> {
                 val paramsUnrolled = params.flatMap { param -> param.unroll() }
                 paramsUnrolled.toSet().toList()

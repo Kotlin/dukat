@@ -7,5 +7,5 @@ data class CompanionObjectModel(
         val name: String,
         val members: List<MemberNode>,
 
-        val parentEntities: List<HeritageNode>
+        val parentEntities: List<HeritageModel>
 ) : MemberDeclaration

@@ -12,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
-import org.jetbrains.dukat.tsmodel.TokenDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -28,7 +28,7 @@ interface AstNodeFactory<T> {
 
     fun createIdentifierDeclaration(value: String): T
 
-    fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: IdentifierDeclaration): T
+    fun createQualifiedNameDeclaration(left: QualifiedLeftDeclaration, right: IdentifierDeclaration): T
 
     fun createThisTypeDeclaration(): T
 
@@ -38,17 +38,15 @@ interface AstNodeFactory<T> {
 
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean): T
 
-    fun createTokenDeclaration(value: String): T
-
     fun createHeritageClauseDeclaration(
             name: HeritageSymbolDeclaration,
-            typeArguments: List<TokenDeclaration>,
+            typeArguments: List<IdentifierDeclaration>,
             extending: Boolean
     ): T
 
     fun createTypeAliasDeclaration(
             aliasName: String,
-            typeParameters: List<TokenDeclaration>,
+            typeParameters: List<IdentifierDeclaration>,
             typeReference: ParameterValueDeclaration
     ): T
 

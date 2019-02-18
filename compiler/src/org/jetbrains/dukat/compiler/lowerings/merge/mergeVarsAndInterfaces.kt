@@ -2,7 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
 import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
-import org.jetbrains.dukat.ast.model.model.HeritageNode
+import org.jetbrains.dukat.ast.model.model.HeritageModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -48,7 +48,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                     "__",
                                     emptyList(),
                                     listOf(
-                                        HeritageNode(correspondingVariable.type, ExternalDelegationModel())
+                                        HeritageModel(correspondingVariable.type, ExternalDelegationModel())
                                     )
                     )))
                 }

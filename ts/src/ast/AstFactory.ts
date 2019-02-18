@@ -16,10 +16,9 @@ declare interface AstFactory {
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
 
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
-    createTokenDeclaration(value: string): TokenDeclaration;
-    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration
+    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<IdentifierDeclaration>, extending: boolean): HeritageClauseDeclaration
 
-    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<IdentifierDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
 
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;

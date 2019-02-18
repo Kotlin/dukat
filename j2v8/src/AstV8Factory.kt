@@ -67,7 +67,6 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
         = astFactory.createEnumTokenDeclaration(value, meta).toV8()
 
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = astFactory.createExportAssignmentDeclaration(name, isExportEquals).toV8()
-    fun createTokenDeclaration(value: String) = astFactory.createTokenDeclaration(value).toV8()
 
     fun createPropertyAccessDeclaration(name: V8Object, expression: V8Object)
         = astFactory.createPropertyAccessDeclaration(name.toAst(), expression.toAst()).toV8()

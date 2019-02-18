@@ -22,7 +22,6 @@ import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
-import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -90,9 +89,6 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
             getEntities("params")
-        )
-        TokenDeclaration::class.simpleName -> TokenDeclaration(
-                get("value") as String
         )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
                 getEntity(HeritageClauseDeclaration::name.name),

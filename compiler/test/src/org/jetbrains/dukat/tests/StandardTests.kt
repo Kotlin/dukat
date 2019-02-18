@@ -27,6 +27,7 @@ open class StandardTests {
 
         val resourceDirectory = File("./test/data")
         val fileNameSource = resourceDirectory.resolve("${name}.d.ts").absolutePath
+
         val targetShortName = "${name}.d.kt"
         val fileNameTarget = resourceDirectory.resolve(targetShortName)
 

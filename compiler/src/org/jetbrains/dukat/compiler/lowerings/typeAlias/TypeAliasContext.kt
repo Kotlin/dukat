@@ -1,32 +1,32 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 // TODO: TypeAliases should be revisited
-private fun IdentifierDeclaration.translate() = value
+private fun IdentifierNode.translate() = value
 
-private fun HeritageSymbolDeclaration.translate(): String {
+private fun HeritageSymbolNode.translate(): String {
     return when (this) {
-        is IdentifierDeclaration -> translate()
-        is PropertyAccessDeclaration -> expression.translate() + "." + name.translate()
+        is IdentifierNode -> translate()
+        is PropertyAccessNode -> expression.translate() + "." + name.translate()
         else -> throw Exception("unknown heritage clause ${this}")
     }
 }
 
 class TypeAliasContext {
 
-    private fun TypeAliasDeclaration.canSusbtitute(heritageClause: HeritageClauseDeclaration): Boolean {
-        return aliasName == heritageClause.name.translate()
+    private fun TypeAliasDeclaration.canSusbtitute(heritageNode: HeritageNode): Boolean {
+        return aliasName == heritageNode.name.translate()
     }
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
@@ -107,7 +107,7 @@ class TypeAliasContext {
         myTypeAliasDeclaration.add(typeAlias)
     }
 
-    fun resolveTypeAlias(heritageClause: HeritageClauseDeclaration): ParameterValueDeclaration? {
+    fun resolveTypeAlias(heritageClause: HeritageNode): ParameterValueDeclaration? {
         myTypeAliasDeclaration.forEach { typeAlias ->
             if (typeAlias.canSusbtitute(heritageClause)) {
                 return typeAlias.typeReference

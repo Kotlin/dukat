@@ -36,9 +36,6 @@ declare interface ExportAssignmentDeclaration extends Declaration {
     name: string;
 }
 
-declare interface TokenDeclaration extends Declaration {
-    value: string
-}
 declare interface IntersectionTypeDeclaration extends Declaration {}
 declare interface UnionTypeDeclatation extends Declaration {}
 declare interface HeritageClauseDeclaration extends Declaration {}

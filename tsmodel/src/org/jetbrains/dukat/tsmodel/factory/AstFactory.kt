@@ -23,9 +23,9 @@ import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
-import org.jetbrains.dukat.tsmodel.TokenDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -57,7 +57,7 @@ class AstFactory : AstNodeFactory<AstNode> {
         return IdentifierDeclaration(value)
     }
 
-    override fun createQualifiedNameDeclaration(left: ParameterValueDeclaration, right: IdentifierDeclaration): AstNode {
+    override fun createQualifiedNameDeclaration(left: QualifiedLeftDeclaration, right: IdentifierDeclaration): AstNode {
         return QualifiedNamedDeclaration(left, right)
     }
 
@@ -75,11 +75,10 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = ExportAssignmentDeclaration(name, isExportEquals)
 
-    override fun createTokenDeclaration(value: String) = TokenDeclaration(value)
 
-    override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<TokenDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
+    override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<IdentifierDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<TokenDeclaration>, typeReference: ParameterValueDeclaration) = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
+    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<IdentifierDeclaration>, typeReference: ParameterValueDeclaration) = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
 
     override fun createStringTypeDeclaration(tokens: List<String>) = StringTypeDeclaration(tokens)
 

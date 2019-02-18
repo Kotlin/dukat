@@ -53,12 +53,12 @@ class AstConverter {
         return typeParameterDeclarations;
     }
 
-    convertTypeParamsToTokens(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<TokenDeclaration> {
-        let typeParameterDeclarations: Array<TokenDeclaration> = [];
+    convertTypeParamsToTokens(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<IdentifierDeclaration> {
+        let typeParameterDeclarations: Array<IdentifierDeclaration> = [];
 
         if (nativeTypeDeclarations) {
             typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
-                return this.astFactory.createTokenDeclaration(typeParam.name.getText())
+                return this.astFactory.createIdentifierDeclaration(typeParam.name.getText())
             });
         }
 
@@ -276,8 +276,10 @@ class AstConverter {
                     ])
                 } else if (ts.isTupleTypeNode(type)) {
                     return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
+                } else if (ts.isTypePredicateNode(type)) {
+                    return this.createTypeDeclaration("boolean");
                 } else {
-                    return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`)
+                    return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`);
                 }
             }
         }
@@ -338,7 +340,6 @@ class AstConverter {
 
     convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration) : Array<MemberDeclaration> {
         let res: Array<MemberDeclaration> = [];
-        //let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(indexSignatureDeclaration.typeParameters);
         let parameterDeclarations = indexSignatureDeclaration.parameters
             .map(
                 (param, count) => this.convertParameterDeclaration(param, count)
@@ -512,12 +513,12 @@ class AstConverter {
                     let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                     for (let type of heritageClause.types) {
-                        let typeArguments: Array<TokenDeclaration> = [];
+                        let typeArguments: Array<IdentifierDeclaration> = [];
 
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
                                 let value = (this.convertType(typeArgument) as any).value;
-                                this.registerDeclaration(this.astFactory.createTokenDeclaration(value), typeArguments)
+                                this.registerDeclaration(this.astFactory.createIdentifierDeclaration(value), typeArguments)
                             }
                         }
 

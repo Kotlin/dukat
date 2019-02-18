@@ -9,7 +9,7 @@ declare class AstFactoryV8 implements AstFactory {
     createExpression(kind: TypeDeclaration, meta: string): Expression;
     createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration;
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
-    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<TokenDeclaration>, extending: boolean): HeritageClauseDeclaration;
+    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<IdentifierDeclaration>, extending: boolean): HeritageClauseDeclaration;
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
     createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;
@@ -24,9 +24,8 @@ declare class AstFactoryV8 implements AstFactory {
     createQualifiedNameDeclaration(left: ParameterValue, right: IdentifierDeclaration): QualifierDeclaration;
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createThisTypeDeclaration(): ThisTypeDeclaration;
-    createTokenDeclaration(value: string): TokenDeclaration;
     createTupleDeclaration(params: Array<ParameterValue>): TupleDeclaration;
-    createTypeAliasDeclaration(aliasName: string, typeParams: Array<TokenDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
+    createTypeAliasDeclaration(aliasName: string, typeParams: Array<IdentifierDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
     createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
