@@ -23,6 +23,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -38,7 +39,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
-    val skipNullableAnnotation = (this is TypeNode) && (this.value == "Nothing")
+    val skipNullableAnnotation = (this is TypeNode) && (value is IdentifierNode) && ((value as IdentifierNode).value == "Nothing")
     if (nullable && !skipNullableAnnotation) {
         //TODO: consider rethinking this restriction
         return " /*= null*/"
@@ -77,9 +78,18 @@ private fun QualifiedNode.translate(): String {
     return translateLeft + "." + translaterRight
 }
 
+
+private fun TypeNodeValue.translate(): String {
+    return when(this) {
+        is IdentifierNode -> translate()
+        else -> throw Exception("unknown TypeNodeValue ${this}")
+    }
+}
+
+
 private fun ParameterValueDeclaration.translate(): String {
     if (this is TypeNode) {
-        val res = mutableListOf(value)
+        val res = mutableListOf(value.translate())
         if (isGeneric()) {
             val paramsList = mutableListOf<String>()
             for (param in params) {
@@ -172,7 +182,7 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterDeclaratio
     }
 }
 
-private fun translateTypeArguments(typeParameters: List<IdentifierDeclaration>): String {
+private fun translateTypeArguments(typeParameters: List<IdentifierNode>): String {
     if (typeParameters.isEmpty()) {
         return ""
     } else {
@@ -365,7 +375,10 @@ private fun ParameterValueDeclaration.translateAsHeritageClause(): String {
                 "<${params.joinToString("::") { it.translateAsHeritageClause() }}>"
             }
 
-            "${value}${typeParams}"
+            when (value) {
+                is IdentifierNode -> "${(value as IdentifierNode).value}${typeParams}"
+                else -> throw Exception("unknown TypeNodeValue ${value}")
+            }
         }
         else -> ""
     }

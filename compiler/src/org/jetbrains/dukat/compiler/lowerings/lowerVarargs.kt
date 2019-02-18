@@ -7,10 +7,9 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
     if (this is TypeNode) {
-        if (value == "Array") {
-            return params[0]
-        } else if (value == "Any") {
-            return this
+        when  {
+            isPrimitive("Array") -> return params[0]
+            isPrimitive("Any") -> return this
         }
     }
 

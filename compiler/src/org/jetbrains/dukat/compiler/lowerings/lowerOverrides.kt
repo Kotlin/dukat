@@ -98,7 +98,6 @@ private fun MethodNode.isSpecialCase(): Boolean {
 
 private fun ParameterValueDeclaration.isOverriding(otherParameterValue: ParameterValueDeclaration): Boolean {
     //TODO: we need to do this the right way
-    println(otherParameterValue)
     if (this == otherParameterValue) {
         return true
     }

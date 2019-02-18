@@ -9,4 +9,4 @@ data class QualifiedNode(
 
     override var nullable: Boolean = false,
     override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftNode
+) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftNode, TypeNodeValue

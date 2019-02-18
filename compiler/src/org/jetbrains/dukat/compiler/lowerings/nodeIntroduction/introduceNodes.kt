@@ -170,7 +170,7 @@ private class LowerDeclarationsToNodes {
         return declarations.map { declaration ->
             HeritageNode(
                 name = declaration.name.convert(),
-                typeArguments = declaration.typeArguments
+                typeArguments = declaration.typeArguments.map { typeArgument -> IdentifierNode(typeArgument.value) }
             )
         }
     }

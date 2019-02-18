@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -23,6 +24,14 @@ private fun HeritageSymbolNode.translate(): String {
     }
 }
 
+private fun TypeNodeValue.getAliasKey(): String {
+    return when(this) {
+        is IdentifierNode -> translate()
+        else -> throw Exception("unknown TypeNodeValue ${this}")
+    }
+}
+
+
 class TypeAliasContext {
 
     private fun TypeAliasDeclaration.canSusbtitute(heritageNode: HeritageNode): Boolean {
@@ -35,13 +44,13 @@ class TypeAliasContext {
                 val paramsSpecified = params.map { param ->
                     when (param) {
                         is TypeNode -> {
-                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
+                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value.getAliasKey(), param.specify(aliasParamsMap)))
                         }
                         else -> param
                     }
                 }
 
-                val valueAliasResolved = aliasParamsMap.get(value)
+                val valueAliasResolved = aliasParamsMap.get(value.getAliasKey())
 
                 val valueResolved = if (valueAliasResolved is TypeNode) {
                     valueAliasResolved.value
@@ -77,7 +86,7 @@ class TypeAliasContext {
     private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
         return when (type) {
             is TypeNode -> {
-                if (aliasName == type.value) {
+                if (type.isPrimitive(aliasName)) {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 

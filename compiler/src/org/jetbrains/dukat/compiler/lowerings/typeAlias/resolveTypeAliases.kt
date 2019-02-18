@@ -17,7 +17,11 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
             val resolved = context.resolveTypeAlias(parent)
 
             if (resolved is TypeNode) {
-                HeritageNode(IdentifierNode(resolved.value), emptyList())
+                val typeNodeValue = resolved.value
+                when (typeNodeValue) {
+                    is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
+                    else -> throw Exception("unknown TypeNodeValue $typeNodeValue")
+                }
             } else {
                 parent
             }
