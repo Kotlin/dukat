@@ -50,22 +50,23 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
         throw new Error(`failed to create languageService ${fileName}`)
     }
 
-    let astConverter: AstConverter = nativeAstFactory == null ?
-        new AstConverter(new AstFactoryV8(), program.getTypeChecker()) : new AstConverter(nativeAstFactory, program.getTypeChecker());
-
-
     var sourceFile = program.getSourceFile(fileName);
 
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)
     }
 
-    var declarations: Declaration[] = astConverter.convertDeclarations(sourceFile.statements as any);
-
     // TODO: don't remeber how it's done in ts2kt, need to refresh my memories
     let packageNameFragments = sourceFile.fileName.split("/");
-    let packageName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
-    return astConverter.createDocumentRoot(packageName, declarations, astConverter.convertModifiers(sourceFile.modifiers), uid())
+    let resourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+    let astConverter: AstConverter = nativeAstFactory == null ?
+        new AstConverter(new AstFactoryV8(), program.getTypeChecker(), resourceName) : new AstConverter(nativeAstFactory, program.getTypeChecker(), resourceName);
+
+
+    var declarations: Declaration[] = astConverter.convertDeclarations(sourceFile.statements as any);
+
+
+    return astConverter.createDocumentRoot("__ROOT__", declarations, astConverter.convertModifiers(sourceFile.modifiers), uid())
 }
 
 

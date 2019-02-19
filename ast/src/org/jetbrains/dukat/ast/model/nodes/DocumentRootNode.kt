@@ -4,6 +4,8 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 
 data class DocumentRootNode(
+        val resourceName: String,
+
         val packageName: String,
         var fullPackageName: String,
         val declarations: List<TopLevelDeclaration> = emptyList(),

@@ -7,5 +7,6 @@ data class DocumentRootDeclaration(
         val declarations: List<TopLevelDeclaration> = emptyList(),
 
         val modifiers: List<ModifierDeclaration>,
-        val uid: String
+        val uid: String,
+        val resourceName: String
 ) : TopLevelDeclaration

@@ -330,21 +330,6 @@ private fun MemberNode.translateSignature(): List<String> {
 }
 
 
-private fun unquote(name: String): String {
-    return name.replace("(?:^\")|(?:\"$)".toRegex(), "")
-}
-
-private fun escapePackageName(name: String): String {
-    return name
-            .replace("/".toRegex(), ".")
-            .replace("-".toRegex(), "_")
-            .replace("^_$".toRegex(), "`_`")
-            .replace("^class$".toRegex(), "`class`")
-            .replace("^var$".toRegex(), "`var`")
-            .replace("^val$".toRegex(), "`val`")
-            .replace("^interface$".toRegex(), "`interface`")
-}
-
 private fun IdentifierDeclaration.translate() = value
 
 private fun HeritageSymbolNode.translate(): String {

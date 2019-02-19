@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 data class ModuleModel(
         val packageName: String,
         val shortName: String,
+        val qualifierName: String,
         val declarations: List<TopLevelDeclaration> = emptyList(),
         val annotations: MutableList<AnnotationNode>,
 

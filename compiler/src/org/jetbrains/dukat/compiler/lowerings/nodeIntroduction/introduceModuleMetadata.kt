@@ -21,17 +21,17 @@ private fun unquote(name: String): String {
 
 fun DocumentRootNode.introduceModuleMetadata(): DocumentRootNode {
 
-    val parentDocRoots = generateSequence(this) { it.owner }.asIterable().reversed()
-    val packageNames = parentDocRoots.map { unquote(it.packageName) }
+    val parentDocRoots = generateSequence(this) { it.owner }.asIterable().reversed().toMutableList()
+    parentDocRoots.removeAt(0)
+    val qualifiers = parentDocRoots.map { unquote(it.packageName) }
 
-    val packageNameResolved = packageNames.joinToString(".") { escapePackageName(it) }
+    val packageNameResolved = (listOf(resourceName) + qualifiers).joinToString(".") { escapePackageName(it) }
     fullPackageName = packageNameResolved
 
     isQualifier = (packageName == unquote(packageName))
 
     showQualifierAnnotation = owner != null
-    val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
-    qualifierName = packageNames.subList(1, packageNames.size).joinToString(".")
+    qualifierName = qualifiers.joinToString(".")
 
     declarations.forEach { declaration ->
         if (declaration is DocumentRootNode) {

@@ -2,7 +2,7 @@ class AstConverter {
 
     private exportContext = new ExportContext();
 
-    constructor(private astFactory: AstFactory, private typeChecker: ts.TypeChecker) {
+    constructor(private astFactory: AstFactory, private typeChecker: ts.TypeChecker, private resourceName: string) {
     }
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
@@ -10,7 +10,7 @@ class AstConverter {
     }
 
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid);
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid, this.resourceName);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {

@@ -201,12 +201,13 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
                     optional
             ).toV8()
 
-    fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array, uid: String): V8Object =
+    fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array, uid: String, resourceName: String): V8Object =
             astFactory.createDocumentRoot(
                     packageName,
                     declarations.toAst<TopLevelDeclaration>().toTypedArray(),
                     modifiers.toAst(),
-                    uid
+                    uid,
+                    resourceName
             ).toV8()
 
     fun createTypeParam(name: String, constraints: V8Array): V8Object = astFactory

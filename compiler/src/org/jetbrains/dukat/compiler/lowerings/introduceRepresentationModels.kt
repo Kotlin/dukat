@@ -7,10 +7,14 @@ import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
 
@@ -70,12 +74,19 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
 }
 
 fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
-    val declarations = declarations.map { declaration ->
+    val declarations = declarations.mapNotNull { declaration ->
         when (declaration) {
             is DocumentRootNode -> declaration.introduceRepresentationModels()
             is ClassNode -> declaration.convertToClassModel()
-            is org.jetbrains.dukat.ast.model.nodes.InterfaceNode -> declaration.convertToInterfaceModel()
-            else -> declaration
+            is InterfaceNode -> declaration.convertToInterfaceModel()
+            is FunctionNode -> declaration
+            is EnumNode -> declaration
+            is VariableNode -> declaration
+            is ObjectNode -> declaration
+            else -> {
+                println("skipping ${declaration::class.simpleName}")
+                null
+            }
         }
     }
 
@@ -96,6 +107,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     return ModuleModel(
             packageName = fullPackageName,
             shortName = packageName,
+            qualifierName = qualifierName,
             declarations = declarationsFiltered,
             annotations = annotations,
             sumbodules = submodules

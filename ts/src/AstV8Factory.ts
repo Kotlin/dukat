@@ -2,7 +2,7 @@ declare class AstFactoryV8 implements AstFactory {
     createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration;
     createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
     createConstructorDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration;
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot;
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string): DocumentRoot;
     createEnumDeclaration(name: String, values: Array<EnumTokenDeclaration>): EnumDeclaration;
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;

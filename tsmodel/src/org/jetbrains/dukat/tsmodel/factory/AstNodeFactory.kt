@@ -126,6 +126,6 @@ interface AstNodeFactory<T> {
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createUnionDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
-    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String): T
+    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String, resourceName: String): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T
 }

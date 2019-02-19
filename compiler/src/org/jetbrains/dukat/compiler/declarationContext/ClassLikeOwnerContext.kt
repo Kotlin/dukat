@@ -1,0 +1,3 @@
+package org.jetbrains.dukat.compiler.declarationContext
+
+interface ClassLikeOwnerContext : DeclarationContext
