@@ -82,8 +82,14 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                         }
                         is FunctionNode -> {
-                            entity.owner?.let {
-                                turnOff.add(it.fullPackageName)
+                            entity.owner?.let { ownerModule ->
+                                turnOff.add(ownerModule.fullPackageName)
+
+                                ownerModule.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
+                                    submodule.packageName == entity.name
+                                }?.let { eponymousDeclaration ->
+                                    exportedModules.put(eponymousDeclaration.uid, ownerModule.qualifierName)
+                                }
                             }
 
                             //TODO: investigate how set annotations only at FunctionNode only
