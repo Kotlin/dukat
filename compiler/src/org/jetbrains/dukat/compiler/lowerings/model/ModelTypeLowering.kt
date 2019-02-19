@@ -110,7 +110,7 @@ interface ModelTypeLowering : ModelLowering {
         return declaration.copy(type = lowerParameterValue(declaration.type, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))))
     }
 
-    fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
+    fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: DeclarationContext): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
             val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList()), TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) as TypeNode
@@ -126,7 +126,7 @@ interface ModelTypeLowering : ModelLowering {
                 members
                 = declaration.members.map { member -> lowerMemberNode(member, ownerContext) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageNode(heritageClause)
+                    lowerHeritageNode(heritageClause, TypeContext(ownerContext))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
@@ -155,7 +155,7 @@ interface ModelTypeLowering : ModelLowering {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberNode(member, ownerContext) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageNode(heritageClause)
+                    lowerHeritageNode(heritageClause, TypeContext(ownerContext))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)

@@ -1,9 +1,11 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.compiler.declarationContext.DeclarationContext
 import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.TypeContext
 import org.jetbrains.dukat.compiler.lowerings.model.ModelTypeLowering
@@ -12,7 +14,6 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 private class SpecifyTypeNodes(private val declarationContext: DeclarationResolver) : ModelTypeLowering {
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: TypeContext): ParameterValueDeclaration {
-
         if (declaration is TypeNode) {
             val declarationValue = declaration.value
             if (declarationValue is IdentifierNode) {
@@ -45,6 +46,24 @@ private class SpecifyTypeNodes(private val declarationContext: DeclarationResolv
 
         }
         return super.lowerParameterValue(declaration, owner)
+    }
+
+    override fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: DeclarationContext): HeritageNode {
+        val name = heritageClause.name
+        if (name is IdentifierNode) {
+            val moduleModelOwnerContext = declarationContext.resolve(name.value)
+
+
+            val declarationOwnerModule = moduleModelOwnerContext?.node
+            val moduleOwner = ownerContext.getModuleOwnerContext()?.node
+
+            if (moduleOwner?.shortName != declarationOwnerModule?.shortName) {
+                if (declarationOwnerModule != null) {
+                    return heritageClause.copy(name = IdentifierNode("${declarationOwnerModule?.qualifierName}.${name.value}"))
+                }
+            }
+        }
+        return super.lowerHeritageNode(heritageClause, ownerContext)
     }
 }
 
