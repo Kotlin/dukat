@@ -14,6 +14,7 @@ fun DocumentRootNode.lowerConstructors(): DocumentRootNode {
 
                 declaration.copy(members = members, primaryConstructor = primaryConstructor as ConstructorNode?)
             }
+            is DocumentRootNode -> declaration.lowerConstructors()
             else -> declaration
         }
     }
