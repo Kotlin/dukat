@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
@@ -13,6 +14,8 @@ private class NativeArrayLowering : DeclarationTypeLowering {
     }
 }
 
-fun DocumentRootDeclaration.desugarArrayDeclarations(): DocumentRootDeclaration {
+fun PackageDeclaration.desugarArrayDeclarations(): PackageDeclaration {
     return org.jetbrains.dukat.tsmodel.lowerings.NativeArrayLowering().lowerDocumentRoot(this)
 }
+
+fun SourceFileDeclaration.desugarArrayDeclarations() = copy(root = root.desugarArrayDeclarations())

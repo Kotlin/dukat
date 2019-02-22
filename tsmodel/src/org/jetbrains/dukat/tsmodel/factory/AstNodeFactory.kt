@@ -10,6 +10,7 @@ import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
@@ -127,5 +128,6 @@ interface AstNodeFactory<T> {
     fun createUnionDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String, resourceName: String): T
+    fun createSourceFileDeclaration(root: PackageDeclaration): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T
 }

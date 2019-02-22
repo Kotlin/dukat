@@ -4,7 +4,6 @@ import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -16,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
@@ -77,7 +77,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers, ::uid).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
-        is DocumentRootDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::uid, ::resourceName).convert(this)
+        is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::uid, ::resourceName).convert(this)
         is EnumDeclaration -> listOf(::name, ::values).convert(this)
         is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
         is ExportAssignmentDeclaration -> listOf(::name, ::isExportEquals).convert(this)
@@ -96,6 +96,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is ParameterDeclaration -> toMap()
         is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
+        is SourceFileDeclaration -> listOf(::root).convert(this)
         is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)

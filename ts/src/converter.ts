@@ -32,6 +32,7 @@ interface FileResolver {
     resolve(fileName: string): string;
 }
 
+
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string) {
     if (fileResolver == null) {
         fileResolver = new FileResolverV8();
@@ -44,29 +45,25 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
 
     let languageService = ts.createLanguageService(host, documentRegistry);
 
-    var program = languageService.getProgram();
+    const program = languageService.getProgram();
 
     if (program == null) {
         throw new Error(`failed to create languageService ${fileName}`)
     }
 
-    var sourceFile = program.getSourceFile(fileName);
+    const sourceFile = program.getSourceFile(fileName);
 
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)
+    } else {
+        let astConverter: AstConverter = new AstConverter(
+            program.getTypeChecker(),
+            (fileName) => program.getSourceFile(fileName),
+            nativeAstFactory == null ? new AstFactoryV8() : nativeAstFactory
+        );
+
+        return astConverter.convertSourceFile(fileName)
     }
-
-    // TODO: don't remeber how it's done in ts2kt, need to refresh my memories
-    let packageNameFragments = sourceFile.fileName.split("/");
-    let resourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
-    let astConverter: AstConverter = nativeAstFactory == null ?
-        new AstConverter(new AstFactoryV8(), program.getTypeChecker(), resourceName) : new AstConverter(nativeAstFactory, program.getTypeChecker(), resourceName);
-
-
-    var declarations: Declaration[] = astConverter.convertDeclarations(sourceFile.statements as any);
-
-
-    return astConverter.createDocumentRoot("__ROOT__", declarations, astConverter.convertModifiers(sourceFile.modifiers), uid())
 }
 
 

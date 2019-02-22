@@ -2,7 +2,7 @@ package org.jetbrains.dukat.tsmodel
 
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
-data class DocumentRootDeclaration(
+data class PackageDeclaration(
         val packageName: String,
         val declarations: List<TopLevelDeclaration> = emptyList(),
 

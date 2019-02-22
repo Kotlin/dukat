@@ -2,14 +2,15 @@ package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -69,7 +70,7 @@ private class GenerateInterfaceReferences(private val astContext: GeneratedInter
         }
     }
 
-    override fun lowerDocumentRoot(documentRoot: DocumentRootDeclaration): DocumentRootDeclaration {
+    override fun lowerDocumentRoot(documentRoot: PackageDeclaration): PackageDeclaration {
         val declarations = documentRoot.declarations.map { declaration ->
             when (declaration) {
                 !is TypeAliasDeclaration -> lowerTopLevelDeclaration(declaration)
@@ -87,7 +88,9 @@ private class GenerateInterfaceReferences(private val astContext: GeneratedInter
     }
 }
 
-fun DocumentRootDeclaration.generateInterfaceReferences(): DocumentRootDeclaration {
+fun PackageDeclaration.generateInterfaceReferences(): PackageDeclaration {
     val astContext = GeneratedInterfacesContext()
     return GenerateInterfaceReferences(astContext).lowerDocumentRoot(this).introduceGeneratedEntities(astContext)
 }
+
+fun SourceFileDeclaration.generateInterfaceReferences() = copy(root = root.generateInterfaceReferences())

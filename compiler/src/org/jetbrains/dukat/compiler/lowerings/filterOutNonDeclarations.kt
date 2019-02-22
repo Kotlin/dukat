@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 
 
 private fun hasExportModifiers(modifiers: List<ModifierDeclaration>): Boolean {
@@ -12,9 +13,7 @@ private fun hasExportModifiers(modifiers: List<ModifierDeclaration>): Boolean {
             || modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
 }
 
-fun DocumentRootDeclaration.filterOutNonDeclarations(parent: DocumentRootDeclaration? = null): DocumentRootDeclaration {
-
-    val isSubModule = parent != null
+fun PackageDeclaration.filterOutNonDeclarations(isSubModule: Boolean): PackageDeclaration {
 
     val declarations = declarations.map { declaration ->
         when (declaration) {
@@ -33,9 +32,9 @@ fun DocumentRootDeclaration.filterOutNonDeclarations(parent: DocumentRootDeclara
                     listOf(declaration)
                 } else emptyList()
             }
-            is DocumentRootDeclaration -> {
+            is PackageDeclaration -> {
                 if (isSubModule || hasExportModifiers(declaration.modifiers)) {
-                    listOf(declaration.filterOutNonDeclarations(this))
+                    listOf(declaration.filterOutNonDeclarations(true))
                 } else emptyList()
             }
             else -> listOf(declaration)
@@ -44,3 +43,5 @@ fun DocumentRootDeclaration.filterOutNonDeclarations(parent: DocumentRootDeclara
 
     return copy(declarations = declarations)
 }
+
+fun SourceFileDeclaration.filterOutNonDeclarations() = copy(root = root.filterOutNonDeclarations(false))

@@ -3,6 +3,7 @@
     "target": "es5",
     "lib": ["es2015"],
     "outFile": "build/ts/dukat-ast-builder.js",
+    "downlevelIteration": true,
     "strict": true,
     "moduleResolution": "node",
     "module": "none",

@@ -8,7 +8,7 @@ import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.converters.toAst
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
 import java.util.*
@@ -67,7 +67,7 @@ private fun createV8Interop(): InteropV8 {
 
 class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
-    override fun translateFile(fileName: String): DocumentRootDeclaration {
+    override fun translateFile(fileName: String): SourceFileDeclaration {
         val result = engine.callFunction<V8Object>("main", null, null, fileName)
         return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
     }
@@ -78,7 +78,7 @@ class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 }
 
 class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
-    override fun translateFile(fileName: String): DocumentRootDeclaration {
+    override fun translateFile(fileName: String): SourceFileDeclaration {
         return engine.callFunction("main", AstFactory(), FileResolver(), fileName)
     }
 
@@ -91,10 +91,4 @@ fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
 
 
 fun main() {
-    val translator = createV8Translator()
-
-//    val astTree = translator.translateFile("./compiler/test/data/simplest_var.declarations.d.ts")
-//
-//    println(compile(astTree))
-//    translator.release()
 }

@@ -5,7 +5,6 @@ import org.jetbrains.dukat.astCommon.Declaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -17,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
@@ -166,7 +166,10 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("optional") as Boolean,
                 getEntities("modifiers")
         )
-        DocumentRootDeclaration::class.simpleName -> DocumentRootDeclaration(
+        SourceFileDeclaration::class.simpleName -> SourceFileDeclaration(
+                getEntity("root")
+        )
+        PackageDeclaration::class.simpleName -> PackageDeclaration(
                 get("packageName") as String,
                 getEntities("declarations"),
                 getEntities("modifiers"),

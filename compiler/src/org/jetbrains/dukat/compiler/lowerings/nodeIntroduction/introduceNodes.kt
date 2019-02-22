@@ -26,7 +26,6 @@ import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
@@ -38,10 +37,12 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -361,7 +362,7 @@ private class LowerDeclarationsToNodes {
             is ClassDeclaration -> declaration.convert(null)
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> declaration.convert()
-            is DocumentRootDeclaration -> lowerDocumentRoot(declaration, null)
+            is PackageDeclaration -> lowerDocumentRoot(declaration, null)
             is EnumDeclaration -> declaration.convert()
             else -> declaration
         }
@@ -376,7 +377,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: DocumentRootDeclaration, owner: DocumentRootNode?): DocumentRootNode {
+    fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: DocumentRootNode?): DocumentRootNode {
         val declarations = documentRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
 
         val imports = mutableMapOf<String, ModuleReferenceDeclaration>()
@@ -420,5 +421,7 @@ private class LowerDeclarationsToNodes {
     }
 }
 
-fun DocumentRootDeclaration.introduceNodes() = LowerDeclarationsToNodes().lowerDocumentRoot(this, null)
+fun PackageDeclaration.introduceNodes() = LowerDeclarationsToNodes().lowerDocumentRoot(this, null)
+
+fun SourceFileDeclaration.introduceNodes() = root.introduceNodes()
 

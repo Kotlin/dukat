@@ -86,14 +86,13 @@ declare class ParameterDeclaration {
   type: ParameterValue;
 }
 
-declare class DocumentRoot implements AstNode {
+declare class PackageDeclaration implements AstNode {
     declarations: Declaration[]
 }
 
-declare class AstTree {
-    root: DocumentRoot;
+declare class SourceFileDeclaration implements AstNode {
+    declarations: Declaration[]
 }
-
 
 declare class TypeParameter {
     name: String;

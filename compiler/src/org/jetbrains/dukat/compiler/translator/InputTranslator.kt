@@ -28,7 +28,7 @@ import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
-import org.jetbrains.dukat.tsmodel.DocumentRootDeclaration
+import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
@@ -50,10 +50,10 @@ private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRoot
 }
 
 interface InputTranslator {
-    fun translateFile(fileName: String): DocumentRootDeclaration
+    fun translateFile(fileName: String): SourceFileDeclaration
     fun release()
 
-    fun lower(documentRoot: DocumentRootDeclaration): ModuleModel {
+    fun lower(documentRoot: SourceFileDeclaration): ModuleModel {
         val myAstContext = AstContext()
 
         return documentRoot

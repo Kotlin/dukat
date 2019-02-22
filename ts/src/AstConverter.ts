@@ -2,15 +2,34 @@ class AstConverter {
 
     private exportContext = new ExportContext();
 
-    constructor(private astFactory: AstFactory, private typeChecker: ts.TypeChecker, private resourceName: string) {
+    constructor(private typeChecker: ts.TypeChecker, private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined, private astFactory: AstFactory) {
     }
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
         collection.push(declaration);
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string): DocumentRoot {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid, this.resourceName);
+
+    convertSourceFile(sourceFileName: string): SourceFileDeclaration {
+
+        const sourceFile = this.sourceFileFetcher(sourceFileName);
+
+        if (sourceFile == null) {
+            throw new Error(`failed to resolve ${sourceFileName}`)
+        }
+
+        // TODO: don't remember how it's done in ts2kt, need to refresh my memories
+        let packageNameFragments = sourceFile.fileName.split("/");
+        let resourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+
+        const declarations = this.convertStatements(sourceFile.statements, resourceName);
+
+        let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), uid(), resourceName);
+        return this.astFactory.createSourceFileDeclaration(packageDeclaration);
+    }
+
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string): PackageDeclaration {
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid, resourceName);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -554,130 +573,131 @@ class AstConverter {
         return  parentEntities
     }
 
-    convertDeclarations(statements: ts.NodeArray<ts.Node>) : Array<Declaration> {
-        var declarations: Declaration[] = [];
-        for (let statement of statements) {
-            if (ts.isEnumDeclaration(statement)) {
-                let enumTokens = statement.members.map(member =>
-                    this.astFactory.createEnumTokenDeclaration(
-                        member.name.getText(),
-                        member.initializer ? member.initializer.getText() : ""
-                    ));
+    private * convertStatement(statement: ts.Node, resourceName: string): IterableIterator<Declaration> {
+        if (ts.isEnumDeclaration(statement)) {
+            let enumTokens = statement.members.map(member =>
+                this.astFactory.createEnumTokenDeclaration(
+                    member.name.getText(),
+                    member.initializer ? member.initializer.getText() : ""
+                ));
 
-                this.registerDeclaration(this.astFactory.createEnumDeclaration(
-                    statement.name.getText(),
-                    enumTokens
-                ), declarations)
-            } else if (ts.isVariableStatement(statement)) {
-                for (let declaration of statement.declarationList.declarations) {
-                    this.registerDeclaration(this.astFactory.declareVariable(
-                        declaration.name.getText(),
-                        this.convertType(declaration.type),
-                        this.convertModifiers(statement.modifiers),
-                        this.exportContext.getUID(declaration)
-                    ), declarations);
-                }
-            } else if (ts.isTypeAliasDeclaration(statement)) {
-                if (ts.isTypeLiteralNode(statement.type)) {
-                    this.registerDeclaration(
-                        this.convertTypeLiteralToInterfaceDeclaration(
-                            statement.name.getText(),
-                            statement.type as ts.TypeLiteralNode,
-                            statement.typeParameters
-                        ), declarations
-                    );
-                } else {
-                    this.registerDeclaration(this.convertTypeAliasDeclaration(statement), declarations);
-                }
-            } else if (ts.isClassDeclaration(statement)) {
-                if (statement.name != undefined) {
-
-                    let uid = this.exportContext.getUID(statement);
-
-                    this.registerDeclaration(
-                        this.astFactory.createClassDeclaration(
-                            statement.name.getText(),
-                            this.convertClassElementsToMembers(statement.members),
-                            this.convertTypeParams(statement.typeParameters),
-                            this.convertHeritageClauses(statement.heritageClauses),
-                            this.convertModifiers(statement.modifiers),
-                            uid
-                        ), declarations
-                    );
-                }
-
-            } else if (ts.isFunctionDeclaration(statement)) {
-                let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
-                if (convertedFunctionDeclaration != null) {
-                    this.registerDeclaration(convertedFunctionDeclaration, declarations)
-                }
-            } else if (ts.isInterfaceDeclaration(statement)) {
-                let parentEntities: Array<InterfaceDeclaration> = [];
-
-                this.registerDeclaration(
-                    this.astFactory.createInterfaceDeclaration(
+            yield this.astFactory.createEnumDeclaration(
+                statement.name.getText(),
+                enumTokens
+            )
+        } else if (ts.isVariableStatement(statement)) {
+            for (let declaration of statement.declarationList.declarations) {
+                yield this.astFactory.declareVariable(
+                    declaration.name.getText(),
+                    this.convertType(declaration.type),
+                    this.convertModifiers(statement.modifiers),
+                    this.exportContext.getUID(declaration)
+                );
+            }
+        } else if (ts.isTypeAliasDeclaration(statement)) {
+            if (ts.isTypeLiteralNode(statement.type)) {
+                yield this.convertTypeLiteralToInterfaceDeclaration(
                         statement.name.getText(),
-                        this.convertMembersToInterfaceMemberDeclarations(statement.members),
+                        statement.type as ts.TypeLiteralNode,
+                        statement.typeParameters
+                    );
+            } else {
+                yield this.convertTypeAliasDeclaration(statement);
+            }
+        } else if (ts.isClassDeclaration(statement)) {
+            if (statement.name != undefined) {
+
+                let uid = this.exportContext.getUID(statement);
+
+                yield this.astFactory.createClassDeclaration(
+                        statement.name.getText(),
+                        this.convertClassElementsToMembers(statement.members),
                         this.convertTypeParams(statement.typeParameters),
                         this.convertHeritageClauses(statement.heritageClauses),
-                        this.exportContext.getUID(statement)
-                    ), declarations
-                )
-            } else if (ts.isModuleDeclaration(statement)) {
-                this.convertModule(statement).forEach(d => this.registerDeclaration(d, declarations));
-            } else if (ts.isExportAssignment(statement)) {
-                let expression = statement.expression;
-                if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
-                    let symbol = this.typeChecker.getSymbolAtLocation(expression);
-
-                    if (symbol) {
-
-                        if (symbol.flags & ts.SymbolFlags.Alias) {
-                             symbol = this.typeChecker.getAliasedSymbol(symbol);
-                        }
-
-                        let declaration = symbol.declarations[0];
-
-                        let uid = this.exportContext.getUID(declaration);
-                        this.registerDeclaration(
-                            this.astFactory.createExportAssignmentDeclaration(
-                                uid, !!statement.isExportEquals
-                            ), declarations)
-                    }
-                }  else {
-                    console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
-                }
-            } else if (ts.isImportEqualsDeclaration(statement)) {
-                if (ts.isEntityName(statement.moduleReference)) {
-                    let moduleReferenceDeclaration = this.convertEntityName(statement.moduleReference);
-                    this.registerDeclaration(this.astFactory.createImportEqualsDeclaration(
-                        statement.name.getText(),
-                        moduleReferenceDeclaration as ModuleReferenceDeclaration
-                    ), declarations)
-                } else {
-                    println(`[TS] skipping external module reference ${statement.moduleReference.getText()}`)
-                }
-            } else {
-                console.log("SKIPPING ", statement.kind);
+                        this.convertModifiers(statement.modifiers),
+                        uid
+                    );
             }
 
+        } else if (ts.isFunctionDeclaration(statement)) {
+            let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
+            if (convertedFunctionDeclaration != null) {
+                yield convertedFunctionDeclaration
+            }
+        } else if (ts.isInterfaceDeclaration(statement)) {
+            let parentEntities: Array<InterfaceDeclaration> = [];
+
+            yield this.astFactory.createInterfaceDeclaration(
+                    statement.name.getText(),
+                    this.convertMembersToInterfaceMemberDeclarations(statement.members),
+                    this.convertTypeParams(statement.typeParameters),
+                    this.convertHeritageClauses(statement.heritageClauses),
+                    this.exportContext.getUID(statement)
+                )
+        } else if (ts.isModuleDeclaration(statement)) {
+            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
+                yield moduleDeclaration;
+            }
+        } else if (ts.isExportAssignment(statement)) {
+            let expression = statement.expression;
+            if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
+                let symbol = this.typeChecker.getSymbolAtLocation(expression);
+
+                if (symbol) {
+
+                    if (symbol.flags & ts.SymbolFlags.Alias) {
+                        symbol = this.typeChecker.getAliasedSymbol(symbol);
+                    }
+
+                    let declaration = symbol.declarations[0];
+
+                    let uid = this.exportContext.getUID(declaration);
+                    yield this.astFactory.createExportAssignmentDeclaration(
+                            uid, !!statement.isExportEquals
+                    )
+                }
+            }  else {
+                console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
+            }
+        } else if (ts.isImportEqualsDeclaration(statement)) {
+            if (ts.isEntityName(statement.moduleReference)) {
+                let moduleReferenceDeclaration = this.convertEntityName(statement.moduleReference);
+                yield this.astFactory.createImportEqualsDeclaration(
+                    statement.name.getText(),
+                    moduleReferenceDeclaration as ModuleReferenceDeclaration
+                )
+            } else {
+                println(`[TS] skipping external module reference ${statement.moduleReference.getText()}`)
+            }
+        } else {
+            console.log("SKIPPING ", statement.kind);
+        }
+    }
+
+
+    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: string) : Array<Declaration> {
+        const declarations: Declaration[] = [];
+        for (let statement of statements) {
+            for (let decl of this.convertStatement(statement, resourceName)) {
+                this.registerDeclaration(decl, declarations)
+            }
         }
 
         return declarations;
     }
 
 
-    convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
-        var declarations: Declaration[] = [];
+    convertModule(module: ts.ModuleDeclaration, resourceName: string): Array<Declaration> {
+        const declarations: Declaration[] = [];
         if (module.body) {
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
             if (ts.isModuleBlock(body)) {
-                let moduleDeclarations = this.convertDeclarations(body.statements);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, uid), declarations);
+                let moduleDeclarations = this.convertStatements(body.statements, resourceName);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, uid, resourceName), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body), modifiers, uid), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName), modifiers, uid, resourceName), declarations);
             }
         }
         return declarations
