@@ -31,5 +31,5 @@ declare class AstFactoryV8 implements AstFactory {
     createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
     declareProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration;
     declareVariable(value: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, uid: String): VariableDeclaration;
-    createSourceFileDeclaration(root: PackageDeclaration): SourceFileDeclaration;
+    createSourceFileDeclaration(root: PackageDeclaration, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration;
 }

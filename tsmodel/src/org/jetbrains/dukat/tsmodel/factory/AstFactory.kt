@@ -144,8 +144,8 @@ class AstFactory : AstNodeFactory<AstNode> {
     override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String, resourceName: String)
             = PackageDeclaration(packageName, declarations.toList(), modifiers, uid, resourceName)
 
-    override fun createSourceFileDeclaration(root: PackageDeclaration): AstNode
-            = SourceFileDeclaration(root)
+    override fun createSourceFileDeclaration(root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): AstNode
+            = SourceFileDeclaration(root, referencedFiles)
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 }

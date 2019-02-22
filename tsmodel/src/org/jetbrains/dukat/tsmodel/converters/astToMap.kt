@@ -96,7 +96,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is ParameterDeclaration -> toMap()
         is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
-        is SourceFileDeclaration -> listOf(::root).convert(this)
+        is SourceFileDeclaration -> listOf(::root, ::referencedFiles).convert(this)
         is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)

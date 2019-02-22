@@ -25,7 +25,10 @@ class AstConverter {
         const declarations = this.convertStatements(sourceFile.statements, resourceName);
 
         let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), uid(), resourceName);
-        return this.astFactory.createSourceFileDeclaration(packageDeclaration);
+        return this.astFactory.createSourceFileDeclaration(
+            packageDeclaration,
+            sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
+        );
     }
 
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string): PackageDeclaration {

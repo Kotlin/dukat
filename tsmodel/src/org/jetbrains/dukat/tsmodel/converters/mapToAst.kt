@@ -167,7 +167,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("modifiers")
         )
         SourceFileDeclaration::class.simpleName -> SourceFileDeclaration(
-                getEntity("root")
+                getEntity("root"),
+                getEntities("referencedFiles")
         )
         PackageDeclaration::class.simpleName -> PackageDeclaration(
                 get("packageName") as String,
