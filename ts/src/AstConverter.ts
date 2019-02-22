@@ -10,8 +10,7 @@ class AstConverter {
     }
 
 
-    convertSourceFile(sourceFileName: string): SourceFileDeclaration {
-
+    createSourceMap(sourceFileName: string, sourceSet: Map<String, SourceFileDeclaration> = new Map()) {
         const sourceFile = this.sourceFileFetcher(sourceFileName);
 
         if (sourceFile == null) {
@@ -25,10 +24,41 @@ class AstConverter {
         const declarations = this.convertStatements(sourceFile.statements, resourceName);
 
         let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), uid(), resourceName);
-        return this.astFactory.createSourceFileDeclaration(
+        let declaration = this.astFactory.createSourceFileDeclaration(
+            sourceFileName,
             packageDeclaration,
             sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
         );
+
+        sourceSet.set(sourceFileName, declaration);
+
+        sourceFile.referencedFiles.forEach(referencedFile => {
+            if (!sourceSet.has(referencedFile.fileName)) {
+                this.createSourceMap(referencedFile.fileName, sourceSet);
+            }
+        });
+    }
+
+    convertSourceMap(sourceSet: Map<String, SourceFileDeclaration>): SourceSet {
+        let sources: Array<SourceFileDeclaration> = [];
+        for (let [sourceName, sourceFileDeclaration] of sourceSet.entries()) {
+            sources.push(sourceFileDeclaration);
+        }
+        return this.astFactory.createSourceSet(sources);
+    }
+
+    createSourceSet(sourceFileName: string): SourceSet {
+        let sourceSet: Map<String, SourceFileDeclaration> = new Map();
+        this.createSourceMap(sourceFileName, sourceSet);
+
+        return this.convertSourceMap(sourceSet);
+    }
+
+    convertSourceFile(sourceFileName: string): SourceFileDeclaration {
+        let sourceSet: Map<String, SourceFileDeclaration> = new Map();
+        this.createSourceMap(sourceFileName, sourceSet);
+
+        return sourceSet.get(sourceFileName) as SourceFileDeclaration
     }
 
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string): PackageDeclaration {

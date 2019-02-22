@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
-import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {

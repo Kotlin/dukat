@@ -25,11 +25,12 @@ import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.converters.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -144,8 +145,11 @@ class AstFactory : AstNodeFactory<AstNode> {
     override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, uid: String, resourceName: String)
             = PackageDeclaration(packageName, declarations.toList(), modifiers, uid, resourceName)
 
-    override fun createSourceFileDeclaration(root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): AstNode
-            = SourceFileDeclaration(root, referencedFiles)
+    override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): AstNode
+            = SourceFileDeclaration(fileName, root, referencedFiles)
 
     override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
+
+    override fun createSourceSet(sources: List<SourceFileDeclaration>)
+        = SourceSetDeclaration(sources)
 }

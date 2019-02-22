@@ -94,6 +94,8 @@ declare class SourceFileDeclaration implements AstNode {
     declarations: Declaration[]
 }
 
+declare class SourceSet implements AstNode {}
+
 declare class TypeParameter {
     name: String;
 }

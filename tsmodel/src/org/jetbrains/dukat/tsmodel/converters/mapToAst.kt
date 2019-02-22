@@ -21,6 +21,8 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -167,8 +169,12 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("modifiers")
         )
         SourceFileDeclaration::class.simpleName -> SourceFileDeclaration(
+                get("fileName") as String,
                 getEntity("root"),
                 getEntities("referencedFiles")
+        )
+        SourceSetDeclaration::class.simpleName -> SourceSetDeclaration(
+                getEntities("sources")
         )
         PackageDeclaration::class.simpleName -> PackageDeclaration(
                 get("packageName") as String,

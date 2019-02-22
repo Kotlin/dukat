@@ -20,6 +20,8 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -96,7 +98,8 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is ParameterDeclaration -> toMap()
         is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
-        is SourceFileDeclaration -> listOf(::root, ::referencedFiles).convert(this)
+        is SourceFileDeclaration -> listOf(::fileName, ::root, ::referencedFiles).convert(this)
+        is SourceSetDeclaration -> listOf(::sources).convert(this)
         is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)

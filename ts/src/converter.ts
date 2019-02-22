@@ -62,7 +62,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
             nativeAstFactory == null ? new AstFactoryV8() : nativeAstFactory
         );
 
-        return astConverter.convertSourceFile(fileName)
+        return astConverter.createSourceSet(fileName);
     }
 }
 

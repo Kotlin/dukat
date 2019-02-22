@@ -210,11 +210,15 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
                     resourceName
             ).toV8()
 
-    fun createSourceFileDeclaration(root: V8Object, referencedFiles: V8Array): V8Object =
+    fun createSourceFileDeclaration(fileName: String, root: V8Object, referencedFiles: V8Array): V8Object =
             astFactory.createSourceFileDeclaration(
+                    fileName,
                     root.toAst(),
                     referencedFiles.toAst()
             ).toV8()
+
+    fun createSourceSet(sources: V8Array): V8Object =
+            astFactory.createSourceSet(sources.toAst()).toV8()
 
     fun createTypeParam(name: String, constraints: V8Array): V8Object = astFactory
             .createTypeParam(name, constraints.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()

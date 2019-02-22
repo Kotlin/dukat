@@ -31,6 +31,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -512,7 +513,13 @@ fun compile(documentRoot: ModuleModel): String {
 }
 
 fun output(fileName: String, translator: InputTranslator): String {
+    val sourceSetDeclaration = translator.translateFile(fileName)
+    val sourcesMap = mutableMapOf<String, SourceFileDeclaration>()
+    sourceSetDeclaration.sources.map { sourceFileDeclaration ->
+       sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
+    }
+
     val documentRoot =
-            translator.lower(translator.translateFile(fileName))
+            translator.lower(sourcesMap.get(fileName)!!)
     return compile(documentRoot)
 }
