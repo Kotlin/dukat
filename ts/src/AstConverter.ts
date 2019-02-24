@@ -1,3 +1,11 @@
+declare function uid(): string;
+
+// Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
+declare namespace ts {
+    function normalizePath(path: String): string;
+    function getDirectoryPath(path: String): string;
+}
+
 class AstConverter {
 
     private exportContext = new ExportContext();
@@ -31,10 +39,12 @@ class AstConverter {
         );
 
         sourceSet.set(sourceFileName, declaration);
+        let curDir = ts.getDirectoryPath(sourceFileName) +  "/";
 
         sourceFile.referencedFiles.forEach(referencedFile => {
-            if (!sourceSet.has(referencedFile.fileName)) {
-                this.createSourceMap(referencedFile.fileName, sourceSet);
+            let resolvedPath = ts.normalizePath(curDir + referencedFile.fileName);
+            if (!sourceSet.has(resolvedPath)) {
+                this.createSourceMap(resolvedPath, sourceSet);
             }
         });
     }

@@ -1,5 +1,6 @@
 /// <reference path="../node_modules/typescript/lib/typescriptServices.d.ts"/>
 /// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
+/// <reference path="../node_modules/typescript/lib/typescript.d.ts"/>
 
 
 if (typeof ts == "undefined") {
@@ -8,14 +9,15 @@ if (typeof ts == "undefined") {
 
 declare function print(...arg: any[]): void;
 
-declare function uid(): string;
-
 declare function println(arg: String): void;
+
+interface FileResolver {
+    resolve(fileName: string): string;
+}
 
 declare class FileResolverV8 implements FileResolver {
     resolve(fileName: string): string;
 }
-
 
 if (typeof console == "undefined") {
     (global as any).console = {
@@ -27,23 +29,15 @@ if (typeof console == "undefined") {
     }
 }
 
-
-interface FileResolver {
-    resolve(fileName: string): string;
-}
-
-
 function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string) {
     if (fileResolver == null) {
         fileResolver = new FileResolverV8();
     }
 
-    let documentRegistry = ts.createDocumentRegistry();
-
     let host = new DukatLanguageServiceHost(fileResolver);
     host.register(fileName);
 
-    let languageService = ts.createLanguageService(host, documentRegistry);
+    let languageService = ts.createLanguageService(host, ts.createDocumentRegistry());
 
     const program = languageService.getProgram();
 

@@ -59,7 +59,7 @@ private fun createV8Interop(): InteropV8 {
 
     interopRuntime
             .proxy(interopRuntime.executeScript("FileResolverV8.prototype"), FileResolver())
-            .method("resolve", InteropV8Signature.STRING)
+            .all()
 
 
     return interopRuntime
