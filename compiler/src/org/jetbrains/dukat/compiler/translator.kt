@@ -32,6 +32,8 @@ private fun createNashornInterop(): InteropNashorn {
     engine.eval("""
         var global = this;
         var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
+        var Map = Java.type('org.jetbrains.dukat.nashorn.Map');
+
         var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
     """.trimIndent())
 
