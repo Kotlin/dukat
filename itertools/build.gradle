@@ -4,4 +4,13 @@ plugins {
 
 sourceSets {
     main.kotlin.srcDirs = ['src']
+    test.kotlin.srcDirs = ['test/src']
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+
 }

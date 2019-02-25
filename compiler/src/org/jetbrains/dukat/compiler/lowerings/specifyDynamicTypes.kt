@@ -5,28 +5,62 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-private fun specifyArguments(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
+private fun specifyArguments(params: List<ParameterDeclaration>, complexityThreshold: Int): List<List<ParameterDeclaration>> {
+
+    var currentComplexity = 1
+
     return params.map { parameterDeclaration ->
         val type = parameterDeclaration.type
-        if (type is UnionTypeNode) {
-            type.params.map { parameterDeclaration.copy(type = it) }
-        } else listOf(parameterDeclaration)
+        when (type) {
+            is UnionTypeNode -> {
+                currentComplexity *= type.params.size
+                if (currentComplexity <= 15) {
+                    type.params.map { parameterDeclaration.copy(type = it) }
+                } else {
+                    listOf(parameterDeclaration)
+                }
+            }
+            else -> {
+                listOf(parameterDeclaration)
+            }
+        }
+    }
+}
+
+private fun ParameterValueDeclaration.description(): String {
+    return when(this) {
+        is TypeNode -> {
+            val typeNodeValue = value
+            when (typeNodeValue) {
+                is IdentifierNode -> typeNodeValue.value
+                else -> typeNodeValue.toString()
+            }
+        }
+        else -> "${this::class.simpleName}"
     }
 }
 
 private class SpecifyDynamicTypesLowering : IdentityLowering {
 
     fun generateParams(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
-        val specifyParams = specifyArguments(params)
-        return cartesian(*specifyParams.toTypedArray())
+        val specifyParams = specifyArguments(params, 16)
+
+        return if (specifyParams.size == 1) {
+            specifyParams.first().map { param -> listOf(param) }
+        } else {
+            cartesian(*specifyParams.toTypedArray())
+        }
     }
 
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
