@@ -27,6 +27,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
+import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -40,7 +41,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
-    val skipNullableAnnotation = (this is TypeNode) && (value is IdentifierNode) && ((value as IdentifierNode).value == "Nothing")
+    val skipNullableAnnotation = meta is MuteMetadata
     if (nullable && !skipNullableAnnotation) {
         //TODO: consider rethinking this restriction
         return " /*= null*/"

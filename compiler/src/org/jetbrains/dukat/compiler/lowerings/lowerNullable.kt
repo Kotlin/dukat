@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -12,7 +13,8 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 private class LowerNullable : ParameterValueLowering {
 
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
-        return declaration.copy(type = if (declaration.optional) declaration.type.makeNullable() else declaration.type)
+        val type = if (declaration.optional) declaration.type.makeNullable() else declaration.type
+        return declaration.copy(type = lowerParameterValue(type))
     }
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
@@ -28,10 +30,12 @@ private class LowerNullable : ParameterValueLowering {
                     if (nullableType is TypeNode) {
                         val res = lowerTypeNode(nullableType)
                         res.nullable = true
+                        res.meta = MuteMetadata()
                         return res
                     } else if (nullableType is FunctionTypeNode) {
                         val res = lowerFunctionNode(nullableType)
                         res.nullable = true
+                        res.meta = MuteMetadata()
                         return res
                     } else {
                         throw Exception("can not lower nullables for unknown param type ${nullableType}")
@@ -44,7 +48,7 @@ private class LowerNullable : ParameterValueLowering {
             is TypeNode -> {
                 return lowerTypeNode(declaration)
             }
-            else -> declaration
+            else -> super.lowerParameterValue(declaration)
         }
 
     }

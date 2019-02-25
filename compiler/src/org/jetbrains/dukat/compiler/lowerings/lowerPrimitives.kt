@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
+import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
@@ -36,16 +37,19 @@ private class PrimitiveClassLowering : ParameterValueLowering {
 
         var value = declaration.value.mapPrimitive()
         var nullable = declaration.nullable
+        var meta = declaration.meta
 
         if (declaration.isPrimitive("undefined") || declaration.isPrimitive("null")) {
             value = IdentifierNode("Nothing")
             nullable = true
+            meta = MuteMetadata()
         }
 
         return declaration.copy(
                 value = value,
                 params = declaration.params.map { lowerParameterValue(it) },
-                nullable = nullable
+                nullable = nullable,
+                meta = meta
         )
     }
 
