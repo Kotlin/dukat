@@ -15,7 +15,6 @@ import java.util.*
 
 
 private fun readResource(name: String): String {
-    println("READING RESOURCE ${name}")
     val resourceAsStream = object {}::class.java.classLoader.getResourceAsStream(name)
     return resourceAsStream.bufferedReader().readText()
 }
