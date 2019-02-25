@@ -20,6 +20,7 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.canBeJson
 
 private data class InterfaceDeclarationKey(
         val members: List<MemberDeclaration>,
@@ -53,8 +54,6 @@ private fun areIdentical(aInterface: GeneratedInterfaceDeclaration, bInterface: 
     return aInterface.key() == bInterface.key()
 }
 
-
-
 class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<String, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
@@ -64,7 +63,9 @@ class GeneratedInterfacesContext {
 
         return when (declaration) {
             is ObjectLiteralDeclaration -> {
-                if (declaration.members.isEmpty()) {
+                if (declaration.canBeJson()) {
+                    TypeDeclaration("Json", emptyList())
+                } else if (declaration.members.isEmpty()) {
                     TypeDeclaration("Any", emptyList())
                 } else {
                     val referenceNode = registerObjectLiteralDeclaration(declaration, ownerUID, typeParamsSet)

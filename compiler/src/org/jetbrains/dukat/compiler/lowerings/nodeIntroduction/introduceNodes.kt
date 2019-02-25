@@ -19,6 +19,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
@@ -46,6 +47,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.canBeJson
 
 
 private class LowerDeclarationsToNodes {
@@ -329,20 +331,32 @@ private class LowerDeclarationsToNodes {
     fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
-            //TODO: don't forget to create owner
-            val objectNode = ObjectNode(
-                    declaration.name,
-                    type.members.flatMap { member -> lowerMemberDeclaration(member) },
-                    emptyList()
-            )
 
-            objectNode.copy(members = objectNode.members.map {
-                when (it) {
-                    is PropertyNode -> it.copy(owner = objectNode, open = false)
-                    is MethodNode -> it.copy(owner = objectNode, open = false)
-                    else -> it
-                }
-            })
+            if (type.canBeJson()) {
+                VariableNode(
+                        declaration.name,
+                        TypeNode("Json", emptyList()),
+                        mutableListOf(),
+                        false,
+                        null,
+                        declaration.uid
+                )
+            } else {
+                //TODO: don't forget to create owner
+                val objectNode = ObjectNode(
+                        declaration.name,
+                        type.members.flatMap { member -> lowerMemberDeclaration(member) },
+                        emptyList()
+                )
+
+                objectNode.copy(members = objectNode.members.map {
+                    when (it) {
+                        is PropertyNode -> it.copy(owner = objectNode, open = false)
+                        is MethodNode -> it.copy(owner = objectNode, open = false)
+                        else -> it
+                    }
+                })
+            }
         } else {
             VariableNode(
                     declaration.name,
