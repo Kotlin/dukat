@@ -6,8 +6,8 @@ external interface MyEvent
 external interface MyOptions
 external interface JQueryStatic {
     fun get(url: String, success: (() -> Any)? = definedExternally /* null */, dataType: String? = definedExternally /* null */): MyXHR
-    fun get(url: String, data: String? = definedExternally /* null */, success: (() -> Any)? = definedExternally /* null */, dataType: String? = definedExternally /* null */): MyXHR
     fun get(url: String, data: Any? = definedExternally /* null */, success: (() -> Any)? = definedExternally /* null */, dataType: String? = definedExternally /* null */): MyXHR
+    fun get(url: String, data: String? = definedExternally /* null */, success: (() -> Any)? = definedExternally /* null */, dataType: String? = definedExternally /* null */): MyXHR
     fun get(settings: MyOptions): MyXHR
     @nativeInvoke
     operator fun invoke(selector: String, context: Element? = definedExternally /* null */): MyQuery
@@ -33,10 +33,10 @@ external interface JQueryStatic {
 }
 external open class JJ {
     open fun foo(data: String, context: HTMLElement? = definedExternally /* null */, keepScripts: Boolean? = definedExternally /* null */): Array<Any> = definedExternally
-    open fun hide(duration: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
     open fun hide(duration: Number? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
-    open fun hide(duration: String? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
+    open fun hide(duration: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
     open fun hide(duration: Number? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
+    open fun hide(duration: String? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
     open fun hide(options: MyOptions): MyQuery = definedExternally
     open fun trigger(eventType: String, extraParameters: Any? = definedExternally /* null */): MyQuery = definedExternally
     open fun trigger(eventType: String, extraParameters: Array<Any>? = definedExternally /* null */): MyQuery = definedExternally
