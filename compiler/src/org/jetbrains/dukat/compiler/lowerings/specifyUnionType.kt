@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import cartesian
+import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -26,7 +27,9 @@ private fun specifyArguments(params: List<ParameterDeclaration>, complexityThres
             is UnionTypeNode -> {
                 currentComplexity *= type.params.size
                 if (currentComplexity <= 15) {
-                    type.params.map { parameterDeclaration.copy(type = it) }
+                    type.params.map {param ->
+                        parameterDeclaration.copy(type = if (type.nullable) param.makeNullable() else param)
+                    }
                 } else {
                     listOf(parameterDeclaration)
                 }
@@ -51,7 +54,7 @@ private fun ParameterValueDeclaration.description(): String {
     }
 }
 
-private class SpecifyDynamicTypesLowering : IdentityLowering {
+private class SpecifyUnionTypeLowering : IdentityLowering {
 
     fun generateParams(params: List<ParameterDeclaration>): List<List<ParameterDeclaration>> {
         val specifyParams = specifyArguments(params, 16)
@@ -126,6 +129,6 @@ private class SpecifyDynamicTypesLowering : IdentityLowering {
 }
 
 
-fun DocumentRootNode.specifyDynamicTypes(): DocumentRootNode {
-    return SpecifyDynamicTypesLowering().lowerDocumentRoot(this)
+fun DocumentRootNode.specifyUnionType(): DocumentRootNode {
+    return SpecifyUnionTypeLowering().lowerDocumentRoot(this)
 }

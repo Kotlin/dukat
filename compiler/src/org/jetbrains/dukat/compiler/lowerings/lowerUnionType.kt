@@ -10,7 +10,10 @@ private class LoweringUnionType() : ParameterValueLowering {
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         if (declaration is UnionTypeDeclaration) {
-            return UnionTypeNode(declaration.params.map { param ->  lowerParameterValue(param)})
+            return UnionTypeNode(
+                params = declaration.params.map { param ->  lowerParameterValue(param)},
+                nullable = declaration.nullable
+            )
         }
         return super.lowerParameterValue(declaration)
     }

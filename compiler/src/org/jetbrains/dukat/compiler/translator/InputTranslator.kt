@@ -27,7 +27,7 @@ import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceModuleMe
 import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
-import org.jetbrains.dukat.compiler.lowerings.specifyDynamicTypes
+import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -78,7 +78,7 @@ interface InputTranslator {
                 .updateContext(myAstContext)
                 .lowerOverrides(myAstContext)
                 .resolveTypeAliases()
-                .specifyDynamicTypes()
+                .specifyUnionType()
                 .rearrangeGeneratedEntities()
                 .lowerConstructors()
                 .introduceRepresentationModels()
