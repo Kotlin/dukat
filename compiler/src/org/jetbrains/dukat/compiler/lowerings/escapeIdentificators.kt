@@ -10,16 +10,27 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
-            "object", "when", "val", "var", "as", "package", "fun", "typealias", "typeof", "in", "interface", "is"
+            "as",
+            "fun",
+            "in",
+            "interface",
+            "is",
+            "object",
+            "package",
+            "typealias",
+            "typeof",
+            "val",
+            "var",
+            "when"
     )
 
+    val isReservedWord = reservedWords.contains(identificator)
+    val containsDollarSign = identificator.contains("$")
+    val containsOnlyUnderscores = "^_+$".toRegex().containsMatchIn(identificator)
+    val isEscapedAlready = "^`.*`$".toRegex().containsMatchIn(identificator)
 
-    return if (reservedWords.contains(identificator) || identificator.contains("$") || "^_+$".toRegex().containsMatchIn(identificator)) {
-        if ("^`.*`$".toRegex().containsMatchIn(identificator)) {
-            identificator
-        } else {
-            "`${identificator}`"
-        }
+    return if (!isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores)) {
+        "`${identificator}`"
     } else {
         identificator
     }
