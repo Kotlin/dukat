@@ -14,6 +14,7 @@ import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.getUID
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -224,7 +225,7 @@ class GeneratedInterfacesContext {
     }
 
     fun resolveGeneratedInterfacesFor(node: TypeAliasDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.aliasName + "_TYPE", mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
+        return myReferences.getOrDefault(node.getUID(), mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
     }
 
 }

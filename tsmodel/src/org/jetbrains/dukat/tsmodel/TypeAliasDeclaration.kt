@@ -8,3 +8,8 @@ data class TypeAliasDeclaration(
         val typeParameters: List<IdentifierDeclaration>,
         val typeReference: ParameterValueDeclaration
 ): TopLevelDeclaration
+
+
+fun TypeAliasDeclaration.getUID(): String {
+    return aliasName + "_TYPE"
+}
