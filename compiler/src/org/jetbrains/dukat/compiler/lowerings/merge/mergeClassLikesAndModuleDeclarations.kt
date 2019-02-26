@@ -70,11 +70,19 @@ private fun CompanionObjectModel.merge(ownerName: String, modulesToBeMerged: Map
     return copy(members = members)
 }
 
+// TODO: duplication, think of separate place to have this (but please don't call it utils )))
+private fun unquote(name: String): String {
+    return name.replace("(?:^\"|\')|(?:\"|\'$)".toRegex(), "")
+}
+
+
 private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<String, ClassLikeNode>, modulesToBeMerged: MutableMap<String, MutableList<ModuleModel>>): List<ModuleModel> {
 
+
     return submodules.map { subModule ->
-        if ((context.containsKey(subModule.shortName)) && (subModule.canBeMerged())) {
-            val bucket = modulesToBeMerged.getOrPut(subModule.shortName) { mutableListOf() }
+        val moduleKey = unquote(subModule.shortName)
+        if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
+            val bucket = modulesToBeMerged.getOrPut(moduleKey) { mutableListOf() }
             bucket.add(subModule)
             emptyList()
         } else listOf(subModule)

@@ -2,51 +2,81 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
-           "_", "object", "when", "val", "var", "as", "package", "fun", "when", "typealias", "typeof", "in"
+            "object", "when", "val", "var", "as", "package", "fun", "typealias", "typeof", "in", "interface", "is"
     )
-    return if (reservedWords.contains(identificator) || identificator.contains("$")) {
-        "`${identificator}`"
+
+
+    return if (reservedWords.contains(identificator) || identificator.contains("$") || "^_+$".toRegex().containsMatchIn(identificator)) {
+        if ("^`.*`$".toRegex().containsMatchIn(identificator)) {
+            identificator
+        } else {
+            "`${identificator}`"
+        }
     } else {
         identificator
     }
 }
 
+
 private class EscapeIdentificators : ParameterValueLowering {
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
-        return declaration.copy(name = escapeIdentificator(declaration.name))
-    }
 
-    override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(name = escapeIdentificator(declaration.name))
-    }
-
-    override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
-        return declaration.copy(
-            name = escapeIdentificator(declaration.name),
-            parameters = declaration.parameters.map {param -> lowerParameterDeclaration(param)}
+    private fun IdentifierNode.escape(): IdentifierNode {
+        return IdentifierNode(
+                value.split(".").joinToString(".") { lowerStringIdentificator(it) }
         )
     }
 
-    override fun lowerMethodNode(declaration: MethodNode): MethodNode {
-        return declaration.copy(
-            name = escapeIdentificator(declaration.name),
-            parameters = declaration.parameters.map {param -> lowerParameterDeclaration(param)}
-        )
+    private fun TypeNode.escape(): TypeNode {
+        val typeNodeValue = value
+        return when (typeNodeValue) {
+            is IdentifierNode -> copy(value = typeNodeValue.escape())
+            else -> this
+        }
+    }
+
+    private fun QualifiedNode.escape(): QualifiedNode {
+        val nodeLeft = left
+        return when(nodeLeft) {
+            is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape())
+            is QualifiedNode -> QualifiedNode(nodeLeft.escape(), right.escape())
+            else -> throw Exception("unknown QualifiedLeftnode")
+        }
+    }
+
+    override fun lowerStringIdentificator(identificator: String): String {
+        return escapeIdentificator(identificator)
+    }
+
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return when (declaration) {
+            is TypeNode -> declaration.escape()
+            is QualifiedNode -> declaration.escape()
+            else -> {
+                super.lowerParameterValue(declaration)
+            }
+        }
     }
 
     override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
         return when (declaration) {
-            is EnumNode -> declaration.copy(values = declaration.values.map {value -> value.copy(value = escapeIdentificator(value.value)) })
+            is EnumNode -> declaration.copy(values = declaration.values.map { value -> value.copy(value = escapeIdentificator(value.value)) })
             else -> super.lowerTopLevelDeclaration(declaration)
         }
+    }
+
+    override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
+        return documentRoot.copy(
+                fullPackageName = documentRoot.fullPackageName.split(".").joinToString(".") { lowerStringIdentificator(it) },
+                declarations = lowerTopLevelDeclarations(documentRoot.declarations)
+        )
     }
 }
 

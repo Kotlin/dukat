@@ -25,8 +25,13 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface ParameterValueLowering : Lowering {
 
+    fun lowerStringIdentificator(identificator: String): String {
+        return identificator;
+    }
+
     fun lowerMethodNode(declaration: MethodNode): MethodNode {
         return declaration.copy(
+                name = lowerStringIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
@@ -37,6 +42,7 @@ interface ParameterValueLowering : Lowering {
 
     fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
         return declaration.copy(
+                name = lowerStringIdentificator(declaration.name),
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
@@ -56,6 +62,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
         return declaration.copy(
+                name = lowerStringIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
@@ -65,7 +72,10 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
-        return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
+        return declaration.copy(
+            name = lowerStringIdentificator(declaration.name),
+            constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) }
+        )
     }
 
     override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
@@ -96,11 +106,14 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
-        return declaration.copy(type = lowerParameterValue(declaration.type))
+        return declaration.copy(
+                name = lowerStringIdentificator(declaration.name),
+                type = lowerParameterValue(declaration.type)
+        )
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(type = lowerParameterValue(declaration.type))
+        return declaration.copy(name = lowerStringIdentificator(declaration.name),type = lowerParameterValue(declaration.type))
     }
 
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
@@ -116,8 +129,8 @@ interface ParameterValueLowering : Lowering {
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
 
         return declaration.copy(
-                members
-                = declaration.members.map { member -> lowerMemberNode(member) },
+                name = lowerStringIdentificator(declaration.name),
+                members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(heritageClause)
                 },
@@ -149,6 +162,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
+                name = lowerStringIdentificator(declaration.name),
                 members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(heritageClause)

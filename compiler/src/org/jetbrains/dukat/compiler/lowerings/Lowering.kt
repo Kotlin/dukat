@@ -80,6 +80,8 @@ interface Lowering {
     }
 
     fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
-        return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations))
+        return documentRoot.copy(
+                declarations = lowerTopLevelDeclarations(documentRoot.declarations)
+        )
     }
 }
