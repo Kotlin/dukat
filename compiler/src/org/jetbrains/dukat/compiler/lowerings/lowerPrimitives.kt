@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -31,7 +32,7 @@ private fun TypeNodeValue.mapPrimitive() : TypeNodeValue {
 
 private class PrimitiveClassLowering : ParameterValueLowering {
     override fun lowerTypeNode(declaration: TypeNode): TypeNode {
-        if (declaration == TypeNode("Function", emptyList())) {
+        if (declaration.value == IdentifierNode("Function")) {
             return TypeNode("Function", listOf(TypeNode("*", emptyList())))
         }
 
@@ -51,6 +52,10 @@ private class PrimitiveClassLowering : ParameterValueLowering {
                 nullable = nullable,
                 meta = meta
         )
+    }
+
+    override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
+        return super.lowerUnionTypeNode(declaration)
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
