@@ -23,6 +23,7 @@ dependencies {
   implementation(project(":ast-common"))
   implementation(project(":tsmodel"))
   implementation(project(":itertools"))
+  implementation(project(":ownerContext"))
 
   implementation(project(":nashorn"))
   implementation(project(":j2v8"))

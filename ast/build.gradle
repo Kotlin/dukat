@@ -8,5 +8,6 @@ sourceSets {
 
 dependencies {
     implementation(project(":ast-common"))
+    implementation(project(":ownerContext"))
     implementation(project(":tsmodel"))
 }

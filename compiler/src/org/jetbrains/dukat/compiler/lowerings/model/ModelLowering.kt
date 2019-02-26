@@ -15,10 +15,10 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.compiler.declarationContext.ClassLikeOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.ClassModelOwnerContext
-import org.jetbrains.dukat.compiler.declarationContext.DeclarationContext
 import org.jetbrains.dukat.compiler.declarationContext.InterfaceModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.TypeContext
+import org.jetbrains.dukat.ownerContext.OwnerContext
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -30,7 +30,7 @@ interface ModelLowering {
     fun lowerClassModel(declaration: ClassModel, ownerContext: ClassModelOwnerContext): ClassModel
     fun lowerInterfaceModel(declaration: InterfaceModel, ownerContext: InterfaceModelOwnerContext): InterfaceModel
 
-    fun lowerParameterDeclaration(declaration: ParameterDeclaration, ownerContext: DeclarationContext): ParameterDeclaration
+    fun lowerParameterDeclaration(declaration: ParameterDeclaration, ownerContext: OwnerContext): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerMemberNode(declaration: MemberNode, ownerContext: ClassLikeOwnerContext): MemberNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode

@@ -11,6 +11,7 @@ data class InterfaceNode(
         val annotations: MutableList<AnnotationNode>,
 
         var owner: DocumentRootNode?,
+        val generated: Boolean,
         val uid: String
 ) : ClassLikeDeclaration, ClassLikeNode {
     companion object {

@@ -17,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.compiler.declarationContext.ClassLikeOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.ClassModelOwnerContext
-import org.jetbrains.dukat.compiler.declarationContext.DeclarationContext
 import org.jetbrains.dukat.compiler.declarationContext.FunctionOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.InterfaceModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.IrrelevantOwnerContext
@@ -25,8 +24,8 @@ import org.jetbrains.dukat.compiler.declarationContext.MethodOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.ObjectNodeOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.PropertyOwnerContext
-import org.jetbrains.dukat.compiler.declarationContext.ROOT_DECLARATION_CONTEXT
 import org.jetbrains.dukat.compiler.declarationContext.TypeContext
+import org.jetbrains.dukat.ownerContext.OwnerContext
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -78,42 +77,42 @@ interface ModelTypeLowering : ModelLowering {
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
-        return declaration.copy(constraints = declaration.constraints.map { constraint -> val lowerParameterValue = lowerParameterValue(constraint, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT)))
+        return declaration.copy(constraints = declaration.constraints.map { constraint -> val lowerParameterValue = lowerParameterValue(constraint, TypeContext(IrrelevantOwnerContext()))
             lowerParameterValue
         })
     }
 
     override fun lowerTupleDeclaration(declaration: TupleDeclaration): ParameterValueDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) })
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext())) })
     }
 
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) })
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext())) })
     }
 
     override fun lowerTypeNode(declaration: TypeNode): TypeNode {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) })
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, TypeContext(IrrelevantOwnerContext())) })
     }
 
     override fun lowerFunctionTypeNode(declaration: FunctionTypeNode): FunctionTypeNode {
         return declaration.copy(
-                parameters = declaration.parameters.map { param -> lowerParameterDeclaration(param, IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT)) },
-                type = lowerParameterValue(declaration.type, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT)))
+                parameters = declaration.parameters.map { param -> lowerParameterDeclaration(param, IrrelevantOwnerContext()) },
+                type = lowerParameterValue(declaration.type, TypeContext(IrrelevantOwnerContext()))
         )
     }
 
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration, ownerContext: DeclarationContext): ParameterDeclaration {
+    override fun lowerParameterDeclaration(declaration: ParameterDeclaration, ownerContext: OwnerContext): ParameterDeclaration {
         return declaration.copy(type = lowerParameterValue(declaration.type, TypeContext(ownerContext)))
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(type = lowerParameterValue(declaration.type, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))))
+        return declaration.copy(type = lowerParameterValue(declaration.type, TypeContext(IrrelevantOwnerContext())))
     }
 
-    fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: DeclarationContext): HeritageNode {
+    fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: OwnerContext): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList()), TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) as TypeNode
+            val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList()), TypeContext(IrrelevantOwnerContext())) as TypeNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)
@@ -137,16 +136,16 @@ interface ModelTypeLowering : ModelLowering {
 
     fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, TypeContext(IrrelevantOwnerContext())) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, TypeContext(IrrelevantOwnerContext(ROOT_DECLARATION_CONTEXT))) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, TypeContext(IrrelevantOwnerContext())) })
                 }
         )
     }
 
     override fun lowerObjectNode(declaration: ObjectNode): ObjectNode {
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberNode(member, ObjectNodeOwnerContext(declaration, ROOT_DECLARATION_CONTEXT)) }
+                members = declaration.members.map { member -> lowerMemberNode(member, ObjectNodeOwnerContext(declaration, null)) }
         )
 
     }

@@ -9,10 +9,10 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
-import org.jetbrains.dukat.compiler.declarationContext.DeclarationContext
 import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
 import org.jetbrains.dukat.compiler.declarationContext.TypeContext
 import org.jetbrains.dukat.compiler.lowerings.model.ModelTypeLowering
+import org.jetbrains.dukat.ownerContext.OwnerContext
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun QualifiedLeftNode.shiftLeft(): QualifiedLeftNode {
@@ -58,11 +58,10 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         return super.lowerParameterValue(declaration, owner)
     }
 
-    override fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: DeclarationContext): HeritageNode {
+    override fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: OwnerContext): HeritageNode {
         val name = heritageClause.name
 
         if (name is IdentifierNode) {
-            println("====> ${name.debugTranslate()}")
             declarationResolver.resolve(name.value, ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
@@ -80,7 +79,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
 
     val declarationContext = DeclarationResolver()
-    declarationContext.process(this)
+    declarationContext.process(this, ModuleModelOwnerContext(this, null))
 
-    return SpecifyTypeNodes(declarationContext).lowerRoot(this, ModuleModelOwnerContext(this))
+    return SpecifyTypeNodes(declarationContext).lowerRoot(this, ModuleModelOwnerContext(this, null))
 }

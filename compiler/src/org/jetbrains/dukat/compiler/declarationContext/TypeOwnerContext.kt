@@ -1,3 +1,5 @@
 package org.jetbrains.dukat.compiler.declarationContext
 
-interface TypeOwnerContext : DeclarationContext
+import org.jetbrains.dukat.ownerContext.OwnerContext
+
+interface TypeOwnerContext : OwnerContext

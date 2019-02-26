@@ -1,0 +1,10 @@
+plugins {
+  id("kotlin")
+}
+
+sourceSets {
+  main.kotlin.srcDirs = ['src']
+}
+
+dependencies {
+}
