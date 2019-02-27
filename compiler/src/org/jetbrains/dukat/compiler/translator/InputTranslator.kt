@@ -9,6 +9,7 @@ import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceExports
+import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
@@ -81,6 +82,7 @@ interface InputTranslator {
                 .specifyUnionType()
                 .rearrangeGeneratedEntities()
                 .lowerConstructors()
+//                .introduceMissedOverloads()
                 .introduceRepresentationModels()
                 .mergeModules()
                 .mergeClassesAndInterfaces()
