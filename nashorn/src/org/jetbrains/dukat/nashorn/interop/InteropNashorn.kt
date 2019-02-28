@@ -18,5 +18,4 @@ class InteropNashorn : InteropEngine {
         return invocable.invokeFunction(name, *params) as T
     }
 
-    override fun release() {}
 }

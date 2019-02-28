@@ -67,14 +67,9 @@ private fun createV8Interop(): InteropV8 {
 }
 
 class TranslatorV8(private val engine: InteropV8) : InputTranslator {
-
     override fun translateFile(fileName: String): SourceSetDeclaration {
         val result = engine.callFunction<V8Object>("main", null, null, fileName)
         return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
-    }
-
-    override fun release() {
-        engine.release()
     }
 }
 
@@ -82,8 +77,6 @@ class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
     override fun translateFile(fileName: String): SourceSetDeclaration {
         return engine.callFunction("main", AstFactory(), FileResolver(), fileName)
     }
-
-    override fun release() {}
 }
 
 

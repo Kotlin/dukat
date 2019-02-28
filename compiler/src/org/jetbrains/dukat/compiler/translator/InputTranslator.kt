@@ -9,7 +9,6 @@ import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceExports
-import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
@@ -54,7 +53,6 @@ private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRoot
 
 interface InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
-    fun release()
 
     fun lower(documentRoot: SourceFileDeclaration): ModuleModel {
         val myAstContext = AstContext()

@@ -1,19 +1,13 @@
 package org.jetbrains.dukat.j2v8.interop
 
-import com.eclipsesource.v8.Releasable
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import org.jetbrains.dukat.interop.InteropEngine
 
 
-class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, InteropEngine {
+class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): InteropEngine {
 
-    private var myRegisteredItems = mutableListOf<Releasable>()
-
-    private fun register(item: Releasable) {
-        myRegisteredItems.add(item)
-    }
 
     override fun eval(script: String) = runtime.executeVoidScript(script)
 
@@ -30,32 +24,21 @@ class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, Int
             else -> throw Exception("can not cast ${it}")
         }}
 
-        register(params)
         return params
     }
 
     fun executeScript(script: String): V8Object {
         val res = runtime.executeObjectScript(script)
-        register(res)
         return res
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> callFunction(name: String, vararg params: Any?): T {
         val result = runtime.executeFunction(name, createParams(*params)) as T
-
-        if (result is Releasable) {
-            register(result)
-        }
         return result
     }
 
     fun proxy(context: V8Object, proxyObject: Any)  = InteropV8Class(context, proxyObject)
 
     fun proxy(proxyObject: Any) = proxy(runtime, proxyObject)
-
-    override fun release() {
-        myRegisteredItems.map(Releasable::release)
-        runtime.release()
-    }
 }
