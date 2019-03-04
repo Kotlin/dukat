@@ -354,6 +354,7 @@ class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number) : ParameterDeclaration {
         let initializer = null;
         if (param.initializer != null) {
+            // TODO: this never happens in tests and I should add one
             initializer = this.astFactory.createExpression(
                 this.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
                 param.initializer.getText()

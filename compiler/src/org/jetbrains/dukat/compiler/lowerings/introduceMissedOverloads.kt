@@ -13,7 +13,11 @@ private data class MethodNodeKey(val name:String, val params: List<ParameterDecl
 private class IntroduceMissedOverloads : ParameterValueLowering {
 
     private fun MethodNode.resolveMissedOverloads(resolvedMembers: MutableSet<MethodNodeKey>) : MemberNode? {
-        val nonOptionalHead = parameters.takeWhile { !it.optional }
+
+        val nonOptionalHead = parameters.takeWhile {
+            !it.optional || (it.initializer != null)
+        }
+
         return if (nonOptionalHead.size != parameters.size) {
             val missedMethodNode = copy(name = name, parameters = nonOptionalHead)
             val missedMethodKey = MethodNodeKey(
@@ -32,7 +36,9 @@ private class IntroduceMissedOverloads : ParameterValueLowering {
     }
 
     private fun FunctionNode.resolveMissedOverloads(resolvedMembers: MutableSet<MethodNodeKey>) : FunctionNode? {
-        val nonOptionalHead = parameters.takeWhile { !it.optional }
+        val nonOptionalHead = parameters.takeWhile {
+            !it.optional || (it.initializer != null)
+        }
         return if (nonOptionalHead.size != parameters.size) {
             val missedMethodNode = copy(name = name, parameters = nonOptionalHead)
             val missedMethodKey = MethodNodeKey(
