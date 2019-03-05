@@ -393,9 +393,10 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
 
     val parents = translateHeritageNodes(parentEntities)
     val externalClause = if (nested) "" else "external "
-    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name}${translateTypeParameters(typeParameters)}${parents}"
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
+
+    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name}${translateTypeParameters(typeParameters)}${params}${parents}"
 
     val members = members
     val staticMembers = companionObject.members
@@ -406,7 +407,7 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
 
     val tab = "    "
 
-    res.add(classDeclaration + params + if (isBlock) " {" else "")
+    res.add(classDeclaration + if (isBlock) " {" else "")
 
     if (hasMembers) {
         res.addAll(members.flatMap { it.translate() }.map({ tab.repeat(padding + 1) + it }))
