@@ -3,40 +3,19 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.appendLeft
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
-import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
-import org.jetbrains.dukat.ownerContext.OwnerContext
+import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class DeclarationKey(
-    val classValue: String,
-    val qualifiedPath: QualifiedLeftNode
+        val classValue: String,
+        val qualifiedPath: QualifiedLeftNode
 )
 
-fun OwnerContext.getQualifiedName(): QualifiedLeftNode {
-    val moduleOwners = getOwners()
-            .filterIsInstance(ModuleModelOwnerContext::class.java)
-            .toList()
-
-    return if (moduleOwners.isEmpty()) {
-        QualifiedNode(IdentifierNode("ROOT"), IdentifierNode("ROOT"))
-    } else if (moduleOwners.size == 1) {
-        return IdentifierNode(moduleOwners.get(0).node.shortName)
-    } else {
-        moduleOwners
-                .drop(1)
-                .fold(IdentifierNode(moduleOwners.first().node.shortName) as QualifiedLeftNode) { acc, a -> IdentifierNode(a.node.shortName).appendLeft(acc) } as QualifiedNode
-    }
-}
-
-
 class DeclarationResolver {
-    private val myDeclarations: MutableMap<DeclarationKey, ModuleModelOwnerContext> = mutableMapOf()
+    private val myDeclarations: MutableMap<DeclarationKey, NodeOwner<ModuleModel>> = mutableMapOf()
 
-    fun process(documentRoot: ModuleModel, moduleContext: ModuleModelOwnerContext) {
+    fun process(documentRoot: ModuleModel, moduleContext: NodeOwner<ModuleModel>) {
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ClassModel) {
@@ -47,15 +26,15 @@ class DeclarationResolver {
         }
 
         documentRoot.sumbodules.forEach { submodule ->
-            process(submodule, ModuleModelOwnerContext(submodule, moduleContext))
+            process(submodule, NodeOwner(submodule, moduleContext))
         }
     }
 
-    private fun register(name: String, moduleContext: ModuleModelOwnerContext) {
+    private fun register(name: String, moduleContext: NodeOwner<ModuleModel>) {
         myDeclarations.put(DeclarationKey(name, moduleContext.getQualifiedName()), moduleContext)
     }
 
-    fun resolve(name: String, path: QualifiedLeftNode?): ModuleModelOwnerContext? {
+    fun resolve(name: String, path: QualifiedLeftNode?): NodeOwner<ModuleModel>? {
         if (path == null) {
             return null
         }
@@ -79,7 +58,7 @@ class DeclarationResolver {
 
     }
 
-    fun resolveStrict(name: String, qualifiedPath: QualifiedLeftNode?): ModuleModelOwnerContext? {
+    fun resolveStrict(name: String, qualifiedPath: QualifiedLeftNode?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
             return null
         }

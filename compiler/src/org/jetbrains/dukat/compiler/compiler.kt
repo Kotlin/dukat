@@ -280,6 +280,8 @@ private fun MemberNode.translate(): List<String> {
         return listOf(translate())
     } else if (this is ConstructorNode) {
         return translate()
+    } else if (this is ClassModel) {
+        return listOf(translate(true, 1))
     } else {
         throw Exception("can not translate ${this}")
     }
@@ -385,6 +387,45 @@ private fun HeritageModel.translateAsHeritageClause(): String {
 }
 
 
+private fun ClassModel.translate(nested: Boolean, padding: Int): String {
+    val res: MutableList<String> = mutableListOf()
+    val primaryConstructor = primaryConstructor
+
+    val parents = translateHeritageNodes(parentEntities)
+    val externalClause = if (nested) "" else "external "
+    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name}${translateTypeParameters(typeParameters)}${parents}"
+    val params = if (primaryConstructor == null) "" else
+        if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
+
+    val members = members
+    val staticMembers = companionObject.members
+
+    val hasMembers = members.isNotEmpty()
+    val hasStaticMembers = staticMembers.isNotEmpty()
+    val isBlock = hasMembers || hasStaticMembers
+
+    val tab = "    "
+
+    res.add(classDeclaration + params + if (isBlock) " {" else "")
+
+    if (hasMembers) {
+        res.addAll(members.flatMap { it.translate() }.map({ tab.repeat(padding + 1) + it }))
+    }
+
+    if (staticMembers.isNotEmpty()) {
+        res.add(tab.repeat(padding + 1) + "companion object {")
+        res.addAll(staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding  + 2) + it }))
+        res.add(tab.repeat(padding + 1) + "}")
+    }
+
+
+    if (isBlock) {
+        res.add(tab.repeat(padding) +  "}")
+    }
+
+    return res.joinToString("\n")
+}
+
 private fun processDeclarations(docRoot: ModuleModel): List<String> {
     val res: MutableList<String> = mutableListOf()
 
@@ -396,37 +437,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
         } else if (declaration is FunctionNode) {
             res.add(declaration.translate())
         } else if (declaration is ClassModel) {
-            val primaryConstructor = declaration.primaryConstructor
-
-            val parents = translateHeritageNodes(declaration.parentEntities)
-            val classDeclaration = "${translateAnnotations(declaration.annotations)}external open class ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}"
-            val params = if (primaryConstructor == null) "" else
-                if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
-
-            val members = declaration.members
-            val staticMembers = declaration.companionObject.members
-
-            val hasMembers = members.isNotEmpty()
-            val hasStaticMembers = staticMembers.isNotEmpty()
-            val isBlock = hasMembers || hasStaticMembers
-
-            res.add(classDeclaration + params + if (isBlock) " {" else "")
-
-            if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "    $it" }))
-            }
-
-            if (staticMembers.isNotEmpty()) {
-                res.add("    companion object {")
-                res.addAll(staticMembers.flatMap { it.translate() }.map({ "        ${it}" }))
-                res.add("    }")
-            }
-
-
-            if (isBlock) {
-                res.add("}")
-            }
-
+            res.add(declaration.translate(false, 0))
         } else if (declaration is ObjectNode) {
 
             val objectNode = "external object ${declaration.name}"
@@ -479,7 +490,7 @@ private fun processDeclarations(docRoot: ModuleModel): List<String> {
 
 
 private fun processModule(docRoot: ModuleModel): List<String> {
-    val res: MutableList<String> = mutableListOf<String>()
+    val res: MutableList<String> = mutableListOf()
     if (docRoot.declarations.isEmpty() && docRoot.sumbodules.isEmpty()) {
         return res
     }

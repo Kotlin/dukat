@@ -9,7 +9,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
 data class ClassModel(
         val name: String,
-        val members: List<MemberNode>,
+        var members: List<MemberNode>,
         val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageNode>,
@@ -17,4 +17,4 @@ data class ClassModel(
         val annotations: MutableList<AnnotationNode>
 
 
-) : ClassLikeNode, ClassLikeModel, DelegationModel
+) : ClassLikeNode, ClassLikeModel, DelegationModel, MemberNode

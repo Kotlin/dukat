@@ -9,10 +9,8 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
-import org.jetbrains.dukat.compiler.declarationContext.ModuleModelOwnerContext
-import org.jetbrains.dukat.compiler.declarationContext.TypeContext
-import org.jetbrains.dukat.compiler.lowerings.model.ModelTypeLowering
-import org.jetbrains.dukat.ownerContext.OwnerContext
+import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun QualifiedLeftNode.shiftLeft(): QualifiedLeftNode {
@@ -27,16 +25,20 @@ private fun QualifiedLeftNode.shiftLeft(): QualifiedLeftNode {
     return this
 }
 
-private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelTypeLowering {
+private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: TypeContext): ParameterValueDeclaration {
+    override fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+        val declaration = ownerContext.node
+        val qualifiedName = ownerContext.getQualifiedName()
+
         if (declaration is TypeNode) {
             val declarationValue = declaration.value
+
             if (declarationValue is IdentifierNode) {
-                declarationResolver.resolve(declarationValue.value, owner.getQualifiedName())?.let { declarationOwnerContext ->
+                declarationResolver.resolve(declarationValue.value, qualifiedName)?.let { declarationOwnerContext ->
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                     if (declarationQualifiedName != IdentifierNode("__ROOT__")) {
-                        if (declarationQualifiedName != owner.getQualifiedName()) {
+                        if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
                             return TypeNode(IdentifierNode(qualifiedNode.debugTranslate()), emptyList())
                         }
@@ -44,10 +46,12 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                 }
             }
         } else if (declaration is QualifiedNode) {
-            val qualifiedPath = owner.getQualifiedName().appendRight(declaration).shiftRight()
+            val qualifiedPath = qualifiedName.appendRight(declaration).shiftRight()
 
             declarationResolver.resolveStrict(declaration.right.value, qualifiedPath)?.let { declarationOwnerContext ->
-                if (declarationOwnerContext.getQualifiedName() != owner.getQualifiedName()) {
+                val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
+
+                if (declarationQualifiedName != qualifiedName) {
                     val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declaration.right)
                     println("substituting ${declaration.debugTranslate()} with ${qualifiedNode?.debugTranslate()} ()")
                     return TypeNode(IdentifierNode(qualifiedNode!!.debugTranslate()), emptyList())
@@ -55,10 +59,11 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             }
 
         }
-        return super.lowerParameterValue(declaration, owner)
+        return super.lowerParameterValue(ownerContext)
     }
 
-    override fun lowerHeritageNode(heritageClause: HeritageNode, ownerContext: OwnerContext): HeritageNode {
+    override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageNode>): HeritageNode {
+        val heritageClause = ownerContext.node
         val name = heritageClause.name
 
         if (name is IdentifierNode) {
@@ -72,14 +77,14 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             }
         }
 
-        return super.lowerHeritageNode(heritageClause, ownerContext)
+        return super.lowerHeritageNode(ownerContext)
     }
 }
 
 fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
 
     val declarationContext = DeclarationResolver()
-    declarationContext.process(this, ModuleModelOwnerContext(this, null))
+    declarationContext.process(this, NodeOwner(this, null))
 
-    return SpecifyTypeNodes(declarationContext).lowerRoot(this, ModuleModelOwnerContext(this, null))
+    return SpecifyTypeNodes(declarationContext).lowerRoot(this, NodeOwner(this, null))
 }
