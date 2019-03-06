@@ -23,25 +23,21 @@ open class StandardTests {
 
     }
 
-    protected fun assertContentEquals(name: String, output: (String, InputTranslator) -> String? = ::output) {
+    protected fun assertContentEquals(descriptor: String, tsPath: String, ktPath: String, output: (String, InputTranslator) -> String? = ::output) {
 
-        val resourceDirectory = File("./test/data")
-        val fileNameSource = resourceDirectory.resolve("${name}.d.ts").absolutePath
+        val targetShortName = "${descriptor}.d.kt"
 
-        val targetShortName = "${name}.d.kt"
-        val fileNameTarget = resourceDirectory.resolve(targetShortName)
-
-        val output = output(fileNameSource, translator)
+        val translated = output(tsPath, translator)
         val outputDirectory = File("./build/tests/out")
-        output?.let {
+        translated?.let {
             val outputFile = outputDirectory.resolve(targetShortName)
             outputFile.parentFile.mkdirs()
-            outputFile.writeText(output)
+            outputFile.writeText(translated)
         }
 
         assertEquals(
-                output,
-                fileNameTarget.readText().trimEnd()
+                translated,
+                File(ktPath).readText().trimEnd()
         )
     }
 
