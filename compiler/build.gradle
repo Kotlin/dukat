@@ -2,6 +2,10 @@ plugins {
   id("kotlin")
 }
 
+configurations {
+  toDownload
+}
+
 sourceSets {
   main.kotlin.srcDirs = ['src']
   //main.resources.srcDirs = ["${project.buildDir}/resources"]
@@ -44,8 +48,11 @@ dependencies {
   testImplementation "org.junit.platform:junit-platform-runner:1.4.0-M1"
   testImplementation "org.junit.platform:junit-platform-suite-api:1.4.0-M1"
 
+  testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
   compile(project(path: ':ts', configuration: 'dukatTsResources'))
+
+  toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
 
 
@@ -63,3 +70,11 @@ task propagateToIdeaRuntime(type: Copy) {
 }
 
 compileTestKotlin.dependsOn = ["propagateToIdeaRuntime"]
+
+task download(type: Copy) {
+  from configurations.toDownload
+  into "${project.buildDir}/lib"
+  rename "kotlin-stdlib-js-1.3.21.jar", "kotlin-stdlib-js.jar"
+}
+
+test.dependsOn(download)
