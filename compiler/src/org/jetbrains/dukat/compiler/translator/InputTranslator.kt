@@ -55,6 +55,7 @@ private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRoot
 
 interface InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
+    fun release()
 
     fun lower(documentRoot: SourceFileDeclaration): ModuleModel {
         val myAstContext = AstContext()
