@@ -3,7 +3,9 @@ package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -34,3 +36,5 @@ private class TypeNodesLowering() : ParameterValueLowering {
 fun DocumentRootNode.introduceTypeNodes(): DocumentRootNode {
     return TypeNodesLowering().lowerDocumentRoot(this)
 }
+
+fun SourceSetNode.introduceTypeNodes() = transform { it.introduceTypeNodes() }

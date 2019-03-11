@@ -8,6 +8,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -94,3 +95,5 @@ fun PackageDeclaration.generateInterfaceReferences(): PackageDeclaration {
 }
 
 fun SourceFileDeclaration.generateInterfaceReferences() = copy(root = root.generateInterfaceReferences())
+
+fun SourceSetDeclaration.generateInterfaceReferences() = copy(sources = sources.map(SourceFileDeclaration::generateInterfaceReferences))

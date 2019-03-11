@@ -5,6 +5,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
 
@@ -45,3 +46,5 @@ fun PackageDeclaration.filterOutNonDeclarations(isSubModule: Boolean): PackageDe
 }
 
 fun SourceFileDeclaration.filterOutNonDeclarations() = copy(root = root.filterOutNonDeclarations(false))
+
+fun SourceSetDeclaration.filterOutNonDeclarations() = copy(sources = sources.map(SourceFileDeclaration::filterOutNonDeclarations))

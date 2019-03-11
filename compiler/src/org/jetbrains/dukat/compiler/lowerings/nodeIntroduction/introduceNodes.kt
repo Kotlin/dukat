@@ -19,6 +19,8 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
@@ -43,6 +45,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -439,5 +442,8 @@ private class LowerDeclarationsToNodes {
 
 fun PackageDeclaration.introduceNodes() = LowerDeclarationsToNodes().lowerDocumentRoot(this, null)
 
-fun SourceFileDeclaration.introduceNodes() = root.introduceNodes()
+fun SourceFileDeclaration.introduceNodes() =
+        SourceFileNode(fileName, root.introduceNodes(), referencedFiles.map {referencedFile -> IdentifierNode(referencedFile.value)})
 
+fun SourceSetDeclaration.introduceNodes() =
+    SourceSetNode(sources = sources.map(SourceFileDeclaration::introduceNodes))

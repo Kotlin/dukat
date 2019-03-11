@@ -3,6 +3,8 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 
 fun DocumentRootNode.lowerConstructors(): DocumentRootNode {
     val loweredDeclarations = declarations.map { declaration ->
@@ -21,3 +23,6 @@ fun DocumentRootNode.lowerConstructors(): DocumentRootNode {
 
     return copy(declarations = loweredDeclarations)
 }
+
+
+fun SourceSetNode.lowerConstructors() = transform { it.lowerConstructors() }

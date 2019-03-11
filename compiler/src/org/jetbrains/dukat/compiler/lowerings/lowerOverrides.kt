@@ -7,8 +7,10 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -162,3 +164,5 @@ fun DocumentRootNode.lowerOverrides(astContext: AstContext): DocumentRootNode {
 
     return copy(declarations = loweredDeclarations)
 }
+
+fun SourceSetNode.lowerOverrides(astContext: AstContext) = transform { it.lowerOverrides(astContext) }

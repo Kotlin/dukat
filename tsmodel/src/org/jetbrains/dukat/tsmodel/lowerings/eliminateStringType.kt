@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -20,3 +21,5 @@ fun PackageDeclaration.eliminateStringType(): PackageDeclaration {
 }
 
 fun SourceFileDeclaration.eliminateStringType() = copy(root = root.eliminateStringType())
+
+fun SourceSetDeclaration.eliminateStringType() = copy(sources = sources.map(SourceFileDeclaration::eliminateStringType))

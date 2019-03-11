@@ -5,6 +5,8 @@ import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
 import org.jetbrains.dukat.ast.model.model.HeritageModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 
 
@@ -59,3 +61,5 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
 
     return copy(declarations = declarationsMerged, sumbodules = sumbodules.map(ModuleModel::mergeVarsAndInterfaces))
 }
+
+fun SourceSetModel.mergeVarsAndInterfaces() = transform { it.mergeVarsAndInterfaces() }

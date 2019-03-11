@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 
 
 private fun ModuleModel.merge(module: ModuleModel): ModuleModel {
@@ -33,3 +35,5 @@ fun ModuleModel.mergeModules(): ModuleModel {
 
     return copy(sumbodules = submodulesResolved)
 }
+
+fun SourceSetModel.mergeModules() = transform { it.mergeModules() }

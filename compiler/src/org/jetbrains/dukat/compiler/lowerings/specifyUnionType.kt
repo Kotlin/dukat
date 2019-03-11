@@ -9,9 +9,11 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -132,3 +134,5 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
 fun DocumentRootNode.specifyUnionType(): DocumentRootNode {
     return SpecifyUnionTypeLowering().lowerDocumentRoot(this)
 }
+
+fun SourceSetNode.specifyUnionType(): SourceSetNode = transform { it.specifyUnionType() }

@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
@@ -88,3 +90,5 @@ fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
 
     return SpecifyTypeNodes(declarationContext).lowerRoot(this, NodeOwner(this, null))
 }
+
+fun SourceSetModel.specifyTypeNodesWithModuleData() = transform { it.specifyTypeNodesWithModuleData() }

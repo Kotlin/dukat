@@ -1,9 +1,11 @@
 package org.jetbrains.dukat.compiler.translator
 
-import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
@@ -31,7 +33,6 @@ import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNode
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
@@ -53,11 +54,13 @@ private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRoot
     return this
 }
 
+private fun SourceSetNode.updateContext(astContext: AstContext) = transform { it.updateContext(astContext) }
+
 interface InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
     fun release()
 
-    fun lower(documentRoot: SourceFileDeclaration): ModuleModel {
+    fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
         val myAstContext = AstContext()
 
         return documentRoot

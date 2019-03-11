@@ -4,6 +4,8 @@ import org.jetbrains.dukat.ast.model.model.ClassLikeModel
 import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -131,3 +133,6 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
         sumbodules = submodulesResolved
     )
 }
+
+
+fun SourceSetModel.mergeClassesAndInterfaces() = transform { it.mergeClassesAndInterfaces() }

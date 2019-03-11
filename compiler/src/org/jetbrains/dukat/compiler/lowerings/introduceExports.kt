@@ -5,7 +5,9 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
@@ -179,3 +181,5 @@ fun DocumentRootNode.introduceExports(): DocumentRootNode {
 
     return docRoot.turnOff(turnOffData).markModulesAsExported(exportedModulesData)
 }
+
+fun SourceSetNode.introduceExports() = transform { it.introduceExports() }

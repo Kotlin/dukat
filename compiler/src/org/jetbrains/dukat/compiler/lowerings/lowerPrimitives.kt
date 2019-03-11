@@ -2,10 +2,12 @@ package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
@@ -66,3 +68,5 @@ private class PrimitiveClassLowering : ParameterValueLowering {
 fun DocumentRootNode.lowerPrimitives(): DocumentRootNode {
     return PrimitiveClassLowering().lowerDocumentRoot(this)
 }
+
+fun SourceSetNode.lowerPrimitives() = transform { it.lowerPrimitives() }

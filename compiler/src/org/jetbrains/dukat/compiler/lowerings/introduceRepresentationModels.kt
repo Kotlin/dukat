@@ -4,6 +4,8 @@ import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceFileModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -14,6 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
@@ -113,3 +116,9 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
             sumbodules = submodules
     )
 }
+
+fun SourceSetNode.introduceRepresentationModels() = SourceSetModel(
+    sources = sources.map { source ->
+        SourceFileModel(source.fileName, source.root.introduceRepresentationModels(), source.referencedFiles)
+    }
+)

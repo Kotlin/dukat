@@ -6,7 +6,9 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.Declaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -113,3 +115,5 @@ fun DocumentRootNode.rearrangeGeneratedEntities(): DocumentRootNode {
 
     return copy(declarations = declarationsRearranged)
 }
+
+fun SourceSetNode.rearrangeGeneratedEntities() = transform { it.rearrangeGeneratedEntities() }

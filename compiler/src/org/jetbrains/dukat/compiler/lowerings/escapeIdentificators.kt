@@ -4,7 +4,9 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -94,3 +96,5 @@ private class EscapeIdentificators : ParameterValueLowering {
 fun DocumentRootNode.escapeIdentificators(): DocumentRootNode {
     return EscapeIdentificators().lowerDocumentRoot(this)
 }
+
+fun SourceSetNode.escapeIdentificators() = transform { it.escapeIdentificators() }

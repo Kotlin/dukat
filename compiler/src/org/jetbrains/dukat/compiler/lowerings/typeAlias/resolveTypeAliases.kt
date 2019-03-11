@@ -4,8 +4,10 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -69,3 +71,5 @@ fun DocumentRootNode.resolveTypeAliases(): DocumentRootNode {
     registerTypeAliases(astContext)
     return LowerTypeAliases(astContext).lowerDocumentRoot(this)
 }
+
+fun SourceSetNode.resolveTypeAliases() = transform { it.resolveTypeAliases() }

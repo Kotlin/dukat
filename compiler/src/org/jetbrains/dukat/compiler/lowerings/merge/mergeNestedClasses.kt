@@ -2,6 +2,8 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
@@ -99,3 +101,5 @@ fun ModuleModel.mergeNestedClasses(): ModuleModel {
 
     return IntroduceNestedClasses(classContext).lowerRoot(mergedModules, NodeOwner(mergedModules, null))
 }
+
+fun SourceSetModel.mergeNestedClasses() = transform { it.mergeNestedClasses() }

@@ -7,6 +7,8 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
@@ -65,3 +67,5 @@ private class LowerQualifiedDeclarations(private val moduleNode: DocumentRootNod
 fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
     return LowerQualifiedDeclarations(this).lower()
 }
+
+fun SourceSetNode.introduceQualifiedNode() = transform { it.introduceQualifiedNode() }

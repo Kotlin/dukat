@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.transform
 
 
 //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
@@ -41,3 +43,5 @@ fun DocumentRootNode.introduceModuleMetadata(): DocumentRootNode {
 
     return this
 }
+
+fun SourceSetNode.introduceModuleMetadata() = transform { it.introduceModuleMetadata() }

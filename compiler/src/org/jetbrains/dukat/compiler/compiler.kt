@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
 import org.jetbrains.dukat.ast.model.model.HeritageModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceFileModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
@@ -32,7 +33,6 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -527,12 +527,16 @@ fun compile(documentRoot: ModuleModel): String {
 
 fun output(fileName: String, translator: InputTranslator): String {
     val sourceSetDeclaration = translator.translateFile(fileName)
-    val sourcesMap = mutableMapOf<String, SourceFileDeclaration>()
-    sourceSetDeclaration.sources.map { sourceFileDeclaration ->
-       sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
+
+    val sourceSet =
+            translator.lower(sourceSetDeclaration)
+
+    val sourcesMap = mutableMapOf<String, SourceFileModel>()
+    sourceSet.sources.map { sourceFileDeclaration ->
+        sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
     }
 
-    val documentRoot =
-            translator.lower(sourcesMap.get(fileName)!!)
+
+    val documentRoot = sourcesMap.get(fileName)?.root!!
     return compile(documentRoot)
 }

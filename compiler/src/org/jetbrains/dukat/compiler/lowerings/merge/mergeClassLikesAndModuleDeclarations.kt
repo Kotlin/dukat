@@ -4,6 +4,8 @@ import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
+import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -151,3 +153,5 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
 
     return copy(declarations = mergedDeclarations, sumbodules = resolvedSubmodules)
 }
+
+fun SourceSetModel.mergeClassLikesAndModuleDeclarations() = transform { it.mergeClassLikesAndModuleDeclarations() }
