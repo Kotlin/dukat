@@ -93,8 +93,30 @@ open class StandardTests {
             outputFile.writeText(translated)
 
             val sourcePath = outputFile.absolutePath
-            //assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
+//            assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
         }
     }
+
+    protected fun assertContentCompiles(
+            descriptor: String,
+            tsPath: String,
+            output: (String, InputTranslator) -> String? = ::output
+    ) {
+
+        val targetShortName = "${descriptor}.d.kt"
+
+        val translated = output(tsPath, translator)
+
+        val outputDirectory = File("./build/tests/out")
+        translated?.let {
+            val outputFile = outputDirectory.resolve(targetShortName)
+            outputFile.parentFile.mkdirs()
+            outputFile.writeText(translated)
+
+            val sourcePath = outputFile.absolutePath
+            assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
+        }
+    }
+
 
 }

@@ -13,6 +13,13 @@ class GenerateCoreSetTests : StandardTests() {
         assertContentEquals(name, tsPath, ktPath)
     }
 
+    @DisplayName("core test set compile")
+    @ParameterizedTest(name="{0}")
+    @MethodSource("coreSet")
+    fun withValueSourceCompiled(name: String, tsPath: String, ktPath: String) {
+        assertContentCompiles(name, tsPath)
+    }
+
     companion object {
         fun fileSet(path: String): Array<Array<String>> {
             val d_ts_postfix = ".d.ts"
