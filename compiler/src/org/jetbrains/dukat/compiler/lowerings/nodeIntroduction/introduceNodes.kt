@@ -446,4 +446,6 @@ fun SourceFileDeclaration.introduceNodes() =
         SourceFileNode(fileName, root.introduceNodes(), referencedFiles.map {referencedFile -> IdentifierNode(referencedFile.value)})
 
 fun SourceSetDeclaration.introduceNodes() =
-    SourceSetNode(sources = sources.map(SourceFileDeclaration::introduceNodes))
+    SourceSetNode(sources = sources.map { source ->
+        source.introduceNodes()
+    })

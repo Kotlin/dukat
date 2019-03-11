@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -19,6 +20,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import java.io.File
 
 
 private fun MemberNode.isStatic() = when (this) {
@@ -119,6 +121,11 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
 
 fun SourceSetNode.introduceRepresentationModels() = SourceSetModel(
     sources = sources.map { source ->
-        SourceFileModel(source.fileName, source.root.introduceRepresentationModels(), source.referencedFiles)
+        val rootFile = File(source.fileName)
+        val fileName = rootFile.normalize().absolutePath
+        SourceFileModel(fileName, source.root.introduceRepresentationModels(), source.referencedFiles.map { referenceFile ->
+            val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
+            IdentifierNode(absolutePath)
+        })
     }
 )

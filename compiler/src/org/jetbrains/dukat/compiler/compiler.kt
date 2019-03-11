@@ -38,6 +38,7 @@ import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclarat
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
+import java.io.File
 
 private fun ParameterValueDeclaration.translateMeta(): String {
 
@@ -537,6 +538,8 @@ fun output(fileName: String, translator: InputTranslator): String {
     }
 
 
-    val documentRoot = sourcesMap.get(fileName)?.root!!
+    val fileNameNormalized = File(fileName).normalize().absolutePath
+
+    val documentRoot = sourcesMap.get(fileNameNormalized)?.root!!
     return compile(documentRoot)
 }
