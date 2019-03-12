@@ -44,12 +44,12 @@ interface NodeLowering {
     fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = ownerContext.node
         return when (declaration) {
-            is TypeNode -> lowerTypeNode(NodeOwner(declaration, ownerContext))
-            is FunctionTypeNode -> lowerFunctionNode(NodeOwner(declaration, ownerContext))
-            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(NodeOwner(declaration, ownerContext))
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(NodeOwner(declaration, ownerContext))
-            is UnionTypeNode -> lowerUnionTypeNode(NodeOwner(declaration, ownerContext))
-            is TupleDeclaration -> lowerTupleDeclaration(NodeOwner(declaration, ownerContext))
+            is TypeNode -> lowerTypeNode(ownerContext.wrap(declaration))
+            is FunctionTypeNode -> lowerFunctionNode(ownerContext.wrap(declaration))
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(ownerContext.wrap(declaration))
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(ownerContext.wrap(declaration))
+            is UnionTypeNode -> lowerUnionTypeNode(ownerContext.wrap(declaration))
+            is TupleDeclaration -> lowerTupleDeclaration(ownerContext.wrap(declaration))
             else -> declaration
         }
     }
@@ -58,8 +58,8 @@ interface NodeLowering {
     fun lowerClassLikeDeclaration(ownerContext: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
         val declaration = ownerContext.node
         return when (declaration) {
-            is InterfaceNode -> lowerInterfaceNode(NodeOwner(declaration, ownerContext))
-            is ClassNode -> lowerClassNode(NodeOwner(declaration, ownerContext))
+            is InterfaceNode -> lowerInterfaceNode(ownerContext.wrap(declaration))
+            is ClassNode -> lowerClassNode(ownerContext.wrap(declaration))
             else -> declaration
         }
     }
@@ -67,19 +67,19 @@ interface NodeLowering {
     fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
         val declaration = ownerContext.node
         return when (declaration) {
-            is VariableNode -> lowerVariableNode(NodeOwner(declaration, ownerContext))
-            is FunctionNode -> lowerFunctionNode(NodeOwner(declaration, ownerContext))
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(NodeOwner(declaration, ownerContext))
-            is DocumentRootNode -> lowerRoot(declaration, NodeOwner(declaration, ownerContext))
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(NodeOwner(declaration, ownerContext))
-            is ObjectNode -> lowerObjectNode(NodeOwner(declaration, ownerContext))
+            is VariableNode -> lowerVariableNode(ownerContext.wrap(declaration))
+            is FunctionNode -> lowerFunctionNode(ownerContext.wrap(declaration))
+            is ClassLikeDeclaration -> lowerClassLikeDeclaration(ownerContext.wrap(declaration))
+            is DocumentRootNode -> lowerRoot(declaration, ownerContext.wrap(declaration))
+            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(ownerContext.wrap(declaration))
+            is ObjectNode -> lowerObjectNode(ownerContext.wrap(declaration))
             else -> declaration.duplicate()
         }
     }
 
     fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, ownerContext: NodeOwner<DocumentRootNode>): List<TopLevelDeclaration> {
         return declarations.map { declaration ->
-            lowerTopLevelDeclaration(NodeOwner(declaration, ownerContext))
+            lowerTopLevelDeclaration(ownerContext.wrap(declaration))
         }
     }
 

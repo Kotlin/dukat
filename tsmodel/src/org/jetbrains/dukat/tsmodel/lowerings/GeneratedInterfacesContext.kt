@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -26,11 +28,20 @@ import org.jetbrains.dukat.tsmodel.types.canBeJson
 private data class InterfaceDeclarationKey(
         val members: List<MemberDeclaration>,
         val typeParameters: List<TypeParameterDeclaration>,
-        val parentEntities: List<HeritageClauseDeclaration>
+        val parentEntities: List<HeritageClauseDeclaration>,
+        val packageName: String
 )
 
 private fun FunctionTypeDeclaration.anonimize(): FunctionTypeDeclaration {
     return copy(parameters = parameters.map { parameter -> parameter.copy(name = "#") })
+}
+
+private fun NodeOwner<*>.findOwnerPackage(): PackageDeclaration {
+    val ownerPackage = getOwners().first() {
+        (it is NodeOwner<*>) && (it.node  is PackageDeclaration)
+    } as NodeOwner<PackageDeclaration>
+
+    return ownerPackage.node
 }
 
 private fun GeneratedInterfaceDeclaration.key(): InterfaceDeclarationKey {
@@ -47,7 +58,8 @@ private fun GeneratedInterfaceDeclaration.key(): InterfaceDeclarationKey {
 
         },
         typeParameters = typeParameters,
-        parentEntities = parentEntities
+        parentEntities = parentEntities,
+        packageName = packageOwner.packageName
     )
 }
 
@@ -59,7 +71,8 @@ class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<String, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
 
-    fun generateInterface(declaration: ParameterValueDeclaration, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
+    fun generateInterface(owner: NodeOwner<ParameterValueDeclaration>, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
+        val declaration = owner.node
         val typeParamsSet = typeParameters.map { it.name }.toSet()
 
         return when (declaration) {
@@ -69,15 +82,15 @@ class GeneratedInterfacesContext {
                 } else if (declaration.members.isEmpty()) {
                     TypeDeclaration("Any", emptyList())
                 } else {
-                    val referenceNode = registerObjectLiteralDeclaration(declaration, ownerUID, typeParamsSet)
+                    val referenceNode = registerObjectLiteralDeclaration(owner.wrap(declaration), ownerUID, typeParamsSet)
                     referenceNode
                 }
             }
             is UnionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(param, ownerUID, typeParameters) } )
+                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) } )
             }
             is IntersectionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(param, ownerUID, typeParameters) } )
+                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) } )
             }
             else -> declaration
         }
@@ -93,46 +106,47 @@ class GeneratedInterfacesContext {
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberDeclaration {
+    fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberDeclaration {
+        val declaration = owner.node
         return when (declaration) {
             is CallSignatureDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
                 declaration.copy(
                         parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(param.type, ownerUid, typeParameters))
+                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
                         },
-                        type = generateInterface(declaration.type, ownerUid, typeParameters)
+                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
                 )
             }
             is ConstructorDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
                 declaration.copy(
                         parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(param.type, ownerUid, typeParameters))
+                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
                         }
                 )
 
             }
             is PropertyDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(type = generateInterface(declaration.type, ownerUid, typeParameters))
+                declaration.copy(type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters))
             }
             is MethodSignatureDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
                 declaration.copy(
                         parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(param.type, ownerUid, typeParameters))
+                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
                         },
-                        type = generateInterface(declaration.type, ownerUid, typeParameters)
+                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
                 )
             }
             is FunctionDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
                 declaration.copy(
                         parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(param.type, ownerUid, typeParameters))
+                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
                         },
-                        type = generateInterface(declaration.type, ownerUid, typeParameters)
+                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
                 )
             }
             else -> declaration
@@ -140,7 +154,7 @@ class GeneratedInterfacesContext {
     }
 
 
-    fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
+    private fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
 
         myGeneratedInterfaces.forEach { entry ->
             if (areIdentical(interfaceNode, entry.value)) {
@@ -158,7 +172,8 @@ class GeneratedInterfacesContext {
         }
     }
 
-    fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, uid: String, typeParamsSet: Set<String>): GeneratedInterfaceReferenceDeclaration {
+    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<String>): GeneratedInterfaceReferenceDeclaration {
+        val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 
         declaration.members.forEach { member ->
@@ -186,7 +201,7 @@ class GeneratedInterfacesContext {
         val generatedTypeParameters = typeParams.toList()
 
 
-        val members = declaration.members.map { member -> lowerMemberDeclaration(member, generatedUid, generatedTypeParameters) }
+        val members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member), generatedUid, generatedTypeParameters) }
 
         val name = "`T$${myGeneratedInterfaces.size}`"
         val interfaceNode =
@@ -195,7 +210,8 @@ class GeneratedInterfacesContext {
                         members = members,
                         typeParameters = generatedTypeParameters,
                         parentEntities = emptyList(),
-                        uid = generatedUid
+                        uid = generatedUid,
+                        packageOwner = owner.findOwnerPackage()
                 )
 
 
