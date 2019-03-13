@@ -26,6 +26,7 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
+import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -238,12 +239,13 @@ fun QualifiedStatementRightNode.translate(): String {
 }
 
 fun StatementCallNode.translate(): String {
-    return "${value}()"
+    return "${value}(${params.joinToString(", ") { it.value }})"
 }
 
 fun StatementNode.translate(): String {
     return when (this) {
         is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
+        is ReturnStatement -> "return ${statement.translate()}"
         else -> throw Exception("unkown StatementNode ${this}")
     }
 }

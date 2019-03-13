@@ -21,6 +21,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
+import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
@@ -166,11 +167,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun HeritageSymbolDeclaration.convert(): HeritageSymbolNode {
-        return when(this) {
+        return when (this) {
             is IdentifierDeclaration -> IdentifierNode(value)
             is PropertyAccessDeclaration -> PropertyAccessNode(
-                name = IdentifierNode(name.value),
-                expression = expression.convert()
+                    name = IdentifierNode(name.value),
+                    expression = expression.convert()
             )
             else -> throw Exception("unknown heritage symbol ${this}")
         }
@@ -179,8 +180,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     private fun convertToHeritageNodes(declarations: List<HeritageClauseDeclaration>): List<HeritageNode> {
         return declarations.map { declaration ->
             HeritageNode(
-                name = declaration.name.convert(),
-                typeArguments = declaration.typeArguments.map { typeArgument -> IdentifierNode(typeArgument.value) }
+                    name = declaration.name.convert(),
+                    typeArguments = declaration.typeArguments.map { typeArgument -> IdentifierNode(typeArgument.value) }
             )
         }
     }
@@ -339,13 +340,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     null,
                     listOf(
-                        QualifiedStatementNode(
-                        QualifiedStatementNode(
-                                    IdentifierNode("this"),
-                                    StatementCallNode("asDynamic")
-                            ),
-                            StatementCallNode(declaration.name)
-                        )
+                            QualifiedStatementNode(
+                                    QualifiedStatementNode(
+                                            IdentifierNode("this"),
+                                            StatementCallNode("asDynamic", emptyList())
+                                    ),
+                                    StatementCallNode(declaration.name, emptyList())
+                            )
                     ),
                     ""
             ))
@@ -359,6 +360,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     ""
             ))
             is IndexSignatureDeclaration -> listOf(
+
+                    // TODO: discuss what we actually gonna do when there's more than one key
+
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("get")),
                             declaration.indexTypes,
@@ -370,13 +374,25 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
-                            emptyList(),
+                            listOf(
+                                    ReturnStatement(
+                                            QualifiedStatementNode(
+                                                    QualifiedStatementNode(
+                                                            IdentifierNode("this"),
+                                                            StatementCallNode("asDynamic", emptyList())
+                                                    ),
+                                                    StatementCallNode("get", listOf(
+                                                            IdentifierNode(declaration.indexTypes.get(0).name)
+                                                    ))
+                                            )
+                                    )
+                            ),
                             ""
                     ),
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("set")),
                             declaration.indexTypes + listOf(ParameterDeclaration(
-                                "value", declaration.returnType, null, false, false
+                                    "value", declaration.returnType, null, false, false
                             )),
                             TypeNode("Unit", emptyList()),
                             emptyList(),
@@ -386,7 +402,17 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
-                            emptyList(),
+                            listOf(QualifiedStatementNode(
+                                    QualifiedStatementNode(
+                                            IdentifierNode("this"),
+                                            StatementCallNode("asDynamic", emptyList())
+                                    ),
+                                    StatementCallNode("set", listOf(
+                                            IdentifierNode(declaration.indexTypes.get(0).name),
+                                            IdentifierNode("value")
+                                    ))
+                            )
+                            ),
                             ""
                     )
             )
@@ -494,8 +520,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
 
     // TODO: introduce ModuleReferenceNode
-    private fun ModuleReferenceDeclaration.convert() : ModuleReferenceDeclaration {
-        return when(this) {
+    private fun ModuleReferenceDeclaration.convert(): ModuleReferenceDeclaration {
+        return when (this) {
             is IdentifierDeclaration -> IdentifierNode(value)
             else -> this
         }
@@ -547,12 +573,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
 private fun PackageDeclaration.introduceNodes(fileName: String) = LowerDeclarationsToNodes(fileName).lowerDocumentRoot(this, null)
 
-fun SourceFileDeclaration.introduceNodes(): SourceFileNode  {
+fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath
-    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map {referencedFile -> IdentifierNode(referencedFile.value)})
+    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map { referencedFile -> IdentifierNode(referencedFile.value) })
 }
 
 fun SourceSetDeclaration.introduceNodes() =
-    SourceSetNode(sources = sources.map { source ->
-        source.introduceNodes()
-    })
+        SourceSetNode(sources = sources.map { source ->
+            source.introduceNodes()
+        })
