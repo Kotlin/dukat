@@ -23,6 +23,11 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
+import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
+import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
@@ -215,6 +220,34 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
     return annotationTranslated
 }
 
+fun QualifiedStatementLeftNode.translate(): String {
+    return when(this) {
+        is IdentifierNode -> value
+        is StatementCallNode -> translate()
+        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
+        else -> throw Exception("unkown QualifiedStatementLeftNode ${this}")
+    }
+}
+
+fun QualifiedStatementRightNode.translate(): String {
+    return when(this) {
+        is IdentifierNode -> value
+        is StatementCallNode -> translate()
+        else -> throw Exception("unkown QualifiedStatementRightNode ${this}")
+    }
+}
+
+fun StatementCallNode.translate(): String {
+    return "${value}()"
+}
+
+fun StatementNode.translate(): String {
+    return when (this) {
+        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
+        else -> throw Exception("unkown StatementNode ${this}")
+    }
+}
+
 private fun FunctionNode.translate(): String {
     val returnType = type.translate()
 
@@ -226,7 +259,10 @@ private fun FunctionNode.translate(): String {
     val modifier = if (inline) "inline" else "external"
     val operator = if (operator) " operator" else ""
 
-    return ("${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType} = definedExternally")
+    val body = if (body.isEmpty()) { "= definedExternally" } else {
+        "{ ${body.joinToString { statementNode -> statementNode.translate() }} }"
+    }
+    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType} ${body}"
 }
 
 private fun MethodNode.translate(): List<String> {

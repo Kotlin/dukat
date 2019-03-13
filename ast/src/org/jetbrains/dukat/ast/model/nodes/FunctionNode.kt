@@ -20,5 +20,6 @@ data class FunctionNode(
         val operator: Boolean,
 
         var owner: DocumentRootNode?,
+        val body: List<StatementNode>,
         val uid: String
 ) : MemberDeclaration, TopLevelDeclaration, MergableNode, MemberNode

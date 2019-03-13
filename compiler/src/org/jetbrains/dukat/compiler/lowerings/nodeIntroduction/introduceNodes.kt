@@ -20,8 +20,10 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
@@ -304,6 +306,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 false,
                 false,
                 null,
+                emptyList(),
                 uid
         )
     }
@@ -335,6 +338,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     true,
                     false,
                     null,
+                    listOf(
+                        QualifiedStatementNode(
+                        QualifiedStatementNode(
+                                    IdentifierNode("this"),
+                                    StatementCallNode("asDynamic")
+                            ),
+                            StatementCallNode(declaration.name)
+                        )
+                    ),
                     ""
             ))
             is PropertyDeclaration -> listOf(VariableNode(
@@ -358,6 +370,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
+                            emptyList(),
                             ""
                     ),
                     FunctionNode(
@@ -373,6 +386,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
+                            emptyList(),
                             ""
                     )
             )
@@ -388,6 +402,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
+                            emptyList(),
                             ""
                     )
             )
