@@ -4,10 +4,12 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
@@ -43,7 +45,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                     uidTable.get(declaration.name)?.let { entity ->
                         when (entity) {
                             is FunctionNode -> {
-                                if (!entity.isExport) {
+                                if (!entity.export) {
                                     entity.annotations.add(defaultAnnotation)
                                 } else Unit
                             }
@@ -88,7 +90,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                                 turnOff.add(ownerModule.fullPackageName)
 
                                 ownerModule.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
-                                    submodule.packageName == entity.name
+                                    submodule.packageName == entity.name.translate()
                                 }?.let { eponymousDeclaration ->
                                     exportedModules.put(eponymousDeclaration.uid, ownerModule.qualifierName)
                                 }
@@ -114,7 +116,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
 
                             if (docRoot.uid == entity.owner?.uid) {
-                                entity.name = docRoot.qualifierName
+                                entity.name = IdentifierNode(docRoot.qualifierName)
                             }
 
                             if (docRoot.owner != null) {

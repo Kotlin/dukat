@@ -53,7 +53,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is PropertyNode -> lowerPropertyNode(NodeOwner(declaration, ownerContext))
             is ConstructorNode -> lowerConstructorNode(NodeOwner(declaration, ownerContext))
             else -> {
-                println("[WARN] skipping ${declaration}")
+                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

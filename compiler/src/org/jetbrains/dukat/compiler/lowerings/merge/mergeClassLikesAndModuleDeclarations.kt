@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 
@@ -23,7 +24,7 @@ private fun ModuleModel.canBeMerged(): Boolean {
 
 private fun VariableNode.convert(): MemberNode {
     return PropertyNode(
-            name = name,
+            name = name.translate(),
             type = type,
             typeParameters = emptyList(),
             owner = ROOT_CLASS_DECLARATION,
@@ -37,8 +38,9 @@ private fun VariableNode.convert(): MemberNode {
 }
 
 private fun FunctionNode.convert(): MemberNode {
+
     return MethodNode(
-            name = name,
+            name = name.translate(),
             parameters = parameters,
             type = type,
             typeParameters = typeParameters,

@@ -57,7 +57,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
             else -> {
-                println("[WARN] skipping ${declaration}")
+                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

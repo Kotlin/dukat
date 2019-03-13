@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.model.SourceSetModel
 import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.translate
 
 
 fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
@@ -23,8 +24,8 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
 
     declarations.forEach { declaration ->
         if (declaration is VariableNode) {
-            if (mergeMap.containsKey(declaration.name)) {
-                mergeMap[declaration.name] = declaration
+            if (mergeMap.containsKey(declaration.name.translate())) {
+                mergeMap[declaration.name.translate()] = declaration
             }
         }
     }
@@ -33,7 +34,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
     val declarationsMerged = declarations.flatMap { declaration ->
         when (declaration) {
             is VariableNode -> {
-                val correspondingInterface = mergeMap.get(declaration.name)
+                val correspondingInterface = mergeMap.get(declaration.name.translate())
                 if (correspondingInterface == null) {
                     listOf(declaration)
                 } else {

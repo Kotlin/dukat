@@ -9,8 +9,10 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -26,14 +28,22 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface NodeTypeLowering : NodeLowering {
 
-    fun lowerStringIdentificator(identificator: String): String {
+    fun lowerIdentificator(identificator: NameNode): NameNode {
+        return when(identificator) {
+            is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
+            is QualifiedNode -> identificator
+            else -> throw Exception("unknown NameNode ${identificator}")
+        }
+    }
+
+    fun lowerIdentificator(identificator: String): String {
         return identificator;
     }
 
     fun lowerMethodNode(ownerContext: NodeOwner<MethodNode>): MethodNode {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(ownerContext.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(ownerContext.wrap(constraint)) })
@@ -45,7 +55,7 @@ interface NodeTypeLowering : NodeLowering {
     fun lowerPropertyNode(ownerContext: NodeOwner<PropertyNode>): PropertyNode {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(ownerContext.wrap(declaration.type)),
                 typeParameters = declaration.typeParameters.map {
                     typeParameter -> lowerTypeParameter(ownerContext.wrap(typeParameter))
@@ -60,7 +70,7 @@ interface NodeTypeLowering : NodeLowering {
             is PropertyNode -> lowerPropertyNode(ownerContext.wrap(declaration))
             is ConstructorNode -> lowerConstructorNode(ownerContext.wrap(declaration))
             else -> {
-                println("[WARN] skipping ${declaration}")
+                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }
@@ -69,7 +79,7 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerFunctionNode(ownerContext: NodeOwner<FunctionNode>): FunctionNode {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(ownerContext.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(ownerContext.wrap(constraint)) })
@@ -81,7 +91,7 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerTypeParameter(ownerContext: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration {
         val declaration = ownerContext.node
         return declaration.copy(
-            name = lowerStringIdentificator(declaration.name),
+            name = lowerIdentificator(declaration.name),
             constraints = declaration.constraints.map { constraint -> lowerParameterValue(NodeOwner(constraint, ownerContext)) }
         )
     }
@@ -132,7 +142,7 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerParameterDeclaration(ownerContext: NodeOwner<ParameterDeclaration>): ParameterDeclaration {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(ownerContext.wrap(declaration.type))
         )
     }
@@ -140,7 +150,7 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerVariableNode(ownerContext: NodeOwner<VariableNode>): VariableNode {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(ownerContext.wrap(declaration.type))
         )
     }
@@ -162,7 +172,7 @@ interface NodeTypeLowering : NodeLowering {
         val declaration = ownerContext.node
 
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 members = declaration.members.map { member -> lowerMemberNode(ownerContext.wrap(member)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(ownerContext.wrap(heritageClause))
@@ -199,7 +209,7 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerClassNode(ownerContext: NodeOwner<ClassNode>): ClassNode {
         val declaration = ownerContext.node
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 members = declaration.members.map { member -> lowerMemberNode(NodeOwner(member, ownerContext)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(ownerContext.wrap(heritageClause))

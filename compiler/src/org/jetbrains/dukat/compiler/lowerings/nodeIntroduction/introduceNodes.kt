@@ -19,6 +19,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -219,7 +220,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         if (isExternalDefinition) {
-            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member) }
+            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, name) }
         }
 
         val declaration = InterfaceNode(
@@ -293,13 +294,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         return FunctionNode(
-                name,
+                IdentifierNode(name),
                 parameters,
                 type,
                 typeParameters,
                 mutableListOf(),
                 annotations,
                 hasExport,
+                false,
+                false,
                 null,
                 uid
         )
@@ -317,28 +320,77 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration): List<TopLevelDeclaration> {
+    fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration, name: String): List<TopLevelDeclaration> {
         val owner = ROOT_CLASS_DECLARATION
+
         return when (declaration) {
             is MethodSignatureDeclaration -> listOf(FunctionNode(
-                    declaration.name,
+                    QualifiedNode(IdentifierNode(name), IdentifierNode(declaration.name)),
                     declaration.parameters,
                     declaration.type,
                     declaration.typeParameters,
                     mutableListOf(),
                     mutableListOf(),
                     true,
-                    null,
-                    ""
-            ))
-            is PropertyDeclaration -> listOf(VariableNode(
-                    declaration.name,
-                    declaration.type,
-                    mutableListOf(),
+                    true,
                     false,
                     null,
                     ""
             ))
+            is PropertyDeclaration -> listOf(VariableNode(
+                    QualifiedNode(IdentifierNode(name), IdentifierNode(declaration.name)),
+                    declaration.type,
+                    mutableListOf(),
+                    false,
+                    true,
+                    null,
+                    ""
+            ))
+            is IndexSignatureDeclaration -> listOf(
+                    FunctionNode(
+                            QualifiedNode(IdentifierNode(name), IdentifierNode("get")),
+                            declaration.indexTypes,
+                            declaration.returnType.makeNullable(),
+                            emptyList(),
+                            mutableListOf(),
+                            mutableListOf(),
+                            true,
+                            true,
+                            true,
+                            null,
+                            ""
+                    ),
+                    FunctionNode(
+                            QualifiedNode(IdentifierNode(name), IdentifierNode("set")),
+                            declaration.indexTypes + listOf(ParameterDeclaration(
+                                "value", declaration.returnType, null, false, false
+                            )),
+                            TypeNode("Unit", emptyList()),
+                            emptyList(),
+                            mutableListOf(),
+                            mutableListOf(),
+                            true,
+                            true,
+                            true,
+                            null,
+                            ""
+                    )
+            )
+            is CallSignatureDeclaration -> listOf(
+                    FunctionNode(
+                            QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
+                            declaration.parameters,
+                            declaration.type,
+                            emptyList(),
+                            mutableListOf(),
+                            mutableListOf(),
+                            true,
+                            true,
+                            true,
+                            null,
+                            ""
+                    )
+            )
             else -> emptyList()
         }
     }
@@ -375,9 +427,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
             if (type.canBeJson()) {
                 VariableNode(
-                        declaration.name,
+                        IdentifierNode(declaration.name),
                         TypeNode("Json", emptyList()),
                         mutableListOf(),
+                        false,
                         false,
                         null,
                         declaration.uid
@@ -400,9 +453,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             }
         } else {
             VariableNode(
-                    declaration.name,
+                    IdentifierNode(declaration.name),
                     type,
                     mutableListOf(),
+                    false,
                     false,
                     null,
                     declaration.uid

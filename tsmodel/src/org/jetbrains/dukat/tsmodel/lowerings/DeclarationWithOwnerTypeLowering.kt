@@ -62,7 +62,7 @@ interface DeclarationWithOwnerTypeLowering : DeclarationWithOwnerLowering {
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(owner.wrap(declaration))
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(owner.wrap(declaration))
             else -> {
-                println("[WARN] skipping ${declaration}")
+                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

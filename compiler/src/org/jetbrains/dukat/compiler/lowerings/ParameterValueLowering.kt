@@ -9,8 +9,10 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -25,13 +27,21 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface ParameterValueLowering : Lowering {
 
-    fun lowerStringIdentificator(identificator: String): String {
+    fun lowerIdentificator(identificator: NameNode): NameNode {
+        return when(identificator) {
+            is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
+            is QualifiedNode -> identificator
+            else -> throw Exception("unknown NameNode ${identificator}")
+        }
+    }
+
+    fun lowerIdentificator(identificator: String): String {
         return identificator;
     }
 
     fun lowerMethodNode(declaration: MethodNode): MethodNode {
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
@@ -42,7 +52,7 @@ interface ParameterValueLowering : Lowering {
 
     fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
@@ -54,7 +64,7 @@ interface ParameterValueLowering : Lowering {
             is PropertyNode -> lowerPropertyNode(declaration)
             is ConstructorNode -> lowerConstructorNode(declaration)
             else -> {
-                println("[WARN] skipping ${declaration}")
+                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }
@@ -62,7 +72,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerFunctionNode(declaration: FunctionNode): FunctionNode {
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
@@ -73,7 +83,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(
-            name = lowerStringIdentificator(declaration.name),
+            name = lowerIdentificator(declaration.name),
             constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) }
         )
     }
@@ -107,13 +117,13 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(declaration.type)
         )
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(name = lowerStringIdentificator(declaration.name),type = lowerParameterValue(declaration.type))
+        return declaration.copy(name = lowerIdentificator(declaration.name),type = lowerParameterValue(declaration.type))
     }
 
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
@@ -129,7 +139,7 @@ interface ParameterValueLowering : Lowering {
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
 
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(heritageClause)
@@ -162,7 +172,7 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
         return declaration.copy(
-                name = lowerStringIdentificator(declaration.name),
+                name = lowerIdentificator(declaration.name),
                 members = declaration.members.map { member -> lowerMemberNode(member) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(heritageClause)

@@ -30,6 +30,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -222,7 +223,10 @@ private fun FunctionNode.translate(): String {
         typeParams = " " + typeParams
     }
 
-    return ("${translateAnnotations(annotations)}external fun${typeParams} ${name}(${translateParameters(parameters)}): ${returnType} = definedExternally")
+    val modifier = if (inline) "inline" else "external"
+    val operator = if (operator) " operator" else ""
+
+    return ("${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType} = definedExternally")
 }
 
 private fun MethodNode.translate(): List<String> {
@@ -243,17 +247,17 @@ private fun MethodNode.translate(): List<String> {
     val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
 
     return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}${type.translateSignatureMeta()}${definedExternallyClause}")
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}${type.translateSignatureMeta()}${definedExternallyClause}")
 }
 
 private fun ConstructorNode.translate(): List<String> {
-    var typeParams = translateTypeParameters(typeParameters)
+    val typeParams = translateTypeParameters(typeParameters)
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
 private fun VariableNode.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
-    return "${translateAnnotations(annotations)}external ${variableKeyword} ${name}: ${type.translate()}${type.translateSignatureMeta()} = definedExternally"
+    val modifier = if (inline) "inline" else "external"
+    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword} ${name.translate()}: ${type.translate()}${type.translateSignatureMeta()} = definedExternally"
 }
 
 private fun EnumNode.translate(): String {

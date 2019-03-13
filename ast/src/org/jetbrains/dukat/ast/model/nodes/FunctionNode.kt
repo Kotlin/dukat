@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class FunctionNode(
-        val name: String,
+        val name: NameNode,
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
@@ -15,7 +15,9 @@ data class FunctionNode(
         val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
         val annotations: MutableList<AnnotationNode>,
 
-        val isExport: Boolean,
+        val export: Boolean,
+        val inline: Boolean,
+        val operator: Boolean,
 
         var owner: DocumentRootNode?,
         val uid: String

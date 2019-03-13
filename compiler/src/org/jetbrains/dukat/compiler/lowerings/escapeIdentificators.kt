@@ -43,7 +43,7 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     private fun IdentifierNode.escape(): IdentifierNode {
         return IdentifierNode(
-                value.split(".").joinToString(".") { lowerStringIdentificator(it) }
+                value.split(".").joinToString(".") { lowerIdentificator(it) }
         )
     }
 
@@ -64,7 +64,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         }
     }
 
-    override fun lowerStringIdentificator(identificator: String): String {
+    override fun lowerIdentificator(identificator: String): String {
         return escapeIdentificator(identificator)
     }
 
@@ -87,7 +87,7 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
         return documentRoot.copy(
-                fullPackageName = documentRoot.fullPackageName.split(".").joinToString(".") { lowerStringIdentificator(it) },
+                fullPackageName = documentRoot.fullPackageName.split(".").joinToString(".") { lowerIdentificator(it) },
                 declarations = lowerTopLevelDeclarations(documentRoot.declarations)
         )
     }

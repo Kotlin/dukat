@@ -9,7 +9,7 @@ data class QualifiedNode(
 
     override var nullable: Boolean = false,
     override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftNode, TypeNodeValue
+) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftNode, TypeNodeValue, NameNode
 
 
 fun IdentifierNode.appendLeft(qualifiedLeftNode: QualifiedLeftNode): QualifiedNode {

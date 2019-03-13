@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 
 private data class MethodNodeKey(val name:String, val params: List<ParameterDeclaration>)
@@ -44,7 +45,7 @@ private class IntroduceMissedOverloads : ParameterValueLowering {
         return if (nonOptionalHead.size != parameters.size) {
             val missedMethodNode = copy(name = name, parameters = nonOptionalHead)
             val missedMethodKey = MethodNodeKey(
-                    missedMethodNode.name,
+                    missedMethodNode.name.translate(),
                     missedMethodNode.parameters.map { it.copy(name = "x")}
             )
             if (resolvedMembers.contains(missedMethodKey)) {
