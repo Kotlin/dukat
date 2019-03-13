@@ -1,4 +1,5 @@
 declare function uid(): string;
+declare function readResourceStream(name: string): string;
 
 // Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
 declare namespace ts {
@@ -10,7 +11,11 @@ class AstConverter {
 
     private exportContext = new ExportContext();
 
-    constructor(private typeChecker: ts.TypeChecker, private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined, private astFactory: AstFactory) {
+    constructor(
+        private typeChecker: ts.TypeChecker,
+        private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
+        private declarationResolver: (node: ts.Node, fileName: string) => ts.DefinitionInfo[] | undefined,
+        private astFactory: AstFactory) {
     }
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
@@ -29,7 +34,7 @@ class AstConverter {
         let packageNameFragments = sourceFile.fileName.split("/");
         let resourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
-        const declarations = this.convertStatements(sourceFile.statements, resourceName);
+        const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
 
         let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), uid(), resourceName);
         let declaration = this.astFactory.createSourceFileDeclaration(
@@ -499,6 +504,7 @@ class AstConverter {
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
             this.convertTypeParams(typeParams),
             [],
+            [],
             this.exportContext.getUID(typeLiteral)
         );
     }
@@ -617,7 +623,7 @@ class AstConverter {
         return  parentEntities
     }
 
-    private * convertStatement(statement: ts.Node, resourceName: string): IterableIterator<Declaration> {
+    private * convertStatement(statement: ts.Node, resourceName: string, sourceFileName: string): IterableIterator<Declaration> {
         if (ts.isEnumDeclaration(statement)) {
             let enumTokens = statement.members.map(member =>
                 this.astFactory.createEnumTokenDeclaration(
@@ -669,17 +675,26 @@ class AstConverter {
                 yield convertedFunctionDeclaration
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
-            let parentEntities: Array<InterfaceDeclaration> = [];
+            let definitionInfos = this.declarationResolver(statement.name, sourceFileName);
 
-            yield this.astFactory.createInterfaceDeclaration(
+
+            var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+            if (definitionInfos) {
+                definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
+                    return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
+                });
+            }
+
+                yield this.astFactory.createInterfaceDeclaration(
                     statement.name.getText(),
                     this.convertMembersToInterfaceMemberDeclarations(statement.members),
                     this.convertTypeParams(statement.typeParameters),
                     this.convertHeritageClauses(statement.heritageClauses),
+                    definitionsInfoDeclarations,
                     this.exportContext.getUID(statement)
                 )
         } else if (ts.isModuleDeclaration(statement)) {
-            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
+            for (let moduleDeclaration of this.convertModule(statement, resourceName, sourceFileName)) {
                 yield moduleDeclaration;
             }
         } else if (ts.isExportAssignment(statement)) {
@@ -719,10 +734,10 @@ class AstConverter {
     }
 
 
-    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: string) : Array<Declaration> {
+    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: string, sourceFileName: string) : Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
-            for (let decl of this.convertStatement(statement, resourceName)) {
+            for (let decl of this.convertStatement(statement, resourceName, sourceFileName)) {
                 this.registerDeclaration(decl, declarations)
             }
         }
@@ -731,17 +746,17 @@ class AstConverter {
     }
 
 
-    convertModule(module: ts.ModuleDeclaration, resourceName: string): Array<Declaration> {
+    convertModule(module: ts.ModuleDeclaration, resourceName: string, sourceFileName: string): Array<Declaration> {
         const declarations: Declaration[] = [];
         if (module.body) {
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
             if (ts.isModuleBlock(body)) {
-                let moduleDeclarations = this.convertStatements(body.statements, resourceName);
+                let moduleDeclarations = this.convertStatements(body.statements, resourceName, sourceFileName);
                 this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, uid, resourceName), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName), modifiers, uid, resourceName), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, uid, resourceName), declarations);
             }
         }
         return declarations

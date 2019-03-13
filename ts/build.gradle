@@ -27,6 +27,11 @@ task createJar(type: Zip) {
   from("${project.projectDir}/node_modules/typescript/lib/tsserverlibrary.js") {
     into 'ts'
   }
+
+  from("${project.projectDir}/node_modules/typescript/lib") {
+    include "**/*.d.ts"
+    into 'ts'
+  }
 }
 
 configurations {

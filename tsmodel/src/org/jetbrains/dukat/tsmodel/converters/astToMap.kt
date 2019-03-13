@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -90,7 +91,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is IdentifierDeclaration -> listOf(::value).convert(this)
         is ImportEqualsDeclaration -> listOf(::name, ::moduleReference).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
-        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::uid).convert(this)
+        is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::definitionsInfo, ::uid).convert(this)
         is IntersectionTypeDeclaration -> listOf(::params).convert(this)
         is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
         is ModifierDeclaration -> listOf(::token).convert(this)
@@ -109,6 +110,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
         is UnionTypeDeclaration -> listOf(::params).convert(this)
         is VariableDeclaration -> listOf(::name, ::type, ::modifiers, ::uid).convert(this)
+        is DefinitionInfoDeclaration -> listOf(::fileName).convert(this)
         else -> throw Exception("can not map ${this}")
     }
 }

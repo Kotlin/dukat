@@ -37,7 +37,7 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
     override fun next() = get(myCounter++)
 }
 
-private fun <T:AstNode> V8Array.toAst(): List<T> {
+private fun <T : AstNode> V8Array.toAst(): List<T> {
     return toArray().map { it.toAst<T>() }
 }
 
@@ -45,31 +45,25 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     private fun AstNode.toV8() = V8ObjectUtils.toV8Object(runtime, astToMap())
 
-    fun createTupleDeclaration(params: V8Array)
-        = astFactory.createTupleDeclaration(params.toAst()).toV8()
+    fun createDefinitionInfoDeclaration(fileName: String) = astFactory.createDefinitionInfoDeclaration(fileName).toV8()
 
-    fun createImportEqualsDeclaration(name: String, moduleReference: V8Object)
-        =  astFactory.createImportEqualsDeclaration(name, moduleReference.toAst()).toV8()
+    fun createTupleDeclaration(params: V8Array) = astFactory.createTupleDeclaration(params.toAst()).toV8()
 
-    fun createIdentifierDeclaration(value: String)
-            = astFactory.createIdentifierDeclaration(value).toV8()
+    fun createImportEqualsDeclaration(name: String, moduleReference: V8Object) = astFactory.createImportEqualsDeclaration(name, moduleReference.toAst()).toV8()
 
-    fun createQualifiedNameDeclaration(left: V8Object, right: V8Object)
-            = astFactory.createQualifiedNameDeclaration(left.toAst(), right.toAst()).toV8()
+    fun createIdentifierDeclaration(value: String) = astFactory.createIdentifierDeclaration(value).toV8()
 
-    fun createThisTypeDeclaration()
-            = astFactory.createThisTypeDeclaration().toV8()
+    fun createQualifiedNameDeclaration(left: V8Object, right: V8Object) = astFactory.createQualifiedNameDeclaration(left.toAst(), right.toAst()).toV8()
 
-    fun createEnumDeclaration(name: String, values: V8Array): V8Object
-        =  astFactory.createEnumDeclaration(name, values.toAst()).toV8()
+    fun createThisTypeDeclaration() = astFactory.createThisTypeDeclaration().toV8()
 
-    fun createEnumTokenDeclaration(value: String, meta: String): V8Object
-        = astFactory.createEnumTokenDeclaration(value, meta).toV8()
+    fun createEnumDeclaration(name: String, values: V8Array): V8Object = astFactory.createEnumDeclaration(name, values.toAst()).toV8()
+
+    fun createEnumTokenDeclaration(value: String, meta: String): V8Object = astFactory.createEnumTokenDeclaration(value, meta).toV8()
 
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = astFactory.createExportAssignmentDeclaration(name, isExportEquals).toV8()
 
-    fun createPropertyAccessDeclaration(name: V8Object, expression: V8Object)
-        = astFactory.createPropertyAccessDeclaration(name.toAst(), expression.toAst()).toV8()
+    fun createPropertyAccessDeclaration(name: V8Object, expression: V8Object) = astFactory.createPropertyAccessDeclaration(name.toAst(), expression.toAst()).toV8()
 
     fun createHeritageClauseDeclaration(name: V8Object, typeArguments: V8Array, extending: Boolean) = astFactory.createHeritageClauseDeclaration(
             name.toAst(),
@@ -106,8 +100,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     }
 
 
-    fun createModifierDeclaration(token: String): V8Object
-            = astFactory.createModifierDeclaration(token).toV8()
+    fun createModifierDeclaration(token: String): V8Object = astFactory.createModifierDeclaration(token).toV8()
 
     fun createClassDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, modifiers: V8Array, uid: String): V8Object = astFactory.createClassDeclaration(
             name,
@@ -120,11 +113,12 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     fun createObjectLiteral(members: V8Array) = astFactory.createObjectLiteral(members.toAst()).toV8()
 
-    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, uid: String): V8Object = astFactory.createInterfaceDeclaration(
+    fun createInterfaceDeclaration(name: String, members: V8Array, typeParameters: V8Array, parentEntities: V8Array, definitionsInfo: V8Array, uid: String): V8Object = astFactory.createInterfaceDeclaration(
             name,
             members.toAst(),
             typeParameters.toAst(),
             parentEntities.toAst(),
+            definitionsInfo.toAst(),
             uid
     ).toV8()
 
@@ -188,8 +182,8 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
         ).toV8()
     }
 
-    fun createIntersectionTypeDeclaration(params: V8Array): V8Object  = astFactory.createIntersectionTypeDeclaration(params.toAst()).toV8()
-    fun createUnionTypeDeclaration(params: V8Array): V8Object  = astFactory.createUnionDeclaration(params.toAst()).toV8()
+    fun createIntersectionTypeDeclaration(params: V8Array): V8Object = astFactory.createIntersectionTypeDeclaration(params.toAst()).toV8()
+    fun createUnionTypeDeclaration(params: V8Array): V8Object = astFactory.createUnionDeclaration(params.toAst()).toV8()
     fun createTypeDeclaration(value: String, params: V8Array): V8Object =
             astFactory.createTypeDeclaration(value, params.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
 

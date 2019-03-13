@@ -14,15 +14,12 @@ import org.jetbrains.dukat.tsmodel.factory.AstFactory
 import java.util.*
 
 
-private fun readResource(name: String): String {
-    val resourceAsStream = object {}::class.java.classLoader.getResourceAsStream(name)
-    return resourceAsStream.bufferedReader().readText()
-}
 
 
 private fun InteropEngine.loadAstBuilder() {
-    eval(readResource("ts/tsserverlibrary.js"))
-    eval(readResource("js/dukat-ast-builder.js"))
+    val fileResolver = FileResolver()
+    eval(fileResolver.readResource("ts/tsserverlibrary.js"))
+    eval(fileResolver.readResource("js/dukat-ast-builder.js"))
 }
 
 private fun createNashornInterop(): InteropNashorn {

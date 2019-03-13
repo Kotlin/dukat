@@ -7,5 +7,6 @@ data class InterfaceDeclaration(
         val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
+        val definitionsInfo: List<DefinitionInfoDeclaration>,
         val uid: String
 ) : ClassLikeDeclaration

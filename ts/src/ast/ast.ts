@@ -5,6 +5,10 @@ declare interface AstNode {
 
 declare interface Declaration extends AstNode {}
 
+declare interface DefinitionInfoDeclaration extends AstNode {
+    fileName: string;
+}
+
 declare interface HeritageSymbol extends Declaration {}
 declare interface PropertyAccessDeclaration extends HeritageSymbol {}
 

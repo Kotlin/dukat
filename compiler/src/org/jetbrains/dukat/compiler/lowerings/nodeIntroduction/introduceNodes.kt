@@ -51,9 +51,10 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import java.io.File
 
 
-private class LowerDeclarationsToNodes {
+private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
@@ -212,7 +213,15 @@ private class LowerDeclarationsToNodes {
         return declaration
     }
 
-    private fun InterfaceDeclaration.convert(): InterfaceNode {
+    private fun InterfaceDeclaration.convert(): List<TopLevelDeclaration> {
+        val isExternalDefinition = definitionsInfo.any { definition ->
+            definition.fileName != fileName
+        }
+
+        if (isExternalDefinition) {
+            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member) }
+        }
+
         val declaration = InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
@@ -233,7 +242,7 @@ private class LowerDeclarationsToNodes {
             }
         }
 
-        return declaration
+        return listOf(declaration)
     }
 
 
@@ -308,6 +317,33 @@ private class LowerDeclarationsToNodes {
         }
     }
 
+    fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration): List<TopLevelDeclaration> {
+        val owner = ROOT_CLASS_DECLARATION
+        return when (declaration) {
+            is MethodSignatureDeclaration -> listOf(FunctionNode(
+                    declaration.name,
+                    declaration.parameters,
+                    declaration.type,
+                    declaration.typeParameters,
+                    mutableListOf(),
+                    mutableListOf(),
+                    true,
+                    null,
+                    ""
+            ))
+            is PropertyDeclaration -> listOf(VariableNode(
+                    declaration.name,
+                    declaration.type,
+                    mutableListOf(),
+                    false,
+                    null,
+                    ""
+            ))
+            else -> emptyList()
+        }
+    }
+
+
     fun lowerMemberDeclaration(declaration: MemberDeclaration): List<MemberNode> {
         val owner = ROOT_CLASS_DECLARATION
         return when (declaration) {
@@ -374,16 +410,16 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(declaration)
-            is FunctionDeclaration -> declaration.convert()
-            is ClassDeclaration -> declaration.convert(null)
+            is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
+            is FunctionDeclaration -> listOf(declaration.convert())
+            is ClassDeclaration -> listOf(declaration.convert(null))
             is InterfaceDeclaration -> declaration.convert()
-            is GeneratedInterfaceDeclaration -> declaration.convert()
-            is PackageDeclaration -> lowerDocumentRoot(declaration, null)
-            is EnumDeclaration -> declaration.convert()
-            else -> declaration
+            is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
+            is PackageDeclaration -> listOf(lowerDocumentRoot(declaration, null))
+            is EnumDeclaration -> listOf(declaration.convert())
+            else -> listOf(declaration)
         }
     }
 
@@ -397,7 +433,7 @@ private class LowerDeclarationsToNodes {
     }
 
     fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: DocumentRootNode?): DocumentRootNode {
-        val declarations = documentRoot.declarations.map { declaration -> lowerTopLevelDeclaration(declaration) }
+        val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration) }
 
         val imports = mutableMapOf<String, ModuleReferenceDeclaration>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
@@ -440,10 +476,12 @@ private class LowerDeclarationsToNodes {
     }
 }
 
-fun PackageDeclaration.introduceNodes() = LowerDeclarationsToNodes().lowerDocumentRoot(this, null)
+private fun PackageDeclaration.introduceNodes(fileName: String) = LowerDeclarationsToNodes(fileName).lowerDocumentRoot(this, null)
 
-fun SourceFileDeclaration.introduceNodes() =
-        SourceFileNode(fileName, root.introduceNodes(), referencedFiles.map {referencedFile -> IdentifierNode(referencedFile.value)})
+fun SourceFileDeclaration.introduceNodes(): SourceFileNode  {
+    val fileNameNormalized = File(fileName).normalize().absolutePath
+    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map {referencedFile -> IdentifierNode(referencedFile.value)})
+}
 
 fun SourceSetDeclaration.introduceNodes() =
     SourceSetNode(sources = sources.map { source ->

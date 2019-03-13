@@ -31,7 +31,7 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getDefaultLibFileName(options: ts.CompilerOptions): string {
-        return "";
+        return "lib.d.ts";
     }
 
     getCurrentDirectory(): string {
@@ -39,8 +39,12 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
-        var contents = this.fileResolver.resolve(fileName);
-        return fromString(contents);
+        try {
+            var contents = this.fileResolver.resolve(fileName);
+            return fromString(contents);
+        } catch (e) {
+            return fromString(readResourceStream(`ts/${fileName}`));
+        }
     }
 
     log(message: string): void {

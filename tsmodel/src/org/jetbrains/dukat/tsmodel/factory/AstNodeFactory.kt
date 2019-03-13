@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsmodel.factory
 
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -21,6 +22,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 interface AstNodeFactory<T> {
+
+    fun createDefinitionInfoDeclaration(fileName: String): T
 
     fun createTupleDeclaration(params: List<ParameterValueDeclaration>): T
 
@@ -79,6 +82,7 @@ interface AstNodeFactory<T> {
             members: List<MemberDeclaration>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
+            definitionsInfo: List<DefinitionInfoDeclaration>,
             uid: String
     ): T
 

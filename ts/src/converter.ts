@@ -52,7 +52,8 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
     } else {
         let astConverter: AstConverter = new AstConverter(
             program.getTypeChecker(),
-            (fileName) => program.getSourceFile(fileName),
+            (fileName: string) => program.getSourceFile(fileName),
+            (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
             nativeAstFactory == null ? new AstFactoryV8() : nativeAstFactory
         );
 

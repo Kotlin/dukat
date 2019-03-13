@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.Declaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -204,7 +205,11 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("members"),
                 getEntities("typeParameters"),
                 getEntities("parentEntities"),
+                getEntities("definitionsInfo"),
                 get("uid") as String
+        )
+        DefinitionInfoDeclaration::class.simpleName -> DefinitionInfoDeclaration(
+                get("fileName") as String
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(getEntities("members"))
         QualifiedNamedDeclaration::class.simpleName -> QualifiedNamedDeclaration(

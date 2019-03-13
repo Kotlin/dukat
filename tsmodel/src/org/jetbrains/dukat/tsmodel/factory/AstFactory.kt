@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -42,6 +43,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory : AstNodeFactory<AstNode> {
+
+    override fun createDefinitionInfoDeclaration(fileName: String): AstNode {
+        return DefinitionInfoDeclaration(fileName)
+    }
 
     override fun createTupleDeclaration(params: List<ParameterValueDeclaration>): AstNode {
         return TupleDeclaration(params)
@@ -105,7 +110,7 @@ class AstFactory : AstNodeFactory<AstNode> {
 
     override fun createObjectLiteral(members: List<MemberDeclaration>) = ObjectLiteralDeclaration(members)
 
-    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>, uid: String): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities, uid)
+    override fun createInterfaceDeclaration(name: String, members: List<MemberDeclaration>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String): AstNode = InterfaceDeclaration(name, members, typeParameters, parentEntities, definitionsInfo, uid)
 
     override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): AstNode = VariableDeclaration(name, type, modifiers, uid)
     override fun declareProperty(
