@@ -305,7 +305,11 @@ private fun VariableNode.translate(): String {
         "${getter} ${setter}"
     }
 
-    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword} ${name.translate()}: ${type.translate()}${type.translateSignatureMeta()} ${body}"
+    val typeParams = if (typeParameters.isEmpty()) {""} else {
+        " ${translateTypeParameters(typeParameters)}"
+    }
+
+    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${name.translate()}: ${type.translate()}${type.translateSignatureMeta()} ${body}"
 }
 
 private fun EnumNode.translate(): String {

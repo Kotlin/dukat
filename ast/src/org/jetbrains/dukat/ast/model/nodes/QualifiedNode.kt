@@ -98,7 +98,8 @@ fun QualifiedLeftNode.debugTranslate(): String {
     return when(this) {
         is IdentifierNode -> debugTranslate()
         is QualifiedNode -> debugTranslate()
-        else -> "unknown QualifiedLeftNode"
+        is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.name }}>"
+        else -> throw Exception("unknown QualifiedLeftNode")
     }
 }
 

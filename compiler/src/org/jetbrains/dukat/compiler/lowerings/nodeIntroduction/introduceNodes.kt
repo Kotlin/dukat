@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
@@ -52,6 +53,7 @@ import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -225,7 +227,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         if (isExternalDefinition) {
-            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, name) }
+            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this) }
         }
 
         val declaration = InterfaceNode(
@@ -326,34 +328,68 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration, name: String): List<TopLevelDeclaration> {
+    private fun mergeTypeParameters(interfaceTypeParams: List<TypeParameterDeclaration>, ownTypeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
+        val ownNames = ownTypeParams.map { typeParam -> typeParam.name }.toSet()
+        return interfaceTypeParams.map { typeParam ->
+            typeParam.copy(name = if(ownNames.contains(typeParam.name)) {
+                typeParam.name + "0"
+            } else {
+                typeParam.name
+            })
+        }
+    }
+
+    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration, interfaceDeclaration: InterfaceDeclaration): List<TopLevelDeclaration> {
         val owner = ROOT_CLASS_DECLARATION
+        val name = interfaceDeclaration.name
 
         return when (declaration) {
-            is MethodSignatureDeclaration -> listOf(FunctionNode(
-                    QualifiedNode(IdentifierNode(name), IdentifierNode(declaration.name)),
-                    declaration.parameters,
-                    declaration.type,
-                    declaration.typeParameters,
-                    mutableListOf(),
-                    mutableListOf(),
-                    true,
-                    true,
-                    false,
-                    null,
-                    listOf(
-                            QualifiedStatementNode(
-                                    QualifiedStatementNode(
-                                            IdentifierNode("this"),
-                                            StatementCallNode("asDynamic", emptyList())
-                                    ),
-                                    StatementCallNode(declaration.name, emptyList())
-                            )
-                    ),
-                    ""
-            ))
+            is MethodSignatureDeclaration -> {
+                val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
+
+                val bodyStatement = QualifiedStatementNode(
+                        QualifiedStatementNode(
+                                IdentifierNode("this"),
+                                StatementCallNode("asDynamic", emptyList())
+                        ),
+                        StatementCallNode(declaration.name, declaration.parameters.map { parameter -> IdentifierNode(parameter.name) })
+                )
+
+                listOf(FunctionNode(
+                        QualifiedNode(
+                                if (interfaceDeclaration.typeParameters.isEmpty()) {
+                                    IdentifierNode(name)
+                                } else {
+                                    GenericIdentifierNode(name, mergeTypeParameters)
+                                }
+                                , IdentifierNode(declaration.name)),
+                        declaration.parameters,
+                        declaration.type,
+                        mergeTypeParameters + declaration.typeParameters,
+                        mutableListOf(),
+                        mutableListOf(),
+                        true,
+                        true,
+                        false,
+                        null,
+                        listOf(
+                                if (declaration.type == TypeDeclaration("Unit", emptyList())) {
+                                    bodyStatement
+                                } else {
+                                    ReturnStatement(bodyStatement)
+                                }
+                        ),
+                        ""
+                ))
+            }
             is PropertyDeclaration -> listOf(VariableNode(
-                    QualifiedNode(IdentifierNode(name), IdentifierNode(declaration.name)),
+                    QualifiedNode(
+                            if (interfaceDeclaration.typeParameters.isEmpty()) {
+                                IdentifierNode(name)
+                            } else {
+                                GenericIdentifierNode(name, interfaceDeclaration.typeParameters)
+                            }, IdentifierNode(declaration.name)
+                    ),
                     if (declaration.optional) declaration.type.makeNullable() else declaration.type,
                     mutableListOf(),
                     false,
@@ -375,6 +411,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             ),
                             IdentifierNode("value")
                     ),
+                    interfaceDeclaration.typeParameters,
                     null,
                     ""
             ))
@@ -437,7 +474,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
-                            declaration.parameters.map{param ->
+                            declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind == TypeDeclaration("definedExternally", emptyList())) {
                                     ExpressionDeclaration(TypeDeclaration("null", emptyList()), null)
                                 } else {
@@ -459,7 +496,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                             IdentifierNode("this"),
                                             StatementCallNode("asDynamic", emptyList())
                                     ),
-                                    StatementCallNode("invoke", declaration.parameters.map {IdentifierNode(it.name)}))
+                                    StatementCallNode("invoke", declaration.parameters.map { IdentifierNode(it.name) }))
                             ),
                             ""
                     )
@@ -507,6 +544,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         null,
                         null,
+                        emptyList(),
                         null,
                         declaration.uid
                 )
@@ -535,6 +573,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     null,
                     null,
+                    emptyList(),
                     null,
                     declaration.uid
             )
