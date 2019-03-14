@@ -35,6 +35,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -428,8 +429,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                     StatementCallNode("set", listOf(
                                             IdentifierNode(declaration.indexTypes.get(0).name),
                                             IdentifierNode("value")
-                                    ))
-                            )
+                                    )))
                             ),
                             ""
                     )
@@ -437,7 +437,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
-                            declaration.parameters,
+                            declaration.parameters.map{param ->
+                                val initializer = if (param.initializer?.kind == TypeDeclaration("definedExternally", emptyList())) {
+                                    ExpressionDeclaration(TypeDeclaration("null", emptyList()), null)
+                                } else {
+                                    param.initializer
+                                }
+
+                                param.copy(initializer = initializer)
+                            },
                             declaration.type,
                             emptyList(),
                             mutableListOf(),
@@ -446,7 +454,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
-                            emptyList(),
+                            listOf(QualifiedStatementNode(
+                                    QualifiedStatementNode(
+                                            IdentifierNode("this"),
+                                            StatementCallNode("asDynamic", emptyList())
+                                    ),
+                                    StatementCallNode("invoke", declaration.parameters.map {IdentifierNode(it.name)}))
+                            ),
                             ""
                     )
             )

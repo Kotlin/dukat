@@ -361,12 +361,12 @@ class AstConverter {
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
             initializer = this.astFactory.createExpression(
-                this.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
+                this.createTypeDeclaration("definedExternally"),
                 param.initializer.getText()
             )
         } else if (param.questionToken != null) {
             initializer = this.astFactory.createExpression(
-                this.createTypeDeclaration("@@DEFINED_EXTERNALLY"),
+                this.createTypeDeclaration("definedExternally"),
                 "null"
             )
         }

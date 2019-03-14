@@ -163,8 +163,8 @@ private fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     if (initializer != null) {
         if (needsMeta) {
 
-            if (initializer!!.kind.value == "@@DEFINED_EXTERNALLY") {
-                res += " = definedExternally"
+            if (initializer?.kind?.value != null) {
+                res += " = ${initializer?.kind?.value}"
 
                 initializer!!.meta?.let { meta ->
                     res += " /* ${meta} */"

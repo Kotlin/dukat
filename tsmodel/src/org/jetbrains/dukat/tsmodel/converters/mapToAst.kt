@@ -56,7 +56,7 @@ private fun Map<String, Any?>.getInitializerExpression(): ExpressionDeclaration?
         val expression = it.toAst<Declaration>()
 
         if (expression is ExpressionDeclaration) {
-            if (expression.kind.value == "@@DEFINED_EXTERNALLY") {
+            if (expression.kind.value == "definedExternally") {
                 expression
             } else throw Exception("unkown initializer")
         } else null
