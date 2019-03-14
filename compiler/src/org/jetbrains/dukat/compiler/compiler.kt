@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.model.SourceFileModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -246,6 +247,8 @@ fun StatementNode.translate(): String {
     return when (this) {
         is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
         is ReturnStatement -> "return ${statement.translate()}"
+        is AssignmentStatementNode -> "${left.translate()} = ${right.translate()}"
+        is IdentifierNode -> translate()
         else -> throw Exception("unkown StatementNode ${this}")
     }
 }
@@ -295,7 +298,14 @@ private fun ConstructorNode.translate(): List<String> {
 private fun VariableNode.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
     val modifier = if (inline) "inline" else "external"
-    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword} ${name.translate()}: ${type.translate()}${type.translateSignatureMeta()} = definedExternally"
+    val getter = "get() = ${get?.translate()};"
+    val setter = "set(value) { ${set?.translate()} }"
+
+    val body = if (get == null) { "= definedExternally" } else {
+        "${getter} ${setter}"
+    }
+
+    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword} ${name.translate()}: ${type.translate()}${type.translateSignatureMeta()} ${body}"
 }
 
 private fun EnumNode.translate(): String {

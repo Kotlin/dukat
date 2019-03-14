@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -352,10 +353,27 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             ))
             is PropertyDeclaration -> listOf(VariableNode(
                     QualifiedNode(IdentifierNode(name), IdentifierNode(declaration.name)),
-                    declaration.type,
+                    if (declaration.optional) declaration.type.makeNullable() else declaration.type,
                     mutableListOf(),
                     false,
                     true,
+                    QualifiedStatementNode(
+                            QualifiedStatementNode(
+                                    IdentifierNode("this"),
+                                    StatementCallNode("asDynamic", emptyList())
+                            ),
+                            IdentifierNode(declaration.name)
+                    ),
+                    AssignmentStatementNode(
+                            QualifiedStatementNode(
+                                    QualifiedStatementNode(
+                                            IdentifierNode("this"),
+                                            StatementCallNode("asDynamic", emptyList())
+                                    ),
+                                    IdentifierNode(declaration.name)
+                            ),
+                            IdentifierNode("value")
+                    ),
                     null,
                     ""
             ))
@@ -474,6 +492,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         false,
                         null,
+                        null,
+                        null,
                         declaration.uid
                 )
             } else {
@@ -499,6 +519,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     mutableListOf(),
                     false,
                     false,
+                    null,
+                    null,
                     null,
                     declaration.uid
             )

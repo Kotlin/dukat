@@ -11,6 +11,8 @@ data class VariableNode(
 
         var immutable: Boolean,
         val inline: Boolean,
+        val get: StatementNode?,
+        val set: StatementNode?,
         var owner: DocumentRootNode?,
         val uid: String
 ) : TopLevelDeclaration, MergableNode
