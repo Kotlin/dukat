@@ -181,6 +181,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("packageName") as String,
                 getEntities("declarations"),
                 getEntities("modifiers"),
+                getEntities("definitionsInfo"),
                 get("uid") as String,
                 get("resourceName") as String
         )

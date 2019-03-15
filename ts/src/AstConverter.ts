@@ -36,7 +36,7 @@ class AstConverter {
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
 
-        let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), uid(), resourceName);
+        let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), resourceName);
         let declaration = this.astFactory.createSourceFileDeclaration(
             sourceFileName,
             packageDeclaration,
@@ -76,8 +76,8 @@ class AstConverter {
         return sourceSet.get(sourceFileName) as SourceFileDeclaration
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string): PackageDeclaration {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, uid, resourceName);
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string): PackageDeclaration {
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -747,16 +747,26 @@ class AstConverter {
 
 
     convertModule(module: ts.ModuleDeclaration, resourceName: string, sourceFileName: string): Array<Declaration> {
+
+        let definitionInfos = this.declarationResolver(module.name, sourceFileName);
+
         const declarations: Declaration[] = [];
         if (module.body) {
+            var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+            if (definitionInfos) {
+                definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
+                    return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
+                });
+            }
+
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName, sourceFileName);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, uid, resourceName), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, resourceName), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, uid, resourceName), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, resourceName), declarations);
             }
         }
         return declarations

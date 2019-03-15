@@ -613,12 +613,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             } else nonImports.add(declaration)
         }
 
+
         val docRoot = DocumentRootNode(
+                fileName,
                 documentRoot.resourceName,
                 documentRoot.packageName,
                 documentRoot.packageName,
                 nonImports,
                 imports,
+                documentRoot.definitionsInfo,
                 null,
                 documentRoot.uid
         )

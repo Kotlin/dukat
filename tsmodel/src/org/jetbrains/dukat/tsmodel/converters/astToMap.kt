@@ -80,7 +80,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers, ::uid).convert(this)
         is ConstructorDeclaration -> listOf(::type, ::parameters, ::typeParameters, ::modifiers).convert(this)
-        is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::uid, ::resourceName).convert(this)
+        is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::definitionsInfo, ::uid, ::resourceName).convert(this)
         is EnumDeclaration -> listOf(::name, ::values).convert(this)
         is EnumTokenDeclaration -> listOf(::value, ::meta).convert(this)
         is ExportAssignmentDeclaration -> listOf(::name, ::isExportEquals).convert(this)

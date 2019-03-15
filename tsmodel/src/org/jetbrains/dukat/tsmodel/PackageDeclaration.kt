@@ -7,6 +7,7 @@ data class PackageDeclaration(
         val declarations: List<TopLevelDeclaration> = emptyList(),
 
         val modifiers: List<ModifierDeclaration>,
+        val definitionsInfo: List<DefinitionInfoDeclaration>,
         val uid: String,
         val resourceName: String
 ) : TopLevelDeclaration
