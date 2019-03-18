@@ -23,7 +23,6 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
@@ -200,7 +199,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val annotations = mutableListOf<AnnotationNode>()
 
         if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
-            annotations.add(AnnotationNode("JsName", listOf("default")))
+            annotations.add(AnnotationNode("JsName", listOf(IdentifierNode("default"))))
         }
 
         val declaration = ClassNode(
@@ -302,7 +301,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val hasExport = ModifierDeclaration.hasExport(modifiers)
         if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
-            annotations.add(AnnotationNode("JsName", listOf("default")))
+            annotations.add(AnnotationNode("JsName", listOf(IdentifierNode("default"))))
         }
 
         return FunctionNode(
@@ -336,7 +335,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     private fun mergeTypeParameters(interfaceTypeParams: List<TypeParameterDeclaration>, ownTypeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
         val ownNames = ownTypeParams.map { typeParam -> typeParam.name }.toSet()
         return interfaceTypeParams.map { typeParam ->
-            typeParam.copy(name = if(ownNames.contains(typeParam.name)) {
+            typeParam.copy(name = if (ownNames.contains(typeParam.name)) {
                 typeParam.name + "0"
             } else {
                 typeParam.name
@@ -603,12 +602,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return IdentifierNode(value)
     }
 
-    private fun QualifiedLeftDeclaration.convert(): QualifiedLeftNode {
-        return when(this) {
+    private fun QualifiedLeftDeclaration.convert(): NameNode {
+        return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(
-                left.convert(),
-                right.convert()
+                    left.convert(),
+                    right.convert()
             )
             else -> throw Exception("unknown QualifiedLeftDeclaration ${this}")
         }

@@ -4,19 +4,19 @@ import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class QualifiedNode(
-    val left: QualifiedLeftNode,
+    val left: NameNode,
     val right: IdentifierNode,
 
     override var nullable: Boolean = false,
     override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftNode, TypeNodeValue, NameNode
+) : ParameterValueDeclaration, ModuleReferenceDeclaration, TypeNodeValue, NameNode
 
 
-fun IdentifierNode.appendLeft(qualifiedLeftNode: QualifiedLeftNode): QualifiedNode {
+fun IdentifierNode.appendLeft(qualifiedLeftNode: NameNode): QualifiedNode {
     return when(qualifiedLeftNode) {
         is IdentifierNode -> this.appendLeft(qualifiedLeftNode)
         is QualifiedNode -> this.appendLeft(qualifiedLeftNode)
-        else -> throw Exception("unknown QualifiedLeftNode ${qualifiedLeftNode}")
+        else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
     }
 }
 
@@ -37,11 +37,11 @@ fun IdentifierNode.appendLeft(qualifiedNode: QualifiedNode): QualifiedNode {
     return QualifiedNode(left, qualifiedNode.right)
 }
 
-fun IdentifierNode.appendRight(qualifiedLeftNode: QualifiedLeftNode): QualifiedNode {
+fun IdentifierNode.appendRight(qualifiedLeftNode: NameNode): QualifiedNode {
     return when(qualifiedLeftNode) {
         is IdentifierNode -> this.appendRight(qualifiedLeftNode)
         is QualifiedNode -> this.appendRight(qualifiedLeftNode)
-        else -> throw Exception("unknown QualifiedLeftNode ${qualifiedLeftNode}")
+        else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
     }
 }
 
@@ -65,7 +65,7 @@ fun QualifiedNode.appendRight(qualifiedNode: QualifiedNode): QualifiedNode {
     }
 }
 
-fun QualifiedLeftNode.appendRight(qualifiedNode: QualifiedLeftNode): QualifiedLeftNode {
+fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
     return when(this) {
         is IdentifierNode -> when(qualifiedNode) {
             is IdentifierNode -> appendRight(qualifiedNode)
@@ -81,25 +81,25 @@ fun QualifiedLeftNode.appendRight(qualifiedNode: QualifiedLeftNode): QualifiedLe
     }
 }
 
-fun QualifiedNode.shiftRight(): QualifiedLeftNode = left
+fun QualifiedNode.shiftRight(): NameNode = left
 
 
-fun QualifiedLeftNode.shiftRight(): QualifiedLeftNode? {
+fun NameNode.shiftRight(): NameNode? {
     return when(this) {
         is IdentifierNode -> null
         is QualifiedNode -> left
-        else -> throw Exception("unknown QualifiedLeftNode")
+        else -> throw Exception("unknown NameNode")
     }
 }
 
 
 fun IdentifierNode.debugTranslate(): String = value
-fun QualifiedLeftNode.debugTranslate(): String {
+fun NameNode.debugTranslate(): String {
     return when(this) {
         is IdentifierNode -> debugTranslate()
         is QualifiedNode -> debugTranslate()
         is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.name }}>"
-        else -> throw Exception("unknown QualifiedLeftNode")
+        else -> throw Exception("unknown NameNode")
     }
 }
 

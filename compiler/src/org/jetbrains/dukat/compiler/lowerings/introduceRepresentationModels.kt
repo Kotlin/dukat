@@ -106,13 +106,12 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
 
     if (showQualifierAnnotation) {
         val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
-        annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifierName)))
+        annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
     }
 
     return ModuleModel(
             packageName = fullPackageName,
             shortName = packageName,
-            qualifierName = qualifierName,
             declarations = declarationsFiltered,
             annotations = annotations,
             sumbodules = submodules

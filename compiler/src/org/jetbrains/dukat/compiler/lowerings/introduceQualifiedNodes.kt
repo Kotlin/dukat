@@ -5,8 +5,8 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
@@ -46,7 +46,7 @@ private class UidData() {
 
 private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTypeLowering {
 
-    private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): QualifiedLeftNode {
+    private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
 
         return when (value) {
             is IdentifierDeclaration -> {
@@ -57,16 +57,16 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTyp
                 } else {
                     val importedDocumentNodes = uidData.resolve(importNode.uid)
                     if (importedDocumentNodes == null) {
-                        importNode.referenceName as QualifiedLeftNode
+                        importNode.referenceName
                     } else {
                         val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
                             importedDocumentNode.packageName == importNode.referenceName.translate()
                         }
 
                         if (resolvedImport == null) {
-                            importNode.referenceName as QualifiedLeftNode
+                            importNode.referenceName
                         } else {
-                            resolvedImport.qualifiedNode as QualifiedLeftNode
+                            resolvedImport.qualifiedNode as NameNode
                         }
                     }
                 }

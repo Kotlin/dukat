@@ -2,7 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.transform
@@ -47,12 +47,11 @@ fun DocumentRootNode.introduceModuleMetadata(nodeOwner: NodeOwner<DocumentRootNo
         showQualifierAnnotation = false
     }
 
-    qualifierName = qualifiers.joinToString(".")
-    qualifiedNode =  if (qualifiers.isEmpty()) {
+    qualifiedNode = if (qualifiers.isEmpty()) {
         null
     } else {
         qualifiers.map { IdentifierNode(it) }
-                .reduce<QualifiedLeftNode, QualifiedLeftNode> { acc, identifierNode  ->
+                .reduce<NameNode, NameNode> { acc, identifierNode ->
                     identifierNode.appendRight(acc)
                 }
     }

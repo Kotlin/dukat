@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.model.SourceSetModel
 import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
@@ -15,7 +15,7 @@ import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-private fun QualifiedLeftNode.shiftLeft(): QualifiedLeftNode {
+private fun NameNode.shiftLeft(): NameNode {
     if (this is QualifiedNode) {
         return when (left) {
             is IdentifierNode -> right

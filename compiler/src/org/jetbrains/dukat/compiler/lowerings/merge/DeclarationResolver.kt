@@ -3,13 +3,13 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.InterfaceModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class DeclarationKey(
         val classValue: String,
-        val qualifiedPath: QualifiedLeftNode
+        val qualifiedPath: NameNode
 )
 
 class DeclarationResolver {
@@ -34,12 +34,12 @@ class DeclarationResolver {
         myDeclarations.put(DeclarationKey(name, moduleContext.getQualifiedName()), moduleContext)
     }
 
-    fun resolve(name: String, path: QualifiedLeftNode?): NodeOwner<ModuleModel>? {
+    fun resolve(name: String, path: NameNode?): NodeOwner<ModuleModel>? {
         if (path == null) {
             return null
         }
 
-        var qualifiedPath: QualifiedLeftNode = path
+        var qualifiedPath: NameNode = path
 
         while (true) {
             val declarationKey = DeclarationKey(name, qualifiedPath)
@@ -58,7 +58,7 @@ class DeclarationResolver {
 
     }
 
-    fun resolveStrict(name: String, qualifiedPath: QualifiedLeftNode?): NodeOwner<ModuleModel>? {
+    fun resolveStrict(name: String, qualifiedPath: NameNode?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
             return null
         }

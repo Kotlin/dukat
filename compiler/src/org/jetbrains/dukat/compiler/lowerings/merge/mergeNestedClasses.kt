@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.model.ClassModel
 import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.model.SourceSetModel
 import org.jetbrains.dukat.ast.model.model.transform
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
@@ -36,12 +36,12 @@ private class ClassContext : ModelWithOwnerTypeLowering {
         return super.lowerRoot(moduleModel, ownerContext)
     }
 
-    fun resolve(name: String, qualifiedNode: QualifiedLeftNode): ClassModel? {
+    fun resolve(name: String, qualifiedNode: NameNode): ClassModel? {
         val key = ClassKey(name, qualifiedNode.debugTranslate())
         return myClassMap.get(key)
     }
 
-    fun resolveModule(moduleModel: ModuleModel, qualifiedNode: QualifiedLeftNode): ModuleModel {
+    fun resolveModule(moduleModel: ModuleModel, qualifiedNode: NameNode): ModuleModel {
         val classKey = ClassKey(moduleModel.shortName, qualifiedNode.debugTranslate())
         if (myClassMap.containsKey(classKey)) {
             val classDeclarations = mutableListOf<ClassModel>()
@@ -57,7 +57,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
                     myClassMap.get(classKey)!!
 
 
-            val members= classModel.members + classDeclarations
+            val members = classModel.members + classDeclarations
             myClassMap.set(classKey, classModel.copy(members = members))
 
             return moduleModel.copy(declarations = nonClassDeclarations)
@@ -84,7 +84,7 @@ private class MergeModule(private val classContext: ClassContext) : ModelWithOwn
 
 }
 
-private class IntroduceNestedClasses(private val classContext: ClassContext): ModelWithOwnerTypeLowering {
+private class IntroduceNestedClasses(private val classContext: ClassContext) : ModelWithOwnerTypeLowering {
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         val resolvedClass = classContext.resolve(ownerContext.node.name, ownerContext.getQualifiedName())

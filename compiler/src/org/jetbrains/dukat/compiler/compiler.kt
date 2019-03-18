@@ -19,10 +19,10 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
@@ -74,7 +74,7 @@ private fun IdentifierNode.translate(): String {
     return value
 }
 
-private fun QualifiedLeftNode.translate() : String {
+private fun NameNode.translate() : String {
     return when(this) {
         is QualifiedNode -> translate()
         is IdentifierNode -> translate()
@@ -212,7 +212,7 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
     val annotations = annotations.map { annotationNode ->
         var res = "@" + annotationNode.name
         if (annotationNode.params.isNotEmpty()) {
-            res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it}\"" } + ")"
+            res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
         }
         res
     }
