@@ -10,13 +10,14 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-private fun NodeOwner<*>.getModule() : DocumentRootNode {
+private fun NodeOwner<*>.getModule(): DocumentRootNode {
     return (getOwners().first { (it is NodeOwner<*>) && (it.node is DocumentRootNode) } as NodeOwner<DocumentRootNode>).node
 }
 
@@ -31,9 +32,22 @@ private fun NodeOwner<*>.findModuleWithImport(value: String): ImportNode? {
     }.firstOrNull()
 }
 
-private class LowerQualifiedDeclarations(private val uidData: Map<String, DocumentRootNode>) : NodeTypeLowering {
+private class UidData() {
+    private val myUidData = mutableMapOf<String, List<DocumentRootNode>>()
+
+    fun register(uid: String, documentRootNodes: List<DocumentRootNode>) {
+        myUidData[uid] = documentRootNodes
+    }
+
+    fun resolve(uid: String?): List<DocumentRootNode>? {
+        return myUidData.get(uid)
+    }
+}
+
+private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTypeLowering {
 
     private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): QualifiedLeftNode {
+
         return when (value) {
             is IdentifierDeclaration -> {
                 val importNode = owner.findModuleWithImport(value.value)
@@ -41,11 +55,19 @@ private class LowerQualifiedDeclarations(private val uidData: Map<String, Docume
                 if (importNode == null) {
                     IdentifierNode(value.value)
                 } else {
-                    val importedDocumentNode = uidData.get(importNode.uid)
-                    if (importedDocumentNode == null)  {
+                    val importedDocumentNodes = uidData.resolve(importNode.uid)
+                    if (importedDocumentNodes == null) {
                         importNode.referenceName as QualifiedLeftNode
                     } else {
-                        importNode.referenceName as QualifiedLeftNode
+                        val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
+                            importedDocumentNode.packageName == importNode.referenceName.translate()
+                        }
+
+                        if (resolvedImport == null) {
+                            importNode.referenceName as QualifiedLeftNode
+                        } else {
+                            resolvedImport.qualifiedNode as QualifiedLeftNode
+                        }
                     }
                 }
             }
@@ -88,19 +110,21 @@ private class LowerQualifiedDeclarations(private val uidData: Map<String, Docume
 }
 
 
-private fun DocumentRootNode.collectUidData(uidData: MutableMap<String, DocumentRootNode>) {
-    uidData.put(uid, this)
-
-    declarations.forEach { declaration ->
+private fun DocumentRootNode.collectUidData(uidData: UidData): DocumentRootNode {
+    val head = if (owner == null) emptyList() else listOf(owner!!)
+    uidData.register(uid, head + declarations.mapNotNull { declaration ->
         if (declaration is DocumentRootNode) {
             declaration.collectUidData(uidData)
-        }
-    }
+        } else null
+    })
+
+    return this
 }
 
 fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
-    val uidData = mutableMapOf<String, DocumentRootNode>()
+    val uidData = UidData()
     collectUidData(uidData)
+
     return LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
 }
 
