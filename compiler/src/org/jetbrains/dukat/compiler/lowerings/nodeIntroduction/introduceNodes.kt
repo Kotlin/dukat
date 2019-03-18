@@ -31,9 +31,11 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -584,14 +586,14 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<PackageDeclaration>): List<TopLevelDeclaration> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> listOf(declaration.convert())
             is ClassDeclaration -> listOf(declaration.convert(null))
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
-            is PackageDeclaration -> listOf(lowerDocumentRoot(declaration, null))
+            is PackageDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
             is EnumDeclaration -> listOf(declaration.convert())
             else -> listOf(declaration)
         }
@@ -622,8 +624,54 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: DocumentRootNode?): DocumentRootNode {
-        val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration) }
+    private fun unquote(name: String): String {
+        return name.replace("(?:^\"|\')|(?:\"|\'$)".toRegex(), "")
+    }
+
+    //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+    private fun escapePackageName(name: String): String {
+        return name
+                .replace("/".toRegex(), ".")
+                .replace("-".toRegex(), "_")
+                .replace("^_$".toRegex(), "`_`")
+                .replace("^class$".toRegex(), "`class`")
+                .replace("^var$".toRegex(), "`var`")
+                .replace("^val$".toRegex(), "`val`")
+                .replace("^interface$".toRegex(), "`interface`")
+    }
+
+
+    fun lowerPackageDeclaration(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): DocumentRootNode {
+        val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration, owner) }
+
+        val parentDocRoots =
+                owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
+
+        val rootOwner = parentDocRoots.removeAt(0)
+
+        val qualifiers = parentDocRoots.map { unquote(it.node.packageName) }
+
+        val isQualifier = (documentRoot.packageName == unquote(documentRoot.packageName))
+
+        var showQualifierAnnotation = owner != rootOwner
+
+        val isExternalDefinition = documentRoot.definitionsInfo.any { definition ->
+            definition.fileName != fileName
+        }
+        if (isExternalDefinition && isQualifier) {
+            showQualifierAnnotation = false
+        }
+
+        val fullPackageName = (listOf(documentRoot.resourceName) + qualifiers).joinToString(".") { escapePackageName(it) }
+
+        val  qualifiedNode = if (qualifiers.isEmpty()) {
+            null
+        } else {
+            qualifiers.map { IdentifierNode(it) }
+                    .reduce<NameNode, NameNode> { acc, identifierNode ->
+                        identifierNode.appendRight(acc)
+                    }
+        }
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
@@ -641,12 +689,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 fileName,
                 documentRoot.resourceName,
                 documentRoot.packageName,
-                documentRoot.packageName,
+                fullPackageName,
                 nonImports,
                 imports,
                 documentRoot.definitionsInfo,
                 null,
-                documentRoot.uid
+                documentRoot.uid,
+                qualifiedNode,
+                isQualifier,
+                showQualifierAnnotation
         )
 
 
@@ -672,7 +723,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 }
 
-private fun PackageDeclaration.introduceNodes(fileName: String) = LowerDeclarationsToNodes(fileName).lowerDocumentRoot(this, null)
+private fun PackageDeclaration.introduceNodes(fileName: String) = LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, NodeOwner(this, null))
 
 fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath

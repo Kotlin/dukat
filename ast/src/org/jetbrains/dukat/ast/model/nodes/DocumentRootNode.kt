@@ -16,7 +16,7 @@ data class DocumentRootNode(
         var owner: DocumentRootNode?,
         var uid: String,
 
-        var qualifiedNode: NameNode? = null,
-        var isQualifier: Boolean = false,
-        var showQualifierAnnotation: Boolean = false
+        var qualifiedNode: NameNode?,
+        var isQualifier: Boolean,
+        var showQualifierAnnotation: Boolean
 ) : TopLevelDeclaration
