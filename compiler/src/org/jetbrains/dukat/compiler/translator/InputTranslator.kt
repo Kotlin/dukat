@@ -27,7 +27,6 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.merge.specifyTypeNodesWithModuleData
-import org.jetbrains.dukat.compiler.lowerings.model.extendExternalInterfaces
 import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
@@ -93,6 +92,5 @@ interface InputTranslator {
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
                 .specifyTypeNodesWithModuleData()
-                .extendExternalInterfaces()
     }
 }
