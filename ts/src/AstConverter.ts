@@ -719,14 +719,18 @@ class AstConverter {
                 console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
             }
         } else if (ts.isImportEqualsDeclaration(statement)) {
+
             if (ts.isEntityName(statement.moduleReference)) {
                 let moduleReferenceDeclaration = this.convertEntityName(statement.moduleReference);
+                let uid = ts.isModuleBlock(statement.parent) ? this.exportContext.getUID(statement.parent.parent) : this.exportContext.getUID(statement.parent);
+
                 yield this.astFactory.createImportEqualsDeclaration(
                     statement.name.getText(),
-                    moduleReferenceDeclaration as ModuleReferenceDeclaration
+                    moduleReferenceDeclaration as ModuleReferenceDeclaration,
+                    uid
                 )
             } else {
-                println(`[TS] skipping external module reference ${statement.moduleReference.getText()}`)
+                println(`[TS] skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
         } else {
             console.log("SKIPPING ", statement.kind);

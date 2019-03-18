@@ -56,8 +56,8 @@ class AstFactory : AstNodeFactory<AstNode> {
         return PropertyAccessDeclaration(name, expression)
     }
 
-    override fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration {
-        return ImportEqualsDeclaration(name, moduleReference)
+    override fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration, uid: String): ImportEqualsDeclaration {
+        return ImportEqualsDeclaration(name, moduleReference, uid)
     }
 
     override fun createIdentifierDeclaration(value: String): AstNode {

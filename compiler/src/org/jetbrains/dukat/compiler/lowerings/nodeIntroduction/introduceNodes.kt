@@ -15,12 +15,15 @@ import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
@@ -51,6 +54,8 @@ import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -594,22 +599,41 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
+    private fun IdentifierDeclaration.convert(): IdentifierNode {
+        return IdentifierNode(value)
+    }
+
+    private fun QualifiedLeftDeclaration.convert(): QualifiedLeftNode {
+        return when(this) {
+            is IdentifierDeclaration -> convert()
+            is QualifiedNamedDeclaration -> QualifiedNode(
+                left.convert(),
+                right.convert()
+            )
+            else -> throw Exception("unknown QualifiedLeftDeclaration ${this}")
+        }
+    }
+
     // TODO: introduce ModuleReferenceNode
-    private fun ModuleReferenceDeclaration.convert(): ModuleReferenceDeclaration {
+    private fun ModuleReferenceDeclaration.convert(): NameNode {
         return when (this) {
-            is IdentifierDeclaration -> IdentifierNode(value)
-            else -> this
+            is IdentifierDeclaration -> convert()
+            is QualifiedNamedDeclaration -> QualifiedNode(left.convert(), right.convert())
+            else -> throw Exception("unknown ModuleReferenceDeclaration ${this}")
         }
     }
 
     fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: DocumentRootNode?): DocumentRootNode {
         val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration) }
 
-        val imports = mutableMapOf<String, ModuleReferenceDeclaration>()
+        val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
         declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
-                imports.put(declaration.name, declaration.moduleReference.convert())
+                imports.put(declaration.name, ImportNode(
+                        declaration.moduleReference.convert(),
+                        declaration.uid
+                ))
             } else nonImports.add(declaration)
         }
 

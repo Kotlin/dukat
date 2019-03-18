@@ -196,7 +196,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         ImportEqualsDeclaration::class.simpleName -> ImportEqualsDeclaration(
             get("name") as String,
-            getEntity("moduleReference")
+            getEntity("moduleReference"),
+            get("uid") as String
         )
         IdentifierDeclaration::class.simpleName -> IdentifierDeclaration(
                 get("value") as String

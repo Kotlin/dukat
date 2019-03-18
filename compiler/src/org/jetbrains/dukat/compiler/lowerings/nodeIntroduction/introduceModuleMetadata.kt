@@ -1,7 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedLeftNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -30,7 +33,6 @@ fun DocumentRootNode.introduceModuleMetadata(nodeOwner: NodeOwner<DocumentRootNo
     val rootOwner = parentDocRoots.removeAt(0)
     val qualifiers = parentDocRoots.map { unquote(it.node.packageName) }
 
-
     val packageNameResolved = (listOf(resourceName) + qualifiers).joinToString(".") { escapePackageName(it) }
     fullPackageName = packageNameResolved
 
@@ -46,7 +48,14 @@ fun DocumentRootNode.introduceModuleMetadata(nodeOwner: NodeOwner<DocumentRootNo
     }
 
     qualifierName = qualifiers.joinToString(".")
-
+    qualifiedNode =  if (qualifiers.isEmpty()) {
+        null
+    } else {
+        qualifiers.map { IdentifierNode(it) }
+                .reduce<QualifiedLeftNode, QualifiedLeftNode> { acc, identifierNode  ->
+                    identifierNode.appendRight(acc)
+                }
+    }
 
     declarations.forEach { declaration ->
         if (declaration is DocumentRootNode) {

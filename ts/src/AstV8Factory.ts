@@ -12,7 +12,7 @@ declare class AstFactoryV8 implements AstFactory {
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
     createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<IdentifierDeclaration>, extending: boolean): HeritageClauseDeclaration;
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
-    createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration;
+    createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration, uid: string): ImportEqualsDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;
     createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration;
     createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;

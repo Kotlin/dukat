@@ -6,7 +6,7 @@ declare interface AstFactory {
 
     createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbol): PropertyAccessDeclaration;
 
-    createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
+    createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration, uid: string): ImportEqualsDeclaration
 
     createIdentifierDeclaration(value: string): IdentifierDeclaration;
 

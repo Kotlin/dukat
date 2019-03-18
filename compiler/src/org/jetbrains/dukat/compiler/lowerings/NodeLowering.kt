@@ -23,69 +23,69 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface NodeLowering {
-    fun lowerVariableNode(ownerContext: NodeOwner<VariableNode>): VariableNode
-    fun lowerFunctionNode(ownerContext: NodeOwner<FunctionNode>): FunctionNode
-    fun lowerClassNode(ownerContext: NodeOwner<ClassNode>): ClassNode
-    fun lowerInterfaceNode(ownerContext: NodeOwner<InterfaceNode>): InterfaceNode
+    fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode
+    fun lowerFunctionNode(owner: NodeOwner<FunctionNode>): FunctionNode
+    fun lowerClassNode(owner: NodeOwner<ClassNode>): ClassNode
+    fun lowerInterfaceNode(owner: NodeOwner<InterfaceNode>): InterfaceNode
 
-    fun lowerParameterDeclaration(ownerContext: NodeOwner<ParameterDeclaration>): ParameterDeclaration
-    fun lowerTypeParameter(ownerContext: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
-    fun lowerMemberNode(ownerContext: NodeOwner<MemberNode>): MemberNode
-    fun lowerTypeAliasDeclaration(ownerContext: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
-    fun lowerObjectNode(ownerContext: NodeOwner<ObjectNode>): ObjectNode
+    fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>): ParameterDeclaration
+    fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
+    fun lowerMemberNode(owner: NodeOwner<MemberNode>): MemberNode
+    fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
+    fun lowerObjectNode(owner: NodeOwner<ObjectNode>): ObjectNode
 
-    fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): ParameterValueDeclaration
-    fun lowerFunctionNode(ownerContext: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
-    fun lowerUnionTypeDeclaration(ownerContext: NodeOwner<UnionTypeDeclaration>): ParameterValueDeclaration
-    fun lowerUnionTypeNode(ownerContext: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
-    fun lowerIntersectionTypeDeclaration(ownerContext: NodeOwner<IntersectionTypeDeclaration>): ParameterValueDeclaration
-    fun lowerTupleDeclaration(ownerContext: NodeOwner<TupleDeclaration>): ParameterValueDeclaration
+    fun lowerTypeNode(owner: NodeOwner<TypeNode>): ParameterValueDeclaration
+    fun lowerFunctionNode(owner: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
+    fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): ParameterValueDeclaration
+    fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
+    fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): ParameterValueDeclaration
+    fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): ParameterValueDeclaration
 
-    fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
-        val declaration = ownerContext.node
+    fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+        val declaration = owner.node
         return when (declaration) {
-            is TypeNode -> lowerTypeNode(ownerContext.wrap(declaration))
-            is FunctionTypeNode -> lowerFunctionNode(ownerContext.wrap(declaration))
-            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(ownerContext.wrap(declaration))
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(ownerContext.wrap(declaration))
-            is UnionTypeNode -> lowerUnionTypeNode(ownerContext.wrap(declaration))
-            is TupleDeclaration -> lowerTupleDeclaration(ownerContext.wrap(declaration))
+            is TypeNode -> lowerTypeNode(owner.wrap(declaration))
+            is FunctionTypeNode -> lowerFunctionNode(owner.wrap(declaration))
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner.wrap(declaration))
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner.wrap(declaration))
+            is UnionTypeNode -> lowerUnionTypeNode(owner.wrap(declaration))
+            is TupleDeclaration -> lowerTupleDeclaration(owner.wrap(declaration))
             else -> declaration
         }
     }
 
 
-    fun lowerClassLikeDeclaration(ownerContext: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
-        val declaration = ownerContext.node
+    fun lowerClassLikeDeclaration(owner: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
+        val declaration = owner.node
         return when (declaration) {
-            is InterfaceNode -> lowerInterfaceNode(ownerContext.wrap(declaration))
-            is ClassNode -> lowerClassNode(ownerContext.wrap(declaration))
+            is InterfaceNode -> lowerInterfaceNode(owner.wrap(declaration))
+            is ClassNode -> lowerClassNode(owner.wrap(declaration))
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
-        val declaration = ownerContext.node
+    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
+        val declaration = owner.node
         return when (declaration) {
-            is VariableNode -> lowerVariableNode(ownerContext.wrap(declaration))
-            is FunctionNode -> lowerFunctionNode(ownerContext.wrap(declaration))
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(ownerContext.wrap(declaration))
-            is DocumentRootNode -> lowerRoot(declaration, ownerContext.wrap(declaration))
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(ownerContext.wrap(declaration))
-            is ObjectNode -> lowerObjectNode(ownerContext.wrap(declaration))
+            is VariableNode -> lowerVariableNode(owner.wrap(declaration))
+            is FunctionNode -> lowerFunctionNode(owner.wrap(declaration))
+            is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner.wrap(declaration))
+            is DocumentRootNode -> lowerRoot(declaration, owner.wrap(declaration))
+            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(owner.wrap(declaration))
+            is ObjectNode -> lowerObjectNode(owner.wrap(declaration))
             else -> declaration.duplicate()
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, ownerContext: NodeOwner<DocumentRootNode>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<DocumentRootNode>): List<TopLevelDeclaration> {
         return declarations.map { declaration ->
-            lowerTopLevelDeclaration(ownerContext.wrap(declaration))
+            lowerTopLevelDeclaration(owner.wrap(declaration))
         }
     }
 
-    fun lowerRoot(documentRoot: DocumentRootNode, ownerContext: NodeOwner<DocumentRootNode>): DocumentRootNode {
+    fun lowerRoot(documentRoot: DocumentRootNode, owner: NodeOwner<DocumentRootNode>): DocumentRootNode {
         return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations, ownerContext)
+                declarations = lowerTopLevelDeclarations(documentRoot.declarations, owner)
         )
     }
 }

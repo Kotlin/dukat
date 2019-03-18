@@ -29,7 +29,7 @@ interface AstNodeFactory<T> {
 
     fun createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbolDeclaration): PropertyAccessDeclaration
 
-    fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration): ImportEqualsDeclaration
+    fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration, uid: String): ImportEqualsDeclaration
 
     fun createIdentifierDeclaration(value: String): T
 

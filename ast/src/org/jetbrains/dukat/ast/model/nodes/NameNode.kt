@@ -1,8 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.Declaration
-
-interface NameNode : Declaration
+interface NameNode : HeritageSymbolNode
 
 fun  NameNode.translate(): String = when (this) {
     is IdentifierNode -> value

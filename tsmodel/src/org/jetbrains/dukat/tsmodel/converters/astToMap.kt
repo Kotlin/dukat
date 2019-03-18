@@ -89,7 +89,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
         is IdentifierDeclaration -> listOf(::value).convert(this)
-        is ImportEqualsDeclaration -> listOf(::name, ::moduleReference).convert(this)
+        is ImportEqualsDeclaration -> listOf(::name, ::moduleReference, ::uid).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
         is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::definitionsInfo, ::uid).convert(this)
         is IntersectionTypeDeclaration -> listOf(::params).convert(this)

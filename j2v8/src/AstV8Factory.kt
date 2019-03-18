@@ -49,7 +49,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     fun createTupleDeclaration(params: V8Array) = astFactory.createTupleDeclaration(params.toAst()).toV8()
 
-    fun createImportEqualsDeclaration(name: String, moduleReference: V8Object) = astFactory.createImportEqualsDeclaration(name, moduleReference.toAst()).toV8()
+    fun createImportEqualsDeclaration(name: String, moduleReference: V8Object, uid: String) = astFactory.createImportEqualsDeclaration(name, moduleReference.toAst(), uid).toV8()
 
     fun createIdentifierDeclaration(value: String) = astFactory.createIdentifierDeclaration(value).toV8()
 
