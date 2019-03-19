@@ -2,108 +2,116 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-
-private data class MethodNodeKey(val name:String, val params: List<ParameterDeclaration>)
-
-private class IntroduceMissedOverloads : ParameterValueLowering {
-
-    private fun MethodNode.resolveMissedOverloads(resolvedMembers: MutableSet<MethodNodeKey>) : MemberNode? {
-
-        val nonOptionalHead = parameters.takeWhile {
-            !it.optional || (it.initializer != null)
-        }
-
-        return if (nonOptionalHead.size != parameters.size) {
-            val missedMethodNode = copy(name = name, parameters = nonOptionalHead)
-            val missedMethodKey = MethodNodeKey(
-                    missedMethodNode.name,
-                    missedMethodNode.parameters.map { it.copy(name = "x")}
-            )
-            if (resolvedMembers.contains(missedMethodKey)) {
-                null
-            } else {
-                resolvedMembers.add(missedMethodKey)
-                missedMethodNode
-            }
-        } else {
-            null
-        }
-    }
-
-    private fun FunctionNode.resolveMissedOverloads(resolvedMembers: MutableSet<MethodNodeKey>) : FunctionNode? {
-        val nonOptionalHead = parameters.takeWhile {
-            !it.optional || (it.initializer != null)
-        }
-        return if (nonOptionalHead.size != parameters.size) {
-            val missedMethodNode = copy(name = name, parameters = nonOptionalHead)
-            val missedMethodKey = MethodNodeKey(
-                    missedMethodNode.name.translate(),
-                    missedMethodNode.parameters.map { it.copy(name = "x")}
-            )
-            if (resolvedMembers.contains(missedMethodKey)) {
-                null
-            } else {
-                resolvedMembers.add(missedMethodKey)
-                missedMethodNode
-            }
-        } else {
-            null
-        }
-    }
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
-    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-        val resolvedMembers = mutableSetOf<MethodNodeKey>()
-
-        val membersWithMissedOverloads = declaration.members.mapNotNull { member ->
-            if (member is MethodNode) {
-                member.resolveMissedOverloads(resolvedMembers)
-            } else {
-                null
-            }
-        }
-
-        return declaration.copy(members = declaration.members + membersWithMissedOverloads)
-    }
-
-    override fun lowerClassNode(declaration: ClassNode): ClassNode {
-        val resolvedMembers = mutableSetOf<MethodNodeKey>()
-
-        val membersWithMissedOverloads = declaration.members.mapNotNull { member ->
-            if (member is MethodNode) {
-                member.resolveMissedOverloads(resolvedMembers)
-            } else {
-                null
-            }
-        }
-
-        return declaration.copy(members = declaration.members + membersWithMissedOverloads)
-    }
-
-    override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
-        val resolvedMembers = mutableSetOf<MethodNodeKey>()
-
-        val membersWithMissedOverloads = documentRoot.declarations.mapNotNull { member ->
-            if (member is FunctionNode) {
-                member.resolveMissedOverloads(resolvedMembers)
-            } else {
-                null
-            }
-        }
-
-        return documentRoot.copy(declarations = documentRoot.declarations.map { lowerTopLevelDeclaration(it) } + membersWithMissedOverloads)
+private fun ParameterValueDeclaration.debugTranslate(): String {
+    return when (this) {
+        is TypeNode -> value.toString()
+        is FunctionTypeNode -> "FunctionTypeNode"
+        else -> throw Exception("unknown ParameterValueDeclaration ${this}")
     }
 }
 
-fun DocumentRootNode.introduceMissedOverloads() : DocumentRootNode {
+private data class MethodData(
+        val optionalArgs: MutableList<Int>,
+        val names: List<String>,
+        val methodNode: MethodNode
+)
+
+private typealias MethodDataRecord = MutableMap<List<ParameterValueDeclaration>, MethodData>
+private typealias MethodsDataMap = MutableMap<String, MethodDataRecord>
+
+private fun MethodNode.process(methodsDataMap: MethodsDataMap) {
+    val params = parameters
+    val nonOptionalHead = params.takeWhile { paramDeclaration ->
+        !paramDeclaration.optional
+    }
+
+    val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
+    val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
+
+    val methodNodeRecord = methodsDataMap.getOrPut(name) { mutableMapOf() }
+    val methodData = methodNodeRecord.getOrPut(headTypes) { MethodData(mutableListOf(), headNames, this) }
+    methodData.optionalArgs.add(params.size - nonOptionalHead.size)
+}
+
+private fun InterfaceNode.collectWeights(): MethodsDataMap {
+    val methodsData: MethodsDataMap = mutableMapOf()
+
+    members.forEach { member ->
+        if (member is MethodNode) {
+            member.process(methodsData)
+        }
+    }
+
+    return methodsData
+}
+
+private fun ClassNode.collectWeights(): MethodsDataMap {
+    val methodsData: MethodsDataMap = mutableMapOf()
+
+    members.forEach { member ->
+        if (member is MethodNode) {
+            member.process(methodsData)
+        }
+    }
+
+    return methodsData
+}
+
+
+private fun Map.Entry<String, MethodDataRecord>.process(generatedMethods: MutableList<MethodNode>) {
+    val optionalData = value
+
+    optionalData.forEach { types, (argsCount, names, originalMethodNode) ->
+
+        val params = types.zip(names).map { (type, name) ->
+            ParameterDeclaration(name, type, null, false, false)
+        }
+
+        val argsCountGrouped = argsCount.groupingBy { it }.eachCount()
+
+        val haseUniqueArity = argsCountGrouped.values.any { it == 1 }
+        val doesntNeedsOverload = haseUniqueArity || ( types.isEmpty() && argsCountGrouped.keys.contains(0))
+
+        if (!doesntNeedsOverload) {
+            generatedMethods.add(
+                    originalMethodNode.copy(parameters = params)
+            )
+        }
+    }
+}
+
+private fun MethodsDataMap.generateMethods(): List<MethodNode> {
+    val generatedMethods = mutableListOf<MethodNode>()
+    this.forEach { weightRecord ->
+        weightRecord.process(generatedMethods)
+    }
+
+    return generatedMethods
+}
+
+private class IntroduceMissedOverloads : ParameterValueLowering {
+
+    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
+        return declaration.copy(members = declaration.members + declaration.collectWeights().generateMethods())
+    }
+
+    override fun lowerClassNode(declaration: ClassNode): ClassNode {
+        return declaration.copy(members = declaration.members + declaration.collectWeights().generateMethods())
+    }
+
+}
+
+fun DocumentRootNode.introduceMissedOverloads(): DocumentRootNode {
     return IntroduceMissedOverloads().lowerDocumentRoot(this)
 }
 
