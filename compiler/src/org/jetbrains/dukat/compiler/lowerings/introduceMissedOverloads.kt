@@ -101,8 +101,8 @@ private fun <T> Map.Entry<String, NodeDataRecord<T>>.process(
 
         val argsCountGrouped = argsCount.groupingBy { it }.eachCount()
 
-        val haseUniqueArity = argsCountGrouped.values.any { it == 1 }
-        val doesntNeedsOverload = haseUniqueArity || ( types.isEmpty() && argsCountGrouped.keys.contains(0))
+        val hasUniqueArity = argsCountGrouped.values.any { it == 1 }
+        val doesntNeedsOverload = hasUniqueArity || ( types.isEmpty() && argsCountGrouped.keys.contains(0))
 
         if (!doesntNeedsOverload) {
             generatedMethods.add(paramsResolved(originalNode, params))
