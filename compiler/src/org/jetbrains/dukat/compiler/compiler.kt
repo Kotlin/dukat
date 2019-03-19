@@ -39,7 +39,6 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.compiler.translator.InputTranslator
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
@@ -74,8 +73,8 @@ private fun IdentifierNode.translate(): String {
     return value
 }
 
-private fun NameNode.translate() : String {
-    return when(this) {
+private fun NameNode.translate(): String {
+    return when (this) {
         is QualifiedNode -> translate()
         is IdentifierNode -> translate()
         else -> throw Exception("unknown ")
@@ -91,7 +90,7 @@ private fun QualifiedNode.translate(): String {
 
 
 private fun TypeNodeValue.translate(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> translate()
         else -> throw Exception("unknown TypeNodeValue ${this}")
     }
@@ -134,8 +133,6 @@ private fun ParameterValueDeclaration.translate(): String {
         return translate()
     } else if (this is TupleDeclaration) {
         return translate()
-    } else if (this is IdentifierDeclaration) {
-        return value
     } else {
         return "failed to translateType ${this}"
     }
@@ -223,7 +220,7 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
 }
 
 fun QualifiedStatementLeftNode.translate(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> value
         is StatementCallNode -> translate()
         is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
@@ -232,7 +229,7 @@ fun QualifiedStatementLeftNode.translate(): String {
 }
 
 fun QualifiedStatementRightNode.translate(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> value
         is StatementCallNode -> translate()
         else -> throw Exception("unkown QualifiedStatementRightNode ${this}")
@@ -264,7 +261,9 @@ private fun FunctionNode.translate(): String {
     val modifier = if (inline) "inline" else "external"
     val operator = if (operator) " operator" else ""
 
-    val body = if (body.isEmpty()) { "= definedExternally" } else {
+    val body = if (body.isEmpty()) {
+        "= definedExternally"
+    } else {
         "{ ${body.joinToString { statementNode -> statementNode.translate() }} }"
     }
     return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType} ${body}"
@@ -301,11 +300,15 @@ private fun VariableNode.translate(): String {
     val getter = "get() = ${get?.translate()};"
     val setter = "set(value) { ${set?.translate()} }"
 
-    val body = if (get == null) { "= definedExternally" } else {
+    val body = if (get == null) {
+        "= definedExternally"
+    } else {
         "${getter} ${setter}"
     }
 
-    val typeParams = if (typeParameters.isEmpty()) {""} else {
+    val typeParams = if (typeParameters.isEmpty()) {
+        ""
+    } else {
         " ${translateTypeParameters(typeParameters)}"
     }
 
@@ -390,9 +393,6 @@ private fun MemberNode.translateSignature(): List<String> {
     }
 }
 
-
-private fun IdentifierDeclaration.translate() = value
-
 private fun HeritageSymbolNode.translate(): String {
     return when (this) {
         is IdentifierNode -> translate()
@@ -472,13 +472,13 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
 
     if (staticMembers.isNotEmpty()) {
         res.add(tab.repeat(padding + 1) + "companion object {")
-        res.addAll(staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding  + 2) + it }))
+        res.addAll(staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding + 2) + it }))
         res.add(tab.repeat(padding + 1) + "}")
     }
 
 
     if (isBlock) {
-        res.add(tab.repeat(padding) +  "}")
+        res.add(tab.repeat(padding) + "}")
     }
 
     return res.joinToString("\n")
