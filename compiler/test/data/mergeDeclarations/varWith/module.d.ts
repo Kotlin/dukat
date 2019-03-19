@@ -3,7 +3,7 @@ declare var _: _.LoDashStatic;
 
 declare module _ {
 	interface LoDashStatic {
-        (value: number): LoDashWrapper<number>;
+        (value: number): LoDashArrayWrapper<number>;
         VERSION: string;
         support: Support;
     }
