@@ -107,7 +107,8 @@ fun QualifiedNode.debugTranslate(): String {
     val leftTranslate = when (left) {
         is IdentifierNode -> left.value
         is QualifiedNode -> left.debugTranslate()
-        else -> throw Exception("XXX")
+        is GenericIdentifierNode -> left.debugTranslate()
+        else -> throw Exception("unknown QualifiedNode ${left::class.simpleName}")
     }
 
     return "${leftTranslate}.${right.value}"
