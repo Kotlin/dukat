@@ -14,8 +14,6 @@ import org.jetbrains.dukat.tsmodel.factory.AstFactory
 import java.util.*
 
 
-
-
 private fun InteropEngine.loadAstBuilder() {
     val fileResolver = FileResolver()
     eval(fileResolver.readResource("ts/tsserverlibrary.js"))

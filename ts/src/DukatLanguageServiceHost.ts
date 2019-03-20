@@ -8,6 +8,7 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
         public fileResolver: FileResolver,
         private knownFiles = new Set<string>(),
         private currentDirectory: string = "",
+        private snapshotCache:Map<string, ts.IScriptSnapshot> =  new Map()
     ) {
     }
 
@@ -43,7 +44,7 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
             var contents = this.fileResolver.resolve(fileName);
             return fromString(contents);
         } catch (e) {
-            return fromString(readResourceStream(`ts/${fileName}`));
+            // TODO: need to pass error logger from frontend here
         }
     }
 

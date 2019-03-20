@@ -69,13 +69,6 @@ class AstConverter {
         return this.convertSourceMap(sourceSet);
     }
 
-    convertSourceFile(sourceFileName: string): SourceFileDeclaration {
-        let sourceSet: Map<String, SourceFileDeclaration> = new Map();
-        this.createSourceMap(sourceFileName, sourceSet);
-
-        return sourceSet.get(sourceFileName) as SourceFileDeclaration
-    }
-
     createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string): PackageDeclaration {
         return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName);
     }
@@ -751,7 +744,6 @@ class AstConverter {
 
 
     convertModule(module: ts.ModuleDeclaration, resourceName: string, sourceFileName: string): Array<Declaration> {
-
         let definitionInfos = this.declarationResolver(module.name, sourceFileName);
 
         const declarations: Declaration[] = [];
