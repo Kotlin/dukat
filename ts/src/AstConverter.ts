@@ -1,5 +1,7 @@
 declare function uid(): string;
 declare function createExportContent(): ExportContext;
+declare function createAstFactory(): AstFactory;
+declare function createFileResolver(): FileResolver;
 
 // Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
 declare namespace ts {

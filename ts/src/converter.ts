@@ -15,9 +15,6 @@ interface FileResolver {
     resolve(fileName: string): string;
 }
 
-declare class FileResolverV8 implements FileResolver {
-    resolve(fileName: string): string;
-}
 
 if (typeof console == "undefined") {
     (global as any).console = {
@@ -29,12 +26,9 @@ if (typeof console == "undefined") {
     }
 }
 
-function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName: string) {
-    if (fileResolver == null) {
-        fileResolver = new FileResolverV8();
-    }
+function main(fileName: string) {
 
-    let host = new DukatLanguageServiceHost(fileResolver);
+    let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 
     let languageService = ts.createLanguageService(host, ts.createDocumentRegistry());
@@ -54,7 +48,7 @@ function main(nativeAstFactory: AstFactory, fileResolver: FileResolver, fileName
             program.getTypeChecker(),
             (fileName: string) => program.getSourceFile(fileName),
             (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
-            nativeAstFactory == null ? new AstFactoryV8() : nativeAstFactory
+            createAstFactory()
         );
 
         return astConverter.createSourceSet(fileName);

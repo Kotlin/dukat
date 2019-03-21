@@ -9,6 +9,7 @@ import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 import org.jetbrains.dukat.tsinterop.ExportContent
+import org.jetbrains.dukat.tsinterop.ExportContentNonGeneric
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.converters.toAst
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
@@ -24,12 +25,17 @@ private fun InteropEngine.loadAstBuilder() {
 private fun createNashornInterop(): InteropNashorn {
     val engine = InteropNashorn()
 
+    engine.put("AstFactory", AstFactory::class.java)
+    engine.put("FileResolver", FileResolver::class.java)
+    engine.put("ExportContent", ExportContentNonGeneric::class.java)
+
     engine.eval("""
         var global = this;
         var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
-        var ExportContent = Java.type('org.jetbrains.dukat.tsinterop.ExportContentNonGeneric');
 
-        function createExportContent() {return new ExportContent(); }
+        function createExportContent() {return new ExportContent.static(); }
+        function createAstFactory() { return new AstFactory.static(); }
+        function createFileResolver() { return new FileResolver.static(); }
 
         var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
     """.trimIndent())
@@ -49,23 +55,23 @@ private fun createV8Interop(): InteropV8 {
     interopRuntime.proxy(object {
         fun uid() = UUID.randomUUID().toString()
         fun createExportContent(): V8Object {
-            val obj = ExportContent<V8Object>() { it.twin() }
             val proxy = V8Object(interopRuntime.runtime)
-            interopRuntime.proxy(proxy, obj).all()
+            interopRuntime.proxy(proxy, ExportContent<V8Object>() { it.twin() }).all()
+            return proxy
+        }
+
+        fun createAstFactory(): V8Object {
+            val proxy = V8Object(interopRuntime.runtime)
+            interopRuntime.proxy(proxy, AstV8Factory(AstFactory(), interopRuntime.runtime)).all()
+            return proxy
+        }
+
+        fun createFileResolver(): V8Object {
+            val proxy = V8Object(interopRuntime.runtime)
+            interopRuntime.proxy(proxy, FileResolver()).all()
             return proxy
         }
     }).all()
-
-    interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
-
-    interopRuntime
-            .proxy(interopRuntime.executeScript("AstFactoryV8.prototype"), AstV8Factory(AstFactory(), interopRuntime.runtime))
-            .all()
-
-    interopRuntime
-            .proxy(interopRuntime.executeScript("FileResolverV8.prototype"), FileResolver())
-            .all()
-
 
     return interopRuntime
 }
@@ -73,7 +79,7 @@ private fun createV8Interop(): InteropV8 {
 class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
     override fun translateFile(fileName: String): SourceSetDeclaration {
-        val result = engine.callFunction<V8Object>("main", null, null, fileName)
+        val result = engine.callFunction<V8Object>("main", fileName)
         return (V8ObjectUtils.toMap(result) as Map<String, Any?>).toAst()
     }
 
@@ -84,7 +90,7 @@ class TranslatorV8(private val engine: InteropV8) : InputTranslator {
 
 class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
     override fun translateFile(fileName: String): SourceSetDeclaration {
-        return engine.callFunction("main", AstFactory(), FileResolver(), fileName)
+        return engine.callFunction("main", fileName)
     }
 
     override fun release() {}
