@@ -1,5 +1,5 @@
 declare function uid(): string;
-declare function readResourceStream(name: string): string;
+declare function createExportContent(): ExportContext;
 
 // Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
 declare namespace ts {
@@ -7,9 +7,11 @@ declare namespace ts {
     function getDirectoryPath(path: String): string;
 }
 
+type MapLike<T> = {[key: string]: T}
+
 class AstConverter {
 
-    private exportContext = new ExportContext();
+    private exportContext = createExportContent();
 
     constructor(
         private typeChecker: ts.TypeChecker,
@@ -23,7 +25,7 @@ class AstConverter {
     }
 
 
-    createSourceMap(sourceFileName: string, sourceSet: Map<String, SourceFileDeclaration> = new Map()) {
+    createSourceMap(sourceFileName: string, sourceSet: MapLike<SourceFileDeclaration> = {}) {
         const sourceFile = this.sourceFileFetcher(sourceFileName);
 
         if (sourceFile == null) {
@@ -43,27 +45,31 @@ class AstConverter {
             sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
         );
 
-        sourceSet.set(sourceFileName, declaration);
+        sourceSet[sourceFileName] = declaration;
         let curDir = ts.getDirectoryPath(sourceFileName) +  "/";
 
         sourceFile.referencedFiles.forEach(referencedFile => {
             let resolvedPath = ts.normalizePath(curDir + referencedFile.fileName);
-            if (!sourceSet.has(resolvedPath)) {
+            if (!sourceSet.hasOwnProperty(resolvedPath)) {
                 this.createSourceMap(resolvedPath, sourceSet);
             }
         });
     }
 
-    convertSourceMap(sourceSet: Map<String, SourceFileDeclaration>): SourceSet {
+    convertSourceMap(sourceSet: MapLike<SourceFileDeclaration>): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
-        for (let [sourceName, sourceFileDeclaration] of sourceSet.entries()) {
-            sources.push(sourceFileDeclaration);
+
+        for (let sourceName in sourceSet) {
+            if (sourceSet.hasOwnProperty(sourceName)) {
+                sources.push(sourceSet[sourceName]);
+            }
         }
+
         return this.astFactory.createSourceSet(sources);
     }
 
     createSourceSet(sourceFileName: string): SourceSet {
-        let sourceSet: Map<String, SourceFileDeclaration> = new Map();
+        let sourceSet: MapLike<SourceFileDeclaration> = {};
         this.createSourceMap(sourceFileName, sourceSet);
 
         return this.convertSourceMap(sourceSet);

@@ -8,6 +8,7 @@ import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
+import org.jetbrains.dukat.tsinterop.ExportContent
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.converters.toAst
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
@@ -26,7 +27,9 @@ private fun createNashornInterop(): InteropNashorn {
     engine.eval("""
         var global = this;
         var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
-        var Map = Java.type('org.jetbrains.dukat.nashorn.Map');
+        var ExportContent = Java.type('org.jetbrains.dukat.tsinterop.ExportContentNonGeneric');
+
+        function createExportContent() {return new ExportContent(); }
 
         var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
     """.trimIndent())
@@ -45,7 +48,13 @@ private fun createV8Interop(): InteropV8 {
 
     interopRuntime.proxy(object {
         fun uid() = UUID.randomUUID().toString()
-    }).method("uid")
+        fun createExportContent(): V8Object {
+            val obj = ExportContent<V8Object>() { it.twin() }
+            val proxy = V8Object(interopRuntime.runtime)
+            interopRuntime.proxy(proxy, obj).all()
+            return proxy
+        }
+    }).all()
 
     interopRuntime.eval("function AstFactoryV8() {}; function FileResolverV8() {}")
 

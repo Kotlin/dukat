@@ -26,6 +26,7 @@ dependencies {
   implementation(project(":ast"))
   implementation(project(":ast-common"))
   implementation(project(":tsmodel"))
+  implementation(project(":tsinterop"))
   implementation(project(":itertools"))
   implementation(project(":ownerContext"))
 
