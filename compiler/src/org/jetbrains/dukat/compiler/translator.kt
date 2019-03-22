@@ -29,6 +29,7 @@ private fun createNashornInterop(): InteropNashorn {
     engine.put("AstFactory", AstFactory::class.java)
     engine.put("FileResolver", FileResolver::class.java)
     engine.put("ExportContent", ExportContentNonGeneric::class.java)
+    engine.put("KotlinLogging", KotlinLogging::class.java)
 
     engine.eval("""
         var global = this;
@@ -37,6 +38,10 @@ private fun createNashornInterop(): InteropNashorn {
         function createExportContent() {return new ExportContent.static(); }
         function createAstFactory() { return new AstFactory.static(); }
         function createFileResolver() { return new FileResolver.static(); }
+
+        function createLogger(name) {
+            return KotlinLogging.static.INSTANCE.logger(name);
+        }
 
         var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
     """.trimIndent())
