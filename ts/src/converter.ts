@@ -7,27 +7,11 @@ if (typeof ts == "undefined") {
     (global as any).ts = require("typescript/lib/tsserverlibrary");
 }
 
-declare function print(...arg: any[]): void;
-
-declare function println(arg: String): void;
-
 interface FileResolver {
     resolve(fileName: string): string;
 }
 
-
-if (typeof console == "undefined") {
-    (global as any).console = {
-        log: (...args: any[]) => {
-            if (typeof println == "function") {
-                println(args.map(it => String(it)).join(", "));
-            }
-        }
-    }
-}
-
 function main(fileName: string) {
-
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 

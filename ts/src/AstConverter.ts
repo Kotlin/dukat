@@ -15,11 +15,14 @@ class AstConverter {
 
     private exportContext = createExportContent();
 
+    private log = createLogger("AstConverter");
+
     constructor(
         private typeChecker: ts.TypeChecker,
         private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
         private declarationResolver: (node: ts.Node, fileName: string) => ts.DefinitionInfo[] | undefined,
-        private astFactory: AstFactory) {
+        private astFactory: AstFactory
+    ) {
     }
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
@@ -717,7 +720,7 @@ class AstConverter {
                     )
                 }
             }  else {
-                console.log("SKIPPING UNKNOWN EXPRESSION ASSIGNMENT", expression.kind)
+                this.log.info(`SKIPPING UNKNOWN EXPRESSION ASSIGNMENT ${expression.kind}`);
             }
         } else if (ts.isImportEqualsDeclaration(statement)) {
 
@@ -731,10 +734,10 @@ class AstConverter {
                     uid
                 )
             } else {
-                println(`[TS] skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
+                this.log.info(`[TS] skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
         } else {
-            console.log("SKIPPING ", statement.kind);
+            this.log.info(`SKIPPING ${statement.kind}`);
         }
     }
 

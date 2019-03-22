@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler
 
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
+import mu.KotlinLogging
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
@@ -69,6 +70,17 @@ private fun createV8Interop(): InteropV8 {
         fun createFileResolver(): V8Object {
             val proxy = V8Object(interopRuntime.runtime)
             interopRuntime.proxy(proxy, FileResolver()).all()
+            return proxy
+        }
+
+        fun createLogger(name: String) : V8Object {
+            val proxy = V8Object(interopRuntime.runtime)
+            interopRuntime.proxy(proxy, KotlinLogging.logger(name))
+                    .method("debug", InteropV8Signature.STRING)
+                    .method("trace", InteropV8Signature.STRING)
+                    .method("info", InteropV8Signature.STRING)
+                    .method("warn", InteropV8Signature.STRING)
+
             return proxy
         }
     }).all()
