@@ -165,4 +165,28 @@ fun DocumentRootNode.lowerOverrides(astContext: AstContext): DocumentRootNode {
     return copy(declarations = loweredDeclarations)
 }
 
-fun SourceSetNode.lowerOverrides(astContext: AstContext) = transform { it.lowerOverrides(astContext) }
+private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
+    for (declaration in declarations) {
+        if (declaration is InterfaceNode) {
+            astContext.registerInterface(declaration)
+        }
+        if (declaration is ClassNode) {
+            astContext.registerClass(declaration)
+        }
+        if (declaration is DocumentRootNode) {
+            declaration.updateContext(astContext)
+        }
+    }
+
+    return this
+}
+
+private fun SourceSetNode.updateContext(astContext: AstContext) = transform { it.updateContext(astContext) }
+
+
+fun SourceSetNode.lowerOverrides(): SourceSetNode {
+    val astContext = AstContext()
+    return updateContext(astContext).transform {
+        it.lowerOverrides(astContext)
+    }
+}

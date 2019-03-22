@@ -1,12 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.ast.model.model.SourceSetModel
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
@@ -37,30 +31,11 @@ import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
-private fun DocumentRootNode.updateContext(astContext: AstContext): DocumentRootNode {
-    for (declaration in declarations) {
-        if (declaration is InterfaceNode) {
-            astContext.registerInterface(declaration)
-        }
-        if (declaration is ClassNode) {
-            astContext.registerClass(declaration)
-        }
-        if (declaration is DocumentRootNode) {
-            declaration.updateContext(astContext)
-        }
-    }
-
-    return this
-}
-
-private fun SourceSetNode.updateContext(astContext: AstContext) = transform { it.updateContext(astContext) }
-
 interface InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
     fun release()
 
     fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
-        val myAstContext = AstContext()
 
         return documentRoot
                 .filterOutNonDeclarations()
@@ -78,8 +53,7 @@ interface InputTranslator {
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerThisType()
-                .updateContext(myAstContext)
-                .lowerOverrides(myAstContext)
+                .lowerOverrides()
                 .resolveTypeAliases()
                 .specifyUnionType()
                 .rearrangeGeneratedEntities()
