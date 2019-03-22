@@ -627,7 +627,9 @@ class AstConverter {
         return  parentEntities
     }
 
-    private * convertStatement(statement: ts.Node, resourceName: string, sourceFileName: string): IterableIterator<Declaration> {
+    private convertStatement(statement: ts.Node, resourceName: string, sourceFileName: string): Array<Declaration> {
+        let res: Array<Declaration> = [];
+
         if (ts.isEnumDeclaration(statement)) {
             let enumTokens = statement.members.map(member =>
                 this.astFactory.createEnumTokenDeclaration(
@@ -635,48 +637,48 @@ class AstConverter {
                     member.initializer ? member.initializer.getText() : ""
                 ));
 
-            yield this.astFactory.createEnumDeclaration(
+            res.push(this.astFactory.createEnumDeclaration(
                 statement.name.getText(),
                 enumTokens
-            )
+            ))
         } else if (ts.isVariableStatement(statement)) {
             for (let declaration of statement.declarationList.declarations) {
-                yield this.astFactory.declareVariable(
+                res.push(this.astFactory.declareVariable(
                     declaration.name.getText(),
                     this.convertType(declaration.type),
                     this.convertModifiers(statement.modifiers),
                     this.exportContext.getUID(declaration)
-                );
+                ));
             }
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
-                yield this.convertTypeLiteralToInterfaceDeclaration(
+                res.push(this.convertTypeLiteralToInterfaceDeclaration(
                         statement.name.getText(),
                         statement.type as ts.TypeLiteralNode,
                         statement.typeParameters
-                    );
+                    ));
             } else {
-                yield this.convertTypeAliasDeclaration(statement);
+                res.push(this.convertTypeAliasDeclaration(statement));
             }
         } else if (ts.isClassDeclaration(statement)) {
             if (statement.name != undefined) {
 
                 let uid = this.exportContext.getUID(statement);
 
-                yield this.astFactory.createClassDeclaration(
+                res.push(this.astFactory.createClassDeclaration(
                         statement.name.getText(),
                         this.convertClassElementsToMembers(statement.members),
                         this.convertTypeParams(statement.typeParameters),
                         this.convertHeritageClauses(statement.heritageClauses),
                         this.convertModifiers(statement.modifiers),
                         uid
-                    );
+                    ));
             }
 
         } else if (ts.isFunctionDeclaration(statement)) {
             let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
             if (convertedFunctionDeclaration != null) {
-                yield convertedFunctionDeclaration
+                res.push(convertedFunctionDeclaration);
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
             let definitionInfos = this.declarationResolver(statement.name, sourceFileName);
@@ -689,17 +691,17 @@ class AstConverter {
                 });
             }
 
-                yield this.astFactory.createInterfaceDeclaration(
+                res.push(this.astFactory.createInterfaceDeclaration(
                     statement.name.getText(),
                     this.convertMembersToInterfaceMemberDeclarations(statement.members),
                     this.convertTypeParams(statement.typeParameters),
                     this.convertHeritageClauses(statement.heritageClauses),
                     definitionsInfoDeclarations,
                     this.exportContext.getUID(statement)
-                )
+                ));
         } else if (ts.isModuleDeclaration(statement)) {
             for (let moduleDeclaration of this.convertModule(statement, resourceName, sourceFileName)) {
-                yield moduleDeclaration;
+                res.push(moduleDeclaration);
             }
         } else if (ts.isExportAssignment(statement)) {
             let expression = statement.expression;
@@ -715,9 +717,9 @@ class AstConverter {
                     let declaration = symbol.declarations[0];
 
                     let uid = this.exportContext.getUID(declaration);
-                    yield this.astFactory.createExportAssignmentDeclaration(
+                    res.push(this.astFactory.createExportAssignmentDeclaration(
                             uid, !!statement.isExportEquals
-                    )
+                    ));
                 }
             }  else {
                 this.log.info(`SKIPPING UNKNOWN EXPRESSION ASSIGNMENT ${expression.kind}`);
@@ -728,17 +730,19 @@ class AstConverter {
                 let moduleReferenceDeclaration = this.convertEntityName(statement.moduleReference);
                 let uid = ts.isModuleBlock(statement.parent) ? this.exportContext.getUID(statement.parent.parent) : this.exportContext.getUID(statement.parent);
 
-                yield this.astFactory.createImportEqualsDeclaration(
+                res.push(this.astFactory.createImportEqualsDeclaration(
                     statement.name.getText(),
                     moduleReferenceDeclaration as ModuleReferenceDeclaration,
                     uid
-                )
+                ));
             } else {
                 this.log.info(`[TS] skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
         } else {
             this.log.info(`SKIPPING ${statement.kind}`);
         }
+
+        return res;
     }
 
 
