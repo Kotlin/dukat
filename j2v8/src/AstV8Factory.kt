@@ -183,7 +183,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     }
 
     fun createIntersectionTypeDeclaration(params: V8Array): V8Object = astFactory.createIntersectionTypeDeclaration(params.toAst()).toV8()
-    fun createUnionTypeDeclaration(params: V8Array): V8Object = astFactory.createUnionDeclaration(params.toAst()).toV8()
+    fun createUnionTypeDeclaration(params: V8Array): V8Object = astFactory.createUnionTypeDeclaration(params.toAst()).toV8()
     fun createTypeDeclaration(value: String, params: V8Array): V8Object =
             astFactory.createTypeDeclaration(value, params.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
 

@@ -130,7 +130,7 @@ interface AstNodeFactory<T> {
     ): T
 
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>): T
-    fun createUnionDeclaration(params: List<ParameterValueDeclaration>): T
+    fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String): T
     fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): T
