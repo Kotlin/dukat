@@ -400,6 +400,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     mutableListOf(),
                     false,
                     true,
+                    null,
                     QualifiedStatementNode(
                             QualifiedStatementNode(
                                     IdentifierNode("this"),
@@ -548,6 +549,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         mutableListOf(),
                         false,
                         false,
+                        IdentifierNode("definedExternally"),
                         null,
                         null,
                         emptyList(),
@@ -577,6 +579,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     mutableListOf(),
                     false,
                     false,
+                    IdentifierNode("definedExternally"),
                     null,
                     null,
                     emptyList(),

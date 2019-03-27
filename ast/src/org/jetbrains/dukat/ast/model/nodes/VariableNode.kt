@@ -12,6 +12,7 @@ data class VariableNode(
 
         var immutable: Boolean,
         val inline: Boolean,
+        val initializer: StatementNode?,
         val get: StatementNode?,
         val set: StatementNode?,
         val typeParameters: List<TypeParameterDeclaration>,

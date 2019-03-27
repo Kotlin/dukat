@@ -239,8 +239,8 @@ fun VariableNode.translate(): String {
     val getter = "get() = ${get?.translate()};"
     val setter = "set(value) { ${set?.translate()} }"
 
-    val body = if (get == null) {
-        "= definedExternally"
+    val body = if (initializer != null) {
+        "= ${initializer?.translate()}"
     } else {
         "${getter} ${setter}"
     }
