@@ -224,7 +224,7 @@ fun MethodNode.translate(): List<String> {
 
     val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
 
-    val metaClause = if (operator) "" else type.translateMeta()
+    val metaClause = type.translateMeta()
     return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}$metaClause${definedExternallyClause}")
 }
 
