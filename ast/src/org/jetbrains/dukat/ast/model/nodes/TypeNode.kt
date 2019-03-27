@@ -11,12 +11,11 @@ data class TypeNode(
 ) : ParameterValueDeclaration {
     constructor(value: String, params: List<ParameterValueDeclaration>) : this(IdentifierNode(value), params)
     constructor(value: String, params: List<ParameterValueDeclaration>, nullable: Boolean, meta: ParameterValueDeclaration?) : this(IdentifierNode(value), params, nullable, meta)
+}
 
-    // TODO: investiate why function was not reachable
-    fun isPrimitive(primitive: String) : Boolean {
-        return when(this.value) {
-            is IdentifierNode -> value.value == primitive
-            else -> false
-        }
+fun TypeNode.isPrimitive(primitive: String) : Boolean {
+    return when(this.value) {
+        is IdentifierNode -> value.value == primitive
+        else -> false
     }
 }

@@ -1,21 +1,22 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.model.ClassLikeModel
-import org.jetbrains.dukat.ast.model.model.ClassModel
-import org.jetbrains.dukat.ast.model.model.InterfaceModel
-import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.model.SourceSetModel
-import org.jetbrains.dukat.ast.model.model.transform
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private data class ClassLikeKey(
-    val name: String,
-    val typeParameters: List<TypeParameterDeclaration>
+        val name: String,
+        val typeParameters: List<TypeParameterDeclaration>
 )
 
 private fun ClassModel.createKey(): ClassLikeKey {
@@ -36,18 +37,18 @@ private fun ClassLikeModel.createKey(): ClassLikeKey? {
 
 private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
     return copy(
-        name = name,
-        typeParameters = typeParameters,
-        members = members + otherClass.members,
-        companionObject = companionObject.copy(members = companionObject.members + otherClass.companionObject.members),
-        parentEntities = parentEntities + otherClass.parentEntities
+            name = name,
+            typeParameters = typeParameters,
+            members = members + otherClass.members,
+            companionObject = companionObject.copy(members = companionObject.members + otherClass.companionObject.members),
+            parentEntities = parentEntities + otherClass.parentEntities
     )
 }
 
 private fun ParameterValueDeclaration.substituteUnit(): ParameterValueDeclaration {
-    val returnsUnit = this == TypeNode("Unit", emptyList())
+    val returnsUnit = this is TypeValueModel && value == IdentifierNode("Unit")
     return if (returnsUnit) {
-        TypeNode("@@None", emptyList())
+        TypeValueModel(IdentifierNode("@@None"), emptyList(), null)
     } else this
 }
 
@@ -82,13 +83,13 @@ private fun InterfaceModel.mergeWithInterface(otherInterface: InterfaceModel): I
 }
 
 private fun ClassLikeModel.merge(otherClassLike: ClassLikeModel): ClassLikeModel {
-    return when(this) {
-        is ClassModel -> when(otherClassLike) {
+    return when (this) {
+        is ClassModel -> when (otherClassLike) {
             is ClassModel -> mergeWithClass(otherClassLike)
             is InterfaceModel -> mergeWithInterface(otherClassLike)
             else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
         }
-        is InterfaceModel -> when(otherClassLike) {
+        is InterfaceModel -> when (otherClassLike) {
             is ClassModel -> otherClassLike.mergeWithInterface(this)
             is InterfaceModel -> mergeWithInterface(otherClassLike)
             else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
@@ -112,7 +113,7 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
 
     val classlikeBucketsMerged = classlikeBuckets
             .mapValues { entry ->
-                entry.value.reduceRight {classLikeModel, acc -> classLikeModel.merge(acc) }
+                entry.value.reduceRight { classLikeModel, acc -> classLikeModel.merge(acc) }
             }.toMutableMap()
 
     val declarationResolved = mutableListOf<TopLevelDeclaration>()
@@ -129,8 +130,8 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
     val submodulesResolved = sumbodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
 
     return copy(
-        declarations = declarationResolved,
-        sumbodules = submodulesResolved
+            declarations = declarationResolved,
+            sumbodules = submodulesResolved
     )
 }
 

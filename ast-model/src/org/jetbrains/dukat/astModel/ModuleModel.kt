@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.model
+package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration

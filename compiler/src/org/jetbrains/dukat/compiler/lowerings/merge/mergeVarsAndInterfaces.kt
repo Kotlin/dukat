@@ -1,14 +1,14 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
-import org.jetbrains.dukat.ast.model.model.ExternalDelegationModel
-import org.jetbrains.dukat.ast.model.model.HeritageModel
-import org.jetbrains.dukat.ast.model.model.InterfaceModel
-import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.model.SourceSetModel
-import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ExternalDelegationModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.transform
 
 
 fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
@@ -51,9 +51,9 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                     "__",
                                     emptyList(),
                                     listOf(
-                                        HeritageModel(correspondingVariable.type, ExternalDelegationModel())
+                                            HeritageModel(correspondingVariable.type, ExternalDelegationModel())
                                     )
-                    )))
+                            )))
                 }
             }
             else -> listOf(declaration)

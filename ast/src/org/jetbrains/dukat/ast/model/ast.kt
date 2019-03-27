@@ -18,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -58,6 +59,7 @@ fun <T : AstNode> AstNode.duplicate(): T {
         is ParameterDeclaration -> copy() as T
         is FunctionTypeDeclaration -> copy() as T
         is TypeAliasDeclaration -> copy() as T
+        is GeneratedInterfaceReferenceDeclaration -> copy() as T
         else -> throw Exception("can not copy ${this}")
     }
 }

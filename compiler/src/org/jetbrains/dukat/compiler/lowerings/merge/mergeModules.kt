@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.model.SourceSetModel
-import org.jetbrains.dukat.ast.model.model.transform
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.transform
 
 
 private fun ModuleModel.merge(module: ModuleModel): ModuleModel {

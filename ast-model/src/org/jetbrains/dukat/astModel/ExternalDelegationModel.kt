@@ -1,3 +1,3 @@
-package org.jetbrains.dukat.ast.model.model
+package org.jetbrains.dukat.astModel
 
 class ExternalDelegationModel : DelegationModel

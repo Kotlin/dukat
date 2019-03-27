@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.model.ClassModel
-import org.jetbrains.dukat.ast.model.model.InterfaceModel
-import org.jetbrains.dukat.ast.model.model.ModuleModel
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class DeclarationKey(

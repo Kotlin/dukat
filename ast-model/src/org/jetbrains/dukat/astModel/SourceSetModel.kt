@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.model
+package org.jetbrains.dukat.astModel
 
 data class SourceSetModel(val sources: List<SourceFileModel>)
 

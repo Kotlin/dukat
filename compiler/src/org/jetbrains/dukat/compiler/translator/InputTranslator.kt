@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
-import org.jetbrains.dukat.ast.model.model.SourceSetModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations

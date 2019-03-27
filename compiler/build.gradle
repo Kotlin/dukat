@@ -25,10 +25,12 @@ dependencies {
 
   implementation(project(":ast"))
   implementation(project(":ast-common"))
+  implementation(project(":ast-model"))
   implementation(project(":tsmodel"))
   implementation(project(":tsinterop"))
   implementation(project(":itertools"))
   implementation(project(":ownerContext"))
+  implementation(project(":translator-string"))
 
   implementation(project(":nashorn"))
   implementation(project(":j2v8"))

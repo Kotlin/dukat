@@ -1,11 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.model.ClassModel
-import org.jetbrains.dukat.ast.model.model.CompanionObjectModel
-import org.jetbrains.dukat.ast.model.model.InterfaceModel
-import org.jetbrains.dukat.ast.model.model.ModuleModel
-import org.jetbrains.dukat.ast.model.model.SourceSetModel
-import org.jetbrains.dukat.ast.model.model.transform
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -15,6 +9,12 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 
 

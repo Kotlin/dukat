@@ -1,16 +1,20 @@
-package org.jetbrains.dukat.ast.model.model
+package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
-data class InterfaceModel(
+data class ClassModel(
         val name: String,
-        val members: List<MemberNode>,
+        var members: List<MemberNode>,
         val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageNode>,
+        val primaryConstructor: ConstructorNode?,
         val annotations: MutableList<AnnotationNode>
-) : ClassLikeNode, ClassLikeModel
+
+
+) : ClassLikeNode, ClassLikeModel, DelegationModel, MemberNode
