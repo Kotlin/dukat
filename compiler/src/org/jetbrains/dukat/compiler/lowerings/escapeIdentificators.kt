@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -47,7 +47,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         )
     }
 
-    private fun TypeNode.escape(): TypeNode {
+    private fun ValueTypeNode.escape(): ValueTypeNode {
         val typeNodeValue = value
         return when (typeNodeValue) {
             is IdentifierNode -> copy(value = typeNodeValue.escape())
@@ -70,7 +70,7 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeNode -> declaration.escape()
+            is ValueTypeNode -> declaration.escape()
             is QualifiedNode -> declaration.escape()
             else -> {
                 super.lowerParameterValue(declaration)

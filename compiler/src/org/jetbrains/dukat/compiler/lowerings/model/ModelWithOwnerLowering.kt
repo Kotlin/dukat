@@ -5,10 +5,10 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -32,7 +32,7 @@ interface ModelWithOwnerLowering {
     fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
 
 
-    fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): ParameterValueDeclaration
+    fun lowerTypeNode(ownerContext: NodeOwner<ValueTypeNode>): ParameterValueDeclaration
     fun lowerFunctionTypeNode(ownerContext: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
     fun lowerUnionTypeNode(ownerContext: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
     fun lowerTupleDeclaration(ownerContext: NodeOwner<TupleDeclaration>): ParameterValueDeclaration
@@ -40,7 +40,7 @@ interface ModelWithOwnerLowering {
     fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = ownerContext.node
         return when (declaration) {
-            is TypeNode -> lowerTypeNode(NodeOwner(declaration, ownerContext))
+            is ValueTypeNode -> lowerTypeNode(NodeOwner(declaration, ownerContext))
             is FunctionTypeNode -> lowerFunctionTypeNode(NodeOwner(declaration, ownerContext))
             is UnionTypeNode -> lowerUnionTypeNode(NodeOwner(declaration, ownerContext))
             is TupleDeclaration -> lowerTupleDeclaration(NodeOwner(declaration, ownerContext))
@@ -58,7 +58,7 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelNode>): TopLevelNode {
         val declaration = ownerContext.node
         return when (declaration) {
             is VariableNode -> lowerVariableNode(NodeOwner(declaration, ownerContext))
@@ -70,7 +70,7 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, ownerContext: NodeOwner<ModuleModel>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, ownerContext: NodeOwner<ModuleModel>): List<TopLevelNode> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(NodeOwner(declaration, ownerContext))
         }

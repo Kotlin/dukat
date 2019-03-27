@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -25,11 +25,11 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-fun TypeNode.isGeneric() = params.isNotEmpty()
+fun ValueTypeNode.isGeneric() = params.isNotEmpty()
 
 fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
-        is TypeNode -> copy(nullable = true)
+        is ValueTypeNode -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
         is FunctionTypeNode -> copy(nullable = true)
@@ -55,7 +55,7 @@ fun <T : AstNode> AstNode.duplicate(): T {
         is FunctionDeclaration -> copy() as T
         is FunctionNode -> copy() as T
         is TypeDeclaration -> copy() as T
-        is TypeNode -> copy() as T
+        is ValueTypeNode -> copy() as T
         is ParameterDeclaration -> copy() as T
         is FunctionTypeDeclaration -> copy() as T
         is TypeAliasDeclaration -> copy() as T

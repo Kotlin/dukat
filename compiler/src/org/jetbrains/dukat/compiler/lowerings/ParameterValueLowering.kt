@@ -13,8 +13,8 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -104,7 +104,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
-    override fun lowerTypeNode(declaration: TypeNode): TypeNode {
+    override fun lowerTypeNode(declaration: ValueTypeNode): ValueTypeNode {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
@@ -129,7 +129,7 @@ interface ParameterValueLowering : Lowering {
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerParameterValue(TypeNode(it.value, emptyList())) as TypeNode
+            val lowerParameterDeclaration = lowerParameterValue(ValueTypeNode(it.value, emptyList())) as ValueTypeNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)

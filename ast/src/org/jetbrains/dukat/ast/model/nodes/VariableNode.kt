@@ -18,4 +18,4 @@ data class VariableNode(
         val typeParameters: List<TypeParameterDeclaration>,
         var owner: DocumentRootNode?,
         val uid: String
-) : TopLevelDeclaration, MergableNode
+) : TopLevelDeclaration, MergableNode, TopLevelNode

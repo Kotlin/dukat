@@ -58,33 +58,34 @@ private fun translateTypeParams(params: List<ParameterValueDeclaration>): String
 }
 
 fun ParameterValueDeclaration.translate(needsMeta: Boolean = false): String {
-    if (this is TypeValueModel) {
-        val res = mutableListOf(value.translate())
-        if (isGeneric()) {
-            res.add(translateTypeParams(params))
+    return when(this) {
+        is TypeValueModel -> {
+            val res = mutableListOf(value.translate())
+            if (isGeneric()) {
+                res.add(translateTypeParams(params))
+            }
+            if (nullable) {
+                res.add("?")
+            }
+            res.joinToString("")
         }
-        if (nullable) {
-            res.add("?")
+        is FunctionTypeModel -> {
+            val res = mutableListOf("(")
+            val paramsList = mutableListOf<String>()
+            for (param in parameters) {
+                val paramSerialized = param.name + ": " + param.type.translate() + param.type.translateMeta()
+                paramsList.add(paramSerialized)
+            }
+            res.add(paramsList.joinToString(", ") + ")")
+            res.add(" -> ${type.translate()}")
+            var translated = res.joinToString("")
+            if (nullable) {
+                translated = "(${translated})?"
+            }
+            translated
         }
-        return res.joinToString("")
-    } else if (this is FunctionTypeModel) {
-        val res = mutableListOf("(")
-        val paramsList = mutableListOf<String>()
-        for (param in parameters) {
-            val paramSerialized = param.name + ": " + param.type.translate() + param.type.translateMeta()
-            paramsList.add(paramSerialized)
-        }
-        res.add(paramsList.joinToString(", ") + ")")
-        res.add(" -> ${type.translate()}")
-        var translated = res.joinToString("")
-        if (nullable) {
-            translated = "(${translated})?"
-        }
-        return translated
-    } else if (this is QualifiedNode) {
-        return translate()
-    } else {
-        return "failed to translateType ${this}"
+        is QualifiedNode -> return translate()
+        else -> return "failed to translateType ${this}"
     }
 }
 
@@ -365,7 +366,7 @@ fun ParameterValueDeclaration.translateAsHeritageClause(): String {
 
             when (value) {
                 is IdentifierNode -> "${(value as IdentifierNode).value}${typeParams}"
-                else -> throw Exception("unknown TypeNodeValue ${value}")
+                else -> throw Exception("unknown ValueTypeNodeValue ${value}")
             }
         }
         else -> ""

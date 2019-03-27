@@ -4,4 +4,4 @@ import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 
 data class IdentifierNode(
     val value: String
-) : TypeNodeValue, HeritageSymbolNode, ModuleReferenceDeclaration, QualifiedStatementLeftNode, QualifiedStatementRightNode, NameNode, StatementNode
+) : ValueTypeNodeValue, HeritageSymbolNode, ModuleReferenceDeclaration, QualifiedStatementLeftNode, QualifiedStatementRightNode, NameNode, StatementNode

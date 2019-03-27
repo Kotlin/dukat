@@ -15,13 +15,13 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -140,7 +140,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 emptyList(),
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
         )
-        is TypeNode -> {
+        is ValueTypeNode -> {
             if ((value == IdentifierNode("String")) && (meta is StringTypeDeclaration)) {
                 TypeValueModel(value as NameNode, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
             } else {
@@ -176,7 +176,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
     }
 }
 
-private fun ClassNode.convertToClassModel(): ClassModel {
+private fun ClassNode.convertToClassModel(): TopLevelNode {
     val membersSplitted = split(members)
 
     return ClassModel(
@@ -240,7 +240,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     }
 
 
-    val declarationsFiltered = mutableListOf<TopLevelDeclaration>()
+    val declarationsFiltered = mutableListOf<TopLevelNode>()
     val submodules = mutableListOf<ModuleModel>()
     declarations.forEach { declaration ->
         if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)

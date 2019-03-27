@@ -10,8 +10,8 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -88,7 +88,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(NodeOwner(param, ownerContext)) })
     }
 
-    override fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): TypeNode {
+    override fun lowerTypeNode(ownerContext: NodeOwner<ValueTypeNode>): ValueTypeNode {
         val declaration = ownerContext.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(NodeOwner(param, ownerContext)) })
     }
@@ -115,7 +115,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val heritageClause = ownerContext.node
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerParameterValue(NodeOwner(TypeNode(it.value, emptyList()), ownerContext)) as TypeNode
+            val lowerParameterDeclaration = lowerParameterValue(NodeOwner(ValueTypeNode(it.value, emptyList()), ownerContext)) as ValueTypeNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)

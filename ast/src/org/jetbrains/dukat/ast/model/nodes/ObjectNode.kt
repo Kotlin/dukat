@@ -5,4 +5,4 @@ data class ObjectNode(
         val members: List<MemberNode>,
 
         val parentEntities: List<HeritageNode>
-) : ClassLikeNode
+) : ClassLikeNode, TopLevelNode

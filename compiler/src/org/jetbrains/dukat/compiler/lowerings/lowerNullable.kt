@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -23,13 +23,13 @@ private class LowerNullable : ParameterValueLowering {
         return when (declaration) {
             is UnionTypeDeclaration -> {
                 val params = declaration.params.filter { param ->
-                    param != TypeNode("undefined", emptyList()) &&
-                            param != TypeNode("null", emptyList())
+                    param != ValueTypeNode("undefined", emptyList()) &&
+                            param != ValueTypeNode("null", emptyList())
                 }
 
                 if (params.size == 1) {
                     val nullableType = params[0]
-                    if (nullableType is TypeNode) {
+                    if (nullableType is ValueTypeNode) {
                         val res = lowerTypeNode(nullableType)
                         res.nullable = true
                         res.meta = MuteMetadata()
@@ -47,7 +47,7 @@ private class LowerNullable : ParameterValueLowering {
             is FunctionTypeNode -> {
                 return lowerFunctionNode(declaration)
             }
-            is TypeNode -> {
+            is ValueTypeNode -> {
                 return lowerTypeNode(declaration)
             }
             else -> super.lowerParameterValue(declaration)

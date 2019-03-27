@@ -5,8 +5,8 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -18,11 +18,11 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         val parentEntitiesRemapped = declaration.parentEntities.map { parent ->
             val resolved = context.resolveTypeAlias(parent)
 
-            if (resolved is TypeNode) {
+            if (resolved is ValueTypeNode) {
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
                     is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
-                    else -> throw Exception("unknown TypeNodeValue $typeNodeValue")
+                    else -> throw Exception("unknown ValueTypeNodeValue $typeNodeValue")
                 }
             } else {
                 parent

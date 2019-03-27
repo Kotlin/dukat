@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.NameNode
+import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -45,7 +45,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
         val classKey = ClassKey(moduleModel.shortName, qualifiedNode.debugTranslate())
         if (myClassMap.containsKey(classKey)) {
             val classDeclarations = mutableListOf<ClassModel>()
-            val nonClassDeclarations = mutableListOf<TopLevelDeclaration>()
+            val nonClassDeclarations = mutableListOf<TopLevelNode>()
             moduleModel.declarations.forEach { declaration ->
                 when (declaration) {
                     is ClassModel -> classDeclarations.add(declaration)

@@ -5,9 +5,9 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -25,10 +25,10 @@ private fun HeritageSymbolNode.translate(): String {
     }
 }
 
-private fun TypeNodeValue.getAliasKey(): String {
+private fun ValueTypeNodeValue.getAliasKey(): String {
     return when(this) {
         is IdentifierNode -> translate()
-        else -> throw Exception("unknown TypeNodeValue ${this}")
+        else -> throw Exception("unknown ValueTypeNodeValue ${this}")
     }
 }
 
@@ -41,10 +41,10 @@ class TypeAliasContext {
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
         return when (this) {
-            is TypeNode -> {
+            is ValueTypeNode -> {
                 val paramsSpecified = params.map { param ->
                     when (param) {
-                        is TypeNode -> {
+                        is ValueTypeNode -> {
                             resolveTypeAlias(aliasParamsMap.getOrDefault(param.value.getAliasKey(), param.specify(aliasParamsMap)))
                         }
                         else -> param
@@ -53,7 +53,7 @@ class TypeAliasContext {
 
                 val valueAliasResolved = aliasParamsMap.get(value.getAliasKey())
 
-                val valueResolved = if (valueAliasResolved is TypeNode) {
+                val valueResolved = if (valueAliasResolved is ValueTypeNode) {
                     valueAliasResolved.value
                 } else value
 
@@ -86,13 +86,13 @@ class TypeAliasContext {
 
     private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
         return when (type) {
-            is TypeNode -> {
+            is ValueTypeNode -> {
                 if (type.isPrimitive(aliasName)) {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 
                         when (typeReference) {
-                            is TypeNode -> return typeReference.specify(aliasParamsMap)
+                            is ValueTypeNode -> return typeReference.specify(aliasParamsMap)
                             is UnionTypeNode -> return typeReference.specify(aliasParamsMap)
                             is FunctionTypeNode -> return typeReference.specify(aliasParamsMap)
                             is GeneratedInterfaceReferenceDeclaration -> return typeReference

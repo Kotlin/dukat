@@ -8,8 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -33,7 +33,7 @@ interface Lowering {
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
-    fun lowerTypeNode(declaration: TypeNode): ParameterValueDeclaration
+    fun lowerTypeNode(declaration: ValueTypeNode): ParameterValueDeclaration
     fun lowerFunctionNode(declaration: FunctionTypeNode): ParameterValueDeclaration
     fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): ParameterValueDeclaration
     fun lowerUnionTypeNode(declaration: UnionTypeNode): ParameterValueDeclaration
@@ -42,7 +42,7 @@ interface Lowering {
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeNode -> lowerTypeNode(declaration)
+            is ValueTypeNode -> lowerTypeNode(declaration)
             is FunctionTypeNode -> lowerFunctionNode(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)

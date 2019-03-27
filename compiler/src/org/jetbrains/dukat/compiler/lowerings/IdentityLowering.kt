@@ -6,8 +6,8 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -25,7 +25,7 @@ interface IdentityLowering : Lowering {
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode = declaration
 
-    override fun lowerTypeNode(declaration: TypeNode): TypeNode = declaration
+    override fun lowerTypeNode(declaration: ValueTypeNode): ValueTypeNode = declaration
 
     override fun lowerFunctionNode(declaration: FunctionTypeNode): FunctionTypeNode = declaration
 

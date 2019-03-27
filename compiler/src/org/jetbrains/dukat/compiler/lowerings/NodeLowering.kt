@@ -8,8 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -34,7 +34,7 @@ interface NodeLowering {
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
     fun lowerObjectNode(owner: NodeOwner<ObjectNode>): ObjectNode
 
-    fun lowerTypeNode(owner: NodeOwner<TypeNode>): ParameterValueDeclaration
+    fun lowerTypeNode(owner: NodeOwner<ValueTypeNode>): ParameterValueDeclaration
     fun lowerFunctionNode(owner: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
     fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): ParameterValueDeclaration
     fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
@@ -44,7 +44,7 @@ interface NodeLowering {
     fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
         return when (declaration) {
-            is TypeNode -> lowerTypeNode(owner.wrap(declaration))
+            is ValueTypeNode -> lowerTypeNode(owner.wrap(declaration))
             is FunctionTypeNode -> lowerFunctionNode(owner.wrap(declaration))
             is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner.wrap(declaration))
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner.wrap(declaration))
