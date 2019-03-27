@@ -28,6 +28,10 @@ task createJar(type: Zip) {
     into 'ts'
   }
 
+  from("${project.projectDir}/node_modules/typescript/lib") {
+    include "**/*.d.ts"
+    into 'ts'
+  }
 }
 
 configurations {
