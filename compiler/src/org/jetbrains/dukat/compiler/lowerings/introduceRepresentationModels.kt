@@ -24,6 +24,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -220,10 +221,18 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
             is DocumentRootNode -> declaration.introduceRepresentationModels()
             is ClassNode -> declaration.convertToClassModel()
             is InterfaceNode -> declaration.convertToInterfaceModel()
-            is FunctionNode -> declaration.copy(
+            is FunctionNode -> FunctionModel(
+                    name = declaration.name,
                     parameters = declaration.parameters.map { param -> param.process() },
+                    type = declaration.type.process(),
+
                     typeParameters = declaration.typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
-                    type = declaration.type.process()
+                    generatedReferenceNodes = declaration.generatedReferenceNodes,
+                    annotations = declaration.annotations,
+                    export = declaration.export,
+                    inline = declaration.inline,
+                    operator = declaration.operator,
+                    body = declaration.body
             )
             is EnumNode -> declaration
             is VariableNode -> VariableModel(

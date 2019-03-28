@@ -2,7 +2,6 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
@@ -22,6 +21,7 @@ import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.DelegationModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -58,7 +58,7 @@ private fun translateTypeParams(params: List<ParameterValueDeclaration>): String
 }
 
 fun ParameterValueDeclaration.translate(needsMeta: Boolean = false): String {
-    return when(this) {
+    return when (this) {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
             if (isGeneric()) {
@@ -189,7 +189,7 @@ fun StatementNode.translate(): String {
     }
 }
 
-fun FunctionNode.translate(): String {
+fun FunctionModel.translate(): String {
     val returnType = type.translate()
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -435,7 +435,7 @@ fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add(declaration.translate())
         } else if (declaration is EnumNode) {
             res.add(declaration.translate())
-        } else if (declaration is FunctionNode) {
+        } else if (declaration is FunctionModel) {
             res.add(declaration.translate())
         } else if (declaration is ClassModel) {
             res.add(declaration.translate(false, 0))

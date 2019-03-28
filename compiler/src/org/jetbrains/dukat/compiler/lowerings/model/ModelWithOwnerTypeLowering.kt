@@ -2,7 +2,6 @@ package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
@@ -13,6 +12,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -59,7 +59,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         }
     }
 
-    override fun lowerFunctionNode(ownerContext: NodeOwner<FunctionNode>): FunctionNode {
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(NodeOwner(parameter, ownerContext)) },

@@ -1,12 +1,19 @@
-package org.jetbrains.dukat.ast.model.nodes
+package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.ast.model.nodes.MergableNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
+import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-data class FunctionNode(
+data class FunctionModel(
         val name: NameNode,
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
@@ -19,7 +26,5 @@ data class FunctionNode(
         val inline: Boolean,
         val operator: Boolean,
 
-        var owner: DocumentRootNode?,
-        val body: List<StatementNode>,
-        val uid: String
-) : MemberDeclaration, TopLevelDeclaration, MergableNode, MemberNode
+        val body: List<StatementNode>
+) : MemberDeclaration, TopLevelDeclaration, MergableNode, MemberNode, TopLevelNode

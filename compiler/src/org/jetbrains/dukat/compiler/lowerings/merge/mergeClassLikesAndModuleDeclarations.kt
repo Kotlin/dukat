@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -10,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -37,7 +37,7 @@ private fun VariableModel.convert(): MemberNode {
     )
 }
 
-private fun FunctionNode.convert(): MemberNode {
+private fun FunctionModel.convert(): MemberNode {
 
     return MethodNode(
             name = name.translate(),
@@ -56,7 +56,7 @@ private fun FunctionNode.convert(): MemberNode {
 
 private fun MergableNode.convert(): MemberNode {
     return when (this) {
-        is FunctionNode -> convert()
+        is FunctionModel -> convert()
         is VariableModel -> convert()
         else -> throw Error("can not convert unknown MergableNode ${this}")
     }
