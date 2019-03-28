@@ -10,7 +10,7 @@ data class InterfaceModel(
         val name: String,
         val members: List<MemberNode>,
         val companionObject: CompanionObjectModel,
-        val typeParameters: List<TypeParameterDeclaration>,
+        val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageNode>,
         val annotations: MutableList<AnnotationNode>
 ) : ClassLikeNode, ClassLikeModel

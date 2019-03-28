@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
@@ -13,7 +14,6 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun NameNode.shiftLeft(): NameNode {
     if (this is QualifiedNode) {
@@ -29,7 +29,7 @@ private fun NameNode.shiftLeft(): NameNode {
 
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
-    override fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+    override fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): TypeNode {
         val declaration = ownerContext.node
         val qualifiedName = ownerContext.getQualifiedName()
 
@@ -61,7 +61,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             }
 
         }
-        return super.lowerParameterValue(ownerContext)
+        return super.lowerTypeNode(ownerContext)
     }
 
     override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageNode>): HeritageNode {

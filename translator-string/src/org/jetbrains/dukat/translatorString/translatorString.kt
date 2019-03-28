@@ -1,6 +1,5 @@
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
@@ -14,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -26,13 +26,12 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
@@ -46,7 +45,7 @@ private fun String?.translateMeta(): String {
     }
 }
 
-fun ParameterValueDeclaration.translateMeta(): String {
+fun TypeNode.translateMeta(): String {
     return when (this) {
         is TypeValueModel -> metaDescription.translateMeta()
         is FunctionTypeModel -> metaDescription.translateMeta()
@@ -54,11 +53,11 @@ fun ParameterValueDeclaration.translateMeta(): String {
     }
 }
 
-private fun translateTypeParams(params: List<ParameterValueDeclaration>): String {
+private fun translateTypeParams(params: List<TypeNode>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
 
-fun ParameterValueDeclaration.translate(needsMeta: Boolean = false): String {
+fun TypeNode.translate(needsMeta: Boolean = false): String {
     return when (this) {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
@@ -90,7 +89,7 @@ fun ParameterValueDeclaration.translate(needsMeta: Boolean = false): String {
     }
 }
 
-fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
+fun ParameterModel.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate(needsMeta)
     if (vararg) {
         res = "vararg $res"
@@ -115,7 +114,7 @@ fun ParameterDeclaration.translate(needsMeta: Boolean = true): String {
     return res
 }
 
-fun translateTypeParameters(typeParameters: List<TypeParameterDeclaration>): String {
+fun translateTypeParameters(typeParameters: List<TypeParameterModel>): String {
     if (typeParameters.isEmpty()) {
         return ""
     } else {
@@ -139,7 +138,7 @@ fun translateTypeArguments(typeParameters: List<IdentifierNode>): String {
 }
 
 
-fun translateParameters(parameters: List<ParameterDeclaration>, needsMeta: Boolean = true): String {
+fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boolean = true): String {
     return parameters
             .map { parameter -> parameter.translate(needsMeta) }
             .joinToString(", ")
@@ -355,7 +354,7 @@ fun translateHeritageNodes(parentEntities: List<HeritageNode>): String {
     return parents
 }
 
-fun ParameterValueDeclaration.translateAsHeritageClause(): String {
+fun TypeNode.translateAsHeritageClause(): String {
     return when (this) {
         is FunctionTypeModel -> translate()
         is TypeValueModel -> {

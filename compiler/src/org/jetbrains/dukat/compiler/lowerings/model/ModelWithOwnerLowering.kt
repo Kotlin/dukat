@@ -1,22 +1,18 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 interface ModelWithOwnerLowering {
     fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel
@@ -24,26 +20,12 @@ interface ModelWithOwnerLowering {
     fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel
     fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
 
-    fun lowerParameterDeclaration(ownerContext: NodeOwner<ParameterDeclaration>): ParameterDeclaration
-    fun lowerTypeParameter(ownerContext: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
+    fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
     fun lowerMemberNode(ownerContext: NodeOwner<MemberNode>): MemberNode
     fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
     fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
 
-
-    fun lowerTypeNode(ownerContext: NodeOwner<ValueTypeNode>): ParameterValueDeclaration
-    fun lowerFunctionTypeNode(ownerContext: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
-    fun lowerUnionTypeNode(ownerContext: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
-
-    fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
-        val declaration = ownerContext.node
-        return when (declaration) {
-            is ValueTypeNode -> lowerTypeNode(NodeOwner(declaration, ownerContext))
-            is FunctionTypeNode -> lowerFunctionTypeNode(NodeOwner(declaration, ownerContext))
-            else -> declaration
-        }
-    }
-
+    fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): TypeNode = ownerContext.node
 
     fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>): ClassLikeModel {
         val declaration = ownerContext.node

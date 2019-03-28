@@ -1,13 +1,12 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 
 data class PropertyModel(
         val name: String,
-        val type: ParameterValueDeclaration,
-        val typeParameters: List<TypeParameterDeclaration>,
+        val type: TypeNode,
+        val typeParameters: List<TypeParameterModel>,
 
         val static: Boolean,
         val override: Boolean,
@@ -17,4 +16,4 @@ data class PropertyModel(
 
         val open: Boolean,
         val definedExternally: Boolean
-) : MemberNode
+) : MemberNode, MemberModel

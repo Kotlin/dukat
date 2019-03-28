@@ -11,10 +11,10 @@ data class ClassModel(
         val name: String,
         var members: List<MemberNode>,
         val companionObject: CompanionObjectModel,
-        val typeParameters: List<TypeParameterDeclaration>,
+        val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageNode>,
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationNode>
 
 
-) : ClassLikeNode, ClassLikeModel, DelegationModel, MemberNode
+) : ClassLikeNode, ClassLikeModel, DelegationModel, MemberNode, MemberModel

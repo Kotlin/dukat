@@ -14,8 +14,10 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -31,9 +33,11 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -84,7 +88,12 @@ private fun MemberNode.process(): MemberNode {
     return when (this) {
         is ConstructorNode -> ConstructorModel(
                 parameters = parameters.map { param -> param.process() },
-                typeParameters = typeParameters,
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            name = typeParam.name,
+                            constraints = typeParam.constraints.map { param -> param.process() }
+                    )
+                },
                 generated = generated
         )
         is ClassModel -> copy(members = members.map { member -> member.process() })
@@ -93,7 +102,10 @@ private fun MemberNode.process(): MemberNode {
                 parameters = parameters.map { param -> param.process() },
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
-                    typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() })
+                    TypeParameterModel(
+                            name = typeParam.name,
+                            constraints = typeParam.constraints.map { param -> param.process() }
+                    )
                 },
 
                 static = static,
@@ -105,15 +117,15 @@ private fun MemberNode.process(): MemberNode {
                 open = open,
                 definedExternally = definedExternally
         )
-        is FunctionNode -> copy(
-                parameters = parameters.map { param -> param.process() },
-                typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
-                type = type.process()
-        )
         is PropertyNode -> PropertyModel(
                 name = name,
                 type = type.process(),
-                typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            name = typeParam.name,
+                            constraints = typeParam.constraints.map { param -> param.process() }
+                    )
+                },
                 static = static,
                 override = override,
                 getter = getter,
@@ -125,8 +137,14 @@ private fun MemberNode.process(): MemberNode {
     }
 }
 
-private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterDeclaration {
-    return copy(type = type.process(context))
+private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+    return ParameterModel(
+            type = type.process(context),
+            name = name,
+            initializer = initializer,
+            vararg = vararg,
+            optional = optional
+    )
 }
 
 private fun ParameterValueDeclaration?.processMeta(owner: ParameterValueDeclaration, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
@@ -155,7 +173,7 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
     }
 }
 
-private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterValueDeclaration {
+private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeNode {
     return when (this) {
         is UnionTypeNode -> TypeValueModel(
                 IdentifierNode("dynamic"),
@@ -198,8 +216,8 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
             )
 
         }
-        is TypeValueModel -> copy(params = (params.map { param -> param.process() }))
-        else -> this
+        is QualifiedNode -> this
+        else -> throw Exception("unable to process ParameterValueDeclaration ${this}")
     }
 }
 
@@ -217,11 +235,21 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
             primaryConstructor = if (primaryConstructor != null) {
                 ConstructorModel(
                         parameters = primaryConstructor!!.parameters.map { param -> param.process() },
-                        typeParameters = primaryConstructor!!.typeParameters,
+                        typeParameters = primaryConstructor!!.typeParameters.map { typeParam ->
+                            TypeParameterModel(
+                                    name = typeParam.name,
+                                    constraints = typeParam.constraints.map { param -> param.process() }
+                            )
+                        },
                         generated = primaryConstructor!!.generated
                 )
             } else null,
-            typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
+            typeParameters = typeParameters.map { typeParam ->
+                TypeParameterModel(
+                        name = typeParam.name,
+                        constraints = typeParam.constraints.map { param -> param.process() }
+                )
+            },
             parentEntities = parentEntities,
             annotations = annotations
     )
@@ -238,7 +266,12 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                     membersSplitted.static,
                     emptyList()
             ),
-            typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
+            typeParameters = typeParameters.map { typeParam ->
+                TypeParameterModel(
+                        name = typeParam.name,
+                        constraints = typeParam.constraints.map { param -> param.process() }
+                )
+            },
             parentEntities = parentEntities,
             annotations = annotations
     )
@@ -255,7 +288,12 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     parameters = declaration.parameters.map { param -> param.process() },
                     type = declaration.type.process(),
 
-                    typeParameters = declaration.typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
+                    typeParameters = declaration.typeParameters.map { typeParam ->
+                        TypeParameterModel(
+                                name = typeParam.name,
+                                constraints = typeParam.constraints.map { param -> param.process() }
+                        )
+                    },
                     generatedReferenceNodes = declaration.generatedReferenceNodes,
                     annotations = declaration.annotations,
                     export = declaration.export,
@@ -273,7 +311,12 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     initializer = declaration.initializer,
                     get = declaration.get,
                     set = declaration.set,
-                    typeParameters = declaration.typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) }
+                    typeParameters = declaration.typeParameters.map { typeParam ->
+                        TypeParameterModel(
+                                name = typeParam.name,
+                                constraints = typeParam.constraints.map { param -> param.process() }
+                        )
+                    }
             )
             is ObjectNode -> ObjectModel(
                     name = declaration.name,

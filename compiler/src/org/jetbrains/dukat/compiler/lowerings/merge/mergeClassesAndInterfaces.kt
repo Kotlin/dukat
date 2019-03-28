@@ -1,9 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -11,14 +10,13 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private data class ClassLikeKey(
         val name: String,
-        val typeParameters: List<TypeParameterDeclaration>
+        val typeParameters: List<TypeParameterModel>
 )
 
 private fun ClassModel.createKey(): ClassLikeKey {
@@ -47,7 +45,7 @@ private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
     )
 }
 
-private fun ParameterValueDeclaration.substituteUnit(): ParameterValueDeclaration {
+private fun TypeNode.substituteUnit(): TypeNode {
     val returnsUnit = this is TypeValueModel && value == IdentifierNode("Unit")
     return if (returnsUnit) {
         TypeValueModel(IdentifierNode("@@None"), emptyList(), null)

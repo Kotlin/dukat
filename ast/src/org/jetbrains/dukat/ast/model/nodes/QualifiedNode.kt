@@ -81,8 +81,6 @@ fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
     }
 }
 
-fun QualifiedNode.shiftRight(): NameNode = left
-
 
 fun NameNode.shiftRight(): NameNode? {
     return when(this) {
@@ -112,18 +110,4 @@ fun QualifiedNode.debugTranslate(): String {
     }
 
     return "${leftTranslate}.${right.value}"
-}
-
-fun main() {
-    val abQualifiedNode = QualifiedNode(IdentifierNode("a"), IdentifierNode("b"))
-    println(abQualifiedNode.debugTranslate())
-
-    val qualifiedNode = IdentifierNode("d").appendLeft(QualifiedNode(abQualifiedNode, IdentifierNode("c")))
-    println(qualifiedNode.debugTranslate())
-
-    println(qualifiedNode.shiftRight().debugTranslate())
-    println(qualifiedNode.appendRight(IdentifierNode("x")).debugTranslate())
-    println(qualifiedNode.appendRight(
-                    QualifiedNode(QualifiedNode(IdentifierNode("x"), IdentifierNode("y")), IdentifierNode("z"))
-    ).debugTranslate())
 }
