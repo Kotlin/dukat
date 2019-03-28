@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
@@ -8,13 +7,14 @@ import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
 
 
 fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
 
     // TODO: investigate where we ever will see multiple variables with same name
-    val mergeMap = mutableMapOf<String, VariableNode?>()
+    val mergeMap = mutableMapOf<String, VariableModel?>()
     declarations.forEach { declaration ->
         when (declaration) {
             is InterfaceModel -> mergeMap.put(declaration.name, null)
@@ -23,7 +23,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
 
 
     declarations.forEach { declaration ->
-        if (declaration is VariableNode) {
+        if (declaration is VariableModel) {
             if (mergeMap.containsKey(declaration.name.translate())) {
                 mergeMap[declaration.name.translate()] = declaration
             }
@@ -33,7 +33,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
 
     val declarationsMerged = declarations.flatMap { declaration ->
         when (declaration) {
-            is VariableNode -> {
+            is VariableModel -> {
                 val correspondingInterface = mergeMap.get(declaration.name.translate())
                 if (correspondingInterface == null) {
                     listOf(declaration)

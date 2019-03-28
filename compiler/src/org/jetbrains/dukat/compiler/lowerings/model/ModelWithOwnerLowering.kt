@@ -8,11 +8,11 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -20,7 +20,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 
 interface ModelWithOwnerLowering {
-    fun lowerVariableNode(ownerContext: NodeOwner<VariableNode>): VariableNode
+    fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel
     fun lowerFunctionNode(ownerContext: NodeOwner<FunctionNode>): FunctionNode
     fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel
     fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
@@ -61,7 +61,7 @@ interface ModelWithOwnerLowering {
     fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelNode>): TopLevelNode {
         val declaration = ownerContext.node
         return when (declaration) {
-            is VariableNode -> lowerVariableNode(NodeOwner(declaration, ownerContext))
+            is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
             is FunctionNode -> lowerFunctionNode(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             is ObjectNode -> lowerObjectNode(NodeOwner(declaration, ownerContext))

@@ -30,6 +30,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -225,8 +226,15 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     type = declaration.type.process()
             )
             is EnumNode -> declaration
-            is VariableNode -> declaration.copy(
+            is VariableNode -> VariableModel(
+                    name = declaration.name,
                     type = declaration.type.process(),
+                    annotations = declaration.annotations,
+                    immutable = declaration.immutable,
+                    inline = declaration.inline,
+                    initializer = declaration.initializer,
+                    get = declaration.get,
+                    set = declaration.set,
                     typeParameters = declaration.typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) }
             )
             is ObjectNode -> declaration.copy(

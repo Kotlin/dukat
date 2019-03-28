@@ -12,9 +12,9 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -106,7 +106,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return declaration.copy(type = lowerParameterValue(NodeOwner(declaration.type, ownerContext)))
     }
 
-    override fun lowerVariableNode(ownerContext: NodeOwner<VariableNode>): VariableNode {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {
         val declaration = ownerContext.node
         return declaration.copy(type = lowerParameterValue(NodeOwner(declaration.type, ownerContext)))
     }

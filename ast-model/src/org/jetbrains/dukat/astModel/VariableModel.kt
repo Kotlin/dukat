@@ -1,10 +1,15 @@
-package org.jetbrains.dukat.ast.model.nodes
+package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.MergableNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
+import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-data class VariableNode(
+data class VariableModel(
         var name: NameNode,
         val type: ParameterValueDeclaration,
 
@@ -15,7 +20,5 @@ data class VariableNode(
         val initializer: StatementNode?,
         val get: StatementNode?,
         val set: StatementNode?,
-        val typeParameters: List<TypeParameterDeclaration>,
-        var owner: DocumentRootNode?,
-        val uid: String
-) : TopLevelDeclaration, MergableNode
+        val typeParameters: List<TypeParameterDeclaration>
+) : TopLevelDeclaration, MergableNode, TopLevelNode

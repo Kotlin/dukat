@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astModel.ClassModel
@@ -14,6 +13,7 @@ import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 
@@ -22,7 +22,7 @@ private fun ModuleModel.canBeMerged(): Boolean {
     return declarations.any { declaration -> declaration is MemberDeclaration }
 }
 
-private fun VariableNode.convert(): MemberNode {
+private fun VariableModel.convert(): MemberNode {
     return PropertyNode(
             name = name.translate(),
             type = type,
@@ -57,7 +57,7 @@ private fun FunctionNode.convert(): MemberNode {
 private fun MergableNode.convert(): MemberNode {
     return when (this) {
         is FunctionNode -> convert()
-        is VariableNode -> convert()
+        is VariableModel -> convert()
         else -> throw Error("can not convert unknown MergableNode ${this}")
     }
 }

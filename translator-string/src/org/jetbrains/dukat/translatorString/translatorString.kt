@@ -18,7 +18,6 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.DelegationModel
@@ -28,6 +27,7 @@ import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -234,7 +234,7 @@ fun ConstructorNode.translate(): List<String> {
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
-fun VariableNode.translate(): String {
+fun VariableModel.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
     val modifier = if (inline) "inline" else "external"
     val getter = "get() = ${get?.translate()};"
@@ -431,7 +431,7 @@ fun processDeclarations(docRoot: ModuleModel): List<String> {
     val res: MutableList<String> = mutableListOf()
 
     for (declaration in docRoot.declarations) {
-        if (declaration is VariableNode) {
+        if (declaration is VariableModel) {
             res.add(declaration.translate())
         } else if (declaration is EnumNode) {
             res.add(declaration.translate())
