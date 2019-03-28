@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[NS] GenerateCoreSetTests.withValueSource " type="JUnit" factoryName="JUnit">
+    <module name="compiler_test" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.GenerateCoreSetTests" />
+    <option name="METHOD_NAME" value="withValueSource(java.lang.String,java.lang.String,java.lang.String)" />
+    <option name="TEST_OBJECT" value="method" />
+    <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <option name="PASS_PARENT_ENVS" value="false" />
+    <envs>
+      <env name="DUKAT_RUNTIME" value="NASHORN" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
