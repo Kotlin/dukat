@@ -16,6 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -229,7 +230,7 @@ fun MethodModel.translate(): List<String> {
     return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}$metaClause${definedExternallyClause}")
 }
 
-fun ConstructorNode.translate(): List<String> {
+fun ConstructorModel.translate(): List<String> {
     val typeParams = translateTypeParameters(typeParameters)
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
@@ -278,7 +279,7 @@ fun MemberNode.translate(): List<String> {
         return translate()
     } else if (this is PropertyModel) {
         return listOf(translate())
-    } else if (this is ConstructorNode) {
+    } else if (this is ConstructorModel) {
         return translate()
     } else if (this is ClassModel) {
         return listOf(translate(true, 1))

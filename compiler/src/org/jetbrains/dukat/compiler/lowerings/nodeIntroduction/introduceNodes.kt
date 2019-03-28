@@ -284,7 +284,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    private fun ConstructorDeclaration.convert(owner: ClassLikeNode): ConstructorNode {
+    private fun ConstructorDeclaration.convert(): ConstructorNode {
         return ConstructorNode(
                 parameters,
                 typeParameters
@@ -533,7 +533,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
-            is ConstructorDeclaration -> listOf(declaration.convert(owner))
+            is ConstructorDeclaration -> listOf(declaration.convert())
             else -> throw Exception("unkown member declaration ${this}")
         }
     }

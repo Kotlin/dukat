@@ -1,15 +1,14 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -50,7 +49,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return when (declaration) {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
-            is ConstructorNode -> lowerConstructorNode(NodeOwner(declaration, ownerContext))
+            is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
             else -> {
                 println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration
@@ -131,7 +130,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     }
 
 
-    fun lowerConstructorNode(ownerContext: NodeOwner<ConstructorNode>): ConstructorNode {
+    fun lowerConstructorModel(ownerContext: NodeOwner<ConstructorModel>): ConstructorModel {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(NodeOwner(parameter, ownerContext)) },

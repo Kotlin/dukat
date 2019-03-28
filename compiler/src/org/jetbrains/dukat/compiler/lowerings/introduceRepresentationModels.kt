@@ -24,6 +24,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -81,7 +82,11 @@ private fun split(members: List<MemberNode>): Members {
 private fun MemberNode.process(): MemberNode {
     // TODO: how ClassModel end up here?
     return when (this) {
-        is ConstructorNode -> copy(parameters = parameters.map { param -> param.process() })
+        is ConstructorNode -> ConstructorModel(
+                parameters = parameters.map { param -> param.process() },
+                typeParameters = typeParameters,
+                generated = generated
+        )
         is ClassModel -> copy(members = members.map { member -> member.process() })
         is MethodNode -> MethodModel(
                 name = name,
@@ -210,7 +215,11 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
                     emptyList()
             ),
             primaryConstructor = if (primaryConstructor != null) {
-                (primaryConstructor)!!.copy(parameters = primaryConstructor!!.parameters.map { param -> param.process() })
+                ConstructorModel(
+                        parameters = primaryConstructor!!.parameters.map { param -> param.process() },
+                        typeParameters = primaryConstructor!!.typeParameters,
+                        generated = primaryConstructor!!.generated
+                )
             } else null,
             typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
             parentEntities = parentEntities,
