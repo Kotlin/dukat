@@ -3,7 +3,6 @@ package org.jetbrains.dukat.compiler.lowerings.model
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
@@ -18,7 +17,6 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 
 interface ModelWithOwnerLowering {
     fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel
@@ -36,15 +34,12 @@ interface ModelWithOwnerLowering {
     fun lowerTypeNode(ownerContext: NodeOwner<ValueTypeNode>): ParameterValueDeclaration
     fun lowerFunctionTypeNode(ownerContext: NodeOwner<FunctionTypeNode>): ParameterValueDeclaration
     fun lowerUnionTypeNode(ownerContext: NodeOwner<UnionTypeNode>): ParameterValueDeclaration
-    fun lowerTupleDeclaration(ownerContext: NodeOwner<TupleDeclaration>): ParameterValueDeclaration
 
     fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = ownerContext.node
         return when (declaration) {
             is ValueTypeNode -> lowerTypeNode(NodeOwner(declaration, ownerContext))
             is FunctionTypeNode -> lowerFunctionTypeNode(NodeOwner(declaration, ownerContext))
-            is UnionTypeNode -> lowerUnionTypeNode(NodeOwner(declaration, ownerContext))
-            is TupleDeclaration -> lowerTupleDeclaration(NodeOwner(declaration, ownerContext))
             else -> declaration
         }
     }

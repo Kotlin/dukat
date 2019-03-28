@@ -11,7 +11,9 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
@@ -23,11 +25,10 @@ private fun ModuleModel.canBeMerged(): Boolean {
 }
 
 private fun VariableModel.convert(): MemberNode {
-    return PropertyNode(
+    return PropertyModel(
             name = name.translate(),
             type = type,
             typeParameters = emptyList(),
-            owner = ROOT_CLASS_DECLARATION,
             static = false,
             override = false,
             getter = false,
@@ -39,12 +40,11 @@ private fun VariableModel.convert(): MemberNode {
 
 private fun FunctionModel.convert(): MemberNode {
 
-    return MethodNode(
+    return MethodModel(
             name = name.translate(),
             parameters = parameters,
             type = type,
             typeParameters = typeParameters,
-            owner = ROOT_CLASS_DECLARATION,
             static = false,
             override = false,
             operator = false,

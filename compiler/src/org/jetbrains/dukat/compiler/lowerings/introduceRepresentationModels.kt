@@ -27,8 +27,10 @@ import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -81,21 +83,38 @@ private fun MemberNode.process(): MemberNode {
     return when (this) {
         is ConstructorNode -> copy(parameters = parameters.map { param -> param.process() })
         is ClassModel -> copy(members = members.map { member -> member.process() })
-        is MethodNode -> copy(
+        is MethodNode -> MethodModel(
+                name = name,
                 parameters = parameters.map { param -> param.process() },
+                type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() })
                 },
-                type = type.process()
+
+                static = static,
+
+                override = override,
+                operator = operator,
+                annotations = annotations,
+
+                open = open,
+                definedExternally = definedExternally
         )
         is FunctionNode -> copy(
                 parameters = parameters.map { param -> param.process() },
                 typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
                 type = type.process()
         )
-        is PropertyNode -> copy(
+        is PropertyNode -> PropertyModel(
+                name = name,
                 type = type.process(),
-                typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) }
+                typeParameters = typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) },
+                static = static,
+                override = override,
+                getter = getter,
+                setter = setter,
+                open = open,
+                definedExternally = definedExternally
         )
         else -> this
     }

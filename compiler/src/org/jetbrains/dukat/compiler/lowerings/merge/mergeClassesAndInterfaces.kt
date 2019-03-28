@@ -7,7 +7,9 @@ import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
@@ -57,8 +59,9 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
     //TODO: should discuss why we are doing the at all
     val openInterfaceMembers = otherInterface.members.map { member ->
         when (member) {
-            is PropertyNode -> member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
-            is MethodNode -> member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
+            is PropertyModel -> member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
+            is MethodModel ->
+                member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
             else -> member
         }
     }

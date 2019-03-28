@@ -6,9 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
@@ -24,8 +22,10 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
@@ -208,7 +208,7 @@ fun FunctionModel.translate(): String {
     return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()} ${body}"
 }
 
-fun MethodNode.translate(): List<String> {
+fun MethodModel.translate(): List<String> {
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierNode("@@None"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
@@ -265,7 +265,7 @@ fun EnumNode.translate(): String {
     return res.joinToString("\n")
 }
 
-fun PropertyNode.translate(): String {
+fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
 
@@ -274,9 +274,9 @@ fun PropertyNode.translate(): String {
 }
 
 fun MemberNode.translate(): List<String> {
-    if (this is MethodNode) {
+    if (this is MethodModel) {
         return translate()
-    } else if (this is PropertyNode) {
+    } else if (this is PropertyModel) {
         return listOf(translate())
     } else if (this is ConstructorNode) {
         return translate()
@@ -287,7 +287,7 @@ fun MemberNode.translate(): List<String> {
     }
 }
 
-fun PropertyNode.translateSignature(): String {
+fun PropertyModel.translateSignature(): String {
     val varModifier = if (getter && !setter) "val" else "var"
     val overrideClause = if (override) "override " else ""
 
@@ -307,7 +307,7 @@ fun PropertyNode.translateSignature(): String {
     return res
 }
 
-fun MethodNode.translateSignature(): List<String> {
+fun MethodModel.translateSignature(): List<String> {
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
@@ -327,9 +327,9 @@ fun MethodNode.translateSignature(): List<String> {
 }
 
 fun MemberNode.translateSignature(): List<String> {
-    if (this is MethodNode) {
+    if (this is MethodModel) {
         return translateSignature()
-    } else if (this is PropertyNode) {
+    } else if (this is PropertyModel) {
         return listOf(translateSignature())
     } else {
         throw Exception("can not translate singature ${this}")
