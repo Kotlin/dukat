@@ -7,13 +7,13 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -147,7 +147,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
-    override fun lowerObjectNode(ownerContext: NodeOwner<ObjectNode>): ObjectNode {
+    override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel {
         val declaration = ownerContext.node
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberNode(NodeOwner(member, ownerContext)) }

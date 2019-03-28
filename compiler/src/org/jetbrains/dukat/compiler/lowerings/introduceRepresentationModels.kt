@@ -28,6 +28,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -246,8 +247,10 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     set = declaration.set,
                     typeParameters = declaration.typeParameters.map { typeParam -> typeParam.copy(constraints = typeParam.constraints.map { param -> param.process() }) }
             )
-            is ObjectNode -> declaration.copy(
-                    members = declaration.members.map { member -> member.process() }
+            is ObjectNode -> ObjectModel(
+                    name = declaration.name,
+                    members = declaration.members.map { member -> member.process() },
+                    parentEntities = declaration.parentEntities
             )
             else -> {
                 println("skipping ${declaration::class.simpleName}")

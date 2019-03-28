@@ -7,7 +7,6 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
@@ -26,6 +25,7 @@ import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
@@ -439,15 +439,15 @@ fun processDeclarations(docRoot: ModuleModel): List<String> {
             res.add(declaration.translate())
         } else if (declaration is ClassModel) {
             res.add(declaration.translate(false, 0))
-        } else if (declaration is ObjectNode) {
+        } else if (declaration is ObjectModel) {
 
-            val objectNode = "external object ${declaration.name}"
+            val objectModel = "external object ${declaration.name}"
 
             val members = declaration.members
 
             val hasMembers = members.isNotEmpty()
 
-            res.add(objectNode + " {")
+            res.add(objectModel + " {")
 
             if (hasMembers) {
                 res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))

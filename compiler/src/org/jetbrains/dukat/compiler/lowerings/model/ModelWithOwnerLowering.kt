@@ -12,6 +12,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -28,7 +29,7 @@ interface ModelWithOwnerLowering {
     fun lowerParameterDeclaration(ownerContext: NodeOwner<ParameterDeclaration>): ParameterDeclaration
     fun lowerTypeParameter(ownerContext: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
     fun lowerMemberNode(ownerContext: NodeOwner<MemberNode>): MemberNode
-    fun lowerObjectNode(ownerContext: NodeOwner<ObjectNode>): ObjectNode
+    fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
     fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
 
 
@@ -64,9 +65,9 @@ interface ModelWithOwnerLowering {
             is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
             is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
-            is ObjectNode -> lowerObjectNode(NodeOwner(declaration, ownerContext))
+            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumNode -> lowerEnumNode(NodeOwner(declaration, ownerContext))
-            else -> throw Exception("unknown TopeLevelDeclaration ${ownerContext::class.simpleName}")
+            else -> throw Exception("unknown TopeLevelDeclaration ${declaration::class.simpleName}")
         }
     }
 
