@@ -22,10 +22,8 @@ import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
-import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
@@ -317,7 +315,6 @@ fun MethodModel.translateSignature(): List<String> {
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
     val overrideClause = if (override) "override " else ""
 
-//    val metaClause = if (operator) "" else type.translateMeta()
     val metaClause = type.translateMeta()
     val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}$metaClause"
     return annotations + listOf(methodNodeTranslation)
@@ -422,67 +419,6 @@ fun ClassModel.translate(nested: Boolean, padding: Int): String {
     return res.joinToString("\n")
 }
 
-fun processDeclarations(docRoot: ModuleModel): List<String> {
-    val res: MutableList<String> = mutableListOf()
-
-    for (declaration in docRoot.declarations) {
-        if (declaration is VariableModel) {
-            res.add(declaration.translate())
-        } else if (declaration is EnumNode) {
-            res.add(declaration.translate())
-        } else if (declaration is FunctionModel) {
-            res.add(declaration.translate())
-        } else if (declaration is ClassModel) {
-            res.add(declaration.translate(false, 0))
-        } else if (declaration is ObjectModel) {
-
-            val objectModel = "external object ${declaration.name}"
-
-            val members = declaration.members
-
-            val hasMembers = members.isNotEmpty()
-
-            res.add(objectModel + " {")
-
-            if (hasMembers) {
-                res.addAll(members.flatMap { it.translate() }.map({ "    " + it }))
-            }
-
-            res.add("}")
-        } else if (declaration is InterfaceModel) {
-            val hasMembers = declaration.members.isNotEmpty()
-            val staticMembers = declaration.companionObject.members
-
-            val showCompanionObject = staticMembers.isNotEmpty() || declaration.companionObject.parentEntities.isNotEmpty()
-
-            val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
-            val parents = translateHeritageNodes(declaration.parentEntities)
-
-            res.add("${translateAnnotations(declaration.annotations)}external interface ${declaration.name}${translateTypeParameters(declaration.typeParameters)}${parents}" + if (isBlock) " {" else "")
-            if (isBlock) {
-                res.addAll(declaration.members.flatMap { it.translateSignature() }.map { "    " + it })
-
-                val parents = if (declaration.companionObject.parentEntities.isEmpty()) {
-                    ""
-                } else {
-                    " : ${declaration.companionObject.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
-                }
-
-                if (showCompanionObject) {
-                    res.add("    companion object${parents} {")
-                    res.addAll(staticMembers.flatMap { it.translate() }.map({ "        ${it}" }))
-                    res.add("    }")
-                }
-
-                res.add("}")
-            }
-
-
-        }
-    }
-
-    return res
-}
 
 private fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
     return (listOf(this) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
