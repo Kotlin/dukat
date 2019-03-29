@@ -29,18 +29,20 @@ private class LowerNullable : ParameterValueLowering {
 
                 if (params.size == 1) {
                     val nullableType = params[0]
-                    if (nullableType is ValueTypeNode) {
-                        val res = lowerTypeNode(nullableType)
-                        res.nullable = true
-                        res.meta = MuteMetadata()
-                        return res
-                    } else if (nullableType is FunctionTypeNode) {
-                        val res = lowerFunctionNode(nullableType)
-                        res.nullable = true
-                        res.meta = MuteMetadata()
-                        return res
-                    } else {
-                        throw Exception("can not lower nullables for unknown param type ${nullableType}")
+                    return when (nullableType) {
+                        is ValueTypeNode -> {
+                            val res = lowerTypeNode(nullableType)
+                            res.nullable = true
+                            res.meta = MuteMetadata()
+                            res
+                        }
+                        is FunctionTypeNode -> {
+                            val res = lowerFunctionNode(nullableType)
+                            res.nullable = true
+                            res.meta = MuteMetadata()
+                            res
+                        }
+                        else -> throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
                 } else lowerUnionTypeDeclaration(declaration)
             }

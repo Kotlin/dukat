@@ -31,7 +31,7 @@ class DeclarationResolver {
     }
 
     private fun register(name: String, moduleContext: NodeOwner<ModuleModel>) {
-        myDeclarations.put(DeclarationKey(name, moduleContext.getQualifiedName()), moduleContext)
+        myDeclarations[DeclarationKey(name, moduleContext.getQualifiedName())] = moduleContext
     }
 
     fun resolve(name: String, path: NameNode?): NodeOwner<ModuleModel>? {

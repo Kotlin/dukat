@@ -190,7 +190,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?, vararg: Boolean, optional: Boolean): V8Object =
             astFactory.createParameterDeclaration(
                     name, type.toAst(),
-                    if (initializer == null) null else initializer.toAst<ExpressionDeclaration>(),
+                    initializer?.toAst<ExpressionDeclaration>(),
                     vararg,
                     optional
             ).toV8()

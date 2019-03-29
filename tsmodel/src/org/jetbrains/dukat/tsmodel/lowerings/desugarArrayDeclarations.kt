@@ -7,10 +7,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        if (declaration.value == "@@ArraySugar") {
-            return declaration.copy(value = "Array", params = declaration.params.map { param -> lowerParameterValue(param) })
+        return if (declaration.value == "@@ArraySugar") {
+            declaration.copy(value = "Array", params = declaration.params.map { param -> lowerParameterValue(param) })
         } else {
-            return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+            declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
         }
     }
 }

@@ -56,7 +56,7 @@ private fun ParameterDeclaration.toMap(): Map<String, Any?> {
 
 private fun Map<String, *>.reflectAs(reflection: Any): Map<String, *> {
     val map = toMutableMap()
-    map.put("reflection", reflection::class.simpleName)
+    map["reflection"] = reflection::class.simpleName
     return map
 }
 

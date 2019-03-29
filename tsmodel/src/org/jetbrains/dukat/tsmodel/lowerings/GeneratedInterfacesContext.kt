@@ -77,13 +77,13 @@ class GeneratedInterfacesContext {
 
         return when (declaration) {
             is ObjectLiteralDeclaration -> {
-                if (declaration.canBeJson()) {
-                    TypeDeclaration("Json", emptyList())
-                } else if (declaration.members.isEmpty()) {
-                    TypeDeclaration("Any", emptyList())
-                } else {
-                    val referenceNode = registerObjectLiteralDeclaration(owner.wrap(declaration), ownerUID, typeParamsSet)
-                    referenceNode
+                when {
+                    declaration.canBeJson() -> TypeDeclaration("Json", emptyList())
+                    declaration.members.isEmpty() -> TypeDeclaration("Any", emptyList())
+                    else -> {
+                        val referenceNode = registerObjectLiteralDeclaration(owner.wrap(declaration), ownerUID, typeParamsSet)
+                        referenceNode
+                    }
                 }
             }
             is UnionTypeDeclaration -> {
@@ -217,7 +217,7 @@ class GeneratedInterfacesContext {
 
         val identicalInterface = findIdenticalInterface(interfaceNode)
         return if (identicalInterface == null) {
-            myGeneratedInterfaces.put(name, interfaceNode)
+            myGeneratedInterfaces[name] = interfaceNode
             val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters)
 
             myReferences.getOrPut(uid) { mutableListOf()}.add(referenceNode)

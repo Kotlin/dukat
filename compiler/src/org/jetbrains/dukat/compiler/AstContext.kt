@@ -11,11 +11,11 @@ class AstContext {
     private val myClassNodes: MutableMap<HeritageSymbolNode, ClassNode> = mutableMapOf()
 
     fun registerInterface(interfaceDeclaration: InterfaceNode) {
-        myInterfaces.put(IdentifierNode(interfaceDeclaration.name), interfaceDeclaration)
+        myInterfaces[IdentifierNode(interfaceDeclaration.name)] = interfaceDeclaration
     }
 
     fun registerClass(classDeclaration: ClassNode) {
-        myClassNodes.put(IdentifierNode(classDeclaration.name), classDeclaration)
+        myClassNodes[IdentifierNode(classDeclaration.name)] = classDeclaration
     }
     
     fun resolveInterface(name: HeritageSymbolNode): InterfaceNode? = myInterfaces.get(name)

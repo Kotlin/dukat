@@ -17,7 +17,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
     val mergeMap = mutableMapOf<String, VariableModel?>()
     declarations.forEach { declaration ->
         when (declaration) {
-            is InterfaceModel -> mergeMap.put(declaration.name, null)
+            is InterfaceModel -> mergeMap[declaration.name] = null
         }
     }
 

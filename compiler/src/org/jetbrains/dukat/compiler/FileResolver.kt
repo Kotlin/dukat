@@ -17,12 +17,12 @@ class FileResolver {
     }
 
     fun resolve(fileName: String): String {
-        try {
-            return readFile(fileName)
+        return try {
+            readFile(fileName)
         } catch (e: Exception) {
             val resourceName = "ts/${fileName}"
 
-            return myFileCache.getOrPut(resourceName) {
+            myFileCache.getOrPut(resourceName) {
                 readResource(resourceName)
             }
         }

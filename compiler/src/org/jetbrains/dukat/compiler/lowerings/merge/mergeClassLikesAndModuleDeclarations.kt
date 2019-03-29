@@ -3,8 +3,6 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astModel.ClassModel
@@ -17,7 +15,6 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
@@ -111,7 +108,7 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
         if (declaration is InterfaceModel) {
             interfacesInBucket.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         } else if (declaration is ClassModel) {
-            classes.put(declaration.name, declaration)
+            classes[declaration.name] = declaration
         }
     }
 

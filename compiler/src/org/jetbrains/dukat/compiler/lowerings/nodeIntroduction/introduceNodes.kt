@@ -680,10 +680,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val nonImports = mutableListOf<TopLevelDeclaration>()
         declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
-                imports.put(declaration.name, ImportNode(
+                imports[declaration.name] = ImportNode(
                         declaration.moduleReference.convert(),
                         declaration.uid
-                ))
+                )
             } else nonImports.add(declaration)
         }
 

@@ -147,7 +147,7 @@ private fun ParameterDeclaration.process(context: TranslationContext = Translati
     )
 }
 
-private fun ParameterValueDeclaration?.processMeta(owner: ParameterValueDeclaration, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
+private fun ParameterValueDeclaration?.processMeta(ownerIsNullable: Boolean, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
     return when (this) {
         is ThisTypeInGeneratedInterfaceMetaData -> "this"
         is IntersectionMetadata -> params.map {
@@ -156,7 +156,7 @@ private fun ParameterValueDeclaration?.processMeta(owner: ParameterValueDeclarat
         else -> {
             if (!metadataOptions.contains(MetaDataOptions.SKIP_NULLS)) {
                 val skipNullableAnnotation = this is MuteMetadata
-                if (owner.nullable && !skipNullableAnnotation) {
+                if (ownerIsNullable && !skipNullableAnnotation) {
                     //TODO: consider rethinking this restriction
                     return "= null"
                 } else null
@@ -192,7 +192,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 TypeValueModel(
                         value as NameNode,
                         params.map { param -> param.process() },
-                        meta.processMeta(this, context.resolveAsMetaOptions()),
+                        meta.processMeta(nullable, context.resolveAsMetaOptions()),
                         nullable
                 )
             }
@@ -203,7 +203,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                         param.process(TranslationContext.FUNCTION_TYPE)
                     }),
                     type = type.process(TranslationContext.FUNCTION_TYPE),
-                    metaDescription = meta.processMeta(this, context.resolveAsMetaOptions()),
+                    metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
                     nullable = nullable
             )
         }
@@ -211,7 +211,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
             TypeValueModel(
                     IdentifierNode(name),
                     typeParameters.map { typeParam -> TypeValueModel(IdentifierNode(typeParam.name), emptyList(), null) },
-                    meta?.processMeta(this, setOf(MetaDataOptions.SKIP_NULLS)),
+                    meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
             )
 

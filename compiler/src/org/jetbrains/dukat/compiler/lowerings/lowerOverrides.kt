@@ -39,22 +39,22 @@ private fun InterfaceNode.allParentProperties(astContext: AstContext): List<Prop
 @Suppress("UNCHECKED_CAST")
 private fun ClassNode.allParentMethods(astContext: AstContext): List<MethodNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        if (parentEntity is InterfaceNode) {
-            parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-        } else if (parentEntity is ClassNode) {
-            parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+        when (parentEntity) {
+            is InterfaceNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+            is ClassNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+            else -> throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+        }
     } as List<MethodNode>
 }
 
 @Suppress("UNCHECKED_CAST")
 private fun ClassNode.allParentProperties(astContext: AstContext): List<PropertyNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        if (parentEntity is InterfaceNode) {
-            parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-        } else if (parentEntity is ClassNode) {
-            parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-        } else throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+        when (parentEntity) {
+            is InterfaceNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+            is ClassNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+            else -> throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+        }
     } as List<PropertyNode>
 }
 
@@ -120,16 +120,20 @@ private fun MemberNode.lowerOverrides(
         allSuperProperties: List<PropertyNode>
 ): MemberNode {
 
-    return if (this is MethodNode) {
-        val override =
-                allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
-        copy(override = override)
-    } else if (this is PropertyNode) {
-        val override = allSuperProperties.any { superMethod ->
-            isOverriding(superMethod)
+    return when(this) {
+        is MethodNode -> {
+            val override =
+                    allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
+            copy(override = override)
         }
-        copy(override = override)
-    } else this
+        is PropertyNode -> {
+            val override = allSuperProperties.any { superMethod ->
+                isOverriding(superMethod)
+            }
+            copy(override = override)
+        }
+        else -> this
+    }
 }
 
 fun DocumentRootNode.lowerOverrides(astContext: AstContext): DocumentRootNode {

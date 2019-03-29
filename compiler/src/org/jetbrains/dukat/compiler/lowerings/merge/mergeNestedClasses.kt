@@ -20,7 +20,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<String, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
-        myClassMap.put(ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().debugTranslate()), ownerContext.node)
+        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().debugTranslate())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
             (it is NodeOwner<*>) && (it.node is ModuleModel)
@@ -32,7 +32,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     }
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
-        myModuleClassesMap.put(moduleModel.packageName, mutableListOf())
+        myModuleClassesMap[moduleModel.packageName] = mutableListOf()
         return super.lowerRoot(moduleModel, ownerContext)
     }
 

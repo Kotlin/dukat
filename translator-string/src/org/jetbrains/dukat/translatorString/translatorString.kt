@@ -115,10 +115,10 @@ fun ParameterModel.translate(needsMeta: Boolean = true): String {
 }
 
 fun translateTypeParameters(typeParameters: List<TypeParameterModel>): String {
-    if (typeParameters.isEmpty()) {
-        return ""
+    return if (typeParameters.isEmpty()) {
+        ""
     } else {
-        return "<" + typeParameters.map { typeParameter ->
+        "<" + typeParameters.map { typeParameter ->
             val constraintDescription = if (typeParameter.constraints.isEmpty()) {
                 ""
             } else {
@@ -130,10 +130,10 @@ fun translateTypeParameters(typeParameters: List<TypeParameterModel>): String {
 }
 
 fun translateTypeArguments(typeParameters: List<IdentifierNode>): String {
-    if (typeParameters.isEmpty()) {
-        return ""
+    return if (typeParameters.isEmpty()) {
+        ""
     } else {
-        return "<" + typeParameters.map { it.value }.joinToString(", ") + ">"
+        "<" + typeParameters.map { it.value }.joinToString(", ") + ">"
     }
 }
 
@@ -274,16 +274,12 @@ fun PropertyModel.translate(): String {
 }
 
 fun MemberNode.translate(): List<String> {
-    if (this is MethodModel) {
-        return translate()
-    } else if (this is PropertyModel) {
-        return listOf(translate())
-    } else if (this is ConstructorModel) {
-        return translate()
-    } else if (this is ClassModel) {
-        return listOf(translate(true, 1))
-    } else {
-        throw Exception("can not translate ${this}")
+    return when(this) {
+        is MethodModel -> translate()
+        is PropertyModel -> listOf(translate())
+        is ConstructorModel -> translate()
+        is ClassModel -> listOf(translate(true, 1))
+        else -> throw Exception("can not translate ${this}")
     }
 }
 
@@ -327,12 +323,10 @@ fun MethodModel.translateSignature(): List<String> {
 }
 
 fun MemberNode.translateSignature(): List<String> {
-    if (this is MethodModel) {
-        return translateSignature()
-    } else if (this is PropertyModel) {
-        return listOf(translateSignature())
-    } else {
-        throw Exception("can not translate singature ${this}")
+    return when(this) {
+        is MethodModel -> translateSignature()
+        is PropertyModel -> listOf(translateSignature())
+        else -> throw Exception("can not translate singature ${this}")
     }
 }
 
