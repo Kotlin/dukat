@@ -7,15 +7,7 @@ import translateModule
 import java.io.File
 
 fun compile(documentRoot: ModuleModel): String {
-    var res = translateModule(documentRoot).joinToString("""
-
-// ------------------------------------------------------------------------------------------
-""") { it.joinToString("\n") }
-
-    if (res == "") {
-        res = "// NO DECLARATIONS"
-    }
-    return res
+    return translateModule(documentRoot)
 }
 
 fun output(fileName: String, translator: InputTranslator): String {

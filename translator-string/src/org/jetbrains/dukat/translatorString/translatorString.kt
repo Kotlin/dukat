@@ -32,6 +32,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.translatorString.StringTranslator
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
@@ -483,26 +484,26 @@ fun processDeclarations(docRoot: ModuleModel): List<String> {
     return res
 }
 
+private fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
+    return (listOf(this) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
+            .filter { module -> module.declarations.isNotEmpty() }
+}
 
-fun processModule(docRoot: ModuleModel): List<String> {
-    val res: MutableList<String> = mutableListOf()
-    if (docRoot.declarations.isEmpty() && docRoot.sumbodules.isEmpty()) {
-        return res
+fun translateModule(docRoot: ModuleModel): String {
+    val translated =  docRoot.flattenDeclarations().map {
+        val stringTranslator = StringTranslator()
+        stringTranslator.process(it)
+        stringTranslator.output()
     }
 
-    val containsSomethingExceptDocRoot = docRoot.declarations.isNotEmpty()
+    return if (translated.isEmpty()) {
+        "// NO DECLARATIONS"
+    } else {
+        translated.joinToString("""
 
-    if (containsSomethingExceptDocRoot) {
-        res.add("${translateAnnotations(docRoot.annotations)}package ${docRoot.packageName}")
-        res.add("")
+// ------------------------------------------------------------------------------------------
+""")
     }
-
-    res.addAll(processDeclarations(docRoot))
-    return res
 
 }
 
-fun translateModule(docRoot: ModuleModel): List<List<String>> {
-    val list = listOf(processModule(docRoot)) + docRoot.sumbodules.map { submodule -> translateModule(submodule) }.flatten()
-    return list.filter { it.isNotEmpty() }
-}
