@@ -26,17 +26,21 @@ import org.jetbrains.dukat.compiler.lowerings.nodeIntroduction.introduceTypeNode
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
+import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
-interface InputTranslator {
+interface InputTranslator : InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
     fun release()
 
-    fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
+    override fun translate(fileName: String): SourceSetModel {
+        return lower(translateFile(fileName))
+    }
 
+    private fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
         return documentRoot
                 .filterOutNonDeclarations()
                 .generateInterfaceReferences()

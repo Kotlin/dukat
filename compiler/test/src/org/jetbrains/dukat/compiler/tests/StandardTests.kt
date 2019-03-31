@@ -1,8 +1,9 @@
 package org.jetbrains.dukat.compiler.tests
 
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
-import org.jetbrains.dukat.compiler.output
 import org.jetbrains.dukat.compiler.translator.InputTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
@@ -11,6 +12,7 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
+import translateModule
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -33,6 +35,36 @@ private class TestCompileMessageCollector : MessageCollector {
             System.err.println("MESSAGE ${severity} ${message} ${location}")
         }
     }
+}
+
+fun compile(documentRoot: ModuleModel): String {
+    val translated = translateModule(documentRoot)
+
+    return if (translated.isEmpty()) {
+        "// NO DECLARATIONS"
+    } else {
+        translated.joinToString("""
+
+// ------------------------------------------------------------------------------------------
+""")
+    }
+}
+
+
+private fun output(fileName: String, translator: InputTranslator): String {
+    val sourceSet =
+            translator.translate(fileName)
+
+    val sourcesMap = mutableMapOf<String, SourceFileModel>()
+    sourceSet.sources.map { sourceFileDeclaration ->
+        sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
+    }
+
+
+    val fileNameNormalized = File(fileName).normalize().absolutePath
+
+    val documentRoot = sourcesMap.get(fileNameNormalized)?.root!!
+    return compile(documentRoot)
 }
 
 open class StandardTests {

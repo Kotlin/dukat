@@ -7,21 +7,12 @@ private fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
             .filter { module -> module.declarations.isNotEmpty() }
 }
 
-fun translateModule(docRoot: ModuleModel): String {
-    val translated = docRoot.flattenDeclarations().map {
+fun translateModule(docRoot: ModuleModel): List<String> {
+    return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
-        stringTranslator.process(it)
+        stringTranslator.process(module)
         stringTranslator.output()
     }
-
-    return if (translated.isEmpty()) {
-        "// NO DECLARATIONS"
-    } else {
-        translated.joinToString("""
-
-// ------------------------------------------------------------------------------------------
-""")
-    }
-
 }
+
 

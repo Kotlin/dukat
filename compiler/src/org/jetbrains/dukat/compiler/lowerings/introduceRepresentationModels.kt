@@ -345,6 +345,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     }
 
     return ModuleModel(
+            qualifiedNode,
             packageName = fullPackageName,
             shortName = packageName,
             declarations = declarationsFiltered,
