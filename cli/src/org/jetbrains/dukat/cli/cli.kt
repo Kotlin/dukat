@@ -15,7 +15,7 @@ private fun unescape(name: String): String {
 }
 
 
-private fun compile(filename: String) {
+private fun compile(filename: String, outDir: String?) {
     println("Converting $filename")
     val translator = createV8Translator()
 
@@ -30,8 +30,6 @@ private fun compile(filename: String) {
         modules.forEach { module ->
 
             val targetName = "${module.packageName.process(::unescape).translate()}.kt"
-
-            println("generating ${targetName}")
 
             module.annotations.add(AnnotationNode("file:Suppress", listOf(
                     "INTERFACE_WITH_SUPERCLASS",
@@ -61,7 +59,15 @@ private fun compile(filename: String) {
                     ).map { it.toNameNode() }
             )
 
-            File(targetName).writeText(translateModule(module).joinToString("\n"))
+            val dir = outDir ?: "./"
+
+            val dirFile = File(dir)
+            dirFile.mkdirs()
+
+            val resolvedTarget = dirFile.resolve(targetName)
+            println("generating ${resolvedTarget}")
+
+            resolvedTarget.writeText(translateModule(module).joinToString("\n"))
         }
     }
 }
@@ -76,27 +82,47 @@ fun Iterator<String>.readArg(): String? {
 
 private fun printUsage(program: String) {
     println("""
-Usage: $program <d.ts files>
+Usage: $program [<options>] <d.ts files>
+
+where possible options include:
+-d <path>                   destination directory for files with converted declarations (current by default)
 """.trimIndent())
 }
 
 
 private data class CliOptions(
-    val sources: List<String>,
-    val outDir: String?
+        val sources: List<String>,
+        val outDir: String?
 )
 
 
-private fun process(args: List<String>): CliOptions {
+private fun printError(message: String) {
+    System.err.println(message)
+}
+
+private fun process(args: List<String>): CliOptions? {
     val argsIterator = args.iterator()
 
     val sources = mutableListOf<String>()
+    var outDir: String? = null
     while (argsIterator.hasNext()) {
-        val tsDeclaration = argsIterator.next()
-        sources.add(tsDeclaration)
+        val arg = argsIterator.next()
+
+        when (arg) {
+            "-d" -> {
+                val outDirArg = argsIterator.readArg()
+                if (outDirArg == null) {
+                    printError("'-d' should be followed by path to destination directory")
+                    return null
+                } else {
+                    outDir = outDirArg
+                }
+            }
+            else -> sources.add(arg)
+        }
     }
 
-    return CliOptions(sources, null)
+    return CliOptions(sources, outDir)
 }
 
 fun main(vararg args: String) {
@@ -105,10 +131,11 @@ fun main(vararg args: String) {
         return
     }
 
-    val options = process(args.toList())
-
-    options.sources.forEach { sourceName ->
-        compile(sourceName)
+    process(args.toList())?.let { options ->
+        options.sources.forEach { sourceName ->
+            compile(sourceName, options.outDir)
+        }
     }
+
 
 }
