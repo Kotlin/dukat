@@ -6,8 +6,8 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -44,7 +44,7 @@ private fun FunctionNode.process(nodesDataMap: NodesDataMap<FunctionNode>) {
     val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
     val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
 
-    val methodNodeRecord = nodesDataMap.getOrPut(name.debugTranslate()) { mutableMapOf() }
+    val methodNodeRecord = nodesDataMap.getOrPut(name.translate()) { mutableMapOf() }
     val methodData = methodNodeRecord.getOrPut(headTypes) { NodeData(mutableListOf(), headNames, this) }
     methodData.optionalArgs.add(params.size - nonOptionalHead.size)
 }

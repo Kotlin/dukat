@@ -107,20 +107,11 @@ fun NameNode.shiftLeft(): NameNode? {
 
 
 fun IdentifierNode.debugTranslate(): String = value
-fun NameNode.debugTranslate(): String {
-    return when(this) {
-        is IdentifierNode -> debugTranslate()
-        is QualifiedNode -> debugTranslate()
-        is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.name }}>"
-        else -> throw Exception("unknown NameNode")
-    }
-}
-
 fun QualifiedNode.debugTranslate(): String {
     val leftTranslate = when (left) {
         is IdentifierNode -> left.value
         is QualifiedNode -> left.debugTranslate()
-        is GenericIdentifierNode -> left.debugTranslate()
+        is GenericIdentifierNode -> left.translate()
         else -> throw Exception("unknown QualifiedNode ${left::class.simpleName}")
     }
 

@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.size
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -44,7 +45,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
-                            return TypeValueModel(IdentifierNode(qualifiedNode.debugTranslate()), emptyList(), null)
+                            return TypeValueModel(IdentifierNode(qualifiedNode.translate()), emptyList(), null)
                         }
                     }
                 }
@@ -57,8 +58,8 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 
                 if (declarationQualifiedName != qualifiedName) {
                     val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declaration.right)
-                    println("substituting ${declaration.debugTranslate()} with ${qualifiedNode?.debugTranslate()} ()")
-                    return TypeValueModel(IdentifierNode(qualifiedNode!!.debugTranslate()), emptyList(), null)
+                    println("substituting ${declaration.debugTranslate()} with ${qualifiedNode?.translate()} ()")
+                    return TypeValueModel(IdentifierNode(qualifiedNode!!.translate()), emptyList(), null)
                 }
             }
 

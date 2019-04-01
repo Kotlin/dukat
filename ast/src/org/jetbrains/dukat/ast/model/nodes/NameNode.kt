@@ -4,7 +4,8 @@ interface NameNode : HeritageSymbolNode
 
 fun  NameNode.translate(): String = when (this) {
     is IdentifierNode -> value
-    is QualifiedNode -> "${left.debugTranslate()}.${right.translate()}"
+    is QualifiedNode -> "${left.translate()}.${right.translate()}"
+    is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.name }}>"
     else -> throw Exception("unknown NameNode ${this}")
 }
 

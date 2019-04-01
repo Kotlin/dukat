@@ -2,8 +2,8 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -20,7 +20,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<String, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
-        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().debugTranslate())] = ownerContext.node
+        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().translate())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
             (it is NodeOwner<*>) && (it.node is ModuleModel)
@@ -37,12 +37,12 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     }
 
     fun resolve(name: String, qualifiedNode: NameNode): ClassModel? {
-        val key = ClassKey(name, qualifiedNode.debugTranslate())
+        val key = ClassKey(name, qualifiedNode.translate())
         return myClassMap.get(key)
     }
 
     fun resolveModule(moduleModel: ModuleModel, qualifiedNode: NameNode): ModuleModel {
-        val classKey = ClassKey(moduleModel.shortName, qualifiedNode.debugTranslate())
+        val classKey = ClassKey(moduleModel.shortName, qualifiedNode.translate())
         if (myClassMap.containsKey(classKey)) {
             val classDeclarations = mutableListOf<ClassModel>()
             val nonClassDeclarations = mutableListOf<TopLevelNode>()
