@@ -29,6 +29,10 @@ private fun compile(filename: String) {
 
         modules.forEach { module ->
 
+            val targetName = "${module.packageName.process(::unescape).translate()}.kt"
+
+            println("generating ${targetName}")
+
             module.annotations.add(AnnotationNode("file:Suppress", listOf(
                     "INTERFACE_WITH_SUPERCLASS",
                     "OVERRIDING_FINAL_MEMBER",
@@ -57,15 +61,54 @@ private fun compile(filename: String) {
                     ).map { it.toNameNode() }
             )
 
-            val targetName = "${module.packageName.process(::unescape).translate()}.kt"
-
-            println("generating ${targetName}")
             File(targetName).writeText(translateModule(module).joinToString("\n"))
         }
     }
 }
 
+
+fun Iterator<String>.readArg(): String? {
+    return if (hasNext()) {
+        val value = next()
+        if (value.startsWith("-")) null else value
+    } else null
+}
+
+private fun printUsage(program: String) {
+    println("""
+Usage: $program <d.ts files>
+""".trimIndent())
+}
+
+
+private data class CliOptions(
+    val sources: List<String>,
+    val outDir: String?
+)
+
+
+private fun process(args: List<String>): CliOptions {
+    val argsIterator = args.iterator()
+
+    val sources = mutableListOf<String>()
+    while (argsIterator.hasNext()) {
+        val tsDeclaration = argsIterator.next()
+        sources.add(tsDeclaration)
+    }
+
+    return CliOptions(sources, null)
+}
+
 fun main(vararg args: String) {
-    val tsDeclaration = args.get(0)
-    compile(tsDeclaration)
+    if (args.isEmpty()) {
+        printUsage("dukat")
+        return
+    }
+
+    val options = process(args.toList())
+
+    options.sources.forEach { sourceName ->
+        compile(sourceName)
+    }
+
 }
