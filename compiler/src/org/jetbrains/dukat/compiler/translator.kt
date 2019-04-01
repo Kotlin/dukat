@@ -4,7 +4,7 @@ import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import mu.KotlinLogging
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
-import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
@@ -93,7 +93,7 @@ private fun createV8Interop(): InteropV8 {
     return interopRuntime
 }
 
-class TranslatorV8(private val engine: InteropV8) : InputTranslator {
+class TranslatorV8(private val engine: InteropV8) : TypescriptInputTranslator {
 
     override fun translateFile(fileName: String): SourceSetDeclaration {
         val result = engine.callFunction<V8Object>("main", fileName)
@@ -105,7 +105,7 @@ class TranslatorV8(private val engine: InteropV8) : InputTranslator {
     }
 }
 
-class TranslatorNashorn(private val engine: InteropNashorn) : InputTranslator {
+class TranslatorNashorn(private val engine: InteropNashorn) : TypescriptInputTranslator {
     override fun translateFile(fileName: String): SourceSetDeclaration {
         return engine.callFunction("main", fileName)
     }

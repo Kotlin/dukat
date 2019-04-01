@@ -183,7 +183,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("modifiers"),
                 getEntities("definitionsInfo"),
                 get("uid") as String,
-                get("resourceName") as String
+                get("resourceName") as String,
+                get("root") as Boolean
         )
         TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(get("name") as String, getEntities("constraints"))
         ClassDeclaration::class.simpleName -> ClassDeclaration(

@@ -17,7 +17,7 @@ private data class ClassKey(val name: String, val moduleQualifiedName: String)
 private class ClassContext : ModelWithOwnerTypeLowering {
 
     private val myClassMap: MutableMap<ClassKey, ClassModel> = mutableMapOf()
-    private val myModuleClassesMap: MutableMap<String, MutableList<ClassModel>> = mutableMapOf()
+    private val myModuleClassesMap: MutableMap<NameNode, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().translate())] = ownerContext.node

@@ -96,7 +96,7 @@ fun AstNode.astToMap(): Map<String, Any?> {
         is MethodSignatureDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::optional, ::modifiers).convert(this)
         is ModifierDeclaration -> listOf(::token).convert(this)
         is ObjectLiteralDeclaration -> listOf(::members).convert(this)
-        is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::definitionsInfo, ::uid, ::resourceName).convert(this)
+        is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::definitionsInfo, ::uid, ::resourceName, ::root).convert(this)
         is ParameterDeclaration -> toMap()
         is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)

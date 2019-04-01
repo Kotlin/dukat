@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
-import org.jetbrains.dukat.compiler.translator.InputTranslator
+import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation

@@ -9,5 +9,6 @@ data class PackageDeclaration(
         val modifiers: List<ModifierDeclaration>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,
         val uid: String,
-        val resourceName: String
+        val resourceName: String,
+        val root: Boolean
 ) : TopLevelDeclaration

@@ -7,10 +7,15 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 
 data class ModuleModel(
         val qualifiedName: NameNode?,
-        val packageName: String,
+        val packageName: NameNode,
         val shortName: String,
         val declarations: List<TopLevelNode> = emptyList(),
         val annotations: MutableList<AnnotationNode>,
 
         val sumbodules: List<ModuleModel>
 ) : TopLevelDeclaration, TopLevelNode
+
+fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
+    return (listOf(this) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
+            .filter { module -> module.declarations.isNotEmpty() }
+}

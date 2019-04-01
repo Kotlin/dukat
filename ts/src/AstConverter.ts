@@ -43,7 +43,7 @@ class AstConverter {
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
 
-        let packageDeclaration = this.createDocumentRoot("__ROOT__", declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), resourceName);
+        let packageDeclaration = this.createDocumentRoot(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), resourceName, true);
         let declaration = this.astFactory.createSourceFileDeclaration(
             sourceFileName,
             packageDeclaration,
@@ -80,8 +80,8 @@ class AstConverter {
         return this.convertSourceMap(sourceSet);
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string): PackageDeclaration {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName);
+    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
+        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -775,9 +775,9 @@ class AstConverter {
             let uid = this.exportContext.getUID(module);
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName, sourceFileName);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, resourceName), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, resourceName, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, resourceName), declarations);
+                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, resourceName, false), declarations);
             }
         }
         return declarations

@@ -18,6 +18,14 @@ private fun NameNode.countDepth(current: Int): Int {
     }
 }
 
+fun NameNode.process(handler: (String) -> String): NameNode {
+    return when(this) {
+        is IdentifierNode -> IdentifierNode(handler(value))
+        is QualifiedNode -> QualifiedNode(left.process(handler), right.process(handler) as IdentifierNode)
+        else -> throw Exception("failed to process NameNode ${this}")
+    }
+}
+
 val NameNode.size: Int
     get() = countDepth(0)
 

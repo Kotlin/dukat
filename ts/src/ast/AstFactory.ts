@@ -97,7 +97,15 @@ declare interface AstFactory {
     createTypeDeclaration(value: string, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: string, constraints: Array<ParameterValue>): TypeParameter;
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string): PackageDeclaration;
+    createDocumentRoot(
+        packageName: string,
+        declarations: Declaration[],
+        modifiers: Array<ModifierDeclaration>,
+        definitionsInfo: Array<DefinitionInfoDeclaration>,
+        uid: string,
+        resourceName: string,
+        root: boolean
+    ): PackageDeclaration;
     createSourceFileDeclaration(fileName: string, root: PackageDeclaration, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration;
 
     createSourceSet(sources: Array<SourceFileDeclaration>): SourceSet

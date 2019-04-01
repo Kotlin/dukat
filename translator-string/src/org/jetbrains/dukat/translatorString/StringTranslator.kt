@@ -510,7 +510,7 @@ class StringTranslator : ModelVisitor {
         val containsSomethingExceptDocRoot = moduleModel.declarations.isNotEmpty()
 
         if (containsSomethingExceptDocRoot) {
-            addOutput("${translateAnnotations(moduleModel.annotations)}package ${moduleModel.packageName}")
+            addOutput("${translateAnnotations(moduleModel.annotations)}package ${moduleModel.packageName.translate()}")
             addOutput("")
         }
     }

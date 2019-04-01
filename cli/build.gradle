@@ -1,0 +1,32 @@
+plugins {
+  id("java")
+  id("kotlin")
+}
+
+sourceSets {
+  main.java.srcDirs = ['src']
+  main.kotlin.srcDirs = ['src']
+}
+
+dependencies {
+  implementation(project(":ast"))
+  implementation(project(":ast-common"))
+  implementation(project(":ast-model"))
+  implementation(project(":tsmodel"))
+  implementation(project(":translator"))
+  implementation(project(":translator-string"))
+  implementation(project(":compiler"))
+}
+
+
+jar {
+  archiveName = "${project.name}-all.jar"
+  manifest {
+    attributes 'Main-Class': 'org.jetbrains.dukat.cli.CliKt'
+  }
+
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+
+}
