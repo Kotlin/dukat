@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
+import org.jetbrains.dukat.ast.model.nodes.size
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -39,7 +40,8 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             if (declarationValue is IdentifierNode) {
                 declarationResolver.resolve(declarationValue.value, qualifiedName)?.let { declarationOwnerContext ->
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
-                    if (declarationQualifiedName != IdentifierNode("__ROOT__")) {
+
+                    if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
                             return TypeValueModel(IdentifierNode(qualifiedNode.debugTranslate()), emptyList(), null)
