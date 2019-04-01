@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
@@ -60,7 +61,15 @@ private class EscapeIdentificators : ParameterValueLowering {
         return when(nodeLeft) {
             is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape())
             is QualifiedNode -> QualifiedNode(nodeLeft.escape(), right.escape())
-            else -> throw Exception("unknown QualifiedLeftnode")
+            else -> throw Exception("unknown QualifiedLeftNode ${nodeLeft}")
+        }
+    }
+
+    private fun NameNode.escape(): NameNode {
+        return when(this) {
+            is IdentifierNode -> escape()
+            is QualifiedNode -> escape()
+            else -> throw Exception("unknown NameNode ${this}")
         }
     }
 
@@ -87,7 +96,7 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
         return documentRoot.copy(
-                fullPackageName = documentRoot.fullPackageName.split(".").joinToString(".") { lowerIdentificator(it) },
+                fullPackageName = documentRoot.fullPackageName.escape(),
                 declarations = lowerTopLevelDeclarations(documentRoot.declarations)
         )
     }

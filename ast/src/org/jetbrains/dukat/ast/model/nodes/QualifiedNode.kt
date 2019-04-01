@@ -90,6 +90,21 @@ fun NameNode.shiftRight(): NameNode? {
     }
 }
 
+fun NameNode.shiftLeft(): NameNode? {
+    return when(this) {
+        is IdentifierNode -> null
+        is QualifiedNode -> {
+            val leftShifted = left.shiftLeft()
+            if (leftShifted == null) {
+                right
+            } else {
+                QualifiedNode(leftShifted, right)
+            }
+        }
+        else -> throw Exception("unknown NameNode")
+    }
+}
+
 
 fun IdentifierNode.debugTranslate(): String = value
 fun NameNode.debugTranslate(): String {

@@ -32,7 +32,7 @@ fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelDec
     return map
 }
 
-fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelDeclaration>, turnOff: MutableSet<String>, exportedModules: MutableMap<String, NameNode?>): DocumentRootNode {
+fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelDeclaration>, turnOff: MutableSet<NameNode>, exportedModules: MutableMap<String, NameNode?>): DocumentRootNode {
 
     val declarations = docRoot.declarations.map { declaration ->
         when (declaration) {
@@ -141,7 +141,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
 
 
-private fun DocumentRootNode.turnOff(turnOffData: MutableSet<String>): DocumentRootNode {
+private fun DocumentRootNode.turnOff(turnOffData: MutableSet<NameNode>): DocumentRootNode {
     if (turnOffData.contains(fullPackageName)) {
         showQualifierAnnotation = false
     }
@@ -178,7 +178,7 @@ private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<Stri
 
 fun DocumentRootNode.introduceExports(): DocumentRootNode {
     val uidTable = buildUidTable(this)
-    val turnOffData = mutableSetOf<String>()
+    val turnOffData = mutableSetOf<NameNode>()
     val exportedModulesData = mutableMapOf<String, NameNode?>()
     val docRoot =  introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
 

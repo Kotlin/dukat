@@ -32,6 +32,7 @@ import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
+import org.jetbrains.dukat.ast.model.nodes.shiftLeft
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
@@ -650,9 +651,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
 
-        val rootOwner = parentDocRoots.removeAt(0)
+        val rootOwner = parentDocRoots.get(0)
 
         val qualifiers = parentDocRoots.map { unquote(it.node.packageName) }
+
 
         val isQualifier = (documentRoot.packageName == unquote(documentRoot.packageName))
 
@@ -665,16 +667,22 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             showQualifierAnnotation = false
         }
 
-        val fullPackageName = (listOf(documentRoot.resourceName) + qualifiers).joinToString(".") { escapePackageName(it) }
+        val qualifierIdentifiers = qualifiers
+                .flatMap { it.split("/") }
+                .map { IdentifierNode(escapePackageName(it)) }
+
+        val fullPackageName = qualifierIdentifiers.reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc)}
+
 
         val  qualifiedNode = if (qualifiers.isEmpty()) {
             null
         } else {
-            qualifiers.map { IdentifierNode(it) }
-                    .reduce<NameNode, NameNode> { acc, identifierNode ->
-                        identifierNode.appendRight(acc)
-                    }
+            qualifiers
+                    .map { IdentifierNode(it) }
+                    .reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc)}
+                    .shiftLeft()
         }
+
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
@@ -733,7 +741,8 @@ fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map { referencedFile -> IdentifierNode(referencedFile.value) })
 }
 
-fun SourceSetDeclaration.introduceNodes() =
+fun SourceSetDeclaration.
+        introduceNodes() =
         SourceSetNode(sources = sources.map { source ->
             source.introduceNodes()
         })
