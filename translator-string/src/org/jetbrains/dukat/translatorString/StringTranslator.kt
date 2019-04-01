@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
@@ -502,6 +503,10 @@ class StringTranslator : ModelVisitor {
         addOutput(classModel.translate(false, 0))
     }
 
+    fun visitImport(import: NameNode) {
+        addOutput("import ${import.translate()}")
+    }
+
     override fun visitModule(moduleModel: ModuleModel) {
         if (moduleModel.declarations.isEmpty() && moduleModel.sumbodules.isEmpty()) {
             return
@@ -512,6 +517,13 @@ class StringTranslator : ModelVisitor {
         if (containsSomethingExceptDocRoot) {
             addOutput("${translateAnnotations(moduleModel.annotations)}package ${moduleModel.packageName.translate()}")
             addOutput("")
+        }
+
+        moduleModel.imports.forEachIndexed { index, importNode ->
+            visitImport(importNode)
+            if (index == moduleModel.imports.size) {
+                addOutput("")
+            }
         }
     }
 

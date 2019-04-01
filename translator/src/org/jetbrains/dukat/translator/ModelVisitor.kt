@@ -110,9 +110,5 @@ interface ModelVisitor {
             processTopLevelDeclaration(declaration)
         }
 
-//        moduleModel.sumbodules.forEach { submodule ->
-//            process(submodule)
-//        }
-
     }
 }

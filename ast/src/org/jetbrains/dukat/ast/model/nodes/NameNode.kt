@@ -30,4 +30,8 @@ val NameNode.size: Int
     get() = countDepth(0)
 
 
+fun String.toNameNode(): NameNode {
+    return split(".").map{IdentifierNode(it)}.reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc)}
+}
+
 

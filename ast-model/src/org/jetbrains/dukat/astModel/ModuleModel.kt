@@ -11,8 +11,8 @@ data class ModuleModel(
         val shortName: String,
         val declarations: List<TopLevelNode> = emptyList(),
         val annotations: MutableList<AnnotationNode>,
-
-        val sumbodules: List<ModuleModel>
+        val sumbodules: List<ModuleModel>,
+        val imports: MutableList<NameNode>
 ) : TopLevelDeclaration, TopLevelNode
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
