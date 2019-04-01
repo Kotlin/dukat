@@ -118,6 +118,7 @@ private fun process(args: List<String>): CliOptions? {
                     outDir = outDirArg
                 }
             }
+
             else -> sources.add(arg)
         }
     }

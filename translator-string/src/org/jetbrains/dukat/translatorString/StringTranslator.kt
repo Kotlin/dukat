@@ -521,7 +521,7 @@ class StringTranslator : ModelVisitor {
 
         moduleModel.imports.forEachIndexed { index, importNode ->
             visitImport(importNode)
-            if (index == moduleModel.imports.size) {
+            if (index == (moduleModel.imports.size - 1)) {
                 addOutput("")
             }
         }
