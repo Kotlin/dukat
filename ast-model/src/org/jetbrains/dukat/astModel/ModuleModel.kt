@@ -16,6 +16,6 @@ data class ModuleModel(
 ) : TopLevelDeclaration, TopLevelNode
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
-    return (listOf(this) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
+    return (listOf(this.copy(sumbodules = emptyList())) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
             .filter { module -> module.declarations.isNotEmpty() }
 }
