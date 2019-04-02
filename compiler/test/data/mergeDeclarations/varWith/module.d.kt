@@ -1,23 +1,23 @@
 package module
 
 @JsModule("lodash")
-external val `_`: `_`.LoDashStatic = definedExternally
+external val `_`: module.`_`.LoDashStatic = definedExternally
 
 // ------------------------------------------------------------------------------------------
-@file:JsModule("lodash")
+@file:JsQualifier("_")
 package module.`_`
 
 external interface LoDashStatic {
     @nativeInvoke
     operator fun invoke(value: Number): LoDashArrayWrapper<Number>
     var VERSION: String
-    var support: `_`.Support
+    var support: Support
 }
 external interface Support {
     var argsClass: Boolean
     var argsObject: Boolean
 }
 external interface LoDashArrayWrapper<T> {
-    fun difference(vararg others: Array<T>): `_`.LoDashArrayWrapper<T>
-    fun difference(vararg others: List<T>): `_`.LoDashArrayWrapper<T>
+    fun difference(vararg others: Array<T>): LoDashArrayWrapper<T>
+    fun difference(vararg others: List<T>): LoDashArrayWrapper<T>
 }

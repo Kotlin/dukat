@@ -7,12 +7,13 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
+import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.size
-import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -28,6 +29,20 @@ private fun NameNode.shiftLeft(): NameNode {
 
     return this
 }
+
+private fun NameNode?.matchesLeft(identifier: NameNode): Boolean {
+    return when(this) {
+        is IdentifierNode -> identifier == this
+        is QualifiedNode -> left.matchesLeft(identifier)
+        else -> false
+    }
+}
+
+
+private fun unescape(name: String): String {
+    return name.replace("(?:^`)|(?:`$)".toRegex(), "")
+}
+
 
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
@@ -45,21 +60,36 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
-                            return TypeValueModel(IdentifierNode(qualifiedNode.translate()), emptyList(), null)
+                            return TypeValueModel(qualifiedNode, emptyList(), null)
                         }
                     }
                 }
             }
         } else if (declaration is QualifiedNode) {
+
+            // TODO: Double check deeply nested qualifiedNames
             val qualifiedPath = qualifiedName.appendRight(declaration).shiftRight()
+
+            if (ownerContext.owner?.node is VariableModel) {
+                val variableModel = ownerContext.owner?.node as VariableModel
+                if (qualifiedPath.matchesLeft(variableModel.name)) {
+                    val pathShifted = qualifiedPath?.shiftLeft()
+                    if (pathShifted is IdentifierNode) {
+                        val supposedModule = variableModel.name.appendRight(qualifiedName)
+
+                        declarationResolver.resolveStrict(pathShifted.value, supposedModule.process(::unescape))?.let {
+                            return TypeValueModel(supposedModule.appendRight(pathShifted), emptyList(), null)
+                        }
+                    }
+                }
+            }
 
             declarationResolver.resolveStrict(declaration.right.value, qualifiedPath)?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
                 if (declarationQualifiedName != qualifiedName) {
                     val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declaration.right)
-                    println("substituting ${declaration.debugTranslate()} with ${qualifiedNode?.translate()} ()")
-                    return TypeValueModel(IdentifierNode(qualifiedNode!!.translate()), emptyList(), null)
+                    return TypeValueModel(qualifiedNode!!, emptyList(), null)
                 }
             }
 

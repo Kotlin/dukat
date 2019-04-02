@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.NameNode
+import org.jetbrains.dukat.ast.model.nodes.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -57,6 +58,31 @@ class DeclarationResolver {
         }
 
     }
+
+    fun resolveLeft(name: String, path: NameNode?): NodeOwner<ModuleModel>? {
+        if (path == null) {
+            return null
+        }
+
+        var qualifiedPath: NameNode = path
+
+        while (true) {
+            val declarationKey = DeclarationKey(name, qualifiedPath)
+
+            if (myDeclarations.containsKey(declarationKey)) {
+                return myDeclarations.get(declarationKey)
+            }
+
+            val shifted = qualifiedPath.shiftLeft()
+            if (shifted != null) {
+                qualifiedPath = shifted
+            } else {
+                return null
+            }
+        }
+
+    }
+
 
     fun resolveStrict(name: String, qualifiedPath: NameNode?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
