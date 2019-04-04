@@ -9,12 +9,16 @@ allprojects {
 
   }
 
-
   afterEvaluate { project ->
     if (project.plugins.hasPlugin("kotlin")) {
 
+      test {
+        useJUnitPlatform()
+      }
+
       project.sourceSets {
         main.kotlin.srcDirs = ['src']
+        test.kotlin.srcDirs = ['test/src']
       }
 
       compileKotlin {
@@ -30,9 +34,3 @@ allprojects {
   }
 
 }
-
-
-//dependencies {
-//  testCompile "junit:junit:4.12"
-//  testCompile 'org.jetbrains.kotlin:kotlin-test-junit5'
-//}

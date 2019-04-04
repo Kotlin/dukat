@@ -45,18 +45,14 @@ dependencies {
   runtime 'org.jetbrains.kotlin:kotlin-reflect'
   compile 'org.jetbrains.kotlin:kotlin-reflect'
 
+  testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
+
   testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
   testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
   testImplementation 'org.jetbrains.kotlin:kotlin-test'
-  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 
-  testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
-  testImplementation "org.junit.vintage:junit-vintage-engine:5.4.0-M1"
-
-  testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.0"
-
-  testImplementation "org.junit.platform:junit-platform-runner:1.4.0-M1"
-  testImplementation "org.junit.platform:junit-platform-suite-api:1.4.0-M1"
+  testImplementation "org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
   testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
 

@@ -2,15 +2,15 @@ plugins {
     id("kotlin")
 }
 
-sourceSets {
-    main.kotlin.srcDirs = ['src']
-    test.kotlin.srcDirs = ['test/src']
-}
 
 dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
+
     testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
 }
