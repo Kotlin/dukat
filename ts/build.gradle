@@ -4,6 +4,7 @@ plugins {
 }
 
 task compileTs(type: NodeTask) {
+  dependsOn = [yarn]
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   outputs.dir("./build/ts")
@@ -13,6 +14,14 @@ task compileTs(type: NodeTask) {
   args = ["-p", "tsconfig.json"]
 }
 
+node {
+  // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
+  version = '10.15.3'
+
+  download = true
+
+  nodeModulesDir = file("${project.projectDir}")
+}
 
 task createJar(type: Zip) {
   dependsOn = [compileTs]
