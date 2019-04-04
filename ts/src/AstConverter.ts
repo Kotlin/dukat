@@ -20,7 +20,7 @@ class AstConverter {
     constructor(
         private typeChecker: ts.TypeChecker,
         private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
-        private declarationResolver: (node: ts.Node, fileName: string) => ts.DefinitionInfo[] | undefined,
+        private declarationResolver: (node: ts.Node, fileName: string) => readonly ts.DefinitionInfo[] | undefined,
         private astFactory: AstFactory
     ) {
     }
