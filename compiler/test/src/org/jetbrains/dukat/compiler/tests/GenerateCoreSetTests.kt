@@ -5,7 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
-class GenerateCoreSetTests : StandardTests() {
+
+abstract class GenerateCoreSetTests : StandardTests() {
 
     @DisplayName("core test set")
     @ParameterizedTest(name = "{0}")

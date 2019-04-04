@@ -2,8 +2,6 @@ package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
-import org.jetbrains.dukat.compiler.createNashornTranslator
-import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
@@ -67,21 +65,9 @@ private fun output(fileName: String, translator: InputTranslator): String {
     return compile(documentRoot)
 }
 
-open class StandardTests {
-    companion object {
-        val translator: InputTranslator
 
-        init {
-            if (System.getenv("DUKAT_RUNTIME") == "NASHORN") {
-                println("nashorn runtime")
-                translator = createNashornTranslator()
-            } else {
-                println("v8 runtime")
-                translator = createV8Translator()
-            }
-        }
-
-    }
+abstract class StandardTests {
+    abstract fun getTranslator(): InputTranslator
 
     private fun compile(sourcePath: String, targetPath: String): ExitCode {
         println("TARGET ${targetPath}")
@@ -111,7 +97,7 @@ open class StandardTests {
 
         val targetShortName = "${descriptor}.d.kt"
 
-        val translated = output(tsPath, translator)
+        val translated = output(tsPath, getTranslator())
 
         assertEquals(
                 translated,
@@ -137,7 +123,7 @@ open class StandardTests {
 
         val targetShortName = "${descriptor}.d.kt"
 
-        val translated = output(tsPath, translator)
+        val translated = output(tsPath, getTranslator())
 
         val outputDirectory = File("./build/tests/out")
         translated?.let {

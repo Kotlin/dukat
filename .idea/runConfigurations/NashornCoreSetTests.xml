@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="[NS] GenerateCoreSetTests.withValueSource " type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="NashornCoreSetTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <module name="compiler_test" />
     <extension name="coverage">
       <pattern>
@@ -8,16 +8,12 @@
       </pattern>
     </extension>
     <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.GenerateCoreSetTests" />
-    <option name="METHOD_NAME" value="withValueSource(java.lang.String,java.lang.String,java.lang.String)" />
-    <option name="TEST_OBJECT" value="method" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.NashornCoreSetTests" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
     <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-    <option name="PASS_PARENT_ENVS" value="false" />
-    <envs>
-      <env name="DUKAT_RUNTIME" value="NASHORN" />
-    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
