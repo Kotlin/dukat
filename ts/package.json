@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "typescript": "^3.1.6"
+    "typescript": "^3.4.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
