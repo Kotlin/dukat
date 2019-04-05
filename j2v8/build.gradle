@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
   id("kotlin")
 }
@@ -7,7 +9,16 @@ sourceSets {
 }
 
 dependencies {
-  implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
+  if (OperatingSystem.current().isMacOsX()) {
+    implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
+  } else if (OperatingSystem.current().isLinux()) {
+    implementation 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0'
+  } else if (OperatingSystem.current().isWindows()) {
+    implementation 'com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0'
+  } else {
+    logger.error("unsupported platform - can not compile com.eclipsesource.j2v8 dependency")
+  }
+
   implementation 'org.jodd:jodd-core:5.0.6'
   implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
