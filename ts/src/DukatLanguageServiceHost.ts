@@ -49,7 +49,6 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     log(message: string): void {
-        console.log(message);
     }
 
     register(knownFile: string) {

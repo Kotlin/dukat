@@ -3,10 +3,6 @@
 /// <reference path="../node_modules/typescript/lib/typescript.d.ts"/>
 
 
-if (typeof ts == "undefined") {
-    (global as any).ts = require("typescript/lib/tsserverlibrary");
-}
-
 interface FileResolver {
     resolve(fileName: string): string;
 }
@@ -37,9 +33,4 @@ function main(fileName: string) {
 
         return astConverter.createSourceSet(fileName);
     }
-}
-
-
-if (typeof module != "undefined") {
-    module.exports = main;
 }
