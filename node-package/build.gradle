@@ -5,6 +5,8 @@ plugins {
 
 task npmPublish(type: NpmTask) {
 
+    dependsOn = [":cli:build"]
+
     def token = System.getProperty("kotlin.npmjs.auth.token")
     def registry = "http://registry.npmjs.org/:_authToken=${token}"
     def distribPath = "${project.projectDir}"
