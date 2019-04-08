@@ -3,10 +3,9 @@
   "version": "0.0.1",
   "description": "Converter definition files to Kotlin declarations. Currently support TypeScript declarations",
   "bin": {
-    "dukat": "./dukat.sh"
+    "dukat": "./build/dukat.jar"
   },
   "files": [
-    "dukat.sh",
     "build/dukat.jar"
   ],
   "scripts": {
