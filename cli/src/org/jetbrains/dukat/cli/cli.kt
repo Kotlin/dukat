@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.toNameNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createV8Translator
+import org.jetbrains.dukat.translatorString.NEW_LINE
 import translateModule
 import java.io.File
 
@@ -67,7 +68,7 @@ private fun compile(filename: String, outDir: String?) {
             val resolvedTarget = dirFile.resolve(targetName)
             println("generating ${resolvedTarget}")
 
-            resolvedTarget.writeText(translateModule(module).joinToString("\n"))
+            resolvedTarget.writeText(translateModule(module).joinToString(NEW_LINE))
         }
     }
 }
