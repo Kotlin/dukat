@@ -12,7 +12,7 @@ class FileResolver {
     }
 
     fun readResource(name: String): String {
-        val resourceAsStream = object {}::class.java.classLoader.getResourceAsStream(name)
+        val resourceAsStream = this::class.java.classLoader.getResourceAsStream(name)
         return resourceAsStream.bufferedReader().readText()
     }
 
