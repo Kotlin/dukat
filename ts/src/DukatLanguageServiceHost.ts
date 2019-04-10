@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/typescript/lib/tsserverlibrary.d.ts"/>
+/// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
 import fromString = ts.ScriptSnapshot.fromString;
 

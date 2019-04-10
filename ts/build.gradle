@@ -3,13 +3,29 @@ plugins {
   id "com.moowork.node" version "1.2.0"
 }
 
+def packagePath = "${project.buildDir}/package"
+def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.4.3"
+
+task prepareNpmPackage(type: Copy) {
+  from "package.json"
+  into packagePath
+}
+
+task installTypescript(type: YarnTask) {
+  dependsOn = [prepareNpmPackage]
+  // install the express package only
+  args = ['add', "typescript@${typescriptVersion}"]
+}
+
+
 task compileTs(type: NodeTask) {
-  dependsOn = [yarn]
+  dependsOn = [installTypescript]
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
+  inputs.dir(packagePath)
   outputs.dir("./build/ts")
 
-  script = file("./node_modules/typescript/bin/tsc")
+  script = file("${packagePath}/node_modules/typescript/bin/tsc")
 
   args = ["-p", "tsconfig.json"]
 }
@@ -20,7 +36,7 @@ node {
 
   download = true
 
-  nodeModulesDir = file("${project.projectDir}")
+  nodeModulesDir = file(packagePath)
 }
 
 task createJar(type: Zip) {
@@ -33,11 +49,11 @@ task createJar(type: Zip) {
     into 'js'
   }
 
-  from("${project.projectDir}/node_modules/typescript/lib/tsserverlibrary.js") {
+  from("${packagePath}/node_modules/typescript/lib/tsserverlibrary.js") {
     into 'ts'
   }
 
-  from("${project.projectDir}/node_modules/typescript/lib") {
+  from("${packagePath}/node_modules/typescript/lib") {
     include "**/*.d.ts"
     into 'ts'
   }

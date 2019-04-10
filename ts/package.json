@@ -1,10 +1,8 @@
 {
-  "name": "ts",
-  "version": "1.0.0",
-  "description": "",
-  "dependencies": {
-    "typescript": "^3.4.1"
-  },
+  "name": "dukat-ts-distrib",
+  "private": true,
+  "version": "0.0.0",
+  "description": "This is non-public package the only purpose of which is to build ts-related part of dukat project",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
