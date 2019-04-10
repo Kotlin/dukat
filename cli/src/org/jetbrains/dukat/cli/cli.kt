@@ -5,7 +5,9 @@ import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.toNameNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
+import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.translatorString.NEW_LINE
 import translateModule
 import java.io.File
@@ -16,9 +18,8 @@ private fun unescape(name: String): String {
 }
 
 
-private fun compile(filename: String, outDir: String?) {
+private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator) {
     println("Converting $filename")
-    val translator = createV8Translator()
 
     val sourceSetModel = translator.translate(filename)
 
@@ -86,14 +87,20 @@ private fun printUsage(program: String) {
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
--d <path>                   destination directory for files with converted declarations (current by default)
+-d  <path>                   destination directory for files with converted declarations (current by default)
+-js nashorn | j2v8          js-interop JVM engine (nashorn by default)
 """.trimIndent())
 }
 
 
+private enum class Engine {
+    NASHORN, J2V8
+}
+
 private data class CliOptions(
         val sources: List<String>,
-        val outDir: String?
+        val outDir: String?,
+        val engine: Engine
 )
 
 
@@ -101,11 +108,16 @@ private fun printError(message: String) {
     System.err.println(message)
 }
 
+private fun printWarning(message: String) {
+    System.out.println("Warning: ${message}")
+}
+
 private fun process(args: List<String>): CliOptions? {
     val argsIterator = args.iterator()
 
     val sources = mutableListOf<String>()
     var outDir: String? = null
+    var engine = Engine.NASHORN
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
@@ -120,11 +132,26 @@ private fun process(args: List<String>): CliOptions? {
                 }
             }
 
+            "-js" -> {
+                val engineId = argsIterator.readArg()
+                engine = when (engineId) {
+                    "nashorn" -> Engine.NASHORN
+                    "j2v8" -> {
+                        printWarning("currently j2v8 backend is not supported on windows-based platforms")
+                        Engine.J2V8
+                    }
+                    else -> {
+                        printError("'-js' can be set to either 'nashorn' or 'j2v8'")
+                        return null
+                    }
+                }
+            }
+
             else -> sources.add(arg)
         }
     }
 
-    return CliOptions(sources, outDir)
+    return CliOptions(sources, outDir, engine)
 }
 
 fun main(vararg args: String) {
@@ -133,9 +160,15 @@ fun main(vararg args: String) {
         return
     }
 
+
     process(args.toList())?.let { options ->
+        options.engine == Engine.J2V8
+
         options.sources.forEach { sourceName ->
-            compile(sourceName, options.outDir)
+            compile(sourceName, options.outDir, when (options.engine) {
+                Engine.NASHORN -> createNashornTranslator()
+                Engine.J2V8 -> createV8Translator()
+            })
         }
     }
 
