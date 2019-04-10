@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
-import org.jetbrains.dukat.translatorString.NEW_LINE
+import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
 import java.io.File
 
@@ -69,7 +69,7 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
             val resolvedTarget = dirFile.resolve(targetName)
             println("generating ${resolvedTarget}")
 
-            resolvedTarget.writeText(translateModule(module).joinToString(NEW_LINE))
+            resolvedTarget.writeText(translateModule(module).joinToString(LINE_SEPARATOR))
         }
     }
 }

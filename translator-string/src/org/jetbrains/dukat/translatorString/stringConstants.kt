@@ -1,3 +1,3 @@
 package org.jetbrains.dukat.translatorString
 
-val NEW_LINE = "\n"
+val LINE_SEPARATOR = System.lineSeparator()

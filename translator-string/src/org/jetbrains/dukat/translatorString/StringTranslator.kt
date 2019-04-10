@@ -158,7 +158,7 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
         res
     }
 
-    val annotationTranslated = if (annotations.isEmpty()) "" else annotations.joinToString(NEW_LINE) + NEW_LINE
+    val annotationTranslated = if (annotations.isEmpty()) "" else annotations.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
 
     return annotationTranslated
 }
@@ -265,9 +265,9 @@ private fun EnumNode.translate(): String {
     res.add(values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
         "    ${value.value}${metaClause}"
-    }.joinToString(",${NEW_LINE}"))
+    }.joinToString(",${LINE_SEPARATOR}"))
     res.add("}")
-    return res.joinToString(NEW_LINE)
+    return res.joinToString(LINE_SEPARATOR)
 }
 
 private fun PropertyModel.translate(): String {
@@ -422,7 +422,7 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
         res.add(tab.repeat(padding) + "}")
     }
 
-    return res.joinToString(NEW_LINE)
+    return res.joinToString(LINE_SEPARATOR)
 }
 
 
@@ -434,7 +434,7 @@ class StringTranslator : ModelVisitor {
     }
 
     fun output(): String {
-        return myOutput.joinToString(NEW_LINE)
+        return myOutput.joinToString(LINE_SEPARATOR)
     }
 
     override fun visitVariable(variable: VariableModel) {
