@@ -90,7 +90,7 @@ compileTestKotlin.dependsOn = ["propagateToIdeaRuntime"]
 task download(type: Copy) {
   from configurations.toDownload
   into "${project.buildDir}/lib"
-  rename "kotlin-stdlib-js-1.3.21.jar", "kotlin-stdlib-js.jar"
+  rename "kotlin-stdlib-js-1.3.30.jar", "kotlin-stdlib-js.jar"
 }
 
 test.dependsOn(download)
