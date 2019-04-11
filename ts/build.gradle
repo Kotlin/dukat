@@ -6,6 +6,17 @@ plugins {
 def packagePath = "${project.buildDir}/package"
 def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.4.3"
 
+
+node {
+  // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
+  version = '10.15.3'
+  yarnVersion = '1.15.2'
+
+  download = true
+
+  nodeModulesDir = file(packagePath)
+}
+
 task prepareNpmPackage(type: Copy) {
   from "package.template"
   into packagePath
@@ -14,10 +25,10 @@ task prepareNpmPackage(type: Copy) {
 
 
   from "yarn.lock"
-  into packagePath  
+  into packagePath
 }
 
-yarn.dependsOn = [prepareNpmPackage]
+yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
 task compileTs(type: NodeTask) {
   dependsOn = [yarn]
@@ -31,14 +42,6 @@ task compileTs(type: NodeTask) {
   args = ["-p", "tsconfig.json"]
 }
 
-node {
-  // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
-  version = '10.15.3'
-
-  download = true
-
-  nodeModulesDir = file(packagePath)
-}
 
 task createJar(type: Zip) {
   dependsOn = [compileTs]
