@@ -7,19 +7,20 @@ def packagePath = "${project.buildDir}/package"
 def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.4.3"
 
 task prepareNpmPackage(type: Copy) {
-  from "package.json"
+  from "package.template"
   into packagePath
+  filter{ String line -> line.replaceAll("__TS_VERSION__", "\"${typescriptVersion}\"") }
+  rename { String fileName -> fileName.replace("template", "json") }
+
+
+  from "yarn.lock"
+  into packagePath  
 }
 
-task installTypescript(type: YarnTask) {
-  dependsOn = [prepareNpmPackage]
-  // install the express package only
-  args = ['add', "typescript@${typescriptVersion}"]
-}
-
+yarn.dependsOn = [prepareNpmPackage]
 
 task compileTs(type: NodeTask) {
-  dependsOn = [installTypescript]
+  dependsOn = [yarn]
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   inputs.dir(packagePath)
