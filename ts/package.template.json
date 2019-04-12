@@ -8,7 +8,7 @@
   },
   "author": "",
   "dependencies": {
-    "typescript": __TS_VERSION__
+    "typescript": "__TS_VERSION__"
   },
   "license": "UNLICENSED"
 }

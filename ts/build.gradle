@@ -18,11 +18,10 @@ node {
 }
 
 task prepareNpmPackage(type: Copy) {
-  from "package.template"
+  from "package.template.json"
   into packagePath
-  filter{ String line -> line.replaceAll("__TS_VERSION__", "\"${typescriptVersion}\"") }
-  rename { String fileName -> fileName.replace("template", "json") }
-
+  filter{ String line -> line.replaceAll("__TS_VERSION__", typescriptVersion) }
+  rename { String fileName -> fileName.replace(".template", "") }
 
   from "yarn.lock"
   into packagePath
