@@ -1,6 +1,9 @@
 package org.jetbrains.dukat.cli
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.toNameNode
 import org.jetbrains.dukat.ast.model.nodes.translate
@@ -18,7 +21,15 @@ private fun unescape(name: String): String {
 }
 
 
-private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator) {
+private fun NameNode.updatePackageNameWithPrefix(basePackage: NameNode): NameNode {
+    return when (this) {
+        is IdentifierNode -> basePackage
+        is QualifiedNode -> copy(left = left.updatePackageNameWithPrefix(basePackage))
+        else -> throw Exception("unsupported NameNode ${this}")
+    }
+}
+
+private fun compile(filename: String, outDir: String?, basePackageName: NameNode?, translator: TypescriptInputTranslator) {
     println("Converting $filename")
 
     val sourceSetModel = translator.translate(filename)
@@ -27,9 +38,14 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
 
     sourceSetModel.sources.forEach { source ->
         println("--- ${source.fileName} -----------")
+
         val modules = source.root.flattenDeclarations()
 
-        modules.forEach { module ->
+        modules.forEach { originalModule ->
+
+            val module = if (basePackageName == null) originalModule else originalModule.copy(packageName = originalModule.packageName.updatePackageNameWithPrefix(basePackageName))
+
+            println("MODULE MODULE ${module.packageName.updatePackageNameWithPrefix(QualifiedNode(IdentifierNode("ping"), IdentifierNode("pong"))).translate()}")
 
             val targetName = "${module.packageName.process(::unescape).translate()}.kt"
 
@@ -87,8 +103,9 @@ private fun printUsage(program: String) {
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
--d  <path>                   destination directory for files with converted declarations (current by default)
--js nashorn | j2v8          js-interop JVM engine (nashorn by default)
+    -b  <qualifiedPackageName>   package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
+    -d  <path>                   destination directory for files with converted declarations (by default declarations are generated in current directory)
+    -js nashorn | j2v8           js-interop JVM engine (nashorn by default)
 """.trimIndent())
 }
 
@@ -100,7 +117,8 @@ private enum class Engine {
 private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
-        val engine: Engine
+        val engine: Engine,
+        val basePackageName: NameNode?
 )
 
 
@@ -118,6 +136,7 @@ private fun process(args: List<String>): CliOptions? {
     val sources = mutableListOf<String>()
     var outDir: String? = null
     var engine = Engine.NASHORN
+    var basePackageName: NameNode? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
@@ -147,11 +166,22 @@ private fun process(args: List<String>): CliOptions? {
                 }
             }
 
+            "-p" -> {
+                val packageNameString = argsIterator.readArg()
+
+                if (packageNameString == null) {
+                    printError("'-p' should be followed with the qualified package name")
+                    return null
+                }
+
+                basePackageName = packageNameString.toNameNode()
+            }
+
             else -> sources.add(arg)
         }
     }
 
-    return CliOptions(sources, outDir, engine)
+    return CliOptions(sources, outDir, engine, basePackageName)
 }
 
 fun main(vararg args: String) {
@@ -165,7 +195,7 @@ fun main(vararg args: String) {
         options.engine == Engine.J2V8
 
         options.sources.forEach { sourceName ->
-            compile(sourceName, options.outDir, when (options.engine) {
+            compile(sourceName, options.outDir, options.basePackageName, when (options.engine) {
                 Engine.NASHORN -> createNashornTranslator()
                 Engine.J2V8 -> createV8Translator()
             })
