@@ -7,11 +7,19 @@ interface FileResolver {
     resolve(fileName: string): string;
 }
 
-function main(fileName: string) {
+declare interface DocumentCache {
+    setDocument(key: string, path: string, sourceFile: ts.SourceFile): void;
+    getDocument(key: string, path: string): ts.SourceFile | undefined;
+}
+
+function main(fileName: string, cache?: DocumentCache) {
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 
-    let languageService = ts.createLanguageService(host, ts.createDocumentRegistry());
+    let logger = createLogger("converter");
+
+    logger.debug(`using document cache: ${!!cache}`);
+    let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
 
     const program = languageService.getProgram();
 

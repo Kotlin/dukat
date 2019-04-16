@@ -8,6 +8,7 @@ import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
+import org.jetbrains.dukat.nashorn.DocumentCache
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 import org.jetbrains.dukat.tsinterop.ExportContent
 import org.jetbrains.dukat.tsinterop.ExportContentNonGeneric
@@ -34,6 +35,7 @@ private fun createNashornInterop(): InteropNashorn {
     engine.eval("""
         var global = this;
         var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
+        var DocumentCache = Java.type('org.jetbrains.dukat.nashorn.DocumentCache');
 
         function createExportContent() {return new ExportContent.static(); }
         function createAstFactory() { return new AstFactory.static(); }
@@ -105,9 +107,12 @@ class TranslatorV8(private val engine: InteropV8) : TypescriptInputTranslator {
     }
 }
 
-class TranslatorNashorn(private val engine: InteropNashorn) : TypescriptInputTranslator {
+class TranslatorNashorn(
+        private val engine: InteropNashorn,
+        private val documentCache: DocumentCache = DocumentCache()
+) : TypescriptInputTranslator {
     override fun translateFile(fileName: String): SourceSetDeclaration {
-        return engine.callFunction("main", fileName)
+        return engine.callFunction("main", fileName, documentCache)
     }
 
     override fun release() {}
