@@ -50,7 +50,7 @@ abstract class GenerateCoreSetTests : StandardTests() {
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/DefinitelyTyped")
+            return fileSetWithDescriptors("./build/DefinitelyTyped")
         }
     }
 }

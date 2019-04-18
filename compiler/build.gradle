@@ -2,6 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
   id("kotlin")
+  id "de.undercouch.download" version "3.4.3"
 }
 
 configurations {
@@ -94,6 +95,20 @@ task download(type: Copy) {
   from configurations.toDownload
   into "${project.buildDir}/lib"
   rename "kotlin-stdlib-js-1.3.30.jar", "kotlin-stdlib-js.jar"
+}
+
+
+task downloadDefinitelyTyped(type: Download) {
+  onlyIfModified true
+  overwrite false
+  def version = '10aca630788ef193f994ac31de63ea9cf44630a3'
+  src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
+  dest new File(rootProject.projectDir.path + "/.gradle", "DefinitelyTyped-${version}.zip")
+}
+
+task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
+  from zipTree(downloadDefinitelyTyped.dest)
+  into "${project.buildDir}/definitelyTyped"
 }
 
 test.dependsOn(download)

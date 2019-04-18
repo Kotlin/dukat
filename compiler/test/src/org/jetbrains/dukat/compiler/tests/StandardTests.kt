@@ -70,8 +70,6 @@ abstract class StandardTests {
     abstract fun getTranslator(): InputTranslator
 
     private fun compile(sourcePath: String, targetPath: String): ExitCode {
-        println("TARGET ${targetPath}")
-
         val options =
                 K2JSCompilerArguments().apply {
                     outputFile = targetPath
