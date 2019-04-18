@@ -61,6 +61,9 @@ dependencies {
   testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
   testImplementation 'org.jetbrains.kotlin:kotlin-test'
 
+  // without this dependency one won't see "Click to see difference" in IDEA
+  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+
   testImplementation "org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
