@@ -121,7 +121,3 @@ class TranslatorNashorn(
 
 fun createV8Translator() = TranslatorV8(createV8Interop())
 fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
-
-
-fun main() {
-}

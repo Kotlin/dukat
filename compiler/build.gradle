@@ -97,3 +97,11 @@ task download(type: Copy) {
 }
 
 test.dependsOn(download)
+
+test {
+  def DUKAT_TEST_EXTENDED = "dukat.test.extended"
+
+  if (project.hasProperty(DUKAT_TEST_EXTENDED)) {
+    systemProperty DUKAT_TEST_EXTENDED, "true"
+  }
+}
