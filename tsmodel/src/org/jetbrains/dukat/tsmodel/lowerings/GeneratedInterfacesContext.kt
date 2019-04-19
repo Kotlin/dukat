@@ -76,6 +76,11 @@ class GeneratedInterfacesContext {
         val typeParamsSet = typeParameters.map { it.name }.toSet()
 
         return when (declaration) {
+            is FunctionTypeDeclaration -> {
+                declaration.copy(
+                    parameters = declaration.parameters.map { parameterDeclaration -> parameterDeclaration.copy(type = generateInterface(owner.wrap(parameterDeclaration.type), ownerUID, typeParameters))  }
+                )
+            }
             is ObjectLiteralDeclaration -> {
                 when {
                     declaration.canBeJson() -> TypeDeclaration("Json", emptyList())

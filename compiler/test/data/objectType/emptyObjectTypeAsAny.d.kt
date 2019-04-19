@@ -20,4 +20,6 @@ external object foo {
 }
 external interface Foo {
     var boo: Any
+    fun ping(param: Any)
+    fun json(fn: (body: Any) -> Any)
 }
