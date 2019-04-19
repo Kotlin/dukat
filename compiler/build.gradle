@@ -1,8 +1,17 @@
 import org.gradle.internal.os.OperatingSystem
+import de.undercouch.gradle.tasks.download.Download
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'de.undercouch:gradle-download-task:3.4.3'
+  }
+}
 
 plugins {
   id("kotlin")
-  id "de.undercouch.download" version "3.4.3"
 }
 
 configurations {
