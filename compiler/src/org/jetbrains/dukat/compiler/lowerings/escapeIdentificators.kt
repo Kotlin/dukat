@@ -59,8 +59,8 @@ private class EscapeIdentificators : ParameterValueLowering {
     private fun QualifiedNode.escape(): QualifiedNode {
         val nodeLeft = left
         return when(nodeLeft) {
-            is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape())
-            is QualifiedNode -> QualifiedNode(nodeLeft.escape(), right.escape())
+            is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape(), nullable = nullable)
+            is QualifiedNode -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
             else -> throw Exception("unknown QualifiedLeftNode ${nodeLeft}")
         }
     }

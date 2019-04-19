@@ -61,7 +61,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                     when (entity) {
                         is DocumentRootNode -> {
-                            exportedModules[entity.uid] = docRoot.qualifiedNode!!
+                            if (docRoot.qualifiedNode != null) {
+                                exportedModules[entity.uid] = docRoot.qualifiedNode!!
+                            }
                             emptyList()
                         }
                         is ClassNode -> {

@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
@@ -34,6 +35,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is FunctionTypeDeclaration -> copy(nullable = true)
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
+        is QualifiedNamedDeclaration -> copy(nullable = true)
         else -> throw Exception("makeNullable does not recognize type ${this}")
     }
 }

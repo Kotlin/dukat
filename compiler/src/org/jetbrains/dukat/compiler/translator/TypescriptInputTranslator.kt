@@ -33,6 +33,7 @@ import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
 
+
 interface TypescriptInputTranslator : InputTranslator {
     fun translateFile(fileName: String): SourceSetDeclaration
     fun release()

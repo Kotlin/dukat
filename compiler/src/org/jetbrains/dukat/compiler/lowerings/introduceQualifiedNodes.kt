@@ -72,7 +72,11 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTyp
                 }
             }
             is QualifiedNamedDeclaration -> {
-                QualifiedNode(resolve(value.left, owner), IdentifierNode(value.right.value))
+                QualifiedNode(
+                        left = resolve(value.left, owner),
+                        right = IdentifierNode(value.right.value),
+                        nullable = value.nullable
+                )
             }
             else -> throw Exception("unknown QualifiedLeftDeclaration subtype")
         }
@@ -97,7 +101,11 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTyp
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
         return when (declaration) {
-            is QualifiedNamedDeclaration -> QualifiedNode(resolve(declaration.left, owner), IdentifierNode(declaration.right.value))
+            is QualifiedNamedDeclaration -> QualifiedNode(
+                    left = resolve(declaration.left, owner),
+                    right = IdentifierNode(declaration.right.value),
+                    nullable = declaration.nullable
+            )
             else -> declaration
         }
     }

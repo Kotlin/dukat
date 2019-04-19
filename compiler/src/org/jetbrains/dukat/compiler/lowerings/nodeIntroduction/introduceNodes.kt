@@ -612,8 +612,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(
-                    left.convert(),
-                    right.convert()
+                    left = left.convert(),
+                    right = right.convert(),
+                    nullable = nullable
             )
             else -> throw Exception("unknown QualifiedLeftDeclaration ${this}")
         }
