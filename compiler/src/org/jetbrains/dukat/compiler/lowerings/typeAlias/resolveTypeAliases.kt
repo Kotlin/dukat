@@ -44,7 +44,6 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
 
 
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
-        //println("LOWER UNION TYPE NODE ${declaration}")
         return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll()))
     }
 

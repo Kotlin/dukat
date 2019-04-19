@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun NodeOwner<*>.getModule(): DocumentRootNode {
     return (getOwners().first { (it is NodeOwner<*>) && (it.node is DocumentRootNode) } as NodeOwner<DocumentRootNode>).node
@@ -106,7 +107,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTyp
                     right = IdentifierNode(declaration.right.value),
                     nullable = declaration.nullable
             )
-            else -> declaration
+            else -> super.lowerParameterValue(owner)
         }
     }
 
