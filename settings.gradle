@@ -27,6 +27,7 @@ gradle.ext {
   jupiterVersion = "5.4.1"
 }
 
+
 include 'ast'
 include 'ast-common'
 include 'ast-model'
@@ -35,6 +36,7 @@ include 'cli'
 include 'compiler'
 include 'itertools'
 include 'interop'
+include 'interop-graal'
 include 'j2v8'
 include 'nashorn'
 include 'node-package'

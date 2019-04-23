@@ -590,7 +590,9 @@ class AstConverter {
 
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
-                                let value = (this.convertType(typeArgument) as any).value;
+                                let parameterValue = this.convertType(typeArgument) as any;
+                                let value = typeof parameterValue.getValue == "function" ?
+                                        (parameterValue).getValue() : parameterValue.value;
                                 this.registerDeclaration(this.astFactory.createIdentifierDeclaration(value), typeArguments)
                             }
                         }

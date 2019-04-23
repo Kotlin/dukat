@@ -8,16 +8,18 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.getUID
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -25,46 +27,163 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 
-private data class InterfaceDeclarationKey(
-        val members: List<MemberDeclaration>,
-        val typeParameters: List<TypeParameterDeclaration>,
-        val parentEntities: List<HeritageClauseDeclaration>,
-        val packageName: String
-)
-
-private fun FunctionTypeDeclaration.anonimize(): FunctionTypeDeclaration {
-    return copy(parameters = parameters.map { parameter -> parameter.copy(name = "#") })
-}
-
 private fun NodeOwner<*>.findOwnerPackage(): PackageDeclaration {
     val ownerPackage = getOwners().first() {
-        (it is NodeOwner<*>) && (it.node  is PackageDeclaration)
+        (it is NodeOwner<*>) && (it.node is PackageDeclaration)
     } as NodeOwner<PackageDeclaration>
 
     return ownerPackage.node
 }
 
-private fun GeneratedInterfaceDeclaration.key(): InterfaceDeclarationKey {
-    return InterfaceDeclarationKey(
-        members = members.map { member ->
-            when (member) {
-                is FunctionDeclaration -> member.copy(parameters = member.parameters.map { parameter -> parameter.copy(name = "#") })
-                is PropertyDeclaration -> member.copy(type = when(member.type) {
-                    is FunctionTypeDeclaration -> member.type.anonimize()
-                    else -> member.type
-                })
-                else -> member
-            }
-
-        },
-        typeParameters = typeParameters,
-        parentEntities = parentEntities,
-        packageName = packageOwner.packageName
-    )
+private fun ParameterDeclaration.isIdenticalTo(parameterDeclaration: ParameterDeclaration): Boolean {
+    return (type == parameterDeclaration.type) &&
+            (initializer == parameterDeclaration.initializer) &&
+            (vararg == parameterDeclaration.vararg) &&
+            (optional == parameterDeclaration.optional)
 }
 
-private fun areIdentical(aInterface: GeneratedInterfaceDeclaration, bInterface: GeneratedInterfaceDeclaration): Boolean {
-    return aInterface.key() == bInterface.key()
+private fun <T> List<T>.isIdenticalTo(list: List<T>, condition: (a: T, b: T) -> Boolean): Boolean {
+    if (this.size != list.size) {
+        return false
+    }
+
+    return this.zip(list).all { (a, b) -> condition(a, b) }
+}
+
+
+private fun FunctionDeclaration.isIdenticalTo(functionDeclaration: FunctionDeclaration): Boolean {
+    if (!type.isIdenticalTo(functionDeclaration.type)) {
+        return false
+    }
+
+    if (!modifiers.isIdenticalTo(functionDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    if (!typeParameters.isIdenticalTo(functionDeclaration.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    return parameters.isIdenticalTo(functionDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }
+}
+
+
+private fun MethodSignatureDeclaration.isIdenticalTo(methodSignatureDeclaration: MethodSignatureDeclaration): Boolean {
+    if (!type.isIdenticalTo(methodSignatureDeclaration.type)) {
+        return false
+    }
+
+    if (optional != methodSignatureDeclaration.optional) {
+        return false
+    }
+
+    if (!modifiers.isIdenticalTo(methodSignatureDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    if (!typeParameters.isIdenticalTo(methodSignatureDeclaration.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    return parameters.isIdenticalTo(methodSignatureDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }
+}
+
+private fun FunctionTypeDeclaration.isIdenticalTo(functionTypeDeclaration: FunctionTypeDeclaration): Boolean {
+    if (!parameters.isIdenticalTo(functionTypeDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    return (nullable == functionTypeDeclaration.nullable) &&
+            (type.isIdenticalTo(functionTypeDeclaration.type))
+}
+
+private fun ParameterValueDeclaration.isIdenticalTo(parameterValueDeclaration: ParameterValueDeclaration): Boolean {
+    if (this::class != parameterValueDeclaration::class) {
+        return false
+    }
+
+    if ((this is FunctionTypeDeclaration) && (parameterValueDeclaration is FunctionTypeDeclaration)) {
+        return this.isIdenticalTo(parameterValueDeclaration)
+    }
+
+    return this == parameterValueDeclaration
+}
+
+private fun ModifierDeclaration.isIdenticalTo(modifierDeclaration: ModifierDeclaration): Boolean {
+    return this == modifierDeclaration
+}
+
+private fun TypeParameterDeclaration.isIdenticalTo(typeParameterDeclaration: TypeParameterDeclaration): Boolean {
+    return this == typeParameterDeclaration
+}
+
+private fun PropertyDeclaration.isIdenticalTo(propertyDeclaration: PropertyDeclaration): Boolean {
+    if (name != propertyDeclaration.name) {
+        return false
+    }
+
+    if (optional != propertyDeclaration.optional) {
+        return false
+    }
+
+    if (!typeParameters.isIdenticalTo(propertyDeclaration.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    if (!modifiers.isIdenticalTo(propertyDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    return type.isIdenticalTo(propertyDeclaration.type)
+}
+
+private fun IndexSignatureDeclaration.isIdenticalTo(indexSignatureDeclaration: IndexSignatureDeclaration): Boolean {
+    if (!indexTypes.isIdenticalTo(indexSignatureDeclaration.indexTypes) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    return returnType.isIdenticalTo(indexSignatureDeclaration.returnType)
+}
+
+private fun MemberDeclaration.isIdenticalTo(memberDeclaration: MemberDeclaration): Boolean {
+    if (this::class != memberDeclaration::class) {
+        return false
+    }
+
+    if ((this is FunctionDeclaration) && (memberDeclaration is FunctionDeclaration)) {
+        return isIdenticalTo(memberDeclaration)
+    }
+
+    if ((this is PropertyDeclaration) && (memberDeclaration is PropertyDeclaration)) {
+        return isIdenticalTo(memberDeclaration)
+    }
+
+    if ((this is MethodSignatureDeclaration) && (memberDeclaration is MethodSignatureDeclaration)) {
+        return isIdenticalTo(memberDeclaration)
+    }
+
+    if ((this is IndexSignatureDeclaration) && (memberDeclaration is IndexSignatureDeclaration)) {
+        return isIdenticalTo(memberDeclaration)
+    }
+
+    return this == memberDeclaration
+}
+
+private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: GeneratedInterfaceDeclaration): Boolean {
+
+    if (packageOwner != someInterface.packageOwner) {
+        return false
+    }
+
+    if (!typeParameters.isIdenticalTo(someInterface.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
+        return false
+    }
+
+    if (!parentEntities.isIdenticalTo(someInterface.parentEntities) { a, b -> a == b }) {
+        return false
+    }
+
+    return members.isIdenticalTo(someInterface.members) { a, b -> a.isIdenticalTo(b) }
 }
 
 class GeneratedInterfacesContext {
@@ -78,7 +197,7 @@ class GeneratedInterfacesContext {
         return when (declaration) {
             is FunctionTypeDeclaration -> {
                 declaration.copy(
-                    parameters = declaration.parameters.map { parameterDeclaration -> parameterDeclaration.copy(type = generateInterface(owner.wrap(parameterDeclaration.type), ownerUID, typeParameters))  }
+                        parameters = declaration.parameters.map { parameterDeclaration -> parameterDeclaration.copy(type = generateInterface(owner.wrap(parameterDeclaration.type), ownerUID, typeParameters)) }
                 )
             }
             is ObjectLiteralDeclaration -> {
@@ -92,10 +211,10 @@ class GeneratedInterfacesContext {
                 }
             }
             is UnionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) } )
+                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) })
             }
             is IntersectionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) } )
+                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) })
             }
             else -> declaration
         }
@@ -162,7 +281,7 @@ class GeneratedInterfacesContext {
     private fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
 
         myGeneratedInterfaces.forEach { entry ->
-            if (areIdentical(interfaceNode, entry.value)) {
+            if (interfaceNode.isIdenticalTo(entry.value)) {
                 return entry.value
             }
         }
@@ -170,9 +289,9 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<String>) : TypeParameterDeclaration? {
+    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<String>): TypeParameterDeclaration? {
         return when (this) {
-            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList())  else null
+            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
             else -> null
         }
     }
@@ -225,7 +344,7 @@ class GeneratedInterfacesContext {
             myGeneratedInterfaces[name] = interfaceNode
             val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters)
 
-            myReferences.getOrPut(uid) { mutableListOf()}.add(referenceNode)
+            myReferences.getOrPut(uid) { mutableListOf() }.add(referenceNode)
 
             referenceNode
         } else {

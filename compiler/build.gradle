@@ -1,131 +1,137 @@
-import org.gradle.internal.os.OperatingSystem
 import de.undercouch.gradle.tasks.download.Download
+import org.gradle.internal.os.OperatingSystem
 
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'de.undercouch:gradle-download-task:3.4.3'
-  }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:3.4.3'
+    }
 }
 
 plugins {
-  id("kotlin")
+    id("kotlin")
 }
 
 configurations {
-  toDownload
+    toDownload
 }
 
 sourceSets {
-  main.kotlin.srcDirs = ['src']
-  //main.resources.srcDirs = ["${project.buildDir}/resources"]
+    main.kotlin.srcDirs = ['src']
+    //main.resources.srcDirs = ["${project.buildDir}/resources"]
 
-  test.kotlin.srcDirs = ['test/src']
-  test.resources.srcDirs = ['test/data']
+    test.kotlin.srcDirs = ['test/src']
+    test.resources.srcDirs = ['test/data']
 }
 
 compileTestKotlin {
-  kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 dependencies {
-  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-  if (OperatingSystem.current().isMacOsX()) {
-    implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
-  } else if (OperatingSystem.current().isLinux()) {
-    implementation 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0'
-  } else if (OperatingSystem.current().isWindows()) {
-    implementation 'com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0'
-  } else {
-    logger.error("unsupported platform - can not compile com.eclipsesource.j2v8 dependency")
-  }
+    if (OperatingSystem.current().isMacOsX()) {
+        implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
+    } else if (OperatingSystem.current().isLinux()) {
+        implementation 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0'
+    } else if (OperatingSystem.current().isWindows()) {
+        implementation 'com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0'
+    } else {
+        logger.error("unsupported platform - can not compile com.eclipsesource.j2v8 dependency")
+    }
 
-  implementation(project(":ast"))
-  implementation(project(":ast-common"))
-  implementation(project(":ast-model"))
-  implementation(project(":tsmodel"))
-  implementation(project(":tsinterop"))
-  implementation(project(":itertools"))
-  implementation(project(":ownerContext"))
-  implementation(project(":translator"))
-  implementation(project(":translator-string"))
+    implementation(project(":ast"))
+    implementation(project(":ast-common"))
+    implementation(project(":ast-model"))
+    implementation(project(":tsmodel"))
+    implementation(project(":interop-graal"))
+    implementation(project(":tsinterop"))
+    implementation(project(":itertools"))
+    implementation(project(":ownerContext"))
+    implementation(project(":translator"))
+    implementation(project(":translator-string"))
 
-  implementation(project(":nashorn"))
-  implementation(project(":j2v8"))
+    implementation(project(":nashorn"))
+    implementation(project(":j2v8"))
 
 
-  compile "org.slf4j:slf4j-api:1.7.22"
-  compile "org.slf4j:slf4j-simple:1.7.22"
+    compile "org.slf4j:slf4j-api:1.7.22"
+    compile "org.slf4j:slf4j-simple:1.7.22"
 
-  implementation("io.github.microutils:kotlin-logging:1.6.24")
+    implementation("io.github.microutils:kotlin-logging:1.6.24")
 
-  runtime 'org.jetbrains.kotlin:kotlin-reflect'
-  compile 'org.jetbrains.kotlin:kotlin-reflect'
+    runtime 'org.jetbrains.kotlin:kotlin-reflect'
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
 
-  testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
+    testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
 
-  testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
-  testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
-  testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-common'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 
-  // without this dependency one won't see "Click to see difference" in IDEA
-  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    // without this dependency one won't see "Click to see difference" in IDEA
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 
-  testImplementation "org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}"
-  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
-  testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
+    testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
-  compile(project(path: ':ts', configuration: 'dukatTsResources'))
+    compile(project(path: ':ts', configuration: 'dukatTsResources'))
 
-  toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
+    toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
 
 
-processResources{
-  from(zipTree(configurations.compile.find {it.name == "dukatts.jar"})) {
-    into "/"
-  }
+processResources {
+    from(zipTree(configurations.compile.find { it.name == "dukatts.jar" })) {
+        into "/"
+    }
 }
 
 
 task propagateToIdeaRuntime(type: Copy) {
-  dependsOn = [":ts:createJar"]
-  from(zipTree(configurations.compile.find {it.name == "dukatts.jar"}))
-  into "out/production/resources/"
+    dependsOn = [":ts:createJar"]
+    from(zipTree(configurations.compile.find { it.name == "dukatts.jar" }))
+    into "out/production/resources/"
 }
 
 compileTestKotlin.dependsOn = ["propagateToIdeaRuntime"]
 
 task download(type: Copy) {
-  from configurations.toDownload
-  into "${project.buildDir}/lib"
-  rename "kotlin-stdlib-js-1.3.30.jar", "kotlin-stdlib-js.jar"
+    from configurations.toDownload
+    into "${project.buildDir}/lib"
+    rename "kotlin-stdlib-js-1.3.30.jar", "kotlin-stdlib-js.jar"
 }
 
 
 task downloadDefinitelyTyped(type: Download) {
-  onlyIfModified true
-  overwrite false
-  def version = '10aca630788ef193f994ac31de63ea9cf44630a3'
-  src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
-  dest new File(rootProject.projectDir.path + "/.gradle", "DefinitelyTyped-${version}.zip")
+    onlyIfModified true
+    overwrite false
+    def version = '10aca630788ef193f994ac31de63ea9cf44630a3'
+    src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
+    dest new File(rootProject.projectDir.path + "/.gradle", "DefinitelyTyped-${version}.zip")
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
-  from zipTree(downloadDefinitelyTyped.dest)
-  into "${project.buildDir}/definitelyTyped"
+    from zipTree(downloadDefinitelyTyped.dest)
+    into "${project.buildDir}/definitelyTyped"
 }
 
 test.dependsOn(download)
 
 test {
-  def DUKAT_TEST_EXTENDED = "dukat.test.extended"
-
-  if (project.hasProperty(DUKAT_TEST_EXTENDED)) {
-    systemProperty DUKAT_TEST_EXTENDED, "true"
-  }
+    [
+            "dukat.test.extended",
+            "dukat.test.jsbackend.graal",
+            "dukat.test.jsbackend.j2v8",
+            "dukat.test.jsbackend.nashorn"
+    ].forEach { String projectProperty ->
+        if (project.hasProperty(projectProperty)) {
+            systemProperty(projectProperty, "true")
+        }
+    }
 }

@@ -1,0 +1,17 @@
+plugins {
+  id("kotlin")
+}
+
+sourceSets {
+  main.kotlin.srcDirs = ['src']
+}
+
+
+def graalVersion = "1.0.0-rc15"
+
+dependencies {
+  compile(project(":interop"))
+  compile "org.graalvm.sdk:graal-sdk:${graalVersion}"
+  compile "org.graalvm.js:js:${graalVersion}"
+  compile "org.graalvm.js:js-scriptengine:${graalVersion}"
+}
