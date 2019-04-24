@@ -44,7 +44,7 @@ fun compile(documentRoot: ModuleModel): String {
         translated.joinToString("""
 
 // ------------------------------------------------------------------------------------------
-""")
+""".replace("\n", System.getProperty("line.separator")))
     }
 }
 
