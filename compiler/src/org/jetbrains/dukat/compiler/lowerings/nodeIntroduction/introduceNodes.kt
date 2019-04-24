@@ -40,6 +40,7 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -229,9 +230,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun InterfaceDeclaration.convert(): List<TopLevelDeclaration> {
-        val isExternalDefinition = definitionsInfo.any { definition ->
-            definition.fileName != fileName
-        }
+        val isExternalDefinition = isExternal(definitionsInfo)
 
         if (isExternalDefinition) {
             return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this) }
@@ -645,6 +644,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 .replace("^interface$".toRegex(), "`interface`")
     }
 
+    private fun isExternal(definitionsInfo: List<DefinitionInfoDeclaration>): Boolean {
+        return definitionsInfo.any { definition ->
+            definition.fileName.replace("/", File.separator) != fileName
+        }
+    }
 
     fun lowerPackageDeclaration(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): DocumentRootNode {
         val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration, owner) }
@@ -661,9 +665,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         var showQualifierAnnotation = owner != rootOwner
 
-        val isExternalDefinition = documentRoot.definitionsInfo.any { definition ->
-            definition.fileName != fileName
-        }
+        val isExternalDefinition = isExternal(documentRoot.definitionsInfo)
+
         if (isExternalDefinition && isQualifier) {
             showQualifierAnnotation = false
         }
