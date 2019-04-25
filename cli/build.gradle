@@ -8,6 +8,12 @@ sourceSets {
   main.kotlin.srcDirs = ['src']
 }
 
+configurations {
+  cliRuntime
+  downloadable
+}
+
+
 dependencies {
   implementation(project(":ast"))
   implementation(project(":ast-common"))
@@ -16,8 +22,17 @@ dependencies {
   implementation(project(":translator"))
   implementation(project(":translator-string"))
   implementation(project(":compiler"))
+
+  cliRuntime(project(":compiler"))
+
+  downloadable("org.graalvm.js:js:${gradle.graalVersion}")
 }
 
+task updateGraalJs(type: Copy) {
+  from configurations.downloadable
+  into "${project.projectDir}/libs"
+  include "js-${gradle.graalVersion}.jar"
+}
 
 jar {
   archiveName = "${project.name}-all.jar"
@@ -25,8 +40,9 @@ jar {
     attributes 'Main-Class': 'org.jetbrains.dukat.cli.CliKt'
   }
 
+
   from {
-    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    configurations.cliRuntime.collect { it.isDirectory() ? it : zipTree(it) }
   }
 
 }

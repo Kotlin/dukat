@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.toNameNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
@@ -73,15 +74,15 @@ private fun printUsage(program: String) {
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
-    -b  <qualifiedPackageName>   package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
-    -d  <path>                   destination directory for files with converted declarations (by default declarations are generated in current directory)
-    -js nashorn | j2v8           js-interop JVM engine (nashorn by default)
+    -b  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
+    -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
+    -js nashorn | j2v8 | graal      js-interop JVM engine (graal by default)
 """.trimIndent())
 }
 
 
 private enum class Engine {
-    NASHORN, J2V8
+    NASHORN, J2V8, GRAAL
 }
 
 private data class CliOptions(
@@ -105,7 +106,7 @@ private fun process(args: List<String>): CliOptions? {
 
     val sources = mutableListOf<String>()
     var outDir: String? = null
-    var engine = Engine.NASHORN
+    var engine = Engine.GRAAL
     var basePackageName: NameNode? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
@@ -124,13 +125,14 @@ private fun process(args: List<String>): CliOptions? {
             "-js" -> {
                 val engineId = argsIterator.readArg()
                 engine = when (engineId) {
+                    "graal" -> Engine.GRAAL
                     "nashorn" -> Engine.NASHORN
                     "j2v8" -> {
                         printWarning("currently j2v8 backend is not supported on windows-based platforms")
                         Engine.J2V8
                     }
                     else -> {
-                        printError("'-js' can be set to either 'nashorn' or 'j2v8'")
+                        printError("'-js' can be set to either 'nashorn' or 'j2v8' or 'graal'")
                         return null
                     }
                 }
@@ -160,7 +162,6 @@ fun main(vararg args: String) {
         return
     }
 
-
     process(args.toList())?.let { options ->
         options.engine == Engine.J2V8
 
@@ -168,6 +169,7 @@ fun main(vararg args: String) {
             compile(sourceName, options.outDir, options.basePackageName, when (options.engine) {
                 Engine.NASHORN -> createNashornTranslator()
                 Engine.J2V8 -> createV8Translator()
+                Engine.GRAAL -> createGraalTranslator()
             })
         }
     }
