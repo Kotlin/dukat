@@ -15,7 +15,7 @@ var run = function(command) {
 };
 
 var main = function() {
-    run("java -cp build/dukat-cli.jar org.jetbrains.dukat.cli.CliKt")
+    run("java -cp ./build/runtime/js.jar:./build/runtime/dukat-cli.jar org.jetbrains.dukat.cli.CliKt")
 };
 
 main();
