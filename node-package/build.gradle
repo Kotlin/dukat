@@ -8,7 +8,6 @@ configurations {
     cliRuntime
 }
 
-<<<<<<< HEAD
 
 task fetchRuntime(type: Copy) {
     from configurations.cliBinary
@@ -22,59 +21,25 @@ task fetchRuntime(type: Copy) {
 
 task npmPack(type: NpmTask) {
     dependsOn = [":cli:downloadRuntimeDeps", ":cli:build", "npmVersion"]
-=======
-
-task fetchRuntime(type: Copy) {
-    from configurations.cliBinary
-    into "${project.buildDir}/runtime"
-
-    from configurations.cliRuntime
-    into "${project.buildDir}/runtime"
-    rename "js-${gradle.graalVersion}.jar", "js.jar"
-}
-
-
-task npmVersion(type: NpmTask) {
-    onlyIf {
-        project.hasProperty("dukatVersion")
-    }
-    args = ["version", project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") : "NEVER" ]
-}
-
-task npmPack(type: NpmTask) {
-    dependsOn = [fetchRuntime, ":cli:build", npmVersion]
->>>>>>> NPM_PACKAGE_WITH_CLASSPATH
     args = ["pack"]
 }
 
 task npmPublish(type: NpmTask) {
-<<<<<<< HEAD
     dependsOn = [":npmPack"]
-=======
-    dependsOn = [npmPack]
->>>>>>> NPM_PACKAGE_WITH_CLASSPATH
 
     def token = System.getProperty("kotlin.npmjs.auth.token")
     def registry = "http://registry.npmjs.org/:_authToken=${token}"
+    def distribPath = "${project.projectDir}"
 
-    def packageVersion =
-            project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") :
-            new groovy.json.JsonSlurper().parseText(file("package.json").text).version
-
-    def distribPath = "dukat-${packageVersion}.tgz"
-
-    args = ["publish",  distribPath, "--registry", "${registry}"]
+    args = ["publish", distribPath, "--registry", "${registry}"]
 }
 
-<<<<<<< HEAD
 task npmVersion(type: NpmTask) {
     onlyIf {
         project.hasProperty("dukatVersion")
     }
     args = ["version", project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") : "NEVER" ]
 }
-=======
->>>>>>> NPM_PACKAGE_WITH_CLASSPATH
 
 dependencies {
     cliBinary(project(":cli")) {

@@ -15,11 +15,7 @@ var run = function(command) {
 };
 
 var main = function() {
-<<<<<<< HEAD
     run("java -cp build/dukat-cli.jar org.jetbrains.dukat.cli.CliKt")
-=======
-    run("java -cp ./build/runtime/js.jar:./build/runtime/dukat-cli.jar org.jetbrains.dukat.cli.CliKt")
->>>>>>> NPM_PACKAGE_WITH_CLASSPATH
 };
 
 main();
