@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var exec = require('child_process').exec;
+var path = require('path');
 
 var execHandler = function(error, stdout, stderr) {
     if (error) {
@@ -15,7 +16,15 @@ var run = function(command) {
 };
 
 var main = function() {
-    run("java -cp ./build/runtime/js.jar:./build/runtime/dukat-cli.jar org.jetbrains.dukat.cli.CliKt")
+    var args = process.argv.slice(2);
+    run("pwd");
+
+    var runtimePath = path.resolve(__dirname + "/../build/runtime");
+    var jsPath = path.resolve(runtimePath, "js.jar");
+    var cliPath = path.resolve(runtimePath, "dukat-cli.jar");
+    var classPath = [jsPath, cliPath].join(":");
+
+    run("java -cp " + classPath + " org.jetbrains.dukat.cli.CliKt " + args.join(" "))
 };
 
 main();
