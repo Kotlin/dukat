@@ -3,13 +3,50 @@ plugins {
 }
 
 
-task npmPublish(type: NpmTask) {
+configurations {
+    cliBinary
+    cliRuntime
+}
 
-    dependsOn = [":cli:build"]
+
+task fetchRuntime(type: Copy) {
+    from configurations.cliBinary
+    into "${project.buildDir}/runtime"
+
+    from configurations.cliRuntime
+    into "${project.buildDir}/runtime"
+    rename "js-${gradle.graalVersion}.jar", "js.jar"
+}
+
+
+task npmPack(type: NpmTask) {
+    dependsOn = [":cli:downloadRuntimeDeps", ":cli:build", "npmVersion"]
+    args = ["pack"]
+}
+
+task npmPublish(type: NpmTask) {
+    dependsOn = [":npmPack"]
 
     def token = System.getProperty("kotlin.npmjs.auth.token")
     def registry = "http://registry.npmjs.org/:_authToken=${token}"
     def distribPath = "${project.projectDir}"
 
     args = ["publish", distribPath, "--registry", "${registry}"]
+}
+
+task npmVersion(type: NpmTask) {
+    onlyIf {
+        project.hasProperty("dukatVersion")
+    }
+    args = ["version", project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") : "NEVER" ]
+}
+
+dependencies {
+    cliBinary(project(":cli")) {
+        transitive = false
+    }
+
+    cliRuntime("org.graalvm.js:js:${gradle.graalVersion}") {
+        transitive = false
+    }
 }
