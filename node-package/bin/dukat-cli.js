@@ -17,7 +17,6 @@ var run = function(command) {
 
 var main = function() {
     var args = process.argv.slice(2);
-    run("pwd");
 
     var runtimePath = path.resolve(__dirname + "/../build/runtime");
     var jsPath = path.resolve(runtimePath, "js.jar");

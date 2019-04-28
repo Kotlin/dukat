@@ -17,8 +17,8 @@ import org.jetbrains.dukat.tsinterop.ExportContentNonGeneric
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.converters.toAst
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
-import org.slf4j.Logger
 import java.util.*
+import java.util.function.Supplier
 
 
 private fun InteropEngine.loadAstBuilder() {
@@ -56,27 +56,15 @@ private fun createNashornInterop(): InteropNashorn {
     return engine
 }
 
+
 private fun createGraalInterop(): InteropGraal {
     val engine = InteropGraal()
 
-    engine.put("AstFactory", AstFactory::class.java)
-    engine.put("FileResolver", FileResolver::class.java)
-    engine.put("ExportContent", ExportContentNonGeneric::class.java)
-    engine.put("KotlinLogging", KotlinLogging::class.java)
-
-    engine.eval("""
-        var global = this;
-
-        function createExportContent() {return new ExportContent.static(); }
-        function createAstFactory() { return new AstFactory.static(); }
-        function createFileResolver() { return new FileResolver.static(); }
-
-        function createLogger(name) {
-            return  KotlinLogging.static.INSTANCE.logger(name)
-        }
-
-        var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
-    """.trimIndent())
+    engine.put("createAstFactory", Supplier { AstFactory() })
+    engine.put("createExportContent", Supplier { ExportContentNonGeneric() })
+    engine.put("createFileResolver", Supplier { FileResolver() })
+    engine.put("createLogger", java.util.function.Function<String, KLogger> { name -> KotlinLogging.logger(name) })
+    engine.put("uid", Supplier { UUID.randomUUID().toString() })
 
     engine.loadAstBuilder()
 
@@ -111,7 +99,7 @@ private fun createV8Interop(): InteropV8 {
             return proxy
         }
 
-        fun createLogger(name: String) : V8Object {
+        fun createLogger(name: String): V8Object {
             val proxy = V8Object(interopRuntime.runtime)
             interopRuntime.proxy(proxy, KotlinLogging.logger(name))
                     .method("debug", InteropV8Signature.STRING)

@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.interop.graal
 
 import org.graalvm.polyglot.Context
+import org.graalvm.polyglot.HostAccess
 import org.jetbrains.dukat.interop.InteropEngine
 
 
@@ -8,7 +9,7 @@ class InteropGraal : InteropEngine {
     private val myContext =
             Context
                     .newBuilder("js")
-                    .allowHostAccess(true)
+                    .allowHostAccess(HostAccess.ALL)
                     .build()
 
     private val myBindings = myContext.getBindings("js")
