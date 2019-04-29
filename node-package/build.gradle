@@ -8,6 +8,9 @@ configurations {
     cliRuntime
 }
 
+def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
+def PROPERTY_REGISTRY = "dukat.npm.registry"
+
 task fetchRuntime(type: Copy) {
     from configurations.cliBinary
     into "${project.buildDir}/runtime"
@@ -19,9 +22,9 @@ task fetchRuntime(type: Copy) {
 
 task npmVersion(type: NpmTask) {
     onlyIf {
-        project.hasProperty("dukatVersion")
+        project.hasProperty(PROPERTY_PACKAGE_VERSION)
     }
-    args = ["version", project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") : "NEVER" ]
+    args = ["version", project.findProperty(PROPERTY_PACKAGE_VERSION) ?: "NEVER" ]
 }
 
 task npmPack(type: NpmTask) {
@@ -33,10 +36,13 @@ task npmPublish(type: NpmTask) {
     dependsOn = [npmPack]
 
     def token = System.getProperty("kotlin.npmjs.auth.token")
-    def registry = "http://registry.npmjs.org/:_authToken=${token}"
+
+    def registryHost = project.findProperty(PROPERTY_REGISTRY) ?: "http://registry.npmjs.org"
+    def registry = "${registryHost}/:_authToken=${token}"
+
 
     def packageVersion =
-            project.hasProperty("dukatVersion") ? project.getProperty("dukatVersion") :
+            project.findProperty(PROPERTY_PACKAGE_VERSION) ?:
             new groovy.json.JsonSlurper().parseText(file("package.json").text).version
 
     def distribPath = "dukat-${packageVersion}.tgz"
