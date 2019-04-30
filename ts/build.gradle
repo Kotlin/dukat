@@ -1,6 +1,6 @@
 plugins {
   id "java"
-  id "com.moowork.node" version "1.2.0"
+  id "com.moowork.node"
 }
 
 def packagePath = "${project.buildDir}/package"
@@ -9,7 +9,7 @@ def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.4.3"
 
 node {
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
-  version = '10.15.3'
+  version = gradle.nodeVersion
   yarnVersion = '1.15.2'
 
   download = true

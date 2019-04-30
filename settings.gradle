@@ -15,6 +15,8 @@ pluginManagement {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
         useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
+      } else  if (pluginId == "com.moowork.node") {
+        useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
       }
     }
   }
@@ -24,6 +26,9 @@ gradle.ext {
   kotlinVersion = "1.3.31"
   jupiterVersion = "5.4.1"
   graalVersion = "1.0.0-rc16"
+  nodeVersion = "10.15.3"
+  npmVersion = "6.9.0"
+  nodePluginVersion = "1.3.1"
 }
 
 

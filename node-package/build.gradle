@@ -1,7 +1,13 @@
 plugins {
-    id "com.moowork.node" version "1.2.0"
+    id "com.moowork.node"
 }
 
+node {
+    version = gradle.nodeVersion
+    npmVersion = gradle.npmVersion
+
+    download = true
+}
 
 configurations {
     cliBinary
@@ -32,14 +38,20 @@ task npmPack(type: NpmTask) {
     args = ["pack"]
 }
 
+task npmrc() {
+    doLast {
+        def token = getProperty("kotlin.npmjs.auth.token")
+        def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
+        def customConfig = """
+//${registry}/:_authToken="${token}"
+        """
+        def configFile = "$projectDir/.npmrc"
+        file(configFile).text = customConfig;
+    }
+}
+
 task npmPublish(type: NpmTask) {
-    dependsOn = [npmPack]
-
-    def token = System.getProperty("kotlin.npmjs.auth.token")
-
-    def registryHost = project.findProperty(PROPERTY_REGISTRY) ?: "http://registry.npmjs.org"
-    def registry = "${registryHost}/:_authToken=${token}"
-
+    dependsOn = [npmrc, npmPack]
 
     def packageVersion =
             project.findProperty(PROPERTY_PACKAGE_VERSION) ?:
@@ -47,9 +59,9 @@ task npmPublish(type: NpmTask) {
 
     def distribPath = "dukat-${packageVersion}.tgz"
 
-    args = ["publish",  distribPath, "--registry", "${registry}"]
+    def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
+    args = ["publish",  distribPath, "--prefix", projectDir,  "--registry", "http://${registry}"]
 }
-
 
 dependencies {
     cliBinary(project(":cli")) {
