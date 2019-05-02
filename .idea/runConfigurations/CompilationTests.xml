@@ -1,17 +1,17 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="J2V8CoreSetTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+  <configuration default="false" name="CompilationTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <module name="compiler_test" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.*" />
+        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.extended.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.core" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.J2V8CoreSetTests" />
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.extended" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.CompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -Ddukat.test.jsbackend.j2v8=true" />
+    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.jsbackend.graal=true -Ddukat.test.extended=true" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">

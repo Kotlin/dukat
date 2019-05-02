@@ -113,7 +113,7 @@ task downloadDefinitelyTyped(type: Download) {
     overwrite false
     def version = '10aca630788ef193f994ac31de63ea9cf44630a3'
     src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
-    dest new File(rootProject.projectDir.path + "/.gradle", "DefinitelyTyped-${version}.zip")
+    dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${version}.zip")
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {

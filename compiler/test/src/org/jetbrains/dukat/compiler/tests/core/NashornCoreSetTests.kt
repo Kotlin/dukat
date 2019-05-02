@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.tests
+package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.translator.InputTranslator
@@ -9,20 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource
 
 
 @EnabledIfSystemProperty(named = "dukat.test.jsbackend.nashorn", matches = "true")
-class NashornCoreSetTests : GenerateCoreSetTests() {
+class NashornCoreSetTests : CoreSetTests() {
 
     override fun getTranslator(): InputTranslator = translator
-
-    @DisplayName("core test set compile")
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("extendedSet")
-    @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
-    fun withValueSourceCompiled(name: String, tsPath: String, ktPath: String) {
-        assertContentCompiles(name, tsPath)
-    }
 
     companion object {
         val translator: InputTranslator = createNashornTranslator()
     }
-
 }

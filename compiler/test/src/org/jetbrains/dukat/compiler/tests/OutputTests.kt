@@ -5,9 +5,6 @@ import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
 import translateModule
@@ -15,58 +12,7 @@ import java.io.File
 import kotlin.test.assertEquals
 
 
-private class TestCompileMessageCollector : MessageCollector {
-    private var myHasErrors: Boolean = false
-
-    override fun clear() {
-        myHasErrors = false
-    }
-
-    override fun hasErrors(): Boolean {
-        return false
-    }
-
-    override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageLocation?) {
-        if (severity.isError) {
-            myHasErrors = true
-
-            System.err.println("MESSAGE ${severity} ${message} ${location}")
-        }
-    }
-}
-
-fun compile(documentRoot: ModuleModel): String {
-    val translated = translateModule(documentRoot)
-
-    return if (translated.isEmpty()) {
-        "// NO DECLARATIONS"
-    } else {
-        translated.joinToString("""
-
-// ------------------------------------------------------------------------------------------
-""".replace("\n", System.getProperty("line.separator")))
-    }
-}
-
-
-private fun output(fileName: String, translator: InputTranslator): String {
-    val sourceSet =
-            translator.translate(fileName)
-
-    val sourcesMap = mutableMapOf<String, SourceFileModel>()
-    sourceSet.sources.map { sourceFileDeclaration ->
-        sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
-    }
-
-
-    val fileNameNormalized = File(fileName).normalize().absolutePath
-
-    val documentRoot = sourcesMap.get(fileNameNormalized)?.root!!
-    return compile(documentRoot)
-}
-
-
-abstract class StandardTests {
+abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator
 
     private fun compile(sourcePath: String, targetPath: String): ExitCode {
@@ -80,11 +26,41 @@ abstract class StandardTests {
 
         options.freeArgs = listOf(sourcePath)
         return K2JSCompiler().exec(
-                TestCompileMessageCollector(),
+                CompileMessageCollector(),
                 Services.EMPTY,
                 options
         )
     }
+
+    private fun concatenate(documentRoot: ModuleModel): String {
+        val translated = translateModule(documentRoot)
+
+        return if (translated.isEmpty()) {
+            "// NO DECLARATIONS"
+        } else {
+            translated.joinToString("""
+
+// ------------------------------------------------------------------------------------------
+""".replace("\n", System.getProperty("line.separator")))
+        }
+    }
+
+    private fun output(fileName: String, translator: InputTranslator): String {
+        val sourceSet =
+                translator.translate(fileName)
+
+        val sourcesMap = mutableMapOf<String, SourceFileModel>()
+        sourceSet.sources.map { sourceFileDeclaration ->
+            sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
+        }
+
+
+        val fileNameNormalized = File(fileName).normalize().absolutePath
+
+        val documentRoot = sourcesMap.get(fileNameNormalized)?.root!!
+        return concatenate(documentRoot)
+    }
+
 
     protected fun assertContentEquals(
             descriptor: String,
@@ -107,9 +83,6 @@ abstract class StandardTests {
             val outputFile = outputDirectory.resolve(targetShortName)
             outputFile.parentFile.mkdirs()
             outputFile.writeText(translated)
-
-            val sourcePath = outputFile.absolutePath
-//            assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
         }
     }
 
@@ -133,6 +106,38 @@ abstract class StandardTests {
             assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
         }
     }
+
+
+    companion object {
+        val TS_POSTFIX = ".d.ts"
+
+        fun fileSet(path: String, postfix: String, recursive: Boolean = false): Sequence<File> {
+            val rootFolder = File(path)
+
+            val files = if (recursive) rootFolder.walk() else rootFolder.walkTopDown()
+
+            return files.filter { file ->
+                file.path.endsWith(postfix)
+            }
+        }
+
+        fun fileSetWithDescriptors(path: String, recursive: Boolean = false): Array<Array<String>> {
+            val rootFolder = File(path)
+            return fileSet(path, TS_POSTFIX, recursive).map { file ->
+                val tsPath = file.absolutePath
+                val ktPath = tsPath.replace(TS_POSTFIX, ".d.kt")
+                val descriptor = file.relativeTo(rootFolder).path.replace(path, "").replace(TS_POSTFIX, "")
+
+                arrayOf(
+                        descriptor,
+                        tsPath,
+                        ktPath
+                )
+            }.toList().toTypedArray()
+        }
+
+    }
+
 
 
 }

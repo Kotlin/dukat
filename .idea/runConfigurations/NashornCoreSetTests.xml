@@ -7,8 +7,8 @@
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.NashornCoreSetTests" />
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.core" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.NashornCoreSetTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
     <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -Ddukat.test.jsbackend.nashorn=true" />
