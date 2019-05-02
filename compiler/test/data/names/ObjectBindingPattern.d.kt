@@ -22,3 +22,7 @@ external interface `T$0` {
 }
 external fun f4(__0: `T$0`): Unit = definedExternally
 external fun f5(__0: `T$0`, p: `T$0`, __2: `T$0`): Unit = definedExternally
+external interface `T$1` {
+    var mode: String /* "something" */
+}
+external fun f6(__0: `T$1`): Unit = definedExternally

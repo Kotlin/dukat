@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
@@ -23,6 +24,7 @@ interface DeclarationLowering {
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration
     fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration
+    fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
@@ -48,6 +50,7 @@ interface DeclarationLowering {
         return when (declaration) {
             is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is ClassDeclaration -> lowerClassDeclaration(declaration)
+            is GeneratedInterfaceDeclaration -> lowerGeneratedInterfaceDeclaration(declaration)
             else -> declaration
         }
     }

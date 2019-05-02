@@ -286,78 +286,76 @@ class AstConverter {
                 return this.createTypeDeclaration("@@ArraySugar", [
                     this.convertType(arrayType.elementType)
                 ] as Array<TypeDeclaration>)
-            } else {
-                if (ts.isUnionTypeNode(type)) {
-                    let unionTypeNode = type as ts.UnionTypeNode;
-                    let params = unionTypeNode.types
-                        .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
+            } else                 if (ts.isUnionTypeNode(type)) {
+                let unionTypeNode = type as ts.UnionTypeNode;
+                let params = unionTypeNode.types
+                    .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
-                    return this.astFactory.createUnionTypeDeclaration(params)
-                } else if (ts.isIntersectionTypeNode(type)) {
-                    let intersectionTypeNode = type as ts.IntersectionTypeNode;
-                    let params = intersectionTypeNode.types
-                        .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
+                return this.astFactory.createUnionTypeDeclaration(params)
+            } else if (ts.isIntersectionTypeNode(type)) {
+                let intersectionTypeNode = type as ts.IntersectionTypeNode;
+                let params = intersectionTypeNode.types
+                    .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
 
-                    return this.createIntersectionType(params);
-                } else if (ts.isTypeReferenceNode(type)) {
-                    if (type.typeArguments) {
-                        let params = type.typeArguments
-                            .map(argumentType => {
-                                return this.convertType(argumentType)
-                            }) as Array<TypeDeclaration>;
+                return this.createIntersectionType(params);
+            } else if (ts.isTypeReferenceNode(type)) {
+                if (type.typeArguments) {
+                    let params = type.typeArguments
+                        .map(argumentType => {
+                            return this.convertType(argumentType)
+                        }) as Array<TypeDeclaration>;
 
-                        return this.createTypeDeclaration(type.typeName.getText(), params)
-                    } else {
-                        if (ts.isQualifiedName(type.typeName)) {
-                            let entity = this.convertEntityName(type.typeName);
-                            if (entity) {
-                                return entity
-                            }
-                        }
-                        return this.createTypeDeclaration(type.typeName.getText())
-                    }
-                } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
-                    let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
-                    return this.convertType(parenthesizedTypeNode.type);
-                } else if (type.kind == ts.SyntaxKind.NullKeyword) {
-                    return this.createTypeDeclaration("null")
-                } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
-                    return this.createTypeDeclaration("undefined")
-                } else if (type.kind == ts.SyntaxKind.StringKeyword) {
-                    return this.createTypeDeclaration("string")
-                } else if (type.kind == ts.SyntaxKind.BooleanKeyword) {
-                    return this.createTypeDeclaration("boolean")
-                } else if (type.kind == ts.SyntaxKind.NumberKeyword) {
-                    return this.createTypeDeclaration("number")
-                } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
-                    return this.createTypeDeclaration("any")
-                } else if (type.kind == ts.SyntaxKind.FunctionType) {
-                    const functionDeclaration = type as ts.FunctionTypeNode;
-                    let parameterDeclarations = functionDeclaration.parameters.map(
-                        (param, count) => this.convertParameterDeclaration(param, count)
-                    );
-                    return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
-                } else if (ts.isTypeLiteralNode(type))  {
-                    return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
-                } else if (ts.isThisTypeNode(type)){
-                    return this.astFactory.createThisTypeDeclaration()
-                } else if (ts.isLiteralTypeNode(type)) {
-                    return this.astFactory.createStringTypeDeclaration([
-                        type.literal.getText()
-                    ])
-                } else if (ts.isTupleTypeNode(type)) {
-                    return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
-                } else if (ts.isTypePredicateNode(type)) {
-                    return this.createTypeDeclaration("boolean");
-                } else if (type.kind = ts.SyntaxKind.ObjectKeyword) {
-                    return this.astFactory.createUnionTypeDeclaration([
-                            this.createTypeDeclaration("any"),
-                            this.createTypeDeclaration("undefined")
-                        ]
-                    )
+                    return this.createTypeDeclaration(type.typeName.getText(), params)
                 } else {
-                    return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`);
+                    if (ts.isQualifiedName(type.typeName)) {
+                        let entity = this.convertEntityName(type.typeName);
+                        if (entity) {
+                            return entity
+                        }
+                    }
+                    return this.createTypeDeclaration(type.typeName.getText())
                 }
+            } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
+                let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
+                return this.convertType(parenthesizedTypeNode.type);
+            } else if (type.kind == ts.SyntaxKind.NullKeyword) {
+                return this.createTypeDeclaration("null")
+            } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
+                return this.createTypeDeclaration("undefined")
+            } else if (type.kind == ts.SyntaxKind.StringKeyword) {
+                return this.createTypeDeclaration("string")
+            } else if (type.kind == ts.SyntaxKind.BooleanKeyword) {
+                return this.createTypeDeclaration("boolean")
+            } else if (type.kind == ts.SyntaxKind.NumberKeyword) {
+                return this.createTypeDeclaration("number")
+            } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
+                return this.createTypeDeclaration("any")
+            } else if (type.kind == ts.SyntaxKind.FunctionType) {
+                const functionDeclaration = type as ts.FunctionTypeNode;
+                let parameterDeclarations = functionDeclaration.parameters.map(
+                    (param, count) => this.convertParameterDeclaration(param, count)
+                );
+                return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
+            } else if (ts.isTypeLiteralNode(type))  {
+                return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
+            } else if (ts.isThisTypeNode(type)){
+                return this.astFactory.createThisTypeDeclaration()
+            } else if (ts.isLiteralTypeNode(type)) {
+                return this.astFactory.createStringTypeDeclaration([
+                    type.literal.getText()
+                ])
+            } else if (ts.isTupleTypeNode(type)) {
+                return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
+            } else if (ts.isTypePredicateNode(type)) {
+                return this.createTypeDeclaration("boolean");
+            } else if (type.kind = ts.SyntaxKind.ObjectKeyword) {
+                return this.astFactory.createUnionTypeDeclaration([
+                        this.createTypeDeclaration("any"),
+                        this.createTypeDeclaration("undefined")
+                    ]
+                )
+            } else {
+                return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`);
             }
         }
     }

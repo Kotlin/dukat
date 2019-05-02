@@ -5,6 +5,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -133,6 +134,19 @@ interface DeclarationTypeLowering : DeclarationLowering {
                     lowerTypeParameter(typeParameter)
                 }
         )
+    }
+
+    override fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration {
+        return declaration.copy(
+                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                parentEntities = declaration.parentEntities.map { heritageClause ->
+                    lowerHeritageClause(heritageClause)
+                },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    lowerTypeParameter(typeParameter)
+                }
+        )
+
     }
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
