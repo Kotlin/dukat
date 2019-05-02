@@ -2,7 +2,6 @@ package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.compiler.tests.OutputTests.Companion.fileSetWithDescriptors
 import org.jetbrains.dukat.translator.InputTranslator
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -28,7 +27,7 @@ class CompilationTests : OutputTests() {
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./build/DefinitelyTyped")
+            return fileSetWithDescriptors(System.getProperty("dukat.test.resources.definitelyTyped"))
         }
 
     }

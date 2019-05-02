@@ -118,7 +118,7 @@ task downloadDefinitelyTyped(type: Download) {
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
     from zipTree(downloadDefinitelyTyped.dest)
-    into "${project.buildDir}/definitelyTyped"
+    into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
 test.dependsOn(download)
@@ -134,4 +134,6 @@ test {
             systemProperty(projectProperty, "true")
         }
     }
+    
+    systemProperty("dukat.test.resources.definitelyTyped", "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped")        
 }
