@@ -119,7 +119,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
 
                             if (docRoot.uid == entity.owner?.uid) {
-                                entity.name = docRoot.qualifiedNode!!
+                                if (docRoot.qualifiedNode != null) {
+                                    entity.name = docRoot.qualifiedNode!!
+                                }
                             }
 
                             if (docRoot.owner != null) {

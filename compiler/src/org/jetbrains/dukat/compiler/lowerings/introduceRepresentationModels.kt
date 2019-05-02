@@ -340,8 +340,10 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     val annotations = mutableListOf<AnnotationNode>()
 
     if (showQualifierAnnotation) {
-        val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
-        annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
+        if (qualifiedNode != null) {
+            val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
+            annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
+        }
     }
 
     return ModuleModel(
