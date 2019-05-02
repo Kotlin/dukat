@@ -28,7 +28,6 @@ private class GenerateInterfaceReferences() : DeclarationWithOwnerLowering {
     override fun lowerTypeDeclaration(owner: NodeOwner<TypeDeclaration>) = owner.node
     override fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>) = owner.node
     override fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>) = owner.node
-    override fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>) = owner.node
     override fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>) = owner.node
     override fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>) = owner.node
     override fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>) = owner.node
@@ -36,6 +35,9 @@ private class GenerateInterfaceReferences() : DeclarationWithOwnerLowering {
     fun getContext(): GeneratedInterfacesContext {
         return myAstContext
     }
+
+    override fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>) = owner.node
+
 
     // TODO: it looks like we haven't covered interface generattion for interface method signatures
     override fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>) = owner.node

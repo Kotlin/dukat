@@ -16,6 +16,24 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external object foo {
+    @nativeGetter
+    operator fun get(someKey: String): Number? = definedExternally
+    @nativeSetter
+    operator fun set(someKey: String, value: Number): Unit = definedExternally
+}
+external interface `T$0` {
+    @nativeGetter
+    operator fun get(someValue: String): Number?
+    @nativeSetter
+    operator fun set(someValue: String, value: Number)
+}
+external interface `T$1` {
+    @nativeGetter
+    operator fun get(someName: String): `T$0`?
+    @nativeSetter
+    operator fun set(someName: String, value: `T$0`)
+}
 external open class Foo {
     @nativeGetter
     open operator fun get(n: Number): Bar? = definedExternally
@@ -25,4 +43,5 @@ external open class Foo {
     open operator fun get(s: String): String? = definedExternally
     @nativeSetter
     open operator fun set(s: String, value: String): Unit = definedExternally
+    open var props: `T$1` = definedExternally
 }

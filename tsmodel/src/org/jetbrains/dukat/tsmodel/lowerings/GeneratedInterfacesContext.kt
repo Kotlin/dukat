@@ -205,8 +205,13 @@ class GeneratedInterfacesContext {
                     declaration.canBeJson() -> TypeDeclaration("Json", emptyList())
                     declaration.members.isEmpty() -> TypeDeclaration("Any", emptyList())
                     else -> {
-                        val referenceNode = registerObjectLiteralDeclaration(owner.wrap(declaration), ownerUID, typeParamsSet)
-                        referenceNode
+                        registerObjectLiteralDeclaration(
+                                owner.wrap(declaration.copy(members = declaration.members.map { param ->
+                                    lowerMemberDeclaration(owner.wrap(param), ownerUID, typeParameters)
+                                })),
+                                ownerUID,
+                                typeParamsSet
+                        )
                     }
                 }
             }
@@ -232,7 +237,12 @@ class GeneratedInterfacesContext {
 
     fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberDeclaration {
         val declaration = owner.node
+
         return when (declaration) {
+            is IndexSignatureDeclaration -> {
+                declaration.copy(returnType = generateInterface(owner.wrap(declaration.returnType), ownerUid, emptyList()))
+            }
+
             is CallSignatureDeclaration -> {
                 val typeParameters = ownerTypeParameters + declaration.typeParameters
                 declaration.copy(
