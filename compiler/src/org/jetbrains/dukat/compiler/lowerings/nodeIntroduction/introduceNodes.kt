@@ -651,8 +651,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     fun lowerPackageDeclaration(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): DocumentRootNode {
-        val declarations = documentRoot.declarations.flatMap { declaration -> lowerTopLevelDeclaration(declaration, owner) }
-
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
 
@@ -687,18 +685,16 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     .shiftLeft()
         }
 
-
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelDeclaration>()
-        declarations.forEach { declaration ->
+        documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
                 imports[declaration.name] = ImportNode(
                         declaration.moduleReference.convert(),
                         declaration.uid
                 )
-            } else nonImports.add(declaration)
+            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner))
         }
-
 
         val docRoot = DocumentRootNode(
                 fileName,
