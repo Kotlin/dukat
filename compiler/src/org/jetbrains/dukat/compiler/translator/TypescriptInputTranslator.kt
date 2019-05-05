@@ -32,6 +32,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsmodel.lowerings.eliminateStringType
 import org.jetbrains.dukat.tsmodel.lowerings.generateInterfaceReferences
+import org.jetbrains.dukat.tsmodel.lowerings.resolvePartials
 
 
 interface TypescriptInputTranslator : InputTranslator {
@@ -45,6 +46,7 @@ interface TypescriptInputTranslator : InputTranslator {
     private fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
         return documentRoot
                 .filterOutNonDeclarations()
+                .resolvePartials()
                 .generateInterfaceReferences()
                 .eliminateStringType()
                 .desugarArrayDeclarations()
