@@ -18,16 +18,19 @@ import org.w3c.xhr.*
 
 external interface Map<K, V>
 external interface List<T>
-external var fooMap: Map<String, List<Number>> = definedExternally
-external fun mapKey(a: Map<Number, List<String>>): Unit = definedExternally
-external var fooStringOrMap: dynamic /* String | Map<String, List<Number>> */ = definedExternally
+typealias Values<V> = List<V>
+typealias MultiMap<K, V> = Map<K, Values<V>>
+typealias MyHeaders = MultiMap<String, String>
+external var fooMap: MultiMap<String, Number> = definedExternally
+external fun mapKey(a: MultiMap<Number, String>): Unit = definedExternally
+external var fooStringOrMap: dynamic /* String | MultiMap<String, Number> */ = definedExternally
 external fun stringOrMapKey(a: String): Unit = definedExternally
-external fun stringOrMapKey(a: Map<Number, List<String>>): Unit = definedExternally
+external fun stringOrMapKey(a: MultiMap<Number, String>): Unit = definedExternally
 external var listOfStringOrNumber: dynamic /* String | List<dynamic /* String | Number */> */ = definedExternally
 external fun listOfNumberOrString(a: List<dynamic /* Number | String */>): Unit = definedExternally
-external var headers: Map<String, List<String>> = definedExternally
-external fun getHeaders(): Map<String, List<String>> = definedExternally
-external fun addHeaders(headers: Map<String, List<String>>): Unit = definedExternally
+external var headers: MyHeaders = definedExternally
+external fun getHeaders(): MyHeaders = definedExternally
+external fun addHeaders(headers: MyHeaders): Unit = definedExternally
 external var someRef: dynamic /* String | (instance: Number) -> Any */ = definedExternally
 external fun addRef(ref: String): Unit = definedExternally
 external fun addRef(ref: (instance: Number) -> Any): Unit = definedExternally

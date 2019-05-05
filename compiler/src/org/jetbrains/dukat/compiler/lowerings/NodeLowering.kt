@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -15,7 +16,6 @@ import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -31,7 +31,7 @@ interface NodeLowering {
     fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>): ParameterDeclaration
     fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
     fun lowerMemberNode(owner: NodeOwner<MemberNode>): MemberNode
-    fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
+    fun lowerTypeAliasNode(owner: NodeOwner<TypeAliasNode>): TypeAliasNode
     fun lowerObjectNode(owner: NodeOwner<ObjectNode>): ObjectNode
 
     fun lowerTypeNode(owner: NodeOwner<ValueTypeNode>): ParameterValueDeclaration
@@ -71,7 +71,7 @@ interface NodeLowering {
             is FunctionNode -> lowerFunctionNode(owner.wrap(declaration))
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner.wrap(declaration))
             is DocumentRootNode -> lowerRoot(declaration, owner.wrap(declaration))
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(owner.wrap(declaration))
+            is TypeAliasNode -> lowerTypeAliasNode(owner.wrap(declaration))
             is ObjectNode -> lowerObjectNode(owner.wrap(declaration))
             else -> declaration.duplicate()
         }

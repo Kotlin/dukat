@@ -17,8 +17,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface List<T>
-external var listOfString: List<String> = definedExternally
-external fun listOfNumberFunction(a: List<Number>): Unit = definedExternally
+external var listOfString: Values<String> = definedExternally
+external fun listOfNumberFunction(a: Values<Number>): Unit = definedExternally
+typealias Values<V> = List<V>
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo")
@@ -40,7 +41,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var listOfString: List<String> = definedExternally
-external fun listOfNumberFunction(a: List<Number>): Unit = definedExternally
-external var myVar: String = definedExternally
-external fun myFunction(a: String): Unit = definedExternally
+external var listOfString: Values<String> = definedExternally
+external fun listOfNumberFunction(a: Values<Number>): Unit = definedExternally
+external var myVar: Value = definedExternally
+external fun myFunction(a: Value): Unit = definedExternally
+typealias Value = String

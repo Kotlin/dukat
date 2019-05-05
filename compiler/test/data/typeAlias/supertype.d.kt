@@ -17,4 +17,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface X
-external interface Y : X
+external interface Y : A
+typealias A = X

@@ -29,6 +29,7 @@ import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
@@ -61,6 +62,7 @@ import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
@@ -295,6 +297,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return EnumNode(
                 name = name,
                 values = values.map { value -> EnumTokenNode(value.value, value.meta) }
+        )
+    }
+
+    private fun TypeAliasDeclaration.convert(): TypeAliasNode {
+        return TypeAliasNode(
+            name = aliasName,
+            typeReference = typeReference,
+            typeParameters = typeParameters.map { typeParameter -> IdentifierNode(typeParameter.value) },
+            canBeTranslated = true
         )
     }
 
@@ -598,6 +609,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
             is PackageDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
             is EnumDeclaration -> listOf(declaration.convert())
+            is TypeAliasDeclaration -> listOf(declaration.convert())
             else -> listOf(declaration)
         }
     }

@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -44,6 +45,7 @@ interface ModelWithOwnerLowering {
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumNode -> lowerEnumNode(NodeOwner(declaration, ownerContext))
+            is TypeAliasModel -> declaration
             else -> throw Exception("unknown TopeLevelDeclaration ${declaration::class.simpleName}")
         }
     }

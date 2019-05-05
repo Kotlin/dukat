@@ -7,12 +7,12 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.Declaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -26,7 +26,7 @@ private fun Declaration.getKey(): String {
         is ObjectNode -> name
         is EnumNode -> ""
         is DocumentRootNode -> ""
-        is TypeAliasDeclaration -> ""
+        is TypeAliasNode -> ""
         else -> throw Exception("unknown TopLevelNode ${this::class.simpleName}")
     }
 }

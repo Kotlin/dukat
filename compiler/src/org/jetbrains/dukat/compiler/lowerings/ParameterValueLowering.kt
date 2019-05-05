@@ -13,11 +13,11 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -150,7 +150,7 @@ interface ParameterValueLowering : Lowering {
         )
     }
 
-    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode {
         return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
     }
 

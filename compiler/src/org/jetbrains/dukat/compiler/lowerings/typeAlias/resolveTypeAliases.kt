@@ -1,15 +1,16 @@
 package org.jetbrains.dukat.compiler.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLowering {
@@ -53,12 +54,25 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
 
 }
 
+private fun TypeAliasNode.shouldBeTranslated(): Boolean {
+    return when(this.typeReference) {
+        is ValueTypeNode -> this.typeReference.meta == null
+        is FunctionTypeNode -> true
+        else -> false
+    }
+}
+
 private fun DocumentRootNode.registerTypeAliases(astContext: TypeAliasContext) {
     declarations.forEach { declaration ->
-        if (declaration is TypeAliasDeclaration) {
-            astContext.registerTypeAlias(
-                    declaration.copy(typeReference = astContext.resolveTypeAlias(declaration.typeReference))
-            )
+        if (declaration is TypeAliasNode) {
+
+            declaration.canBeTranslated = declaration.shouldBeTranslated()
+
+            if (!declaration.canBeTranslated) {
+                astContext.registerTypeAlias(
+                        declaration.copy(typeReference = astContext.resolveTypeAlias(declaration.typeReference))
+                )
+            }
         } else if (declaration is DocumentRootNode) {
             declaration.registerTypeAliases(astContext)
         }

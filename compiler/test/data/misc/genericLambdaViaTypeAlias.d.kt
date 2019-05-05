@@ -16,4 +16,5 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var foo: (x: String) -> String = definedExternally
+typealias A<T> = (x: T) -> T
+external var foo: A<String> = definedExternally

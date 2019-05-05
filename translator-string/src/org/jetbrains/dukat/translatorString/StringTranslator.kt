@@ -31,6 +31,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -239,6 +240,10 @@ private fun ConstructorModel.translate(): List<String> {
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
+private fun TypeAliasModel.translate(): String {
+    return "typealias ${name}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
+}
+
 private fun VariableModel.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
     val modifier = if (inline) "inline" else "external"
@@ -435,6 +440,10 @@ class StringTranslator : ModelVisitor {
 
     fun output(): String {
         return myOutput.joinToString(LINE_SEPARATOR)
+    }
+
+    override fun visitTypeAlias(typeAlias: TypeAliasModel) {
+        addOutput(typeAlias.translate())
     }
 
     override fun visitVariable(variable: VariableModel) {

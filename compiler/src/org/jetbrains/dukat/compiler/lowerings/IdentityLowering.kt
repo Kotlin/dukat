@@ -6,11 +6,11 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -43,7 +43,7 @@ interface IdentityLowering : Lowering {
 
     override fun lowerTupleDeclaration(declaration: TupleDeclaration) = declaration
 
-    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration = declaration
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode = declaration
 
     override fun lowerUnionTypeNode(declaration: UnionTypeNode) = declaration
 }

@@ -18,8 +18,9 @@ import org.w3c.xhr.*
 
 external object foo {
 }
+typealias Transform = (body: Any) -> Any
 external interface Foo {
     var boo: Any
     fun ping(param: Any)
-    fun json(fn: (body: Any) -> Any)
+    fun json(fn: Transform)
 }

@@ -17,6 +17,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
@@ -37,6 +38,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -323,6 +325,12 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     members = declaration.members.map { member -> member.process() },
                     parentEntities = declaration.parentEntities
             )
+            is TypeAliasNode -> if (declaration.canBeTranslated) {
+                TypeAliasModel(
+                        name = declaration.name,
+                        typeReference = declaration.typeReference.process(),
+                        typeParameters = declaration.typeParameters.map { typeParameter -> TypeParameterModel(typeParameter.value, emptyList()) })
+            } else null
             else -> {
                 println("skipping ${declaration::class.simpleName}")
                 null

@@ -5,12 +5,12 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -26,7 +26,7 @@ private fun HeritageSymbolNode.translate(): String {
 }
 
 private fun ValueTypeNodeValue.getAliasKey(): String {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> translate()
         else -> throw Exception("unknown ValueTypeNodeValue ${this}")
     }
@@ -35,8 +35,8 @@ private fun ValueTypeNodeValue.getAliasKey(): String {
 
 class TypeAliasContext {
 
-    private fun TypeAliasDeclaration.canSusbtitute(heritageNode: HeritageNode): Boolean {
-        return aliasName == heritageNode.name.translate()
+    private fun TypeAliasNode.canSusbtitute(heritageNode: HeritageNode): Boolean {
+        return (!canBeTranslated) && (name == heritageNode.name.translate())
     }
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
@@ -84,10 +84,10 @@ class TypeAliasContext {
         }
     }
 
-    private fun TypeAliasDeclaration.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+    private fun TypeAliasNode.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
         return when (type) {
             is ValueTypeNode -> {
-                if (type.isPrimitive(aliasName)) {
+                if (type.isPrimitive(name)) {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 
@@ -111,14 +111,14 @@ class TypeAliasContext {
         }
     }
 
-    private val myTypeAliasDeclaration: MutableSet<TypeAliasDeclaration> = mutableSetOf()
+    private val myTypeAliasNodes: MutableSet<TypeAliasNode> = mutableSetOf()
 
-    fun registerTypeAlias(typeAlias: TypeAliasDeclaration) {
-        myTypeAliasDeclaration.add(typeAlias)
+    fun registerTypeAlias(typeAlias: TypeAliasNode) {
+        myTypeAliasNodes.add(typeAlias)
     }
 
     fun resolveTypeAlias(heritageClause: HeritageNode): ParameterValueDeclaration? {
-        myTypeAliasDeclaration.forEach { typeAlias ->
+        myTypeAliasNodes.forEach { typeAlias ->
             if (typeAlias.canSusbtitute(heritageClause)) {
                 return typeAlias.typeReference
             }
@@ -129,7 +129,7 @@ class TypeAliasContext {
 
     fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
 
-        myTypeAliasDeclaration.forEach { typeAlias ->
+        myTypeAliasNodes.forEach { typeAlias ->
             typeAlias.substitute(type)?.let {
                 return it
             }

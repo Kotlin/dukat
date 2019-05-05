@@ -10,13 +10,13 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun specifyArguments(params: List<ParameterDeclaration>, complexityThreshold: Int): List<List<ParameterDeclaration>> {
@@ -29,7 +29,7 @@ private fun specifyArguments(params: List<ParameterDeclaration>, complexityThres
             is UnionTypeNode -> {
                 currentComplexity *= type.params.size
                 if (currentComplexity <= 15) {
-                    type.params.map {param ->
+                    type.params.map { param ->
                         parameterDeclaration.copy(type = if (type.nullable) param.makeNullable() else param)
                     }
                 } else {
@@ -44,7 +44,7 @@ private fun specifyArguments(params: List<ParameterDeclaration>, complexityThres
 }
 
 private fun ParameterValueDeclaration.description(): String {
-    return when(this) {
+    return when (this) {
         is ValueTypeNode -> {
             val typeNodeValue = value
             when (typeNodeValue) {
@@ -117,7 +117,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
             is DocumentRootNode -> listOf(lowerDocumentRoot(declaration))
-            is TypeAliasDeclaration -> listOf(lowerTypeAliasDeclaration(declaration))
+            is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration))
             else -> listOf(declaration)
         }
     }

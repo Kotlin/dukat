@@ -8,13 +8,13 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -30,7 +30,7 @@ interface Lowering {
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerMemberNode(declaration: MemberNode): MemberNode
-    fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
+    fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
     fun lowerTypeNode(declaration: ValueTypeNode): ParameterValueDeclaration
@@ -67,7 +67,7 @@ interface Lowering {
             is FunctionNode -> lowerFunctionNode(declaration)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
             is DocumentRootNode -> lowerDocumentRoot(declaration)
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
+            is TypeAliasNode -> lowerTypeAliasNode(declaration)
             is ObjectNode -> lowerObjectNode(declaration)
             else -> declaration.duplicate()
         }

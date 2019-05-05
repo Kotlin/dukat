@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
@@ -65,7 +66,7 @@ fun <T : AstNode> AstNode.duplicate(): T {
         is ValueTypeNode -> copy() as T
         is ParameterDeclaration -> copy() as T
         is FunctionTypeDeclaration -> copy() as T
-        is TypeAliasDeclaration -> copy() as T
+        is TypeAliasNode -> copy() as T
         is GeneratedInterfaceReferenceDeclaration -> copy() as T
         else -> throw Exception("can not copy ${this}")
     }
