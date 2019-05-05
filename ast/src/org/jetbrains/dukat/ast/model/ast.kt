@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstNode
@@ -37,6 +38,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
         is QualifiedNamedDeclaration -> copy(nullable = true)
+        is QualifiedNode -> copy(nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)
         is ObjectLiteralDeclaration -> copy(nullable = true)
         else -> throw Exception("makeNullable does not recognize type ${this}")
