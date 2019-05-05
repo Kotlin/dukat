@@ -61,9 +61,11 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
                     when (entity) {
                         is DocumentRootNode -> {
-                            if (docRoot.qualifiedNode != null) {
-                                exportedModules[entity.uid] = docRoot.qualifiedNode!!
+
+                            docRoot.qualifiedNode?.let { qualifiedNode ->
+                                exportedModules[entity.uid] = qualifiedNode
                             }
+
                             null
                         }
                         is ClassNode -> {
@@ -73,7 +75,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                             }
 
                             if (docRoot.owner != null) {
-                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifiedNode!!)))
+                                docRoot.qualifiedNode?.let { qualifiedNode ->
+                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                                }
                             }
                             null
                         }
@@ -83,7 +87,9 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                             }
 
                             if (docRoot.owner != null) {
-                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifiedNode!!)))
+                                docRoot.qualifiedNode?.let { qualifiedNode ->
+                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                                }
                             }
                             null
                         }
@@ -101,13 +107,16 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
                             //TODO: investigate how set annotations only at FunctionNode only
                             docRoot.declarations.filterIsInstance(FunctionNode::class.java).forEach {
                                 if (it != entity) {
-                                    it.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifiedNode!!)))
-
+                                    docRoot.qualifiedNode?.let { qualifiedNode ->
+                                        it.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                                    }
                                 }
                             }
 
                             if (docRoot.owner != null) {
-                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifiedNode!!)))
+                                docRoot.qualifiedNode?.let { qualifiedNode ->
+                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                                }
                             }
                             null
                         }
@@ -118,13 +127,15 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
 
                             if (docRoot.uid == entity.owner?.uid) {
-                                if (docRoot.qualifiedNode != null) {
-                                    entity.name = docRoot.qualifiedNode!!
+                                docRoot.qualifiedNode?.let { qualifiedNode ->
+                                    entity.name = qualifiedNode
                                 }
                             }
 
                             if (docRoot.owner != null) {
-                                entity.annotations.add(AnnotationNode("JsModule", listOf(docRoot.qualifiedNode!!)))
+                                docRoot.qualifiedNode?.let { qualifiedNode ->
+                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                                }
                                 entity.immutable = true
                             }
 
@@ -180,13 +191,13 @@ private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<Stri
     return copy(declarations = declarations)
 }
 
-fun DocumentRootNode.introduceExports(): DocumentRootNode {
+fun DocumentRootNode.introduceExportAnnotations(): DocumentRootNode {
     val uidTable = buildUidTable(this)
     val turnOffData = mutableSetOf<NameNode>()
     val exportedModulesData = mutableMapOf<String, NameNode?>()
-    val docRoot =  introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
+    val docRoot = introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
 
     return docRoot.turnOff(turnOffData).markModulesAsExported(exportedModulesData)
 }
 
-fun SourceSetNode.introduceExports() = transform { it.introduceExports() }
+fun SourceSetNode.introduceExportAnnotations() = transform { it.introduceExportAnnotations() }

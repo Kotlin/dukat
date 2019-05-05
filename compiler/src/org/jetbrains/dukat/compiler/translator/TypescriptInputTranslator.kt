@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
-import org.jetbrains.dukat.compiler.lowerings.introduceExports
+import org.jetbrains.dukat.compiler.lowerings.introduceExportAnnotations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceQualifiedNode
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
@@ -51,7 +51,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceNodes()
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
-                .introduceExports()
+                .introduceExportAnnotations()
                 .lowerNullable()
                 .lowerPrimitives()
                 .escapeIdentificators()
