@@ -1,13 +1,14 @@
 {
   "name": "dukat",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Converter definition files to Kotlin declarations. Currently support TypeScript declarations",
   "bin": {
     "dukat": "./bin/dukat-cli.js"
   },
   "files": [
     "build/runtime/*.jar",
-    "bin/dukat-cli.js"
+    "bin/dukat-cli.js",
+    "README.md"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

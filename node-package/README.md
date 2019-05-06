@@ -19,4 +19,4 @@ This requires JRE 1.8+ to run. It generates Kotlin files that are compatible wit
 
  #### [0.0.1] - 30'Apr, 2019
  
- - dukat npm package introduced 
+ - dukat npm package introduced
