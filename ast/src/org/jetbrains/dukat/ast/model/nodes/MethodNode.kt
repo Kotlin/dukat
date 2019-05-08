@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class MethodNode(
         val name: String,
-        val parameters: List<ParameterDeclaration>,
+        val parameters: List<ParameterNode>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>,
 

@@ -5,10 +5,10 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.translate
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private data class NodeData<T>(
@@ -86,23 +86,22 @@ private fun DocumentRootNode.createDataMap(): NodesDataMap<FunctionNode> {
 }
 
 
-
 private fun <T> Map.Entry<String, NodeDataRecord<T>>.process(
         generatedMethods: MutableList<T>,
-        paramsResolved: (node: T, params: List<ParameterDeclaration>) -> T
+        paramsResolved: (node: T, params: List<ParameterNode>) -> T
 ) {
     val optionalData = value
 
     optionalData.forEach { types, (argsCount, names, originalNode) ->
 
         val params = types.zip(names).map { (type, name) ->
-            ParameterDeclaration(name, type, null, false, false)
+            ParameterNode(name, type, null, null, false, false)
         }
 
         val argsCountGrouped = argsCount.groupingBy { it }.eachCount()
 
         val hasUniqueArity = argsCountGrouped.values.any { it == 1 }
-        val doesntNeedsOverload = hasUniqueArity || ( types.isEmpty() && argsCountGrouped.keys.contains(0))
+        val doesntNeedsOverload = hasUniqueArity || (types.isEmpty() && argsCountGrouped.keys.contains(0))
 
         if (!doesntNeedsOverload) {
             generatedMethods.add(paramsResolved(originalNode, params))

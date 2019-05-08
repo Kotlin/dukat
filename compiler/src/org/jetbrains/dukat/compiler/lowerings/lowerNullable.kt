@@ -3,18 +3,18 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
 private class LowerNullable : ParameterValueLowering {
 
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
+    override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
         val type = if (declaration.optional) declaration.type.makeNullable() else declaration.type
         return declaration.copy(type = lowerParameterValue(type))
     }

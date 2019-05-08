@@ -21,6 +21,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
@@ -33,6 +34,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
+import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.shiftLeft
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
@@ -95,12 +97,16 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         )
     }
 
+    private fun convertParameters(parameters: List<ParameterDeclaration>): List<ParameterNode> {
+        return parameters.map { param -> param.convertToNode() }
+    }
+
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
         return if (declaration.optional) {
             PropertyNode(
                     declaration.name,
                     FunctionTypeNode(
-                            declaration.parameters,
+                            convertParameters(declaration.parameters),
                             declaration.type,
                             true,
                             null
@@ -117,7 +123,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         } else {
             MethodNode(
                     declaration.name,
-                    declaration.parameters,
+                    convertParameters(declaration.parameters),
                     declaration.type,
                     declaration.typeParameters,
                     owner,
@@ -136,7 +142,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return listOf(
                 MethodNode(
                         "get",
-                        declaration.indexTypes,
+                        convertParameters(declaration.indexTypes),
                         declaration.returnType.makeNullable(),
                         emptyList(),
                         owner,
@@ -149,7 +155,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 ),
                 MethodNode(
                         "set",
-                        declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false)),
+                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
                         TypeDeclaration("Unit", emptyList()),
                         emptyList(),
                         owner,
@@ -167,7 +173,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
         return MethodNode(
                 "invoke",
-                parameters,
+                convertParameters(parameters),
                 type,
                 typeParameters,
                 owner,
@@ -288,7 +294,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun ConstructorDeclaration.convert(): ConstructorNode {
         return ConstructorNode(
-                parameters,
+                convertParameters(parameters),
                 typeParameters
         )
     }
@@ -319,7 +325,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         return FunctionNode(
                 IdentifierNode(name),
-                parameters,
+                convertParameters(parameters),
                 type,
                 typeParameters,
                 mutableListOf(),
@@ -380,7 +386,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                     GenericIdentifierNode(name, mergeTypeParameters)
                                 }
                                 , IdentifierNode(declaration.name)),
-                        declaration.parameters,
+                        convertParameters(declaration.parameters),
                         declaration.type,
                         mergeTypeParameters + declaration.typeParameters,
                         mutableListOf(),
@@ -439,7 +445,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("get")),
-                            declaration.indexTypes,
+                            convertParameters(declaration.indexTypes),
                             declaration.returnType.makeNullable(),
                             emptyList(),
                             mutableListOf(),
@@ -465,9 +471,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     ),
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("set")),
-                            declaration.indexTypes + listOf(ParameterDeclaration(
+                            convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
-                            )),
+                            ))),
                             ValueTypeNode("Unit", emptyList()),
                             emptyList(),
                             mutableListOf(),
@@ -492,7 +498,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
-                            declaration.parameters.map { param ->
+                            convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind == TypeDeclaration("definedExternally", emptyList())) {
                                     ExpressionDeclaration(TypeDeclaration("null", emptyList()), null)
                                 } else {
@@ -500,7 +506,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                 }
 
                                 param.copy(initializer = initializer)
-                            },
+                            }),
                             declaration.type,
                             emptyList(),
                             mutableListOf(),
@@ -529,7 +535,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
-                    declaration.parameters,
+                    convertParameters(declaration.parameters),
                     declaration.type,
                     declaration.typeParameters,
                     owner,

@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
@@ -18,7 +19,6 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -44,7 +44,7 @@ interface NodeTypeLowering : NodeLowering {
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(owner.wrap(parameter)) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(owner.wrap(constraint)) })
                 },
@@ -80,7 +80,7 @@ interface NodeTypeLowering : NodeLowering {
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(owner.wrap(parameter)) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(owner.wrap(constraint)) })
                 },
@@ -134,12 +134,12 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerFunctionNode(owner: NodeOwner<FunctionTypeNode>): FunctionTypeNode {
         val declaration = owner.node
         return declaration.copy(
-                parameters = declaration.parameters.map { param -> lowerParameterDeclaration(owner.wrap(param)) },
+                parameters = declaration.parameters.map { param -> lowerParameterNode(owner.wrap(param)) },
                 type = lowerParameterValue(owner.wrap(declaration.type))
         )
     }
 
-    override fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>): ParameterDeclaration {
+    override fun lowerParameterNode(owner: NodeOwner<ParameterNode>): ParameterNode {
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
@@ -191,7 +191,7 @@ interface NodeTypeLowering : NodeLowering {
     fun lowerConstructorNode(owner: NodeOwner<ConstructorNode>): ConstructorNode {
         val declaration = owner.node
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(owner.wrap(parameter)) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(owner.wrap(constraint)) })
                 }

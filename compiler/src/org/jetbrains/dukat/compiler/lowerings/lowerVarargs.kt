@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
@@ -20,7 +20,7 @@ private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclara
 }
 
 private class LoweringVarags : ParameterValueLowering {
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
+    override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
         return if (declaration.vararg) declaration.copy(type = declaration.type.extractVarargType()) else declaration
     }
 }

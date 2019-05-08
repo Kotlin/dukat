@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -139,11 +140,14 @@ private fun MemberNode.process(): MemberNode {
     }
 }
 
-private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+private fun ParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
     return ParameterModel(
             type = type.process(context),
             name = name,
-            initializer = initializer,
+            initializer = initializer?.let { valueNode ->
+                // TODO: don't like this particular cast
+                TypeValueModel(valueNode.value as NameNode, emptyList(), meta, valueNode.nullable)
+            },
             vararg = vararg,
             optional = optional
     )

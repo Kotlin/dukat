@@ -101,17 +101,14 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res = "vararg $res"
     }
 
-
-    if (initializer != null) {
+    if (initializer is TypeValueModel) {
         if (needsMeta) {
+            val typeValueModel = initializer as TypeValueModel
 
-            if (initializer?.kind?.value != null) {
-                res += " = ${initializer?.kind?.value}"
-
-                initializer!!.meta?.let { meta ->
+            res += " = ${typeValueModel.value.translate()}"
+            typeValueModel.metaDescription?.let { meta ->
                     res += " /* ${meta} */"
                 }
-            }
         }
     } else {
         res += type.translateMeta()
