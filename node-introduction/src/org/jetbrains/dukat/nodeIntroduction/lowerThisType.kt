@@ -11,7 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -60,7 +60,7 @@ private class LowerThisType {
         return declaration.copy(members = declaration.members.map { lowerMemberNode(it, declaration) })
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is InterfaceNode -> lowerInterfaceNode(declaration)
             is ClassNode -> lowerClassNode(declaration)

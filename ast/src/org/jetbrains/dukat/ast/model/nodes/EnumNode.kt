@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class EnumNode(
         val name: String,
         val values: List<EnumTokenNode>
-) : TopLevelDeclaration, TopLevelNode
+) : AstTopLevelEntity, TopLevelNode

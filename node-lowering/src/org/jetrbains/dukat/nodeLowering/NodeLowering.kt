@@ -13,7 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -64,7 +64,7 @@ interface NodeLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(owner: NodeOwner<AstTopLevelEntity>): AstTopLevelEntity {
         val declaration = owner.node
         return when (declaration) {
             is VariableNode -> lowerVariableNode(owner.wrap(declaration))
@@ -77,7 +77,7 @@ interface NodeLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<DocumentRootNode>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>, owner: NodeOwner<DocumentRootNode>): List<AstTopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(owner.wrap(declaration))
         }

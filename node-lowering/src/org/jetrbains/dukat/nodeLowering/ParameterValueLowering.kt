@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.nodeIntroduction
+package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -23,7 +23,6 @@ import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
-import org.jetrbains.dukat.nodeLowering.Lowering
 
 
 interface ParameterValueLowering : Lowering {

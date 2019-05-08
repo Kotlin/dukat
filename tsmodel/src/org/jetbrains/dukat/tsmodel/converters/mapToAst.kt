@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.tsmodel.converters
 
-import org.jetbrains.dukat.astCommon.AstNode
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -39,21 +38,21 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
 @Suppress("UNCHECKED_CAST")
-private fun <T: AstNode> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
+private fun <T : AstEntity> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getEntitiesList(key: String) = get(key) as List<Map<String, Any?>>
 
-private fun <T : Declaration> Map<String, Any?>.getEntities(key: String, mapper: (Map<String, Any?>) -> T = {
+private fun <T : AstEntity> Map<String, Any?>.getEntities(key: String, mapper: (Map<String, Any?>) -> T = {
     it.toAst()
-} ) =
+}) =
         getEntitiesList(key).map(mapper)
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getInitializerExpression(): ExpressionDeclaration? {
     val initializer = get("initializer") as Map<String, Any?>?
     return initializer?.let {
-        val expression = it.toAst<Declaration>()
+        val expression = it.toAst<AstEntity>()
 
         if (expression is ExpressionDeclaration) {
             if (expression.kind.value == "definedExternally") {
@@ -73,14 +72,14 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
         )
 
 @Suppress("UNCHECKED_CAST")
-fun <T : AstNode> Map<String, Any?>.toAst(): T {
+fun <T : AstEntity> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
         TupleDeclaration::class.simpleName -> TupleDeclaration(getEntities("params"))
         ThisTypeDeclaration::class.simpleName -> ThisTypeDeclaration()
         EnumDeclaration::class.simpleName -> EnumDeclaration(
-            get("name") as String,
-            getEntities("values")
+                get("name") as String,
+                getEntities("values")
         )
         EnumTokenDeclaration::class.simpleName -> EnumTokenDeclaration(get("value") as String, get("meta") as String)
         ExportAssignmentDeclaration::class.simpleName -> ExportAssignmentDeclaration(
@@ -91,7 +90,7 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 getEntities("params")
         )
         UnionTypeDeclaration::class.simpleName -> UnionTypeDeclaration(
-            getEntities("params")
+                getEntities("params")
         )
         HeritageClauseDeclaration::class.simpleName -> HeritageClauseDeclaration(
                 getEntity(HeritageClauseDeclaration::name.name),
@@ -196,9 +195,9 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
                 get("uid") as String
         )
         ImportEqualsDeclaration::class.simpleName -> ImportEqualsDeclaration(
-            get("name") as String,
-            getEntity("moduleReference"),
-            get("uid") as String
+                get("name") as String,
+                getEntity("moduleReference"),
+                get("uid") as String
         )
         IdentifierDeclaration::class.simpleName -> IdentifierDeclaration(
                 get("value") as String
@@ -216,8 +215,8 @@ fun <T : AstNode> Map<String, Any?>.toAst(): T {
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(getEntities("members"))
         QualifiedNamedDeclaration::class.simpleName -> QualifiedNamedDeclaration(
-           getEntity("left"),
-           getEntity("right")
+                getEntity("left"),
+                getEntity("right")
         )
         else -> throw Exception("failed to create declaration from mapper: ${this}")
     }

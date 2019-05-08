@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.translate
-import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -18,7 +18,7 @@ import org.jetbrains.dukat.astModel.transform
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
-    return declarations.any { declaration -> declaration is MemberDeclaration }
+    return declarations.any { declaration -> declaration is AstMemberEntity }
 }
 
 private fun VariableModel.convert(): MemberNode {

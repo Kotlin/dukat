@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -30,7 +30,7 @@ interface DeclarationWithOwnerLowering {
     fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
     fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
     fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>): MemberDeclaration
+    fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>): AstMemberEntity
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
 
@@ -55,7 +55,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(owner: NodeOwner<AstTopLevelEntity>): AstTopLevelEntity {
         val declaration = owner.node
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(owner.wrap(declaration))
@@ -67,7 +67,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<PackageDeclaration>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>, owner: NodeOwner<PackageDeclaration>): List<AstTopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(owner.wrap(declaration))
         }

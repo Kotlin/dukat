@@ -16,7 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.IdentityLowering
 
@@ -111,7 +111,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         return declaration.copy(members = members)
     }
 
-    fun lowerTopLevelDeclarationList(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarationList(declaration: AstTopLevelEntity): List<AstTopLevelEntity> {
         return when (declaration) {
             is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
@@ -123,7 +123,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         }
     }
 
-    override fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
+    override fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>): List<AstTopLevelEntity> {
         return declarations.flatMap { declaration ->
             lowerTopLevelDeclarationList(declaration)
         }

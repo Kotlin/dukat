@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -21,4 +21,4 @@ data class FunctionNode(
         var owner: DocumentRootNode?,
         val body: List<StatementNode>,
         val uid: String
-) : MemberDeclaration, TopLevelDeclaration, MergableNode, MemberNode
+) : AstMemberEntity, AstTopLevelEntity, MergableNode, MemberNode

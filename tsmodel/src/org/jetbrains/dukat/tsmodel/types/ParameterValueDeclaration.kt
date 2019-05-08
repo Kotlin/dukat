@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.tsmodel.types
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 
 interface
-ParameterValueDeclaration : Declaration {
+ParameterValueDeclaration : AstEntity {
     val nullable: Boolean
     var meta: ParameterValueDeclaration?
 }

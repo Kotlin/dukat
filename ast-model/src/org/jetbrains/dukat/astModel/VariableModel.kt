@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class VariableModel(
         var name: NameNode,
@@ -20,4 +20,4 @@ data class VariableModel(
         val get: StatementNode?,
         val set: StatementNode?,
         val typeParameters: List<TypeParameterModel>
-) : TopLevelDeclaration, MergableNode, TopLevelNode
+) : AstTopLevelEntity, MergableNode, TopLevelNode

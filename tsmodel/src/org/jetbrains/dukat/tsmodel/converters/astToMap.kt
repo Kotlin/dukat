@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.converters
 
-import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -64,18 +64,18 @@ private fun Any.toMap(): Any {
     return when (this) {
         is Boolean -> this
         is String -> this
-        is AstNode -> astToMap()
+        is AstEntity -> astToMap()
         is List<*> -> this.map { it?.toMap() }
         else -> throw Exception("can not map ${this}")
     }
 }
 
 private fun List<KProperty0<*>>.convert(reflection: Any) =
-    map { property -> Pair(property.name, property.getter())}
-            .associateBy ({ it.first }, {it.second?.toMap()}).reflectAs(reflection)
+        map { property -> Pair(property.name, property.getter()) }
+                .associateBy({ it.first }, { it.second?.toMap() }).reflectAs(reflection)
 
 
-fun AstNode.astToMap(): Map<String, Any?> {
+fun AstEntity.astToMap(): Map<String, Any?> {
     return when (this) {
         is CallSignatureDeclaration -> listOf(::type, ::parameters, ::typeParameters).convert(this)
         is ClassDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::modifiers, ::uid).convert(this)

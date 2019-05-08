@@ -4,8 +4,8 @@ import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.jetbrains.dukat.astCommon.AstNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -15,7 +15,7 @@ import org.jetbrains.dukat.tsmodel.factory.AstFactory
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun V8Object.toMap(): Map<String, Any?> = V8ObjectUtils.toMap(this)
-private fun <T : AstNode> V8Object.toAst(): T = toMap().toAst()
+private fun <T : AstEntity> V8Object.toAst(): T = toMap().toAst()
 
 private fun V8Array.toArray(): Array<Map<String, Any?>> {
     val res = mutableListOf<Map<String, Any?>>()
@@ -37,13 +37,13 @@ private fun V8Array.asIterator() = object : Iterator<Any> {
     override fun next() = get(myCounter++)
 }
 
-private fun <T : AstNode> V8Array.toAst(): List<T> {
+private fun <T : AstEntity> V8Array.toAst(): List<T> {
     return toArray().map { it.toAst<T>() }
 }
 
 class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) {
 
-    private fun AstNode.toV8() = V8ObjectUtils.toV8Object(runtime, astToMap())
+    private fun AstEntity.toV8() = V8ObjectUtils.toV8Object(runtime, astToMap())
 
     fun createDefinitionInfoDeclaration(fileName: String) = astFactory.createDefinitionInfoDeclaration(fileName).toV8()
 
@@ -198,7 +198,7 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createDocumentRoot(packageName: String, declarations: V8Array, modifiers: V8Array, definitionsInfo: V8Array, uid: String, resourceName: String, root: Boolean): V8Object =
             astFactory.createDocumentRoot(
                     packageName,
-                    declarations.toAst<TopLevelDeclaration>().toTypedArray(),
+                    declarations.toAst<AstTopLevelEntity>().toTypedArray(),
                     modifiers.toAst(),
                     definitionsInfo.toAst(),
                     uid,

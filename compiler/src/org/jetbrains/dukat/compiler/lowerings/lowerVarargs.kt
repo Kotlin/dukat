@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {

@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 

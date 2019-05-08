@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.factory
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
@@ -68,18 +68,18 @@ interface AstNodeFactory<T> {
 
     fun createClassDeclaration(
             name: String,
-            members: List<MemberDeclaration>,
+            members: List<AstMemberEntity>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
             modifiers: List<ModifierDeclaration>,
             uid: String
     ): T
 
-    fun createObjectLiteral(members: List<MemberDeclaration>): T
+    fun createObjectLiteral(members: List<AstMemberEntity>): T
 
     fun createInterfaceDeclaration(
             name: String,
-            members: List<MemberDeclaration>,
+            members: List<AstMemberEntity>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
             definitionsInfo: List<DefinitionInfoDeclaration>,
@@ -132,7 +132,7 @@ interface AstNodeFactory<T> {
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: String, params: Array<ParameterValueDeclaration>): T
-    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelDeclaration>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean): T
+    fun createDocumentRoot(packageName: String, declarations: Array<AstTopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean): T
     fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): T
     fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>): T
 

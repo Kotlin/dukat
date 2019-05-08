@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 data class DefinitionInfoDeclaration(
         val fileName: String
-) : Declaration
+) : AstEntity

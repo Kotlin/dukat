@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -30,7 +30,7 @@ private class GenerateInterfaceReferences() : DeclarationWithOwnerLowering {
     override fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>) = owner.node
     override fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>) = owner.node
     override fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>) = owner.node
-    override fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>) = owner.node
+    override fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>) = owner.node
 
     fun getContext(): GeneratedInterfacesContext {
         return myAstContext

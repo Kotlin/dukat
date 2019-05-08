@@ -2,7 +2,7 @@ package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 data class TypeValueModel(
         val value: NameNode,
@@ -10,6 +10,6 @@ data class TypeValueModel(
 
         val metaDescription: String?,
         val nullable: Boolean = false
-) : Declaration, TypeNode
+) : AstEntity, TypeNode
 
 fun TypeValueModel.isGeneric() = params.isNotEmpty()

@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
-interface DelegationModel : Declaration
+interface DelegationModel : AstEntity

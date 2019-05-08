@@ -8,8 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
-import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun escapeIdentificator(identificator: String): String {
@@ -88,7 +88,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         }
     }
 
-    override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+    override fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is EnumNode -> declaration.copy(values = declaration.values.map { value -> value.copy(value = escapeIdentificator(value.value)) })
             else -> super.lowerTopLevelDeclaration(declaration)

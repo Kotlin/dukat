@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 
 
 private class LoweringUnionType() : ParameterValueLowering {

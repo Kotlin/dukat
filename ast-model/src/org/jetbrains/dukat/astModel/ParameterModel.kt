@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 data class ParameterModel(
         val name: String,
@@ -10,4 +10,4 @@ data class ParameterModel(
 
         val vararg: Boolean,
         val optional: Boolean
-) : Declaration
+) : AstEntity

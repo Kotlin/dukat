@@ -1,3 +1,3 @@
 package org.jetbrains.dukat.astCommon
 
-interface AstNode
+interface AstMemberEntity : AstEntity

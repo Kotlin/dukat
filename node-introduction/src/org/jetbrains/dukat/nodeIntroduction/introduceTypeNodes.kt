@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 
 private class TypeNodesLowering() : ParameterValueLowering {
 

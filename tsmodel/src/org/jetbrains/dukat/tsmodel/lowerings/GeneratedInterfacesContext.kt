@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -145,7 +145,7 @@ private fun IndexSignatureDeclaration.isIdenticalTo(indexSignatureDeclaration: I
     return returnType.isIdenticalTo(indexSignatureDeclaration.returnType)
 }
 
-private fun MemberDeclaration.isIdenticalTo(memberDeclaration: MemberDeclaration): Boolean {
+private fun AstMemberEntity.isIdenticalTo(memberDeclaration: AstMemberEntity): Boolean {
     if (this::class != memberDeclaration::class) {
         return false
     }
@@ -235,7 +235,7 @@ class GeneratedInterfacesContext {
         }
     }
 
-    fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberDeclaration {
+    fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): AstMemberEntity {
         val declaration = owner.node
 
         return when (declaration) {

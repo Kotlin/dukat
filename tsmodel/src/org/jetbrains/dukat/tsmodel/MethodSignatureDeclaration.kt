@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class MethodSignatureDeclaration(
@@ -10,4 +10,4 @@ data class MethodSignatureDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
         val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration
+) : AstMemberEntity

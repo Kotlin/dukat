@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableDeclaration(
@@ -9,4 +9,4 @@ data class VariableDeclaration(
         val modifiers: List<ModifierDeclaration>,
 
         val uid: String
-) : TopLevelDeclaration
+) : AstTopLevelEntity

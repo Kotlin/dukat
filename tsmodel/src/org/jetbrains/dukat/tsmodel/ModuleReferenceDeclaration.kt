@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
-interface ModuleReferenceDeclaration : Declaration
+interface ModuleReferenceDeclaration : AstEntity

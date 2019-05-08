@@ -7,8 +7,8 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class FunctionModel(
         val name: NameNode,
@@ -24,4 +24,4 @@ data class FunctionModel(
         val operator: Boolean,
 
         val body: List<StatementNode>
-) : MemberDeclaration, TopLevelDeclaration, MergableNode, TopLevelNode
+) : AstMemberEntity, AstTopLevelEntity, MergableNode, TopLevelNode

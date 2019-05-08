@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 
-interface QualifiedLeftDeclaration : Declaration
+interface QualifiedLeftDeclaration : AstEntity

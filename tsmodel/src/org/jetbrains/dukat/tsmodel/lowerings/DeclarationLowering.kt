@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -31,7 +31,7 @@ interface DeclarationLowering {
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration
+    fun lowerMemberDeclaration(declaration: AstMemberEntity): AstMemberEntity
     fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
 
@@ -55,7 +55,7 @@ interface DeclarationLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
@@ -66,7 +66,7 @@ interface DeclarationLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>): List<AstTopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(declaration)
         }

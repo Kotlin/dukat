@@ -8,7 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 

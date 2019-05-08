@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
-data class ModifierDeclaration(val token: String) : Declaration {
+data class ModifierDeclaration(val token: String) : AstEntity {
     companion object {
         val DECLARE_KEYWORD = ModifierDeclaration("DECLARE")
         val STATIC_KEYWORD = ModifierDeclaration("STATIC")

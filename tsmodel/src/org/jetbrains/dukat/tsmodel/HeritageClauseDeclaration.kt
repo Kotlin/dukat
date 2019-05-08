@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 
 data class HeritageClauseDeclaration(
         val name: HeritageSymbolDeclaration,
         val typeArguments: List<IdentifierDeclaration>,
         val extending: Boolean
-) : Declaration
+) : AstEntity

@@ -3,7 +3,7 @@ package org.jetbrains.dukat.astModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class ModuleModel(
         val qualifiedName: NameNode?,
@@ -13,7 +13,7 @@ data class ModuleModel(
         val annotations: MutableList<AnnotationNode>,
         val sumbodules: List<ModuleModel>,
         val imports: MutableList<NameNode>
-) : TopLevelDeclaration, TopLevelNode
+) : AstTopLevelEntity, TopLevelNode
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
     return (listOf(this.copy(sumbodules = emptyList())) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })

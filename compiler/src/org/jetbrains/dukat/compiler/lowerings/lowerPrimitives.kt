@@ -8,7 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.ValueTypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
 

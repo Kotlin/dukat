@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.Declaration
+import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class ParameterDeclaration(
@@ -10,4 +10,4 @@ data class ParameterDeclaration(
 
         val vararg: Boolean,
         val optional: Boolean
-) : Declaration
+) : AstEntity

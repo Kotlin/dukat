@@ -13,7 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TopLevelDeclaration
+import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -61,7 +61,7 @@ interface Lowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
+    fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
@@ -73,7 +73,7 @@ interface Lowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
+    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>): List<AstTopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(declaration)
         }

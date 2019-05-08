@@ -9,7 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.AstNode
+import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -19,7 +19,6 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -47,7 +46,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T : AstNode> AstNode.duplicate(): T {
+fun <T : AstEntity> AstEntity.duplicate(): T {
     return when (this) {
         is EnumNode -> copy() as T
         is EnumDeclaration -> copy() as T

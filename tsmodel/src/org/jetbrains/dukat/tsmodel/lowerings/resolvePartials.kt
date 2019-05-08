@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.MemberDeclaration
+import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -10,7 +10,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
-private fun MemberDeclaration.makeOptional(): MemberDeclaration {
+private fun AstMemberEntity.makeOptional(): AstMemberEntity {
     return when (this) {
         is PropertyDeclaration -> copy(optional = true)
         else -> this
