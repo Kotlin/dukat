@@ -3,13 +3,12 @@ package org.jetbrains.dukat.compiler
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNodeValue
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.compiler.lowerings.ParameterValueLowering
+import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 
 
@@ -55,10 +54,6 @@ private class PrimitiveClassLowering : ParameterValueLowering {
                 nullable = nullable,
                 meta = meta
         )
-    }
-
-    override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
-        return super.lowerUnionTypeNode(declaration)
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {

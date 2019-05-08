@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -13,8 +13,8 @@ private class LoweringUnionType() : ParameterValueLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         if (declaration is UnionTypeDeclaration) {
             return UnionTypeNode(
-                params = declaration.params.map { param ->  lowerParameterValue(param)},
-                nullable = declaration.nullable
+                    params = declaration.params.map { param -> lowerParameterValue(param) },
+                    nullable = declaration.nullable
             )
         }
         return super.lowerParameterValue(declaration)
@@ -22,7 +22,7 @@ private class LoweringUnionType() : ParameterValueLowering {
 }
 
 fun DocumentRootNode.lowerUnionType(): DocumentRootNode {
-    return LoweringUnionType().lowerDocumentRoot(this)
+    return org.jetbrains.dukat.nodeIntroduction.LoweringUnionType().lowerDocumentRoot(this)
 }
 
 fun SourceSetNode.lowerUnionType() = transform { it.lowerUnionType() }

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -74,7 +74,7 @@ private class LowerThisType {
 }
 
 fun DocumentRootNode.lowerThisType(): DocumentRootNode {
-    return LowerThisType().lowerDocumentRoot(this)
+    return org.jetbrains.dukat.nodeIntroduction.LowerThisType().lowerDocumentRoot(this)
 }
 
 fun SourceSetNode.lowerThisType() = transform { it.lowerThisType() }

@@ -1,0 +1,14 @@
+plugins {
+    id("kotlin")
+}
+
+sourceSets {
+    main.kotlin.srcDirs = ['src']
+}
+
+dependencies {
+    implementation(project(":ast"))
+    implementation(project(":ast-common"))
+    implementation(project(":ownerContext"))
+    implementation(project(":tsmodel"))
+}

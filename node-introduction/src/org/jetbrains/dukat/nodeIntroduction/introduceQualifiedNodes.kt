@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
@@ -16,7 +16,7 @@ import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 private fun NodeOwner<*>.getModule(): DocumentRootNode {
     return (getOwners().first { (it is NodeOwner<*>) && (it.node is DocumentRootNode) } as NodeOwner<DocumentRootNode>).node
@@ -130,11 +130,11 @@ private fun DocumentRootNode.collectUidData(uidData: UidData): DocumentRootNode 
     return this
 }
 
-fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
-    val uidData = UidData()
+private fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
+    val uidData = org.jetbrains.dukat.nodeIntroduction.UidData()
     collectUidData(uidData)
 
-    return LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
+    return org.jetbrains.dukat.nodeIntroduction.LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
 }
 
 fun SourceSetNode.introduceQualifiedNode() = transform { it.introduceQualifiedNode() }

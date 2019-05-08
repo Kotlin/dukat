@@ -58,21 +58,21 @@ private fun ClassNode.allParentProperties(astContext: AstContext): List<Property
     } as List<PropertyNode>
 }
 
-private fun MethodNode.isOverriding(otherMethodDeclaration: MethodNode): Boolean {
-    if (name != otherMethodDeclaration.name) {
+private fun MethodNode.isOverriding(otherMethodNode: MethodNode): Boolean {
+    if (name != otherMethodNode.name) {
         return false
     }
 
-    if (parameters.size != otherMethodDeclaration.parameters.size) {
+    if (parameters.size != otherMethodNode.parameters.size) {
         return false
     }
 
-    if (typeParameters.size != otherMethodDeclaration.typeParameters.size) {
+    if (typeParameters.size != otherMethodNode.typeParameters.size) {
         return false
     }
 
     return parameters
-            .zip(otherMethodDeclaration.parameters) { a, b -> a.type.isOverriding(b.type) }
+            .zip(otherMethodNode.parameters) { a, b -> a.type.isOverriding(b.type) }
             .all { it }
 }
 

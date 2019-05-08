@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.nodeIntroduction
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
@@ -38,7 +38,6 @@ import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.shiftLeft
 import org.jetbrains.dukat.astCommon.MemberDeclaration
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
-import org.jetbrains.dukat.compiler.model.ROOT_CLASS_DECLARATION
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -308,10 +307,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun TypeAliasDeclaration.convert(): TypeAliasNode {
         return TypeAliasNode(
-            name = aliasName,
-            typeReference = typeReference,
-            typeParameters = typeParameters.map { typeParameter -> IdentifierNode(typeParameter.value) },
-            canBeTranslated = true
+                name = aliasName,
+                typeReference = typeReference,
+                typeParameters = typeParameters.map { typeParameter -> IdentifierNode(typeParameter.value) },
+                canBeTranslated = true
         )
     }
 
@@ -363,7 +362,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberDeclaration, interfaceDeclaration: InterfaceDeclaration): List<TopLevelDeclaration> {
-        val owner = ROOT_CLASS_DECLARATION
         val name = interfaceDeclaration.name
 
         return when (declaration) {
@@ -653,7 +651,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
     private fun escapePackageName(name: String): String {
         return name
-                .replace("/".toRegex(), ".")
+                .replace("/".toRegex(), "")
                 .replace("-".toRegex(), "_")
                 .replace("^_$".toRegex(), "`_`")
                 .replace("^class$".toRegex(), "`class`")
@@ -691,15 +689,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 .flatMap { it.split("/") }
                 .map { IdentifierNode(escapePackageName(it)) }
 
-        val fullPackageName = qualifierIdentifiers.reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc)}
+        val fullPackageName = qualifierIdentifiers.reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
 
 
-        val  qualifiedNode = if (qualifiers.isEmpty()) {
+        val qualifiedNode = if (qualifiers.isEmpty()) {
             null
         } else {
             qualifiers
                     .map { IdentifierNode(it) }
-                    .reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc)}
+                    .reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
                     .shiftLeft()
         }
 
@@ -752,15 +750,14 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 }
 
-private fun PackageDeclaration.introduceNodes(fileName: String) = LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, NodeOwner(this, null))
+private fun PackageDeclaration.introduceNodes(fileName: String) = org.jetbrains.dukat.nodeIntroduction.LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, NodeOwner(this, null))
 
 fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath
     return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map { referencedFile -> IdentifierNode(referencedFile.value) })
 }
 
-fun SourceSetDeclaration.
-        introduceNodes() =
+fun SourceSetDeclaration.introduceNodes() =
         SourceSetNode(sources = sources.map { source ->
             source.introduceNodes()
         })

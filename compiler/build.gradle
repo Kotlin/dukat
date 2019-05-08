@@ -50,6 +50,8 @@ dependencies {
     implementation(project(":interop-graal"))
     implementation(project(":tsinterop"))
     implementation(project(":itertools"))
+    implementation(project(":node-lowering"))
+    implementation(project(":node-introduction"))
     implementation(project(":ownerContext"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))

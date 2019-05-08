@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -45,12 +46,6 @@ private class LowerNullable : ParameterValueLowering {
                         else -> throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
                 } else lowerUnionTypeDeclaration(declaration)
-            }
-            is FunctionTypeNode -> {
-                return lowerFunctionNode(declaration)
-            }
-            is ValueTypeNode -> {
-                return lowerTypeNode(declaration)
             }
             else -> super.lowerParameterValue(declaration)
         }

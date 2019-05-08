@@ -18,6 +18,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.IdentityLowering
 
 private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: Int): List<List<ParameterNode>> {
 

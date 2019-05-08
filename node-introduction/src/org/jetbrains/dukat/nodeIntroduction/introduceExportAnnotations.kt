@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -192,10 +192,10 @@ private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<Stri
 }
 
 fun DocumentRootNode.introduceExportAnnotations(): DocumentRootNode {
-    val uidTable = buildUidTable(this)
+    val uidTable = org.jetbrains.dukat.nodeIntroduction.buildUidTable(this)
     val turnOffData = mutableSetOf<NameNode>()
     val exportedModulesData = mutableMapOf<String, NameNode?>()
-    val docRoot = introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
+    val docRoot = org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
 
     return docRoot.turnOff(turnOffData).markModulesAsExported(exportedModulesData)
 }

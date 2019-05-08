@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.model
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 

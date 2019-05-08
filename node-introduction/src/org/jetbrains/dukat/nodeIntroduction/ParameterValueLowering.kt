@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -23,12 +23,13 @@ import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetrbains.dukat.nodeLowering.Lowering
 
 
 interface ParameterValueLowering : Lowering {
 
     fun lowerIdentificator(identificator: NameNode): NameNode {
-        return when(identificator) {
+        return when (identificator) {
             is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
             is QualifiedNode -> identificator
             else -> throw Exception("unknown NameNode ${identificator}")
@@ -83,8 +84,8 @@ interface ParameterValueLowering : Lowering {
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(
-            name = lowerIdentificator(declaration.name),
-            constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) }
+                name = lowerIdentificator(declaration.name),
+                constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) }
         )
     }
 
@@ -123,7 +124,7 @@ interface ParameterValueLowering : Lowering {
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(name = lowerIdentificator(declaration.name),type = lowerParameterValue(declaration.type))
+        return declaration.copy(name = lowerIdentificator(declaration.name), type = lowerParameterValue(declaration.type))
     }
 
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
