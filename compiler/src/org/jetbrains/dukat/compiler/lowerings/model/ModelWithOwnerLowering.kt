@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -26,7 +26,7 @@ interface ModelWithOwnerLowering {
     fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
     fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
 
-    fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): TypeNode = ownerContext.node
+    fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel = ownerContext.node
 
     fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>): ClassLikeModel {
         val declaration = ownerContext.node

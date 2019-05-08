@@ -2,14 +2,14 @@ package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
+import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNodeValue
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 
 
 private fun mapPrimitiveValue(value: String): String {
@@ -23,8 +23,8 @@ private fun mapPrimitiveValue(value: String): String {
     }
 }
 
-private fun ValueTypeNodeValue.mapPrimitive() : ValueTypeNodeValue {
-    return when(this) {
+private fun NameNode.mapPrimitive(): NameNode {
+    return when (this) {
         is IdentifierNode -> {
             copy(value = mapPrimitiveValue(value))
         }
@@ -33,9 +33,9 @@ private fun ValueTypeNodeValue.mapPrimitive() : ValueTypeNodeValue {
 }
 
 private class PrimitiveClassLowering : ParameterValueLowering {
-    override fun lowerTypeNode(declaration: ValueTypeNode): ValueTypeNode {
+    override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
         if (declaration.value == IdentifierNode("Function")) {
-            return declaration.copy(params = listOf(ValueTypeNode("*", emptyList())))
+            return declaration.copy(params = listOf(TypeValueNode("*", emptyList())))
         }
 
         var value = declaration.value.mapPrimitive()

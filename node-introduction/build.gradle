@@ -9,6 +9,7 @@ sourceSets {
 dependencies {
     implementation(project(":ast"))
     implementation(project(":ast-common"))
+    compile(project(":ast-model-marker"))
     implementation(project(":node-lowering"))
     implementation(project(":ownerContext"))
     implementation(project(":tsmodel"))

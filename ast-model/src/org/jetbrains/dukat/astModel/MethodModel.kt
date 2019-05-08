@@ -1,14 +1,14 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 
 
 data class MethodModel(
         val name: String,
         val parameters: List<ParameterModel>,
-        val type: TypeNode,
+        val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 
         val static: Boolean,

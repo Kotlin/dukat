@@ -11,17 +11,17 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.AstTypeEntity
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-interface Lowering {
+interface Lowering<T:AstTypeEntity> {
     fun lowerVariableNode(declaration: VariableNode): VariableNode
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
@@ -33,25 +33,12 @@ interface Lowering {
     fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
-    fun lowerTypeNode(declaration: ValueTypeNode): ParameterValueDeclaration
-    fun lowerFunctionNode(declaration: FunctionTypeNode): ParameterValueDeclaration
-    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): ParameterValueDeclaration
-    fun lowerUnionTypeNode(declaration: UnionTypeNode): ParameterValueDeclaration
-    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): ParameterValueDeclaration
-    fun lowerTupleDeclaration(declaration: TupleDeclaration): ParameterValueDeclaration
-
-    fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return when (declaration) {
-            is ValueTypeNode -> lowerTypeNode(declaration)
-            is FunctionTypeNode -> lowerFunctionNode(declaration)
-            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
-            is UnionTypeNode -> lowerUnionTypeNode(declaration)
-            is TupleDeclaration -> lowerTupleDeclaration(declaration)
-            else -> declaration
-        }
-    }
-
+    fun lowerTypeNode(declaration: TypeValueNode): T
+    fun lowerFunctionNode(declaration: FunctionTypeNode): T
+    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): T
+    fun lowerUnionTypeNode(declaration: UnionTypeNode): T
+    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): T
+    fun lowerTupleDeclaration(declaration: TupleDeclaration): T
 
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
         return when (declaration) {
@@ -61,7 +48,7 @@ interface Lowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
+    fun lowerTopLevelEntity(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
@@ -75,7 +62,7 @@ interface Lowering {
 
     fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>): List<AstTopLevelEntity> {
         return declarations.map { declaration ->
-            lowerTopLevelDeclaration(declaration)
+            lowerTopLevelEntity(declaration)
         }
     }
 

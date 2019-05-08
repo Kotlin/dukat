@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.translatorString
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
@@ -16,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -51,7 +51,7 @@ private fun String?.translateMeta(): String {
     }
 }
 
-private fun TypeNode.translateMeta(): String {
+private fun TypeModel.translateMeta(): String {
     return when (this) {
         is TypeValueModel -> metaDescription.translateMeta()
         is FunctionTypeModel -> metaDescription.translateMeta()
@@ -59,11 +59,11 @@ private fun TypeNode.translateMeta(): String {
     }
 }
 
-private fun translateTypeParams(params: List<TypeNode>): String {
+private fun translateTypeParams(params: List<TypeModel>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
 
-fun TypeNode.translate(needsMeta: Boolean = false): String {
+fun TypeModel.translate(needsMeta: Boolean = false): String {
     return when (this) {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
@@ -354,7 +354,7 @@ private fun translateHeritageNodes(parentEntities: List<HeritageNode>): String {
     return parents
 }
 
-private fun TypeNode.translateAsHeritageClause(): String {
+private fun TypeModel.translateAsHeritageClause(): String {
     return when (this) {
         is FunctionTypeModel -> translate()
         is TypeValueModel -> {

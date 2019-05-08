@@ -8,7 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -19,7 +19,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         val parentEntitiesRemapped = declaration.parentEntities.map { parent ->
             val resolved = context.resolveTypeAlias(parent)
 
-            if (resolved is ValueTypeNode) {
+            if (resolved is TypeValueNode) {
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
                     is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
@@ -56,7 +56,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
 
 private fun TypeAliasNode.shouldBeTranslated(): Boolean {
     return when(this.typeReference) {
-        is ValueTypeNode -> this.typeReference.meta == null
+        is TypeValueNode -> this.typeReference.meta == null
         is FunctionTypeNode -> true
         else -> false
     }

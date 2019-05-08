@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
@@ -49,7 +49,7 @@ private class EscapeIdentificators : ParameterValueLowering {
         )
     }
 
-    private fun ValueTypeNode.escape(): ValueTypeNode {
+    private fun TypeValueNode.escape(): TypeValueNode {
         val typeNodeValue = value
         return when (typeNodeValue) {
             is IdentifierNode -> copy(value = typeNodeValue.escape())
@@ -80,7 +80,7 @@ private class EscapeIdentificators : ParameterValueLowering {
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is ValueTypeNode -> declaration.escape()
+            is TypeValueNode -> declaration.escape()
             is QualifiedNode -> declaration.escape()
             else -> {
                 super.lowerParameterValue(declaration)
@@ -88,10 +88,10 @@ private class EscapeIdentificators : ParameterValueLowering {
         }
     }
 
-    override fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity): AstTopLevelEntity {
+    override fun lowerTopLevelEntity(declaration: AstTopLevelEntity): AstTopLevelEntity {
         return when (declaration) {
             is EnumNode -> declaration.copy(values = declaration.values.map { value -> value.copy(value = escapeIdentificator(value.value)) })
-            else -> super.lowerTopLevelDeclaration(declaration)
+            else -> super.lowerTopLevelEntity(declaration)
         }
     }
 

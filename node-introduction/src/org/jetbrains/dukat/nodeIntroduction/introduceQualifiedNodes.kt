@@ -16,7 +16,7 @@ import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
+import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
 private fun NodeOwner<*>.getModule(): DocumentRootNode {
     return (getOwners().first { (it is NodeOwner<*>) && (it.node is DocumentRootNode) } as NodeOwner<DocumentRootNode>).node
@@ -45,7 +45,7 @@ private class UidData() {
     }
 }
 
-private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeTypeLowering {
+private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWithOwnerTypeLowering {
 
     private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
 

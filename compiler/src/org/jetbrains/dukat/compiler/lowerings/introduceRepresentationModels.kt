@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -19,9 +20,8 @@ import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
@@ -44,7 +44,6 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.translatorString.translate
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
@@ -179,7 +178,7 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
     }
 }
 
-private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeNode {
+private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
         is UnionTypeNode -> TypeValueModel(
                 IdentifierNode("dynamic"),
@@ -191,7 +190,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 emptyList(),
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
         )
-        is ValueTypeNode -> {
+        is TypeValueNode -> {
             if ((value == IdentifierNode("String")) && (meta is StringTypeDeclaration)) {
                 TypeValueModel(value as NameNode, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
             } else {

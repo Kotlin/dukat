@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.process
@@ -46,7 +46,7 @@ private fun unescape(name: String): String {
 
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
-    override fun lowerTypeNode(ownerContext: NodeOwner<TypeNode>): TypeNode {
+    override fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel {
         val declaration = ownerContext.node
         val qualifiedName = ownerContext.getQualifiedName()
 

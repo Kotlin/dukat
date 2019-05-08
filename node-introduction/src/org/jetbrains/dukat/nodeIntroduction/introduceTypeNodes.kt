@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -16,7 +16,7 @@ private class TypeNodesLowering() : ParameterValueLowering {
 
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeDeclaration -> ValueTypeNode(
+            is TypeDeclaration -> TypeValueNode(
                     value = IdentifierNode(declaration.value),
                     params = declaration.params.map { param -> lowerParameterValue(param) },
                     nullable = declaration.nullable,

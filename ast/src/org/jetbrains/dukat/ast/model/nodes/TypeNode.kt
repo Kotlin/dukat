@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-interface TypeNode : AstEntity
+interface TypeNode : ParameterValueDeclaration

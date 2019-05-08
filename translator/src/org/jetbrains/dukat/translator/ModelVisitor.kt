@@ -1,11 +1,10 @@
 package org.jetbrains.dukat.translator
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -47,7 +46,7 @@ interface ModelVisitor {
         visitTypeAlias(declaration)
     }
 
-    private fun processTypeNode(declaration: TypeNode) {}
+    private fun processTypeNode(declaration: TypeModel) {}
 
 
     fun visitInterface(interfaceModel: InterfaceModel)
@@ -64,7 +63,6 @@ interface ModelVisitor {
             processHeritageNode(heritageClause)
         }
     }
-
 
 
     fun visitClass(classModel: ClassModel)

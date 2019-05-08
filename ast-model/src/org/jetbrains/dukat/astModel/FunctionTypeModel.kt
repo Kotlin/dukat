@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 
 data class FunctionTypeModel(
         val parameters: List<ParameterModel>,
-        val type: TypeNode,
+        val type: TypeModel,
 
         val metaDescription: String?,
         var nullable: Boolean = false
-) : TypeNode
+) : TypeModel

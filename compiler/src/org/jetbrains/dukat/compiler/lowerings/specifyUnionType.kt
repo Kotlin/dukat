@@ -13,7 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
@@ -46,7 +46,7 @@ private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: I
 
 private fun ParameterValueDeclaration.description(): String {
     return when (this) {
-        is ValueTypeNode -> {
+        is TypeValueNode -> {
             val typeNodeValue = value
             when (typeNodeValue) {
                 is IdentifierNode -> typeNodeValue.value

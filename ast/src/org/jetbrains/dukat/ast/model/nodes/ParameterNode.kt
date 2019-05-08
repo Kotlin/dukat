@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 data class ParameterNode(
         val name: String,
         val type: ParameterValueDeclaration,
-        val initializer: ValueTypeNode?,
+        val initializer: TypeValueNode?,
         val meta: String?,
 
         val vararg: Boolean,
@@ -19,7 +19,7 @@ fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
     name = name,
     type = type,
     initializer = if (initializer != null) {
-        ValueTypeNode(initializer!!.kind.value, emptyList())
+        TypeValueNode(initializer!!.kind.value, emptyList())
     } else null,
     meta = initializer?.meta,
     vararg = vararg,

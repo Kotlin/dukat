@@ -8,7 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
@@ -18,22 +18,22 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private class LowerThisType {
 
-    private fun translateParams(typeParams: List<TypeParameterDeclaration>): List<ValueTypeNode> {
-        return typeParams.map { typeParam -> ValueTypeNode(typeParam.name, emptyList()) }
+    private fun translateParams(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
+        return typeParams.map { typeParam -> TypeValueNode(typeParam.name, emptyList()) }
     }
 
-    private fun ClassLikeNode.convertToTypeSignature(): ValueTypeNode {
+    private fun ClassLikeNode.convertToTypeSignature(): TypeValueNode {
 
         return when (this) {
             is InterfaceNode -> {
                 if (generated) {
-                    ValueTypeNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
                 } else {
-                    ValueTypeNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
                 }
             }
-            is ClassNode -> ValueTypeNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
-            else -> ValueTypeNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeValueNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+            else -> TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 

@@ -1,19 +1,20 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class QualifiedNode(
-    val left: NameNode,
-    val right: IdentifierNode,
+        val left: NameNode,
+        val right: IdentifierNode,
 
-    override var nullable: Boolean = false,
-    override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, ValueTypeNodeValue, NameNode, TypeNode
+        override var nullable: Boolean = false,
+        override var meta: ParameterValueDeclaration? = null
+) : ParameterValueDeclaration, ModuleReferenceDeclaration, NameNode, TypeModel
 
 
 fun IdentifierNode.appendLeft(qualifiedLeftNode: NameNode): QualifiedNode {
-    return when(qualifiedLeftNode) {
+    return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendLeft(qualifiedLeftNode)
         is QualifiedNode -> this.appendLeft(qualifiedLeftNode)
         else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
@@ -30,7 +31,7 @@ fun IdentifierNode.appendLeft(qualifiedNode: QualifiedNode): QualifiedNode {
         is QualifiedNode -> QualifiedNode(when (qualifiedNode.left.left) {
             is IdentifierNode -> this.appendLeft(qualifiedNode.left.left)
             is QualifiedNode -> this.appendLeft(qualifiedNode.left.left)
-            else ->throw Exception("unkown qualifiedNode ${qualifiedNode.left.left}")
+            else -> throw Exception("unkown qualifiedNode ${qualifiedNode.left.left}")
         }, qualifiedNode.left.right)
         else -> throw Exception("unkown qualifiedNode ${qualifiedNode.left}")
     }
@@ -38,7 +39,7 @@ fun IdentifierNode.appendLeft(qualifiedNode: QualifiedNode): QualifiedNode {
 }
 
 fun IdentifierNode.appendRight(qualifiedLeftNode: NameNode): QualifiedNode {
-    return when(qualifiedLeftNode) {
+    return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendRight(qualifiedLeftNode)
         is QualifiedNode -> this.appendRight(qualifiedLeftNode)
         else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
@@ -58,7 +59,7 @@ fun QualifiedNode.appendRight(identifierNode: IdentifierNode): QualifiedNode {
 }
 
 fun QualifiedNode.appendRight(qualifiedNode: QualifiedNode): QualifiedNode {
-    return when(qualifiedNode.left) {
+    return when (qualifiedNode.left) {
         is IdentifierNode -> appendRight(qualifiedNode.left).appendRight(qualifiedNode.right)
         is QualifiedNode -> appendRight(qualifiedNode.left).appendRight(qualifiedNode.right)
         else -> throw Exception("unknown QualifiedNode")
@@ -66,13 +67,13 @@ fun QualifiedNode.appendRight(qualifiedNode: QualifiedNode): QualifiedNode {
 }
 
 fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
-    return when(this) {
-        is IdentifierNode -> when(qualifiedNode) {
+    return when (this) {
+        is IdentifierNode -> when (qualifiedNode) {
             is IdentifierNode -> appendRight(qualifiedNode)
             is QualifiedNode -> appendRight(qualifiedNode)
             else -> throw Exception("unknown QualifiedNode")
         }
-        is QualifiedNode -> when(qualifiedNode) {
+        is QualifiedNode -> when (qualifiedNode) {
             is IdentifierNode -> appendRight(qualifiedNode)
             is QualifiedNode -> appendRight(qualifiedNode)
             else -> throw Exception("unknown QualifiedNode")
@@ -83,7 +84,7 @@ fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
 
 
 fun NameNode.shiftRight(): NameNode? {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> null
         is QualifiedNode -> left
         else -> throw Exception("unknown NameNode")
@@ -91,7 +92,7 @@ fun NameNode.shiftRight(): NameNode? {
 }
 
 fun NameNode.shiftLeft(): NameNode? {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> null
         is QualifiedNode -> {
             val leftShifted = left.shiftLeft()

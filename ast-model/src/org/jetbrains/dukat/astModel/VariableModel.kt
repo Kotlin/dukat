@@ -1,16 +1,16 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class VariableModel(
         var name: NameNode,
-        val type: TypeNode,
+        val type: TypeModel,
 
         val annotations: MutableList<AnnotationNode>,
 

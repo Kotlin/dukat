@@ -16,7 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -26,13 +26,25 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-interface NodeTypeLowering : NodeLowering {
+interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclaration> {
 
     fun lowerIdentificator(identificator: NameNode): NameNode {
-        return when(identificator) {
+        return when (identificator) {
             is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
             is QualifiedNode -> identificator
             else -> throw Exception("unknown NameNode ${identificator}")
+        }
+    }
+
+    fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+        return when (val declaration = owner.node) {
+            is TypeValueNode -> lowerTypeNode(owner.wrap(declaration))
+            is FunctionTypeNode -> lowerFunctionTypeNode(owner.wrap(declaration))
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner.wrap(declaration))
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner.wrap(declaration))
+            is UnionTypeNode -> lowerUnionTypeNode(owner.wrap(declaration))
+            is TupleDeclaration -> lowerTupleDeclaration(owner.wrap(declaration))
+            else -> declaration
         }
     }
 
@@ -57,8 +69,8 @@ interface NodeTypeLowering : NodeLowering {
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
                 type = lowerParameterValue(owner.wrap(declaration.type)),
-                typeParameters = declaration.typeParameters.map {
-                    typeParameter -> lowerTypeParameter(owner.wrap(typeParameter))
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    lowerTypeParameter(owner.wrap(typeParameter))
                 }
         )
     }
@@ -91,47 +103,47 @@ interface NodeTypeLowering : NodeLowering {
     override fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration {
         val declaration = owner.node
         return declaration.copy(
-            name = lowerIdentificator(declaration.name),
-            constraints = declaration.constraints.map { constraint -> lowerParameterValue(NodeOwner(constraint, owner)) }
+                name = lowerIdentificator(declaration.name),
+                constraints = declaration.constraints.map { constraint -> lowerParameterValue(NodeOwner(constraint, owner)) }
         )
     }
 
     override fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map {
-            param -> lowerParameterValue(owner.wrap(param))
+        return declaration.copy(params = declaration.params.map { param ->
+            lowerParameterValue(owner.wrap(param))
         })
     }
 
     override fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map {
-            param -> lowerParameterValue(owner.wrap(param))
+        return declaration.copy(params = declaration.params.map { param ->
+            lowerParameterValue(owner.wrap(param))
         })
     }
 
     override fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): UnionTypeNode {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map {
-            param -> lowerParameterValue(owner.wrap(param))
+        return declaration.copy(params = declaration.params.map { param ->
+            lowerParameterValue(owner.wrap(param))
         })
     }
 
     override fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map {
-            param -> lowerParameterValue(owner.wrap(param))
+        return declaration.copy(params = declaration.params.map { param ->
+            lowerParameterValue(owner.wrap(param))
         })
     }
 
-    override fun lowerTypeNode(owner: NodeOwner<ValueTypeNode>): ValueTypeNode {
+    override fun lowerTypeNode(owner: NodeOwner<TypeValueNode>): TypeValueNode {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map {
-            param -> lowerParameterValue(owner.wrap(param))
+        return declaration.copy(params = declaration.params.map { param ->
+            lowerParameterValue(owner.wrap(param))
         })
     }
 
-    override fun lowerFunctionNode(owner: NodeOwner<FunctionTypeNode>): FunctionTypeNode {
+    override fun lowerFunctionTypeNode(owner: NodeOwner<FunctionTypeNode>): FunctionTypeNode {
         val declaration = owner.node
         return declaration.copy(
                 parameters = declaration.parameters.map { param -> lowerParameterNode(owner.wrap(param)) },
@@ -159,8 +171,8 @@ interface NodeTypeLowering : NodeLowering {
         val heritageClause = owner.node
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val typeNode = ValueTypeNode(it.value, emptyList())
-            val lowerParameterDeclaration = lowerParameterValue(owner.wrap(typeNode)) as ValueTypeNode
+            val typeNode = TypeValueNode(it.value, emptyList())
+            val lowerParameterDeclaration = lowerParameterValue(owner.wrap(typeNode)) as TypeValueNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)

@@ -15,7 +15,7 @@ import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
+import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
 
 private fun AstEntity.getKey(): String {
@@ -32,7 +32,7 @@ private fun AstEntity.getKey(): String {
     }
 }
 
-private class RearrangeLowering() : NodeTypeLowering {
+private class RearrangeLowering() : NodeWithOwnerTypeLowering {
     val myReferences = mutableMapOf<String, MutableList<String>>()
 
     fun getReferences(): Map<String, List<String>> {

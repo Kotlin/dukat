@@ -3,14 +3,14 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
-    if (this is ValueTypeNode) {
+    if (this is TypeValueNode) {
         when  {
             isPrimitive("Array") -> return params[0]
             isPrimitive("Any") -> return this

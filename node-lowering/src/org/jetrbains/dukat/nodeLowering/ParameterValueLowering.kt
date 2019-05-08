@@ -16,7 +16,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -25,7 +25,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 
-interface ParameterValueLowering : Lowering {
+interface ParameterValueLowering : Lowering<ParameterValueDeclaration> {
 
     fun lowerIdentificator(identificator: NameNode): NameNode {
         return when (identificator) {
@@ -56,6 +56,18 @@ interface ParameterValueLowering : Lowering {
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
+    }
+
+    fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return when (declaration) {
+            is TypeValueNode -> lowerTypeNode(declaration)
+            is FunctionTypeNode -> lowerFunctionNode(declaration)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
+            is UnionTypeNode -> lowerUnionTypeNode(declaration)
+            is TupleDeclaration -> lowerTupleDeclaration(declaration)
+            else -> declaration
+        }
     }
 
     override fun lowerMemberNode(declaration: MemberNode): MemberNode {
@@ -104,7 +116,7 @@ interface ParameterValueLowering : Lowering {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
-    override fun lowerTypeNode(declaration: ValueTypeNode): ValueTypeNode {
+    override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
@@ -129,7 +141,7 @@ interface ParameterValueLowering : Lowering {
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerParameterValue(ValueTypeNode(it.value, emptyList())) as ValueTypeNode
+            val lowerParameterDeclaration = lowerParameterValue(TypeValueNode(it.value, emptyList())) as TypeValueNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)

@@ -1,19 +1,19 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 
 data class FunctionModel(
         val name: NameNode,
         val parameters: List<ParameterModel>,
-        val type: TypeNode,
+        val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 
         val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,

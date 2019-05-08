@@ -31,7 +31,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.ValueTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
@@ -472,7 +472,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
                             ))),
-                            ValueTypeNode("Unit", emptyList()),
+                            TypeValueNode("Unit", emptyList()),
                             emptyList(),
                             mutableListOf(),
                             mutableListOf(),
@@ -560,7 +560,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             if (type.canBeJson()) {
                 VariableNode(
                         IdentifierNode(declaration.name),
-                        ValueTypeNode("Json", emptyList()),
+                        TypeValueNode("Json", emptyList()),
                         mutableListOf(),
                         false,
                         false,
