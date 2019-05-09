@@ -27,7 +27,7 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface TypeLowering : Lowering<ParameterValueDeclaration> {
 
-    fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration
+    fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration
 
     fun lowerIdentificator(identificator: NameNode): NameNode {
         return when (identificator) {
@@ -46,16 +46,16 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
                 name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerType(constraint) })
                 },
-                type = lowerParameterValue(declaration.type)
+                type = lowerType(declaration.type)
         )
     }
 
     fun lowerPropertyNode(declaration: PropertyNode): PropertyNode {
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                type = lowerParameterValue(declaration.type),
+                type = lowerType(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
     }
@@ -77,61 +77,61 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
                 name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerType(constraint) })
                 },
-                type = lowerParameterValue(declaration.type)
+                type = lowerType(declaration.type)
         )
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) }
+                constraints = declaration.constraints.map { constraint -> lowerType(constraint) }
         )
     }
 
     override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
     override fun lowerTupleDeclaration(declaration: TupleDeclaration): ParameterValueDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
     override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
     override fun lowerFunctionNode(declaration: FunctionTypeNode): FunctionTypeNode {
         return declaration.copy(
                 parameters = declaration.parameters.map { param -> lowerParameterNode(param) },
-                type = lowerParameterValue(declaration.type)
+                type = lowerType(declaration.type)
         )
     }
 
     override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                type = lowerParameterValue(declaration.type)
+                type = lowerType(declaration.type)
         )
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
-        return declaration.copy(name = lowerIdentificator(declaration.name), type = lowerParameterValue(declaration.type))
+        return declaration.copy(name = lowerIdentificator(declaration.name), type = lowerType(declaration.type))
     }
 
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerParameterValue(TypeValueNode(it.value, emptyList())) as TypeValueNode
+            val lowerParameterDeclaration = lowerType(TypeValueNode(it.value, emptyList())) as TypeValueNode
             lowerParameterDeclaration.value as IdentifierNode
         }
         return heritageClause.copy(typeArguments = typeArguments)
@@ -153,14 +153,14 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
     }
 
     override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode {
-        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
+        return declaration.copy(typeReference = lowerType(declaration.typeReference))
     }
 
     fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerType(constraint) })
                 }
         )
     }

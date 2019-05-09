@@ -6,23 +6,23 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 
-private class LowerNullable : ParameterValueLowering {
+private class LowerNullable : NodeTypeLowering {
 
     override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
         val type = if (declaration.optional) declaration.type.makeNullable() else declaration.type
-        return declaration.copy(type = lowerParameterValue(type))
+        return declaration.copy(type = lowerType(type))
     }
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is UnionTypeDeclaration -> {
+            is UnionTypeNode -> {
                 val params = declaration.params.filter { param ->
                     param != TypeValueNode("undefined", emptyList()) &&
                             param != TypeValueNode("null", emptyList())
@@ -45,11 +45,10 @@ private class LowerNullable : ParameterValueLowering {
                         }
                         else -> throw Exception("can not lower nullables for unknown param type ${nullableType}")
                     }
-                } else lowerUnionTypeDeclaration(declaration)
+                } else lowerUnionTypeNode(declaration)
             }
-            else -> super.lowerParameterValue(declaration)
+            else -> super.lowerType(declaration)
         }
-
     }
 }
 

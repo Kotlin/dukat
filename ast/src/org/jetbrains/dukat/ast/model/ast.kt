@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -34,6 +35,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is FunctionTypeDeclaration -> copy(nullable = true)
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
+        is UnionTypeNode -> copy(nullable = true)
         is QualifiedNamedDeclaration -> copy(nullable = true)
         is QualifiedNode -> copy(nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)

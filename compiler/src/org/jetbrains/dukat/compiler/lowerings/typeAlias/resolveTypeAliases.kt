@@ -10,10 +10,10 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
-private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLowering {
+private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering {
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
 
         val parentEntitiesRemapped = declaration.parentEntities.map { parent ->
@@ -48,8 +48,8 @@ private class LowerTypeAliases(val context: TypeAliasContext) : ParameterValueLo
         return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll()))
     }
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return super.lowerParameterValue(context.resolveTypeAlias(declaration))
+    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return super.lowerType(context.resolveTypeAlias(declaration))
     }
 
 }

@@ -7,7 +7,7 @@ import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
 import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
-import org.jetbrains.dukat.compiler.lowerings.lowerIntersectionType
+import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
@@ -54,10 +54,10 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .introduceExportAnnotations()
+                .lowerUnionType()
                 .lowerNullable()
                 .lowerPrimitives()
                 .escapeIdentificators()
-                .lowerUnionType()
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerThisType()

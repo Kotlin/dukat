@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -79,12 +78,12 @@ private class EscapeIdentificators : NodeTypeLowering {
         return escapeIdentificator(identificator)
     }
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeValueNode -> declaration.escape()
             is QualifiedNode -> declaration.escape()
             else -> {
-                super.lowerParameterValue(declaration)
+                super.lowerType(declaration)
             }
         }
     }

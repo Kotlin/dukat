@@ -6,19 +6,18 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 
 
 private class LoweringUnionType() : ParameterValueLowering {
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         if (declaration is UnionTypeDeclaration) {
             return UnionTypeNode(
-                    params = declaration.params.map { param -> lowerParameterValue(param) },
+                    params = declaration.params.map { param -> lowerType(param) },
                     nullable = declaration.nullable
             )
         }
-        return super.lowerParameterValue(declaration)
+        return super.lowerType(declaration)
     }
 }
 

@@ -9,7 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
+import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 
 
 private fun mapPrimitiveValue(value: String): String {
@@ -50,7 +50,7 @@ private class PrimitiveClassLowering : ParameterValueLowering {
 
         return declaration.copy(
                 value = value,
-                params = declaration.params.map { lowerParameterValue(it) },
+                params = declaration.params.map { lowerType(it) },
                 nullable = nullable,
                 meta = meta
         )
