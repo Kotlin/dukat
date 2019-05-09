@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 private fun escapeIdentificator(identificator: String): String {
     val reservedWords = setOf(
@@ -41,7 +42,7 @@ private fun escapeIdentificator(identificator: String): String {
 }
 
 
-private class EscapeIdentificators : ParameterValueLowering {
+private class EscapeIdentificators : NodeTypeLowering {
 
     private fun IdentifierNode.escape(): IdentifierNode {
         return IdentifierNode(

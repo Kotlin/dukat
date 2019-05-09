@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -41,11 +42,12 @@ interface NodeWithOwnerLowering<T:AstTypeEntity> {
     fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): T
     fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): T
 
-    fun lowerClassLikeDeclaration(owner: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
+    fun lowerClassLikeNode(owner: NodeOwner<ClassLikeNode>): ClassLikeNode {
         val declaration = owner.node
         return when (declaration) {
             is InterfaceNode -> lowerInterfaceNode(owner.wrap(declaration))
             is ClassNode -> lowerClassNode(owner.wrap(declaration))
+            is ObjectNode -> lowerObjectNode(owner.wrap(declaration))
             else -> declaration
         }
     }
@@ -55,10 +57,9 @@ interface NodeWithOwnerLowering<T:AstTypeEntity> {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(owner.wrap(declaration))
             is FunctionNode -> lowerFunctionNode(owner.wrap(declaration))
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner.wrap(declaration))
+            is ClassLikeNode -> lowerClassLikeNode(owner.wrap(declaration))
             is DocumentRootNode -> lowerRoot(declaration, owner.wrap(declaration))
             is TypeAliasNode -> lowerTypeAliasNode(owner.wrap(declaration))
-            is ObjectNode -> lowerObjectNode(owner.wrap(declaration))
             else -> declaration.duplicate()
         }
     }

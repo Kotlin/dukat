@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetrbains.dukat.nodeLowering.ParameterValueLowering
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 private data class NodeData<T>(
         val optionalArgs: MutableList<Int>,
@@ -128,7 +129,7 @@ private fun NodesDataMap<FunctionNode>.generateFunctions(): List<FunctionNode> {
     return generatedFunctions
 }
 
-private class IntroduceMissedOverloads : ParameterValueLowering {
+private class IntroduceMissedOverloads : NodeTypeLowering {
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
         return declaration.copy(members = declaration.members + declaration.createDataMap().generateMethods())
