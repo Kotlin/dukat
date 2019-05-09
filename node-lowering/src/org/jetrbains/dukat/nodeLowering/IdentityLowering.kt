@@ -36,13 +36,7 @@ interface IdentityLowering : Lowering<ParameterValueDeclaration> {
 
     override fun lowerObjectNode(declaration: ObjectNode) = declaration
 
-    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration = declaration
-
-    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration = declaration
-
     override fun lowerMemberNode(declaration: MemberNode): MemberNode = declaration
-
-    override fun lowerTupleDeclaration(declaration: TupleDeclaration) = declaration
 
     override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode = declaration
 

@@ -17,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -93,6 +94,10 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     override fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    }
+
+    override fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 

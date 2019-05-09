@@ -19,9 +19,10 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
@@ -47,7 +48,6 @@ import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import java.io.File
 
 
@@ -185,7 +185,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 emptyList(),
                 params.map { it.process().translate() }.joinToString(" | ")
         )
-        is TupleDeclaration -> TypeValueModel(
+        is TupleTypeNode -> TypeValueModel(
                 IdentifierNode("dynamic"),
                 emptyList(),
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"

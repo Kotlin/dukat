@@ -24,6 +24,7 @@ import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
+import org.jetbrains.dukat.nodeIntroduction.introduceTupleNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.lowerUnionType
@@ -53,6 +54,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceNodes()
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
+                .introduceTupleNodes()
                 .introduceExportAnnotations()
                 .lowerUnionType()
                 .lowerNullable()

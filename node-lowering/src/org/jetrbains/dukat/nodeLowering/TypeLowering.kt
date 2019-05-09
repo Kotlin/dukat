@@ -90,21 +90,10 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
         )
     }
 
-    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
-    }
-
-    override fun lowerTupleDeclaration(declaration: TupleDeclaration): ParameterValueDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
-    }
-
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
         return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
-    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
-    }
 
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(params = declaration.params.map { param -> lowerType(param) })

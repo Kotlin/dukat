@@ -19,7 +19,6 @@ import org.jetbrains.dukat.astCommon.AstTypeEntity
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface Lowering<T : AstTypeEntity> {
     fun lowerVariableNode(declaration: VariableNode): VariableNode
@@ -35,10 +34,7 @@ interface Lowering<T : AstTypeEntity> {
 
     fun lowerTypeNode(declaration: TypeValueNode): T
     fun lowerFunctionNode(declaration: FunctionTypeNode): T
-    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): T
     fun lowerUnionTypeNode(declaration: UnionTypeNode): T
-    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): T
-    fun lowerTupleDeclaration(declaration: TupleDeclaration): T
 
     fun lowerClassLikeNode(declaration: ClassLikeNode): ClassLikeNode {
         return when (declaration) {

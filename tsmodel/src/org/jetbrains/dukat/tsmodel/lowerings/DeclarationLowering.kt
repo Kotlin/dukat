@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -30,6 +31,7 @@ interface DeclarationLowering {
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
     fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
+    fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration
     fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(declaration: AstMemberEntity): AstMemberEntity
     fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration
@@ -40,6 +42,7 @@ interface DeclarationLowering {
             is TypeDeclaration -> lowerTypeDeclaration(declaration)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
+            is TupleDeclaration -> lowerTupleDeclaration(declaration)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(declaration)
             else -> declaration
         }
