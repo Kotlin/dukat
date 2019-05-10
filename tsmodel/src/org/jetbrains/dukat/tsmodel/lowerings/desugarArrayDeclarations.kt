@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -7,8 +8,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return if (declaration.value == "@@ArraySugar") {
-            declaration.copy(value = "Array", params = declaration.params.map { param -> lowerParameterValue(param) })
+        return if (declaration.value.value == "@@ArraySugar") {
+            declaration.copy(value = IdentifierDeclaration("Array"), params = declaration.params.map { param -> lowerParameterValue(param) })
         } else {
             declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
         }

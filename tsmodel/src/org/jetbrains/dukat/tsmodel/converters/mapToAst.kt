@@ -35,6 +35,7 @@ import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.isSimpleType
 
 
 @Suppress("UNCHECKED_CAST")
@@ -55,7 +56,7 @@ private fun Map<String, Any?>.getInitializerExpression(): ExpressionDeclaration?
         val expression = it.toAst<AstEntity>()
 
         if (expression is ExpressionDeclaration) {
-            if (expression.kind.value == "definedExternally") {
+            if (expression.kind.isSimpleType("definedExternally")) {
                 expression
             } else throw Exception("unkown initializer")
         } else null
@@ -119,11 +120,10 @@ fun <T : AstEntity> Map<String, Any?>.toAst(): T {
                 get("meta") as String
         )
         ModifierDeclaration::class.simpleName -> ModifierDeclaration(get("token") as String)
-        TypeDeclaration::class.simpleName -> TypeDeclaration(if (get("value") is String) {
-            get("value") as String
-        } else {
-            throw Exception("failed to create type declaration from ${this}")
-        }, getEntities("params"))
+        TypeDeclaration::class.simpleName -> TypeDeclaration(
+                getEntity("value"),
+                getEntities("params")
+        )
         ConstructorDeclaration::class.simpleName -> ConstructorDeclaration(
                 getEntities("parameters"),
                 getEntity("type"),

@@ -131,8 +131,8 @@ interface DeclarationWithOwnerTypeLowering : DeclarationWithOwnerLowering {
     fun lowerHeritageClause(owner: NodeOwner<HeritageClauseDeclaration>): HeritageClauseDeclaration {
         val heritageClause = owner.node
         val typeArguments = heritageClause.typeArguments.map {
-            val lowerParameterDeclaration = lowerParameterValue(owner.wrap(TypeDeclaration(it.value, emptyList()))) as TypeDeclaration
-            IdentifierDeclaration(lowerParameterDeclaration.value)
+            val lowerParameterDeclaration = lowerParameterValue(owner.wrap(TypeDeclaration(IdentifierDeclaration(it.value), emptyList()))) as TypeDeclaration
+            lowerParameterDeclaration.value
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }

@@ -7,6 +7,7 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.converters.astToMap
@@ -184,8 +185,8 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
 
     fun createIntersectionTypeDeclaration(params: V8Array): V8Object = astFactory.createIntersectionTypeDeclaration(params.toAst()).toV8()
     fun createUnionTypeDeclaration(params: V8Array): V8Object = astFactory.createUnionTypeDeclaration(params.toAst()).toV8()
-    fun createTypeDeclaration(value: String, params: V8Array): V8Object =
-            astFactory.createTypeDeclaration(value, params.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
+    fun createTypeDeclaration(value: V8Object, params: V8Array): V8Object =
+            astFactory.createTypeDeclaration(value.toAst(), params.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
 
     fun createParameterDeclaration(name: String, type: V8Object, initializer: V8Object?, vararg: Boolean, optional: Boolean): V8Object =
             astFactory.createParameterDeclaration(

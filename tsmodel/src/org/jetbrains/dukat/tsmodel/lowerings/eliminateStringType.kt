@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -12,7 +13,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 private class EliminateStringType : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return if (declaration is StringTypeDeclaration) {
-            TypeDeclaration("String", emptyList(), meta = declaration)
+            TypeDeclaration(IdentifierDeclaration("String"), emptyList(), meta = declaration)
         } else super.lowerParameterValue(declaration)
     }
 }

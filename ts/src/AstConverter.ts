@@ -244,7 +244,7 @@ class AstConverter {
     }
 
     private createTypeDeclaration(value: string, params: Array<ParameterValue> = []): TypeDeclaration {
-        return this.astFactory.createTypeDeclaration(value, params);
+        return this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclaration(value), params);
     }
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
@@ -597,7 +597,8 @@ class AstConverter {
                                 let parameterValue = this.convertType(typeArgument) as any;
                                 let value = typeof parameterValue.getValue == "function" ?
                                         (parameterValue).getValue() : parameterValue.value;
-                                this.registerDeclaration(this.astFactory.createIdentifierDeclaration(value), typeArguments)
+
+                                this.registerDeclaration(value, typeArguments)
                             }
                         }
 

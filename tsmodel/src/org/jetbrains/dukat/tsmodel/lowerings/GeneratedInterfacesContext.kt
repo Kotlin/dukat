@@ -8,6 +8,7 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -192,7 +193,7 @@ class GeneratedInterfacesContext {
 
     fun generateInterface(owner: NodeOwner<ParameterValueDeclaration>, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
-        val typeParamsSet = typeParameters.map { it.name }.toSet()
+        val typeParamsSet = typeParameters.map { IdentifierDeclaration(it.name) }.toSet()
 
         return when (declaration) {
             is FunctionTypeDeclaration -> {
@@ -202,8 +203,8 @@ class GeneratedInterfacesContext {
             }
             is ObjectLiteralDeclaration -> {
                 when {
-                    declaration.canBeJson() -> TypeDeclaration("Json", emptyList())
-                    declaration.members.isEmpty() -> TypeDeclaration("Any", emptyList())
+                    declaration.canBeJson() -> TypeDeclaration(IdentifierDeclaration("Json"), emptyList())
+                    declaration.members.isEmpty() -> TypeDeclaration(IdentifierDeclaration("Any"), emptyList())
                     else -> {
                         registerObjectLiteralDeclaration(
                                 owner.wrap(declaration.copy(members = declaration.members.map { param ->
@@ -299,14 +300,14 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<String>): TypeParameterDeclaration? {
+    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<IdentifierDeclaration>): TypeParameterDeclaration? {
         return when (this) {
-            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
+            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value.value, emptyList()) else null
             else -> null
         }
     }
 
-    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<String>): GeneratedInterfaceReferenceDeclaration {
+    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<IdentifierDeclaration>): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 

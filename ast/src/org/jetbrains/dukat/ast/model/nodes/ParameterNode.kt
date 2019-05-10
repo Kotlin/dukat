@@ -19,7 +19,7 @@ fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
     name = name,
     type = type,
     initializer = if (initializer != null) {
-        TypeValueNode(initializer!!.kind.value, emptyList())
+        TypeValueNode(IdentifierNode(initializer!!.kind.value.value), emptyList())
     } else null,
     meta = initializer?.meta,
     vararg = vararg,

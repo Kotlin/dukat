@@ -156,7 +156,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 MethodNode(
                         "set",
                         convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
-                        TypeDeclaration("Unit", emptyList()),
+                        TypeDeclaration(IdentifierDeclaration("Unit"), emptyList()),
                         emptyList(),
                         owner,
                         false,
@@ -499,7 +499,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
                             convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
-                                    ExpressionDeclaration(TypeDeclaration("null", emptyList()), null)
+                                    ExpressionDeclaration(TypeDeclaration(IdentifierDeclaration("null"), emptyList()), null)
                                 } else {
                                     param.initializer
                                 }

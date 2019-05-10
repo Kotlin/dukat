@@ -16,7 +16,7 @@ private class TypeNodesLowering() : ParameterValueLowering {
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> TypeValueNode(
-                    value = IdentifierNode(declaration.value),
+                    value = IdentifierNode(declaration.value.value),
                     params = declaration.params.map { param -> lowerType(param) },
                     nullable = declaration.nullable,
                     meta = declaration.meta

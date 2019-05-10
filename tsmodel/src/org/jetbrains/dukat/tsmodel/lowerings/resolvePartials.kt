@@ -20,7 +20,7 @@ private fun AstMemberEntity.makeOptional(): AstMemberEntity {
 private class PartialLowering : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeDeclaration -> if (declaration.value == "Partial") {
+            is TypeDeclaration -> if (declaration.value.value == "Partial") {
                 if ((declaration.params.size == 1) && (declaration.params[0] is ObjectLiteralDeclaration)) {
                     val objectLiteral = (declaration.params.get(0) as ObjectLiteralDeclaration)
                     super.lowerParameterValue(objectLiteral.copy(members = objectLiteral.members.map { member ->
