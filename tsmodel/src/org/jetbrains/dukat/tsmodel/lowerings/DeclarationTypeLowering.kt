@@ -7,7 +7,6 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -122,7 +121,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
         val typeArguments = heritageClause.typeArguments.map {
-            val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(IdentifierDeclaration(it.value), emptyList())) as TypeDeclaration
+            val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(it, emptyList())) as TypeDeclaration
             lowerParameterDeclaration.value
         }
         return heritageClause.copy(typeArguments = typeArguments)

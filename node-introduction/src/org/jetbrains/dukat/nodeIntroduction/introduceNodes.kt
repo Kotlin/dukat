@@ -382,7 +382,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                 if (interfaceDeclaration.typeParameters.isEmpty()) {
                                     IdentifierNode(name)
                                 } else {
-                                    GenericIdentifierNode(name, mergeTypeParameters)
+                                    GenericIdentifierNode(name, mergeTypeParameters.map { typeParam ->
+                                        TypeValueNode(typeParam.name, typeParam.constraints)
+                                    })
                                 }
                                 , IdentifierNode(declaration.name)),
                         convertParameters(declaration.parameters),
@@ -409,7 +411,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             if (interfaceDeclaration.typeParameters.isEmpty()) {
                                 IdentifierNode(name)
                             } else {
-                                GenericIdentifierNode(name, interfaceDeclaration.typeParameters)
+                                GenericIdentifierNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
+                                    TypeValueNode(typeParam.name, typeParam.constraints)
+                                })
                             }, IdentifierNode(declaration.name)
                     ),
                     if (declaration.optional) declaration.type.makeNullable() else declaration.type,

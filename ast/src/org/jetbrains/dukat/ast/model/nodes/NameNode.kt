@@ -7,7 +7,7 @@ fun  NameNode.translate(): String = when (this) {
     is QualifiedNode -> {
         "${left.translate()}.${right.translate()}" + (if (nullable) "?" else "")
     }
-    is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.name }}>"
+    is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
     else -> throw Exception("unknown NameNode ${this}")
 }
 
