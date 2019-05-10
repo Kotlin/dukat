@@ -70,6 +70,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import org.jetbrains.dukat.tsmodel.types.isSimpleType
 import java.io.File
 
 
@@ -394,7 +395,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         null,
                         listOf(
-                                if (declaration.type == TypeDeclaration("Unit", emptyList())) {
+                                if (declaration.type.isSimpleType("Unit")) {
                                     bodyStatement
                                 } else {
                                     ReturnStatement(bodyStatement)
@@ -497,7 +498,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     FunctionNode(
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
                             convertParameters(declaration.parameters.map { param ->
-                                val initializer = if (param.initializer?.kind == TypeDeclaration("definedExternally", emptyList())) {
+                                val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
                                     ExpressionDeclaration(TypeDeclaration("null", emptyList()), null)
                                 } else {
                                     param.initializer
