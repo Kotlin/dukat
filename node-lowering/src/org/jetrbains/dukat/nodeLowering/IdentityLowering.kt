@@ -11,11 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface IdentityLowering : Lowering<ParameterValueDeclaration> {
     override fun lowerVariableNode(declaration: VariableNode): VariableNode = declaration
@@ -32,7 +28,7 @@ interface IdentityLowering : Lowering<ParameterValueDeclaration> {
 
     override fun lowerParameterNode(declaration: ParameterNode): ParameterNode = declaration
 
-    override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration = declaration
+    override fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode = declaration
 
     override fun lowerObjectNode(declaration: ObjectNode) = declaration
 

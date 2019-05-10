@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 
 
@@ -54,10 +53,6 @@ private class PrimitiveClassLowering : ParameterValueLowering {
                 nullable = nullable,
                 meta = meta
         )
-    }
-
-    override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
-        return declaration.copy(name = mapPrimitiveValue(declaration.name))
     }
 }
 

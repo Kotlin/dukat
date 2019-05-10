@@ -27,6 +27,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -92,8 +93,8 @@ private fun MemberNode.process(): MemberNode {
                 parameters = parameters.map { param -> param.process() },
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.name,
-                            constraints = typeParam.constraints.map { param -> param.process() }
+                            name = typeParam.value.translate(),
+                            constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
                 generated = generated
@@ -105,8 +106,8 @@ private fun MemberNode.process(): MemberNode {
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.name,
-                            constraints = typeParam.constraints.map { param -> param.process() }
+                            name = typeParam.value.translate(),
+                            constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
 
@@ -124,8 +125,8 @@ private fun MemberNode.process(): MemberNode {
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.name,
-                            constraints = typeParam.constraints.map { param -> param.process() }
+                            name = typeParam.value.translate(),
+                            constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
                 static = static,
@@ -242,8 +243,8 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
                         parameters = primaryConstructor!!.parameters.map { param -> param.process() },
                         typeParameters = primaryConstructor!!.typeParameters.map { typeParam ->
                             TypeParameterModel(
-                                    name = typeParam.name,
-                                    constraints = typeParam.constraints.map { param -> param.process() }
+                                    name = typeParam.value.translate(),
+                                    constraints = typeParam.params.map { param -> param.process() }
                             )
                         },
                         generated = primaryConstructor!!.generated
@@ -251,8 +252,8 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
             } else null,
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        name = typeParam.name,
-                        constraints = typeParam.constraints.map { param -> param.process() }
+                        name = typeParam.value.translate(),
+                        constraints = typeParam.params.map { param -> param.process() }
                 )
             },
             parentEntities = parentEntities,
@@ -273,8 +274,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             ),
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        name = typeParam.name,
-                        constraints = typeParam.constraints.map { param -> param.process() }
+                        name = typeParam.value.translate(),
+                        constraints = typeParam.params.map { param -> param.process() }
                 )
             },
             parentEntities = parentEntities,
@@ -295,8 +296,8 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
 
                     typeParameters = declaration.typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                name = typeParam.name,
-                                constraints = typeParam.constraints.map { param -> param.process() }
+                                name = typeParam.value.translate(),
+                                constraints = typeParam.params.map { param -> param.process() }
                         )
                     },
                     generatedReferenceNodes = declaration.generatedReferenceNodes,
@@ -318,8 +319,8 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
                     set = declaration.set,
                     typeParameters = declaration.typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                name = typeParam.name,
-                                constraints = typeParam.constraints.map { param -> param.process() }
+                                name = typeParam.value.translate(),
+                                constraints = typeParam.params.map { param -> param.process() }
                         )
                     }
             )

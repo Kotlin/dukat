@@ -13,14 +13,9 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private class LowerThisType {
-
-    private fun translateParams(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
-        return typeParams.map { typeParam -> TypeValueNode(typeParam.name, emptyList()) }
-    }
 
     private fun ClassLikeNode.convertToTypeSignature(): TypeValueNode {
 
@@ -29,10 +24,10 @@ private class LowerThisType {
                 if (generated) {
                     TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
                 } else {
-                    TypeValueNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
                 }
             }
-            is ClassNode -> TypeValueNode(name, translateParams(typeParameters), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
             else -> TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }

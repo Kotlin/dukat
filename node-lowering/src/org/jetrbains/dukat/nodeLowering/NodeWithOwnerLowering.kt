@@ -17,8 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.astCommon.AstTypeEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -30,7 +28,7 @@ interface NodeWithOwnerLowering<T:AstTypeEntity> {
     fun lowerInterfaceNode(owner: NodeOwner<InterfaceNode>): InterfaceNode
 
     fun lowerParameterNode(owner: NodeOwner<ParameterNode>): ParameterNode
-    fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
+    fun lowerTypeParameter(owner: NodeOwner<TypeValueNode>): TypeValueNode
     fun lowerMemberNode(owner: NodeOwner<MemberNode>): MemberNode
     fun lowerTypeAliasNode(owner: NodeOwner<TypeAliasNode>): TypeAliasNode
     fun lowerObjectNode(owner: NodeOwner<ObjectNode>): ObjectNode

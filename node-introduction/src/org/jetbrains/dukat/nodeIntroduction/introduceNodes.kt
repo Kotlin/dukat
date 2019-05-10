@@ -84,7 +84,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return PropertyNode(
                 declaration.name,
                 if (declaration.optional) declaration.type.makeNullable() else declaration.type,
-                declaration.typeParameters,
+                convertTypeParameters(declaration.typeParameters),
 
                 owner,
                 declaration.isStatic(),
@@ -101,6 +101,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return parameters.map { param -> param.convertToNode() }
     }
 
+    private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
+        return typeParams.map { typeParam -> TypeValueNode(
+               value = typeParam.name,
+               params = typeParam.constraints
+        ) }
+    }
+
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
         return if (declaration.optional) {
             PropertyNode(
@@ -111,7 +118,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             null
                     ),
-                    declaration.typeParameters,
+                    convertTypeParameters(declaration.typeParameters),
                     owner,
                     false,
                     false,
@@ -125,7 +132,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     declaration.name,
                     convertParameters(declaration.parameters),
                     declaration.type,
-                    declaration.typeParameters,
+                    convertTypeParameters(declaration.typeParameters),
                     owner,
                     false, //TODO: remove static, we don't need it for MethodSignatures
                     false,
@@ -175,7 +182,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 "invoke",
                 convertParameters(parameters),
                 type,
-                typeParameters,
+                convertTypeParameters(typeParameters),
                 owner,
                 false,
                 false,
@@ -217,7 +224,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val declaration = ClassNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
-                typeParameters,
+                typeParameters.map { typeParameter ->
+                    TypeValueNode(typeParameter.name, typeParameter.constraints)
+                },
                 convertToHeritageNodes(parentEntities),
                 null,
 
@@ -247,7 +256,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val declaration = InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
-                typeParameters,
+                convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 mutableListOf(),
                 null,
@@ -272,7 +281,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val declaration = InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
-                typeParameters,
+                convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 mutableListOf(),
                 null,
@@ -295,7 +304,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     private fun ConstructorDeclaration.convert(): ConstructorNode {
         return ConstructorNode(
                 convertParameters(parameters),
-                typeParameters
+                convertTypeParameters(typeParameters)
         )
     }
 
@@ -327,7 +336,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 IdentifierNode(name),
                 convertParameters(parameters),
                 type,
-                typeParameters,
+                convertTypeParameters(typeParameters),
                 mutableListOf(),
                 annotations,
                 hasExport,
@@ -389,7 +398,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                 , IdentifierNode(declaration.name)),
                         convertParameters(declaration.parameters),
                         declaration.type,
-                        mergeTypeParameters + declaration.typeParameters,
+                        convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
                         mutableListOf(),
                         mutableListOf(),
                         true,
@@ -438,7 +447,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             ),
                             IdentifierNode("value")
                     ),
-                    interfaceDeclaration.typeParameters,
+                    convertTypeParameters(interfaceDeclaration.typeParameters),
                     null,
                     ""
             ))
@@ -540,7 +549,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     declaration.name,
                     convertParameters(declaration.parameters),
                     declaration.type,
-                    declaration.typeParameters,
+                    convertTypeParameters(declaration.typeParameters),
                     owner,
                     declaration.isStatic(),
                     false,
