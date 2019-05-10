@@ -127,7 +127,7 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
             } else {
                 " : ${typeParameter.constraints[0].translate()}"
             }
-            typeParameter.name + constraintDescription
+            typeParameter.name.translate() + constraintDescription
         }.joinToString(", ") + ">"
     }
 }
