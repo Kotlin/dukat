@@ -348,7 +348,7 @@ class AstConverter {
                 return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
             } else if (ts.isTypePredicateNode(type)) {
                 return this.createTypeDeclaration("boolean");
-            } else if (type.kind = ts.SyntaxKind.ObjectKeyword) {
+            } else if (type.kind == ts.SyntaxKind.ObjectKeyword) {
                 return this.astFactory.createUnionTypeDeclaration([
                         this.createTypeDeclaration("any"),
                         this.createTypeDeclaration("undefined")
