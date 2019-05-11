@@ -185,7 +185,10 @@ fun <T : AstEntity> Map<String, Any?>.toAst(): T {
                 get("resourceName") as String,
                 get("root") as Boolean
         )
-        TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(get("name") as String, getEntities("constraints"))
+        TypeParameterDeclaration::class.simpleName -> TypeParameterDeclaration(
+                getEntity("name"),
+                getEntities("constraints")
+        )
         ClassDeclaration::class.simpleName -> ClassDeclaration(
                 get("name") as String,
                 getEntities("members"),

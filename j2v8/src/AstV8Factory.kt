@@ -217,6 +217,6 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     fun createSourceSet(sources: V8Array): V8Object =
             astFactory.createSourceSet(sources.toAst()).toV8()
 
-    fun createTypeParam(name: String, constraints: V8Array): V8Object = astFactory
-            .createTypeParam(name, constraints.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
+    fun createTypeParam(name: V8Object, constraints: V8Array): V8Object = astFactory
+            .createTypeParam(name.toAst(), constraints.toAst<ParameterValueDeclaration>().toTypedArray()).toV8()
 }

@@ -151,7 +151,7 @@ class AstFactory : AstNodeFactory<AstEntity> {
 
     override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): AstEntity = SourceFileDeclaration(fileName, root, referencedFiles)
 
-    override fun createTypeParam(name: String, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
+    override fun createTypeParam(name: QualifiedLeftDeclaration, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 
     override fun createSourceSet(sources: List<SourceFileDeclaration>) = SourceSetDeclaration(sources)
 }

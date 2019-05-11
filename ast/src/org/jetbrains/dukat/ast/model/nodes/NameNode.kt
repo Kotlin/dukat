@@ -1,5 +1,9 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+
 interface NameNode : HeritageSymbolNode
 
 fun  NameNode.translate(): String = when (this) {
@@ -9,6 +13,14 @@ fun  NameNode.translate(): String = when (this) {
     }
     is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
     else -> throw Exception("unknown NameNode ${this}")
+}
+
+fun QualifiedLeftDeclaration.toNode(): NameNode {
+    return when(this) {
+        is IdentifierDeclaration -> IdentifierNode(value)
+        is QualifiedNamedDeclaration -> QualifiedNode(left = left.toNode(), right = IdentifierNode(right.value))
+        else -> throw Exception("unknown QualifiedLeftDeclaration")
+    }
 }
 
 

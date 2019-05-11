@@ -36,6 +36,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.shiftLeft
+import org.jetbrains.dukat.ast.model.nodes.toNode
 import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -103,7 +104,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
         return typeParams.map { typeParam -> TypeValueNode(
-               value = typeParam.name,
+               value = typeParam.name.toNode(),
                params = typeParam.constraints
         ) }
     }
@@ -225,7 +226,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name, typeParameter.constraints)
+                    TypeValueNode(typeParameter.name.toNode(), typeParameter.constraints)
                 },
                 convertToHeritageNodes(parentEntities),
                 null,
@@ -363,10 +364,20 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     private fun mergeTypeParameters(interfaceTypeParams: List<TypeParameterDeclaration>, ownTypeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
         val ownNames = ownTypeParams.map { typeParam -> typeParam.name }.toSet()
         return interfaceTypeParams.map { typeParam ->
-            typeParam.copy(name = if (ownNames.contains(typeParam.name)) {
-                typeParam.name + "0"
+            val name = typeParam.name
+            //TODO: it's quite easy to break this, so consider to introduce "breaking" test and fix for it
+            typeParam.copy(name = if (ownNames.contains(name)) {
+                when (name) {
+                    is IdentifierDeclaration -> {
+                        name.copy(value = name.value + "0")
+                    }
+                    is QualifiedNamedDeclaration -> {
+                        name.copy(right = name.right.copy(value = name.right.value + "0"))
+                    }
+                    else -> name
+                }
             } else {
-                typeParam.name
+                name
             })
         }
     }
@@ -392,7 +403,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                     IdentifierNode(name)
                                 } else {
                                     GenericIdentifierNode(name, mergeTypeParameters.map { typeParam ->
-                                        TypeValueNode(typeParam.name, typeParam.constraints)
+                                        TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
                                     })
                                 }
                                 , IdentifierNode(declaration.name)),
@@ -421,7 +432,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                                 IdentifierNode(name)
                             } else {
                                 GenericIdentifierNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
-                                    TypeValueNode(typeParam.name, typeParam.constraints)
+                                    TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
                                 })
                             }, IdentifierNode(declaration.name)
                     ),

@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return if (declaration.value.value == "@@ArraySugar") {
+        return if ((declaration.value is IdentifierDeclaration) && (declaration.value.value == "@@ArraySugar")) {
             declaration.copy(value = IdentifierDeclaration("Array"), params = declaration.params.map { param -> lowerParameterValue(param) })
         } else {
             declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })

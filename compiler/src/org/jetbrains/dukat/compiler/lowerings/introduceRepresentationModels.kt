@@ -27,6 +27,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.ast.model.nodes.toNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -215,7 +216,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
                     IdentifierNode(name),
-                    typeParameters.map { typeParam -> TypeValueModel(IdentifierNode(typeParam.name), emptyList(), null) },
+                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name.toNode(), emptyList(), null) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
             )

@@ -14,12 +14,14 @@ declare interface PropertyAccessDeclaration extends HeritageSymbol {}
 
 declare interface TupleDeclaration extends ParameterValue {}
 
-declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue {
+declare interface NameDeclaration extends Declaration {}
+
+declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue, NameDeclaration {
     left: ParameterValue,
     right: ParameterValue
 }
 
-declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, HeritageSymbol {}
+declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, HeritageSymbol, NameDeclaration {}
 declare interface ThisTypeDeclaration extends Declaration {}
 declare interface ModuleReferenceDeclaration extends Declaration {}
 

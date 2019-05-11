@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -193,7 +194,7 @@ class GeneratedInterfacesContext {
 
     fun generateInterface(owner: NodeOwner<ParameterValueDeclaration>, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
-        val typeParamsSet = typeParameters.map { IdentifierDeclaration(it.name) }.toSet()
+        val typeParamsSet = typeParameters.map { it.name }.toSet()
 
         return when (declaration) {
             is FunctionTypeDeclaration -> {
@@ -300,14 +301,14 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<IdentifierDeclaration>): TypeParameterDeclaration? {
+    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<QualifiedLeftDeclaration>): TypeParameterDeclaration? {
         return when (this) {
-            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value.value, emptyList()) else null
+            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
             else -> null
         }
     }
 
-    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<IdentifierDeclaration>): GeneratedInterfaceReferenceDeclaration {
+    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<QualifiedLeftDeclaration>): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 

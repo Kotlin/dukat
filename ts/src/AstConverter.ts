@@ -115,7 +115,7 @@ class AstConverter {
         if (nativeTypeDeclarations) {
             typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
                 const constraint = typeParam.constraint;
-                return this.astFactory.createTypeParam(typeParam.name.getText(), constraint ? [
+                return this.astFactory.createTypeParam(this.astFactory.createIdentifierDeclaration(typeParam.name.getText()), constraint ? [
                     this.convertType(constraint)
                 ] : [])
             });

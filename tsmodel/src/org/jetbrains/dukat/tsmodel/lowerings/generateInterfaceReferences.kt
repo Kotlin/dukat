@@ -59,7 +59,7 @@ private class GenerateInterfaceReferences() : DeclarationWithOwnerLowering {
     override fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration {
         val declaration = owner.node
         // TODO: there's should be one way to declare params
-        val typeParams = declaration.typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter.value, emptyList()) }
+        val typeParams = declaration.typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
         return declaration.copy(typeReference = lowerParameterValue(owner.wrap(declaration.typeReference), "${declaration.aliasName}_TYPE", typeParams))
     }
 

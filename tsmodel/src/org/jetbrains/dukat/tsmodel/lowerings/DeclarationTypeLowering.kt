@@ -120,11 +120,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
-        val typeArguments = heritageClause.typeArguments.map {
-            val lowerParameterDeclaration = lowerParameterValue(TypeDeclaration(it, emptyList())) as TypeDeclaration
-            lowerParameterDeclaration.value
-        }
-        return heritageClause.copy(typeArguments = typeArguments)
+        return heritageClause
     }
 
 
