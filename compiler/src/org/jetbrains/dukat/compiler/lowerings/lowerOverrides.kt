@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -83,15 +84,15 @@ private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode): B
 
 private fun MethodNode.isSpecialCase(): Boolean {
 
-    if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeValueNode("Any", emptyList()))) {
+    if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeValueNode(IdentifierNode("Any"), emptyList()))) {
         return true
     }
 
-    if ((name == "hashCode" && parameters.isEmpty() && type == TypeValueNode("Number", emptyList()))) {
+    if ((name == "hashCode" && parameters.isEmpty() && type == TypeValueNode(IdentifierNode("Number"), emptyList()))) {
         return true
     }
 
-    if ((name == "toString" && parameters.isEmpty() && type == TypeValueNode("String", emptyList()))) {
+    if ((name == "toString" && parameters.isEmpty() && type == TypeValueNode(IdentifierNode("String"), emptyList()))) {
         return true
     }
 
@@ -108,7 +109,7 @@ private fun ParameterValueDeclaration.isOverriding(otherParameterValue: Paramete
         return otherParameterValue.params.any { isOverriding(it) }
     }
 
-    if (otherParameterValue == TypeValueNode("Any", emptyList(), false, null)) {
+    if (otherParameterValue == TypeValueNode(IdentifierNode("Any"), emptyList(), false, null)) {
         return true
     }
 

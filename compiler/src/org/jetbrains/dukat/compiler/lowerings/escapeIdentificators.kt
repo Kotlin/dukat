@@ -53,6 +53,7 @@ private class EscapeIdentificators : NodeTypeLowering {
         val typeNodeValue = value
         return when (typeNodeValue) {
             is IdentifierNode -> copy(value = typeNodeValue.escape())
+            is QualifiedNode -> copy(value = typeNodeValue.escape())
             else -> this
         }
     }

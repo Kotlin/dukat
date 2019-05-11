@@ -59,31 +59,6 @@ class DeclarationResolver {
 
     }
 
-    fun resolveLeft(name: String, path: NameNode?): NodeOwner<ModuleModel>? {
-        if (path == null) {
-            return null
-        }
-
-        var qualifiedPath: NameNode = path
-
-        while (true) {
-            val declarationKey = DeclarationKey(name, qualifiedPath)
-
-            if (myDeclarations.containsKey(declarationKey)) {
-                return myDeclarations.get(declarationKey)
-            }
-
-            val shifted = qualifiedPath.shiftLeft()
-            if (shifted != null) {
-                qualifiedPath = shifted
-            } else {
-                return null
-            }
-        }
-
-    }
-
-
     fun resolveStrict(name: String, qualifiedPath: NameNode?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
             return null

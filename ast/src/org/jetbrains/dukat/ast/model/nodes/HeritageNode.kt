@@ -5,5 +5,5 @@ import org.jetbrains.dukat.astCommon.AstEntity
 
 data class HeritageNode(
         val name: HeritageSymbolNode,
-        val typeArguments: List<IdentifierNode>
+        val typeArguments: List<NameNode>
 ) : AstEntity

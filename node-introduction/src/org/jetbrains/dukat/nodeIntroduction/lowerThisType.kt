@@ -3,6 +3,7 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -22,13 +23,13 @@ private class LowerThisType {
         return when (this) {
             is InterfaceNode -> {
                 if (generated) {
-                    TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(IdentifierNode("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
                 } else {
-                    TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(IdentifierNode(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
                 }
             }
-            is ClassNode -> TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
-            else -> TypeValueNode("Any", emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeValueNode(IdentifierNode(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
+            else -> TypeValueNode(IdentifierNode("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 

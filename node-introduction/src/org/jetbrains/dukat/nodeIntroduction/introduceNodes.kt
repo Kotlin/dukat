@@ -209,7 +209,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return declarations.map { declaration ->
             HeritageNode(
                     name = declaration.name.convert(),
-                    typeArguments = declaration.typeArguments.map { typeArgument -> IdentifierNode(typeArgument.value) }
+                    typeArguments = declaration.typeArguments.map { typeArgument -> typeArgument.toNode() }
             )
         }
     }
@@ -497,7 +497,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
                             ))),
-                            TypeValueNode("Unit", emptyList()),
+                            TypeValueNode(IdentifierNode("Unit"), emptyList()),
                             emptyList(),
                             mutableListOf(),
                             mutableListOf(),
@@ -585,7 +585,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             if (type.canBeJson()) {
                 VariableNode(
                         IdentifierNode(declaration.name),
-                        TypeValueNode("Json", emptyList()),
+                        TypeValueNode(IdentifierNode("Json"), emptyList()),
                         mutableListOf(),
                         false,
                         false,

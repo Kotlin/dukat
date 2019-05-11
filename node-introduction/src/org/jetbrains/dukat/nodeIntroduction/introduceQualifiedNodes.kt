@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -47,30 +48,33 @@ private class UidData() {
 
 private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWithOwnerTypeLowering {
 
-    private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
+    private fun resolve(value: String, owner: NodeOwner<*>): NameNode {
+        val importNode = owner.findModuleWithImport(value)
 
+        return if (importNode == null) {
+            IdentifierNode(value)
+        } else {
+            val importedDocumentNodes = uidData.resolve(importNode.uid)
+            if (importedDocumentNodes == null) {
+                importNode.referenceName
+            } else {
+                val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
+                    importedDocumentNode.packageName == importNode.referenceName.translate()
+                }
+
+                if (resolvedImport == null) {
+                    importNode.referenceName
+                } else {
+                    resolvedImport.qualifiedNode as NameNode
+                }
+            }
+        }
+    }
+
+    private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
         return when (value) {
             is IdentifierDeclaration -> {
-                val importNode = owner.findModuleWithImport(value.value)
-
-                if (importNode == null) {
-                    IdentifierNode(value.value)
-                } else {
-                    val importedDocumentNodes = uidData.resolve(importNode.uid)
-                    if (importedDocumentNodes == null) {
-                        importNode.referenceName
-                    } else {
-                        val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
-                            importedDocumentNode.packageName == importNode.referenceName.translate()
-                        }
-
-                        if (resolvedImport == null) {
-                            importNode.referenceName
-                        } else {
-                            resolvedImport.qualifiedNode as NameNode
-                        }
-                    }
-                }
+                resolve(value.value, owner)
             }
             is QualifiedNamedDeclaration -> {
                 QualifiedNode(
@@ -82,6 +86,23 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
             else -> throw Exception("unknown QualifiedLeftDeclaration subtype")
         }
     }
+
+    private fun resolve(value: NameNode, owner: NodeOwner<*>): NameNode {
+        return when (value) {
+            is IdentifierNode -> {
+                resolve(value.value, owner)
+            }
+            is QualifiedNode -> {
+                QualifiedNode(
+                        left = resolve(value.left, owner),
+                        right = IdentifierNode(value.right.value),
+                        nullable = value.nullable
+                )
+            }
+            else -> throw Exception("unknown QualifiedLeftDeclaration subtype")
+        }
+    }
+
 
     private fun resolveExression(heritageSymbol: HeritageSymbolNode, ownerModule: DocumentRootNode): HeritageSymbolNode {
         return when (heritageSymbol) {
@@ -102,6 +123,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
         return when (declaration) {
+            is TypeValueNode -> declaration.copy(value = resolve(declaration.value, owner))
             is QualifiedNamedDeclaration -> QualifiedNode(
                     left = resolve(declaration.left, owner),
                     right = IdentifierNode(declaration.right.value),

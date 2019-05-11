@@ -34,7 +34,7 @@ private fun NameNode.mapPrimitive(): NameNode {
 private class PrimitiveClassLowering : ParameterValueLowering {
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
         if (declaration.value == IdentifierNode("Function")) {
-            return declaration.copy(params = listOf(TypeValueNode("*", emptyList())))
+            return declaration.copy(params = listOf(TypeValueNode(IdentifierNode("*"), emptyList())))
         }
 
         var value = declaration.value.mapPrimitive()

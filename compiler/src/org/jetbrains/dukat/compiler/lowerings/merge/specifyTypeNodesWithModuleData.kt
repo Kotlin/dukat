@@ -10,6 +10,8 @@ import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.size
+import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -64,35 +66,37 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                         }
                     }
                 }
-            }
-        } else if (declaration is QualifiedNode) {
+            } else if (declarationValue is QualifiedNode) {
 
-            // TODO: Double check deeply nested qualifiedNames
-            val qualifiedPath = qualifiedName.appendRight(declaration).shiftRight()
+                // TODO: Double check deeply nested qualifiedNames
+                val qualifiedPath = qualifiedName.appendRight(declarationValue).shiftRight()
 
-            if (ownerContext.owner?.node is VariableModel) {
-                val variableModel = ownerContext.owner?.node as VariableModel
-                if (qualifiedPath.matchesLeft(variableModel.name)) {
-                    val pathShifted = qualifiedPath?.shiftLeft()
-                    if (pathShifted is IdentifierNode) {
-                        val supposedModule = variableModel.name.appendRight(qualifiedName)
+                if (ownerContext.owner?.node is VariableModel) {
+                    val variableModel = ownerContext.owner?.node as VariableModel
 
-                        declarationResolver.resolveStrict(pathShifted.value, supposedModule.process(::unescape))?.let {
-                            return TypeValueModel(supposedModule.appendRight(pathShifted), emptyList(), null)
+                    if (qualifiedPath.matchesLeft(variableModel.name)) {
+                        val pathShifted = qualifiedPath?.shiftLeft()
+                        if (pathShifted is IdentifierNode) {
+                            val supposedModule = variableModel.name.appendRight(qualifiedName)
+
+                            declarationResolver.resolveStrict(pathShifted.value, supposedModule.process(::unescape))?.let {
+                                return TypeValueModel(supposedModule.appendRight(pathShifted), emptyList(), null)
+                            }
                         }
                     }
                 }
-            }
 
-            declarationResolver.resolveStrict(declaration.right.value, qualifiedPath)?.let { declarationOwnerContext ->
-                val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
-                if (declarationQualifiedName != qualifiedName) {
-                    val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declaration.right)
-                    return TypeValueModel(qualifiedNode!!, emptyList(), null)
+                declarationResolver.resolveStrict(declarationValue.right.value, qualifiedPath)?.let { declarationOwnerContext ->
+                    val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
+
+                    if (declarationQualifiedName != qualifiedName) {
+                        val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declarationValue.right)
+                        return TypeValueModel(qualifiedNode!!, emptyList(), null)
+                    }
                 }
-            }
 
+            }
         }
         return super.lowerTypeNode(ownerContext)
     }

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -24,8 +25,8 @@ private class LowerNullable : NodeTypeLowering {
         return when (declaration) {
             is UnionTypeNode -> {
                 val params = declaration.params.filter { param ->
-                    param != TypeValueNode("undefined", emptyList()) &&
-                            param != TypeValueNode("null", emptyList())
+                    param != TypeValueNode(IdentifierNode("undefined"), emptyList()) &&
+                            param != TypeValueNode(IdentifierNode("null"), emptyList())
                 }
 
                 if (params.size == 1) {

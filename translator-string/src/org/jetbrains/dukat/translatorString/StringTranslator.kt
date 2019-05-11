@@ -132,11 +132,11 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
     }
 }
 
-private fun translateTypeArguments(typeParameters: List<IdentifierNode>): String {
+private fun translateTypeArguments(typeParameters: List<NameNode>): String {
     return if (typeParameters.isEmpty()) {
         ""
     } else {
-        "<" + typeParameters.map { it.value }.joinToString(", ") + ">"
+        "<" + typeParameters.map { it.translate() }.joinToString(", ") + ">"
     }
 }
 

@@ -72,8 +72,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val heritageClause = ownerContext.node
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerTypeNode(NodeOwner(TypeValueModel(IdentifierNode(it.value), emptyList(), null), ownerContext)) as TypeValueModel
-            lowerParameterDeclaration.value as IdentifierNode
+            val lowerParameterDeclaration = lowerTypeNode(NodeOwner(TypeValueModel(it, emptyList(), null), ownerContext)) as TypeValueModel
+            lowerParameterDeclaration.value
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }

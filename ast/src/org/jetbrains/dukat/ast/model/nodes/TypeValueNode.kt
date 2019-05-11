@@ -8,10 +8,7 @@ data class TypeValueNode(
 
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration {
-    constructor(value: String, params: List<ParameterValueDeclaration>) : this(IdentifierNode(value), params)
-    constructor(value: String, params: List<ParameterValueDeclaration>, nullable: Boolean, meta: ParameterValueDeclaration?) : this(IdentifierNode(value), params, nullable, meta)
-}
+) : ParameterValueDeclaration
 
 fun TypeValueNode.isPrimitive(primitive: String) : Boolean {
     return when(this.value) {

@@ -260,7 +260,7 @@ class AstConverter {
         return this.astFactory.createIntersectionTypeDeclaration(params);
     }
 
-    convertEntityName(entityName: ts.EntityName) : ModuleReferenceDeclaration | null {
+    convertEntityName(entityName: ts.EntityName) : NameDeclaration | null {
         if (ts.isIdentifier(entityName)) {
             return this.astFactory.createIdentifierDeclaration(entityName.text)
         } else if (ts.isQualifiedName(entityName)) {
@@ -273,7 +273,19 @@ class AstConverter {
         return null
     }
 
-    convertType(type: ts.TypeNode | ts.TypeElement | ts.EntityName | undefined) : ParameterValue {
+
+    private convertTypeArguments(typeArguments: ts.NodeArray<ts.TypeNode> | undefined): Array<TypeDeclaration> {
+        if (typeArguments == undefined) {
+            return []
+        } else {
+            return typeArguments
+                .map(argumentType => {
+                    return this.convertType(argumentType)
+                });
+        }
+    }
+
+    convertType(type: ts.TypeNode | undefined) : ParameterValue {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
@@ -286,7 +298,7 @@ class AstConverter {
                 return this.createTypeDeclaration("@@ArraySugar", [
                     this.convertType(arrayType.elementType)
                 ] as Array<TypeDeclaration>)
-            } else                 if (ts.isUnionTypeNode(type)) {
+            } else if (ts.isUnionTypeNode(type)) {
                 let unionTypeNode = type as ts.UnionTypeNode;
                 let params = unionTypeNode.types
                     .map(argumentType => this.convertType(argumentType)) as Array<TypeDeclaration>;
@@ -299,22 +311,19 @@ class AstConverter {
 
                 return this.createIntersectionType(params);
             } else if (ts.isTypeReferenceNode(type)) {
-                if (type.typeArguments) {
-                    let params = type.typeArguments
-                        .map(argumentType => {
-                            return this.convertType(argumentType)
-                        }) as Array<TypeDeclaration>;
+                let params = this.convertTypeArguments(type.typeArguments);
 
-                    return this.createTypeDeclaration(type.typeName.getText(), params)
-                } else {
-                    if (ts.isQualifiedName(type.typeName)) {
-                        let entity = this.convertEntityName(type.typeName);
-                        if (entity) {
-                            return entity
-                        }
+                if (ts.isQualifiedName(type.typeName)) {
+                    let entity = this.convertEntityName(type.typeName);
+                    if (entity) {
+                        return this.astFactory.createTypeDeclaration(entity,  params);
                     }
-                    return this.createTypeDeclaration(type.typeName.getText())
                 }
+
+                return this.createTypeDeclaration(
+                    type.typeName.getText(),
+                    params
+                );
             } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
                 let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
                 return this.convertType(parenthesizedTypeNode.type);

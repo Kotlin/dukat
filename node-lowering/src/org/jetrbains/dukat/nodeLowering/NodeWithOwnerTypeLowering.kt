@@ -170,9 +170,9 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val heritageClause = owner.node
         val typeArguments = heritageClause.typeArguments.map {
             // TODO: obviously very clumsy place
-            val typeNode = TypeValueNode(it.value, emptyList())
+            val typeNode = TypeValueNode(it, emptyList())
             val lowerParameterDeclaration = lowerParameterValue(owner.wrap(typeNode)) as TypeValueNode
-            lowerParameterDeclaration.value as IdentifierNode
+            lowerParameterDeclaration.value
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }
