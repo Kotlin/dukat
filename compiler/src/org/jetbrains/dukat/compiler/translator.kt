@@ -2,14 +2,13 @@ package org.jetbrains.dukat.compiler
 
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.interop.graal.InteropGraal
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.nashorn.DocumentCache
 import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 import org.jetbrains.dukat.tsinterop.ExportContent
@@ -33,7 +32,7 @@ private fun createNashornInterop(): InteropNashorn {
     engine.put("AstFactory", AstFactory::class.java)
     engine.put("FileResolver", FileResolver::class.java)
     engine.put("ExportContent", ExportContentNonGeneric::class.java)
-    engine.put("KotlinLogging", KotlinLogging::class.java)
+    engine.put("KotlinLogging", Logging::class.java)
 
     engine.eval("""
         var global = this;
@@ -45,7 +44,7 @@ private fun createNashornInterop(): InteropNashorn {
         function createFileResolver() { return new FileResolver.static(); }
 
         function createLogger(name) {
-            return KotlinLogging.static.INSTANCE.logger(name);
+            return KotlinLogging.static.logger(name);
         }
 
         var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
@@ -63,7 +62,7 @@ private fun createGraalInterop(): InteropGraal {
     engine.put("createAstFactory", Supplier { AstFactory() })
     engine.put("createExportContent", Supplier { ExportContentNonGeneric() })
     engine.put("createFileResolver", Supplier { FileResolver() })
-    engine.put("createLogger", java.util.function.Function<String, KLogger> { name -> KotlinLogging.logger(name) })
+    engine.put("createLogger", java.util.function.Function<String, Logging> { name -> Logging.logger(name) })
     engine.put("uid", Supplier { UUID.randomUUID().toString() })
 
     engine.loadAstBuilder()
@@ -101,7 +100,7 @@ private fun createV8Interop(): InteropV8 {
 
         fun createLogger(name: String): V8Object {
             val proxy = V8Object(interopRuntime.runtime)
-            interopRuntime.proxy(proxy, KotlinLogging.logger(name))
+            interopRuntime.proxy(proxy, Logging.logger(name))
                     .method("debug", InteropV8Signature.STRING)
                     .method("trace", InteropV8Signature.STRING)
                     .method("info", InteropV8Signature.STRING)

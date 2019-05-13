@@ -60,11 +60,7 @@ dependencies {
     implementation(project(":nashorn"))
     implementation(project(":j2v8"))
 
-
-    compile "org.slf4j:slf4j-api:1.7.22"
-    compile "org.slf4j:slf4j-simple:1.7.22"
-
-    implementation("io.github.microutils:kotlin-logging:1.6.24")
+    implementation(project(":logging"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
