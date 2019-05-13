@@ -589,6 +589,16 @@ class AstConverter {
         )
     }
 
+    private convertValue(entity: ts.TypeNode): NameDeclaration {
+        let convertedEntity = this.convertType(entity) as any;
+
+        // TODO: getValue() we get in Graal, .value in Nashorn and J2V8 - I need to create a minimal example and report it
+        let value = typeof convertedEntity.getValue == "function" ?
+            (convertedEntity).getValue() : convertedEntity.value;
+
+        return value as NameDeclaration;
+    }
+
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
@@ -603,11 +613,7 @@ class AstConverter {
 
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
-                                let parameterValue = this.convertType(typeArgument) as any;
-                                let value = typeof parameterValue.getValue == "function" ?
-                                        (parameterValue).getValue() : parameterValue.value;
-
-                                this.registerDeclaration(value, typeArguments)
+                                this.registerDeclaration(this.convertValue(typeArgument), typeArguments)
                             }
                         }
 
