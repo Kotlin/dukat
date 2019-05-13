@@ -285,7 +285,7 @@ class AstConverter {
         }
     }
 
-    convertType(type: ts.TypeNode | undefined) : ParameterValue {
+    convertType(type: ts.TypeNode | ts.Identifier | undefined) : ParameterValue {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
@@ -565,10 +565,12 @@ class AstConverter {
     }
 
     private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): TypeAliasDeclaration {
+
         return this.astFactory.createTypeAliasDeclaration(
-            declaration.name.getText(),
+            this.convertType(declaration.name),
             this.convertTypeParamsToTokens(declaration.typeParameters),
-            this.convertType(declaration.type)
+            this.convertType(declaration.type),
+            declaration.name.getText() + "_TYPE"
         )
     }
 
@@ -589,12 +591,17 @@ class AstConverter {
         )
     }
 
-    private convertValue(entity: ts.TypeNode): NameDeclaration {
+    private convertValue(entity: ts.TypeNode | ts.Identifier): NameDeclaration {
         let convertedEntity = this.convertType(entity) as any;
+
+        this.log.debug(`CONVERTED ENTITY ${convertedEntity}`);
 
         // TODO: getValue() we get in Graal, .value in Nashorn and J2V8 - I need to create a minimal example and report it
         let value = typeof convertedEntity.getValue == "function" ?
             (convertedEntity).getValue() : convertedEntity.value;
+
+
+        this.log.debug(`CONVERTED ENTITY ${convertedEntity}`);
 
         return value as NameDeclaration;
     }

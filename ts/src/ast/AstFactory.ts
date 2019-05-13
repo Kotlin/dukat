@@ -20,7 +20,12 @@ declare interface AstFactory {
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
     createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<NameDeclaration>, extending: boolean): HeritageClauseDeclaration
 
-    createTypeAliasDeclaration(aliasName: string, typeParams: Array<IdentifierDeclaration>, typeReference: ParameterValue): TypeAliasDeclaration;
+    createTypeAliasDeclaration(
+        aliasName: NameDeclaration,
+        typeParams: Array<IdentifierDeclaration>,
+        typeReference: ParameterValue,
+        uid: String
+    ): TypeAliasDeclaration;
 
     createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;

@@ -7,8 +7,8 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
@@ -23,7 +23,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
                     is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
-                    else -> throw Exception("unknown ValueTypeNodeValue $typeNodeValue")
+                    else -> throw Exception("unknown NameNode $typeNodeValue")
                 }
             } else {
                 parent
@@ -55,7 +55,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
 }
 
 private fun TypeAliasNode.shouldBeTranslated(): Boolean {
-    return when(this.typeReference) {
+    return when (this.typeReference) {
         is TypeValueNode -> this.typeReference.meta == null
         is FunctionTypeNode -> true
         else -> false

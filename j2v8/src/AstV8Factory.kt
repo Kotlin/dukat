@@ -72,10 +72,11 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
             extending
     ).toV8()
 
-    fun createTypeAliasDeclaration(aliasName: String, typeParameters: V8Array, typeReference: V8Object) = astFactory.createTypeAliasDeclaration(
-            aliasName,
+    fun createTypeAliasDeclaration(aliasName: V8Object, typeParameters: V8Array, typeReference: V8Object, uid: String) = astFactory.createTypeAliasDeclaration(
+            aliasName.toAst(),
             typeParameters.toAst(),
-            typeReference.toAst()
+            typeReference.toAst(),
+            uid
     ).toV8()
 
 

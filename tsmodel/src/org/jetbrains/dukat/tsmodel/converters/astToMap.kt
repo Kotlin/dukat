@@ -106,7 +106,7 @@ fun AstEntity.astToMap(): Map<String, Any?> {
         is StringTypeDeclaration -> listOf(::tokens).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)
         is TupleDeclaration -> listOf(::params).convert(this)
-        is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference).convert(this)
+        is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference, ::uid).convert(this)
         is TypeDeclaration -> listOf(::value, ::params).convert(this)
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
         is UnionTypeDeclaration -> listOf(::params).convert(this)

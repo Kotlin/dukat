@@ -6,37 +6,29 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
+import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-// TODO: TypeAliases should be revisited
-private fun IdentifierNode.translate() = value
-
-private fun HeritageSymbolNode.translate(): String {
-    return when (this) {
-        is IdentifierNode -> translate()
-        is PropertyAccessNode -> expression.translate() + "." + name.translate()
-        else -> throw Exception("unknown heritage clause ${this}")
-    }
-}
 
 private fun NameNode.getAliasKey(): String {
     return when (this) {
         is IdentifierNode -> translate()
-        else -> throw Exception("unknown ValueTypeNodeValue ${this}")
+        is QualifiedNode -> translate()
+        else -> throw Exception("unknown NameNode ${this}")
     }
 }
-
 
 class TypeAliasContext {
 
     private fun TypeAliasNode.canSusbtitute(heritageNode: HeritageNode): Boolean {
-        return (!canBeTranslated) && (name == heritageNode.name.translate())
+        return (!canBeTranslated) && (name == heritageNode.name)
     }
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
@@ -87,7 +79,7 @@ class TypeAliasContext {
     private fun TypeAliasNode.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
         return when (type) {
             is TypeValueNode -> {
-                if (type.isPrimitive(name)) {
+                if (type.value == name) {
                     if (typeParameters.size == type.params.size) {
                         val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
 

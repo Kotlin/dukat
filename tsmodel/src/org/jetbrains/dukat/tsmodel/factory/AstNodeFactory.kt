@@ -50,9 +50,10 @@ interface AstNodeFactory<T> {
     ): T
 
     fun createTypeAliasDeclaration(
-            aliasName: String,
+            aliasName: QualifiedLeftDeclaration,
             typeParameters: List<IdentifierDeclaration>,
-            typeReference: ParameterValueDeclaration
+            typeReference: ParameterValueDeclaration,
+            uid: String
     ): T
 
     fun createStringTypeDeclaration(tokens: List<String>): T;

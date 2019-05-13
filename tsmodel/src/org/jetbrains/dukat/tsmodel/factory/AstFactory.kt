@@ -85,7 +85,12 @@ class AstFactory : AstNodeFactory<AstEntity> {
 
     override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<QualifiedLeftDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
-    override fun createTypeAliasDeclaration(aliasName: String, typeParameters: List<IdentifierDeclaration>, typeReference: ParameterValueDeclaration) = TypeAliasDeclaration(aliasName, typeParameters, typeReference)
+    override fun createTypeAliasDeclaration(
+            aliasName: QualifiedLeftDeclaration,
+            typeParameters: List<IdentifierDeclaration>,
+            typeReference: ParameterValueDeclaration,
+            uid: String
+    ) = TypeAliasDeclaration(aliasName, typeParameters, typeReference, uid)
 
     override fun createStringTypeDeclaration(tokens: List<String>) = StringTypeDeclaration(tokens)
 

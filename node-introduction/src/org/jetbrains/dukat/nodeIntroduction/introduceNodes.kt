@@ -318,7 +318,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun TypeAliasDeclaration.convert(): TypeAliasNode {
         return TypeAliasNode(
-                name = aliasName,
+                name = aliasName.toNode(),
                 typeReference = typeReference,
                 typeParameters = typeParameters.map { typeParameter -> IdentifierNode(typeParameter.value) },
                 canBeTranslated = true

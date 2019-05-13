@@ -238,7 +238,7 @@ private fun ConstructorModel.translate(): List<String> {
 }
 
 private fun TypeAliasModel.translate(): String {
-    return "typealias ${name}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
+    return "typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
 }
 
 private fun VariableModel.translate(): String {
@@ -339,6 +339,7 @@ private fun MemberNode.translateSignature(): List<String> {
 private fun HeritageSymbolNode.translate(): String {
     return when (this) {
         is IdentifierNode -> translate()
+        is QualifiedNode -> translate()
         is PropertyAccessNode -> expression.translate() + "." + name.translate()
         else -> throw Exception("unknown heritage clause ${this}")
     }

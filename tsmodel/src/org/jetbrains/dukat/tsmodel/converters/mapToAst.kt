@@ -99,9 +99,10 @@ fun <T : AstEntity> Map<String, Any?>.toAst(): T {
                 get(HeritageClauseDeclaration::extending.name) as Boolean
         )
         TypeAliasDeclaration::class.simpleName -> TypeAliasDeclaration(
-                get("aliasName") as String,
+                getEntity("aliasName"),
                 getEntities("typeParameters"),
-                getEntity("typeReference")
+                getEntity("typeReference"),
+                get("uid") as String
         )
         StringTypeDeclaration::class.simpleName -> StringTypeDeclaration(
                 get(StringTypeDeclaration::tokens.name) as List<String>
