@@ -743,12 +743,14 @@ class AstConverter {
                         symbol = this.typeChecker.getAliasedSymbol(symbol);
                     }
 
-                    let declaration = symbol.declarations[0];
+                    if (Array.isArray(symbol.declarations) && symbol.declarations.length > 0) {
+                        let declaration = symbol.declarations[0];
 
-                    let uid = this.exportContext.getUID(declaration);
-                    res.push(this.astFactory.createExportAssignmentDeclaration(
+                        let uid = this.exportContext.getUID(declaration);
+                        res.push(this.astFactory.createExportAssignmentDeclaration(
                             uid, !!statement.isExportEquals
-                    ));
+                        ));
+                    }
                 }
             }  else {
                 this.log.info(`SKIPPING UNKNOWN EXPRESSION ASSIGNMENT ${expression.kind}`);
