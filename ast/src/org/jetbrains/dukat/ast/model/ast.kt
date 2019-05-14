@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -40,7 +41,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is QualifiedNode -> copy(nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)
         is ObjectLiteralDeclaration -> copy(nullable = true)
-        else -> throw Exception("makeNullable does not recognize type ${this}")
+        else -> raiseConcern("makeNullable does not recognize type ${this}") { this }
     }
 }
 
@@ -66,6 +67,6 @@ fun <T : AstEntity> AstEntity.duplicate(): T {
         is FunctionTypeDeclaration -> copy() as T
         is TypeAliasNode -> copy() as T
         is GeneratedInterfaceReferenceDeclaration -> copy() as T
-        else -> throw Exception("can not copy ${this}")
+        else -> raiseConcern("can not copy ${this}") { this as T }
     }
 }

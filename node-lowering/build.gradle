@@ -11,5 +11,6 @@ dependencies {
     implementation(project(":ast-common"))
     compile(project(":ast-model-marker"))
     implementation(project(":ownerContext"))
+    implementation(project(":panic"))
     implementation(project(":tsmodel"))
 }

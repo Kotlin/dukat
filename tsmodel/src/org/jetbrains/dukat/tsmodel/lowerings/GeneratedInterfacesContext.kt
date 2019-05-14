@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -232,7 +233,7 @@ class GeneratedInterfacesContext {
             is ClassDeclaration -> uid
             is InterfaceDeclaration -> uid
             is GeneratedInterfaceDeclaration -> uid
-            else -> throw Exception("can not create uid for ${this}")
+            else -> raiseConcern("can not create uid for ${this}") { "INVALID_UID" }
         }
     }
 

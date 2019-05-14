@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.cli
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
@@ -12,6 +11,7 @@ import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
 import java.io.File
@@ -26,7 +26,7 @@ private fun NameNode.updatePackageNameWithPrefix(basePackage: NameNode): NameNod
     return when (this) {
         is IdentifierNode -> basePackage
         is QualifiedNode -> copy(left = left.updatePackageNameWithPrefix(basePackage))
-        else -> throw Exception("unsupported NameNode ${this}")
+        else -> raiseConcern("unsupported NameNode ${this}") { this }
     }
 }
 

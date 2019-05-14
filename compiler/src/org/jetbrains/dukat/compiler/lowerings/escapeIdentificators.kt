@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -63,7 +64,7 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when(nodeLeft) {
             is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape(), nullable = nullable)
             is QualifiedNode -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
-            else -> throw Exception("unknown QualifiedLeftNode ${nodeLeft}")
+            else -> raiseConcern("unknown QualifiedLeftNode ${nodeLeft}") { this }
         }
     }
 
@@ -71,7 +72,7 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when(this) {
             is IdentifierNode -> escape()
             is QualifiedNode -> escape()
-            else -> throw Exception("unknown NameNode ${this}")
+            else -> raiseConcern("unknown NameNode ${this}") { this }
         }
     }
 

@@ -5,6 +5,7 @@ import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import org.jetbrains.dukat.interop.InteropEngine
+import org.jetbrains.dukat.panic.raiseConcern
 
 
 class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, InteropEngine {
@@ -27,7 +28,7 @@ class InteropV8(val runtime: V8 = V8.createV8Runtime("global")): Releasable, Int
             it is String -> params.push(it)
             it is Boolean -> params.push(it)
             it is V8Object -> params.push(it)
-            else -> throw Exception("can not cast ${it}")
+            else -> raiseConcern("can not cast ${it}") { params.pushNull() }
         }}
 
         register(params)

@@ -18,6 +18,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
@@ -29,7 +30,7 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
         return when (identificator) {
             is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
             is QualifiedNode -> identificator
-            else -> throw Exception("unknown NameNode ${identificator}")
+            else -> raiseConcern("unknown NameNode ${identificator}") { identificator }
         }
     }
 

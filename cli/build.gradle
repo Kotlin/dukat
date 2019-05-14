@@ -21,6 +21,8 @@ dependencies {
   implementation(project(":translator"))
   implementation(project(":translator-string"))
   implementation(project(":compiler"))
+  implementation(project(":panic"))
+
 
   cliRuntime(project(":compiler"))
 }

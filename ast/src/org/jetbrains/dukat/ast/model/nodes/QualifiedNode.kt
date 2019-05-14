@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.ast.model.marker.TypeModel
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -17,7 +18,7 @@ fun IdentifierNode.appendLeft(qualifiedLeftNode: NameNode): QualifiedNode {
     return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendLeft(qualifiedLeftNode)
         is QualifiedNode -> this.appendLeft(qualifiedLeftNode)
-        else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
+        else -> raiseConcern("unknown NameNode ${qualifiedLeftNode}") { QualifiedNode(this, this) }
     }
 }
 
@@ -31,9 +32,9 @@ fun IdentifierNode.appendLeft(qualifiedNode: QualifiedNode): QualifiedNode {
         is QualifiedNode -> QualifiedNode(when (qualifiedNode.left.left) {
             is IdentifierNode -> this.appendLeft(qualifiedNode.left.left)
             is QualifiedNode -> this.appendLeft(qualifiedNode.left.left)
-            else -> throw Exception("unkown qualifiedNode ${qualifiedNode.left.left}")
+            else -> raiseConcern("unkown qualifiedNode ${qualifiedNode.left.left}") { qualifiedNode }
         }, qualifiedNode.left.right)
-        else -> throw Exception("unkown qualifiedNode ${qualifiedNode.left}")
+        else -> raiseConcern("unkown qualifiedNode ${qualifiedNode.left}") { qualifiedNode }
     }
     return QualifiedNode(left, qualifiedNode.right)
 }
@@ -42,7 +43,7 @@ fun IdentifierNode.appendRight(qualifiedLeftNode: NameNode): QualifiedNode {
     return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendRight(qualifiedLeftNode)
         is QualifiedNode -> this.appendRight(qualifiedLeftNode)
-        else -> throw Exception("unknown NameNode ${qualifiedLeftNode}")
+        else -> raiseConcern("unknown NameNode ${qualifiedLeftNode}") { QualifiedNode(qualifiedLeftNode, this) }
     }
 }
 
@@ -62,7 +63,7 @@ fun QualifiedNode.appendRight(qualifiedNode: QualifiedNode): QualifiedNode {
     return when (qualifiedNode.left) {
         is IdentifierNode -> appendRight(qualifiedNode.left).appendRight(qualifiedNode.right)
         is QualifiedNode -> appendRight(qualifiedNode.left).appendRight(qualifiedNode.right)
-        else -> throw Exception("unknown QualifiedNode")
+        else -> raiseConcern("unknown QualifiedNode") { this }
     }
 }
 
@@ -71,14 +72,14 @@ fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
         is IdentifierNode -> when (qualifiedNode) {
             is IdentifierNode -> appendRight(qualifiedNode)
             is QualifiedNode -> appendRight(qualifiedNode)
-            else -> throw Exception("unknown QualifiedNode")
+            else -> raiseConcern("unknown QualifiedNode") { this }
         }
         is QualifiedNode -> when (qualifiedNode) {
             is IdentifierNode -> appendRight(qualifiedNode)
             is QualifiedNode -> appendRight(qualifiedNode)
-            else -> throw Exception("unknown QualifiedNode")
+            else -> raiseConcern("unknown QualifiedNode") { this }
         }
-        else -> throw Exception("unknown QualifiedNode")
+        else -> raiseConcern("unknown QualifiedNode") { this }
     }
 }
 
@@ -86,8 +87,9 @@ fun NameNode.appendRight(qualifiedNode: NameNode): NameNode {
 fun NameNode.shiftRight(): NameNode? {
     return when (this) {
         is IdentifierNode -> null
+        is GenericIdentifierNode -> null
         is QualifiedNode -> left
-        else -> throw Exception("unknown NameNode")
+        else -> raiseConcern("unknown NameNode") { this }
     }
 }
 
@@ -102,7 +104,7 @@ fun NameNode.shiftLeft(): NameNode? {
                 QualifiedNode(leftShifted, right)
             }
         }
-        else -> throw Exception("unknown NameNode")
+        else -> raiseConcern("unknown NameNode") { this }
     }
 }
 
@@ -113,7 +115,7 @@ fun QualifiedNode.debugTranslate(): String {
         is IdentifierNode -> left.value
         is QualifiedNode -> left.debugTranslate()
         is GenericIdentifierNode -> left.translate()
-        else -> throw Exception("unknown QualifiedNode ${left::class.simpleName}")
+        else -> raiseConcern("unknown QualifiedNode ${left::class.simpleName}") { this.toString() }
     }
 
     return "${leftTranslate}.${right.value}"

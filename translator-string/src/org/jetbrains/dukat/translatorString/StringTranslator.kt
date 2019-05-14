@@ -36,6 +36,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 
 
@@ -166,7 +167,7 @@ private fun QualifiedStatementLeftNode.translate(): String {
         is IdentifierNode -> value
         is StatementCallNode -> translate()
         is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
-        else -> throw Exception("unkown QualifiedStatementLeftNode ${this}")
+        else -> raiseConcern("unkown QualifiedStatementLeftNode ${this}") { "" }
     }
 }
 
@@ -174,7 +175,7 @@ private fun QualifiedStatementRightNode.translate(): String {
     return when (this) {
         is IdentifierNode -> value
         is StatementCallNode -> translate()
-        else -> throw Exception("unkown QualifiedStatementRightNode ${this}")
+        else -> raiseConcern("unkown QualifiedStatementRightNode ${this}") { "" }
     }
 }
 
@@ -188,7 +189,7 @@ private fun StatementNode.translate(): String {
         is ReturnStatement -> "return ${statement.translate()}"
         is AssignmentStatementNode -> "${left.translate()} = ${right.translate()}"
         is IdentifierNode -> translate()
-        else -> throw Exception("unkown StatementNode ${this}")
+        else -> raiseConcern("unkown StatementNode ${this}") { "" }
     }
 }
 
@@ -286,7 +287,7 @@ private fun MemberNode.translate(): List<String> {
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
         is ClassModel -> listOf(translate(true, 1))
-        else -> throw Exception("can not translate ${this}")
+        else -> raiseConcern("can not translate MemberNode ${this::class.simpleName}") { listOf("") }
     }
 }
 
@@ -332,7 +333,7 @@ private fun MemberNode.translateSignature(): List<String> {
     return when (this) {
         is MethodModel -> translateSignature()
         is PropertyModel -> listOf(translateSignature())
-        else -> throw Exception("can not translate singature ${this}")
+        else -> raiseConcern("can not translate singature ${this}") { emptyList<String>() }
     }
 }
 
@@ -341,7 +342,7 @@ private fun HeritageSymbolNode.translate(): String {
         is IdentifierNode -> translate()
         is QualifiedNode -> translate()
         is PropertyAccessNode -> expression.translate() + "." + name.translate()
-        else -> throw Exception("unknown heritage clause ${this}")
+        else -> raiseConcern("unknown heritage clause ${this}") { "" }
     }
 }
 
@@ -367,7 +368,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
 
             when (value) {
                 is IdentifierNode -> "${(value as IdentifierNode).value}${typeParams}"
-                else -> throw Exception("unknown ValueTypeNodeValue ${value}")
+                else -> raiseConcern("unknown NameNode ${value}") { "" }
             }
         }
         else -> ""

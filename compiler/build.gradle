@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":j2v8"))
 
     implementation(project(":logging"))
+    implementation(project(":panic"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'

@@ -19,6 +19,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -31,7 +32,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         return when (identificator) {
             is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
             is QualifiedNode -> identificator
-            else -> throw Exception("unknown NameNode ${identificator}")
+            else -> raiseConcern("unknown NameNode ${identificator}") { identificator }
         }
     }
 

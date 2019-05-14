@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.marker.TypeModel
+import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
@@ -10,8 +11,6 @@ import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.size
-import org.jetbrains.dukat.ast.model.nodes.translate
-import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -19,13 +18,15 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 
 private fun NameNode.shiftLeft(): NameNode {
     if (this is QualifiedNode) {
         return when (left) {
             is IdentifierNode -> right
+            is GenericIdentifierNode -> right
             is QualifiedNode -> QualifiedNode((left as QualifiedNode).right, right)
-            else -> throw Exception("unknown ")
+            else -> raiseConcern("unknown NameNode") { this }
         }
     }
 
@@ -33,7 +34,7 @@ private fun NameNode.shiftLeft(): NameNode {
 }
 
 private fun NameNode?.matchesLeft(identifier: NameNode): Boolean {
-    return when(this) {
+    return when (this) {
         is IdentifierNode -> identifier == this
         is QualifiedNode -> left.matchesLeft(identifier)
         else -> false

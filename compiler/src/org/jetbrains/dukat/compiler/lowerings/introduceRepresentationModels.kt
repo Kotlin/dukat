@@ -45,6 +45,7 @@ import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -223,7 +224,13 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
 
         }
         is QualifiedNode -> this
-        else -> throw Exception("unable to process ParameterValueDeclaration ${this}")
+        else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") { TypeValueModel(
+                IdentifierNode("dynamic"),
+                emptyList(),
+                null,
+                false
+            )
+        }
     }
 }
 

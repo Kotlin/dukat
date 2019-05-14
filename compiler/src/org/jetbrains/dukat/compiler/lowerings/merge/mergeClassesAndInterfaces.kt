@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.panic.raiseConcern
 
 private data class ClassLikeKey(
         val name: String,
@@ -88,14 +89,14 @@ private fun ClassLikeModel.merge(otherClassLike: ClassLikeModel): ClassLikeModel
         is ClassModel -> when (otherClassLike) {
             is ClassModel -> mergeWithClass(otherClassLike)
             is InterfaceModel -> mergeWithInterface(otherClassLike)
-            else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
+            else -> raiseConcern("can not merge unknown ClassLikeModel implementation: ${this}") { this }
         }
         is InterfaceModel -> when (otherClassLike) {
             is ClassModel -> otherClassLike.mergeWithInterface(this)
             is InterfaceModel -> mergeWithInterface(otherClassLike)
-            else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
+            else -> raiseConcern("can not merge unknown ClassLikeModel implementation: ${this}") { this }
         }
-        else -> throw Exception("can not merge unknown ClassLikeModel implementation: ${this}")
+        else -> raiseConcern("can not merge unknown ClassLikeModel implementation: ${this}") { this }
     }
 }
 

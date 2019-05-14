@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.converters
 
 import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -66,7 +67,7 @@ private fun Any.toMap(): Any {
         is String -> this
         is AstEntity -> astToMap()
         is List<*> -> this.map { it?.toMap() }
-        else -> throw Exception("can not map ${this}")
+        else -> raiseConcern("can not map ${this}") { this }
     }
 }
 
@@ -111,7 +112,7 @@ fun AstEntity.astToMap(): Map<String, Any?> {
         is TypeParameterDeclaration -> listOf(::name, ::constraints).convert(this)
         is UnionTypeDeclaration -> listOf(::params).convert(this)
         is VariableDeclaration -> listOf(::name, ::type, ::modifiers, ::uid).convert(this)
-        else -> throw Exception("can not map ${this}")
+        else -> raiseConcern("can not map ${this}") { emptyMap<String, Any?>() }
     }
 }
 

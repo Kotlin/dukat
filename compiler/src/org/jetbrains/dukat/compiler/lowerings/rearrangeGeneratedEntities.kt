@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.AstEntity
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
@@ -28,7 +29,7 @@ private fun AstEntity.getKey(): String {
         is EnumNode -> ""
         is DocumentRootNode -> ""
         is TypeAliasNode -> ""
-        else -> throw Exception("unknown TopLevelNode ${this::class.simpleName}")
+        else -> raiseConcern("unknown TopLevelNode ${this::class.simpleName}") { "" }
     }
 }
 

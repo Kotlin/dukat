@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
@@ -12,14 +13,14 @@ fun  NameNode.translate(): String = when (this) {
         "${left.translate()}.${right.translate()}" + (if (nullable) "?" else "")
     }
     is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
-    else -> throw Exception("unknown NameNode ${this}")
+    else -> raiseConcern("unknown NameNode ${this}") { this.toString() }
 }
 
 fun QualifiedLeftDeclaration.toNode(): NameNode {
     return when(this) {
         is IdentifierDeclaration -> IdentifierNode(value)
         is QualifiedNamedDeclaration -> QualifiedNode(left = left.toNode(), right = IdentifierNode(right.value))
-        else -> throw Exception("unknown QualifiedLeftDeclaration")
+        else -> raiseConcern("unknown QualifiedLeftDeclaration") { IdentifierNode(this.toString()) }
     }
 }
 
@@ -28,7 +29,7 @@ private fun NameNode.countDepth(current: Int): Int {
     return when(this) {
         is IdentifierNode -> current + 1
         is QualifiedNode -> left.countDepth(current) + right.countDepth(current)
-        else -> throw Exception("unknown NameNode ${this}")
+        else -> raiseConcern("unknown NameNode ${this}") { 0 }
     }
 }
 
@@ -36,7 +37,8 @@ fun NameNode.process(handler: (String) -> String): NameNode {
     return when(this) {
         is IdentifierNode -> IdentifierNode(handler(value))
         is QualifiedNode -> copy(left = left.process(handler), right = right.process(handler) as IdentifierNode)
-        else -> throw Exception("failed to process NameNode ${this}")
+        is GenericIdentifierNode -> copy(value = handler(value))
+        else -> raiseConcern("failed to process NameNode ${this}") { this }
     }
 }
 

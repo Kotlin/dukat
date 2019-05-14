@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
@@ -71,6 +72,8 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
         }
     }
 
+
+    // TODO: This kind of declarations are not supposed to survive up to this point at all
     private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
         return when (value) {
             is IdentifierDeclaration -> {
@@ -83,7 +86,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                         nullable = value.nullable
                 )
             }
-            else -> throw Exception("unknown QualifiedLeftDeclaration subtype")
+            else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
         }
     }
 
@@ -99,7 +102,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                         nullable = value.nullable
                 )
             }
-            else -> throw Exception("unknown QualifiedLeftDeclaration subtype")
+            else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
         }
     }
 

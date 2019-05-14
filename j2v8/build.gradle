@@ -29,4 +29,5 @@ dependencies {
 
   // TODO: if you make this implementation it's fail - I believe it's a bug
   compile(project(":interop"))
+  compile(project(":panic"))
 }

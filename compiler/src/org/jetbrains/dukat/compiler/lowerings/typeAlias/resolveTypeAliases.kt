@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -23,7 +24,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
                     is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
-                    else -> throw Exception("unknown NameNode $typeNodeValue")
+                    else -> raiseConcern("unknown NameNode $typeNodeValue") { parent }
                 }
             } else {
                 parent

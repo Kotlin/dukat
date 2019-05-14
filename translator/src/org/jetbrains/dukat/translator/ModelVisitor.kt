@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.panic.raiseConcern
 
 interface ModelVisitor {
 
@@ -101,7 +102,7 @@ interface ModelVisitor {
             is ObjectModel -> processObjectModel(declaration)
             is EnumNode -> processEnumNode(declaration)
             is TypeAliasModel -> processTypeAliasModel(declaration)
-            else -> throw Exception("unable to process TopeLevelDeclaration ${declaration::class.simpleName}")
+            else -> raiseConcern("unable to process TopeLevelDeclaration ${declaration::class.simpleName}") {  }
         }
     }
 

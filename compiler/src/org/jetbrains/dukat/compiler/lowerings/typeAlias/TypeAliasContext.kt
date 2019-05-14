@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -21,7 +22,7 @@ private fun NameNode.getAliasKey(): String {
     return when (this) {
         is IdentifierNode -> translate()
         is QualifiedNode -> translate()
-        else -> throw Exception("unknown NameNode ${this}")
+        else -> raiseConcern("unknown NameNode ${this}") { "" }
     }
 }
 

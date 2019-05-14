@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.compiler.AstContext
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
@@ -43,7 +44,7 @@ private fun ClassNode.allParentMethods(astContext: AstContext): List<MethodNode>
         when (parentEntity) {
             is InterfaceNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
             is ClassNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-            else -> throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+            else -> raiseConcern("unkown ClassLikeDeclaration ${parentEntity}") { emptyList<MethodNode>() }
         }
     } as List<MethodNode>
 }
@@ -54,7 +55,7 @@ private fun ClassNode.allParentProperties(astContext: AstContext): List<Property
         when (parentEntity) {
             is InterfaceNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
             is ClassNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-            else -> throw Exception("unkown ClassLikeDeclaration ${parentEntity}")
+            else -> raiseConcern("unkown ClassLikeDeclaration ${parentEntity}") { emptyList<PropertyNode>() }
         }
     } as List<PropertyNode>
 }

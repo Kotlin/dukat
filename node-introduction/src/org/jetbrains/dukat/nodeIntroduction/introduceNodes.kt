@@ -40,6 +40,7 @@ import org.jetbrains.dukat.ast.model.nodes.toNode
 import org.jetbrains.dukat.astCommon.AstMemberEntity
 import org.jetbrains.dukat.astCommon.AstTopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -103,10 +104,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
-        return typeParams.map { typeParam -> TypeValueNode(
-               value = typeParam.name.toNode(),
-               params = typeParam.constraints
-        ) }
+        return typeParams.map { typeParam ->
+            TypeValueNode(
+                    value = typeParam.name.toNode(),
+                    params = typeParam.constraints
+            )
+        }
     }
 
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
@@ -201,7 +204,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     name = IdentifierNode(name.value),
                     expression = expression.convert()
             )
-            else -> throw Exception("unknown heritage symbol ${this}")
+            else -> raiseConcern("unknown heritage symbol ${this}") { IdentifierNode(this.toString()) }
         }
     }
 
@@ -349,7 +352,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         )
     }
 
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode? {
         val memberDeclaration = convertMethodSignatureDeclaration(declaration, owner)
         return when (memberDeclaration) {
             is PropertyNode -> memberDeclaration
@@ -357,7 +360,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     parameters = memberDeclaration.parameters,
                     type = memberDeclaration.type
             )
-            else -> throw Exception("unkown method signature")
+            else -> raiseConcern("unkown method signature") { null }
         }
     }
 
@@ -569,12 +572,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     true,
                     true
             ))
-            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner))
+            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert(owner))
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
             is ConstructorDeclaration -> listOf(declaration.convert())
-            else -> throw Exception("unkown member declaration ${this}")
+            else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberNode>() }
         }
     }
 
@@ -656,7 +659,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     right = right.convert(),
                     nullable = nullable
             )
-            else -> throw Exception("unknown QualifiedLeftDeclaration ${this}")
+            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_NODE") }
         }
     }
 
@@ -665,7 +668,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(left.convert(), right.convert())
-            else -> throw Exception("unknown ModuleReferenceDeclaration ${this}")
+            else -> raiseConcern("unknown ModuleReferenceDeclaration ${this}") { IdentifierNode("INVALID_MODULE_REFERENCE") }
         }
     }
 

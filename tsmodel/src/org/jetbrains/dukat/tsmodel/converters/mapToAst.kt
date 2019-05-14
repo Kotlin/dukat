@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.converters
 
 import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -58,7 +59,7 @@ private fun Map<String, Any?>.getInitializerExpression(): ExpressionDeclaration?
         if (expression is ExpressionDeclaration) {
             if (expression.kind.isSimpleType("definedExternally")) {
                 expression
-            } else throw Exception("unkown initializer")
+            } else raiseConcern("unkown initializer") { null }
         } else null
     }
 }
@@ -222,7 +223,9 @@ fun <T : AstEntity> Map<String, Any?>.toAst(): T {
                 getEntity("left"),
                 getEntity("right")
         )
-        else -> throw Exception("failed to create declaration from mapper: ${this}")
+        else -> raiseConcern("failed to create declaration from mapper: ${this}") {
+            throw Exception("failed to create declaration from mapper: ${this}")
+        }
     }
 
     return res as T

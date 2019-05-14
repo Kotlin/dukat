@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 
 interface ModelWithOwnerLowering {
     fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel
@@ -46,7 +47,7 @@ interface ModelWithOwnerLowering {
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumNode -> lowerEnumNode(NodeOwner(declaration, ownerContext))
             is TypeAliasModel -> declaration
-            else -> throw Exception("unknown TopeLevelDeclaration ${declaration::class.simpleName}")
+            else -> raiseConcern("unknown TopeLevelDeclaration ${declaration::class.simpleName}") { declaration }
         }
     }
 

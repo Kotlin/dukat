@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -44,7 +45,9 @@ private class LowerNullable : NodeTypeLowering {
                             res.meta = MuteMetadata()
                             res
                         }
-                        else -> throw Exception("can not lower nullables for unknown param type ${nullableType}")
+                        else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
+                            lowerUnionTypeNode(declaration)
+                        }
                     }
                 } else lowerUnionTypeNode(declaration)
             }
