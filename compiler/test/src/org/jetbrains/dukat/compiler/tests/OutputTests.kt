@@ -2,6 +2,8 @@ package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.panic.PanicMode
+import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
@@ -14,6 +16,12 @@ import kotlin.test.assertEquals
 
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator
+
+    init {
+        if (System.getProperty("dukat.test.failure.always") == "true") {
+            setPanicMode(PanicMode.ALWAYS_FAIL)
+        }
+    }
 
     private fun compile(sourcePath: String, targetPath: String): ExitCode {
         val options =

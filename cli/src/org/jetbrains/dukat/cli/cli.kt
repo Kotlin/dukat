@@ -11,7 +11,9 @@ import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createNashornTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
+import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
 import java.io.File
@@ -112,6 +114,9 @@ private fun process(args: List<String>): CliOptions? {
         val arg = argsIterator.next()
 
         when (arg) {
+            "--always-fail" -> {
+                setPanicMode(PanicMode.ALWAYS_FAIL)
+            }
             "-d" -> {
                 val outDirArg = argsIterator.readArg()
                 if (outDirArg == null) {
