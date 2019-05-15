@@ -41,7 +41,7 @@ interface AstNodeFactory<T> {
 
     fun createHeritageClauseDeclaration(
             name: NameEntity,
-            typeArguments: List<NameEntity>,
+            typeArguments: List<ParameterValueDeclaration>,
             extending: Boolean
     ): T
 

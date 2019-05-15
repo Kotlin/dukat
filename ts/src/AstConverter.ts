@@ -622,7 +622,7 @@ class AstConverter {
 
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
-                                this.registerDeclaration(this.convertValue(typeArgument), typeArguments)
+                                this.registerDeclaration(this.convertType(typeArgument), typeArguments)
                             }
                         }
 

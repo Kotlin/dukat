@@ -77,7 +77,7 @@ class AstFactory : AstNodeFactory<Entity> {
     override fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = ExportAssignmentDeclaration(name, isExportEquals)
 
 
-    override fun createHeritageClauseDeclaration(name: NameEntity, typeArguments: List<NameEntity>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
+    override fun createHeritageClauseDeclaration(name: NameEntity, typeArguments: List<ParameterValueDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
     override fun createTypeAliasDeclaration(
             aliasName: NameEntity,
