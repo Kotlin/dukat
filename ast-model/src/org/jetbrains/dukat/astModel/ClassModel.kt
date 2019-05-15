@@ -10,7 +10,7 @@ data class ClassModel(
         var members: List<MemberNode>,
         val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterModel>,
-        val parentEntities: List<HeritageNode>,
+        val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationNode>
 

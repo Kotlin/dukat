@@ -115,10 +115,9 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
     }
 
     fun lowerHeritageNode(heritageClause: HeritageNode): HeritageNode {
-        val typeArguments = heritageClause.typeArguments.map {
+        val typeArguments = heritageClause.typeArguments.map { typeArgument ->
             // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerType(TypeValueNode(it, emptyList())) as TypeValueNode
-            lowerParameterDeclaration.value
+            lowerType(typeArgument)
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }

@@ -2,11 +2,11 @@ package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ObjectModel
@@ -68,14 +68,12 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return declaration.copy(type = lowerTypeNode(NodeOwner(declaration.type, ownerContext)))
     }
 
-    fun lowerHeritageNode(ownerContext: NodeOwner<HeritageNode>): HeritageNode {
+    fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
-        val typeArguments = heritageClause.typeArguments.map {
-            // TODO: obviously very clumsy place
-            val lowerParameterDeclaration = lowerTypeNode(NodeOwner(TypeValueModel(it, emptyList(), null), ownerContext)) as TypeValueModel
-            lowerParameterDeclaration.value
+        val typeParams = heritageClause.typeParams.map {
+            lowerTypeNode(ownerContext.wrap(it))
         }
-        return heritageClause.copy(typeArguments = typeArguments)
+        return heritageClause.copy(typeParams = typeParams)
     }
 
 

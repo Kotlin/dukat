@@ -11,6 +11,8 @@ import org.jetbrains.dukat.ast.model.nodes.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.process
 import org.jetbrains.dukat.ast.model.nodes.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.size
+import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -102,17 +104,19 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         return super.lowerTypeNode(ownerContext)
     }
 
-    override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageNode>): HeritageNode {
+    override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
-        val name = heritageClause.name
+        val heritageClauseValue = heritageClause.value
+        val name = heritageClauseValue
 
-        if (name is IdentifierNode) {
-            declarationResolver.resolve(name.value, ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
+        if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierNode)) {
+            val name = (heritageClauseValue.value as IdentifierNode)
+            declarationResolver.resolve(name.translate(), ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
                     // TODO: use QualifierNode instead of IdentifierNode
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
-                    return heritageClause.copy(name = IdentifierNode(qualifiedNode.debugTranslate()))
+                    return heritageClause.copy(value = TypeValueModel(IdentifierNode(qualifiedNode.debugTranslate()), emptyList(), null))
                 }
             }
         }

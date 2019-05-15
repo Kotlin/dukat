@@ -51,7 +51,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                     "__",
                                     emptyList(),
                                     listOf(
-                                            HeritageModel(correspondingVariable.type, ExternalDelegationModel())
+                                            HeritageModel(correspondingVariable.type, emptyList(), ExternalDelegationModel())
                                     )
                             )))
                 }

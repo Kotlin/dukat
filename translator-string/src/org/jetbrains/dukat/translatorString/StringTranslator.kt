@@ -4,12 +4,9 @@ import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
@@ -64,7 +61,7 @@ private fun translateTypeParams(params: List<TypeModel>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
 
-fun TypeModel.translate(needsMeta: Boolean = false): String {
+fun TypeModel.translate(): String {
     return when (this) {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
@@ -97,7 +94,7 @@ fun TypeModel.translate(needsMeta: Boolean = false): String {
 }
 
 private fun ParameterModel.translate(needsMeta: Boolean = true): String {
-    var res = name + ": " + type.translate(needsMeta)
+    var res = name + ": " + type.translate()
     if (vararg) {
         res = "vararg $res"
     }
@@ -108,8 +105,8 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
 
             res += " = ${typeValueModel.value.translate()}"
             typeValueModel.metaDescription?.let { meta ->
-                    res += " /* ${meta} */"
-                }
+                res += " /* ${meta} */"
+            }
         }
     } else {
         res += type.translateMeta()
@@ -133,11 +130,13 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
     }
 }
 
-private fun translateTypeArguments(typeParameters: List<NameNode>): String {
+private fun translateTypeArguments(typeParameters: List<TypeModel>): String {
     return if (typeParameters.isEmpty()) {
         ""
     } else {
-        "<" + typeParameters.map { it.translate() }.joinToString(", ") + ">"
+        "<" + typeParameters.map {
+            it.translate() + it.translateMeta()
+        }.joinToString(", ") + ">"
     }
 }
 
@@ -337,19 +336,10 @@ private fun MemberNode.translateSignature(): List<String> {
     }
 }
 
-private fun HeritageSymbolNode.translate(): String {
-    return when (this) {
-        is IdentifierNode -> translate()
-        is QualifiedNode -> translate()
-        is PropertyAccessNode -> expression.translate() + "." + name.translate()
-        else -> raiseConcern("unknown heritage clause ${this}") { "" }
-    }
-}
-
-private fun translateHeritageNodes(parentEntities: List<HeritageNode>): String {
+private fun translateHeritagModels(parentEntities: List<HeritageModel>): String {
     val parents = if (parentEntities.isNotEmpty()) {
         " : " + parentEntities.map { parentEntity ->
-            "${parentEntity.name.translate()}${translateTypeArguments(parentEntity.typeArguments)}"
+            "${parentEntity.value.translate()}${translateTypeArguments(parentEntity.typeParams)}"
         }.joinToString(", ")
     } else ""
 
@@ -393,7 +383,7 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
     val res: MutableList<String> = kotlin.collections.mutableListOf()
     val primaryConstructor = primaryConstructor
 
-    val parents = translateHeritageNodes(parentEntities)
+    val parents = translateHeritagModels(parentEntities)
     val externalClause = if (nested) "" else "external "
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
@@ -483,7 +473,7 @@ class StringTranslator : ModelVisitor {
         val showCompanionObject = staticMembers.isNotEmpty() || interfaceModel.companionObject.parentEntities.isNotEmpty()
 
         val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
-        val parents = translateHeritageNodes(interfaceModel.parentEntities)
+        val parents = translateHeritagModels(interfaceModel.parentEntities)
 
         addOutput("${translateAnnotations(interfaceModel.annotations)}external interface ${interfaceModel.name}${translateTypeParameters(interfaceModel.typeParameters)}${parents}" + if (isBlock) " {" else "")
         if (isBlock) {

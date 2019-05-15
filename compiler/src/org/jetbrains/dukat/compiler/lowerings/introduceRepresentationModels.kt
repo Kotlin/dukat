@@ -8,6 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -15,6 +17,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -28,11 +31,13 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.toNode
+import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -47,6 +52,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
@@ -180,6 +186,7 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
     }
 }
 
+
 private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
         is UnionTypeNode -> TypeValueModel(
@@ -224,11 +231,12 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
 
         }
         is QualifiedNode -> this
-        else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") { TypeValueModel(
-                IdentifierNode("dynamic"),
-                emptyList(),
-                null,
-                false
+        else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
+            TypeValueModel(
+                    IdentifierNode("dynamic"),
+                    emptyList(),
+                    null,
+                    false
             )
         }
     }
@@ -263,8 +271,38 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
-            parentEntities = parentEntities,
+            parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = annotations
+    )
+}
+
+private fun HeritageSymbolNode.translate(): String {
+    return when(this) {
+        is NameNode -> translate()
+        is PropertyAccessNode -> translate()
+        else -> raiseConcern("unknown HeritageSymbolNode ${this}") { "" }
+    }
+}
+
+private fun PropertyAccessNode.translate(): String {
+    return expression.translate() + "." + name.translate()
+}
+
+private fun HeritageSymbolNode.toTypeValueModel(): TypeValueModel {
+    val nameTranslated = when (this) {
+        is NameNode -> translate()
+        is PropertyAccessNode -> translate()
+        else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }
+    }
+
+    return TypeValueModel(IdentifierNode(nameTranslated), emptyList(), null)
+}
+
+private fun HeritageNode.convertToModel(): HeritageModel {
+    return HeritageModel(
+            value = name.toTypeValueModel(),
+            typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
+            delegateTo = null
     )
 }
 
@@ -285,7 +323,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
-            parentEntities = parentEntities,
+            parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = annotations
     )
 }
@@ -334,7 +372,7 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
             is ObjectNode -> ObjectModel(
                     name = declaration.name,
                     members = declaration.members.map { member -> member.process() },
-                    parentEntities = declaration.parentEntities
+                    parentEntities = declaration.parentEntities.map { parentEntity -> parentEntity.convertToModel()}
             )
             is TypeAliasNode -> if (declaration.canBeTranslated) {
                 TypeAliasModel(

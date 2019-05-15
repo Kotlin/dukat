@@ -7,4 +7,4 @@ data class UnionTypeNode(
 
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration
+) : TypeNode

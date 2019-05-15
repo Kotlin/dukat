@@ -8,7 +8,7 @@ data class TypeValueNode(
 
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration
+) : TypeNode
 
 fun TypeValueNode.isPrimitive(primitive: String) : Boolean {
     return when(this.value) {

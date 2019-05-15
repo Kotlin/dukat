@@ -2,12 +2,12 @@ package org.jetbrains.dukat.translator
 
 import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
@@ -80,7 +80,7 @@ interface ModelVisitor {
         }
     }
 
-    private fun processHeritageNode(declaration: HeritageNode) {
+    private fun processHeritageNode(declaration: HeritageModel) {
         val heritageClause = declaration
     }
 
