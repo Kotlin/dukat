@@ -1,10 +1,7 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class IdentifierDeclaration(
-        val value: String,
-
-        override var nullable: Boolean = false,
-        override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, HeritageSymbolDeclaration, QualifiedLeftDeclaration
+        val value: String
+) : ModuleReferenceDeclaration, HeritageSymbolDeclaration, NameEntity

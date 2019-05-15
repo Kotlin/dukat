@@ -37,8 +37,8 @@ import org.jetbrains.dukat.ast.model.nodes.appendRight
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.toNode
-import org.jetbrains.dukat.astCommon.AstMemberEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
@@ -61,7 +61,7 @@ import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -250,7 +250,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return declaration
     }
 
-    private fun InterfaceDeclaration.convert(): List<AstTopLevelEntity> {
+    private fun InterfaceDeclaration.convert(): List<TopLevelEntity> {
         val isExternalDefinition = isExternal(definitionsInfo)
 
         if (isExternalDefinition) {
@@ -385,7 +385,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    private fun lowerInlinedInterfaceMemberDeclaration(declaration: AstMemberEntity, interfaceDeclaration: InterfaceDeclaration): List<AstTopLevelEntity> {
+    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration): List<TopLevelEntity> {
         val name = interfaceDeclaration.name
 
         return when (declaration) {
@@ -556,7 +556,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    fun lowerMemberDeclaration(declaration: AstMemberEntity): List<MemberNode> {
+    fun lowerMemberDeclaration(declaration: MemberEntity): List<MemberNode> {
         val owner = ROOT_CLASS_DECLARATION
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -581,7 +581,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): AstTopLevelEntity {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelEntity {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
 
@@ -632,7 +632,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: AstTopLevelEntity, owner: NodeOwner<PackageDeclaration>): List<AstTopLevelEntity> {
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<PackageDeclaration>): List<TopLevelEntity> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> listOf(declaration.convert())
@@ -651,13 +651,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return IdentifierNode(value)
     }
 
-    private fun QualifiedLeftDeclaration.convert(): NameNode {
+    private fun NameEntity.convert(): NameNode {
         return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(
                     left = left.convert(),
-                    right = right.convert(),
-                    nullable = nullable
+                    right = right.convert()
             )
             else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_NODE") }
         }
@@ -730,7 +729,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         val imports = mutableMapOf<String, ImportNode>()
-        val nonImports = mutableListOf<AstTopLevelEntity>()
+        val nonImports = mutableListOf<TopLevelEntity>()
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
                 imports[declaration.name] = ImportNode(

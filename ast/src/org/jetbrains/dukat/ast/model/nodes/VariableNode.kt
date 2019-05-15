@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableNode(
@@ -17,4 +17,4 @@ data class VariableNode(
         val typeParameters: List<TypeValueNode>,
         var owner: DocumentRootNode?,
         val uid: String
-) : AstTopLevelEntity, MergableNode
+) : TopLevelEntity, MergableNode

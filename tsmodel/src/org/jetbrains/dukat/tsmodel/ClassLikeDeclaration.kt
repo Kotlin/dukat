@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 
-interface ClassLikeDeclaration : AstTopLevelEntity {
+interface ClassLikeDeclaration : TopLevelEntity {
     val name: String
     val typeParameters: List<TypeParameterDeclaration>
 }

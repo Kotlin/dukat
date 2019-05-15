@@ -5,12 +5,11 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -20,7 +19,6 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -37,8 +35,6 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
         is UnionTypeNode -> copy(nullable = true)
-        is QualifiedNamedDeclaration -> copy(nullable = true)
-        is QualifiedNode -> copy(nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)
         is ObjectLiteralDeclaration -> copy(nullable = true)
         else -> raiseConcern("makeNullable does not recognize type ${this}") { this }
@@ -46,7 +42,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T : AstEntity> AstEntity.duplicate(): T {
+fun <T : Entity> Entity.duplicate(): T {
     return when (this) {
         is EnumNode -> copy() as T
         is EnumDeclaration -> copy() as T

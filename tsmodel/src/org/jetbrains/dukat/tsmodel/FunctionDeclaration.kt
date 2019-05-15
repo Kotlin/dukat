@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class FunctionDeclaration(
@@ -11,4 +11,4 @@ data class FunctionDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val modifiers: List<ModifierDeclaration>,
         val uid: String
-) : AstMemberEntity, AstTopLevelEntity
+) : MemberEntity, TopLevelEntity

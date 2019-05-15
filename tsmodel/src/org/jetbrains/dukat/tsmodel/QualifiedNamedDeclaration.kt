@@ -1,11 +1,8 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class QualifiedNamedDeclaration(
-        val left: QualifiedLeftDeclaration,
-        val right: IdentifierDeclaration,
-
-        override var nullable: Boolean = false,
-        override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, QualifiedLeftDeclaration
+        val left: NameEntity,
+        val right: IdentifierDeclaration
+) : ModuleReferenceDeclaration, NameEntity

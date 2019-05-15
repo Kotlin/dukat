@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
 data class SourceFileDeclaration(
         val fileName: String,
         val root: PackageDeclaration,
         val referencedFiles: List<IdentifierDeclaration>
-) : AstEntity
+) : Entity

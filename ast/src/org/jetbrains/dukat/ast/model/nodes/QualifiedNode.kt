@@ -7,11 +7,8 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class QualifiedNode(
         val left: NameNode,
-        val right: IdentifierNode,
-
-        override var nullable: Boolean = false,
-        override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, ModuleReferenceDeclaration, NameNode, TypeModel
+        val right: IdentifierNode
+) : ModuleReferenceDeclaration, NameNode, TypeModel
 
 
 fun IdentifierNode.appendLeft(qualifiedLeftNode: NameNode): QualifiedNode {

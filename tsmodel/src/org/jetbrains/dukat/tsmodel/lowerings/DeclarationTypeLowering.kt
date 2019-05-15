@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -50,7 +50,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
 
-    override fun lowerMemberDeclaration(declaration: AstMemberEntity): AstMemberEntity {
+    override fun lowerMemberDeclaration(declaration: MemberEntity): MemberEntity {
         return when (declaration) {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is PropertyDeclaration -> lowerPropertyDeclaration(declaration)

@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.tsmodel.types
 
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class TypeDeclaration(
-        val value: QualifiedLeftDeclaration,
+        val value: NameEntity,
         val params: List<ParameterValueDeclaration>,
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null

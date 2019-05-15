@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.tsmodel.types
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 
 data class ObjectLiteralDeclaration(
-        val members: List<AstMemberEntity>,
+        val members: List<MemberEntity>,
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration, AstMemberEntity
+) : ParameterValueDeclaration, MemberEntity
 
 fun ObjectLiteralDeclaration.canBeJson(): Boolean {
     if (members.size != 1) {

@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
-interface HeritageSymbolDeclaration : AstEntity
+interface HeritageSymbolDeclaration : Entity

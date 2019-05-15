@@ -1,4 +1,3 @@
 package org.jetbrains.dukat.astCommon
 
-
-interface AstEntity
+interface TypeEntity : Entity

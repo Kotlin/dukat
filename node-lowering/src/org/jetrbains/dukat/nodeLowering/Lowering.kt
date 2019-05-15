@@ -14,10 +14,10 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
-import org.jetbrains.dukat.astCommon.AstTypeEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.TypeEntity
 
-interface Lowering<T : AstTypeEntity> {
+interface Lowering<T : TypeEntity> {
     fun lowerVariableNode(declaration: VariableNode): VariableNode
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
@@ -42,7 +42,7 @@ interface Lowering<T : AstTypeEntity> {
         }
     }
 
-    fun lowerTopLevelEntity(declaration: AstTopLevelEntity): AstTopLevelEntity {
+    fun lowerTopLevelEntity(declaration: TopLevelEntity): TopLevelEntity {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
@@ -53,7 +53,7 @@ interface Lowering<T : AstTypeEntity> {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>): List<AstTopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>): List<TopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelEntity(declaration)
         }

@@ -14,14 +14,14 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
-import org.jetbrains.dukat.astCommon.AstTypeEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.TypeEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-interface NodeWithOwnerLowering<T:AstTypeEntity> {
+interface NodeWithOwnerLowering<T:TypeEntity> {
     fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode
     fun lowerFunctionNode(owner: NodeOwner<FunctionNode>): FunctionNode
     fun lowerClassNode(owner: NodeOwner<ClassNode>): ClassNode
@@ -50,7 +50,7 @@ interface NodeWithOwnerLowering<T:AstTypeEntity> {
         }
     }
 
-    fun lowerTopLevelEntity(owner: NodeOwner<AstTopLevelEntity>): AstTopLevelEntity {
+    fun lowerTopLevelEntity(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
         val declaration = owner.node
         return when (declaration) {
             is VariableNode -> lowerVariableNode(owner.wrap(declaration))
@@ -62,7 +62,7 @@ interface NodeWithOwnerLowering<T:AstTypeEntity> {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>, owner: NodeOwner<DocumentRootNode>): List<AstTopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<DocumentRootNode>): List<TopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelEntity(owner.wrap(declaration))
         }

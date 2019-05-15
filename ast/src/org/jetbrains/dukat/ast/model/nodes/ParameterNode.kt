@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -12,7 +12,7 @@ data class ParameterNode(
 
         val vararg: Boolean,
         val optional: Boolean
-) : AstEntity
+) : Entity
 
 
 fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(

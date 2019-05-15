@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -30,7 +30,7 @@ interface DeclarationWithOwnerLowering {
     fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
     fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
     fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>): AstMemberEntity
+    fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>): MemberEntity
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
 
@@ -55,7 +55,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(owner: NodeOwner<AstTopLevelEntity>): AstTopLevelEntity {
+    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
         val declaration = owner.node
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(owner.wrap(declaration))
@@ -67,7 +67,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<AstTopLevelEntity>, owner: NodeOwner<PackageDeclaration>): List<AstTopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<PackageDeclaration>): List<TopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(owner.wrap(declaration))
         }

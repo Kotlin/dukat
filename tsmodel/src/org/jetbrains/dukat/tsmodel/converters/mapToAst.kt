@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.converters
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -40,12 +40,12 @@ import org.jetbrains.dukat.tsmodel.types.isSimpleType
 
 
 @Suppress("UNCHECKED_CAST")
-private fun <T : AstEntity> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
+private fun <T : Entity> Map<String, Any?>.getEntity(key: String) = (get(key) as Map<String, Any?>?)!!.toAst<T>()
 
 @Suppress("UNCHECKED_CAST")
 private fun Map<String, Any?>.getEntitiesList(key: String) = get(key) as List<Map<String, Any?>>
 
-private fun <T : AstEntity> Map<String, Any?>.getEntities(key: String, mapper: (Map<String, Any?>) -> T = {
+private fun <T : Entity> Map<String, Any?>.getEntities(key: String, mapper: (Map<String, Any?>) -> T = {
     it.toAst()
 }) =
         getEntitiesList(key).map(mapper)
@@ -54,7 +54,7 @@ private fun <T : AstEntity> Map<String, Any?>.getEntities(key: String, mapper: (
 private fun Map<String, Any?>.getInitializerExpression(): ExpressionDeclaration? {
     val initializer = get("initializer") as Map<String, Any?>?
     return initializer?.let {
-        val expression = it.toAst<AstEntity>()
+        val expression = it.toAst<Entity>()
 
         if (expression is ExpressionDeclaration) {
             if (expression.kind.isSimpleType("definedExternally")) {
@@ -74,7 +74,7 @@ private fun Map<String, Any?>.parameterDeclarationToAst() =
         )
 
 @Suppress("UNCHECKED_CAST")
-fun <T : AstEntity> Map<String, Any?>.toAst(): T {
+fun <T : Entity> Map<String, Any?>.toAst(): T {
     val reflectionType = get("reflection") as String
     val res = when (reflectionType) {
         TupleDeclaration::class.simpleName -> TupleDeclaration(getEntities("params"))

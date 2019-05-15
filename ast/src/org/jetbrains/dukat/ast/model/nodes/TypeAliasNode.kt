@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class TypeAliasNode(
@@ -9,4 +9,4 @@ data class TypeAliasNode(
         val typeParameters: List<IdentifierNode>,
 
         var canBeTranslated: Boolean
-) : AstTopLevelEntity, TopLevelNode
+) : TopLevelEntity, TopLevelNode

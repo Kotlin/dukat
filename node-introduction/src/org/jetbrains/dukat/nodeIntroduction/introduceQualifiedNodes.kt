@@ -15,7 +15,7 @@ import org.jetbrains.dukat.ast.model.nodes.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
@@ -74,7 +74,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
 
 
     // TODO: This kind of declarations are not supposed to survive up to this point at all
-    private fun resolve(value: QualifiedLeftDeclaration, owner: NodeOwner<*>): NameNode {
+    private fun resolve(value: NameEntity, owner: NodeOwner<*>): NameNode {
         return when (value) {
             is IdentifierDeclaration -> {
                 resolve(value.value, owner)
@@ -82,8 +82,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
             is QualifiedNamedDeclaration -> {
                 QualifiedNode(
                         left = resolve(value.left, owner),
-                        right = IdentifierNode(value.right.value),
-                        nullable = value.nullable
+                        right = IdentifierNode(value.right.value)
                 )
             }
             else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
@@ -98,8 +97,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
             is QualifiedNode -> {
                 QualifiedNode(
                         left = resolve(value.left, owner),
-                        right = IdentifierNode(value.right.value),
-                        nullable = value.nullable
+                        right = IdentifierNode(value.right.value)
                 )
             }
             else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
@@ -127,11 +125,6 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
         val declaration = owner.node
         return when (declaration) {
             is TypeValueNode -> declaration.copy(value = resolve(declaration.value, owner))
-            is QualifiedNamedDeclaration -> QualifiedNode(
-                    left = resolve(declaration.left, owner),
-                    right = IdentifierNode(declaration.right.value),
-                    nullable = declaration.nullable
-            )
             else -> super.lowerParameterValue(owner)
         }
     }

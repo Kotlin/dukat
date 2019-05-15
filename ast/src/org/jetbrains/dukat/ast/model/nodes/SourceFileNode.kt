@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
 data class SourceFileNode(
         val fileName: String,
         val root: DocumentRootNode,
         val referencedFiles: List<IdentifierNode>
-) : AstEntity
+) : Entity
 
 
 fun SourceFileNode.transform(rootHandler: (DocumentRootNode) -> DocumentRootNode)

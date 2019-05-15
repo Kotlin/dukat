@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
@@ -16,7 +16,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -147,7 +147,7 @@ private fun IndexSignatureDeclaration.isIdenticalTo(indexSignatureDeclaration: I
     return returnType.isIdenticalTo(indexSignatureDeclaration.returnType)
 }
 
-private fun AstMemberEntity.isIdenticalTo(memberDeclaration: AstMemberEntity): Boolean {
+private fun MemberEntity.isIdenticalTo(memberDeclaration: MemberEntity): Boolean {
     if (this::class != memberDeclaration::class) {
         return false
     }
@@ -237,7 +237,7 @@ class GeneratedInterfacesContext {
         }
     }
 
-    fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): AstMemberEntity {
+    fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberEntity {
         val declaration = owner.node
 
         return when (declaration) {
@@ -301,14 +301,14 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<QualifiedLeftDeclaration>): TypeParameterDeclaration? {
+    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<NameEntity>): TypeParameterDeclaration? {
         return when (this) {
             is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
             else -> null
         }
     }
 
-    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<QualifiedLeftDeclaration>): GeneratedInterfaceReferenceDeclaration {
+    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<NameEntity>): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 

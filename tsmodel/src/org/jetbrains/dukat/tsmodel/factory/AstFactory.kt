@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.tsmodel.factory
 
-import org.jetbrains.dukat.astCommon.AstEntity
-import org.jetbrains.dukat.astCommon.AstMemberEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -24,7 +24,7 @@ import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -42,13 +42,13 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-class AstFactory : AstNodeFactory<AstEntity> {
+class AstFactory : AstNodeFactory<Entity> {
 
-    override fun createDefinitionInfoDeclaration(fileName: String): AstEntity {
+    override fun createDefinitionInfoDeclaration(fileName: String): Entity {
         return DefinitionInfoDeclaration(fileName)
     }
 
-    override fun createTupleDeclaration(params: List<ParameterValueDeclaration>): AstEntity {
+    override fun createTupleDeclaration(params: List<ParameterValueDeclaration>): Entity {
         return TupleDeclaration(params)
     }
 
@@ -60,33 +60,33 @@ class AstFactory : AstNodeFactory<AstEntity> {
         return ImportEqualsDeclaration(name, moduleReference, uid)
     }
 
-    override fun createIdentifierDeclaration(value: String): AstEntity {
+    override fun createIdentifierDeclaration(value: String): Entity {
         return IdentifierDeclaration(value)
     }
 
-    override fun createQualifiedNameDeclaration(left: QualifiedLeftDeclaration, right: IdentifierDeclaration): AstEntity {
+    override fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): Entity {
         return QualifiedNamedDeclaration(left, right)
     }
 
-    override fun createThisTypeDeclaration(): AstEntity {
+    override fun createThisTypeDeclaration(): Entity {
         return ThisTypeDeclaration()
     }
 
-    override fun createEnumDeclaration(name: String, values: List<EnumTokenDeclaration>): AstEntity {
+    override fun createEnumDeclaration(name: String, values: List<EnumTokenDeclaration>): Entity {
         return EnumDeclaration(name, values)
     }
 
-    override fun createEnumTokenDeclaration(value: String, meta: String): AstEntity {
+    override fun createEnumTokenDeclaration(value: String, meta: String): Entity {
         return EnumTokenDeclaration(value, meta)
     }
 
     override fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = ExportAssignmentDeclaration(name, isExportEquals)
 
 
-    override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<QualifiedLeftDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
+    override fun createHeritageClauseDeclaration(name: HeritageSymbolDeclaration, typeArguments: List<NameEntity>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
 
     override fun createTypeAliasDeclaration(
-            aliasName: QualifiedLeftDeclaration,
+            aliasName: NameEntity,
             typeParameters: List<IdentifierDeclaration>,
             typeReference: ParameterValueDeclaration,
             uid: String
@@ -106,18 +106,18 @@ class AstFactory : AstNodeFactory<AstEntity> {
 
     override fun createClassDeclaration(
             name: String,
-            members: List<AstMemberEntity>,
+            members: List<MemberEntity>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
             modifiers: List<ModifierDeclaration>,
             uid: String
-    ): AstEntity = ClassDeclaration(name, members, typeParameters, parentEntities, modifiers, uid)
+    ): Entity = ClassDeclaration(name, members, typeParameters, parentEntities, modifiers, uid)
 
-    override fun createObjectLiteral(members: List<AstMemberEntity>) = ObjectLiteralDeclaration(members)
+    override fun createObjectLiteral(members: List<MemberEntity>) = ObjectLiteralDeclaration(members)
 
-    override fun createInterfaceDeclaration(name: String, members: List<AstMemberEntity>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String): AstEntity = InterfaceDeclaration(name, members, typeParameters, parentEntities, definitionsInfo, uid)
+    override fun createInterfaceDeclaration(name: String, members: List<MemberEntity>, typeParameters: List<TypeParameterDeclaration>, parentEntities: List<HeritageClauseDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String): Entity = InterfaceDeclaration(name, members, typeParameters, parentEntities, definitionsInfo, uid)
 
-    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): AstEntity = VariableDeclaration(name, type, modifiers, uid)
+    override fun declareVariable(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>, uid: String): Entity = VariableDeclaration(name, type, modifiers, uid)
     override fun declareProperty(
             name: String,
             type: ParameterValueDeclaration,
@@ -148,15 +148,15 @@ class AstFactory : AstNodeFactory<AstEntity> {
     override fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>) = IntersectionTypeDeclaration(params)
 
     override fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(params)
-    override fun createTypeDeclaration(value: QualifiedLeftDeclaration, params: Array<ParameterValueDeclaration>) = TypeDeclaration(value, params.toList())
+    override fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>) = TypeDeclaration(value, params.toList())
 
     override fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean) = ParameterDeclaration(name, type, initializer, vararg, optional)
 
-    override fun createDocumentRoot(packageName: String, declarations: Array<AstTopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean) = PackageDeclaration(packageName, declarations.toList(), modifiers, definitionsInfo, uid, resourceName, root)
+    override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean) = PackageDeclaration(packageName, declarations.toList(), modifiers, definitionsInfo, uid, resourceName, root)
 
-    override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): AstEntity = SourceFileDeclaration(fileName, root, referencedFiles)
+    override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): Entity = SourceFileDeclaration(fileName, root, referencedFiles)
 
-    override fun createTypeParam(name: QualifiedLeftDeclaration, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
+    override fun createTypeParam(name: NameEntity, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 
     override fun createSourceSet(sources: List<SourceFileDeclaration>) = SourceSetDeclaration(sources)
 }

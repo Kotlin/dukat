@@ -1,13 +1,12 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -53,7 +52,7 @@ interface DeclarationWithOwnerTypeLowering : DeclarationWithOwnerLowering {
     }
 
 
-    override fun lowerMemberDeclaration(owner: NodeOwner<AstMemberEntity>): AstMemberEntity {
+    override fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>): MemberEntity {
         val declaration = owner.node
         return when (declaration) {
             is FunctionDeclaration -> lowerFunctionDeclaration(owner.wrap(declaration))

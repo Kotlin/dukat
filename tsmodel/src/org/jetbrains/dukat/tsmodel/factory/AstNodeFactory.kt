@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.factory
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedLeftDeclaration
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -33,7 +33,7 @@ interface AstNodeFactory<T> {
 
     fun createIdentifierDeclaration(value: String): T
 
-    fun createQualifiedNameDeclaration(left: QualifiedLeftDeclaration, right: IdentifierDeclaration): T
+    fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): T
 
     fun createThisTypeDeclaration(): T
 
@@ -45,12 +45,12 @@ interface AstNodeFactory<T> {
 
     fun createHeritageClauseDeclaration(
             name: HeritageSymbolDeclaration,
-            typeArguments: List<QualifiedLeftDeclaration>,
+            typeArguments: List<NameEntity>,
             extending: Boolean
     ): T
 
     fun createTypeAliasDeclaration(
-            aliasName: QualifiedLeftDeclaration,
+            aliasName: NameEntity,
             typeParameters: List<IdentifierDeclaration>,
             typeReference: ParameterValueDeclaration,
             uid: String
@@ -69,18 +69,18 @@ interface AstNodeFactory<T> {
 
     fun createClassDeclaration(
             name: String,
-            members: List<AstMemberEntity>,
+            members: List<MemberEntity>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
             modifiers: List<ModifierDeclaration>,
             uid: String
     ): T
 
-    fun createObjectLiteral(members: List<AstMemberEntity>): T
+    fun createObjectLiteral(members: List<MemberEntity>): T
 
     fun createInterfaceDeclaration(
             name: String,
-            members: List<AstMemberEntity>,
+            members: List<MemberEntity>,
             typeParameters: List<TypeParameterDeclaration>,
             parentEntities: List<HeritageClauseDeclaration>,
             definitionsInfo: List<DefinitionInfoDeclaration>,
@@ -132,10 +132,10 @@ interface AstNodeFactory<T> {
 
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>): T
-    fun createTypeDeclaration(value: QualifiedLeftDeclaration, params: Array<ParameterValueDeclaration>): T
-    fun createDocumentRoot(packageName: String, declarations: Array<AstTopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean): T
+    fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>): T
+    fun createDocumentRoot(packageName: String, declarations: Array<TopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean): T
     fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): T
-    fun createTypeParam(name: QualifiedLeftDeclaration, constraints: Array<ParameterValueDeclaration>): T
+    fun createTypeParam(name: NameEntity, constraints: Array<ParameterValueDeclaration>): T
 
     fun createSourceSet(sources: List<SourceFileDeclaration>): T
 }

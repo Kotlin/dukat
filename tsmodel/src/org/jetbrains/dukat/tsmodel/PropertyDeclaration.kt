@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.AstMemberEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class PropertyDeclaration(
@@ -9,4 +9,4 @@ data class PropertyDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
         val modifiers: List<ModifierDeclaration>
-) : AstMemberEntity
+) : MemberEntity

@@ -11,11 +11,11 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.translate
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
 
-fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, AstTopLevelEntity> = mutableMapOf()): Map<String, AstTopLevelEntity> {
+fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelEntity> = mutableMapOf()): Map<String, TopLevelEntity> {
     map[docRoot.uid] = docRoot
 
     docRoot.declarations.forEach { declaration ->
@@ -32,7 +32,7 @@ fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, AstTopLevel
     return map
 }
 
-fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, AstTopLevelEntity>, turnOff: MutableSet<NameNode>, exportedModules: MutableMap<String, NameNode?>): DocumentRootNode {
+fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelEntity>, turnOff: MutableSet<NameNode>, exportedModules: MutableMap<String, NameNode?>): DocumentRootNode {
 
     val declarations = docRoot.declarations.mapNotNull { declaration ->
         when (declaration) {

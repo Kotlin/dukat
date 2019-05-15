@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 
-interface ClassLikeNode : AstTopLevelEntity
+interface ClassLikeNode : TopLevelEntity

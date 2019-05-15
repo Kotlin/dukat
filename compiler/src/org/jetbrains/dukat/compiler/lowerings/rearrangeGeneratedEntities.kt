@@ -10,8 +10,8 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.AstEntity
-import org.jetbrains.dukat.astCommon.AstTopLevelEntity
+import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
@@ -19,7 +19,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
 
-private fun AstEntity.getKey(): String {
+private fun Entity.getKey(): String {
     return when (this) {
         is ClassNode -> uid
         is InterfaceNode -> uid
@@ -40,7 +40,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
         return myReferences
     }
 
-    private fun findTopLevelOwner(ownerContext: NodeOwner<*>): NodeOwner<out AstEntity>? {
+    private fun findTopLevelOwner(ownerContext: NodeOwner<*>): NodeOwner<out Entity>? {
         ownerContext.getOwners().forEach { owner ->
             if (owner is NodeOwner<*>) {
                 when (owner.node) {
@@ -71,7 +71,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
 
 }
 
-private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, InterfaceNode>, List<AstTopLevelEntity>> {
+private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, InterfaceNode>, List<TopLevelEntity>> {
     val generatedDeclarations = mutableListOf<InterfaceNode>()
     val nonGeneratedDeclarations = declarations.mapNotNull { declaration ->
         if ((declaration is InterfaceNode) && (declaration.generated)) {
@@ -90,7 +90,7 @@ private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, Int
     return Pair(generatedDeclarationsMap, nonGeneratedDeclarations)
 }
 
-private fun AstTopLevelEntity.generateEntites(references: Map<String, List<String>>, generatedDeclarationsMap: MutableMap<String, InterfaceNode>): List<AstTopLevelEntity> {
+private fun TopLevelEntity.generateEntites(references: Map<String, List<String>>, generatedDeclarationsMap: MutableMap<String, InterfaceNode>): List<TopLevelEntity> {
     val genRefs = references.getOrDefault(getKey(), emptyList())
     val genEntities = genRefs.mapNotNull {
         val interfaceNode = generatedDeclarationsMap.get(it)

@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.ast.model.marker
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
-interface TypeModel : AstEntity
+interface TypeModel : Entity

@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
-interface TopLevelNode : AstEntity
+interface TopLevelNode : Entity

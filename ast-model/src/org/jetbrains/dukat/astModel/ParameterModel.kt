@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.marker.TypeModel
-import org.jetbrains.dukat.astCommon.AstEntity
+import org.jetbrains.dukat.astCommon.Entity
 
 data class ParameterModel(
         val name: String,
@@ -10,4 +10,4 @@ data class ParameterModel(
 
         val vararg: Boolean,
         val optional: Boolean
-) : AstEntity
+) : Entity
