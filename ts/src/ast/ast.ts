@@ -9,9 +9,6 @@ declare interface DefinitionInfoDeclaration extends AstNode {
     fileName: string;
 }
 
-declare interface HeritageSymbol extends Declaration {}
-declare interface PropertyAccessDeclaration extends HeritageSymbol {}
-
 declare interface TupleDeclaration extends ParameterValue {}
 
 declare interface NameDeclaration extends Declaration {}
@@ -21,7 +18,7 @@ declare interface QualifierDeclaration extends ModuleReferenceDeclaration, Param
     right: ParameterValue
 }
 
-declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, HeritageSymbol, NameDeclaration {}
+declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, NameDeclaration {}
 declare interface ThisTypeDeclaration extends Declaration {}
 declare interface ModuleReferenceDeclaration extends Declaration {}
 

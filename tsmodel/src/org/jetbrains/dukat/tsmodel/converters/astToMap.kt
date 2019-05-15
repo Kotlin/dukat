@@ -19,7 +19,6 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -99,7 +98,6 @@ fun Entity.astToMap(): Map<String, Any?> {
         is ObjectLiteralDeclaration -> listOf(::members).convert(this)
         is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::definitionsInfo, ::uid, ::resourceName, ::root).convert(this)
         is ParameterDeclaration -> toMap()
-        is PropertyAccessDeclaration -> listOf(::name, ::expression).convert(this)
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
         is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
         is SourceFileDeclaration -> listOf(::fileName, ::root, ::referencedFiles).convert(this)

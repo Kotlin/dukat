@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class HeritageClauseDeclaration(
-        val name: HeritageSymbolDeclaration,
+        val name: NameEntity,
         val typeArguments: List<NameEntity>,
         val extending: Boolean
 ) : Entity

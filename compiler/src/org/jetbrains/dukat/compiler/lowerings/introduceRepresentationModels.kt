@@ -17,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
@@ -276,19 +275,14 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
 private fun HeritageSymbolNode.translate(): String {
     return when (this) {
         is NameNode -> translate()
-        is PropertyAccessNode -> translate()
         else -> raiseConcern("unknown HeritageSymbolNode ${this}") { "" }
     }
 }
 
-private fun PropertyAccessNode.translate(): String {
-    return expression.translate() + "." + name.translate()
-}
 
 private fun HeritageSymbolNode.toTypeValueModel(): TypeValueModel {
     val nameTranslated = when (this) {
         is NameNode -> translate()
-        is PropertyAccessNode -> translate()
         else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }
     }
 

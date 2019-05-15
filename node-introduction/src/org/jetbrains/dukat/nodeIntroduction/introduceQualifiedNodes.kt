@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyAccessNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -114,8 +113,8 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                     else -> heritageSymbol
                 }
             }
-            is PropertyAccessNode -> {
-                return heritageSymbol.copy(expression = resolveExression(heritageSymbol.expression, ownerModule))
+            is QualifiedNode -> {
+                return heritageSymbol.copy(left = resolveExression(heritageSymbol.left, ownerModule) as NameNode)
             }
             else -> heritageSymbol
         }

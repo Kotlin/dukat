@@ -4,8 +4,6 @@ declare interface AstFactory {
 
     createTupleDeclaration(params: Array<ParameterValue>): TupleDeclaration;
 
-    createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbol): PropertyAccessDeclaration;
-
     createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration, uid: string): ImportEqualsDeclaration
 
     createIdentifierDeclaration(value: string): IdentifierDeclaration;

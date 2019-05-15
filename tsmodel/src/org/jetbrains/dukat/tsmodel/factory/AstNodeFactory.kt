@@ -6,14 +6,12 @@ import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageSymbolDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -26,8 +24,6 @@ interface AstNodeFactory<T> {
     fun createDefinitionInfoDeclaration(fileName: String): T
 
     fun createTupleDeclaration(params: List<ParameterValueDeclaration>): T
-
-    fun createPropertyAccessDeclaration(name: IdentifierDeclaration, expression: HeritageSymbolDeclaration): PropertyAccessDeclaration
 
     fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration, uid: String): ImportEqualsDeclaration
 
@@ -44,7 +40,7 @@ interface AstNodeFactory<T> {
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean): T
 
     fun createHeritageClauseDeclaration(
-            name: HeritageSymbolDeclaration,
+            name: NameEntity,
             typeArguments: List<NameEntity>,
             extending: Boolean
     ): T

@@ -577,21 +577,20 @@ class AstConverter {
         )
     }
 
-    private convertPropertyAccessExpression(propertyAccessExpression: ts.PropertyAccessExpression): PropertyAccessDeclaration  {
-        let convertedExpression: HeritageSymbol | null;
+    private convertPropertyAccessExpression(propertyAccessExpression: ts.PropertyAccessExpression): QualifierDeclaration  {
+        let convertedExpression: NameDeclaration | null;
+        let name = this.astFactory.createIdentifierDeclaration(propertyAccessExpression.name.text);
+
         if (ts.isIdentifier(propertyAccessExpression.expression)) {
-            convertedExpression = this.astFactory.createIdentifierDeclaration(propertyAccessExpression.expression.text)
+            convertedExpression = this.astFactory.createIdentifierDeclaration(propertyAccessExpression.expression.text);
         } else if (ts.isPropertyAccessExpression(propertyAccessExpression.expression)) {
-            convertedExpression = this.convertPropertyAccessExpression(propertyAccessExpression.expression)
+            convertedExpression = this.convertPropertyAccessExpression(propertyAccessExpression.expression);
         } else {
             // TODO: we can not have errors to be honest
             throw new Error("never supposed to be there")
         }
 
-        return this.astFactory.createPropertyAccessDeclaration(
-            this.astFactory.createIdentifierDeclaration(propertyAccessExpression.name.text),
-            convertedExpression
-        )
+        return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
     }
 
     private convertValue(entity: ts.TypeNode | ts.Identifier): NameDeclaration {

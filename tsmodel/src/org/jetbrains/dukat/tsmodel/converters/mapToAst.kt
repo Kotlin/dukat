@@ -19,7 +19,6 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyAccessDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -139,10 +138,6 @@ fun <T : Entity> Map<String, Any?>.toAst(): T {
                 getEntities("typeParameters"),
                 getEntities("modifiers"),
                 get("uid") as String
-        )
-        PropertyAccessDeclaration::class.simpleName -> PropertyAccessDeclaration(
-                getEntity("name"),
-                getEntity("expression")
         )
         MethodSignatureDeclaration::class.simpleName -> MethodSignatureDeclaration(
                 get(MethodSignatureDeclaration::name.name) as String,
