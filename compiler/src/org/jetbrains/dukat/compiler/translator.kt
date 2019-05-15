@@ -5,12 +5,11 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.jetbrains.dukat.ast.j2v8.AstV8Factory
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
+import org.jetbrains.dukat.interop.graal.DocumentCache
 import org.jetbrains.dukat.interop.graal.InteropGraal
 import org.jetbrains.dukat.j2v8.interop.InteropV8
 import org.jetbrains.dukat.j2v8.interop.InteropV8Signature
 import org.jetbrains.dukat.logger.Logging
-import org.jetbrains.dukat.nashorn.DocumentCache
-import org.jetbrains.dukat.nashorn.interop.InteropNashorn
 import org.jetbrains.dukat.tsinterop.ExportContent
 import org.jetbrains.dukat.tsinterop.ExportContentNonGeneric
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -25,36 +24,6 @@ private fun InteropEngine.loadAstBuilder() {
     eval(fileResolver.readResource("ts/tsserverlibrary.js"))
     eval(fileResolver.readResource("js/dukat-ast-builder.js"))
 }
-
-private fun createNashornInterop(): InteropNashorn {
-    val engine = InteropNashorn()
-
-    engine.put("AstFactory", AstFactory::class.java)
-    engine.put("FileResolver", FileResolver::class.java)
-    engine.put("ExportContent", ExportContentNonGeneric::class.java)
-    engine.put("KotlinLogging", Logging::class.java)
-
-    engine.eval("""
-        var global = this;
-        var DocumentCache = Java.type('org.jetbrains.dukat.nashorn.DocumentCache');
-        var Set = Java.type('org.jetbrains.dukat.nashorn.Set');
-
-        function createExportContent() {return new ExportContent.static(); }
-        function createAstFactory() { return new AstFactory.static(); }
-        function createFileResolver() { return new FileResolver.static(); }
-
-        function createLogger(name) {
-            return KotlinLogging.static.logger(name);
-        }
-
-        var uid = function(){return Java.type('java.util.UUID').randomUUID().toString();}
-    """.trimIndent())
-
-    engine.loadAstBuilder()
-
-    return engine
-}
-
 
 private fun createGraalInterop(): InteropGraal {
     val engine = InteropGraal()
@@ -125,16 +94,6 @@ class TranslatorV8(private val engine: InteropV8) : TypescriptInputTranslator {
     }
 }
 
-class TranslatorNashorn(
-        private val engine: InteropNashorn,
-        private val documentCache: DocumentCache = DocumentCache()
-) : TypescriptInputTranslator {
-    override fun translateFile(fileName: String): SourceSetDeclaration {
-        return engine.callFunction("main", fileName, documentCache)
-    }
-
-    override fun release() {}
-}
 
 class TranslatorGraal(
         private val engine: InteropGraal,
@@ -148,5 +107,4 @@ class TranslatorGraal(
 }
 
 fun createV8Translator() = TranslatorV8(createV8Interop())
-fun createNashornTranslator() = TranslatorNashorn(createNashornInterop())
 fun createGraalTranslator() = TranslatorGraal(createGraalInterop())

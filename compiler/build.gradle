@@ -57,7 +57,6 @@ dependencies {
     implementation(project(":translator"))
     implementation(project(":translator-string"))
 
-    implementation(project(":nashorn"))
     implementation(project(":j2v8"))
 
     implementation(project(":logging"))
@@ -128,7 +127,6 @@ test {
             "dukat.test.extended",
             "dukat.test.jsbackend.graal",
             "dukat.test.jsbackend.j2v8",
-            "dukat.test.jsbackend.nashorn"
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
             systemProperty(projectProperty, "true")
