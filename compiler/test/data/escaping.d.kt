@@ -21,6 +21,8 @@ external var `$foo`: Boolean = definedExternally
 external fun `bar$`(`ba$z`: Number): Unit = definedExternally
 external fun `fun`(): Unit = definedExternally
 external interface This {
+    var `string-literal`: Boolean
+    var `another-string-literal`: String
     var `when`: String
     var `typealias`: Number
     var `typeof`: Number

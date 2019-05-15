@@ -85,8 +85,11 @@ class AstConverter {
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
+        //TODO: this should be process at frontend
         if (ts.isNumericLiteral(name)) {
             return "`" + name.getText() + "`";
+        } else if (ts.isStringLiteral(name)) {
+            return "`" + name.getText().replace(/^["']/, "").replace(/["']$/,"") + "`";
         } else if (ts.isIdentifier(name)) {
             return name.getText();
         }

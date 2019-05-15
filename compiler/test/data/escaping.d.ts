@@ -4,6 +4,8 @@ declare var $foo: boolean;
 declare function bar$(ba$z: number);
 declare function fun();
 interface This {
+    "string-literal": boolean,
+    'another-string-literal': string,
     when: string;
     typealias: number;
     typeof: number;
