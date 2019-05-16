@@ -6,9 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
@@ -159,33 +157,17 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
     return annotationTranslated
 }
 
-private fun QualifiedStatementLeftNode.translate(): String {
-    return when (this) {
-        is IdentifierNode -> value
-        is StatementCallNode -> translate()
-        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
-        else -> raiseConcern("unkown QualifiedStatementLeftNode ${this}") { "" }
-    }
-}
-
-private fun QualifiedStatementRightNode.translate(): String {
-    return when (this) {
-        is IdentifierNode -> value
-        is StatementCallNode -> translate()
-        else -> raiseConcern("unkown QualifiedStatementRightNode ${this}") { "" }
-    }
-}
-
 private fun StatementCallNode.translate(): String {
     return "${value}(${params.joinToString(", ") { it.value }})"
 }
 
 private fun StatementNode.translate(): String {
     return when (this) {
-        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
-        is ReturnStatement -> "return ${statement.translate()}"
         is AssignmentStatementNode -> "${left.translate()} = ${right.translate()}"
         is IdentifierNode -> translate()
+        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
+        is ReturnStatement -> "return ${statement.translate()}"
+        is StatementCallNode -> translate()
         else -> raiseConcern("unkown StatementNode ${this}") { "" }
     }
 }
