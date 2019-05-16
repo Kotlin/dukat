@@ -4,4 +4,4 @@ import org.jetbrains.dukat.astCommon.NameEntity
 
 data class IdentifierDeclaration(
         val value: String
-) : ModuleReferenceDeclaration, NameEntity
+) : NameEntity

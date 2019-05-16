@@ -53,7 +53,6 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
@@ -643,15 +642,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     right = right.convert()
             )
             else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_ENTITY") }
-        }
-    }
-
-    // TODO: introduce ModuleReferenceNode
-    private fun ModuleReferenceDeclaration.convert(): NameEntity {
-        return when (this) {
-            is IdentifierDeclaration -> convert()
-            is QualifiedNamedDeclaration -> QualifiedNode(left.convert(), right.convert())
-            else -> raiseConcern("unknown ModuleReferenceDeclaration ${this}") { IdentifierNode("INVALID_MODULE_REFERENCE") }
         }
     }
 

@@ -9,7 +9,6 @@ import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -25,7 +24,7 @@ interface AstNodeFactory<T> {
 
     fun createTupleDeclaration(params: List<ParameterValueDeclaration>): T
 
-    fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration, uid: String): ImportEqualsDeclaration
+    fun createImportEqualsDeclaration(name: String, moduleReference: NameEntity, uid: String): ImportEqualsDeclaration
 
     fun createIdentifierDeclaration(value: String): T
 

@@ -5,4 +5,4 @@ import org.jetbrains.dukat.astCommon.NameEntity
 data class QualifiedNamedDeclaration(
         val left: NameEntity,
         val right: IdentifierDeclaration
-) : ModuleReferenceDeclaration, NameEntity
+) : NameEntity

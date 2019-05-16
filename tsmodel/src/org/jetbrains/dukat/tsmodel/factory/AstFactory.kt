@@ -19,7 +19,6 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
@@ -50,7 +49,7 @@ class AstFactory : AstNodeFactory<Entity> {
         return TupleDeclaration(params)
     }
 
-    override fun createImportEqualsDeclaration(name: String, moduleReference: ModuleReferenceDeclaration, uid: String): ImportEqualsDeclaration {
+    override fun createImportEqualsDeclaration(name: String, moduleReference: NameEntity, uid: String): ImportEqualsDeclaration {
         return ImportEqualsDeclaration(name, moduleReference, uid)
     }
 
