@@ -3,21 +3,22 @@
 var exec = require('child_process').exec;
 var path = require('path');
 
+var printError = function(errorMessage) {
+    console.error("ERROR: " + errorMessage);
+};
 
 var processError = function(error) {
-    if (error.code == 127) {
-        console.log(
-            "ERROR: It looks like you don't have java installed or it's just not reachable from command-line. \r\n"+
-            "ERROR: As of now \"dukat\" requires Java Runtime Environment.");
-    } else {
-        console.error("ERROR: " + error.message);
+    printError(error.message);
+    if ((error.code == 127) || (error.code == 1)) {
+        printError("It looks like you don't have java installed or it's just not reachable from command-line");
+        printError("As of now \"dukat\" requires Java Runtime Environment to be installed.");
     }
 };
 
 var execHandler = function(error, stdout, stderr) {
     if (error) {
         processError(error);
-        process.exit(error.code);
+        process.exitCode = error.code;
     } else {
         console.log(stdout);
     }
