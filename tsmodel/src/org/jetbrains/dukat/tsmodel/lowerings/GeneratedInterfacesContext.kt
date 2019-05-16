@@ -9,7 +9,7 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -204,8 +204,8 @@ class GeneratedInterfacesContext {
             }
             is ObjectLiteralDeclaration -> {
                 when {
-                    declaration.canBeJson() -> TypeDeclaration(IdentifierDeclaration("Json"), emptyList())
-                    declaration.members.isEmpty() -> TypeDeclaration(IdentifierDeclaration("Any"), emptyList())
+                    declaration.canBeJson() -> TypeDeclaration(IdentifierEntity("Json"), emptyList())
+                    declaration.members.isEmpty() -> TypeDeclaration(IdentifierEntity("Any"), emptyList())
                     else -> {
                         registerObjectLiteralDeclaration(
                                 owner.wrap(declaration.copy(members = declaration.members.map { param ->

@@ -12,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -20,7 +20,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -88,7 +88,7 @@ fun Entity.astToMap(): Map<String, Any?> {
         is FunctionDeclaration -> listOf(::name, ::type, ::parameters, ::typeParameters, ::modifiers, ::uid).convert(this)
         is FunctionTypeDeclaration -> listOf(::type, ::parameters).convert(this)
         is HeritageClauseDeclaration -> listOf(::name, ::typeArguments, ::extending).convert(this)
-        is IdentifierDeclaration -> listOf(::value).convert(this)
+        is IdentifierEntity -> listOf(::value).convert(this)
         is ImportEqualsDeclaration -> listOf(::name, ::moduleReference, ::uid).convert(this)
         is IndexSignatureDeclaration -> listOf(::returnType, ::indexTypes).convert(this)
         is InterfaceDeclaration -> listOf(::name, ::members, ::typeParameters, ::parentEntities, ::definitionsInfo, ::uid).convert(this)
@@ -99,7 +99,7 @@ fun Entity.astToMap(): Map<String, Any?> {
         is PackageDeclaration -> listOf(::packageName, ::declarations, ::modifiers, ::definitionsInfo, ::uid, ::resourceName, ::root).convert(this)
         is ParameterDeclaration -> toMap()
         is PropertyDeclaration -> listOf(::name, ::type, ::typeParameters, ::optional, ::modifiers).convert(this)
-        is QualifiedNamedDeclaration -> listOf(::left, ::right).convert(this)
+        is QualifierEntity -> listOf(::left, ::right).convert(this)
         is SourceFileDeclaration -> listOf(::fileName, ::root, ::referencedFiles).convert(this)
         is SourceSetDeclaration -> listOf(::sources).convert(this)
         is StringTypeDeclaration -> listOf(::tokens).convert(this)

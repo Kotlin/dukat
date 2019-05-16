@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
@@ -28,7 +28,7 @@ interface AstNodeFactory<T> {
 
     fun createIdentifierDeclaration(value: String): T
 
-    fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): T
+    fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierEntity): T
 
     fun createThisTypeDeclaration(): T
 
@@ -46,7 +46,7 @@ interface AstNodeFactory<T> {
 
     fun createTypeAliasDeclaration(
             aliasName: NameEntity,
-            typeParameters: List<IdentifierDeclaration>,
+            typeParameters: List<IdentifierEntity>,
             typeReference: ParameterValueDeclaration,
             uid: String
     ): T
@@ -129,7 +129,7 @@ interface AstNodeFactory<T> {
     fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>): T
     fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>): T
     fun createDocumentRoot(packageName: String, declarations: Array<TopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean): T
-    fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): T
+    fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierEntity>): T
     fun createTypeParam(name: NameEntity, constraints: Array<ParameterValueDeclaration>): T
 
     fun createSourceSet(sources: List<SourceFileDeclaration>): T

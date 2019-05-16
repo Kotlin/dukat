@@ -12,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -20,7 +20,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -199,7 +199,7 @@ fun <T : Entity> Map<String, Any?>.toAst(): T {
                 getEntity("moduleReference"),
                 get("uid") as String
         )
-        IdentifierDeclaration::class.simpleName -> IdentifierDeclaration(
+        IdentifierEntity::class.simpleName -> IdentifierEntity(
                 get("value") as String
         )
         InterfaceDeclaration::class.simpleName -> InterfaceDeclaration(
@@ -214,7 +214,7 @@ fun <T : Entity> Map<String, Any?>.toAst(): T {
                 get("fileName") as String
         )
         ObjectLiteralDeclaration::class.simpleName -> ObjectLiteralDeclaration(getEntities("members"))
-        QualifiedNamedDeclaration::class.simpleName -> QualifiedNamedDeclaration(
+        QualifierEntity::class.simpleName -> QualifierEntity(
                 getEntity("left"),
                 getEntity("right")
         )

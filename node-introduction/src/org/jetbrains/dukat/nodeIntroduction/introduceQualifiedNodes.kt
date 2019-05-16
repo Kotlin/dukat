@@ -11,9 +11,9 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
@@ -72,10 +72,10 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
 
     private fun resolve(value: NameEntity, owner: NodeOwner<*>): NameEntity {
         return when (value) {
-            is IdentifierDeclaration -> {
+            is IdentifierEntity -> {
                 resolve(value.value, owner)
             }
-            is QualifiedNamedDeclaration -> {
+            is QualifierEntity -> {
                 QualifiedNode(
                         left = resolve(value.left, owner),
                         right = IdentifierNode(value.right.value)

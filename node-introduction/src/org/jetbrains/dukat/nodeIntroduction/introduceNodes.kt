@@ -48,7 +48,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -56,7 +56,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -161,7 +161,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 MethodNode(
                         "set",
                         convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
-                        TypeDeclaration(IdentifierDeclaration("Unit"), emptyList()),
+                        TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
                         owner,
                         false,
@@ -354,10 +354,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             //TODO: it's quite easy to break this, so consider to introduce "breaking" test and fix for it
             typeParam.copy(name = if (ownNames.contains(name)) {
                 when (name) {
-                    is IdentifierDeclaration -> {
+                    is IdentifierEntity -> {
                         name.copy(value = name.value + "0")
                     }
-                    is QualifiedNamedDeclaration -> {
+                    is QualifierEntity -> {
                         name.copy(right = name.right.copy(value = name.right.value + "0"))
                     }
                     else -> name
@@ -509,7 +509,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
                             convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
-                                    ExpressionDeclaration(TypeDeclaration(IdentifierDeclaration("null"), emptyList()), null)
+                                    ExpressionDeclaration(TypeDeclaration(IdentifierEntity("null"), emptyList()), null)
                                 } else {
                                     param.initializer
                                 }
@@ -630,14 +630,14 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    private fun IdentifierDeclaration.convert(): IdentifierNode {
+    private fun IdentifierEntity.convert(): IdentifierNode {
         return IdentifierNode(value)
     }
 
     private fun NameEntity.convert(): NameEntity {
         return when (this) {
-            is IdentifierDeclaration -> convert()
-            is QualifiedNamedDeclaration -> QualifiedNode(
+            is IdentifierEntity -> convert()
+            is QualifierEntity -> QualifiedNode(
                     left = left.convert(),
                     right = right.convert()
             )

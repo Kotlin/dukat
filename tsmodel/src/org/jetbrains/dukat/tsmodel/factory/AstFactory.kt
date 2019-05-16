@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -22,7 +22,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -54,11 +54,11 @@ class AstFactory : AstNodeFactory<Entity> {
     }
 
     override fun createIdentifierDeclaration(value: String): Entity {
-        return IdentifierDeclaration(value)
+        return IdentifierEntity(value)
     }
 
-    override fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): Entity {
-        return QualifiedNamedDeclaration(left, right)
+    override fun createQualifiedNameDeclaration(left: NameEntity, right: IdentifierEntity): Entity {
+        return QualifierEntity(left, right)
     }
 
     override fun createThisTypeDeclaration(): Entity {
@@ -80,7 +80,7 @@ class AstFactory : AstNodeFactory<Entity> {
 
     override fun createTypeAliasDeclaration(
             aliasName: NameEntity,
-            typeParameters: List<IdentifierDeclaration>,
+            typeParameters: List<IdentifierEntity>,
             typeReference: ParameterValueDeclaration,
             uid: String
     ) = TypeAliasDeclaration(aliasName, typeParameters, typeReference, uid)
@@ -147,7 +147,7 @@ class AstFactory : AstNodeFactory<Entity> {
 
     override fun createDocumentRoot(packageName: String, declarations: Array<TopLevelEntity>, modifiers: List<ModifierDeclaration>, definitionsInfo: List<DefinitionInfoDeclaration>, uid: String, resourceName: String, root: Boolean) = PackageDeclaration(packageName, declarations.toList(), modifiers, definitionsInfo, uid, resourceName, root)
 
-    override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierDeclaration>): Entity = SourceFileDeclaration(fileName, root, referencedFiles)
+    override fun createSourceFileDeclaration(fileName: String, root: PackageDeclaration, referencedFiles: List<IdentifierEntity>): Entity = SourceFileDeclaration(fileName, root, referencedFiles)
 
     override fun createTypeParam(name: NameEntity, constraints: Array<ParameterValueDeclaration>) = TypeParameterDeclaration(name, constraints.toList())
 

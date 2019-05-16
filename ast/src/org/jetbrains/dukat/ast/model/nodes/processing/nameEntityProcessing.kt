@@ -5,8 +5,8 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
-import org.jetbrains.dukat.tsmodel.QualifiedNamedDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 
 fun NameEntity.translate(): String = when (this) {
     is IdentifierNode -> value
@@ -19,8 +19,8 @@ fun NameEntity.translate(): String = when (this) {
 
 fun NameEntity.toNode(): NameEntity {
     return when (this) {
-        is IdentifierDeclaration -> IdentifierNode(value)
-        is QualifiedNamedDeclaration -> QualifiedNode(left = left.toNode(), right = IdentifierNode(right.value))
+        is IdentifierEntity -> IdentifierNode(value)
+        is QualifierEntity -> QualifiedNode(left = left.toNode(), right = IdentifierNode(right.value))
         else -> raiseConcern("unknown QualifiedLeftDeclaration") { IdentifierNode(this.toString()) }
     }
 }

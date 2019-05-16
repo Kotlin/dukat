@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberEntity
-import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -21,7 +21,7 @@ private fun MemberEntity.makeOptional(): MemberEntity {
 private class PartialLowering : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeDeclaration -> if (((declaration.value is IdentifierDeclaration)) && (declaration.value.value == "Partial")) {
+            is TypeDeclaration -> if (((declaration.value is IdentifierEntity)) && (declaration.value.value == "Partial")) {
                 if ((declaration.params.size == 1) && (declaration.params[0] is ObjectLiteralDeclaration)) {
                     val objectLiteral = (declaration.params.get(0) as ObjectLiteralDeclaration)
                     super.lowerParameterValue(objectLiteral.copy(members = objectLiteral.members.map { member ->
