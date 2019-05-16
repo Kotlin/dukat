@@ -34,7 +34,7 @@ var main = function() {
     var runtimePath = path.resolve(__dirname + "/../build/runtime");
     var jsPath = path.resolve(runtimePath, "js.jar");
     var cliPath = path.resolve(runtimePath, "dukat-cli.jar");
-    var classPath = [jsPath, cliPath].join(":");
+    var classPath = [jsPath, cliPath].join(path.delimiter);
 
     run("java -cp " + classPath + " org.jetbrains.dukat.cli.CliKt " + args.join(" "))
 };
