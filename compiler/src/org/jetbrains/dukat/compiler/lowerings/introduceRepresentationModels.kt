@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -272,15 +271,7 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
     )
 }
 
-private fun HeritageSymbolNode.translate(): String {
-    return when (this) {
-        is NameNode -> translate()
-        else -> raiseConcern("unknown HeritageSymbolNode ${this}") { "" }
-    }
-}
-
-
-private fun HeritageSymbolNode.toTypeValueModel(): TypeValueModel {
+private fun NameNode.toTypeValueModel(): TypeValueModel {
     val nameTranslated = when (this) {
         is NameNode -> translate()
         else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }

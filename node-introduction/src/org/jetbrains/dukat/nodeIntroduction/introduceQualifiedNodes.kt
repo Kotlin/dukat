@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageSymbolNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
@@ -104,7 +103,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
     }
 
 
-    private fun resolveExression(heritageSymbol: HeritageSymbolNode, ownerModule: DocumentRootNode): HeritageSymbolNode {
+    private fun resolveExression(heritageSymbol: NameNode, ownerModule: DocumentRootNode): NameNode {
         return when (heritageSymbol) {
             is IdentifierNode -> {
                 val reference = ownerModule.imports.get(heritageSymbol.value)
@@ -114,7 +113,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 }
             }
             is QualifiedNode -> {
-                return heritageSymbol.copy(left = resolveExression(heritageSymbol.left, ownerModule) as NameNode)
+                return heritageSymbol.copy(left = resolveExression(heritageSymbol.left, ownerModule))
             }
             else -> heritageSymbol
         }
