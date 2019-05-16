@@ -367,7 +367,9 @@ class AstConverter {
                     ]
                 )
             } else {
-                return this.createTypeDeclaration(`__UNKNOWN__:${type.kind}`);
+                // TODO: use raiseConcern for this
+                this.log.debug(`unsupported declaration type: [${type.kind}]`);
+                return this.createTypeDeclaration("any");
             }
         }
     }
@@ -755,7 +757,7 @@ class AstConverter {
                     }
                 }
             }  else {
-                this.log.info(`SKIPPING UNKNOWN EXPRESSION ASSIGNMENT ${expression.kind}`);
+                this.log.info(`skipping unknown expression assignment: [${expression.kind}]`);
             }
         } else if (ts.isImportEqualsDeclaration(statement)) {
 
@@ -769,10 +771,10 @@ class AstConverter {
                     uid
                 ));
             } else {
-                this.log.info(`[TS] skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
+                this.log.info(`skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
         } else {
-            this.log.info(`SKIPPING ${statement.kind}`);
+            this.log.info(`skipping ${statement.kind}`);
         }
 
         return res;
