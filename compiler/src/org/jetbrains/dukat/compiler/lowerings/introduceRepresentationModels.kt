@@ -12,7 +12,6 @@ import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -26,8 +25,9 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.ast.model.nodes.toNode
-import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.toNode
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -149,7 +149,7 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             name = name,
             initializer = initializer?.let { valueNode ->
                 // TODO: don't like this particular cast
-                TypeValueModel(valueNode.value as NameNode, emptyList(), meta, valueNode.nullable)
+                TypeValueModel(valueNode.value, emptyList(), meta, valueNode.nullable)
             },
             vararg = vararg,
             optional = optional
@@ -197,10 +197,10 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         )
         is TypeValueNode -> {
             if ((value == IdentifierNode("String")) && (meta is StringTypeDeclaration)) {
-                TypeValueModel(value as NameNode, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
+                TypeValueModel(value, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
             } else {
                 TypeValueModel(
-                        value as NameNode,
+                        value,
                         params.map { param -> param.process() },
                         meta.processMeta(nullable, context.resolveAsMetaOptions()),
                         nullable
@@ -271,9 +271,9 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
     )
 }
 
-private fun NameNode.toTypeValueModel(): TypeValueModel {
+private fun NameEntity.toTypeValueModel(): TypeValueModel {
     val nameTranslated = when (this) {
-        is NameNode -> translate()
+        is NameEntity -> translate()
         else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }
     }
 

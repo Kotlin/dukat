@@ -4,12 +4,11 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.IdentifierDeclaration
@@ -47,7 +46,7 @@ private class UidData() {
 
 private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWithOwnerTypeLowering {
 
-    private fun resolve(value: String, owner: NodeOwner<*>): NameNode {
+    private fun resolve(value: String, owner: NodeOwner<*>): NameEntity {
         val importNode = owner.findModuleWithImport(value)
 
         return if (importNode == null) {
@@ -64,15 +63,14 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 if (resolvedImport == null) {
                     importNode.referenceName
                 } else {
-                    resolvedImport.qualifiedNode as NameNode
+                    resolvedImport.qualifiedNode as NameEntity
                 }
             }
         }
     }
 
 
-    // TODO: This kind of declarations are not supposed to survive up to this point at all
-    private fun resolve(value: NameEntity, owner: NodeOwner<*>): NameNode {
+    private fun resolve(value: NameEntity, owner: NodeOwner<*>): NameEntity {
         return when (value) {
             is IdentifierDeclaration -> {
                 resolve(value.value, owner)
@@ -83,27 +81,18 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                         right = IdentifierNode(value.right.value)
                 )
             }
-            else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
-        }
-    }
-
-    private fun resolve(value: NameNode, owner: NodeOwner<*>): NameNode {
-        return when (value) {
             is IdentifierNode -> {
                 resolve(value.value, owner)
             }
-            is QualifiedNode -> {
-                QualifiedNode(
-                        left = resolve(value.left, owner),
-                        right = IdentifierNode(value.right.value)
-                )
-            }
-            else -> raiseConcern("unknown QualifiedLeftDeclaration subtype") { IdentifierNode("INVALID_NODE") }
+            is QualifiedNode -> value.copy(
+                left = resolve(value.left, owner),
+                right = IdentifierNode(value.right.value)
+            )
+            else -> raiseConcern("unknown NameEntity subtype ${value::class.simpleName}") { value }
         }
     }
 
-
-    private fun resolveExression(heritageSymbol: NameNode, ownerModule: DocumentRootNode): NameNode {
+    private fun resolveExression(heritageSymbol: NameEntity, ownerModule: DocumentRootNode): NameEntity {
         return when (heritageSymbol) {
             is IdentifierNode -> {
                 val reference = ownerModule.imports.get(heritageSymbol.value)

@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 
@@ -8,7 +9,7 @@ data class DocumentRootNode(
         val resourceName: String,
 
         val packageName: String,
-        var fullPackageName: NameNode,
+        var fullPackageName: NameEntity,
         val declarations: List<TopLevelEntity> = emptyList(),
         val imports: Map<String, ImportNode>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,
@@ -16,7 +17,7 @@ data class DocumentRootNode(
         var owner: DocumentRootNode?,
         var uid: String,
 
-        var qualifiedNode: NameNode?,
+        var qualifiedNode: NameEntity?,
         var isQualifier: Boolean,
         var showQualifierAnnotation: Boolean
 ) : TopLevelEntity

@@ -2,12 +2,12 @@ package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 
 
@@ -22,7 +22,7 @@ private fun mapPrimitiveValue(value: String): String {
     }
 }
 
-private fun NameNode.mapPrimitive(): NameNode {
+private fun NameEntity.mapPrimitive(): NameEntity {
     return when (this) {
         is IdentifierNode -> {
             copy(value = mapPrimitiveValue(value))

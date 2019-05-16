@@ -3,23 +3,23 @@ package org.jetbrains.dukat.compiler.lowerings.typeAlias
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
-private fun NameNode.getAliasKey(): String {
+private fun NameEntity.getAliasKey(): String {
     return when (this) {
         is IdentifierNode -> translate()
         is QualifiedNode -> translate()
-        else -> raiseConcern("unknown NameNode ${this}") { "" }
+        else -> raiseConcern("unknown NameEntity ${this}") { "" }
     }
 }
 

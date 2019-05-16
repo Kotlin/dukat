@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class TypeParameterModel(
-        val name: NameNode,
+        val name: NameEntity,
         val constraints: List<TypeModel>
 ) : Entity

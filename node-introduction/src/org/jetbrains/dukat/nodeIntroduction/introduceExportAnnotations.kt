@@ -6,11 +6,11 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
@@ -32,7 +32,7 @@ fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelEnt
     return map
 }
 
-fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelEntity>, turnOff: MutableSet<NameNode>, exportedModules: MutableMap<String, NameNode?>): DocumentRootNode {
+fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelEntity>, turnOff: MutableSet<NameEntity>, exportedModules: MutableMap<String, NameEntity?>): DocumentRootNode {
 
     val declarations = docRoot.declarations.mapNotNull { declaration ->
         when (declaration) {
@@ -156,7 +156,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
 
 
 
-private fun DocumentRootNode.turnOff(turnOffData: MutableSet<NameNode>): DocumentRootNode {
+private fun DocumentRootNode.turnOff(turnOffData: MutableSet<NameEntity>): DocumentRootNode {
     if (turnOffData.contains(fullPackageName)) {
         showQualifierAnnotation = false
     }
@@ -173,7 +173,7 @@ private fun DocumentRootNode.turnOff(turnOffData: MutableSet<NameNode>): Documen
     return copy(declarations = declarations)
 }
 
-private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<String, NameNode?>): DocumentRootNode {
+private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<String, NameEntity?>): DocumentRootNode {
     if (exportedModulesData.containsKey(uid)) {
         qualifiedNode = exportedModulesData.getValue(uid)
         isQualifier = false
@@ -193,8 +193,8 @@ private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<Stri
 
 fun DocumentRootNode.introduceExportAnnotations(): DocumentRootNode {
     val uidTable = org.jetbrains.dukat.nodeIntroduction.buildUidTable(this)
-    val turnOffData = mutableSetOf<NameNode>()
-    val exportedModulesData = mutableMapOf<String, NameNode?>()
+    val turnOffData = mutableSetOf<NameEntity>()
+    val exportedModulesData = mutableMapOf<String, NameEntity?>()
     val docRoot = org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
 
     return docRoot.turnOff(turnOffData).markModulesAsExported(exportedModulesData)

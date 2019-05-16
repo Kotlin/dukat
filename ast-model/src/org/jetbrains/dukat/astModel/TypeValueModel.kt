@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class TypeValueModel(
-        val value: NameNode,
+        val value: NameEntity,
         val params: List<TypeModel>,
 
         val metaDescription: String?,

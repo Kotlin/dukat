@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
-import org.jetbrains.dukat.ast.model.nodes.toNameNode
+import org.jetbrains.dukat.ast.model.nodes.processing.toNameNode
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 

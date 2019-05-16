@@ -1,17 +1,13 @@
 package org.jetbrains.dukat.cli
 
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.process
-import org.jetbrains.dukat.ast.model.nodes.toNameNode
-import org.jetbrains.dukat.ast.model.nodes.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.toNameNode
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.panic.PanicMode
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule

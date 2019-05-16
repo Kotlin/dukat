@@ -18,7 +18,6 @@ import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -31,10 +30,10 @@ import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.appendRight
+import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
-import org.jetbrains.dukat.ast.model.nodes.shiftLeft
-import org.jetbrains.dukat.ast.model.nodes.toNode
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
+import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -636,19 +635,19 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return IdentifierNode(value)
     }
 
-    private fun NameEntity.convert(): NameNode {
+    private fun NameEntity.convert(): NameEntity {
         return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(
                     left = left.convert(),
                     right = right.convert()
             )
-            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_NODE") }
+            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_ENTITY") }
         }
     }
 
     // TODO: introduce ModuleReferenceNode
-    private fun ModuleReferenceDeclaration.convert(): NameNode {
+    private fun ModuleReferenceDeclaration.convert(): NameEntity {
         return when (this) {
             is IdentifierDeclaration -> convert()
             is QualifiedNamedDeclaration -> QualifiedNode(left.convert(), right.convert())
@@ -701,7 +700,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 .flatMap { it.split("/") }
                 .map { IdentifierNode(escapePackageName(it)) }
 
-        val fullPackageName = qualifierIdentifiers.reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
+        val fullPackageName = qualifierIdentifiers.reduce<NameEntity, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
 
 
         val qualifiedNode = if (qualifiers.isEmpty()) {
@@ -709,7 +708,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         } else {
             qualifiers
                     .map { IdentifierNode(it) }
-                    .reduce<NameNode, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
+                    .reduce<NameEntity, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
                     .shiftLeft()
         }
 

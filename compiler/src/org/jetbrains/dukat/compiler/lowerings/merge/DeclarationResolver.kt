@@ -1,8 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.NameNode
-import org.jetbrains.dukat.ast.model.nodes.shiftLeft
-import org.jetbrains.dukat.ast.model.nodes.shiftRight
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -10,7 +9,7 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class DeclarationKey(
         val classValue: String,
-        val qualifiedPath: NameNode
+        val qualifiedPath: NameEntity
 )
 
 class DeclarationResolver {
@@ -35,12 +34,12 @@ class DeclarationResolver {
         myDeclarations[DeclarationKey(name, moduleContext.getQualifiedName())] = moduleContext
     }
 
-    fun resolve(name: String, path: NameNode?): NodeOwner<ModuleModel>? {
+    fun resolve(name: String, path: NameEntity?): NodeOwner<ModuleModel>? {
         if (path == null) {
             return null
         }
 
-        var qualifiedPath: NameNode = path
+        var qualifiedPath: NameEntity = path
 
         while (true) {
             val declarationKey = DeclarationKey(name, qualifiedPath)
@@ -59,7 +58,7 @@ class DeclarationResolver {
 
     }
 
-    fun resolveStrict(name: String, qualifiedPath: NameNode?): NodeOwner<ModuleModel>? {
+    fun resolveStrict(name: String, qualifiedPath: NameEntity?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
             return null
         }

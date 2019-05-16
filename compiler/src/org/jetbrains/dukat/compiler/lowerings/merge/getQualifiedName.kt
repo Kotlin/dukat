@@ -1,15 +1,15 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.NameNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.appendLeft
+import org.jetbrains.dukat.ast.model.nodes.processing.appendLeft
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.OwnerContext
 
 @Suppress("UNCHECKED_CAST")
-fun OwnerContext.getQualifiedName(): NameNode {
+fun OwnerContext.getQualifiedName(): NameEntity {
     val moduleOwners = getOwners()
             .filter { (it is NodeOwner<*>) && (it.node is ModuleModel) }
             .toList() as List<NodeOwner<ModuleModel>>
@@ -19,6 +19,6 @@ fun OwnerContext.getQualifiedName(): NameNode {
     } else {
         return moduleOwners
                 .drop(1)
-                .fold(IdentifierNode(moduleOwners.first().node.shortName) as NameNode) { acc, a -> IdentifierNode(a.node.shortName).appendLeft(acc) } as QualifiedNode
+                .fold(IdentifierNode(moduleOwners.first().node.shortName) as NameEntity) { acc, a -> IdentifierNode(a.node.shortName).appendLeft(acc) } as QualifiedNode
     }
 }
