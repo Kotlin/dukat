@@ -8,6 +8,5 @@ sourceSets {
 
 dependencies {
     implementation(project(":ast"))
-    compile(project(":ast-model-marker"))
     implementation(project(":ast-common"))
 }

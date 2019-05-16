@@ -1,14 +1,12 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ModuleReferenceDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class QualifiedNode(
         val left: NameNode,
         val right: IdentifierNode
-) : ModuleReferenceDeclaration, NameNode, TypeModel
+) : ModuleReferenceDeclaration, NameNode
 
 
 fun IdentifierNode.appendLeft(qualifiedLeftNode: NameNode): QualifiedNode {

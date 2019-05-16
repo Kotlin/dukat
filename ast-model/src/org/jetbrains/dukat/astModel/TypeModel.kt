@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.marker
+package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.Entity
 

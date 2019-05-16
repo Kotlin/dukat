@@ -1,13 +1,11 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.NameNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementLeftNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementRightNode
@@ -29,6 +27,7 @@ import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
+import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -88,7 +87,6 @@ fun TypeModel.translate(): String {
             }
             translated
         }
-        is QualifiedNode -> return translate()
         else -> return "failed to translateType ${this}"
     }
 }

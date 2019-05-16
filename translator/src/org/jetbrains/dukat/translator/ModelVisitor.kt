@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.translator
 
-import org.jetbrains.dukat.ast.model.marker.TypeModel
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
@@ -46,9 +45,6 @@ interface ModelVisitor {
     private fun processTypeAliasModel(declaration: TypeAliasModel) {
         visitTypeAlias(declaration)
     }
-
-    private fun processTypeNode(declaration: TypeModel) {}
-
 
     fun visitInterface(interfaceModel: InterfaceModel)
     private fun processInterfaceModel(declaration: InterfaceModel) {

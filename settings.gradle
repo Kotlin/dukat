@@ -35,7 +35,6 @@ gradle.ext {
 include 'ast'
 include 'ast-common'
 include 'ast-model'
-include 'ast-model-marker'
 include 'cli'
 include 'compiler'
 include 'itertools'

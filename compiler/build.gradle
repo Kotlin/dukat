@@ -45,7 +45,6 @@ dependencies {
 
     implementation(project(":ast"))
     implementation(project(":ast-common"))
-    compile(project(":ast-model-marker"))
     implementation(project(":ast-model"))
     implementation(project(":tsmodel"))
     implementation(project(":interop-graal"))
