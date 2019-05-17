@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
-import org.jetbrains.dukat.ast.model.nodes.processing.toNameNode
+import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
@@ -14,7 +14,7 @@ private fun ModuleModel.addStandardImports() {
             "CONFLICTING_OVERLOADS",
             "EXTERNAL_DELEGATION",
             "NESTED_CLASS_IN_EXTERNAL_INTERFACE"
-    ).map { it.toNameNode() }))
+    ).map { it.toNameEntity() }))
 
     imports.addAll(
             listOf(
@@ -32,7 +32,7 @@ private fun ModuleModel.addStandardImports() {
                     "org.w3c.performance.*",
                     "org.w3c.workers.*",
                     "org.w3c.xhr.*"
-            ).map { it.toNameNode() }
+            ).map { it.toNameEntity() }
     )
 
     sumbodules.forEach { submodule ->  submodule.addStandardImports() }

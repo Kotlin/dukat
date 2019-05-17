@@ -30,7 +30,7 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
         return when (identificator) {
             is IdentifierNode -> identificator.copy(value = lowerIdentificator(identificator.value))
             is QualifiedNode -> identificator
-            else -> raiseConcern("unknown NameNode ${identificator}") { identificator }
+            else -> raiseConcern("unknown NameEntity ${identificator}") { identificator }
         }
     }
 

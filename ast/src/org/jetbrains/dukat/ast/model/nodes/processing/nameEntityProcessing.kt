@@ -14,7 +14,7 @@ fun NameEntity.translate(): String = when (this) {
         "${left.translate()}.${right.translate()}"
     }
     is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
-    else -> raiseConcern("unknown NameNode ${this}") { this.toString() }
+    else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
 }
 
 fun NameEntity.toNode(): NameEntity {
@@ -38,14 +38,14 @@ fun NameEntity.process(handler: (String) -> String): NameEntity {
         is IdentifierNode -> IdentifierNode(handler(value))
         is QualifiedNode -> copy(left = left.process(handler), right = right.process(handler) as IdentifierNode)
         is GenericIdentifierNode -> copy(value = handler(value))
-        else -> raiseConcern("failed to process NameNode ${this}") { this }
+        else -> raiseConcern("failed to process NameEntity ${this}") { this }
     }
 }
 
 val NameEntity.size: Int
     get() = countDepth(0)
 
-fun String.toNameNode(): NameEntity {
+fun String.toNameEntity(): NameEntity {
     return split(".").map { IdentifierNode(it) }.reduce<NameEntity, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
 }
 
@@ -53,7 +53,7 @@ fun IdentifierNode.appendLeft(qualifiedLeftNode: NameEntity): QualifiedNode {
     return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendLeft(qualifiedLeftNode)
         is QualifiedNode -> this.appendLeft(qualifiedLeftNode)
-        else -> raiseConcern("unknown NameNode ${qualifiedLeftNode}") { QualifiedNode(this, this) }
+        else -> raiseConcern("unknown NameEntity ${qualifiedLeftNode}") { QualifiedNode(this, this) }
     }
 }
 
@@ -78,7 +78,7 @@ fun IdentifierNode.appendRight(qualifiedLeftNode: NameEntity): QualifiedNode {
     return when (qualifiedLeftNode) {
         is IdentifierNode -> this.appendRight(qualifiedLeftNode)
         is QualifiedNode -> this.appendRight(qualifiedLeftNode)
-        else -> raiseConcern("unknown NameNode ${qualifiedLeftNode}") { QualifiedNode(qualifiedLeftNode, this) }
+        else -> raiseConcern("unknown NameEntity ${qualifiedLeftNode}") { QualifiedNode(qualifiedLeftNode, this) }
     }
 }
 

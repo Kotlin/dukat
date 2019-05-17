@@ -72,7 +72,7 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when(this) {
             is IdentifierNode -> escape()
             is QualifiedNode -> escape()
-            else -> raiseConcern("unknown NameNode ${this}") { this }
+            else -> raiseConcern("unknown NameEntity ${this}") { this }
         }
     }
 

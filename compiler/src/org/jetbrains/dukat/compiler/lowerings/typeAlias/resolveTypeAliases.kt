@@ -24,7 +24,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
                     is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
-                    else -> raiseConcern("unknown NameNode $typeNodeValue") { parent }
+                    else -> raiseConcern("unknown NameEntity $typeNodeValue") { parent }
                 }
             } else {
                 parent

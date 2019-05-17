@@ -2,12 +2,16 @@ package org.jetbrains.dukat.cli
 
 import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.processing.toNameNode
+import org.jetbrains.dukat.ast.model.nodes.processing.process
+import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.panic.PanicMode
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
@@ -19,15 +23,15 @@ private fun unescape(name: String): String {
 }
 
 
-private fun NameNode.updatePackageNameWithPrefix(basePackage: NameNode): NameNode {
+private fun NameEntity.updatePackageNameWithPrefix(basePackage: NameEntity): NameEntity {
     return when (this) {
         is IdentifierNode -> basePackage
         is QualifiedNode -> copy(left = left.updatePackageNameWithPrefix(basePackage))
-        else -> raiseConcern("unsupported NameNode ${this}") { this }
+        else -> raiseConcern("unsupported org.jetbrains.dukat.astCommon.NameEntity ${this}") { this }
     }
 }
 
-private fun compile(filename: String, outDir: String?, basePackageName: NameNode?, translator: TypescriptInputTranslator) {
+private fun compile(filename: String, outDir: String?, basePackageName: NameEntity?, translator: TypescriptInputTranslator) {
     println("Converting $filename")
 
     val sourceSetModel = translator.translate(filename)
@@ -86,7 +90,7 @@ private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
         val engine: Engine,
-        val basePackageName: NameNode?
+        val basePackageName: NameEntity?
 )
 
 
@@ -104,7 +108,7 @@ private fun process(args: List<String>): CliOptions? {
     val sources = mutableListOf<String>()
     var outDir: String? = null
     var engine = Engine.GRAAL
-    var basePackageName: NameNode? = null
+    var basePackageName: NameEntity? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
@@ -145,7 +149,7 @@ private fun process(args: List<String>): CliOptions? {
                     return null
                 }
 
-                basePackageName = packageNameString.toNameNode()
+                basePackageName = packageNameString.toNameEntity()
             }
 
             else -> sources.add(arg)

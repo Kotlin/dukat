@@ -338,7 +338,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
 
             when (value) {
                 is IdentifierNode -> "${(value as IdentifierNode).value}${typeParams}"
-                else -> raiseConcern("unknown NameNode ${value}") { "" }
+                else -> raiseConcern("unknown NameEntity ${value}") { "" }
             }
         }
         else -> ""
