@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class SourceFileNode(
         val fileName: String,
         val root: DocumentRootNode,
-        val referencedFiles: List<IdentifierNode>
+        val referencedFiles: List<IdentifierEntity>
 ) : Entity
 
 

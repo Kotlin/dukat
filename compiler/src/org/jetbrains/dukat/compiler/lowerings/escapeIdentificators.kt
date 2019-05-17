@@ -2,11 +2,11 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.panic.raiseConcern
@@ -44,8 +44,8 @@ private fun escapeIdentificator(identificator: String): String {
 
 private class EscapeIdentificators : NodeTypeLowering {
 
-    private fun IdentifierNode.escape(): IdentifierNode {
-        return IdentifierNode(
+    private fun IdentifierEntity.escape(): IdentifierEntity {
+        return IdentifierEntity(
                 value.split(".").joinToString(".") { lowerIdentificator(it) }
         )
     }
@@ -53,7 +53,7 @@ private class EscapeIdentificators : NodeTypeLowering {
     private fun TypeValueNode.escape(): TypeValueNode {
         val typeNodeValue = value
         return when (typeNodeValue) {
-            is IdentifierNode -> copy(value = typeNodeValue.escape())
+            is IdentifierEntity -> copy(value = typeNodeValue.escape())
             is QualifiedNode -> copy(value = typeNodeValue.escape())
             else -> this
         }
@@ -62,7 +62,7 @@ private class EscapeIdentificators : NodeTypeLowering {
     private fun QualifiedNode.escape(): QualifiedNode {
         val nodeLeft = left
         return when(nodeLeft) {
-            is IdentifierNode -> QualifiedNode(nodeLeft.escape(), right.escape())
+            is IdentifierEntity -> QualifiedNode(nodeLeft.escape(), right.escape())
             is QualifiedNode -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
             else -> raiseConcern("unknown QualifiedLeftNode ${nodeLeft}") { this }
         }
@@ -70,7 +70,7 @@ private class EscapeIdentificators : NodeTypeLowering {
 
     private fun NameEntity.escape(): NameEntity {
         return when(this) {
-            is IdentifierNode -> escape()
+            is IdentifierEntity -> escape()
             is QualifiedNode -> escape()
             else -> raiseConcern("unknown NameEntity ${this}") { this }
         }

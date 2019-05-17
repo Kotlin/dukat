@@ -3,6 +3,7 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
+import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -13,7 +14,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
@@ -22,7 +22,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -30,12 +29,14 @@ import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
+import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -48,7 +49,6 @@ import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -56,7 +56,6 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -205,7 +204,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val annotations = mutableListOf<AnnotationNode>()
 
         if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
-            annotations.add(AnnotationNode("JsName", listOf(IdentifierNode("default"))))
+            annotations.add(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
         }
 
         val declaration = ClassNode(
@@ -306,7 +305,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return TypeAliasNode(
                 name = aliasName.toNode(),
                 typeReference = typeReference,
-                typeParameters = typeParameters.map { typeParameter -> IdentifierNode(typeParameter.value) },
+                typeParameters = typeParameters.map { typeParameter -> IdentifierEntity(typeParameter.value) },
                 canBeTranslated = true
         )
     }
@@ -316,11 +315,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val hasExport = ModifierDeclaration.hasExport(modifiers)
         if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
-            annotations.add(AnnotationNode("JsName", listOf(IdentifierNode("default"))))
+            annotations.add(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
         }
 
         return FunctionNode(
-                IdentifierNode(name),
+                IdentifierEntity(name),
                 convertParameters(parameters),
                 type,
                 convertTypeParameters(typeParameters),
@@ -375,26 +374,26 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is MethodSignatureDeclaration -> {
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
-                val bodyStatement = QualifiedStatementNode(
+                val bodyStatement = ChainCallNode(
                         StatementCallNode(
                                 QualifiedNode(
-                                        IdentifierNode("this"),
-                                        IdentifierNode("asDynamic")
+                                        IdentifierEntity("this"),
+                                        IdentifierEntity("asDynamic")
                                 )
                                 , emptyList()),
-                                StatementCallNode(IdentifierNode(declaration.name), declaration.parameters.map { parameter -> IdentifierNode(parameter.name) })
+                        StatementCallNode(IdentifierEntity(declaration.name), declaration.parameters.map { parameter -> IdentifierEntity(parameter.name) })
                 )
 
                 listOf(FunctionNode(
                         QualifiedNode(
                                 if (interfaceDeclaration.typeParameters.isEmpty()) {
-                                    IdentifierNode(name)
+                                    IdentifierEntity(name)
                                 } else {
                                     GenericIdentifierNode(name, mergeTypeParameters.map { typeParam ->
                                         TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
                                     })
                                 }
-                                , IdentifierNode(declaration.name)),
+                                , IdentifierEntity(declaration.name)),
                         convertParameters(declaration.parameters),
                         declaration.type,
                         convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
@@ -417,30 +416,30 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is PropertyDeclaration -> listOf(VariableNode(
                     QualifiedNode(
                             if (interfaceDeclaration.typeParameters.isEmpty()) {
-                                IdentifierNode(name)
+                                IdentifierEntity(name)
                             } else {
                                 GenericIdentifierNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
                                     TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
                                 })
-                            }, IdentifierNode(declaration.name)
+                            }, IdentifierEntity(declaration.name)
                     ),
                     if (declaration.optional) declaration.type.makeNullable() else declaration.type,
                     mutableListOf(),
                     false,
                     true,
                     null,
-                    QualifiedStatementNode(
+                    ChainCallNode(
                             StatementCallNode(
-                                    QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()
+                                    QualifiedNode(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
                             ),
-                            IdentifierNode(declaration.name)
+                            StatementCallNode(IdentifierEntity(declaration.name), null)
                     ),
                     AssignmentStatementNode(
-                            QualifiedStatementNode(
-                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
-                                    IdentifierNode(declaration.name)
+                            ChainCallNode(
+                                    StatementCallNode(QualifiedNode(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                    StatementCallNode(IdentifierEntity(declaration.name), null)
                             ),
-                            IdentifierNode("value")
+                            StatementCallNode(IdentifierEntity("value"), null)
                     ),
                     convertTypeParameters(interfaceDeclaration.typeParameters),
                     null,
@@ -451,7 +450,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     // TODO: discuss what we actually gonna do when there's more than one key
 
                     FunctionNode(
-                            QualifiedNode(IdentifierNode(name), IdentifierNode("get")),
+                            QualifiedNode(IdentifierEntity(name), IdentifierEntity("get")),
                             convertParameters(declaration.indexTypes),
                             declaration.returnType.makeNullable(),
                             emptyList(),
@@ -463,10 +462,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             null,
                             listOf(
                                     ReturnStatement(
-                                            QualifiedStatementNode(
-                                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
-                                                    StatementCallNode(IdentifierNode("get"), listOf(
-                                                            IdentifierNode(declaration.indexTypes.get(0).name)
+                                            ChainCallNode(
+                                                    StatementCallNode(QualifiedNode(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                                    StatementCallNode(IdentifierEntity("get"), listOf(
+                                                            IdentifierEntity(declaration.indexTypes.get(0).name)
                                                     ))
                                             )
                                     )
@@ -474,11 +473,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             ""
                     ),
                     FunctionNode(
-                            QualifiedNode(IdentifierNode(name), IdentifierNode("set")),
+                            QualifiedNode(IdentifierEntity(name), IdentifierEntity("set")),
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
                             ))),
-                            TypeValueNode(IdentifierNode("Unit"), emptyList()),
+                            TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                             emptyList(),
                             mutableListOf(),
                             mutableListOf(),
@@ -486,11 +485,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
-                            listOf(QualifiedStatementNode(
-                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
-                                    StatementCallNode(IdentifierNode("set"), listOf(
-                                            IdentifierNode(declaration.indexTypes.get(0).name),
-                                            IdentifierNode("value")
+                            listOf(ChainCallNode(
+                                    StatementCallNode(QualifiedNode(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                    StatementCallNode(IdentifierEntity("set"), listOf(
+                                            IdentifierEntity(declaration.indexTypes.get(0).name),
+                                            IdentifierEntity("value")
                                     )))
                             ),
                             ""
@@ -498,7 +497,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             )
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
-                            QualifiedNode(IdentifierNode(name), IdentifierNode("invoke")),
+                            QualifiedNode(IdentifierEntity(name), IdentifierEntity("invoke")),
                             convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
                                     ExpressionDeclaration(TypeDeclaration(IdentifierEntity("null"), emptyList()), null)
@@ -516,9 +515,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             null,
-                            listOf(QualifiedStatementNode(
-                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
-                                    StatementCallNode(IdentifierNode("invoke"), declaration.parameters.map { IdentifierNode(it.name) }))
+                            listOf(ChainCallNode(
+                                    StatementCallNode(QualifiedNode(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                    StatementCallNode(IdentifierEntity("invoke"), declaration.parameters.map { IdentifierEntity(it.name) }))
                             ),
                             ""
                     )
@@ -559,12 +558,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
             if (type.canBeJson()) {
                 VariableNode(
-                        IdentifierNode(declaration.name),
-                        TypeValueNode(IdentifierNode("Json"), emptyList()),
+                        IdentifierEntity(declaration.name),
+                        TypeValueNode(IdentifierEntity("Json"), emptyList()),
                         mutableListOf(),
                         false,
                         false,
-                        IdentifierNode("definedExternally"),
+                        StatementCallNode(IdentifierEntity("definedExternally"), null),
                         null,
                         null,
                         emptyList(),
@@ -589,12 +588,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             }
         } else {
             VariableNode(
-                    IdentifierNode(declaration.name),
+                    IdentifierEntity(declaration.name),
                     type,
                     mutableListOf(),
                     false,
                     false,
-                    IdentifierNode("definedExternally"),
+                    StatementCallNode(IdentifierEntity("definedExternally"), null),
                     null,
                     null,
                     emptyList(),
@@ -619,8 +618,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    private fun IdentifierEntity.convert(): IdentifierNode {
-        return IdentifierNode(value)
+    private fun IdentifierEntity.convert(): IdentifierEntity {
+        return IdentifierEntity(value)
     }
 
     private fun NameEntity.convert(): NameEntity {
@@ -630,7 +629,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     left = left.convert(),
                     right = right.convert()
             )
-            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierNode("INVALID_ENTITY") }
+            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierEntity("INVALID_ENTITY") }
         }
     }
 
@@ -677,17 +676,17 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val qualifierIdentifiers = qualifiers
                 .flatMap { it.split("/") }
-                .map { IdentifierNode(escapePackageName(it)) }
+                .map { IdentifierEntity(escapePackageName(it)) }
 
-        val fullPackageName = qualifierIdentifiers.reduce<NameEntity, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
+        val fullPackageName = qualifierIdentifiers.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
 
 
         val qualifiedNode = if (qualifiers.isEmpty()) {
             null
         } else {
             qualifiers
-                    .map { IdentifierNode(it) }
-                    .reduce<NameEntity, IdentifierNode> { acc, identifier -> identifier.appendRight(acc) }
+                    .map { IdentifierEntity(it) }
+                    .reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
                     .shiftLeft()
         }
 
@@ -744,7 +743,7 @@ private fun PackageDeclaration.introduceNodes(fileName: String) = org.jetbrains.
 
 fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath
-    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map { referencedFile -> IdentifierNode(referencedFile.value) })
+    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized), referencedFiles.map { referencedFile -> IdentifierEntity(referencedFile.value) })
 }
 
 fun SourceSetDeclaration.introduceNodes() =

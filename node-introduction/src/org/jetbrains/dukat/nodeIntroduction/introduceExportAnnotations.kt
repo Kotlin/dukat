@@ -4,12 +4,12 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
@@ -39,7 +39,7 @@ fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, 
             is DocumentRootNode -> introduceExportAnnotations(declaration, uidTable, turnOff, exportedModules)
 
             is ExportAssignmentDeclaration -> {
-                val defaultAnnotation = AnnotationNode("JsName", listOf(IdentifierNode("default")))
+                val defaultAnnotation = AnnotationNode("JsName", listOf(IdentifierEntity("default")))
 
 
                 if (!declaration.isExportEquals) {

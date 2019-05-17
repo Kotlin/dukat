@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -13,7 +14,7 @@ data class TypeValueNode(
 
 fun TypeValueNode.isPrimitive(primitive: String): Boolean {
     return when (this.value) {
-        is IdentifierNode -> value.value == primitive
+        is IdentifierEntity -> value.value == primitive
         else -> false
     }
 }

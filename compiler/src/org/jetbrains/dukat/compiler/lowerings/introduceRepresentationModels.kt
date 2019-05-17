@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -27,6 +26,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
@@ -186,17 +186,17 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
 private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
         is UnionTypeNode -> TypeValueModel(
-                IdentifierNode("dynamic"),
+                IdentifierEntity("dynamic"),
                 emptyList(),
                 params.map { it.process().translate() }.joinToString(" | ")
         )
         is TupleTypeNode -> TypeValueModel(
-                IdentifierNode("dynamic"),
+                IdentifierEntity("dynamic"),
                 emptyList(),
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
         )
         is TypeValueNode -> {
-            if ((value == IdentifierNode("String")) && (meta is StringTypeDeclaration)) {
+            if ((value == IdentifierEntity("String")) && (meta is StringTypeDeclaration)) {
                 TypeValueModel(value, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
             } else {
                 TypeValueModel(
@@ -219,7 +219,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         }
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
-                    IdentifierNode(name),
+                    IdentifierEntity(name),
                     typeParameters.map { typeParam -> TypeValueModel(typeParam.name.toNode(), emptyList(), null) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
@@ -228,7 +228,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         }
         else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
             TypeValueModel(
-                    IdentifierNode("dynamic"),
+                    IdentifierEntity("dynamic"),
                     emptyList(),
                     null,
                     false
@@ -277,7 +277,7 @@ private fun NameEntity.toTypeValueModel(): TypeValueModel {
         else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }
     }
 
-    return TypeValueModel(IdentifierNode(nameTranslated), emptyList(), null)
+    return TypeValueModel(IdentifierEntity(nameTranslated), emptyList(), null)
 }
 
 private fun HeritageNode.convertToModel(): HeritageModel {
@@ -402,7 +402,7 @@ fun SourceSetNode.introduceRepresentationModels() = SourceSetModel(
             val fileName = rootFile.normalize().absolutePath
             SourceFileModel(fileName, source.root.introduceRepresentationModels(), source.referencedFiles.map { referenceFile ->
                 val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
-                IdentifierNode(absolutePath)
+                IdentifierEntity(absolutePath)
             })
         }
 )

@@ -3,7 +3,6 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -12,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -85,15 +85,15 @@ private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode): B
 
 private fun MethodNode.isSpecialCase(): Boolean {
 
-    if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeValueNode(IdentifierNode("Any"), emptyList()))) {
+    if ((name == "equals") && (parameters.size == 1) && (parameters[0].type == TypeValueNode(IdentifierEntity("Any"), emptyList()))) {
         return true
     }
 
-    if ((name == "hashCode" && parameters.isEmpty() && type == TypeValueNode(IdentifierNode("Number"), emptyList()))) {
+    if ((name == "hashCode" && parameters.isEmpty() && type == TypeValueNode(IdentifierEntity("Number"), emptyList()))) {
         return true
     }
 
-    if ((name == "toString" && parameters.isEmpty() && type == TypeValueNode(IdentifierNode("String"), emptyList()))) {
+    if ((name == "toString" && parameters.isEmpty() && type == TypeValueNode(IdentifierEntity("String"), emptyList()))) {
         return true
     }
 
@@ -110,7 +110,7 @@ private fun ParameterValueDeclaration.isOverriding(otherParameterValue: Paramete
         return otherParameterValue.params.any { isOverriding(it) }
     }
 
-    if (otherParameterValue == TypeValueNode(IdentifierNode("Any"), emptyList(), false, null)) {
+    if (otherParameterValue == TypeValueNode(IdentifierEntity("Any"), emptyList(), false, null)) {
         return true
     }
 

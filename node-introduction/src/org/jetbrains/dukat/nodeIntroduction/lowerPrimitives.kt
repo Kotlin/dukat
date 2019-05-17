@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.nodeIntroduction.ParameterValueLowering
 
@@ -24,7 +24,7 @@ private fun mapPrimitiveValue(value: String): String {
 
 private fun NameEntity.mapPrimitive(): NameEntity {
     return when (this) {
-        is IdentifierNode -> {
+        is IdentifierEntity -> {
             copy(value = mapPrimitiveValue(value))
         }
         else -> this
@@ -33,8 +33,8 @@ private fun NameEntity.mapPrimitive(): NameEntity {
 
 private class PrimitiveClassLowering : ParameterValueLowering {
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
-        if (declaration.value == IdentifierNode("Function")) {
-            return declaration.copy(params = listOf(TypeValueNode(IdentifierNode("*"), emptyList())))
+        if (declaration.value == IdentifierEntity("Function")) {
+            return declaration.copy(params = listOf(TypeValueNode(IdentifierEntity("*"), emptyList())))
         }
 
         var value = declaration.value.mapPrimitive()
@@ -42,7 +42,7 @@ private class PrimitiveClassLowering : ParameterValueLowering {
         var meta = declaration.meta
 
         if (declaration.isPrimitive("undefined") || declaration.isPrimitive("null")) {
-            value = IdentifierNode("Nothing")
+            value = IdentifierEntity("Nothing")
             nullable = true
             meta = MuteMetadata()
         }

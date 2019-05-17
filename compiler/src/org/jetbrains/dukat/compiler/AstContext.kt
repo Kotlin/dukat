@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
 
@@ -11,11 +11,11 @@ class AstContext {
     private val myClassNodes: MutableMap<NameEntity, ClassNode> = mutableMapOf()
 
     fun registerInterface(interfaceDeclaration: InterfaceNode) {
-        myInterfaces[IdentifierNode(interfaceDeclaration.name)] = interfaceDeclaration
+        myInterfaces[IdentifierEntity(interfaceDeclaration.name)] = interfaceDeclaration
     }
 
     fun registerClass(classDeclaration: ClassNode) {
-        myClassNodes[IdentifierNode(classDeclaration.name)] = classDeclaration
+        myClassNodes[IdentifierEntity(classDeclaration.name)] = classDeclaration
     }
 
     fun resolveInterface(name: NameEntity): InterfaceNode? = myInterfaces.get(name)

@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -50,7 +49,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
         val importNode = owner.findModuleWithImport(value)
 
         return if (importNode == null) {
-            IdentifierNode(value)
+            IdentifierEntity(value)
         } else {
             val importedDocumentNodes = uidData.resolve(importNode.uid)
             if (importedDocumentNodes == null) {
@@ -78,15 +77,15 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
             is QualifierEntity -> {
                 QualifiedNode(
                         left = resolve(value.left, owner),
-                        right = IdentifierNode(value.right.value)
+                        right = IdentifierEntity(value.right.value)
                 )
             }
-            is IdentifierNode -> {
+            is IdentifierEntity -> {
                 resolve(value.value, owner)
             }
             is QualifiedNode -> value.copy(
                 left = resolve(value.left, owner),
-                right = IdentifierNode(value.right.value)
+                right = IdentifierEntity(value.right.value)
             )
             else -> raiseConcern("unknown NameEntity subtype ${value::class.simpleName}") { value }
         }
@@ -94,10 +93,10 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
 
     private fun resolveExression(heritageSymbol: NameEntity, ownerModule: DocumentRootNode): NameEntity {
         return when (heritageSymbol) {
-            is IdentifierNode -> {
+            is IdentifierEntity -> {
                 val reference = ownerModule.imports.get(heritageSymbol.value)
                 when (reference?.referenceName) {
-                    is IdentifierNode -> reference.referenceName
+                    is IdentifierEntity -> reference.referenceName
                     else -> heritageSymbol
                 }
             }

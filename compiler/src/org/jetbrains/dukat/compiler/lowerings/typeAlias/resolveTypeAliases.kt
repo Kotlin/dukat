@@ -3,13 +3,13 @@ package org.jetbrains.dukat.compiler.lowerings.typeAlias
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
@@ -23,7 +23,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
             if (resolved is TypeValueNode) {
                 val typeNodeValue = resolved.value
                 when (typeNodeValue) {
-                    is IdentifierNode -> HeritageNode(IdentifierNode(typeNodeValue.value), emptyList())
+                    is IdentifierEntity -> HeritageNode(IdentifierEntity(typeNodeValue.value), emptyList())
                     else -> raiseConcern("unknown NameEntity $typeNodeValue") { parent }
                 }
             } else {

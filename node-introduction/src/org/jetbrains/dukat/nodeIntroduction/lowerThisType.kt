@@ -3,7 +3,6 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -12,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -23,13 +23,13 @@ private class LowerThisType {
         return when (this) {
             is InterfaceNode -> {
                 if (generated) {
-                    TypeValueNode(IdentifierNode("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(IdentifierEntity("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
                 } else {
-                    TypeValueNode(IdentifierNode(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(IdentifierEntity(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
                 }
             }
-            is ClassNode -> TypeValueNode(IdentifierNode(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
-            else -> TypeValueNode(IdentifierNode("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeValueNode(IdentifierEntity(name), typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
+            else -> TypeValueNode(IdentifierEntity("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 

@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -47,9 +47,9 @@ private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
 }
 
 private fun TypeModel.substituteUnit(): TypeModel {
-    val returnsUnit = this is TypeValueModel && value == IdentifierNode("Unit")
+    val returnsUnit = this is TypeValueModel && value == IdentifierEntity("Unit")
     return if (returnsUnit) {
-        TypeValueModel(IdentifierNode("@@None"), emptyList(), null)
+        TypeValueModel(IdentifierEntity("@@None"), emptyList(), null)
     } else this
 }
 

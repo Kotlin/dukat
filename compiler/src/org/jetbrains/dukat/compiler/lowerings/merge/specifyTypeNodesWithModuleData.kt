@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.debugTranslate
@@ -9,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.size
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -24,7 +24,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 private fun NameEntity.shiftLeft(): NameEntity {
     if (this is QualifiedNode) {
         return when (left) {
-            is IdentifierNode -> right
+            is IdentifierEntity -> right
             is GenericIdentifierNode -> right
             is QualifiedNode -> QualifiedNode((left as QualifiedNode).right, right)
             else -> raiseConcern("unknown org.jetbrains.dukat.astCommon.NameEntity") { this }
@@ -36,7 +36,7 @@ private fun NameEntity.shiftLeft(): NameEntity {
 
 private fun NameEntity?.matchesLeft(identifier: NameEntity): Boolean {
     return when (this) {
-        is IdentifierNode -> identifier == this
+        is IdentifierEntity -> identifier == this
         is QualifiedNode -> left.matchesLeft(identifier)
         else -> false
     }
@@ -57,7 +57,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         if (declaration is TypeValueModel) {
             val declarationValue = declaration.value
 
-            if (declarationValue is IdentifierNode) {
+            if (declarationValue is IdentifierEntity) {
                 declarationResolver.resolve(declarationValue.value, qualifiedName)?.let { declarationOwnerContext ->
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
@@ -78,7 +78,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 
                     if (qualifiedPath.matchesLeft(variableModel.name)) {
                         val pathShifted = qualifiedPath?.shiftLeft()
-                        if (pathShifted is IdentifierNode) {
+                        if (pathShifted is IdentifierEntity) {
                             val supposedModule = variableModel.name.appendRight(qualifiedName)
 
                             declarationResolver.resolveStrict(pathShifted.value, supposedModule.process(::unescape))?.let {
@@ -108,14 +108,14 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         val heritageClauseValue = heritageClause.value
         val name = heritageClauseValue
 
-        if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierNode)) {
-            val name = (heritageClauseValue.value as IdentifierNode)
+        if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierEntity)) {
+            val name = (heritageClauseValue.value as IdentifierEntity)
             declarationResolver.resolve(name.translate(), ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
-                    // TODO: use QualifierNode instead of IdentifierNode
+                    // TODO: use QualifierNode instead of IdentifierEntity
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
-                    return heritageClause.copy(value = TypeValueModel(IdentifierNode(qualifiedNode.debugTranslate()), emptyList(), null))
+                    return heritageClause.copy(value = TypeValueModel(IdentifierEntity(qualifiedNode.debugTranslate()), emptyList(), null))
                 }
             }
         }

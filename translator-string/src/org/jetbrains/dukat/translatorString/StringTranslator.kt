@@ -2,14 +2,14 @@ package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
+import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.IdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -158,14 +158,13 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
 }
 
 private fun StatementCallNode.translate(): String {
-    return "${value.translate()}(${params.joinToString(", ") { it.value }})"
+    return "${value.translate()}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
 }
 
 private fun StatementNode.translate(): String {
     return when (this) {
         is AssignmentStatementNode -> "${left.translate()} = ${right.translate()}"
-        is IdentifierNode -> translate()
-        is QualifiedStatementNode -> "${left.translate()}.${right.translate()}"
+        is ChainCallNode -> "${left.translate()}.${right.translate()}"
         is ReturnStatement -> "return ${statement.translate()}"
         is StatementCallNode -> translate()
         else -> raiseConcern("unkown StatementNode ${this}") { "" }
@@ -192,7 +191,7 @@ private fun FunctionModel.translate(): String {
 }
 
 private fun MethodModel.translate(): List<String> {
-    val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierNode("@@None"))
+    val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("@@None"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -299,7 +298,7 @@ private fun MethodModel.translateSignature(): List<String> {
     val operatorModifier = if (operator) "operator " else ""
     val annotations = annotations.map { "@${it.name}" }
 
-    val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierNode("Unit"))
+    val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
     val overrideClause = if (override) "override " else ""
 
@@ -337,7 +336,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
             }
 
             when (value) {
-                is IdentifierNode -> "${(value as IdentifierNode).value}${typeParams}"
+                is IdentifierEntity -> "${(value as IdentifierEntity).value}${typeParams}"
                 else -> raiseConcern("unknown NameEntity ${value}") { "" }
             }
         }
