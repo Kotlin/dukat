@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.astCommon.NameEntity
+
 data class StatementCallNode(
-    val value: String,
-    val params: List<IdentifierNode>
+        val value: NameEntity,
+        val params: List<IdentifierNode>
 ) : StatementNode

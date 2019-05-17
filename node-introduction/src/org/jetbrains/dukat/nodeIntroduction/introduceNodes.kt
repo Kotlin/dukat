@@ -376,11 +376,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
                 val bodyStatement = QualifiedStatementNode(
-                        QualifiedStatementNode(
-                                IdentifierNode("this"),
-                                StatementCallNode("asDynamic", emptyList())
-                        ),
-                        StatementCallNode(declaration.name, declaration.parameters.map { parameter -> IdentifierNode(parameter.name) })
+                        StatementCallNode(
+                                QualifiedNode(
+                                        IdentifierNode("this"),
+                                        IdentifierNode("asDynamic")
+                                )
+                                , emptyList()),
+                                StatementCallNode(IdentifierNode(declaration.name), declaration.parameters.map { parameter -> IdentifierNode(parameter.name) })
                 )
 
                 listOf(FunctionNode(
@@ -428,18 +430,14 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     true,
                     null,
                     QualifiedStatementNode(
-                            QualifiedStatementNode(
-                                    IdentifierNode("this"),
-                                    StatementCallNode("asDynamic", emptyList())
+                            StatementCallNode(
+                                    QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()
                             ),
                             IdentifierNode(declaration.name)
                     ),
                     AssignmentStatementNode(
                             QualifiedStatementNode(
-                                    QualifiedStatementNode(
-                                            IdentifierNode("this"),
-                                            StatementCallNode("asDynamic", emptyList())
-                                    ),
+                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
                                     IdentifierNode(declaration.name)
                             ),
                             IdentifierNode("value")
@@ -466,11 +464,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             listOf(
                                     ReturnStatement(
                                             QualifiedStatementNode(
-                                                    QualifiedStatementNode(
-                                                            IdentifierNode("this"),
-                                                            StatementCallNode("asDynamic", emptyList())
-                                                    ),
-                                                    StatementCallNode("get", listOf(
+                                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
+                                                    StatementCallNode(IdentifierNode("get"), listOf(
                                                             IdentifierNode(declaration.indexTypes.get(0).name)
                                                     ))
                                             )
@@ -492,11 +487,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             null,
                             listOf(QualifiedStatementNode(
-                                    QualifiedStatementNode(
-                                            IdentifierNode("this"),
-                                            StatementCallNode("asDynamic", emptyList())
-                                    ),
-                                    StatementCallNode("set", listOf(
+                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
+                                    StatementCallNode(IdentifierNode("set"), listOf(
                                             IdentifierNode(declaration.indexTypes.get(0).name),
                                             IdentifierNode("value")
                                     )))
@@ -525,11 +517,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             null,
                             listOf(QualifiedStatementNode(
-                                    QualifiedStatementNode(
-                                            IdentifierNode("this"),
-                                            StatementCallNode("asDynamic", emptyList())
-                                    ),
-                                    StatementCallNode("invoke", declaration.parameters.map { IdentifierNode(it.name) }))
+                                    StatementCallNode(QualifiedNode(IdentifierNode("this"), IdentifierNode("asDynamic")), emptyList()),
+                                    StatementCallNode(IdentifierNode("invoke"), declaration.parameters.map { IdentifierNode(it.name) }))
                             ),
                             ""
                     )

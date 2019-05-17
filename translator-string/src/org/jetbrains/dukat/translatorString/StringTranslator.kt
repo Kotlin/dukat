@@ -158,7 +158,7 @@ private fun translateAnnotations(annotations: List<AnnotationNode>): String {
 }
 
 private fun StatementCallNode.translate(): String {
-    return "${value}(${params.joinToString(", ") { it.value }})"
+    return "${value.translate()}(${params.joinToString(", ") { it.value }})"
 }
 
 private fun StatementNode.translate(): String {
