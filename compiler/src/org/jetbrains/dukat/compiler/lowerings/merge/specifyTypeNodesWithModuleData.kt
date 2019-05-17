@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.processing.process
@@ -10,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.size
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -22,11 +22,11 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 private fun NameEntity.shiftLeft(): NameEntity {
-    if (this is QualifiedNode) {
+    if (this is QualifierEntity) {
         return when (left) {
             is IdentifierEntity -> right
             is GenericIdentifierNode -> right
-            is QualifiedNode -> QualifiedNode((left as QualifiedNode).right, right)
+            is QualifierEntity -> QualifierEntity((left as QualifierEntity).right, right)
             else -> raiseConcern("unknown org.jetbrains.dukat.astCommon.NameEntity") { this }
         }
     }
@@ -37,7 +37,7 @@ private fun NameEntity.shiftLeft(): NameEntity {
 private fun NameEntity?.matchesLeft(identifier: NameEntity): Boolean {
     return when (this) {
         is IdentifierEntity -> identifier == this
-        is QualifiedNode -> left.matchesLeft(identifier)
+        is QualifierEntity -> left.matchesLeft(identifier)
         else -> false
     }
 }
@@ -68,7 +68,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                         }
                     }
                 }
-            } else if (declarationValue is QualifiedNode) {
+            } else if (declarationValue is QualifierEntity) {
 
                 // TODO: Double check deeply nested qualifiedNames
                 val qualifiedPath = qualifiedName.appendRight(declarationValue).shiftRight()

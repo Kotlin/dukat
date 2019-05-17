@@ -2,12 +2,12 @@ package org.jetbrains.dukat.compiler.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -54,16 +54,16 @@ private class EscapeIdentificators : NodeTypeLowering {
         val typeNodeValue = value
         return when (typeNodeValue) {
             is IdentifierEntity -> copy(value = typeNodeValue.escape())
-            is QualifiedNode -> copy(value = typeNodeValue.escape())
+            is QualifierEntity -> copy(value = typeNodeValue.escape())
             else -> this
         }
     }
 
-    private fun QualifiedNode.escape(): QualifiedNode {
+    private fun QualifierEntity.escape(): QualifierEntity {
         val nodeLeft = left
         return when(nodeLeft) {
-            is IdentifierEntity -> QualifiedNode(nodeLeft.escape(), right.escape())
-            is QualifiedNode -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
+            is IdentifierEntity -> QualifierEntity(nodeLeft.escape(), right.escape())
+            is QualifierEntity -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
             else -> raiseConcern("unknown QualifiedLeftNode ${nodeLeft}") { this }
         }
     }
@@ -71,7 +71,7 @@ private class EscapeIdentificators : NodeTypeLowering {
     private fun NameEntity.escape(): NameEntity {
         return when(this) {
             is IdentifierEntity -> escape()
-            is QualifiedNode -> escape()
+            is QualifierEntity -> escape()
             else -> raiseConcern("unknown NameEntity ${this}") { this }
         }
     }

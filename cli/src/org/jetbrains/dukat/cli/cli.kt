@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.cli
 
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.createV8Translator
@@ -26,7 +26,7 @@ private fun unescape(name: String): String {
 private fun NameEntity.updatePackageNameWithPrefix(basePackage: NameEntity): NameEntity {
     return when (this) {
         is IdentifierEntity -> basePackage
-        is QualifiedNode -> copy(left = left.updatePackageNameWithPrefix(basePackage))
+        is QualifierEntity -> copy(left = left.updatePackageNameWithPrefix(basePackage))
         else -> raiseConcern("unsupported org.jetbrains.dukat.astCommon.NameEntity ${this}") { this }
     }
 }

@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendLeft
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.OwnerContext
@@ -19,6 +19,6 @@ fun OwnerContext.getQualifiedName(): NameEntity {
     } else {
         return moduleOwners
                 .drop(1)
-                .fold(IdentifierEntity(moduleOwners.first().node.shortName) as NameEntity) { acc, a -> IdentifierEntity(a.node.shortName).appendLeft(acc) } as QualifiedNode
+                .fold(IdentifierEntity(moduleOwners.first().node.shortName) as NameEntity) { acc, a -> IdentifierEntity(a.node.shortName).appendLeft(acc) } as QualifierEntity
     }
 }

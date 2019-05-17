@@ -3,16 +3,15 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
@@ -75,7 +74,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 resolve(value.value, owner)
             }
             is QualifierEntity -> {
-                QualifiedNode(
+                QualifierEntity(
                         left = resolve(value.left, owner),
                         right = IdentifierEntity(value.right.value)
                 )
@@ -83,7 +82,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
             is IdentifierEntity -> {
                 resolve(value.value, owner)
             }
-            is QualifiedNode -> value.copy(
+            is QualifierEntity -> value.copy(
                 left = resolve(value.left, owner),
                 right = IdentifierEntity(value.right.value)
             )
@@ -100,7 +99,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                     else -> heritageSymbol
                 }
             }
-            is QualifiedNode -> {
+            is QualifierEntity -> {
                 return heritageSymbol.copy(left = resolveExression(heritageSymbol.left, ownerModule))
             }
             else -> heritageSymbol

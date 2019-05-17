@@ -11,13 +11,13 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.QualifiedNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -31,7 +31,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
     fun lowerIdentificator(identificator: NameEntity): NameEntity {
         return when (identificator) {
             is IdentifierEntity -> identificator.copy(value = lowerIdentificator(identificator.value))
-            is QualifiedNode -> identificator
+            is QualifierEntity -> identificator
             else -> raiseConcern("unknown NameEntity ${identificator}") { identificator }
         }
     }
