@@ -40,8 +40,10 @@ external open class Foo {
     @nativeSetter
     open operator fun set(n: Number, value: Bar): Unit = definedExternally
     @nativeGetter
-    open operator fun get(s: String): String? = definedExternally
+    open operator fun get(s: String): dynamic /* String | Array<String> */ = definedExternally
     @nativeSetter
     open operator fun set(s: String, value: String): Unit = definedExternally
+    @nativeSetter
+    open operator fun set(s: String, value: Array<String>): Unit = definedExternally
     open var props: `T$1` = definedExternally
 }

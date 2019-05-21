@@ -2,11 +2,8 @@
 
 declare namespace algebra.js {
     function toTex(input: Fraction | Expression | Equation | object | Array<Fraction | object>): string;
-
     class Equation {}
-
     class Expression {}
-
     class Fraction {}
 }
 export = algebra.js;

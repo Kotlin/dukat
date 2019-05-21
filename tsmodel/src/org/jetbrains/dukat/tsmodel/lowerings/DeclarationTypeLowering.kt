@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -49,6 +50,12 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
+    override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): IndexSignatureDeclaration {
+        return declaration.copy(
+                indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType) },
+                returnType = lowerParameterValue(declaration.returnType)
+        );
+    }
 
     override fun lowerMemberDeclaration(declaration: MemberEntity): MemberEntity {
         return when (declaration) {
@@ -57,6 +64,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
+            is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration)
             else -> {
                 println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
                 declaration

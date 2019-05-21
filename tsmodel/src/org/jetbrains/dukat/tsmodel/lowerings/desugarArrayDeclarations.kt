@@ -14,6 +14,7 @@ private class NativeArrayLowering : DeclarationTypeLowering {
             declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
         }
     }
+
 }
 
 fun PackageDeclaration.desugarArrayDeclarations(): PackageDeclaration {
