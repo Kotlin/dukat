@@ -23,6 +23,7 @@ external interface BaseEvent {
     fun getDelegateTarget(): Shape
     fun getElement(): Element
     fun <T : Shape> transform(shape: T? = definedExternally /* null */): T
+    var prop: Any
 }
 external open class BoxStringEvent : BaseEvent {
     override var data: String = definedExternally
@@ -32,4 +33,5 @@ external open class BoxStringEvent : BaseEvent {
 }
 external interface NumberEvent : BaseEvent {
     override var data: Number
+    var otherProp: Any
 }

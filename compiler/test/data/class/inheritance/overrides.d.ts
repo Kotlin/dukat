@@ -7,6 +7,7 @@ declare interface BaseEvent {
     getDelegateTarget(): Shape;
     getElement(): Element;
     transform<T extends Shape>(shape?: T): T;
+    prop: any;
 }
 declare class BoxStringEvent implements BaseEvent {
     data: string;
@@ -16,4 +17,5 @@ declare class BoxStringEvent implements BaseEvent {
 }
 declare interface NumberEvent extends BaseEvent {
     data: number;
+    otherProp: any;
 }

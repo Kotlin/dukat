@@ -78,8 +78,8 @@ private fun MethodNode.isOverriding(otherMethodNode: MethodNode): Boolean {
             .all { it }
 }
 
-private fun PropertyNode.isOverriding(otherPropertyDeclaration: PropertyNode): Boolean {
-    return type.isOverriding(otherPropertyDeclaration.type)
+private fun PropertyNode.isOverriding(otherPropertyNode: PropertyNode): Boolean {
+    return (name == otherPropertyNode.name) && type.isOverriding(otherPropertyNode.type)
 }
 
 
