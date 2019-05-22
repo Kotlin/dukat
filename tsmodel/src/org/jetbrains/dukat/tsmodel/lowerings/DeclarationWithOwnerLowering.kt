@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -33,14 +34,16 @@ interface DeclarationWithOwnerLowering {
     fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>): MemberEntity
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
+    fun lowerObjectDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>): ParameterValueDeclaration
 
     fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
         return when (declaration) {
-            is TypeDeclaration -> lowerTypeDeclaration(owner.wrap(declaration))
-            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(owner.wrap(declaration))
-            is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner.wrap(declaration))
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(owner.wrap(declaration))
+            is TypeDeclaration -> lowerTypeDeclaration(owner as NodeOwner<TypeDeclaration>)
+            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(owner as NodeOwner<FunctionTypeDeclaration>)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner as NodeOwner<UnionTypeDeclaration>)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(owner as NodeOwner<IntersectionTypeDeclaration>)
+            is ObjectLiteralDeclaration -> lowerObjectDeclaration(owner as NodeOwner<ObjectLiteralDeclaration>)
             else -> declaration
         }
     }
@@ -49,8 +52,8 @@ interface DeclarationWithOwnerLowering {
     fun lowerClassLikeDeclaration(owner: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
         val declaration = owner.node
         return when (declaration) {
-            is InterfaceDeclaration -> lowerInterfaceDeclaration(owner.wrap(declaration))
-            is ClassDeclaration -> lowerClassDeclaration(owner.wrap(declaration))
+            is InterfaceDeclaration -> lowerInterfaceDeclaration(owner as NodeOwner<InterfaceDeclaration>)
+            is ClassDeclaration -> lowerClassDeclaration(owner as NodeOwner<ClassDeclaration>)
             else -> declaration
         }
     }
@@ -58,11 +61,11 @@ interface DeclarationWithOwnerLowering {
     fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
         val declaration = owner.node
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(owner.wrap(declaration))
-            is FunctionDeclaration -> lowerFunctionDeclaration(owner.wrap(declaration))
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner.wrap(declaration))
-            is PackageDeclaration -> lowerDocumentRoot(declaration, owner.wrap(declaration))
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(owner.wrap(declaration))
+            is VariableDeclaration -> lowerVariableDeclaration(owner as NodeOwner<VariableDeclaration>)
+            is FunctionDeclaration -> lowerFunctionDeclaration(owner as NodeOwner<FunctionDeclaration>)
+            is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner as NodeOwner<ClassLikeDeclaration>)
+            is PackageDeclaration -> lowerDocumentRoot(declaration, owner as NodeOwner<PackageDeclaration>)
+            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(owner as NodeOwner<TypeAliasDeclaration>)
             else -> declaration
         }
     }

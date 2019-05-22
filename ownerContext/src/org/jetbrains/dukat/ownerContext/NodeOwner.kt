@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.ownerContext
 
-class NodeOwner<T>(val node: T, override val owner: NodeOwner<*>?) : OwnerContext {
-    fun <D> wrap(child: D): NodeOwner<D> = NodeOwner(child, this)
+import org.jetbrains.dukat.astCommon.Entity
+
+class NodeOwner<T : Entity>(val node: T, override val owner: NodeOwner<*>?) : OwnerContext {
+    fun <D: Entity> wrap(child: D): NodeOwner<D> = NodeOwner(child, this)
 }
 

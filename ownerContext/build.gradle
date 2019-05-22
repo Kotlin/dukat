@@ -7,4 +7,5 @@ sourceSets {
 }
 
 dependencies {
+  implementation(project(":ast-common"))
 }

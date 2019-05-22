@@ -1,33 +1,41 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.canBeJson
+
+internal fun Entity.getUID(): String {
+    return when (this) {
+        is TypeAliasDeclaration -> uid
+        is FunctionDeclaration -> uid
+        is ClassDeclaration -> uid
+        is InterfaceDeclaration -> uid
+        is GeneratedInterfaceDeclaration -> uid
+        is VariableDeclaration -> uid
+        else -> raiseConcern("unknown Entity uid ${this::class.simpleName}") { "" };
+    }
+}
 
 private fun NodeOwner<*>.findOwnerPackage(): PackageDeclaration {
     val ownerPackage = getOwners().first() {
@@ -192,104 +200,6 @@ class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<String, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
 
-    fun generateInterface(owner: NodeOwner<ParameterValueDeclaration>, ownerUID: String, typeParameters: List<TypeParameterDeclaration>): ParameterValueDeclaration {
-        val declaration = owner.node
-        val typeParamsSet = typeParameters.map { it.name }.toSet()
-
-        return when (declaration) {
-            is FunctionTypeDeclaration -> {
-                declaration.copy(
-                        parameters = declaration.parameters.map { parameterDeclaration -> parameterDeclaration.copy(type = generateInterface(owner.wrap(parameterDeclaration.type), ownerUID, typeParameters)) }
-                )
-            }
-            is ObjectLiteralDeclaration -> {
-                when {
-                    declaration.canBeJson() -> TypeDeclaration(IdentifierEntity("Json"), emptyList())
-                    declaration.members.isEmpty() -> TypeDeclaration(IdentifierEntity("Any"), emptyList())
-                    else -> {
-                        registerObjectLiteralDeclaration(
-                                owner.wrap(declaration.copy(members = declaration.members.map { param ->
-                                    lowerMemberDeclaration(owner.wrap(param), ownerUID, typeParameters)
-                                })),
-                                ownerUID,
-                                typeParamsSet
-                        )
-                    }
-                }
-            }
-            is UnionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) })
-            }
-            is IntersectionTypeDeclaration -> {
-                declaration.copy(params = declaration.params.map { param -> generateInterface(owner.wrap(param), ownerUID, typeParameters) })
-            }
-            else -> declaration
-        }
-    }
-
-
-    private fun ClassLikeDeclaration.getUID(): String {
-        return when (this) {
-            is ClassDeclaration -> uid
-            is InterfaceDeclaration -> uid
-            is GeneratedInterfaceDeclaration -> uid
-            else -> raiseConcern("can not create uid for ${this}") { "INVALID_UID" }
-        }
-    }
-
-    fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>, ownerUid: String, ownerTypeParameters: List<TypeParameterDeclaration>): MemberEntity {
-        val declaration = owner.node
-
-        return when (declaration) {
-            is IndexSignatureDeclaration -> {
-                declaration.copy(returnType = generateInterface(owner.wrap(declaration.returnType), ownerUid, emptyList()))
-            }
-
-            is CallSignatureDeclaration -> {
-                val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(
-                        parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
-                        },
-                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
-                )
-            }
-            is ConstructorDeclaration -> {
-                val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(
-                        parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
-                        }
-                )
-
-            }
-            is PropertyDeclaration -> {
-                val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters))
-            }
-            is MethodSignatureDeclaration -> {
-                val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(
-                        parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
-                        },
-                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
-                )
-            }
-            is FunctionDeclaration -> {
-                val typeParameters = ownerTypeParameters + declaration.typeParameters
-                declaration.copy(
-                        parameters = declaration.parameters.map { param ->
-                            param.copy(type = generateInterface(owner.wrap(param.type), ownerUid, typeParameters))
-                        },
-                        type = generateInterface(owner.wrap(declaration.type), ownerUid, typeParameters)
-                )
-            }
-            else -> declaration
-        }
-    }
-
-
     private fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
 
         myGeneratedInterfaces.forEach { entry ->
@@ -308,7 +218,7 @@ class GeneratedInterfacesContext {
         }
     }
 
-    private fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<NameEntity>): GeneratedInterfaceReferenceDeclaration {
+    internal fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<NameEntity>): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 
@@ -336,14 +246,11 @@ class GeneratedInterfacesContext {
 
         val generatedTypeParameters = typeParams.toList()
 
-
-        val members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member), generatedUid, generatedTypeParameters) }
-
         val name = "`T$${myGeneratedInterfaces.size}`"
         val interfaceNode =
                 GeneratedInterfaceDeclaration(
                         name = name,
-                        members = members,
+                        members = declaration.members,
                         typeParameters = generatedTypeParameters,
                         parentEntities = emptyList(),
                         uid = generatedUid,
@@ -364,20 +271,37 @@ class GeneratedInterfacesContext {
         }
     }
 
-    fun resolveGeneratedInterfacesFor(node: ClassLikeDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.getUID(), mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
+    private fun resolveGeneratedInterfacesFor(node: ClassLikeDeclaration): List<GeneratedInterfaceDeclaration> {
+        return myReferences.getOrDefault(node.getUID(), mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
     }
 
-    fun resolveGeneratedInterfacesFor(node: FunctionDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
+    private fun resolveGeneratedInterfacesFor(node: FunctionDeclaration): List<GeneratedInterfaceDeclaration> {
+        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
     }
 
-    fun resolveGeneratedInterfacesFor(node: VariableDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
+    private fun resolveGeneratedInterfacesFor(node: VariableDeclaration): List<GeneratedInterfaceDeclaration> {
+        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
     }
 
-    fun resolveGeneratedInterfacesFor(node: TypeAliasDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).map { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }.filterNotNull()
+    private fun resolveGeneratedInterfacesFor(node: TypeAliasDeclaration): List<GeneratedInterfaceDeclaration> {
+        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
     }
 
+    private fun introduceGeneratedEntities(declaration: TopLevelEntity): List<TopLevelEntity> {
+        return when (declaration) {
+            is ClassLikeDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is VariableDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is FunctionDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is TypeAliasDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is PackageDeclaration -> listOf(introduceGeneratedEntities(declaration))
+            else -> listOf(declaration)
+        }
+    }
+
+    fun introduceGeneratedEntities(packageDeclaration: PackageDeclaration): PackageDeclaration {
+        val declarations = packageDeclaration.declarations.flatMap { declaration ->
+            introduceGeneratedEntities(declaration)
+        }
+        return packageDeclaration.copy(declarations = declarations)
+    }
 }
