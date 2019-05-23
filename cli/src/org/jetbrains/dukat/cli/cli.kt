@@ -75,7 +75,7 @@ private fun printUsage(program: String) {
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
-    -b  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
+    -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -js graal | j2v8                js-interop JVM engine (graal by default)
 """.trimIndent())
