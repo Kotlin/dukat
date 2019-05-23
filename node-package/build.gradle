@@ -2,9 +2,15 @@ plugins {
     id "com.moowork.node"
 }
 
+def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
+def PROPERTY_REGISTRY = "dukat.npm.registry"
+def DISTRIB_PATH = "${project.buildDir}/distrib"
+
 node {
     version = gradle.nodeVersion
     npmVersion = gradle.npmVersion
+
+    nodeModulesDir = file(DISTRIB_PATH)
 
     download = true
 }
@@ -14,16 +20,35 @@ configurations {
     cliRuntime
 }
 
-def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
-def PROPERTY_REGISTRY = "dukat.npm.registry"
+task buildDistrib {
+    doLast {
+        copy {
+            from "package.template.json"
+            into DISTRIB_PATH
+            rename { String fileName -> fileName.replace(".template", "") }
+        }
 
-task fetchRuntime(type: Copy) {
-    from configurations.cliBinary
-    into "${project.buildDir}/runtime"
+        copy {
+            from "${rootProject.projectDir}/README.md"
+            into DISTRIB_PATH
+        }
 
-    from configurations.cliRuntime
-    into "${project.buildDir}/runtime"
-    rename "js-${gradle.graalVersion}.jar", "js.jar"
+        copy {
+            from "bin"
+            into "${DISTRIB_PATH}/bin"
+        }
+
+        copy {
+            from configurations.cliBinary
+            into "${DISTRIB_PATH}/build/runtime"
+        }
+
+        copy {
+            from configurations.cliRuntime
+            into "${DISTRIB_PATH}/build/runtime"
+            rename "js-${gradle.graalVersion}.jar", "js.jar"
+        }
+    }
 }
 
 task npmVersion(type: NpmTask) {
@@ -34,7 +59,7 @@ task npmVersion(type: NpmTask) {
 }
 
 task npmPack(type: NpmTask) {
-    dependsOn = [fetchRuntime, ":cli:build", npmVersion]
+    dependsOn = [":cli:build", buildDistrib, npmVersion]
     args = ["pack"]
 }
 
@@ -45,7 +70,7 @@ task npmrc() {
         def customConfig = """
 //${registry}/:_authToken="${token}"
         """
-        def configFile = "$projectDir/.npmrc"
+        def configFile = "${DISTRIB_PATH}/.npmrc"
         file(configFile).text = customConfig;
     }
 }
@@ -55,12 +80,12 @@ task npmPublish(type: NpmTask) {
 
     def packageVersion =
             project.findProperty(PROPERTY_PACKAGE_VERSION) ?:
-            new groovy.json.JsonSlurper().parseText(file("package.json").text).version
+            new groovy.json.JsonSlurper().parseText(file("package.template.json").text).version
 
     def distribPath = "dukat-${packageVersion}.tgz"
 
     def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
-    args = ["publish",  distribPath, "--prefix", projectDir,  "--registry", "http://${registry}"]
+    args = ["publish",  distribPath,  "--registry", "http://${registry}"]
 }
 
 dependencies {
