@@ -124,8 +124,9 @@ test.dependsOn(download)
 test {
     [
             "dukat.test.extended",
+            "dukat.test.failure.always",
             "dukat.test.jsbackend.graal",
-            "dukat.test.jsbackend.j2v8",
+            "dukat.test.jsbackend.j2v8"
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
             systemProperty(projectProperty, "true")

@@ -32,14 +32,19 @@ import org.jetbrains.dukat.tsmodel.types.canBeJson
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {
-        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
-        is FunctionDeclaration -> typeParameters
-        is MethodSignatureDeclaration -> typeParameters
+        is CallSignatureDeclaration -> typeParameters
         is ClassDeclaration -> typeParameters
-        is InterfaceDeclaration -> typeParameters
+        is ConstructorDeclaration -> typeParameters
+        is FunctionDeclaration -> typeParameters
         is GeneratedInterfaceDeclaration -> typeParameters
-        is VariableDeclaration -> emptyList()
+        is IndexSignatureDeclaration -> emptyList()
+        is IntersectionTypeDeclaration -> emptyList()
+        is InterfaceDeclaration -> typeParameters
+        is MethodSignatureDeclaration -> typeParameters
         is PropertyDeclaration -> typeParameters
+        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
+        is UnionTypeDeclaration -> emptyList()
+        is VariableDeclaration -> emptyList()
         else -> raiseConcern("unknown Entity ${this::class.simpleName}") { emptyList<TypeParameterDeclaration>() };
     }
 }
