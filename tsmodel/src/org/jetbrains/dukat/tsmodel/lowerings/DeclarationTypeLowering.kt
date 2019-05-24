@@ -96,11 +96,11 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
     }
 
-    override fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
+    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 
-    override fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
+    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
     }
 

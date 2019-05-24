@@ -31,9 +31,9 @@ interface DeclarationLowering {
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
-    fun lowerUnionTypeDeclation(declaration: UnionTypeDeclaration): UnionTypeDeclaration
+    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration
-    fun lowerIntersectionTypeDeclatation(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
+    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(declaration: MemberEntity): MemberEntity
     fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
@@ -43,9 +43,9 @@ interface DeclarationLowering {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
-            is UnionTypeDeclaration -> lowerUnionTypeDeclation(declaration)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
             is TupleDeclaration -> lowerTupleDeclaration(declaration)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(declaration)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
             else -> declaration
         }
     }
