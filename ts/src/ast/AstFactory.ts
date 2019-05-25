@@ -25,7 +25,7 @@ declare interface AstFactory {
         uid: String
     ): TypeAliasDeclaration;
 
-    createStringTypeDeclaration(tokens: Array<string>): StringTypeDeclaration;
+    createStringLiteralDeclaration(token: string): StringLiteralDeclaration;
     createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration;
 
     createModifierDeclaration(name: string): ModifierDeclaration;

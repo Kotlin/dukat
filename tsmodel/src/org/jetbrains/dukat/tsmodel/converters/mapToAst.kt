@@ -31,7 +31,7 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -104,8 +104,8 @@ fun <T : Entity> Map<String, Any?>.toAst(): T {
                 getEntity("typeReference"),
                 get("uid") as String
         )
-        StringTypeDeclaration::class.simpleName -> StringTypeDeclaration(
-                get(StringTypeDeclaration::tokens.name) as List<String>
+        StringLiteralDeclaration::class.simpleName -> StringLiteralDeclaration(
+                get(StringLiteralDeclaration::token.name) as String
         )
         IndexSignatureDeclaration::class.simpleName -> IndexSignatureDeclaration(
                 getEntities(IndexSignatureDeclaration::indexTypes.name),

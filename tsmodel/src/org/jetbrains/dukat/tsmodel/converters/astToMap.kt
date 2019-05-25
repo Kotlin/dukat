@@ -31,7 +31,7 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -102,7 +102,7 @@ fun Entity.astToMap(): Map<String, Any?> {
         is QualifierEntity -> listOf(::left, ::right).convert(this)
         is SourceFileDeclaration -> listOf(::fileName, ::root, ::referencedFiles).convert(this)
         is SourceSetDeclaration -> listOf(::sources).convert(this)
-        is StringTypeDeclaration -> listOf(::tokens).convert(this)
+        is StringLiteralDeclaration -> listOf(::token).convert(this)
         is ThisTypeDeclaration -> emptyList<KProperty0<*>>().convert(this)
         is TupleDeclaration -> listOf(::params).convert(this)
         is TypeAliasDeclaration -> listOf(::aliasName, ::typeParameters, ::typeReference, ::uid).convert(this)

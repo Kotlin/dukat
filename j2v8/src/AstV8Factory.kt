@@ -77,10 +77,8 @@ class AstV8Factory(private val astFactory: AstFactory, private val runtime: V8) 
     ).toV8()
 
 
-    fun createStringTypeDeclaration(tokens: V8Array): V8Object {
-        return astFactory.createStringTypeDeclaration(
-                tokens.asIterator().asSequence().map { it as String }.toList()
-        ).toV8()
+    fun createStringLiteralDeclaration(token: String): V8Object {
+        return astFactory.createStringLiteralDeclaration(token).toV8()
     }
 
     fun createIndexSignatureDeclaration(indexType: V8Array, returnType: V8Object): V8Object {

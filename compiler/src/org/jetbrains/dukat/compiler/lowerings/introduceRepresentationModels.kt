@@ -51,7 +51,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import java.io.File
 
 
@@ -188,7 +188,13 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         is UnionTypeNode -> TypeValueModel(
                 IdentifierEntity("dynamic"),
                 emptyList(),
-                params.map { it.process().translate() }.joinToString(" | ")
+                params.map { unionMember ->
+                    if (unionMember.meta is StringLiteralDeclaration) {
+                        (unionMember.meta as StringLiteralDeclaration).token
+                    } else {
+                        unionMember.process().translate()
+                    }
+                }.joinToString(" | ")
         )
         is TupleTypeNode -> TypeValueModel(
                 IdentifierEntity("dynamic"),
@@ -196,8 +202,8 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
         )
         is TypeValueNode -> {
-            if ((value == IdentifierEntity("String")) && (meta is StringTypeDeclaration)) {
-                TypeValueModel(value, emptyList(), (meta as StringTypeDeclaration).tokens.joinToString("|"))
+            if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
+                TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token)
             } else {
                 TypeValueModel(
                         value,

@@ -34,7 +34,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -85,7 +85,7 @@ class AstFactory : AstNodeFactory<Entity> {
             uid: String
     ) = TypeAliasDeclaration(aliasName, typeParameters, typeReference, uid)
 
-    override fun createStringTypeDeclaration(tokens: List<String>) = StringTypeDeclaration(tokens)
+    override fun createStringLiteralDeclaration(token: String) = StringLiteralDeclaration(token)
 
     override fun createIndexSignatureDeclaration(indexTypes: List<ParameterDeclaration>, returnType: ParameterValueDeclaration) = IndexSignatureDeclaration(indexTypes, returnType)
 

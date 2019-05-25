@@ -51,7 +51,7 @@ interface AstNodeFactory<T> {
             uid: String
     ): T
 
-    fun createStringTypeDeclaration(tokens: List<String>): T;
+    fun createStringLiteralDeclaration(token: String): T;
     fun createIndexSignatureDeclaration(indexTypes: List<ParameterDeclaration>, returnType: ParameterValueDeclaration): T
 
     fun createCallSignatureDeclaration(

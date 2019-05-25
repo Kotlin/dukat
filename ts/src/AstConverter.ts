@@ -353,9 +353,7 @@ class AstConverter {
             } else if (ts.isThisTypeNode(type)){
                 return this.astFactory.createThisTypeDeclaration()
             } else if (ts.isLiteralTypeNode(type)) {
-                return this.astFactory.createStringTypeDeclaration([
-                    type.literal.getText()
-                ])
+                return this.astFactory.createStringLiteralDeclaration(type.literal.getText())
             } else if (ts.isTupleTypeNode(type)) {
                 return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
             } else if (ts.isTypePredicateNode(type)) {

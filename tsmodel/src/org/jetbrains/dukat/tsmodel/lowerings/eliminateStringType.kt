@@ -5,13 +5,13 @@ import org.jetbrains.dukat.tsmodel.PackageDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 private class EliminateStringType : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return if (declaration is StringTypeDeclaration) {
+        return if (declaration is StringLiteralDeclaration) {
             TypeDeclaration(IdentifierEntity("String"), emptyList(), meta = declaration)
         } else super.lowerParameterValue(declaration)
     }
