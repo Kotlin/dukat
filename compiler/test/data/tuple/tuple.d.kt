@@ -20,3 +20,6 @@ external interface Options {
     var mode: dynamic /* JsTuple<dynamic> */
 }
 external var foo: dynamic /* JsTuple<String, Any> */ = definedExternally
+external interface State {
+    fun set(newValue: Any): dynamic /* JsTuple<`T$0`> */
+}

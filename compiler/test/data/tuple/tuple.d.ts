@@ -3,3 +3,10 @@ declare interface Options {
 }
 
 declare var foo: [string, any];
+
+declare interface State {
+    set(newValue: {}): [{
+        id: number;
+        state: {};
+    }];
+}

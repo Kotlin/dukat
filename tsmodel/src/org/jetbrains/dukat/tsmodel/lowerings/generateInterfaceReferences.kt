@@ -26,9 +26,11 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import javax.xml.stream.events.EntityDeclaration
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {
@@ -43,6 +45,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is InterfaceDeclaration -> typeParameters
         is MethodSignatureDeclaration -> typeParameters
         is PropertyDeclaration -> typeParameters
+        is TupleDeclaration -> emptyList()
         is TypeDeclaration -> emptyList()
         is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
         is UnionTypeDeclaration -> emptyList()
@@ -75,6 +78,11 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     }
 
     override fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
+        val declaration = owner.node
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
+    }
+
+    override fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): TupleDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }

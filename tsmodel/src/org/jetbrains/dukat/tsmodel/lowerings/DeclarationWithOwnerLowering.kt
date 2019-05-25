@@ -17,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
@@ -35,6 +36,7 @@ interface DeclarationWithOwnerLowering {
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
     fun lowerObjectDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>): ParameterValueDeclaration
+    fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): TupleDeclaration
 
     fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
@@ -44,6 +46,7 @@ interface DeclarationWithOwnerLowering {
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner as NodeOwner<UnionTypeDeclaration>)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(owner as NodeOwner<IntersectionTypeDeclaration>)
             is ObjectLiteralDeclaration -> lowerObjectDeclaration(owner as NodeOwner<ObjectLiteralDeclaration>)
+            is TupleDeclaration -> lowerTupleDeclaration(owner as NodeOwner<TupleDeclaration>)
             else -> declaration
         }
     }
