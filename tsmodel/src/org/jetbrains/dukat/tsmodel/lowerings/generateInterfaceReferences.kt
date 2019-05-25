@@ -43,6 +43,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is InterfaceDeclaration -> typeParameters
         is MethodSignatureDeclaration -> typeParameters
         is PropertyDeclaration -> typeParameters
+        is TypeDeclaration -> emptyList()
         is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
         is UnionTypeDeclaration -> emptyList()
         is VariableDeclaration -> emptyList()
@@ -55,7 +56,10 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
     private val myAstContext: GeneratedInterfacesContext = GeneratedInterfacesContext()
 
-    override fun lowerTypeDeclaration(owner: NodeOwner<TypeDeclaration>) = owner.node
+    override fun lowerTypeDeclaration(owner: NodeOwner<TypeDeclaration>): TypeDeclaration {
+        val declaration = owner.node
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param))})
+    }
 
     override fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>): FunctionTypeDeclaration {
         val declaration = owner.node
@@ -220,7 +224,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
                         members = declaration.type.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
                 ))
             }
-            else -> declaration
+            else -> declaration.copy(type = lowerParameterValue(owner.wrap(declaration.type)))
         }
     }
 

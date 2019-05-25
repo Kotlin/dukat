@@ -49,6 +49,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
                     is InterfaceNode -> return owner as NodeOwner<InterfaceNode>
                     is FunctionNode -> return owner as NodeOwner<FunctionNode>
                     is ObjectNode -> return owner as NodeOwner<ObjectNode>
+                    is VariableNode -> return owner as NodeOwner<VariableNode>
                     is TypeAliasNode -> if (node.canBeTranslated) {
                         return owner as NodeOwner<TypeAliasNode>
                     } else null

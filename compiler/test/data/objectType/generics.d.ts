@@ -18,3 +18,6 @@ declare function withDoublyGenericObjectTypeParam<T,S>(opt: {
 declare function returnsGenericObjectType<S>(): {
     bar(a): S;
 };
+
+declare var Tokens: Array<{}>;
+declare var PingableTokens: Array<{ping: () => boolean}>;
