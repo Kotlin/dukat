@@ -7,6 +7,7 @@ type Values<V> = List<V>;
 type MultiMap<K,V> = Map<K,Values<V>>;
 type MyHeaders = MultiMap<String,String>
 type Ref<T> = string | ((instance: T) => any);
+type Ping<T> = (packet: {ip: T}) => boolean;
 
 declare var fooMap: MultiMap<string,number>;
 

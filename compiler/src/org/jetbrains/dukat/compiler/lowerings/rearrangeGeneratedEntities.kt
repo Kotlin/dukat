@@ -26,9 +26,9 @@ private fun Entity.getKey(): String {
         is VariableNode -> uid
         is FunctionNode -> uid
         is ObjectNode -> name
+        is TypeAliasNode -> uid
         is EnumNode -> ""
         is DocumentRootNode -> ""
-        is TypeAliasNode -> ""
         else -> raiseConcern("unknown TopLevelNode ${this::class.simpleName}") { "" }
     }
 }
@@ -43,11 +43,15 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
     private fun findTopLevelOwner(ownerContext: NodeOwner<*>): NodeOwner<out Entity>? {
         ownerContext.getOwners().forEach { owner ->
             if (owner is NodeOwner<*>) {
-                when (owner.node) {
+                val node = owner.node
+                when (node) {
                     is ClassNode -> return owner as NodeOwner<ClassNode>
                     is InterfaceNode -> return owner as NodeOwner<InterfaceNode>
                     is FunctionNode -> return owner as NodeOwner<FunctionNode>
                     is ObjectNode -> return owner as NodeOwner<ObjectNode>
+                    is TypeAliasNode -> if (node.canBeTranslated) {
+                        return owner as NodeOwner<TypeAliasNode>
+                    } else null
                 }
             }
         }

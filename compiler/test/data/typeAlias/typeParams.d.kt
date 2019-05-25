@@ -21,6 +21,10 @@ external interface List<T>
 typealias Values<V> = List<V>
 typealias MultiMap<K, V> = Map<K, Values<V>>
 typealias MyHeaders = MultiMap<String, String>
+external interface `T$0`<T> {
+    var ip: T
+}
+typealias Ping<T> = (packet: `T$0`<T>) -> Boolean
 external var fooMap: MultiMap<String, Number> = definedExternally
 external fun mapKey(a: MultiMap<Number, String>): Unit = definedExternally
 external var fooStringOrMap: dynamic /* String | MultiMap<String, Number> */ = definedExternally

@@ -36,6 +36,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is ClassDeclaration -> typeParameters
         is ConstructorDeclaration -> typeParameters
         is FunctionDeclaration -> typeParameters
+        is FunctionTypeDeclaration -> emptyList()
         is GeneratedInterfaceDeclaration -> typeParameters
         is IndexSignatureDeclaration -> emptyList()
         is IntersectionTypeDeclaration -> emptyList()
@@ -132,7 +133,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
             it.owner
         }.lastOrNull { (it.node is TopLevelEntity) && (it.node !is PackageDeclaration) }
 
-        return (topOwner?.node as TopLevelEntity)
+        return (topOwner?.node as? TopLevelEntity)
     }
 
     private fun <T: Entity> lowerTypeParams(owner: NodeOwner<T>, typeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {

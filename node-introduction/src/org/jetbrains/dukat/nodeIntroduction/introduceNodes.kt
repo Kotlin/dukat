@@ -305,6 +305,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 name = aliasName.toNode(),
                 typeReference = typeReference,
                 typeParameters = typeParameters.map { typeParameter -> IdentifierEntity(typeParameter.value) },
+                uid = uid,
                 canBeTranslated = true
         )
     }
