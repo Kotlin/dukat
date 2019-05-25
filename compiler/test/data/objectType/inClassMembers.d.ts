@@ -15,4 +15,6 @@ declare class Foo {
         bar(a): number;
         baz(a, b: any, c: String): boolean;
     };
+
+    dimensions: (startPointX: number, startPointY: number, endPointX: number, endPointY: number) => { width: number, height: number };
 }

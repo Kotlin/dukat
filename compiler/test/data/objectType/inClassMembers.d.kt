@@ -30,8 +30,13 @@ external interface `T$2` {
     fun bar(a: Any): Number
     fun baz(a: Any, b: Any, c: String): Boolean
 }
+external interface `T$3` {
+    var width: Number
+    var height: Number
+}
 external open class Foo {
     open fun withObjectTypeParam(opt: `T$0`): Unit = definedExternally
     open fun returnsObjectType(): `T$1` = definedExternally
     open var foo: `T$2` = definedExternally
+    open var dimensions: (startPointX: Number, startPointY: Number, endPointX: Number, endPointY: Number) -> `T$3` = definedExternally
 }

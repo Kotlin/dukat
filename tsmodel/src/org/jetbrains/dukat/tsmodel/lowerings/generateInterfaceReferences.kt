@@ -64,6 +64,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     override fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>): FunctionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(
+                type = lowerParameterValue(owner.wrap(declaration.type)),
                 parameters = declaration.parameters.map { parameterDeclaration -> parameterDeclaration.copy(type = lowerParameterValue(owner.wrap(parameterDeclaration.type))) }
         )
     }
