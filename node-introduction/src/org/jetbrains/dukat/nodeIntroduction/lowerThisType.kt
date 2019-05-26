@@ -4,19 +4,17 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
-private class LowerThisType: ParameterValueLowering {
+private class LowerThisType : NodeWithOwnerTypeLowering {
 
     private fun ClassLikeNode.convertToTypeSignature(): TypeValueNode {
 
@@ -33,33 +31,31 @@ private class LowerThisType: ParameterValueLowering {
         }
     }
 
-    private fun ParameterValueDeclaration.lower(owner: ClassLikeNode): ParameterValueDeclaration {
-        return when (this) {
-            is ThisTypeDeclaration -> owner.convertToTypeSignature()
-            else -> this
+    private fun NodeOwner<*>.classLikeOwnerNode(): ClassLikeNode? {
+        val topOwner = generateSequence(this) {
+            it.owner
+        }.lastOrNull { (it.node is ClassLikeNode) }
+
+        return (topOwner?.node as? ClassLikeNode)
+    }
+
+    override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+        val classLikeOwnerNode = owner.classLikeOwnerNode()
+        val declaration = owner.node
+
+        return when (declaration) {
+            is ThisTypeDeclaration -> if (classLikeOwnerNode == null) {
+                super.lowerParameterValue(owner)
+            } else {
+                classLikeOwnerNode.convertToTypeSignature()
+            }
+            else -> super.lowerParameterValue(owner)
         }
     }
-
-    fun lowerMemberNode(member: MemberNode, owner: ClassLikeNode): MemberNode {
-        return when (member) {
-            is PropertyNode -> member.copy(type = member.type.lower(owner))
-            is MethodNode -> member.copy(type = member.type.lower(owner))
-            else -> member
-        }
-    }
-
-    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-        return declaration.copy(members = declaration.members.map { lowerMemberNode(it, declaration) })
-    }
-
-    override fun lowerClassNode(declaration: ClassNode): ClassNode {
-        return declaration.copy(members = declaration.members.map { lowerMemberNode(it, declaration) })
-    }
-
 }
 
 fun DocumentRootNode.lowerThisType(): DocumentRootNode {
-    return org.jetbrains.dukat.nodeIntroduction.LowerThisType().lowerDocumentRoot(this)
+    return org.jetbrains.dukat.nodeIntroduction.LowerThisType().lowerRoot(this, NodeOwner(this, null))
 }
 
 fun SourceSetNode.lowerThisType() = transform { it.lowerThisType() }
