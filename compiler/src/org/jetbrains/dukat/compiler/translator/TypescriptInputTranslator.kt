@@ -6,7 +6,7 @@ import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
-import org.jetbrains.dukat.compiler.lowerings.lowerConstructors
+import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
@@ -67,7 +67,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .resolveTypeAliases()
                 .specifyUnionType()
                 .rearrangeGeneratedEntities()
-                .lowerConstructors()
+                .rearrangeConstructors()
                 .introduceMissedOverloads()
                 .introduceRepresentationModels()
                 .mergeModules()
