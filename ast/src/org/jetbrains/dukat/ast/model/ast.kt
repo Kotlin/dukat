@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
@@ -59,6 +60,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is ObjectNode -> copy() as T
         is PackageDeclaration -> copy() as T
         is ParameterDeclaration -> copy() as T
+        is TupleTypeNode -> copy() as T
         is TypeAliasNode -> copy() as T
         is TypeDeclaration -> copy() as T
         is TypeValueNode -> copy() as T
