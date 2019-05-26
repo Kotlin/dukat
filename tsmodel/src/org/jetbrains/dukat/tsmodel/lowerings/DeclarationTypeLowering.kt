@@ -128,7 +128,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
-        return heritageClause
+        return heritageClause.copy(typeArguments = heritageClause.typeArguments.map { typeArgument -> lowerParameterValue(typeArgument) })
     }
 
 
