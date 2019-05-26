@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -23,7 +22,7 @@ private class LoweringUnionType() : ParameterValueLowering {
 }
 
 fun DocumentRootNode.lowerUnionType(): DocumentRootNode {
-    return org.jetbrains.dukat.nodeIntroduction.LoweringUnionType().lowerDocumentRoot(this)
+    return LoweringUnionType().lowerDocumentRoot(this)
 }
 
 fun SourceSetNode.lowerUnionType() = transform { it.lowerUnionType() }

@@ -17,7 +17,7 @@ private class LowerIntersection : ParameterValueLowering {
                         IntersectionMetadata(declaration.params)
                 return lowerType(firstIntersectionType)
             }
-            else -> declaration
+            else -> super.lowerType(declaration)
         }
     }
 }

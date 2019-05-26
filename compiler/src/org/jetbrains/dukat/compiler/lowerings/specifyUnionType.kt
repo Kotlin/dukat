@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings
 
 import cartesian
+import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -11,8 +12,8 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -57,6 +58,7 @@ private fun ParameterValueDeclaration.description(): String {
     }
 }
 
+
 private class SpecifyUnionTypeLowering : IdentityLowering {
 
     fun generateParams(params: List<ParameterNode>): List<List<ParameterNode>> {
@@ -72,6 +74,19 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
         return generateParams(declaration.parameters).map { params ->
             declaration.copy(parameters = params)
+        }.distinctBy { node ->
+            node.copy(
+                    owner = null,
+                    parameters = node.parameters.mapIndexed { index, param ->
+                        val paramCopy = param.copy(
+                                name = "p${index}",
+                                type = param.type.duplicate()
+                        )
+
+                        paramCopy.type.meta = null
+                        paramCopy
+                    }
+            )
         }
     }
 
@@ -80,6 +95,18 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
 
         return generateParams(declaration.parameters).map { params ->
             declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)
+        }.distinctBy { node ->
+            node.copy(
+                    parameters = node.parameters.mapIndexed { index, param ->
+                        val paramCopy = param.copy(
+                                name = "p${index}",
+                                type = param.type.duplicate()
+                        )
+
+                        paramCopy.type.meta = null
+                        paramCopy
+                    }
+            )
         }
     }
 

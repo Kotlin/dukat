@@ -44,25 +44,27 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
 @Suppress("UNCHECKED_CAST")
 fun <T : Entity> Entity.duplicate(): T {
     return when (this) {
-        is EnumNode -> copy() as T
-        is EnumDeclaration -> copy() as T
-        is ImportEqualsDeclaration -> copy() as T
-        is ExportAssignmentDeclaration -> copy() as T
         is ClassDeclaration -> copy() as T
-        is ObjectNode -> copy() as T
-        is PackageDeclaration -> copy() as T
-        is InterfaceDeclaration -> copy() as T
-        is InterfaceNode -> copy() as T
-        is VariableDeclaration -> copy() as T
-        is VariableNode -> copy() as T
+        is EnumDeclaration -> copy() as T
+        is EnumNode -> copy() as T
+        is ExportAssignmentDeclaration -> copy() as T
         is FunctionDeclaration -> copy() as T
         is FunctionNode -> copy() as T
+        is FunctionTypeDeclaration -> copy() as T
+        is FunctionTypeNode -> copy() as T
+        is GeneratedInterfaceReferenceDeclaration -> copy() as T
+        is ImportEqualsDeclaration -> copy() as T
+        is InterfaceDeclaration -> copy() as T
+        is InterfaceNode -> copy() as T
+        is ObjectNode -> copy() as T
+        is PackageDeclaration -> copy() as T
+        is ParameterDeclaration -> copy() as T
+        is TypeAliasNode -> copy() as T
         is TypeDeclaration -> copy() as T
         is TypeValueNode -> copy() as T
-        is ParameterDeclaration -> copy() as T
-        is FunctionTypeDeclaration -> copy() as T
-        is TypeAliasNode -> copy() as T
-        is GeneratedInterfaceReferenceDeclaration -> copy() as T
+        is UnionTypeNode -> copy() as T
+        is VariableDeclaration -> copy() as T
+        is VariableNode -> copy() as T
         else -> raiseConcern("can not copy ${this}") { this as T }
     }
 }
