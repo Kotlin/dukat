@@ -7,23 +7,25 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
+typealias EntityWithOwner = Pair<TopLevelEntity, DocumentRootNode>
 
-fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelEntity> = mutableMapOf()): Map<String, TopLevelEntity> {
-    map[docRoot.uid] = docRoot
+private fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, EntityWithOwner> = mutableMapOf()): Map<String, EntityWithOwner> {
+    map[docRoot.uid] = Pair(docRoot, docRoot)
 
     docRoot.declarations.forEach { declaration ->
         when (declaration) {
-            is InterfaceNode -> map[declaration.uid] = declaration
-            is ClassNode -> map[declaration.uid] = declaration
-            is FunctionNode -> map[declaration.uid] = declaration
-            is VariableNode -> map[declaration.uid] = declaration
+            is InterfaceNode -> map[declaration.uid] = Pair(declaration, docRoot)
+            is ClassNode -> map[declaration.uid] = Pair(declaration, docRoot)
+            is FunctionNode -> map[declaration.uid] = Pair(declaration, docRoot)
+            is VariableNode -> map[declaration.uid] = Pair(declaration, docRoot)
             is DocumentRootNode -> buildUidTable(declaration, map)
             else -> Unit
         }
@@ -32,172 +34,175 @@ fun buildUidTable(docRoot: DocumentRootNode, map: MutableMap<String, TopLevelEnt
     return map
 }
 
-fun introduceExportAnnotations(docRoot: DocumentRootNode, uidTable: Map<String, TopLevelEntity>, turnOff: MutableSet<NameEntity>, exportedModules: MutableMap<String, NameEntity?>): DocumentRootNode {
+private class ExportAnnotationsLowering(private val myUidTable: Map<String, EntityWithOwner>) {
+    private val myTurnOffData = mutableSetOf<NameEntity>()
+    private val myExportedModulesData = mutableMapOf<String, NameEntity?>()
 
-    val declarations = docRoot.declarations.mapNotNull { declaration ->
-        when (declaration) {
-            is DocumentRootNode -> introduceExportAnnotations(declaration, uidTable, turnOff, exportedModules)
+    private fun lowerExportAssignmentDeclaration(owner: NodeOwner<ExportAssignmentDeclaration>): TopLevelEntity? {
+        val defaultAnnotation = AnnotationNode("JsName", listOf(IdentifierEntity("default")))
 
-            is ExportAssignmentDeclaration -> {
-                val defaultAnnotation = AnnotationNode("JsName", listOf(IdentifierEntity("default")))
+        val declaration = owner.node
+        val docRoot = owner.owner?.node
 
+        if (docRoot !is DocumentRootNode) {
+            return null
+        }
 
-                if (!declaration.isExportEquals) {
-                    uidTable.get(declaration.name)?.let { entity ->
-                        when (entity) {
-                            is FunctionNode -> {
-                                if (!entity.export) {
-                                    entity.annotations.add(defaultAnnotation)
-                                } else Unit
-                            }
-                            is VariableNode -> entity.annotations.add(defaultAnnotation)
-                            else -> Unit
-                        }
+        return if (!declaration.isExportEquals) {
+            myUidTable.get(declaration.name)?.let { (entity, _) ->
+                when (entity) {
+                    is FunctionNode -> {
+                        if (!entity.export) {
+                            entity.annotations.add(defaultAnnotation)
+                        } else Unit
+                    }
+                    is VariableNode -> entity.annotations.add(defaultAnnotation)
+                    else -> Unit
+                }
+            }
+
+            null
+        } else {
+            val uidRecord = myUidTable.get(declaration.name)
+            if (uidRecord == null) {
+                return null
+            }
+
+            val (entity, entityOwner) = uidRecord
+
+            val rootQualifiedNode = docRoot.qualifiedNode
+            when (entity) {
+                is DocumentRootNode -> {
+
+                    rootQualifiedNode?.let { qualifiedNode ->
+                        myExportedModulesData[entity.uid] = qualifiedNode
                     }
 
                     null
-                } else {
-                    val entity = uidTable.get(declaration.name)
-
-                    when (entity) {
-                        is DocumentRootNode -> {
-
-                            docRoot.qualifiedNode?.let { qualifiedNode ->
-                                exportedModules[entity.uid] = qualifiedNode
-                            }
-
-                            null
-                        }
-                        is ClassNode -> {
-
-                            entity.owner?.let {
-                                turnOff.add(it.fullPackageName)
-                            }
-
-                            if (docRoot.owner != null) {
-                                docRoot.qualifiedNode?.let { qualifiedNode ->
-                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
-                                }
-                            }
-                            null
-                        }
-                        is InterfaceNode -> {
-                            entity.owner?.let {
-                                turnOff.add(it.fullPackageName)
-                            }
-
-                            if (docRoot.owner != null) {
-                                docRoot.qualifiedNode?.let { qualifiedNode ->
-                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
-                                }
-                            }
-                            null
-                        }
-                        is FunctionNode -> {
-                            entity.owner?.let { ownerModule ->
-                                turnOff.add(ownerModule.fullPackageName)
-
-                                ownerModule.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
-                                    submodule.packageName == entity.name.translate()
-                                }?.let { eponymousDeclaration ->
-                                    exportedModules.put(eponymousDeclaration.uid, ownerModule.qualifiedNode)
-                                }
-                            }
-
-                            //TODO: investigate how set annotations only at FunctionNode only
-                            docRoot.declarations.filterIsInstance(FunctionNode::class.java).forEach {
-                                if (it != entity) {
-                                    docRoot.qualifiedNode?.let { qualifiedNode ->
-                                        it.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
-                                    }
-                                }
-                            }
-
-                            if (docRoot.owner != null) {
-                                docRoot.qualifiedNode?.let { qualifiedNode ->
-                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
-                                }
-                            }
-                            null
-                        }
-                        is VariableNode -> {
-                            entity.owner?.let {
-                                turnOff.add(it.fullPackageName)
-                            }
-
-
-                            if (docRoot.uid == entity.owner?.uid) {
-                                docRoot.qualifiedNode?.let { qualifiedNode ->
-                                    entity.name = qualifiedNode
-                                }
-                            }
-
-                            if (docRoot.owner != null) {
-                                docRoot.qualifiedNode?.let { qualifiedNode ->
-                                    entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
-                                }
-                                entity.immutable = true
-                            }
-
-                            null
-                        }
-                        else -> declaration
-                    }
                 }
+                is ClassNode -> {
 
+                    myTurnOffData.add(entityOwner.fullPackageName)
+
+                    if (docRoot.owner != null) {
+                        rootQualifiedNode?.let { qualifiedNode ->
+                            entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                        }
+                    }
+                    null
+                }
+                is InterfaceNode -> {
+                    myTurnOffData.add(entityOwner.fullPackageName)
+
+                    if (docRoot.owner != null) {
+                        rootQualifiedNode?.let { qualifiedNode ->
+                            entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                        }
+                    }
+                    null
+                }
+                is FunctionNode -> {
+                    myTurnOffData.add(entityOwner.fullPackageName)
+
+                    entityOwner.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
+                        submodule.packageName == entity.name.translate()
+                    }?.let { eponymousDeclaration ->
+                        myExportedModulesData.put(eponymousDeclaration.uid, entityOwner.qualifiedNode)
+                    }
+
+                    //TODO: investigate how set annotations only at FunctionNode only
+                    docRoot.declarations.filterIsInstance(FunctionNode::class.java).forEach {
+                        if (it != entity) {
+                            rootQualifiedNode?.let { qualifiedNode ->
+                                it.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                            }
+                        }
+                    }
+
+                    if (docRoot.owner != null) {
+                        rootQualifiedNode?.let { qualifiedNode ->
+                            entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                        }
+                    }
+                    null
+                }
+                is VariableNode -> {
+                    myTurnOffData.add(entityOwner.fullPackageName)
+
+                    if (docRoot.uid == entityOwner.uid) {
+                        rootQualifiedNode?.let { qualifiedNode ->
+                            entity.name = qualifiedNode
+                        }
+                    }
+
+                    if (docRoot.owner != null) {
+                        rootQualifiedNode?.let { qualifiedNode ->
+                            entity.annotations.add(AnnotationNode("JsModule", listOf(qualifiedNode)))
+                        }
+                        entity.immutable = true
+                    }
+
+                    null
+                }
+                else -> declaration
             }
-
-            else -> declaration
         }
+
     }
 
-    return docRoot.copy(declarations = declarations)
-}
+    fun introduceExportAnnotations(owner: NodeOwner<DocumentRootNode>): DocumentRootNode {
+        val docRoot = owner.node
 
-
-
-private fun DocumentRootNode.turnOff(turnOffData: MutableSet<NameEntity>): DocumentRootNode {
-    if (turnOffData.contains(fullPackageName)) {
-        showQualifierAnnotation = false
-    }
-
-    val declarations = declarations.map { declaration ->
-        when (declaration) {
-            is DocumentRootNode -> {
-            declaration.turnOff(turnOffData)
+        val declarations = docRoot.declarations.mapNotNull { declaration ->
+            when (declaration) {
+                is DocumentRootNode -> introduceExportAnnotations(owner.wrap(declaration))
+                is ExportAssignmentDeclaration -> lowerExportAssignmentDeclaration(owner.wrap(declaration))
+                else -> declaration
             }
-            else -> declaration
         }
+
+        return docRoot.copy(declarations = declarations).turnOff().markModulesAsExported()
     }
 
-    return copy(declarations = declarations)
-}
+    private fun DocumentRootNode.markModulesAsExported(): DocumentRootNode {
+        if (myExportedModulesData.containsKey(uid)) {
+            qualifiedNode = myExportedModulesData.getValue(uid)
+            isQualifier = false
+        }
 
-private fun DocumentRootNode.markModulesAsExported(exportedModulesData: Map<String, NameEntity?>): DocumentRootNode {
-    if (exportedModulesData.containsKey(uid)) {
-        qualifiedNode = exportedModulesData.getValue(uid)
-        isQualifier = false
-    }
-
-    val declarations = declarations.map { declaration ->
-        when (declaration) {
-            is DocumentRootNode -> {
-                declaration.markModulesAsExported(exportedModulesData)
+        val declarations = declarations.map { declaration ->
+            when (declaration) {
+                is DocumentRootNode -> {
+                    declaration.markModulesAsExported()
+                }
+                else -> declaration
             }
-            else -> declaration
         }
+
+        return copy(declarations = declarations)
     }
 
-    return copy(declarations = declarations)
+
+    private fun DocumentRootNode.turnOff(): DocumentRootNode {
+        if (myTurnOffData.contains(fullPackageName)) {
+            showQualifierAnnotation = false
+        }
+
+        val declarations = declarations.map { declaration ->
+            when (declaration) {
+                is DocumentRootNode -> {
+                    declaration.turnOff()
+                }
+                else -> declaration
+            }
+        }
+
+        return copy(declarations = declarations)
+    }
 }
 
 fun DocumentRootNode.introduceExportAnnotations(): DocumentRootNode {
-    val uidTable = org.jetbrains.dukat.nodeIntroduction.buildUidTable(this)
-    val turnOffData = mutableSetOf<NameEntity>()
-    val exportedModulesData = mutableMapOf<String, NameEntity?>()
-    val docRoot = org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations(this, uidTable, turnOffData, exportedModulesData)
-
-    return docRoot.turnOff(turnOffData).markModulesAsExported(exportedModulesData)
+    return ExportAnnotationsLowering(buildUidTable(this)).introduceExportAnnotations(NodeOwner(this, null))
 }
 
 fun SourceSetNode.introduceExportAnnotations() = transform { it.introduceExportAnnotations() }
