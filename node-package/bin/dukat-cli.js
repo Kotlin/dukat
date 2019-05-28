@@ -51,6 +51,10 @@ function guardJavaExists() {
     });
 }
 
+function getVersion() {
+    return require(path.resolve(__dirname, "..", "package.json")).version;
+}
+
 var main = function() {
     var args = process.argv.slice(2);
 
@@ -60,7 +64,7 @@ var main = function() {
     var classPath = [jsPath, cliPath].join(path.delimiter);
 
     guardJavaExists();
-    run("java -cp " + classPath + " org.jetbrains.dukat.cli.CliKt " + args.join(" "))
+    run("java "+ " -Ddukat.cli.internal.version=" + getVersion() + " -cp " + classPath + " org.jetbrains.dukat.cli.CliKt " + args.join(" "))
 };
 
 main();

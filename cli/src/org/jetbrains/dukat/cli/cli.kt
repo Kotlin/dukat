@@ -70,6 +70,12 @@ fun Iterator<String>.readArg(): String? {
     } else null
 }
 
+private fun printVersion() {
+    println("""
+dukat version ${System.getProperty("dukat.cli.internal.version")}
+""".trimIndent())
+}
+
 private fun printUsage(program: String) {
     println("""
 Usage: $program [<options>] <d.ts files>
@@ -78,6 +84,7 @@ where possible options include:
     -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -js graal | j2v8                js-interop JVM engine (graal by default)
+    -v, -version                    print version
 """.trimIndent())
 }
 
@@ -113,6 +120,7 @@ private fun process(args: List<String>): CliOptions? {
         val arg = argsIterator.next()
 
         when (arg) {
+            "-v", "-version" -> printVersion()
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)
             }
