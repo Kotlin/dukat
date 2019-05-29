@@ -9,7 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 
-@EnabledIfSystemProperty(named = "dukat.test.jsbackend.graal", matches = "true")
 class CompilationTests : OutputTests() {
 
     override fun getTranslator(): InputTranslator = translator

@@ -20,7 +20,7 @@ where possible options include:
 ```shell
     -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
-    -js graal | j2v8                js-interop JVM engine (graal by default)
+    -v, -version                    print version
 ```
 
 # How to setup and build
@@ -39,7 +39,7 @@ where possible options include:
 3. (optional) Run unit tests
 
 ```shell
-./gradlew test -Pdukat.test.jsbackend.graal -Pdukat.test.failure.always
+./gradlew test -Pdukat.test.failure.always
 ```  
 
 # Recent Changes

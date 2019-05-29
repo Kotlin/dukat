@@ -8,7 +8,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createGraalTranslator
-import org.jetbrains.dukat.compiler.createV8Translator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.raiseConcern
@@ -83,14 +82,13 @@ Usage: $program [<options>] <d.ts files>
 where possible options include:
     -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
-    -js graal | j2v8                js-interop JVM engine (graal by default)
     -v, -version                    print version
 """.trimIndent())
 }
 
 
 private enum class Engine {
-    J2V8, GRAAL
+    GRAAL
 }
 
 private data class CliOptions(
@@ -136,15 +134,15 @@ private fun process(args: List<String>): CliOptions? {
 
             "-js" -> {
                 val engineId = argsIterator.readArg()
+                printWarning("'-js' is an obsolete flag and planned to be removed")
                 engine = when (engineId) {
                     "graal" -> Engine.GRAAL
                     "j2v8" -> {
-                        printWarning("currently j2v8 backend is not supported on windows-based platforms")
-                        Engine.J2V8
+                        printWarning("j2v8 backend is not supported any more, '-js' option is ignored")
+                        Engine.GRAAL
                     }
                     else -> {
-                        printError("'-js' can be set to either 'graal' or 'j2v8'")
-                        return null
+                        Engine.GRAAL
                     }
                 }
             }
@@ -174,11 +172,10 @@ fun main(vararg args: String) {
     }
 
     process(args.toList())?.let { options ->
-        options.engine == Engine.J2V8
+        options.engine == Engine.GRAAL
 
         options.sources.forEach { sourceName ->
             compile(sourceName, options.outDir, options.basePackageName, when (options.engine) {
-                Engine.J2V8 -> createV8Translator()
                 Engine.GRAAL -> createGraalTranslator()
             })
         }
