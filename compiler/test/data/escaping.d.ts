@@ -37,6 +37,10 @@ declare namespace when {
 declare var _: __.___;
 
 declare namespace __ {
+    namespace xxx {
+        interface Amsterdam {}
+    }
+
     interface ___ {
     }
 

@@ -1,5 +1,4 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package module
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -17,12 +16,12 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("lodash")
-external val `_`: module.`_`.LoDashStatic = definedExternally
+external val `_`: `_`.LoDashStatic = definedExternally
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("_")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package module.`_`
+package `_`
 
 import kotlin.js.*
 import kotlin.js.Json

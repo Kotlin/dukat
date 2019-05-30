@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.interop.graal.DocumentCache
@@ -35,8 +36,8 @@ class TranslatorGraal(
         private val engine: InteropGraal,
         private val documentCache: DocumentCache = DocumentCache()
 ) : TypescriptInputTranslator {
-    override fun translateFile(fileName: String): SourceSetDeclaration {
-        return engine.callFunction("main", fileName, documentCache)
+    override fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration {
+        return engine.callFunction("main", fileName, packageName, documentCache)
     }
 
     override fun release() {}

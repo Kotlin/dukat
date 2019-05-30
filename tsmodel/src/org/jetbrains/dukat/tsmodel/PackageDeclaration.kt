@@ -1,9 +1,10 @@
 package org.jetbrains.dukat.tsmodel
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class PackageDeclaration(
-        val packageName: String,
+        val packageName: NameEntity,
         val declarations: List<TopLevelEntity> = emptyList(),
 
         val modifiers: List<ModifierDeclaration>,

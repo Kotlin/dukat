@@ -15,10 +15,13 @@ fun OwnerContext.getQualifiedName(): NameEntity {
             .toList() as List<NodeOwner<ModuleModel>>
 
     return if (moduleOwners.size == 1) {
-        IdentifierEntity(moduleOwners.get(0).node.shortName)
+        moduleOwners.get(0).node.shortName
     } else {
         return moduleOwners
                 .drop(1)
-                .fold(IdentifierEntity(moduleOwners.first().node.shortName) as NameEntity) { acc, a -> IdentifierEntity(a.node.shortName).appendLeft(acc) } as QualifierEntity
+                .fold(moduleOwners.first().node.shortName) { acc, a ->
+                    //TODO: got rid of this cast
+                    (a.node.shortName as IdentifierEntity).appendLeft(acc)
+                } as QualifierEntity
     }
 }

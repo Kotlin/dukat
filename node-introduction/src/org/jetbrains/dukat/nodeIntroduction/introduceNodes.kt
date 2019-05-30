@@ -32,6 +32,7 @@ import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -661,10 +662,10 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val rootOwner = parentDocRoots.get(0)
 
-        val qualifiers = parentDocRoots.map { unquote(it.node.packageName) }
+        val qualifiers = parentDocRoots.map { unquote(it.node.packageName.translate()) }
 
 
-        val isQualifier = (documentRoot.packageName == unquote(documentRoot.packageName))
+        val isQualifier = (documentRoot.packageName.translate() == unquote(documentRoot.packageName.translate()))
 
         var showQualifierAnnotation = owner != rootOwner
 

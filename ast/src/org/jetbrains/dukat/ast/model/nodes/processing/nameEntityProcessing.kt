@@ -6,10 +6,16 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.panic.raiseConcern
 
+val ROOT_PACKAGENAME = IdentifierEntity("<ROOT>")
+
 fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
-        "${left.translate()}.${right.translate()}"
+        if (leftMost() == ROOT_PACKAGENAME) {
+            shiftLeft()!!.translate()
+        } else {
+            "${left.translate()}.${right.translate()}"
+        }
     }
     is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
     else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
@@ -123,10 +129,19 @@ fun NameEntity.appendRight(qualifiedNode: NameEntity): NameEntity {
 
 fun NameEntity.shiftRight(): NameEntity? {
     return when (this) {
-        is IdentifierEntity -> null
         is GenericIdentifierNode -> null
+        is IdentifierEntity -> null
         is QualifierEntity -> left
         else -> raiseConcern("unknown NameEntity") { this }
+    }
+}
+
+fun NameEntity.leftMost(): NameEntity? {
+    return when (this) {
+        is GenericIdentifierNode -> this
+        is IdentifierEntity -> this
+        is QualifierEntity -> left.leftMost()
+        else -> raiseConcern("unknown NameEntity ${this}") { this }
     }
 }
 

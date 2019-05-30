@@ -1,6 +1,6 @@
 @file:JsQualifier("lib1")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package namespaceImportMultiple.lib1
+package lib1
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -24,7 +24,7 @@ external interface I {
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("lib1.lib3")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package namespaceImportMultiple.lib1.lib3
+package lib1.lib3
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -46,7 +46,7 @@ external interface K
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("lib1.lib2")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package namespaceImportMultiple.lib1.lib2
+package lib1.lib2
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -70,7 +70,7 @@ external interface J {
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("lib1.lib2.lib3")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package namespaceImportMultiple.lib1.lib2.lib3
+package lib1.lib2.lib3
 
 import kotlin.js.*
 import kotlin.js.Json

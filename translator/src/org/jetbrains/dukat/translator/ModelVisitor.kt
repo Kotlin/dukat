@@ -48,8 +48,6 @@ interface ModelVisitor {
 
     fun visitInterface(interfaceModel: InterfaceModel)
     private fun processInterfaceModel(declaration: InterfaceModel) {
-        val declaration = declaration
-
         visitInterface(declaration)
 
         declaration.members.forEach { member ->
@@ -65,7 +63,6 @@ interface ModelVisitor {
     fun visitClass(classModel: ClassModel)
     private fun processClassModel(declaration: ClassModel) {
         visitClass(declaration)
-        val declaration = declaration
 
         declaration.members.forEach { member ->
             processMemberNode(member)
@@ -82,7 +79,6 @@ interface ModelVisitor {
 
 
     private fun processClassLikeModel(declaration: ClassLikeModel) {
-        val declaration = declaration
         when (declaration) {
             is InterfaceModel -> processInterfaceModel(declaration)
             is ClassModel -> processClassModel(declaration)
@@ -90,7 +86,6 @@ interface ModelVisitor {
     }
 
     private fun processTopLevelDeclaration(declaration: TopLevelNode) {
-        val declaration = declaration
         when (declaration) {
             is VariableModel -> processVariableModel(declaration)
             is FunctionModel -> processFunctionModel(declaration)

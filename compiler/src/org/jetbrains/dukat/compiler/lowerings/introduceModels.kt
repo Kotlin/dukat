@@ -316,10 +316,10 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     )
 }
 
-fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
+fun DocumentRootNode.introduceModels(): ModuleModel {
     val declarations = declarations.mapNotNull { declaration ->
         when (declaration) {
-            is DocumentRootNode -> declaration.introduceRepresentationModels()
+            is DocumentRootNode -> declaration.introduceModels()
             is ClassNode -> declaration.convertToClassModel()
             is InterfaceNode -> declaration.convertToInterfaceModel()
             is FunctionNode -> FunctionModel(
@@ -402,11 +402,11 @@ fun DocumentRootNode.introduceRepresentationModels(): ModuleModel {
     )
 }
 
-fun SourceSetNode.introduceRepresentationModels() = SourceSetModel(
+fun SourceSetNode.introduceModels() = SourceSetModel(
         sources = sources.map { source ->
             val rootFile = File(source.fileName)
             val fileName = rootFile.normalize().absolutePath
-            SourceFileModel(fileName, source.root.introduceRepresentationModels(), source.referencedFiles.map { referenceFile ->
+            SourceFileModel(fileName, source.root.introduceModels(), source.referencedFiles.map { referenceFile ->
                 val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
                 IdentifierEntity(absolutePath)
             })

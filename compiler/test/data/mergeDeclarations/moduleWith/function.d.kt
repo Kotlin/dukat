@@ -1,5 +1,4 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package function
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -24,7 +23,7 @@ external interface Fiber_ {
 
 // ------------------------------------------------------------------------------------------
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package function.fibers
+package fibers
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -47,7 +46,7 @@ external fun Fiber(fn: Function<*>): Fiber_ = definedExternally
 // ------------------------------------------------------------------------------------------
 @file:JsModule("fibers")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package function.fibers.Fiber
+package fibers.Fiber
 
 import kotlin.js.*
 import kotlin.js.Json

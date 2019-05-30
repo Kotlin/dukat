@@ -18,6 +18,7 @@ class AstConverter {
     private log = createLogger("AstConverter");
 
     constructor(
+        private rootPackageName: NameDeclaration,
         private typeChecker: ts.TypeChecker,
         private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
         private declarationResolver: (node: ts.Node, fileName: string) => readonly ts.DefinitionInfo[] | undefined,
@@ -37,13 +38,14 @@ class AstConverter {
             throw new Error(`failed to resolve ${sourceFileName}`)
         }
 
-        // TODO: don't remember how it's done in ts2kt, need to refresh my memories
+        let resourceName = this.rootPackageName;
+
         let packageNameFragments = sourceFile.fileName.split("/");
-        let resourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+        let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
 
-        let packageDeclaration = this.createDocumentRoot(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), resourceName, true);
+        let packageDeclaration = this.createDocumentRoot(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
         let declaration = this.astFactory.createSourceFileDeclaration(
             sourceFileName,
             packageDeclaration,
@@ -80,7 +82,7 @@ class AstConverter {
         return this.convertSourceMap(sourceSet);
     }
 
-    createDocumentRoot(packageName: string, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
+    createDocumentRoot(packageName: NameDeclaration, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
         return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
     }
 
@@ -658,7 +660,7 @@ class AstConverter {
         return  parentEntities
     }
 
-    private convertStatement(statement: ts.Node, resourceName: string, sourceFileName: string): Array<Declaration> {
+    private convertStatement(statement: ts.Node, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
         let res: Array<Declaration> = [];
 
         if (ts.isEnumDeclaration(statement)) {
@@ -779,7 +781,7 @@ class AstConverter {
     }
 
 
-    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: string, sourceFileName: string) : Array<Declaration> {
+    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameDeclaration, sourceFileName: string) : Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
             for (let decl of this.convertStatement(statement, resourceName, sourceFileName)) {
@@ -791,7 +793,7 @@ class AstConverter {
     }
 
 
-    convertModule(module: ts.ModuleDeclaration, resourceName: string, sourceFileName: string): Array<Declaration> {
+    convertModule(module: ts.ModuleDeclaration, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
         let definitionInfos = this.declarationResolver(module.name, sourceFileName);
 
         const declarations: Declaration[] = [];
@@ -806,11 +808,13 @@ class AstConverter {
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
+            let sourceNameFragment = module.name.getText();
+
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName, sourceFileName);
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, resourceName, false), declarations);
+                this.registerDeclaration(this.createDocumentRoot(this.astFactory.createIdentifierDeclaration(sourceNameFragment), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(module.name.getText(), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, resourceName, false), declarations);
+                this.registerDeclaration(this.createDocumentRoot(this.astFactory.createIdentifierDeclaration(sourceNameFragment), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations

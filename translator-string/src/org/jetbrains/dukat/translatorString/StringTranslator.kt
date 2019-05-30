@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -57,6 +58,7 @@ private fun TypeModel.translateMeta(): String {
 private fun translateTypeParams(params: List<TypeModel>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
+
 
 fun TypeModel.translate(): String {
     return when (this) {
@@ -492,8 +494,14 @@ class StringTranslator : ModelVisitor {
         val containsSomethingExceptDocRoot = moduleModel.declarations.isNotEmpty()
 
         if (containsSomethingExceptDocRoot) {
-            addOutput("${translateAnnotations(moduleModel.annotations)}package ${moduleModel.packageName.translate()}")
-            addOutput("")
+            val translateAnnotations = translateAnnotations(moduleModel.annotations)
+
+            if (moduleModel.packageName != ROOT_PACKAGENAME) {
+                addOutput("${translateAnnotations}package ${moduleModel.packageName.translate()}")
+                addOutput("")
+            } else {
+                addOutput(translateAnnotations)
+            }
         }
 
         moduleModel.imports.forEachIndexed { index, importNode ->

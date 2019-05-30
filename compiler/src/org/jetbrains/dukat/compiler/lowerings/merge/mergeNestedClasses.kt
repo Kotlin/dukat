@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -10,9 +11,10 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import javax.naming.Name
 
 
-private data class ClassKey(val name: String, val moduleQualifiedName: String)
+private data class ClassKey(val name: NameEntity, val moduleQualifiedName: String)
 
 private class ClassContext : ModelWithOwnerTypeLowering {
 
@@ -20,7 +22,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<NameEntity, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
-        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().translate())] = ownerContext.node
+        myClassMap[ClassKey(IdentifierEntity(ownerContext.node.name), ownerContext.getQualifiedName().translate())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
             (it is NodeOwner<*>) && (it.node is ModuleModel)
@@ -37,7 +39,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     }
 
     fun resolve(name: String, qualifiedNode: NameEntity): ClassModel? {
-        val key = ClassKey(name, qualifiedNode.translate())
+        val key = ClassKey(IdentifierEntity(name), qualifiedNode.translate())
         return myClassMap.get(key)
     }
 

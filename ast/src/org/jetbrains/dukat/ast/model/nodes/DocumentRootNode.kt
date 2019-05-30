@@ -8,7 +8,7 @@ data class DocumentRootNode(
         val fileName: String,
         val resourceName: String,
 
-        val packageName: String,
+        val packageName: NameEntity,
         var fullPackageName: NameEntity,
         val declarations: List<TopLevelEntity> = emptyList(),
         val imports: Map<String, ImportNode>,

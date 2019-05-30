@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.compiler.translator
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
-import org.jetbrains.dukat.compiler.lowerings.introduceRepresentationModels
+import org.jetbrains.dukat.compiler.lowerings.introduceModels
 import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
@@ -37,11 +38,11 @@ import org.jetbrains.dukat.tsmodel.lowerings.resolvePartials
 
 
 interface TypescriptInputTranslator : InputTranslator {
-    fun translateFile(fileName: String): SourceSetDeclaration
+    fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration
     fun release()
 
-    override fun translate(fileName: String): SourceSetModel {
-        return lower(translateFile(fileName))
+    override fun translate(fileName: String, packageName: NameEntity): SourceSetModel {
+        return lower(translateFile(fileName, packageName))
     }
 
     private fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
@@ -69,7 +70,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .rearrangeGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
-                .introduceRepresentationModels()
+                .introduceModels()
                 .mergeModules()
                 .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()

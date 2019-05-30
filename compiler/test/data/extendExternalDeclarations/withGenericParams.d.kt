@@ -1,5 +1,5 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package withGenericParams.Q
+package Q
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -23,7 +23,7 @@ inline var <T> Promise<T>.bar: Array<T> get() = this.asDynamic().bar; set(value)
 // ------------------------------------------------------------------------------------------
 @file:JsModule("ref-array")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package withGenericParams.ref_array
+package ref_array
 
 import kotlin.js.*
 import kotlin.js.Json

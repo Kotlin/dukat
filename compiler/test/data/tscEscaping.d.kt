@@ -1,5 +1,4 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package tscEscaping
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -35,7 +34,7 @@ external fun <__T> foo(__a: __T, _b: __M.__N.__C): Unit = definedExternally
 // ------------------------------------------------------------------------------------------
 @file:JsModule("atpl")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package tscEscaping.atpl
+package atpl
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -58,7 +57,7 @@ external fun __express(filename: String, options: Any, callback: Function<*>): A
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("__M")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package tscEscaping.__M
+package __M
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -81,7 +80,7 @@ external fun __express(filename: String, options: Any, callback: Function<*>): A
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("__M.__N")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package tscEscaping.__M.__N
+package __M.__N
 
 import kotlin.js.*
 import kotlin.js.Json

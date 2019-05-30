@@ -55,7 +55,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 importNode.referenceName
             } else {
                 val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
-                    importedDocumentNode.packageName == importNode.referenceName.translate()
+                    importedDocumentNode.packageName.translate() == importNode.referenceName.translate()
                 }
 
                 if (resolvedImport == null) {

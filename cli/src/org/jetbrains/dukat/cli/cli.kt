@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.cli
 
+import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
 import org.jetbrains.dukat.ast.model.nodes.processing.process
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -16,37 +18,39 @@ import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
 import java.io.File
 
-
 private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-
-private fun NameEntity.updatePackageNameWithPrefix(basePackage: NameEntity): NameEntity {
-    return when (this) {
-        is IdentifierEntity -> basePackage
-        is QualifierEntity -> copy(left = left.updatePackageNameWithPrefix(basePackage))
-        else -> raiseConcern("unsupported org.jetbrains.dukat.astCommon.NameEntity ${this}") { this }
+private fun NameEntity.fileNameFragment(): String {
+    val name= if (this.leftMost() == IdentifierEntity("<ROOT>")) {
+        this.shiftLeft()
+    } else {
+        this
     }
+
+    return if (name == null) { "" } else { name.process(::unescape).translate() + "." }
 }
 
-private fun compile(filename: String, outDir: String?, basePackageName: NameEntity?, translator: TypescriptInputTranslator) {
+private fun compile(filename: String, outDir: String?, basePackageName: NameEntity, translator: TypescriptInputTranslator) {
     println("Converting $filename")
 
-    val sourceSetModel = translator.translate(filename)
+    val sourceSetModel = translator.translate(filename, basePackageName)
 
     println("Save declarations:")
 
     sourceSetModel.sources.forEach { source ->
         println("--- ${source.fileName} -----------")
 
+        val ktFileNamePrefix = File(source.fileName).name.removeSuffix(".ts")
+
         val modules = source.root.flattenDeclarations()
 
         modules.forEach { originalModule ->
 
-            val module = if (basePackageName == null) originalModule else originalModule.copy(packageName = originalModule.packageName.updatePackageNameWithPrefix(basePackageName))
+            val module = originalModule
 
-            val targetName = "${module.packageName.process(::unescape).translate()}.kt"
+            val targetName = "${ktFileNamePrefix}.${module.packageName.fileNameFragment()}kt"
 
             val dir = outDir ?: "./"
 
@@ -95,7 +99,7 @@ private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
         val engine: Engine,
-        val basePackageName: NameEntity?
+        val basePackageName: NameEntity
 )
 
 
@@ -113,7 +117,7 @@ private fun process(args: List<String>): CliOptions? {
     val sources = mutableListOf<String>()
     var outDir: String? = null
     var engine = Engine.GRAAL
-    var basePackageName: NameEntity? = null
+    var basePackageName: NameEntity = IdentifierEntity("<ROOT>")
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 

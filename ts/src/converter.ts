@@ -12,7 +12,7 @@ declare interface DocumentCache {
     getDocument(key: string, path: string): ts.SourceFile | undefined;
 }
 
-function main(fileName: string, cache?: DocumentCache) {
+function main(fileName: string, packageName: NameDeclaration, cache?: DocumentCache) {
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 
@@ -33,6 +33,7 @@ function main(fileName: string, cache?: DocumentCache) {
         throw new Error(`failed to resolve ${fileName}`)
     } else {
         let astConverter: AstConverter = new AstConverter(
+            packageName,
             program.getTypeChecker(),
             (fileName: string) => program.getSourceFile(fileName),
             (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),

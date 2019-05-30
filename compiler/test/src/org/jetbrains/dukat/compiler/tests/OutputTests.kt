@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.panic.PanicMode
@@ -55,7 +56,7 @@ abstract class OutputTests {
 
     private fun output(fileName: String, translator: InputTranslator): String {
         val sourceSet =
-                translator.translate(fileName)
+                translator.translate(fileName, IdentifierEntity("<ROOT>"))
 
         val sourcesMap = mutableMapOf<String, SourceFileModel>()
         sourceSet.sources.map { sourceFileDeclaration ->

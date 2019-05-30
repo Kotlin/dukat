@@ -1,6 +1,6 @@
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package withNonExportDeclarations.Foo
+package Foo
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -29,7 +29,7 @@ external fun d(a: Boolean, b: Any, c: SomeType): Unit = definedExternally
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo.Bar")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package withNonExportDeclarations.Foo.Bar
+package Foo.Bar
 
 import kotlin.js.*
 import kotlin.js.Json

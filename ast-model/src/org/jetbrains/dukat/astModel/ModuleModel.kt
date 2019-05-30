@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 data class ModuleModel(
         val qualifiedName: NameEntity?,
         val packageName: NameEntity,
-        val shortName: String,
+        val shortName: NameEntity,
         val declarations: List<TopLevelNode> = emptyList(),
         val annotations: MutableList<AnnotationNode>,
         val sumbodules: List<ModuleModel>,

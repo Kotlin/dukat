@@ -81,7 +81,7 @@ private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<
 
 
     return submodules.map { subModule ->
-        val moduleKey = unquote(subModule.shortName)
+        val moduleKey = unquote(subModule.shortName.translate())
         if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
             val bucket = modulesToBeMerged.getOrPut(moduleKey) { mutableListOf() }
             bucket.add(subModule)

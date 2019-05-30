@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.transform
@@ -15,7 +16,7 @@ private fun ModuleModel.merge(module: ModuleModel): ModuleModel {
 
 fun ModuleModel.mergeModules(): ModuleModel {
 
-    val modulesInBuckets = mutableMapOf<String, MutableList<ModuleModel>>()
+    val modulesInBuckets = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
 
     sumbodules.forEach { submodule ->
         modulesInBuckets.getOrPut(submodule.shortName) { mutableListOf() }.add(submodule)
