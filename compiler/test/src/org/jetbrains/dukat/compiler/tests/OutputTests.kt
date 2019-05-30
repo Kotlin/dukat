@@ -1,11 +1,13 @@
 package org.jetbrains.dukat.compiler.tests
 
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translatorString.ModuleTranslationUnit
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -41,8 +43,7 @@ abstract class OutputTests {
         )
     }
 
-    private fun concatenate(documentRoot: ModuleModel): String {
-        val translated = translateModule(documentRoot)
+    private fun concatenate(translated: List<ModuleTranslationUnit>): String {
 
         return if (translated.isEmpty()) {
             "// NO DECLARATIONS"
@@ -50,24 +51,12 @@ abstract class OutputTests {
             translated.joinToString("""
 
 // ------------------------------------------------------------------------------------------
-""".replace("\n", System.getProperty("line.separator")))
+""".replace("\n", System.getProperty("line.separator"))) { it.content }
         }
     }
 
     private fun output(fileName: String, translator: InputTranslator): String {
-        val sourceSet =
-                translator.translate(fileName, IdentifierEntity("<ROOT>"))
-
-        val sourcesMap = mutableMapOf<String, SourceFileModel>()
-        sourceSet.sources.map { sourceFileDeclaration ->
-            sourcesMap[sourceFileDeclaration.fileName] = sourceFileDeclaration
-        }
-
-
-        val fileNameNormalized = File(fileName).normalize().absolutePath
-
-        val documentRoot = sourcesMap.get(fileNameNormalized)?.root!!
-        return concatenate(documentRoot)
+        return concatenate(translateModule(fileName, translator, ROOT_PACKAGENAME))
     }
 
 

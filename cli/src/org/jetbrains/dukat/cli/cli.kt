@@ -1,20 +1,15 @@
 package org.jetbrains.dukat.cli
 
-import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.panic.PanicMode
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translatorString.LINE_SEPARATOR
 import translateModule
 import java.io.File
 
@@ -23,45 +18,48 @@ private fun unescape(name: String): String {
 }
 
 private fun NameEntity.fileNameFragment(): String {
-    val name= if (this.leftMost() == IdentifierEntity("<ROOT>")) {
-        this.shiftLeft()
-    } else {
-        this
-    }
+    val unprefixedName = shiftLeft()
 
-    return if (name == null) { "" } else { name.process(::unescape).translate() + "." }
+    return if (unprefixedName == null) {
+        ""
+    } else {
+        unprefixedName.process(::unescape).translate() + "."
+    }
 }
 
 private fun compile(filename: String, outDir: String?, basePackageName: NameEntity, translator: TypescriptInputTranslator) {
-    println("Converting $filename")
+    val sourceFile = File(filename)
+    val sourceFileName = sourceFile.name
 
-    val sourceSetModel = translator.translate(filename, basePackageName)
+    println("converting ${sourceFileName}")
 
-    println("Save declarations:")
+    val D_TS_SUFFIX = ".d.ts"
+    val TS_SUFFIX = ".ts"
 
-    sourceSetModel.sources.forEach { source ->
-        println("--- ${source.fileName} -----------")
+    val ktFileNamePrefix =
+            if (sourceFileName.endsWith(D_TS_SUFFIX)) {
+                sourceFileName.removeSuffix(D_TS_SUFFIX)
+            } else if (sourceFileName.endsWith(TS_SUFFIX)) {
+                printWarning("well-formed declaration file supposed to end with .d.ts")
+                sourceFileName.removeSuffix(TS_SUFFIX)
+            } else {
+                printError("source file should have .ts extension")
+                return
+            }
 
-        val ktFileNamePrefix = File(source.fileName).name.removeSuffix(".ts")
+    val translatedUnits = translateModule(sourceFile.absolutePath, translator, basePackageName)
 
-        val modules = source.root.flattenDeclarations()
+    val dirFile = File(outDir ?: "./")
+    if (translatedUnits.isNotEmpty()) {
+        dirFile.mkdirs()
+    }
 
-        modules.forEach { originalModule ->
+    translatedUnits.forEach { (packageName, content) ->
+        val targetName = "${ktFileNamePrefix}.${packageName.fileNameFragment()}kt"
+        val resolvedTarget = dirFile.resolve(targetName)
 
-            val module = originalModule
-
-            val targetName = "${ktFileNamePrefix}.${module.packageName.fileNameFragment()}kt"
-
-            val dir = outDir ?: "./"
-
-            val dirFile = File(dir)
-            dirFile.mkdirs()
-
-            val resolvedTarget = dirFile.resolve(targetName)
-            println("${resolvedTarget}")
-
-            resolvedTarget.writeText(translateModule(module).joinToString(LINE_SEPARATOR))
-        }
+        println("${resolvedTarget}")
+        resolvedTarget.writeText(content)
     }
 }
 
@@ -117,7 +115,7 @@ private fun process(args: List<String>): CliOptions? {
     val sources = mutableListOf<String>()
     var outDir: String? = null
     var engine = Engine.GRAAL
-    var basePackageName: NameEntity = IdentifierEntity("<ROOT>")
+    var basePackageName: NameEntity = ROOT_PACKAGENAME
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
