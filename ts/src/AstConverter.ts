@@ -424,8 +424,14 @@ class AstConverter {
         return null;
     }
 
-    convertPropertySignature(node: ts.PropertySignature) : MemberDeclaration  {
-         return this.createProperty(this.convertName(node.name) as string, this.convertType(node.type), [], !!node.questionToken);
+    convertPropertySignature(node: ts.PropertySignature) : MemberDeclaration | null  {
+        let name = this.convertName(node.name);
+
+        if (name !== null) {
+            return this.createProperty(name, this.convertType(node.type), [], !!node.questionToken);
+        }
+
+        return null;
     }
 
     convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration) : Array<MemberDeclaration> {
@@ -453,9 +459,12 @@ class AstConverter {
                 this.registerDeclaration(methodDeclaration, res);
             }
         } else if (ts.isPropertySignature(member)) {
-            this.registerDeclaration(
-                this.convertPropertySignature(member), res
-            );
+            let propertySignatureDeclaration = this.convertPropertySignature(member);
+            if (propertySignatureDeclaration !== null) {
+                this.registerDeclaration(
+                    propertySignatureDeclaration, res
+                );
+            }
         } else if (ts.isIndexSignatureDeclaration(member)) {
             this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
                 this.registerDeclaration(member, res)
