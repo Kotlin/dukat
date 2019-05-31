@@ -1,9 +1,6 @@
 package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
-import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -48,7 +45,16 @@ abstract class OutputTests {
         return if (translated.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
-            translated.joinToString("""
+            val externalDeclarations = setOf(
+                    "jquery.d.ts",
+                    "node-ffi-buffer.d.ts",
+                    "ref-array.d.ts",
+                    "ref.d.ts",
+                    "Q.d.ts"
+            )
+            translated.filter { (fileName, _, _) ->
+                !externalDeclarations.contains(File(fileName).name)
+            }.joinToString("""
 
 // ------------------------------------------------------------------------------------------
 """.replace("\n", System.getProperty("line.separator"))) { it.content }
@@ -63,8 +69,7 @@ abstract class OutputTests {
     protected fun assertContentEquals(
             descriptor: String,
             tsPath: String,
-            ktPath: String,
-            output: (String, InputTranslator) -> String? = ::output
+            ktPath: String
     ) {
 
         val targetShortName = "${descriptor}.d.kt"
@@ -135,7 +140,6 @@ abstract class OutputTests {
         }
 
     }
-
 
 
 }

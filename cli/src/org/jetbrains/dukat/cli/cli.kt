@@ -27,25 +27,12 @@ private fun NameEntity.fileNameFragment(): String {
     }
 }
 
+
 private fun compile(filename: String, outDir: String?, basePackageName: NameEntity, translator: TypescriptInputTranslator) {
     val sourceFile = File(filename)
-    val sourceFileName = sourceFile.name
-
-    println("converting ${sourceFileName}")
 
     val D_TS_SUFFIX = ".d.ts"
     val TS_SUFFIX = ".ts"
-
-    val ktFileNamePrefix =
-            if (sourceFileName.endsWith(D_TS_SUFFIX)) {
-                sourceFileName.removeSuffix(D_TS_SUFFIX)
-            } else if (sourceFileName.endsWith(TS_SUFFIX)) {
-                printWarning("well-formed declaration file supposed to end with .d.ts")
-                sourceFileName.removeSuffix(TS_SUFFIX)
-            } else {
-                printError("source file should have .ts extension")
-                return
-            }
 
     val translatedUnits = translateModule(sourceFile.absolutePath, translator, basePackageName)
 
@@ -54,11 +41,25 @@ private fun compile(filename: String, outDir: String?, basePackageName: NameEnti
         dirFile.mkdirs()
     }
 
-    translatedUnits.forEach { (packageName, content) ->
+    translatedUnits.forEach { (fileName, packageName, content) ->
+        val sourceFile = File(fileName)
+        val sourceFileName = sourceFile.name
+
+        val ktFileNamePrefix =
+                if (sourceFileName.endsWith(D_TS_SUFFIX)) {
+                    sourceFileName.removeSuffix(D_TS_SUFFIX)
+                } else if (sourceFileName.endsWith(TS_SUFFIX)) {
+                    printWarning("well-formed declaration file supposed to end with .d.ts")
+                    sourceFileName.removeSuffix(TS_SUFFIX)
+                } else {
+                    printError("source file should have .ts extension")
+                    return
+                }
+
         val targetName = "${ktFileNamePrefix}.${packageName.fileNameFragment()}kt"
         val resolvedTarget = dirFile.resolve(targetName)
 
-        println("${resolvedTarget}")
+        println(resolvedTarget.name)
         resolvedTarget.writeText(content)
     }
 }
