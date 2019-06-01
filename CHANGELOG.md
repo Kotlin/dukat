@@ -1,5 +1,12 @@
 # Changelog
 
+#### [0.0.6] - 31'May, 2019
+ - All files by default are translated into the root package (so, no package declaration at all) - [#28](https://github.com/Kotlin/dukat/issues/28)
+ - Translate file and all files referenced in it single run ([#22](https://github.com/Kotlin/dukat/issues/22))
+ - [Omit computed property names](https://github.com/Kotlin/dukat/issues/27) - this is the best we can do right now
+ - command line - In some cases files were not processed correctly from command line ([#26](https://github.com/Kotlin/dukat/issues/26) and [#])    
+ - J2V8 js-backend removed 
+ 
 #### [0.0.5] - 28'May, 2019
  - precise meta information for string literals
  - collapse unrolled callable entities if they differ only by metainformation
