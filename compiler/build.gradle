@@ -18,14 +18,6 @@ configurations {
     toDownload
 }
 
-sourceSets {
-    main.kotlin.srcDirs = ['src']
-    //main.resources.srcDirs = ["${project.buildDir}/resources"]
-
-    test.kotlin.srcDirs = ['test/src']
-    test.resources.srcDirs = ['test/data']
-}
-
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }

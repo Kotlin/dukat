@@ -18,7 +18,9 @@ allprojects {
 
       project.sourceSets {
         main.kotlin.srcDirs = ['src']
+        
         test.kotlin.srcDirs = ['test/src']
+        test.resources.srcDirs = ['test/data']
       }
 
       compileKotlin {
