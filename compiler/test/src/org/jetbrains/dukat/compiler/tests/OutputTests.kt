@@ -45,7 +45,7 @@ abstract class OutputTests {
         return if (translated.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
-            val externalDeclarations = setOf(
+            val skipDeclarations = setOf(
                     "jquery.d.ts",
                     "node-ffi-buffer.d.ts",
                     "ref-array.d.ts",
@@ -53,7 +53,7 @@ abstract class OutputTests {
                     "Q.d.ts"
             )
             translated.filter { (fileName, _, _) ->
-                !externalDeclarations.contains(File(fileName).name)
+                !skipDeclarations.contains(File(fileName).name)
             }.joinToString("""
 
 // ------------------------------------------------------------------------------------------
@@ -126,16 +126,18 @@ abstract class OutputTests {
 
         fun fileSetWithDescriptors(path: String, recursive: Boolean = false): Array<Array<String>> {
             val rootFolder = File(path)
-            return fileSet(path, TS_POSTFIX, recursive).map { file ->
+            return fileSet(path, TS_POSTFIX, recursive).mapNotNull { file ->
                 val tsPath = file.absolutePath
                 val ktPath = tsPath.replace(TS_POSTFIX, ".d.kt")
                 val descriptor = file.relativeTo(rootFolder).path.replace(path, "").replace(TS_POSTFIX, "")
 
-                arrayOf(
-                        descriptor,
-                        tsPath,
-                        ktPath
-                )
+                if (!file.name.startsWith("_")) {
+                    arrayOf(
+                            descriptor,
+                            tsPath,
+                            ktPath
+                    )
+                } else null
             }.toList().toTypedArray()
         }
 
