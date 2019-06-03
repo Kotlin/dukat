@@ -57,7 +57,7 @@ class AstConverter {
 
         sourceFile.referencedFiles.forEach(referencedFile => {
             let resolvedPath = ts.normalizePath(curDir + referencedFile.fileName);
-            if (!sourceSet.hasOwnProperty(resolvedPath)) {
+            if (!sourceSet.has(resolvedPath)) {
                 this.createSourceMap(resolvedPath, sourceSet);
             }
         });
