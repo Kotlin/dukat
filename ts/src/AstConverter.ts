@@ -9,7 +9,7 @@ declare namespace ts {
     function getDirectoryPath(path: String): string;
 }
 
-type MapLike<T> = {[key: string]: T}
+type StringKeyMap<T> = Map<String, T>;
 
 class AstConverter {
 
@@ -31,7 +31,7 @@ class AstConverter {
     }
 
 
-    createSourceMap(sourceFileName: string, sourceSet: MapLike<SourceFileDeclaration> = {}) {
+    createSourceMap(sourceFileName: string, sourceSet: StringKeyMap<SourceFileDeclaration> = new Map()) {
         const sourceFile = this.sourceFileFetcher(sourceFileName);
 
         if (sourceFile == null) {
@@ -52,7 +52,7 @@ class AstConverter {
             sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
         );
 
-        sourceSet[sourceFileName] = declaration;
+        sourceSet.set(sourceFileName, declaration);
         let curDir = ts.getDirectoryPath(sourceFileName) +  "/";
 
         sourceFile.referencedFiles.forEach(referencedFile => {
@@ -63,20 +63,18 @@ class AstConverter {
         });
     }
 
-    convertSourceMap(sourceSet: MapLike<SourceFileDeclaration>): SourceSet {
+    convertSourceMap(sourceSet: StringKeyMap<SourceFileDeclaration>): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
 
-        for (let sourceName in sourceSet) {
-            if (sourceSet.hasOwnProperty(sourceName)) {
-                sources.push(sourceSet[sourceName]);
-            }
-        }
+        sourceSet.forEach( (source) => {
+            sources.push(source);
+        });
 
         return this.astFactory.createSourceSet(sources);
     }
 
     createSourceSet(sourceFileName: string): SourceSet {
-        let sourceSet: MapLike<SourceFileDeclaration> = {};
+        let sourceSet = new Map<String, SourceFileDeclaration>();
         this.createSourceMap(sourceFileName, sourceSet);
 
         return this.convertSourceMap(sourceSet);

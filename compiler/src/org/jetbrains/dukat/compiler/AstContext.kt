@@ -18,7 +18,7 @@ class AstContext {
         myClassNodes[IdentifierEntity(classDeclaration.name)] = classDeclaration
     }
 
-    fun resolveInterface(name: NameEntity): InterfaceNode? = myInterfaces.get(name)
+    fun resolveInterface(name: NameEntity): InterfaceNode? = myInterfaces[name]
 
     fun resolveClass(name: NameEntity): ClassNode? {
         return myClassNodes.get(name)

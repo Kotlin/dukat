@@ -7,8 +7,7 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     constructor(
         public fileResolver: FileResolver,
         private knownFiles = new Set<string>(),
-        private currentDirectory: string = "",
-        private snapshotCache:MapLike<ts.IScriptSnapshot> =  {}
+        private currentDirectory: string = ""
     ) {
     }
 

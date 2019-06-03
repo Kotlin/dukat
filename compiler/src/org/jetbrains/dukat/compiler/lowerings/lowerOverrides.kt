@@ -18,7 +18,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
 private fun InterfaceNode.getKnownParents(astContext: AstContext) =
-        parentEntities.map { astContext.resolveInterface(it.name) }.filterNotNull()
+        parentEntities.mapNotNull { astContext.resolveInterface(it.name) }
 
 private fun ClassNode.getKnownParents(astContext: AstContext) =
         parentEntities.flatMap { listOf(astContext.resolveInterface(it.name), astContext.resolveClass(it.name)) }.filterNotNull()
