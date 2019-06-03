@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.processing.appendLeft
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -20,8 +19,7 @@ fun OwnerContext.getQualifiedName(): NameEntity {
         return moduleOwners
                 .drop(1)
                 .fold(moduleOwners.first().node.shortName) { acc, a ->
-                    //TODO: got rid of this cast
-                    (a.node.shortName as IdentifierEntity).appendLeft(acc)
+                    a.node.shortName.appendLeft(acc)
                 } as QualifierEntity
     }
 }

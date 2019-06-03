@@ -53,11 +53,27 @@ fun String.toNameEntity(): NameEntity {
     return split(".").map { IdentifierEntity(it) }.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
 }
 
-fun IdentifierEntity.appendLeft(qualifiedLeftNode: NameEntity): QualifierEntity {
+private fun IdentifierEntity.appendLeft(qualifiedLeftNode: NameEntity): QualifierEntity {
     return when (qualifiedLeftNode) {
         is IdentifierEntity -> this.appendLeft(qualifiedLeftNode)
         is QualifierEntity -> this.appendLeft(qualifiedLeftNode)
         else -> raiseConcern("unknown NameEntity ${qualifiedLeftNode}") { QualifierEntity(this, this) }
+    }
+}
+
+private fun QualifierEntity.appendLeft(qualifiedNode: NameEntity): QualifierEntity {
+    return when (left) {
+        is IdentifierEntity -> copy(left = (left as IdentifierEntity).appendLeft(qualifiedNode))
+        is QualifierEntity -> copy(left = (left as QualifierEntity).appendLeft(qualifiedNode))
+        else -> raiseConcern("unknown NameEntity ${left}") { this }
+    }
+}
+
+fun NameEntity.appendLeft(qualifiedNode: NameEntity): NameEntity {
+    return when(this) {
+        is IdentifierEntity -> this.appendLeft(qualifiedNode)
+        is QualifierEntity -> this.appendLeft(qualifiedNode)
+        else -> raiseConcern("unknown NameEntity ${this}") { this }
     }
 }
 
