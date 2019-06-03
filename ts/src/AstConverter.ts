@@ -5,8 +5,9 @@ declare function createFileResolver(): FileResolver;
 
 // Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
 declare namespace ts {
-    function normalizePath(path: String): string;
-    function getDirectoryPath(path: String): string;
+    function normalizePath(path: string): string;
+    function getDirectoryPath(path: string): string;
+    var libMap : { get(path: string) : string };
 }
 
 type StringKeyMap<T> = Map<String, T>;
@@ -55,10 +56,18 @@ class AstConverter {
         sourceSet.set(sourceFileName, declaration);
         let curDir = ts.getDirectoryPath(sourceFileName) +  "/";
 
-        sourceFile.referencedFiles.forEach(referencedFile => {
-            let resolvedPath = ts.normalizePath(curDir + referencedFile.fileName);
-            if (!sourceSet.has(resolvedPath)) {
-                this.createSourceMap(resolvedPath, sourceSet);
+        let referencedFiles = sourceFile.referencedFiles.map(
+          referencedFile => ts.normalizePath(curDir + referencedFile.fileName)
+        );
+
+        let libReferences = sourceFile.libReferenceDirectives.map(libReference => {
+            let libName = libReference.fileName.toLocaleLowerCase();
+            return ts.libMap.get(libName);
+        });
+
+        referencedFiles.concat(libReferences).forEach(path => {
+            if (!sourceSet.has(path)) {
+                this.createSourceMap(path, sourceSet);
             }
         });
     }
