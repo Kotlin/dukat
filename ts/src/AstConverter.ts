@@ -669,6 +669,21 @@ class AstConverter {
         return  parentEntities
     }
 
+    private convertClassDeclaration(statement: ts.ClassDeclaration): ClassDeclaration | null {
+        if (statement.name == undefined) {
+            return null;
+        }
+
+        return this.astFactory.createClassDeclaration(
+          statement.name.getText(),
+          this.convertClassElementsToMembers(statement.members),
+          this.convertTypeParams(statement.typeParameters),
+          this.convertHeritageClauses(statement.heritageClauses),
+          this.convertModifiers(statement.modifiers),
+          this.exportContext.getUID(statement)
+        )
+    }
+
     private convertStatement(statement: ts.Node, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
         let res: Array<Declaration> = [];
 
@@ -703,20 +718,11 @@ class AstConverter {
                 res.push(this.convertTypeAliasDeclaration(statement));
             }
         } else if (ts.isClassDeclaration(statement)) {
-            if (statement.name != undefined) {
+            let classDeclaration = this.convertClassDeclaration(statement);
 
-                let uid = this.exportContext.getUID(statement);
-
-                res.push(this.astFactory.createClassDeclaration(
-                        statement.name.getText(),
-                        this.convertClassElementsToMembers(statement.members),
-                        this.convertTypeParams(statement.typeParameters),
-                        this.convertHeritageClauses(statement.heritageClauses),
-                        this.convertModifiers(statement.modifiers),
-                        uid
-                    ));
+            if (classDeclaration != null) {
+                res.push(classDeclaration);
             }
-
         } else if (ts.isFunctionDeclaration(statement)) {
             let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
             if (convertedFunctionDeclaration != null) {
