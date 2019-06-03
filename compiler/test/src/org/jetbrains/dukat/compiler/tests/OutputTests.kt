@@ -50,7 +50,8 @@ abstract class OutputTests {
                     "node-ffi-buffer.d.ts",
                     "ref-array.d.ts",
                     "ref.d.ts",
-                    "Q.d.ts"
+                    "Q.d.ts",
+                    "_skippedReferenced.d.ts"
             )
             translated.filter { (fileName, _, _) ->
                 !skipDeclarations.contains(File(fileName).name)
