@@ -10,13 +10,18 @@ declare namespace ts {
     var libMap : { get(path: string) : string };
 }
 
-class AstConverter {
 
+class AstConverter {
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
 
-    private libDeclarations = new Map<string, Array<Declaration>>();
     private resources = new ResourceFetcher(this.sourceFileFetcher).build(this.sourceName);
+
+    private libVisitor = new LibraryDeclarationsVisitor(
+      this.resources,
+      this.typeChecker,
+      this
+    );
 
     constructor(
         private sourceName: string,
@@ -38,6 +43,8 @@ class AstConverter {
         if (sourceFile == null) {
             throw new Error(`failed to resolve ${sourceFileName}`)
         }
+
+        this.libVisitor.visit(sourceFile);
 
         let resourceName = this.rootPackageName;
 
@@ -61,7 +68,7 @@ class AstConverter {
             sources.push(source);
         });
 
-        this.libDeclarations.forEach( (libDeclarations, resourceName) => {
+        this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
             sources.push(this.astFactory.createSourceFileDeclaration(
               "<LIBROOT>", this.astFactory.createDocumentRoot(
                 this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
@@ -73,7 +80,6 @@ class AstConverter {
                 true
               ), []
             ));
-
         });
 
         return this.astFactory.createSourceSet(sources);
@@ -630,34 +636,6 @@ class AstConverter {
                     let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                     for (let type of heritageClause.types) {
-
-                        let symbol = this.typeChecker.getTypeAtLocation(type).symbol;
-                        if (symbol) {
-                            for (let declaration of symbol.declarations) {
-                                let sourceFile = declaration.getSourceFile();
-
-                                let sourceName = sourceFile.fileName;
-                                if (sourceFile && !this.resources.has(sourceName)) {
-                                    if (ts.isClassDeclaration(declaration)) {
-                                        let classDeclaration = this.convertClassDeclaration(declaration);
-                                        if (classDeclaration) {
-                                            if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-                                                this.libDeclarations.set(sourceName, []);
-                                            }
-                                            (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
-                                        }
-                                    } else if (ts.isInterfaceDeclaration(declaration)) {
-                                        let interfaceDeclaration = this.convertInterfaceDeclaration(declaration);
-                                        if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-                                            this.libDeclarations.set(sourceName, []);
-                                        }
-                                        (this.libDeclarations.get(sourceName) as Array<Declaration>).push(interfaceDeclaration);
-                                    }
-                                }
-
-                            }
-                        }
-
                         let typeArguments: Array<IdentifierDeclaration> = [];
 
                         if (type.typeArguments) {
@@ -698,7 +676,7 @@ class AstConverter {
         return  parentEntities
     }
 
-    private convertClassDeclaration(statement: ts.ClassDeclaration): ClassDeclaration | null {
+    convertClassDeclaration(statement: ts.ClassDeclaration): ClassDeclaration | null {
         if (statement.name == undefined) {
             return null;
         }
@@ -728,7 +706,7 @@ class AstConverter {
         return definitionsInfoDeclarations;
     }
 
-    private convertInterfaceDeclaration(statement: ts.InterfaceDeclaration): InterfaceDeclaration  {
+    convertInterfaceDeclaration(statement: ts.InterfaceDeclaration): InterfaceDeclaration  {
 
         let interfaceDeclaration = this.astFactory.createInterfaceDeclaration(
           statement.name.getText(),
