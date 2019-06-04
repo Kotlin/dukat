@@ -15,8 +15,9 @@ type StringKeyMap<T> = Map<String, T>;
 class AstConverter {
 
     private exportContext = createExportContent();
-
     private log = createLogger("AstConverter");
+
+    private libDeclarations: Array<Declaration> = [];
 
     constructor(
         private rootPackageName: NameDeclaration,
@@ -75,15 +76,28 @@ class AstConverter {
     convertSourceMap(sourceSet: StringKeyMap<SourceFileDeclaration>): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
 
-        sourceSet.forEach( (source) => {
+        sourceSet.forEach( source => {
             sources.push(source);
         });
+
+        sources.push(this.astFactory.createSourceFileDeclaration(
+          "<LIBROOT>", this.astFactory.createDocumentRoot(
+            this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
+            this.libDeclarations,
+            [],
+            [],
+            "<LIBROOT>",
+            "<LIBROOT>",
+            true
+          ), []
+        ));
 
         return this.astFactory.createSourceSet(sources);
     }
 
     createSourceSet(sourceFileName: string): SourceSet {
         let sourceSet = new Map<String, SourceFileDeclaration>();
+
         this.createSourceMap(sourceFileName, sourceSet);
 
         return this.convertSourceMap(sourceSet);
@@ -626,7 +640,7 @@ class AstConverter {
         return value as NameDeclaration;
     }
 
-    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
+    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined, sourceFileName: string): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
 
@@ -636,6 +650,28 @@ class AstConverter {
                     let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                     for (let type of heritageClause.types) {
+
+                        let symbol = this.typeChecker.getTypeAtLocation(type).symbol;
+                        if (symbol) {
+                            for (let declaration of symbol.declarations) {
+                                let sourceFile = declaration.getSourceFile();
+
+                                // TODO: check whether we never have relative paths for non-libs
+                                if (sourceFile && sourceFile.fileName.startsWith("lib.")) {
+                                    if (ts.isClassDeclaration(declaration)) {
+                                        let classDeclaration = this.convertClassDeclaration(declaration, sourceFileName);
+                                        if (classDeclaration) {
+                                            this.libDeclarations.push(classDeclaration);
+                                        }
+                                    } else if (ts.isInterfaceDeclaration(declaration)) {
+                                        let interfaceDeclaration = this.convertInterfaceDeclaration(declaration, sourceFileName);
+                                        this.libDeclarations.push(interfaceDeclaration);
+                                    }
+                                }
+
+                            }
+                        }
+
                         let typeArguments: Array<IdentifierDeclaration> = [];
 
                         if (type.typeArguments) {
@@ -676,19 +712,48 @@ class AstConverter {
         return  parentEntities
     }
 
-    private convertClassDeclaration(statement: ts.ClassDeclaration): ClassDeclaration | null {
+    private convertClassDeclaration(statement: ts.ClassDeclaration, sourceFileName: string): ClassDeclaration | null {
         if (statement.name == undefined) {
             return null;
         }
 
-        return this.astFactory.createClassDeclaration(
+        let classDeclaration = this.astFactory.createClassDeclaration(
           statement.name.getText(),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
-          this.convertHeritageClauses(statement.heritageClauses),
+          this.convertHeritageClauses(statement.heritageClauses, sourceFileName),
           this.convertModifiers(statement.modifiers),
           this.exportContext.getUID(statement)
-        )
+        );
+
+        return classDeclaration;
+    }
+
+    private convertDefinitions(name: ts.Node, sourceFileName: string): Array<DefinitionInfoDeclaration> {
+        let definitionInfos = this.declarationResolver(name, sourceFileName);
+
+        var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+        if (definitionInfos) {
+            definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
+                return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
+            });
+        }
+
+        return definitionsInfoDeclarations;
+    }
+
+    private convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, sourceFileName: string): InterfaceDeclaration  {
+
+        let interfaceDeclaration = this.astFactory.createInterfaceDeclaration(
+          statement.name.getText(),
+          this.convertMembersToInterfaceMemberDeclarations(statement.members),
+          this.convertTypeParams(statement.typeParameters),
+          this.convertHeritageClauses(statement.heritageClauses, sourceFileName),
+          this.convertDefinitions(statement.name, sourceFileName),
+          this.exportContext.getUID(statement)
+        );
+
+        return interfaceDeclaration;
     }
 
     private convertStatement(statement: ts.Node, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
@@ -725,7 +790,7 @@ class AstConverter {
                 res.push(this.convertTypeAliasDeclaration(statement));
             }
         } else if (ts.isClassDeclaration(statement)) {
-            let classDeclaration = this.convertClassDeclaration(statement);
+            let classDeclaration = this.convertClassDeclaration(statement, sourceFileName);
 
             if (classDeclaration != null) {
                 res.push(classDeclaration);
@@ -738,7 +803,6 @@ class AstConverter {
         } else if (ts.isInterfaceDeclaration(statement)) {
             let definitionInfos = this.declarationResolver(statement.name, sourceFileName);
 
-
             var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
             if (definitionInfos) {
                 definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
@@ -746,14 +810,7 @@ class AstConverter {
                 });
             }
 
-                res.push(this.astFactory.createInterfaceDeclaration(
-                    statement.name.getText(),
-                    this.convertMembersToInterfaceMemberDeclarations(statement.members),
-                    this.convertTypeParams(statement.typeParameters),
-                    this.convertHeritageClauses(statement.heritageClauses),
-                    definitionsInfoDeclarations,
-                    this.exportContext.getUID(statement)
-                ));
+            res.push(this.convertInterfaceDeclaration(statement, sourceFileName));
         } else if (ts.isModuleDeclaration(statement)) {
             for (let moduleDeclaration of this.convertModule(statement, resourceName, sourceFileName)) {
                 res.push(moduleDeclaration);

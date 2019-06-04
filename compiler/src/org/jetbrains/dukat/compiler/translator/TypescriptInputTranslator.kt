@@ -19,6 +19,7 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.compiler.lowerings.model.addStandardImports
+import org.jetbrains.dukat.compiler.lowerings.model.omitStdLib
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
@@ -78,5 +79,6 @@ interface TypescriptInputTranslator : InputTranslator {
                 .mergeNestedClasses()
                 .specifyTypeNodesWithModuleData()
                 .addStandardImports()
+                .omitStdLib()
     }
 }
