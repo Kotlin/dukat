@@ -706,14 +706,14 @@ class AstConverter {
         return definitionsInfoDeclarations;
     }
 
-    convertInterfaceDeclaration(statement: ts.InterfaceDeclaration): InterfaceDeclaration  {
+    convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, computeDefinitions: boolean = true): InterfaceDeclaration  {
 
         let interfaceDeclaration = this.astFactory.createInterfaceDeclaration(
           statement.name.getText(),
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
-          this.convertDefinitions(statement.name),
+          computeDefinitions? this.convertDefinitions(statement.name) : [],
           this.exportContext.getUID(statement)
         );
 

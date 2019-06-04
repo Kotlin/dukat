@@ -2,6 +2,7 @@ class LibraryDeclarationsVisitor {
 
   private log = createLogger("LibraryDeclarationsVisitor");
   private libDeclarations = new Map<string, Array<Declaration>>();
+  private visited = new Set<ts.Node>();
 
   constructor(
     private resources: Set<string>,
@@ -16,11 +17,12 @@ class LibraryDeclarationsVisitor {
 
   private checkLibReferences(entity: ts.Node) {
     let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
-    if (symbol) {
+    if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         let sourceFile = declaration.getSourceFile();
 
         let sourceName = sourceFile.fileName;
+
         if (sourceFile && !this.resources.has(sourceName)) {
           if (ts.isClassDeclaration(declaration)) {
             let classDeclaration = this.astConverter.convertClassDeclaration(declaration);
@@ -29,13 +31,27 @@ class LibraryDeclarationsVisitor {
                 this.libDeclarations.set(sourceName, []);
               }
               (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
+
+              if (declaration.name) {
+                if (declaration.heritageClauses) {
+                  declaration.heritageClauses.forEach(heritageClause => {
+                    this.visit(heritageClause);
+                  });
+                }
+              }
             }
           } else if (ts.isInterfaceDeclaration(declaration)) {
-            let interfaceDeclaration = this.astConverter.convertInterfaceDeclaration(declaration);
+            let interfaceDeclaration = this.astConverter.convertInterfaceDeclaration(declaration, false);
             if (!Array.isArray(this.libDeclarations.get(sourceName))) {
               this.libDeclarations.set(sourceName, []);
             }
             (this.libDeclarations.get(sourceName) as Array<Declaration>).push(interfaceDeclaration);
+
+            if (declaration.heritageClauses) {
+              declaration.heritageClauses.forEach(heritageClause => {
+                this.visit(heritageClause);
+              });
+            }
           }
         }
 
@@ -44,12 +60,21 @@ class LibraryDeclarationsVisitor {
   }
 
   visit(node: ts.Node) {
+    if (this.visited.has(node)) {
+      return;
+    }
+
+    this.visited.add(node);
+
     node.forEachChild(declaration => {
       if (ts.isHeritageClause(declaration)) {
         for (let type of declaration.types) {
           this.checkLibReferences(type);
         }
-      } else {
+      } else if (ts.isTypeNode(declaration)) {
+          this.checkLibReferences(declaration);
+      }
+      else {
         this.visit(declaration)
       }
     });

@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -44,6 +45,9 @@ private class LowerNullable : NodeTypeLowering {
                             res.nullable = true
                             res.meta = MuteMetadata()
                             res
+                        }
+                        is IntersectionTypeDeclaration -> {
+                            nullableType.copy(params = nullableType.params.map {param -> lowerType(param) })
                         }
                         else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
                             lowerUnionTypeNode(declaration)

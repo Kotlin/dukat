@@ -16,6 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface AppEvent : Event {
+    override var currentTarget: Element
+    override var target: Element
     override fun preventDefault(): Any
 }
 external open class NativeEvent : Event {
