@@ -44,7 +44,7 @@ class AstConverter {
         let packageNameFragments = sourceFile.fileName.split("/");
         let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
-        const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
+        const declarations = this.convertStatements(sourceFile.statements, resourceName);
 
         let packageDeclaration = this.createDocumentRoot(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
         return this.astFactory.createSourceFileDeclaration(
@@ -620,7 +620,7 @@ class AstConverter {
         return value as NameDeclaration;
     }
 
-    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined, sourceFileName: string): Array<HeritageClauseDeclaration> {
+    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
 
@@ -639,7 +639,7 @@ class AstConverter {
                                 let sourceName = sourceFile.fileName;
                                 if (sourceFile && !this.resources.has(sourceName)) {
                                     if (ts.isClassDeclaration(declaration)) {
-                                        let classDeclaration = this.convertClassDeclaration(declaration, sourceFileName);
+                                        let classDeclaration = this.convertClassDeclaration(declaration);
                                         if (classDeclaration) {
                                             if (!Array.isArray(this.libDeclarations.get(sourceName))) {
                                                 this.libDeclarations.set(sourceName, []);
@@ -647,7 +647,7 @@ class AstConverter {
                                             (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
                                         }
                                     } else if (ts.isInterfaceDeclaration(declaration)) {
-                                        let interfaceDeclaration = this.convertInterfaceDeclaration(declaration, sourceFileName);
+                                        let interfaceDeclaration = this.convertInterfaceDeclaration(declaration);
                                         if (!Array.isArray(this.libDeclarations.get(sourceName))) {
                                             this.libDeclarations.set(sourceName, []);
                                         }
@@ -698,7 +698,7 @@ class AstConverter {
         return  parentEntities
     }
 
-    private convertClassDeclaration(statement: ts.ClassDeclaration, sourceFileName: string): ClassDeclaration | null {
+    private convertClassDeclaration(statement: ts.ClassDeclaration): ClassDeclaration | null {
         if (statement.name == undefined) {
             return null;
         }
@@ -707,7 +707,7 @@ class AstConverter {
           statement.name.getText(),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
-          this.convertHeritageClauses(statement.heritageClauses, sourceFileName),
+          this.convertHeritageClauses(statement.heritageClauses),
           this.convertModifiers(statement.modifiers),
           this.exportContext.getUID(statement)
         );
@@ -715,8 +715,8 @@ class AstConverter {
         return classDeclaration;
     }
 
-    private convertDefinitions(name: ts.Node, sourceFileName: string): Array<DefinitionInfoDeclaration> {
-        let definitionInfos = this.declarationResolver(name, sourceFileName);
+    private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
+        let definitionInfos = this.declarationResolver(name, this.sourceName);
 
         var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
         if (definitionInfos) {
@@ -728,21 +728,21 @@ class AstConverter {
         return definitionsInfoDeclarations;
     }
 
-    private convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, sourceFileName: string): InterfaceDeclaration  {
+    private convertInterfaceDeclaration(statement: ts.InterfaceDeclaration): InterfaceDeclaration  {
 
         let interfaceDeclaration = this.astFactory.createInterfaceDeclaration(
           statement.name.getText(),
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
-          this.convertHeritageClauses(statement.heritageClauses, sourceFileName),
-          this.convertDefinitions(statement.name, sourceFileName),
+          this.convertHeritageClauses(statement.heritageClauses),
+          this.convertDefinitions(statement.name),
           this.exportContext.getUID(statement)
         );
 
         return interfaceDeclaration;
     }
 
-    private convertStatement(statement: ts.Node, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
+    private convertStatement(statement: ts.Node, resourceName: NameDeclaration): Array<Declaration> {
         let res: Array<Declaration> = [];
 
         if (ts.isEnumDeclaration(statement)) {
@@ -776,7 +776,7 @@ class AstConverter {
                 res.push(this.convertTypeAliasDeclaration(statement));
             }
         } else if (ts.isClassDeclaration(statement)) {
-            let classDeclaration = this.convertClassDeclaration(statement, sourceFileName);
+            let classDeclaration = this.convertClassDeclaration(statement);
 
             if (classDeclaration != null) {
                 res.push(classDeclaration);
@@ -787,7 +787,7 @@ class AstConverter {
                 res.push(convertedFunctionDeclaration);
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
-            let definitionInfos = this.declarationResolver(statement.name, sourceFileName);
+            let definitionInfos = this.declarationResolver(statement.name, this.sourceName);
 
             var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
             if (definitionInfos) {
@@ -796,9 +796,9 @@ class AstConverter {
                 });
             }
 
-            res.push(this.convertInterfaceDeclaration(statement, sourceFileName));
+            res.push(this.convertInterfaceDeclaration(statement));
         } else if (ts.isModuleDeclaration(statement)) {
-            for (let moduleDeclaration of this.convertModule(statement, resourceName, sourceFileName)) {
+            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
                 res.push(moduleDeclaration);
             }
         } else if (ts.isExportAssignment(statement)) {
@@ -845,10 +845,10 @@ class AstConverter {
         return res;
     }
 
-    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameDeclaration, sourceFileName: string) : Array<Declaration> {
+    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameDeclaration) : Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
-            for (let decl of this.convertStatement(statement, resourceName, sourceFileName)) {
+            for (let decl of this.convertStatement(statement, resourceName)) {
                 this.registerDeclaration(decl, declarations)
             }
         }
@@ -856,8 +856,8 @@ class AstConverter {
         return declarations;
     }
 
-    convertModule(module: ts.ModuleDeclaration, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
-        let definitionInfos = this.declarationResolver(module.name, sourceFileName);
+    convertModule(module: ts.ModuleDeclaration, resourceName: NameDeclaration): Array<Declaration> {
+        let definitionInfos = this.declarationResolver(module.name, this.sourceName);
 
         const declarations: Declaration[] = [];
         if (module.body) {
@@ -874,10 +874,10 @@ class AstConverter {
             let sourceNameFragment = module.name.getText();
 
             if (ts.isModuleBlock(body)) {
-                let moduleDeclarations = this.convertStatements(body.statements, resourceName, sourceFileName);
+                let moduleDeclarations = this.convertStatements(body.statements, resourceName);
                 this.registerDeclaration(this.createDocumentRoot(this.astFactory.createIdentifierDeclaration(sourceNameFragment), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createDocumentRoot(this.astFactory.createIdentifierDeclaration(sourceNameFragment), this.convertModule(body, resourceName, sourceFileName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createDocumentRoot(this.astFactory.createIdentifierDeclaration(sourceNameFragment), this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations
