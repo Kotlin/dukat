@@ -10,16 +10,16 @@ declare namespace ts {
     var libMap : { get(path: string) : string };
 }
 
-type StringKeyMap<T> = Map<String, T>;
-
 class AstConverter {
 
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
 
     private libDeclarations = new Map<string, Array<Declaration>>();
+    private resources = new ResourceFetcher(this.sourceFileFetcher).build(this.sourceName);
 
     constructor(
+        private sourceName: string,
         private rootPackageName: NameDeclaration,
         private typeChecker: ts.TypeChecker,
         private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
@@ -32,8 +32,7 @@ class AstConverter {
         collection.push(declaration);
     }
 
-
-    createSourceMap(sourceFileName: string, sourceSet: StringKeyMap<SourceFileDeclaration> = new Map()) {
+    createSourceFileDeclaration(sourceFileName: string): SourceFileDeclaration {
         const sourceFile = this.sourceFileFetcher(sourceFileName);
 
         if (sourceFile == null) {
@@ -48,32 +47,14 @@ class AstConverter {
         const declarations = this.convertStatements(sourceFile.statements, resourceName, sourceFileName);
 
         let packageDeclaration = this.createDocumentRoot(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
-        let declaration = this.astFactory.createSourceFileDeclaration(
+        return this.astFactory.createSourceFileDeclaration(
             sourceFileName,
             packageDeclaration,
             sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
         );
-
-        sourceSet.set(sourceFileName, declaration);
-        let curDir = ts.getDirectoryPath(sourceFileName) +  "/";
-
-        let referencedFiles = sourceFile.referencedFiles.map(
-          referencedFile => ts.normalizePath(curDir + referencedFile.fileName)
-        );
-
-        let libReferences = sourceFile.libReferenceDirectives.map(libReference => {
-            let libName = libReference.fileName.toLocaleLowerCase();
-            return ts.libMap.get(libName);
-        });
-
-        referencedFiles.concat(libReferences).forEach(path => {
-            if (!sourceSet.has(path)) {
-                this.createSourceMap(path, sourceSet);
-            }
-        });
     }
 
-    convertSourceMap(sourceSet: StringKeyMap<SourceFileDeclaration>): SourceSet {
+    convertSourceSet(sourceSet: Array<SourceFileDeclaration>): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
 
         sourceSet.forEach( source => {
@@ -98,12 +79,13 @@ class AstConverter {
         return this.astFactory.createSourceSet(sources);
     }
 
-    createSourceSet(sourceFileName: string): SourceSet {
-        let sourceSet = new Map<String, SourceFileDeclaration>();
+    createSourceSet(): SourceSet {
+        let sources: Array<SourceFileDeclaration> = [];
+        this.resources.forEach(resource => {
+            sources.push(this.createSourceFileDeclaration(resource))
+        });
 
-        this.createSourceMap(sourceFileName, sourceSet);
-
-        return this.convertSourceMap(sourceSet);
+        return this.convertSourceSet(sources);
     }
 
     createDocumentRoot(packageName: NameDeclaration, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
@@ -631,14 +613,9 @@ class AstConverter {
     private convertValue(entity: ts.TypeNode | ts.Identifier): NameDeclaration {
         let convertedEntity = this.convertType(entity) as any;
 
-        this.log.debug(`CONVERTED ENTITY ${convertedEntity}`);
-
         // TODO: getValue() we get in Graal, .value in Nashorn and J2V8 - I need to create a minimal example and report it
         let value = typeof convertedEntity.getValue == "function" ?
             (convertedEntity).getValue() : convertedEntity.value;
-
-
-        this.log.debug(`CONVERTED ENTITY ${convertedEntity}`);
 
         return value as NameDeclaration;
     }
@@ -659,9 +636,8 @@ class AstConverter {
                             for (let declaration of symbol.declarations) {
                                 let sourceFile = declaration.getSourceFile();
 
-                                // TODO: check whether we never have relative paths for non-libs
                                 let sourceName = sourceFile.fileName;
-                                if (sourceFile && sourceName.startsWith("lib.")) {
+                                if (sourceFile && !this.resources.has(sourceName)) {
                                     if (ts.isClassDeclaration(declaration)) {
                                         let classDeclaration = this.convertClassDeclaration(declaration, sourceFileName);
                                         if (classDeclaration) {
@@ -869,7 +845,6 @@ class AstConverter {
         return res;
     }
 
-
     private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameDeclaration, sourceFileName: string) : Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
@@ -880,7 +855,6 @@ class AstConverter {
 
         return declarations;
     }
-
 
     convertModule(module: ts.ModuleDeclaration, resourceName: NameDeclaration, sourceFileName: string): Array<Declaration> {
         let definitionInfos = this.declarationResolver(module.name, sourceFileName);

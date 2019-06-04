@@ -33,6 +33,7 @@ function main(fileName: string, packageName: NameDeclaration, cache?: DocumentCa
         throw new Error(`failed to resolve ${fileName}`)
     } else {
         let astConverter: AstConverter = new AstConverter(
+            fileName,
             packageName,
             program.getTypeChecker(),
             (fileName: string) => program.getSourceFile(fileName),
@@ -40,6 +41,6 @@ function main(fileName: string, packageName: NameDeclaration, cache?: DocumentCa
             createAstFactory()
         );
 
-        return astConverter.createSourceSet(fileName);
+        return astConverter.createSourceSet();
     }
 }
