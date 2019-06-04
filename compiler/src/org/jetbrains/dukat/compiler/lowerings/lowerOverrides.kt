@@ -23,41 +23,37 @@ private fun InterfaceNode.getKnownParents(astContext: AstContext) =
 private fun ClassNode.getKnownParents(astContext: AstContext) =
         parentEntities.flatMap { listOf(astContext.resolveInterface(it.name), astContext.resolveClass(it.name)) }.filterNotNull()
 
-@Suppress("UNCHECKED_CAST")
 private fun InterfaceNode.allParentMethods(astContext: AstContext): List<MethodNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-    } as List<MethodNode>
+        parentEntity.members.filterIsInstance(MethodNode::class.java) + parentEntity.allParentMethods(astContext)
+    }
 }
 
-@Suppress("UNCHECKED_CAST")
 private fun InterfaceNode.allParentProperties(astContext: AstContext): List<PropertyNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
-        parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-    } as List<PropertyNode>
+        parentEntity.members.filterIsInstance(PropertyNode::class.java) + parentEntity.allParentProperties(astContext)
+    }
 }
 
 
-@Suppress("UNCHECKED_CAST")
 private fun ClassNode.allParentMethods(astContext: AstContext): List<MethodNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
         when (parentEntity) {
-            is InterfaceNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
-            is ClassNode -> parentEntity.members.filter { member -> member is MethodNode } + parentEntity.allParentMethods(astContext)
+            is InterfaceNode -> parentEntity.members.filterIsInstance(MethodNode::class.java) + parentEntity.allParentMethods(astContext)
+            is ClassNode -> parentEntity.members.filterIsInstance(MethodNode::class.java) + parentEntity.allParentMethods(astContext)
             else -> raiseConcern("unkown ClassLikeDeclaration ${parentEntity}") { emptyList<MethodNode>() }
         }
-    } as List<MethodNode>
+    }
 }
 
-@Suppress("UNCHECKED_CAST")
 private fun ClassNode.allParentProperties(astContext: AstContext): List<PropertyNode> {
     return getKnownParents(astContext).flatMap { parentEntity ->
         when (parentEntity) {
-            is InterfaceNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
-            is ClassNode -> parentEntity.members.filter { member -> member is PropertyNode } + parentEntity.allParentProperties(astContext)
+            is InterfaceNode -> parentEntity.members.filterIsInstance(PropertyNode::class.java) + parentEntity.allParentProperties(astContext)
+            is ClassNode -> parentEntity.members.filterIsInstance(PropertyNode::class.java) + parentEntity.allParentProperties(astContext)
             else -> raiseConcern("unkown ClassLikeDeclaration ${parentEntity}") { emptyList<PropertyNode>() }
         }
-    } as List<PropertyNode>
+    }
 }
 
 private fun MethodNode.isOverriding(otherMethodNode: MethodNode): Boolean {
