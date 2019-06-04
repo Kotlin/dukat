@@ -18,3 +18,6 @@ import org.w3c.xhr.*
 external interface AppEvent : Event {
     override fun preventDefault(): Any
 }
+external open class NativeEvent : Event {
+    override fun preventDefault(): Any = definedExternally
+}

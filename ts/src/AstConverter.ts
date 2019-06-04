@@ -17,7 +17,7 @@ class AstConverter {
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
 
-    private libDeclarations: Array<Declaration> = [];
+    private libDeclarations = new Map<string, Array<Declaration>>();
 
     constructor(
         private rootPackageName: NameDeclaration,
@@ -80,17 +80,20 @@ class AstConverter {
             sources.push(source);
         });
 
-        sources.push(this.astFactory.createSourceFileDeclaration(
-          "<LIBROOT>", this.astFactory.createDocumentRoot(
-            this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
-            this.libDeclarations,
-            [],
-            [],
-            "<LIBROOT>",
-            "<LIBROOT>",
-            true
-          ), []
-        ));
+        this.libDeclarations.forEach( (libDeclarations, resourceName) => {
+            sources.push(this.astFactory.createSourceFileDeclaration(
+              "<LIBROOT>", this.astFactory.createDocumentRoot(
+                this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
+                libDeclarations,
+                [],
+                [],
+                `<LIBROOT-${resourceName}>`,
+                resourceName,
+                true
+              ), []
+            ));
+
+        });
 
         return this.astFactory.createSourceSet(sources);
     }
@@ -657,15 +660,22 @@ class AstConverter {
                                 let sourceFile = declaration.getSourceFile();
 
                                 // TODO: check whether we never have relative paths for non-libs
-                                if (sourceFile && sourceFile.fileName.startsWith("lib.")) {
+                                let sourceName = sourceFile.fileName;
+                                if (sourceFile && sourceName.startsWith("lib.")) {
                                     if (ts.isClassDeclaration(declaration)) {
                                         let classDeclaration = this.convertClassDeclaration(declaration, sourceFileName);
                                         if (classDeclaration) {
-                                            this.libDeclarations.push(classDeclaration);
+                                            if (!Array.isArray(this.libDeclarations.get(sourceName))) {
+                                                this.libDeclarations.set(sourceName, []);
+                                            }
+                                            (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
                                         }
                                     } else if (ts.isInterfaceDeclaration(declaration)) {
                                         let interfaceDeclaration = this.convertInterfaceDeclaration(declaration, sourceFileName);
-                                        this.libDeclarations.push(interfaceDeclaration);
+                                        if (!Array.isArray(this.libDeclarations.get(sourceName))) {
+                                            this.libDeclarations.set(sourceName, []);
+                                        }
+                                        (this.libDeclarations.get(sourceName) as Array<Declaration>).push(interfaceDeclaration);
                                     }
                                 }
 
