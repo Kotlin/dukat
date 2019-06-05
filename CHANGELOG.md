@@ -1,5 +1,13 @@
 # Changelog
 
+#### [0.0.7] - 05'June, 2019
+ - Resolving overrides parent entity is defined in stdlib ([#33 - Overrides not resolved for entities extending external objects](https://github.com/Kotlin/dukat/issues/33))
+ - Fix for #9 (["Overrides are not resolved for parent entities defined in different files"](https://github.com/Kotlin/dukat/issues/9))
+ - Allow custom qualified package name set from CLI ([#30 - Custom qualified package name will lead to a failure](https://github.com/Kotlin/dukat/issues/30)) 
+ - Respect covariance in return types while resolving overrides
+ - [#34](https://github.com/Kotlin/dukat/issues/34) - Processing lib references (like `/// <reference lib="es5" />`) - support for this is experimental and was introduced
+ mainly for debugging purposes 
+
 #### [0.0.6] - 31'May, 2019
  - All files by default are translated into the root package (so, no package declaration at all) - [#28](https://github.com/Kotlin/dukat/issues/28)
  - Translate file and all files referenced in it single run ([#22](https://github.com/Kotlin/dukat/issues/22))
