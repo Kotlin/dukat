@@ -35,7 +35,7 @@ class LibraryDeclarationsVisitor {
               if (declaration.name) {
                 if (declaration.heritageClauses) {
                   declaration.heritageClauses.forEach(heritageClause => {
-                    this.visit(heritageClause);
+                    this.visit(heritageClause, declaration);
                   });
                 }
               }
@@ -49,7 +49,7 @@ class LibraryDeclarationsVisitor {
 
             if (declaration.heritageClauses) {
               declaration.heritageClauses.forEach(heritageClause => {
-                this.visit(heritageClause);
+                this.visit(heritageClause, declaration);
               });
             }
           }
@@ -59,7 +59,7 @@ class LibraryDeclarationsVisitor {
     }
   }
 
-  visit(node: ts.Node) {
+  visit(node: ts.Node, classLikeOwner: ts.Node | null = null) {
     if (this.visited.has(node)) {
       return;
     }
@@ -72,10 +72,18 @@ class LibraryDeclarationsVisitor {
           this.checkLibReferences(type);
         }
       } else if (ts.isTypeNode(declaration)) {
-          this.checkLibReferences(declaration);
+          if (classLikeOwner) {
+            this.checkLibReferences(declaration);
+          }
       }
       else {
-        this.visit(declaration)
+        if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
+          if (node.heritageClauses) {
+            this.visit(declaration, node);
+          }
+        } else {
+          this.visit(declaration, classLikeOwner);
+        }
       }
     });
   }
