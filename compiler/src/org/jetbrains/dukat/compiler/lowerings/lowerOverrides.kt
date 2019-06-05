@@ -11,7 +11,6 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.compiler.AstContext
@@ -20,7 +19,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
 private fun ClassLikeNode.translate(): String {
-    return when(this) {
+    return when (this) {
         is ClassNode -> "<${name}:${uid}>"
         is InterfaceNode -> "<${name}:${uid}>"
         else -> "<UNKNOWN>"
