@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -386,8 +387,13 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
     val annotations = mutableListOf<AnnotationNode>()
 
     if (qualifiedNode != null) {
-        val qualifier = if (isQualifier) "JsQualifier" else "JsModule"
-        annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
+        when (qualifierKind) {
+            QualifierKind.QUALIFIER -> "JsQualifier"
+            QualifierKind.MODULE -> "JsModule"
+            else -> null
+        }.let { qualifier ->
+            annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
+        }
     }
 
     return ModuleModel(

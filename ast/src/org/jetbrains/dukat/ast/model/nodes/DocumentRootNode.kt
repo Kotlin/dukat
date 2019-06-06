@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
@@ -16,5 +17,5 @@ data class DocumentRootNode(
         var uid: String,
 
         var qualifiedNode: NameEntity?,
-        var isQualifier: Boolean
+        var qualifierKind: QualifierKind
 ) : TopLevelEntity

@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
@@ -711,7 +712,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 null,
                 documentRoot.uid,
                 if (showQualifierAnnotation) qualifiedNode else null,
-                isQualifier
+                if (isQualifier) QualifierKind.QUALIFIER else QualifierKind.MODULE
         )
 
 

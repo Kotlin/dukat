@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -167,7 +168,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
     private fun DocumentRootNode.markModulesAsExported(): DocumentRootNode {
         if (myExportedModulesData.containsKey(uid)) {
             qualifiedNode = myExportedModulesData.getValue(uid)
-            isQualifier = false
+            qualifierKind = QualifierKind.MODULE
         }
 
         val declarations = declarations.map { declaration ->
