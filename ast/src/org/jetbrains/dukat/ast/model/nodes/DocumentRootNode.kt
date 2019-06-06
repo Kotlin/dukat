@@ -6,7 +6,6 @@ import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 
 data class DocumentRootNode(
         val fileName: String,
-        val resourceName: String,
 
         val packageName: NameEntity,
         var fullPackageName: NameEntity,

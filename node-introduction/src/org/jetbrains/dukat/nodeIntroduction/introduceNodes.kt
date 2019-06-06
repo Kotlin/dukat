@@ -704,7 +704,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val docRoot = DocumentRootNode(
                 fileName,
-                documentRoot.resourceName,
                 documentRoot.packageName,
                 fullPackageName,
                 nonImports,
