@@ -7,8 +7,7 @@ import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 data class DocumentRootNode(
         val fileName: String,
 
-        val packageName: NameEntity,
-        var fullPackageName: NameEntity,
+        var packageName: NameEntity,
         val declarations: List<TopLevelEntity> = emptyList(),
         val imports: Map<String, ImportNode>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,

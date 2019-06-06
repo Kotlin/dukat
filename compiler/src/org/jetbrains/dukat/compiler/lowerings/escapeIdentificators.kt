@@ -98,7 +98,7 @@ private class EscapeIdentificators : NodeTypeLowering {
 
     override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
         return documentRoot.copy(
-                fullPackageName = documentRoot.fullPackageName.escape(),
+                packageName = documentRoot.packageName.escape(),
                 declarations = lowerTopLevelDeclarations(documentRoot.declarations)
         )
     }

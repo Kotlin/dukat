@@ -152,11 +152,20 @@ fun NameEntity.shiftRight(): NameEntity? {
     }
 }
 
-fun NameEntity.leftMost(): NameEntity? {
+fun NameEntity.leftMost(): NameEntity {
     return when (this) {
         is GenericIdentifierNode -> this
         is IdentifierEntity -> this
         is QualifierEntity -> left.leftMost()
+        else -> raiseConcern("unknown NameEntity ${this}") { this }
+    }
+}
+
+fun NameEntity.rightMost(): NameEntity {
+    return when (this) {
+        is GenericIdentifierNode -> this
+        is IdentifierEntity -> this
+        is QualifierEntity -> right
         else -> raiseConcern("unknown NameEntity ${this}") { this }
     }
 }

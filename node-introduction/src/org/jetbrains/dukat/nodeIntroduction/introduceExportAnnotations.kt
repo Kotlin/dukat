@@ -7,7 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -82,7 +82,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
                 }
                 is ClassNode -> {
 
-                    myTurnOffData.add(entityOwner.fullPackageName)
+                    myTurnOffData.add(entityOwner.packageName)
 
                     if (docRoot.owner != null) {
                         rootQualifiedNode?.let { qualifiedNode ->
@@ -92,7 +92,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
                     null
                 }
                 is InterfaceNode -> {
-                    myTurnOffData.add(entityOwner.fullPackageName)
+                    myTurnOffData.add(entityOwner.packageName)
 
                     if (docRoot.owner != null) {
                         rootQualifiedNode?.let { qualifiedNode ->
@@ -102,10 +102,10 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
                     null
                 }
                 is FunctionNode -> {
-                    myTurnOffData.add(entityOwner.fullPackageName)
+                    myTurnOffData.add(entityOwner.packageName)
 
                     entityOwner.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
-                        submodule.packageName == entity.name
+                        submodule.packageName.rightMost() == entity.name
                     }?.let { eponymousDeclaration ->
                         myExportedModulesData.put(eponymousDeclaration.uid, entityOwner.qualifiedNode)
                     }
@@ -127,7 +127,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
                     null
                 }
                 is VariableNode -> {
-                    myTurnOffData.add(entityOwner.fullPackageName)
+                    myTurnOffData.add(entityOwner.packageName)
 
                     if (docRoot.uid == entityOwner.uid) {
                         rootQualifiedNode?.let { qualifiedNode ->
@@ -184,7 +184,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
 
 
     private fun DocumentRootNode.turnOff(): DocumentRootNode {
-        if (myTurnOffData.contains(fullPackageName)) {
+        if (myTurnOffData.contains(packageName)) {
             showQualifierAnnotation = false
         }
 

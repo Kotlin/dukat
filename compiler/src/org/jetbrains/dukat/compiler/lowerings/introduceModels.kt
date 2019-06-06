@@ -24,6 +24,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -393,8 +394,8 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
 
     return ModuleModel(
             qualifiedNode,
-            packageName = fullPackageName,
-            shortName = packageName,
+            packageName = packageName,
+            shortName = packageName.rightMost(),
             declarations = declarationsFiltered,
             annotations = annotations,
             sumbodules = submodules,

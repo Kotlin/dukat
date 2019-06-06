@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -55,7 +55,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 importNode.referenceName
             } else {
                 val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
-                    importedDocumentNode.packageName == importNode.referenceName
+                    importedDocumentNode.packageName.rightMost() == importNode.referenceName
                 }
 
                 if (resolvedImport == null) {
