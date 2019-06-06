@@ -16,6 +16,5 @@ data class DocumentRootNode(
         var uid: String,
 
         var qualifiedNode: NameEntity?,
-        var isQualifier: Boolean,
-        var showQualifierAnnotation: Boolean
+        var isQualifier: Boolean
 ) : TopLevelEntity

@@ -185,7 +185,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
 
     private fun DocumentRootNode.turnOff(): DocumentRootNode {
         if (myTurnOffData.contains(packageName)) {
-            showQualifierAnnotation = false
+            qualifiedNode = null
         }
 
         val declarations = declarations.map { declaration ->

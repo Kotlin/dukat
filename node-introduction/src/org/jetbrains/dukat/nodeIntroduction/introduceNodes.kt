@@ -710,9 +710,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 documentRoot.definitionsInfo,
                 null,
                 documentRoot.uid,
-                qualifiedNode,
-                isQualifier,
-                showQualifierAnnotation
+                if (showQualifierAnnotation) qualifiedNode else null,
+                isQualifier
         )
 
 
