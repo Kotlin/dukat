@@ -105,7 +105,7 @@ private class ExportAnnotationsLowering(private val myUidTable: Map<String, Enti
                     myTurnOffData.add(entityOwner.fullPackageName)
 
                     entityOwner.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
-                        submodule.packageName.translate() == entity.name.translate()
+                        submodule.packageName == entity.name
                     }?.let { eponymousDeclaration ->
                         myExportedModulesData.put(eponymousDeclaration.uid, entityOwner.qualifiedNode)
                     }
