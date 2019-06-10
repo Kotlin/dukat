@@ -15,6 +15,8 @@ pluginManagement {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
         useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
+      } else if (pluginId == "kotlinx-serialization"){
+        useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
       } else  if (pluginId == "com.moowork.node") {
         useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
       }
@@ -29,6 +31,7 @@ gradle.ext {
   nodeVersion = "10.15.3"
   npmVersion = "6.9.0"
   nodePluginVersion = "1.3.1"
+  kotlinSerializationRuntimeVersion = "0.11.0"
 }
 
 
@@ -41,6 +44,7 @@ include 'itertools'
 include 'interop'
 include 'interop-graal'
 include 'logging'
+include 'module-name-resolver'
 include 'node-introduction'
 include 'node-package'
 include 'node-lowering'
