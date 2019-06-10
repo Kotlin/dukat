@@ -397,7 +397,6 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
     }
 
     return ModuleModel(
-            qualifiedNode,
             packageName = packageName,
             shortName = packageName.rightMost(),
             declarations = declarationsFiltered,
