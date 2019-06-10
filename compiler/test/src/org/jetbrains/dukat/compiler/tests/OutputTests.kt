@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests
 
-import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -63,7 +62,7 @@ abstract class OutputTests {
     }
 
     private fun output(fileName: String, translator: InputTranslator): String {
-        return concatenate(translateModule(fileName, translator, ROOT_PACKAGENAME))
+        return concatenate(translateModule(fileName, translator))
     }
 
 

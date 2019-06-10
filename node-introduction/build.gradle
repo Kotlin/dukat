@@ -1,11 +1,15 @@
 plugins {
     id("kotlin")
+    id("kotlinx-serialization")
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
+
     implementation(project(":ast"))
     implementation(project(":ast-common"))
     implementation(project(":node-lowering"))
+    implementation(project(":module-name-resolver"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":tsmodel"))

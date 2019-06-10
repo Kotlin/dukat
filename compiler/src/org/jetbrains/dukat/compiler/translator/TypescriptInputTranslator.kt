@@ -7,8 +7,6 @@ import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceModels
-import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
-import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
 import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
@@ -20,14 +18,17 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.compiler.lowerings.model.addStandardImports
 import org.jetbrains.dukat.compiler.lowerings.model.omitStdLib
+import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
 import org.jetbrains.dukat.nodeIntroduction.introduceTupleNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
+import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.lowerUnionType
 import org.jetbrains.dukat.translator.InputTranslator
@@ -42,7 +43,10 @@ interface TypescriptInputTranslator : InputTranslator {
     fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration
     fun release()
 
-    override fun translate(fileName: String, packageName: NameEntity): SourceSetModel {
+    val packageName: NameEntity;
+    val moduleNameResolver: ModuleNameResolver;
+
+    override fun translate(fileName: String): SourceSetModel {
         return lower(translateFile(fileName, packageName))
     }
 
@@ -57,7 +61,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .introduceTupleNodes()
-                .introduceExportAnnotations()
+                .introduceExportAnnotations(moduleNameResolver)
                 .lowerUnionType()
                 .lowerNullable()
                 .lowerPrimitives()

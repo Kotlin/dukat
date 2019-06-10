@@ -1,5 +1,4 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.internal.os.OperatingSystem
 
 buildscript {
     repositories {
@@ -34,6 +33,7 @@ dependencies {
     implementation(project(":itertools"))
     implementation(project(":node-lowering"))
     implementation(project(":node-introduction"))
+    implementation(project(":module-name-resolver"))
     implementation(project(":ownerContext"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))
@@ -110,6 +110,6 @@ test {
             systemProperty(projectProperty, "true")
         }
     }
-    
-    systemProperty("dukat.test.resources.definitelyTyped", "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped")        
+
+    systemProperty("dukat.test.resources.definitelyTyped", "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped")
 }

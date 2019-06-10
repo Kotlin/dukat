@@ -11,6 +11,7 @@ dependencies {
   implementation(project(":ast"))
   implementation(project(":ast-common"))
   implementation(project(":ast-model"))
+  implementation(project(":module-name-resolver"))
   implementation(project(":tsmodel"))
   implementation(project(":translator"))
   implementation(project(":translator-string"))

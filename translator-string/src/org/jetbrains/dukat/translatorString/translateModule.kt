@@ -16,9 +16,9 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
     }
 }
 
-fun translateModule(fileName: String, translator: InputTranslator, rootPackageName: NameEntity): List<ModuleTranslationUnit> {
+fun translateModule(fileName: String, translator: InputTranslator): List<ModuleTranslationUnit> {
     val sourceSet =
-            translator.translate(fileName, rootPackageName)
+            translator.translate(fileName)
 
     val visited = mutableSetOf<SourceUnit>()
 

@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import translateModule
@@ -28,13 +29,13 @@ private fun NameEntity.fileNameFragment(): String {
 }
 
 
-private fun compile(filename: String, outDir: String?, basePackageName: NameEntity, translator: TypescriptInputTranslator) {
+private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator) {
     val sourceFile = File(filename)
 
     val D_TS_SUFFIX = ".d.ts"
     val TS_SUFFIX = ".ts"
 
-    val translatedUnits = translateModule(sourceFile.absolutePath, translator, basePackageName)
+    val translatedUnits = translateModule(sourceFile.absolutePath, translator)
 
     val dirFile = File(outDir ?: "./")
     if (translatedUnits.isNotEmpty()) {
@@ -178,8 +179,8 @@ fun main(vararg args: String) {
         options.engine == Engine.GRAAL
 
         options.sources.forEach { sourceName ->
-            compile(sourceName, options.outDir, options.basePackageName, when (options.engine) {
-                Engine.GRAAL -> createGraalTranslator()
+            compile(sourceName, options.outDir, when (options.engine) {
+                Engine.GRAAL -> createGraalTranslator(options.basePackageName, CommonJsNameResolver())
             })
         }
     }

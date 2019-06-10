@@ -20,14 +20,15 @@ private fun NodeOwner<*>.getModule(): DocumentRootNode {
 }
 
 private fun NodeOwner<*>.findModuleWithImport(value: String): ImportNode? {
-    return getOwners().mapNotNull { docRootOwner ->
+    getOwners().forEach { docRootOwner ->
         if ((docRootOwner is NodeOwner<*>) && (docRootOwner.node is DocumentRootNode)) {
-            (docRootOwner.node as DocumentRootNode).imports.get(value)
-        } else {
-            null
+            (docRootOwner.node as DocumentRootNode).imports[value]?.let {
+                return it
+            }
         }
+    }
 
-    }.firstOrNull()
+    return null
 }
 
 private class UidData() {
@@ -83,8 +84,8 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 resolve(value.value, owner)
             }
             is QualifierEntity -> value.copy(
-                left = resolve(value.left, owner),
-                right = IdentifierEntity(value.right.value)
+                    left = resolve(value.left, owner),
+                    right = IdentifierEntity(value.right.value)
             )
             else -> raiseConcern("unknown NameEntity subtype ${value::class.simpleName}") { value }
         }
@@ -107,8 +108,7 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
     }
 
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
-        val declaration = owner.node
-        return when (declaration) {
+        return when (val declaration = owner.node) {
             is TypeValueNode -> declaration.copy(value = resolve(declaration.value, owner))
             else -> super.lowerParameterValue(owner)
         }
@@ -134,10 +134,10 @@ private fun DocumentRootNode.collectUidData(uidData: UidData): DocumentRootNode 
 }
 
 private fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
-    val uidData = org.jetbrains.dukat.nodeIntroduction.UidData()
+    val uidData = UidData()
     collectUidData(uidData)
 
-    return org.jetbrains.dukat.nodeIntroduction.LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
+    return LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
 }
 
 fun SourceSetNode.introduceQualifiedNode() = transform { it.introduceQualifiedNode() }

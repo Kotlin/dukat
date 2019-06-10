@@ -1,7 +1,9 @@
 package org.jetbrains.dukat.compiler.tests.core
 
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.OutputTests
+import org.jetbrains.dukat.moduleNameResolver.NullNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,6 +26,6 @@ class CoreSetTests : OutputTests() {
             return fileSetWithDescriptors("./test/data")
         }
 
-        val translator: InputTranslator = createGraalTranslator()
+        val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, NullNameResolver())
     }
 }

@@ -6,6 +6,7 @@ import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.interop.graal.DocumentCache
 import org.jetbrains.dukat.interop.graal.InteropGraal
 import org.jetbrains.dukat.logger.Logging
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsinterop.ExportContentNonGeneric
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
@@ -34,6 +35,8 @@ private fun createGraalInterop(): InteropGraal {
 
 class TranslatorGraal(
         private val engine: InteropGraal,
+        override val packageName: NameEntity,
+        override val moduleNameResolver: ModuleNameResolver,
         private val documentCache: DocumentCache = DocumentCache()
 ) : TypescriptInputTranslator {
     override fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration {
@@ -43,4 +46,4 @@ class TranslatorGraal(
     override fun release() {}
 }
 
-fun createGraalTranslator() = TranslatorGraal(createGraalInterop())
+fun createGraalTranslator(packageName: NameEntity, moduleNameResolver: ModuleNameResolver) = TranslatorGraal(createGraalInterop(), packageName, moduleNameResolver)

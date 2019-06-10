@@ -6,6 +6,6 @@ import java.io.File
 
 class TestResourceNameResolver : ModuleNameResolver {
     override fun resolveName(sourceName: String): NameEntity? {
-        return IdentifierEntity(File(sourceName).parentFile.name);
+        return IdentifierEntity(File(sourceName).parentFile.name)
     }
 }

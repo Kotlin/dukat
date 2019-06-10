@@ -8,6 +8,8 @@ dependencies {
     implementation(project(":ast-model"))
     implementation(project(":tsmodel"))
     implementation(project(":translator"))
+
+    implementation(project(":module-name-resolver"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
 }
