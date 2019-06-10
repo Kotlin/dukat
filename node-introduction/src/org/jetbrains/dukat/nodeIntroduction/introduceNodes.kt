@@ -636,7 +636,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun unquote(name: String): String {
-        return name.replace("(?:^\"|\')|(?:\"|\'$)".toRegex(), "")
+        return name.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
     }
 
     //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
@@ -665,14 +665,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val qualifiers = parentDocRoots.map { unquote(it.node.packageName.translate()) }
 
-
-        val isQualifier = (documentRoot.packageName.translate() == unquote(documentRoot.packageName.translate()))
+        val moduleNameIsStringLiteral = documentRoot.packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
 
         var showQualifierAnnotation = owner != rootOwner
 
         val isExternalDefinition = isExternal(documentRoot.definitionsInfo)
 
-        if (isExternalDefinition && isQualifier) {
+        if (isExternalDefinition && !moduleNameIsStringLiteral) {
             showQualifierAnnotation = false
         }
 
@@ -712,7 +711,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 null,
                 documentRoot.uid,
                 if (showQualifierAnnotation) qualifiedNode else null,
-                if (isQualifier) QualifierKind.QUALIFIER else QualifierKind.MODULE
+                if (!moduleNameIsStringLiteral) QualifierKind.QUALIFIER else QualifierKind.MODULE
         )
 
 

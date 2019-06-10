@@ -386,13 +386,13 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
 
     val annotations = mutableListOf<AnnotationNode>()
 
-    if (qualifiedNode != null) {
+    qualifiedNode?.let { node ->
         when (qualifierKind) {
             QualifierKind.QUALIFIER -> "JsQualifier"
             QualifierKind.MODULE -> "JsModule"
             else -> null
-        }.let { qualifier ->
-            annotations.add(AnnotationNode("file:${qualifier}", listOf(qualifiedNode!!)))
+        }?.let { qualifier ->
+            annotations.add(AnnotationNode("file:${qualifier}", listOf(node)))
         }
     }
 
