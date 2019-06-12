@@ -2,7 +2,10 @@ package org.jetbrains.dukat.moduleNameResolver.tests
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.moduleNameResolver.ChainedNameResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -34,9 +37,24 @@ class ModuleResolverTests {
         resolve("moduleE/lib/deeply/nested/moduleE.d.ts", null)
     }
 
-    private fun resolve(path: String, expected: NameEntity?) {
+    @Test
+    fun resolveModuleWithName() {
+        resolve("whatever/path/we/pass.txt", IdentifierEntity("mylib"), ConstNameResolver(IdentifierEntity("mylib")))
+    }
+
+    @Test
+    fun resolveModuleChained() {
+        resolve("whatever/path/we/pass.txt", IdentifierEntity("forcedName"),
+                ChainedNameResolver(listOf(
+                    CommonJsNameResolver(),
+                    ConstNameResolver(IdentifierEntity("forcedName"))
+                ))
+        )
+    }
+
+    private fun resolve(path: String, expected: NameEntity?, resolver: ModuleNameResolver = CommonJsNameResolver()) {
         val prefix = "./test/data/node_modules"
         val fullPath = File(prefix, path).absolutePath
-        assertEquals(CommonJsNameResolver().resolveName(fullPath), expected)
+        assertEquals(resolver.resolveName(fullPath), expected)
     }
 }
