@@ -5,10 +5,12 @@ import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import translateModule
@@ -85,6 +87,7 @@ Usage: $program [<options>] <d.ts files>
 
 where possible options include:
     -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
+    -m  String                      use this value as @file:JsModule annotation value whenever such annotation occurs
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -v, -version                    print version
 """.trimIndent())
@@ -99,7 +102,8 @@ private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
         val engine: Engine,
-        val basePackageName: NameEntity
+        val basePackageName: NameEntity,
+        val jsModuleName: String?
 )
 
 
@@ -118,6 +122,7 @@ private fun process(args: List<String>): CliOptions? {
     var outDir: String? = null
     var engine = Engine.GRAAL
     var basePackageName: NameEntity = ROOT_PACKAGENAME
+    var jsModuleName: String? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
@@ -161,12 +166,22 @@ private fun process(args: List<String>): CliOptions? {
 
                 basePackageName = packageNameString.toNameEntity()
             }
+            "-m" -> {
+                val packageNameString = argsIterator.readArg()
+
+                if (packageNameString == null) {
+                    printError("'-m' should be followed with a string value")
+                    return null
+                }
+
+                jsModuleName = packageNameString
+            }
 
             else -> sources.add(arg)
         }
     }
 
-    return CliOptions(sources, outDir, engine, basePackageName)
+    return CliOptions(sources, outDir, engine, basePackageName, jsModuleName)
 }
 
 fun main(vararg args: String) {
@@ -178,9 +193,15 @@ fun main(vararg args: String) {
     process(args.toList())?.let { options ->
         options.engine == Engine.GRAAL
 
+        val moduleResolver = if (options.jsModuleName != null) {
+            ConstNameResolver(IdentifierEntity(options.jsModuleName))
+        } else {
+            CommonJsNameResolver()
+        }
+
         options.sources.forEach { sourceName ->
             compile(sourceName, options.outDir, when (options.engine) {
-                Engine.GRAAL -> createGraalTranslator(options.basePackageName, CommonJsNameResolver())
+                Engine.GRAAL -> createGraalTranslator(options.basePackageName, moduleResolver)
             })
         }
     }

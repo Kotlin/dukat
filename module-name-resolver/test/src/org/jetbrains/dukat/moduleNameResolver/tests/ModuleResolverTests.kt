@@ -2,7 +2,6 @@ package org.jetbrains.dukat.moduleNameResolver.tests
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.moduleNameResolver.ChainedNameResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
@@ -40,16 +39,6 @@ class ModuleResolverTests {
     @Test
     fun resolveModuleWithName() {
         resolve("whatever/path/we/pass.txt", IdentifierEntity("mylib"), ConstNameResolver(IdentifierEntity("mylib")))
-    }
-
-    @Test
-    fun resolveModuleChained() {
-        resolve("whatever/path/we/pass.txt", IdentifierEntity("forcedName"),
-                ChainedNameResolver(listOf(
-                    CommonJsNameResolver(),
-                    ConstNameResolver(IdentifierEntity("forcedName"))
-                ))
-        )
     }
 
     private fun resolve(path: String, expected: NameEntity?, resolver: ModuleNameResolver = CommonJsNameResolver()) {

@@ -20,6 +20,7 @@ dukat [<options>] <d.ts files>
 where possible options include:
 ```shell
     -p  <qualifiedPackageName>      package name for the generated file (by default filename.d.ts renamed to filename.d.kt)
+    -m  String                      use this value as @file:JsModule annotation value whenever such annotation occurs
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -v, -version                    print version
 ```
