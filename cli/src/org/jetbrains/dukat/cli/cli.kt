@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.cli
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
@@ -30,8 +32,10 @@ private fun NameEntity.fileNameFragment(): String {
     }
 }
 
+@Serializable
+private data class Report(val outputs: List<String>)
 
-private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator) {
+private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator, pathToReport: String?) {
     val sourceFile = File(filename)
 
     val D_TS_SUFFIX = ".d.ts"
@@ -43,6 +47,10 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()
     }
+
+    val buildReport = pathToReport !== null
+
+    val output = mutableListOf<String>()
 
     translatedUnits.forEach { (fileName, packageName, content) ->
         val sourceFile = File(fileName)
@@ -63,10 +71,35 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
         val resolvedTarget = dirFile.resolve(targetName)
 
         println(resolvedTarget.name)
+
+        if (buildReport) {
+            output.add(resolvedTarget.name)
+        }
+
         resolvedTarget.writeText(content)
+    }
+
+    if (buildReport) {
+        saveReport(pathToReport!!, Report(output))
     }
 }
 
+private fun saveReport(reportPath: String, report: Report): Boolean {
+    val reportFile = File(reportPath)
+
+    val reportBody = Json.indented.stringify(Report.serializer(), report)
+    try {
+        println("saving report to ${reportFile.absolutePath}")
+        reportFile.absoluteFile.parentFile.mkdirs()
+        reportFile.writeText(reportBody)
+    } catch (e: Exception) {
+        printError("Failed to save report with following exception:")
+        println(e)
+        return false
+    }
+
+    return true
+}
 
 fun Iterator<String>.readArg(): String? {
     return if (hasNext()) {
@@ -103,7 +136,8 @@ private data class CliOptions(
         val outDir: String?,
         val engine: Engine,
         val basePackageName: NameEntity,
-        val jsModuleName: String?
+        val jsModuleName: String?,
+        val reportPath: String?
 )
 
 
@@ -123,6 +157,7 @@ private fun process(args: List<String>): CliOptions? {
     var engine = Engine.GRAAL
     var basePackageName: NameEntity = ROOT_PACKAGENAME
     var jsModuleName: String? = null
+    var reportPath: String? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
 
@@ -177,11 +212,21 @@ private fun process(args: List<String>): CliOptions? {
                 jsModuleName = packageNameString
             }
 
+            "-r" -> {
+                reportPath = argsIterator.readArg()
+
+                if (reportPath == null) {
+                    printError("'-r' should be followed with a string value")
+                    return null
+                }
+
+            }
+
             else -> sources.add(arg)
         }
     }
 
-    return CliOptions(sources, outDir, engine, basePackageName, jsModuleName)
+    return CliOptions(sources, outDir, engine, basePackageName, jsModuleName, reportPath)
 }
 
 fun main(vararg args: String) {
@@ -202,9 +247,9 @@ fun main(vararg args: String) {
         options.sources.forEach { sourceName ->
             compile(sourceName, options.outDir, when (options.engine) {
                 Engine.GRAAL -> createGraalTranslator(options.basePackageName, moduleResolver)
-            })
+            }, options.reportPath)
         }
     }
-
-
 }
+
+
