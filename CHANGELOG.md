@@ -1,5 +1,10 @@
 # Changelog
 
+#### [0.0.8] - 12'June, 2019
+ - Fixing behaviour for resolving JsModules and JsQualifier (see [#45 - Export with assignment should produce JSModule annotation](https://github.com/Kotlin/dukat/issues/45))
+ - [cli] -m option added so one can resolve JsModule names manually for files that are not in node_modules 
+ - [dev] Make it possible to save optionally minimal report on dukat run ([#35 - Generate JSON report based on run results](https://github.com/Kotlin/dukat/issues/35)) 
+
 #### [0.0.7] - 05'June, 2019
  - Resolving overrides parent entity is defined in stdlib ([#33 - Overrides not resolved for entities extending external objects](https://github.com/Kotlin/dukat/issues/33))
  - Fix for #9 (["Overrides are not resolved for parent entities defined in different files"](https://github.com/Kotlin/dukat/issues/9))
