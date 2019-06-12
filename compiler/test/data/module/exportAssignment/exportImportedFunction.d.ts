@@ -1,10 +1,10 @@
 declare namespace a {
     namespace b {
-        function foo(): string
+        function foo(): string;
     }
 }
 
 declare module "c" {
-    import x = a.b.foo
-    export = x
+    import x = a.b.foo;
+    export = x;
 }

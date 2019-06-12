@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
@@ -30,8 +29,9 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
+import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
+import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -202,11 +202,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
 
-        val annotations = mutableListOf<AnnotationNode>()
-
-        if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
-            annotations.add(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
-        }
+        val exportQualifier = if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
+            JsDefault()
+        } else null
 
         val declaration = ClassNode(
                 name,
@@ -219,7 +217,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
                 owner,
                 uid,
-                annotations
+                exportQualifier
         )
 
         declaration.members.forEach { member ->
@@ -245,7 +243,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                mutableListOf(),
+                null,
                 null,
                 false,
                 uid
@@ -270,7 +268,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                mutableListOf(),
+                null,
                 null,
                 true,
                 uid
@@ -313,12 +311,11 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     private fun FunctionDeclaration.convert(): FunctionNode {
-        val annotations = mutableListOf<AnnotationNode>()
-
         val hasExport = ModifierDeclaration.hasExport(modifiers)
-        if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
-            annotations.add(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
-        }
+
+        val exportQualifier = if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
+            JsDefault()
+        } else null
 
         return FunctionNode(
                 IdentifierEntity(name),
@@ -326,7 +323,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 type,
                 convertTypeParameters(typeParameters),
                 mutableListOf(),
-                annotations,
+                exportQualifier,
                 hasExport,
                 false,
                 false,
@@ -400,7 +397,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         declaration.type,
                         convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
                         mutableListOf(),
-                        mutableListOf(),
+                        null,
                         true,
                         true,
                         false,
@@ -426,7 +423,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             }, IdentifierEntity(declaration.name)
                     ),
                     if (declaration.optional) declaration.type.makeNullable() else declaration.type,
-                    mutableListOf(),
+                    null,
                     false,
                     true,
                     null,
@@ -457,7 +454,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             declaration.returnType.makeNullable(),
                             emptyList(),
                             mutableListOf(),
-                            mutableListOf(),
+                            null,
                             true,
                             true,
                             true,
@@ -482,7 +479,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                             emptyList(),
                             mutableListOf(),
-                            mutableListOf(),
+                            null,
                             true,
                             true,
                             true,
@@ -512,7 +509,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             declaration.type,
                             emptyList(),
                             mutableListOf(),
-                            mutableListOf(),
+                            null,
                             true,
                             true,
                             true,
@@ -562,7 +559,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 VariableNode(
                         IdentifierEntity(declaration.name),
                         TypeValueNode(IdentifierEntity("Json"), emptyList()),
-                        mutableListOf(),
+                        null,
                         false,
                         false,
                         StatementCallNode(IdentifierEntity("definedExternally"), null),
@@ -592,7 +589,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             VariableNode(
                     IdentifierEntity(declaration.name),
                     type,
-                    mutableListOf(),
+                    null,
                     false,
                     false,
                     StatementCallNode(IdentifierEntity("definedExternally"), null),
@@ -661,19 +658,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
 
-        val rootOwner = parentDocRoots.get(0)
-
         val qualifiers = parentDocRoots.map { unquote(it.node.packageName.translate()) }
-
-        val moduleNameIsStringLiteral = documentRoot.packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
-
-        var showQualifierAnnotation = owner != rootOwner
-
-        val isExternalDefinition = isExternal(documentRoot.definitionsInfo)
-
-        if (isExternalDefinition && !moduleNameIsStringLiteral) {
-            showQualifierAnnotation = false
-        }
 
         val qualifierIdentifiers = qualifiers
                 .flatMap { it.split("/") }
@@ -681,15 +666,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
         val fullPackageName = qualifierIdentifiers.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
 
-
-        val qualifiedNode = if (qualifiers.isEmpty()) {
-            null
-        } else {
-            qualifiers
-                    .map { IdentifierEntity(it) }
-                    .reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
-                    .shiftLeft()
-        }
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelEntity>()
@@ -703,15 +679,16 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         val docRoot = DocumentRootNode(
-                fileName,
-                fullPackageName,
-                nonImports,
-                imports,
-                documentRoot.definitionsInfo,
-                null,
-                documentRoot.uid,
-                if (showQualifierAnnotation) qualifiedNode else null,
-                if (!moduleNameIsStringLiteral) QualifierKind.QUALIFIER else QualifierKind.MODULE
+                fileName = fileName,
+                packageName = documentRoot.packageName,
+                qualifiedPackageName = fullPackageName,
+                declarations = nonImports,
+                imports = imports,
+                definitionsInfo = documentRoot.definitionsInfo,
+                jsModule = null,
+                jsQualifier = null,
+                owner = null,
+                uid = documentRoot.uid
         )
 
 

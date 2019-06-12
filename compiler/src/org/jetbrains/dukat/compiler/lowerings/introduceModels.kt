@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.QualifierKind
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -22,6 +21,9 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
+import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
+import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
@@ -275,7 +277,7 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
                 )
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-            annotations = annotations
+            annotations = exportQualifier.toAnnotation()
     )
 }
 
@@ -314,8 +316,16 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                 )
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-            annotations = annotations
+            annotations = exportQualifier.toAnnotation()
     )
+}
+
+private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationNode> {
+    return when (this) {
+        is JsModule -> mutableListOf(AnnotationNode("JsModule", listOf(name)))
+        is JsDefault -> mutableListOf(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
+        else -> mutableListOf()
+    }
 }
 
 fun DocumentRootNode.introduceModels(): ModuleModel {
@@ -336,7 +346,7 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
                         )
                     },
                     generatedReferenceNodes = declaration.generatedReferenceNodes,
-                    annotations = declaration.annotations,
+                    annotations = declaration.exportQualifier.toAnnotation(),
                     export = declaration.export,
                     inline = declaration.inline,
                     operator = declaration.operator,
@@ -346,7 +356,7 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
             is VariableNode -> VariableModel(
                     name = declaration.name,
                     type = declaration.type.process(),
-                    annotations = declaration.annotations,
+                    annotations = declaration.exportQualifier.toAnnotation(),
                     immutable = declaration.immutable,
                     inline = declaration.inline,
                     initializer = declaration.initializer,
@@ -386,19 +396,17 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
 
     val annotations = mutableListOf<AnnotationNode>()
 
-    qualifiedNode?.let { node ->
-        when (qualifierKind) {
-            QualifierKind.QUALIFIER -> "JsQualifier"
-            QualifierKind.MODULE -> "JsModule"
-            else -> null
-        }?.let { qualifier ->
-            annotations.add(AnnotationNode("file:${qualifier}", listOf(node)))
-        }
+    jsModule?.let {
+        annotations.add(AnnotationNode("file:JsModule", listOf(it)))
+    }
+
+    jsQualifier?.let {
+        annotations.add(AnnotationNode("file:JsQualifier", listOf(it)))
     }
 
     return ModuleModel(
-            packageName = packageName,
-            shortName = packageName.rightMost(),
+            packageName = qualifiedPackageName,
+            shortName = qualifiedPackageName.rightMost(),
             declarations = declarationsFiltered,
             annotations = annotations,
             sumbodules = submodules,

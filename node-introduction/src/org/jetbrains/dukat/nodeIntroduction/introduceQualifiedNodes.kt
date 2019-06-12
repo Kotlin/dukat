@@ -56,13 +56,13 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                 importNode.referenceName
             } else {
                 val resolvedImport = importedDocumentNodes.firstOrNull { importedDocumentNode ->
-                    importedDocumentNode.packageName.rightMost() == importNode.referenceName
+                    importedDocumentNode.qualifiedPackageName.rightMost() == importNode.referenceName
                 }
 
                 if (resolvedImport == null) {
                     importNode.referenceName
                 } else {
-                    resolvedImport.qualifiedNode as NameEntity
+                    resolvedImport.qualifiedPackageName
                 }
             }
         }

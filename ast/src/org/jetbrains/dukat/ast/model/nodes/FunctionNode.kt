@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -12,7 +13,7 @@ data class FunctionNode(
         val typeParameters: List<TypeValueNode>,
 
         val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
-        val annotations: MutableList<AnnotationNode>,
+        var exportQualifier: ExportQualifier?,
 
         val export: Boolean,
         val inline: Boolean,

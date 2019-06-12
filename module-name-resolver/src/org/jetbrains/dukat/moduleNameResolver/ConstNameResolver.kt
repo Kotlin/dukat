@@ -1,9 +1,10 @@
 package org.jetbrains.dukat.moduleNameResolver
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
-class NullNameResolver : ModuleNameResolver {
+class ConstNameResolver : ModuleNameResolver {
     override fun resolveName(sourceName: String): NameEntity? {
-        return null
+        return IdentifierEntity("<RESOLVED_MODULE_NAME>")
     }
 }

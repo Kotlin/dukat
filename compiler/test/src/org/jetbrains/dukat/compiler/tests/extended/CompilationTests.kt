@@ -3,8 +3,7 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.moduleNameResolver.NullNameResolver
-import org.jetbrains.dukat.moduleNameResolver.TestResourceNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -25,7 +24,7 @@ class CompilationTests : OutputTests() {
     }
 
     companion object {
-        val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, NullNameResolver())
+        val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, ConstNameResolver())
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {

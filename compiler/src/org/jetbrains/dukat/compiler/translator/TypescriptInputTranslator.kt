@@ -23,7 +23,6 @@ import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
 import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.nodeIntroduction.introduceExportAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
 import org.jetbrains.dukat.nodeIntroduction.introduceTupleNodes
@@ -31,6 +30,7 @@ import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.lowerUnionType
+import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.desugarArrayDeclarations
@@ -61,7 +61,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .introduceTupleNodes()
-                .introduceExportAnnotations(moduleNameResolver)
+                .resolveModuleAnnotations(moduleNameResolver)
                 .lowerUnionType()
                 .lowerNullable()
                 .lowerPrimitives()

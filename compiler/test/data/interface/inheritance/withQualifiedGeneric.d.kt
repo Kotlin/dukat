@@ -15,4 +15,5 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+@JsModule("<RESOLVED_MODULE_NAME>")
 external open class ChildComponent : Factory.Component<ChildComponent.Props>

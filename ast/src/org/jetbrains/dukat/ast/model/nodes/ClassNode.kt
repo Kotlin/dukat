@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
+
 data class ClassNode(
         val name: String,
         val members: List<MemberNode>,
@@ -9,5 +11,5 @@ data class ClassNode(
 
         var owner: DocumentRootNode?,
         val uid: String,
-        val annotations: MutableList<AnnotationNode>
+        var exportQualifier: ExportQualifier?
 ) : ClassLikeNode

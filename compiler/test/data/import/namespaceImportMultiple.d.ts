@@ -8,17 +8,17 @@ declare namespace lib1 {
         }
     }
 
-    import e = lib3
+    import e = lib3;
 
     namespace lib2 {
-        import q = lib1
+        import q = lib1;
 
         interface J {
             y: q.I
         }
 
         namespace lib3 {
-            import w = lib2
+            import w = lib2;
 
             function foo(x: w.J, y: q.I, z: q.lib3.K, v: e.K): void
         }
