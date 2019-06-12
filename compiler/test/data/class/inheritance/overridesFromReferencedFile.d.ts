@@ -5,6 +5,7 @@ declare class BoxStringEvent implements BaseEvent {
     getElement(): HTMLElement;
     transform<T extends Shape>(shape?: T): T;
     getSortOfEventTarget(): SortOfElement;
+    prop: string;
 }
 declare interface NumberEvent extends BaseEvent {
     data: number;

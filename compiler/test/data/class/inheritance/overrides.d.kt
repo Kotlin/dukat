@@ -23,14 +23,23 @@ external interface BaseEvent {
     fun getElement(): Element
     fun <T : Shape> transform(shape: T? = definedExternally /* null */): T
     var prop: Any
+    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally /* null */): Promise<Any>
 }
 external open class BoxStringEvent : BaseEvent {
     override var data: String = definedExternally
     override fun getDelegateTarget(): Box = definedExternally
     override fun getElement(): HTMLElement = definedExternally
     override fun <T : Shape> transform(shape: T?): T = definedExternally
+    override var prop: String = definedExternally
+    override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String> = definedExternally
 }
 external interface NumberEvent : BaseEvent {
     override var data: Number
     var otherProp: Any
+}
+external open class ParentClass {
+    open var prop: Any = definedExternally
+}
+external open class ChildClass : ParentClass {
+    override var prop: String = definedExternally
 }

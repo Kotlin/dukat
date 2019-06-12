@@ -21,6 +21,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getElement(): HTMLElement = definedExternally
     override fun <T : Shape> transform(shape: T?): T = definedExternally
     override fun getSortOfEventTarget(): SortOfElement = definedExternally
+    override var prop: String = definedExternally
 }
 external interface NumberEvent : BaseEvent {
     override var data: Number
