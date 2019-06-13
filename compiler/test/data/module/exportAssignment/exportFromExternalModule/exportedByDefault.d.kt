@@ -23,5 +23,5 @@ external interface IBaz {
     fun doSomething()
 }
 external open class Klass {
-    open fun method(s: Any): String = definedExternally
+    open fun method(s: Any): String
 }

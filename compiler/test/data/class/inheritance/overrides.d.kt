@@ -27,11 +27,11 @@ external interface BaseEvent {
 }
 external open class BoxStringEvent : BaseEvent {
     override var data: String = definedExternally
-    override fun getDelegateTarget(): Box = definedExternally
-    override fun getElement(): HTMLElement = definedExternally
-    override fun <T : Shape> transform(shape: T?): T = definedExternally
+    override fun getDelegateTarget(): Box
+    override fun getElement(): HTMLElement
+    override fun <T : Shape> transform(shape: T?): T
     override var prop: String = definedExternally
-    override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String> = definedExternally
+    override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String>
 }
 external interface NumberEvent : BaseEvent {
     override var data: Number

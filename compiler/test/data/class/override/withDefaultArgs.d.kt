@@ -16,10 +16,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open fun bar(a: Number = definedExternally /* 1 */): Unit = definedExternally
-    open fun baz(a: Any? = definedExternally /* null */): Unit = definedExternally
+    open fun bar(a: Number = definedExternally /* 1 */): Unit
+    open fun baz(a: Any? = definedExternally /* null */): Unit
 }
 external open class Boo : Foo {
-    override fun bar(a: Number): Unit = definedExternally
-    override fun baz(a: Any?): Unit = definedExternally
+    override fun bar(a: Number): Unit
+    override fun baz(a: Any?): Unit
 }

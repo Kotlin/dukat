@@ -17,10 +17,10 @@ import org.w3c.xhr.*
 
 external open class BoxStringEvent : BaseEvent {
     override var data: String = definedExternally
-    override fun getDelegateTarget(): Box = definedExternally
-    override fun getElement(): HTMLElement = definedExternally
-    override fun <T : Shape> transform(shape: T?): T = definedExternally
-    override fun getSortOfEventTarget(): SortOfElement = definedExternally
+    override fun getDelegateTarget(): Box
+    override fun getElement(): HTMLElement
+    override fun <T : Shape> transform(shape: T?): T
+    override fun getSortOfEventTarget(): SortOfElement
     override var prop: String = definedExternally
 }
 external interface NumberEvent : BaseEvent {

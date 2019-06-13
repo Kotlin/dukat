@@ -22,6 +22,6 @@ external interface I {
     fun bar(s: String /* "string" */): String
 }
 external open class C {
-    open fun baz(s: String /* "number" */): Number = definedExternally
-    open fun baz(s: String /* "string" */): String = definedExternally
+    open fun baz(s: String /* "number" */): Number
+    open fun baz(s: String /* "string" */): String
 }

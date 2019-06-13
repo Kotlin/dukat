@@ -19,7 +19,7 @@ external var __foo: Any
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __A {
     open var __foo: Number = definedExternally
-    open fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
+    open fun __express(filename: String, options: Any, callback: Function<*>): Any
 }
 external interface __B {
     var __foo: Number

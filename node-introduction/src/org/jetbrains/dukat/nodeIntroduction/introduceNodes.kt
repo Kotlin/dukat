@@ -136,7 +136,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     false,
                     emptyList(),
-                    true,
                     true
             )
         }
@@ -155,7 +154,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         true,
                         listOf(AnnotationNode("nativeGetter", emptyList())),
-                        true,
                         true
                 ),
                 MethodNode(
@@ -168,7 +166,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         true,
                         listOf(AnnotationNode("nativeSetter", emptyList())),
-                        true,
                         true
                 )
         )
@@ -186,7 +183,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 false,
                 true,
                 listOf(AnnotationNode("nativeInvoke", emptyList())),
-                true,
                 true
         )
     }
@@ -539,7 +535,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     false,
                     emptyList(),
-                    true,
                     true
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner)).mapNotNull { it }

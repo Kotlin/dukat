@@ -34,8 +34,8 @@ external interface `T$3` {
     var height: Number
 }
 external open class Foo {
-    open fun withObjectTypeParam(opt: `T$0`): Unit = definedExternally
-    open fun returnsObjectType(): `T$1` = definedExternally
+    open fun withObjectTypeParam(opt: `T$0`): Unit
+    open fun returnsObjectType(): `T$1`
     open var foo: `T$2` = definedExternally
     open var dimensions: (startPointX: Number, startPointY: Number, endPointX: Number, endPointY: Number) -> `T$3` = definedExternally
 }

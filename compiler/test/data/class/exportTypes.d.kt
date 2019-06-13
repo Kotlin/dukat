@@ -21,7 +21,7 @@ external interface FooInterface {
     fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }
 external open class FooClass {
-    open fun methodWithOutArgs(): Unit = definedExternally
-    open fun methodWithString(s: String): String = definedExternally
-    open fun methodWithManyArgs(n: Number, settings: Bar): Boolean = definedExternally
+    open fun methodWithOutArgs(): Unit
+    open fun methodWithString(s: String): String
+    open fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }

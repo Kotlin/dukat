@@ -19,16 +19,16 @@ external interface `T$0` {
     var target: Any? get() = definedExternally; set(value) = definedExternally
 }
 external open class SomeClass {
-    open fun <T : `T$0`> ping(source: T): Unit = definedExternally
+    open fun <T : `T$0`> ping(source: T): Unit
     companion object {
-        fun <T : `T$0`> foo(array: Array<T>, classes: Array<Any>? = definedExternally /* null */): Array<T> = definedExternally
+        fun <T : `T$0`> foo(array: Array<T>, classes: Array<Any>? = definedExternally /* null */): Array<T>
     }
 }
 external interface `T$1` {
     var target: Any
 }
 external open class SomeOtherClass<T : `T$1`> {
-    open fun ping(obj: T): Boolean = definedExternally
+    open fun ping(obj: T): Boolean
 }
 external interface OtherClassLikeInterface<T : `T$1`> {
     fun ping(obj: T): SomeOtherClass<T>

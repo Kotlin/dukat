@@ -21,7 +21,7 @@ external interface A {
     fun baz()
 }
 external open class B {
-    open fun boo(): Unit = definedExternally
+    open fun boo(): Unit
 }
 external var c: Number
 external fun d(a: Boolean, b: Any, c: SomeType): Unit

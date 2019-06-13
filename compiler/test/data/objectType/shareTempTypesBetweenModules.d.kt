@@ -28,8 +28,8 @@ external interface `T$5` {
 }
 external fun returnsObjectType(): `T$5`
 external object foo {
-    fun bar(a: Any): Number = definedExternally
-    fun baz(a: Any, b: Any, c: String): Boolean = definedExternally
+    fun bar(a: Any): Number
+    fun baz(a: Any, b: Any, c: String): Boolean
 }
 
 // ------------------------------------------------------------------------------------------
@@ -65,8 +65,8 @@ external interface `T$1` {
 }
 external fun returnsObjectType(): `T$1`
 external object foo {
-    fun bar(a: Any): Number = definedExternally
-    fun baz(a: Any, b: Any, c: String): Boolean = definedExternally
+    fun bar(a: Any): Number
+    fun baz(a: Any, b: Any, c: String): Boolean
 }
 
 // ------------------------------------------------------------------------------------------
@@ -102,6 +102,6 @@ external interface `T$3` {
 }
 external fun anotherReturnsObjectType(): `T$3`
 external object foo {
-    fun bar(a: Any): Number = definedExternally
-    fun baz(a: Any, b: Any, c: String): Boolean = definedExternally
+    fun bar(a: Any): Number
+    fun baz(a: Any, b: Any, c: String): Boolean
 }

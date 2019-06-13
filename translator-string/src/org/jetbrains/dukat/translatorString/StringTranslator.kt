@@ -207,10 +207,8 @@ private fun MethodModel.translate(): List<String> {
     val open = !static && open
     val overrideClause = if (override) "override " else if (open) "open " else ""
 
-    val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
-
     val metaClause = type.translateMeta()
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}$metaClause${definedExternallyClause}")
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}$metaClause")
 }
 
 private fun ConstructorModel.translate(): List<String> {

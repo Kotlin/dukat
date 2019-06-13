@@ -15,6 +15,5 @@ data class MethodModel(
         val operator: Boolean,
         val annotations: List<AnnotationNode>,
 
-        val open: Boolean,
-        val definedExternally: Boolean
+        val open: Boolean
 ) : MemberNode, MemberModel

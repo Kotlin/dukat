@@ -26,7 +26,7 @@ external interface `T$0` {
     operator fun set(key: String?, value: String?)
 }
 external open class Foo(a: String?) {
-    open fun someMethod(): dynamic /* String | Number | Nothing? */ = definedExternally
+    open fun someMethod(): dynamic /* String | Number | Nothing? */
     open var foo: Foo? = definedExternally
     open var optionalFoo: String? = definedExternally
     open var optionalFoo2: String? = definedExternally

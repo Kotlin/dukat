@@ -16,10 +16,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open fun bar(): Number = definedExternally
+    open fun bar(): Number
     companion object {
         var variable: String = definedExternally
-        fun bar(): Unit = definedExternally
-        fun baz(a: Any): Unit = definedExternally
+        fun bar(): Unit
+        fun baz(a: Any): Unit
     }
 }

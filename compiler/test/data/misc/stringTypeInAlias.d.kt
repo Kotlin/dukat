@@ -21,17 +21,17 @@ external open class A11yDialog {
     constructor(el: Element?, containers: Element?)
     constructor(el: Element?, containers: String?)
     constructor(el: Element?, containers: Nothing?)
-    open fun create(el: Element? = definedExternally /* null */, containers: NodeList? = definedExternally /* null */): Unit = definedExternally
-    open fun create(el: Element? = definedExternally /* null */, containers: Element? = definedExternally /* null */): Unit = definedExternally
-    open fun create(el: Element? = definedExternally /* null */, containers: String? = definedExternally /* null */): Unit = definedExternally
-    open fun create(el: Element? = definedExternally /* null */, containers: Nothing? = definedExternally /* null */): Unit = definedExternally
-    open fun on(evt: String /* "show" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun on(evt: String /* "hide" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun on(evt: String /* "destroy" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun on(evt: String /* "create" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun off(evt: String /* "show" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun off(evt: String /* "hide" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun off(evt: String /* "destroy" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun off(evt: String /* "create" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit = definedExternally
-    open fun create(): Unit = definedExternally
+    open fun create(el: Element? = definedExternally /* null */, containers: NodeList? = definedExternally /* null */): Unit
+    open fun create(el: Element? = definedExternally /* null */, containers: Element? = definedExternally /* null */): Unit
+    open fun create(el: Element? = definedExternally /* null */, containers: String? = definedExternally /* null */): Unit
+    open fun create(el: Element? = definedExternally /* null */, containers: Nothing? = definedExternally /* null */): Unit
+    open fun on(evt: String /* "show" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun on(evt: String /* "hide" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun on(evt: String /* "destroy" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun on(evt: String /* "create" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun off(evt: String /* "show" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun off(evt: String /* "hide" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun off(evt: String /* "destroy" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun off(evt: String /* "create" */, callback: (dialogElement: Any, event: Event) -> Unit): Unit
+    open fun create(): Unit
 }

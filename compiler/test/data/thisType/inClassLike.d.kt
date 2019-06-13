@@ -17,8 +17,8 @@ import org.w3c.xhr.*
 
 external open class MyClass {
     open var self: MyClass /* this */ = definedExternally
-    open fun that(): MyClass /* this */ = definedExternally
-    open fun load(ids: String, handler: (self: MyClass /* this */, args: Array<Any>) -> Unit): Unit = definedExternally
+    open fun that(): MyClass /* this */
+    open fun load(ids: String, handler: (self: MyClass /* this */, args: Array<Any>) -> Unit): Unit
 }
 external interface MyInterface {
     var self: MyInterface /* this */

@@ -46,8 +46,7 @@ private fun FunctionModel.convert(): MemberNode {
             override = false,
             operator = false,
             annotations = annotations,
-            open = false,
-            definedExternally = true
+            open = false
     )
 }
 

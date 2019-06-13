@@ -47,5 +47,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class EmptySyntaxList : TypeScript.ISyntaxList {
-    override fun kind(): SyntaxKind = definedExternally
+    override fun kind(): SyntaxKind
 }

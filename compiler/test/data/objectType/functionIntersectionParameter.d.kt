@@ -21,5 +21,5 @@ external interface `T$0` {
     var bar: Any
 }
 external open class FooIntersection {
-    open fun bar(p: `T$0` /* `T$0` & FooIntersectionPart */): Unit = definedExternally
+    open fun bar(p: `T$0` /* `T$0` & FooIntersectionPart */): Unit
 }

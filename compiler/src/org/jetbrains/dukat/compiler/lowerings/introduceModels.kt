@@ -124,8 +124,7 @@ private fun MemberNode.process(): MemberNode {
                 operator = operator,
                 annotations = annotations,
 
-                open = open,
-                definedExternally = definedExternally
+                open = open
         )
         is PropertyNode -> PropertyModel(
                 name = name,

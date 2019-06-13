@@ -18,5 +18,5 @@ import org.w3c.xhr.*
 
 @JsModule("Boo")
 external open class Klass {
-    open fun method(s: Any): String = definedExternally
+    open fun method(s: Any): String
 }

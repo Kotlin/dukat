@@ -60,7 +60,7 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
         when (member) {
             is PropertyModel -> member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
             is MethodModel ->
-                member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
+                member.copy(open = false, type = member.type.substituteUnit())
             else -> member
         }
     }

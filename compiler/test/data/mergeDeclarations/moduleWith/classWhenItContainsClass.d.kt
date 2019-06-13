@@ -18,8 +18,8 @@ import org.w3c.xhr.*
 
 @JsModule("ws")
 external open class WebSocket(address: String) : events.EventEmitter {
-    open fun connect(): Boolean = definedExternally
+    open fun connect(): Boolean
     open class Server {
-        open fun start(): Unit = definedExternally
+        open fun start(): Unit
     }
 }

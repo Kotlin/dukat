@@ -43,6 +43,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class B {
-    open fun boo(): Foo.A = definedExternally
+    open fun boo(): Foo.A
 }
 external var c: Number
