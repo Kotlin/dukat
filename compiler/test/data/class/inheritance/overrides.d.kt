@@ -26,11 +26,11 @@ external interface BaseEvent {
     fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally /* null */): Promise<Any>
 }
 external open class BoxStringEvent : BaseEvent {
-    override var data: String = definedExternally
+    override var data: String
     override fun getDelegateTarget(): Box
     override fun getElement(): HTMLElement
     override fun <T : Shape> transform(shape: T?): T
-    override var prop: String = definedExternally
+    override var prop: String
     override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String>
 }
 external interface NumberEvent : BaseEvent {
@@ -38,8 +38,8 @@ external interface NumberEvent : BaseEvent {
     var otherProp: Any
 }
 external open class ParentClass {
-    open var prop: Any = definedExternally
+    open var prop: Any
 }
 external open class ChildClass : ParentClass {
-    override var prop: String = definedExternally
+    override var prop: String
 }

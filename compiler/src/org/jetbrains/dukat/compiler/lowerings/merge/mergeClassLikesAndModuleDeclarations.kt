@@ -30,8 +30,7 @@ private fun VariableModel.convert(): MemberNode {
             override = false,
             getter = false,
             setter = false,
-            open = false,
-            definedExternally = true
+            open = false
     )
 }
 

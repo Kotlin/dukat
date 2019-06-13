@@ -27,14 +27,14 @@ external interface This {
     var `typeof`: Number
     fun `in`(`object`: Foo)
     companion object {
-        var `$foo`: Boolean = definedExternally
+        var `$foo`: Boolean
         fun `bar$`(`ba$z`: Number): Unit
-        var aaa: `when`.`interface` = definedExternally
-        var bbb: `when`.`$foo` = definedExternally
+        var aaa: `when`.`interface`
+        var bbb: `when`.`$foo`
     }
 }
 external open class `is`<`interface`> {
-    open var `as`: Number = definedExternally
+    open var `as`: Number
     open fun `package`(a: Any): Boolean
 }
 external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>

@@ -17,9 +17,9 @@ import org.w3c.xhr.*
 
 external open class Foo {
     companion object {
-        var varAsAny: Any = definedExternally
-        var varAsNumber: Number = definedExternally
-        var varAsBoolean: Boolean = definedExternally
-        var varAsString: String = definedExternally
+        var varAsAny: Any
+        var varAsNumber: Number
+        var varAsBoolean: Boolean
+        var varAsString: String
     }
 }

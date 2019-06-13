@@ -27,11 +27,11 @@ external interface `T$0` {
 }
 external open class Foo(a: String?) {
     open fun someMethod(): dynamic /* String | Number | Nothing? */
-    open var foo: Foo? = definedExternally
-    open var optionalFoo: String? = definedExternally
-    open var optionalFoo2: String? = definedExternally
-    open var optionalFoo3: String? = definedExternally
-    open var refs: `T$0` = definedExternally
+    open var foo: Foo?
+    open var optionalFoo: String?
+    open var optionalFoo2: String?
+    open var optionalFoo3: String?
+    open var refs: `T$0`
 }
 external interface IBar {
     fun someMethod(): dynamic /* String | Number | Nothing? */

@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo<T : Bar> {
-    open var varT: T = definedExternally
+    open var varT: T
     open fun withoutArgumentsReturnsT(): T
     open fun withOneT(a: T): T
     open fun <B : Baz> returnsB(a: Any): B

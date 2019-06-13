@@ -255,8 +255,7 @@ private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
 
-    val definedExternallyClause = if (definedExternally) " = definedExternally" else ""
-    return "${modifier}var ${name}: ${type.translate()}${type.translateMeta()}${definedExternallyClause}"
+    return "${modifier}var ${name}: ${type.translate()}${type.translateMeta()}"
 }
 
 private fun MemberNode.translate(): List<String> {

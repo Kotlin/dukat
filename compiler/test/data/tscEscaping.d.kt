@@ -18,7 +18,7 @@ import org.w3c.xhr.*
 external var __foo: Any
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __A {
-    open var __foo: Number = definedExternally
+    open var __foo: Number
     open fun __express(filename: String, options: Any, callback: Function<*>): Any
 }
 external interface __B {

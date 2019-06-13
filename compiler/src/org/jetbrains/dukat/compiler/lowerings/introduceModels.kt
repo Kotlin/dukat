@@ -139,8 +139,7 @@ private fun MemberNode.process(): MemberNode {
                 override = override,
                 getter = getter,
                 setter = setter,
-                open = open,
-                definedExternally = definedExternally
+                open = open
         )
         else -> this
     }

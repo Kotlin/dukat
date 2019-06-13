@@ -18,11 +18,11 @@ import org.w3c.xhr.*
 external open class Foo {
     open fun bar(): Unit
     open fun bar(a: Number): Unit
-    open var baz: Any = definedExternally
+    open var baz: Any
 }
 external open class Boo : Foo {
     override fun bar(): Unit
     override fun bar(a: Number): Unit
     open fun bar(a: String): Unit
-    override var baz: Number = definedExternally
+    override var baz: Number
 }

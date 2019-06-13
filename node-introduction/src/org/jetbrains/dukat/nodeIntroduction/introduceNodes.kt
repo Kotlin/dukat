@@ -88,7 +88,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 declaration.optional,
                 declaration.optional,  // TODO: it's actually wrong
 
-                true,
                 true
         )
     }
@@ -122,7 +121,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     true,
                     false,
-                    true,
                     true
             )
         } else {

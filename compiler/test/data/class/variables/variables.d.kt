@@ -16,9 +16,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open var varWithoutTypeAnnotation: Any = definedExternally
-    open var varAsAny: Any = definedExternally
-    open var varAsNumber: Number = definedExternally
-    open var varAsBoolean: Boolean = definedExternally
-    open var varAsString: String = definedExternally
+    open var varWithoutTypeAnnotation: Any
+    open var varAsAny: Any
+    open var varAsNumber: Number
+    open var varAsBoolean: Boolean
+    open var varAsString: String
 }

@@ -14,6 +14,5 @@ data class PropertyNode(
         val getter: Boolean,
         val setter: Boolean,
 
-        val open: Boolean,
-        val definedExternally: Boolean
+        val open: Boolean
 ) : MemberNode

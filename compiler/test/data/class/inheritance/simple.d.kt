@@ -16,8 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class BaseJQueryEventObject : Event {
-    open var data: Any = definedExternally
-    open var delegateTarget: Element = definedExternally
+    open var data: Any
+    open var delegateTarget: Element
     open fun isDefaultPrevented(): Boolean
     open fun isImmediatePropogationStopped(): Boolean
     open fun isPropagationStopped(): Boolean

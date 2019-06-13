@@ -44,5 +44,5 @@ external open class Foo {
     open operator fun set(s: String, value: String): Unit
     @nativeSetter
     open operator fun set(s: String, value: Array<String>): Unit
-    open var props: `T$1` = definedExternally
+    open var props: `T$1`
 }

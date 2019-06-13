@@ -17,5 +17,5 @@ import org.w3c.xhr.*
 
 @JsModule("<RESOLVED_MODULE_NAME>")
 external open class SampleView : _atom.ScrollView {
-    open var foo: String = definedExternally
+    open var foo: String
 }

@@ -58,7 +58,7 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
     //TODO: should discuss why we are doing the at all
     val openInterfaceMembers = otherInterface.members.map { member ->
         when (member) {
-            is PropertyModel -> member.copy(open = false, definedExternally = false, type = member.type.substituteUnit())
+            is PropertyModel -> member.copy(open = false, type = member.type.substituteUnit())
             is MethodModel ->
                 member.copy(open = false, type = member.type.substituteUnit())
             else -> member

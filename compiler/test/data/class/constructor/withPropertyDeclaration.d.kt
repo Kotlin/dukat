@@ -16,9 +16,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo(x: Any) {
-    open var x: Any = definedExternally
+    open var x: Any
 }
 external open class Bar(n: Number, a: Any) {
-    open var n: Number = definedExternally
-    open var a: Any = definedExternally
+    open var n: Number
+    open var a: Any
 }

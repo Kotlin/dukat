@@ -37,7 +37,7 @@ external open class Foo {
     constructor(a: String)
     constructor(a: Number)
     open fun someMethod(): dynamic /* String | Number */
-    open var foo: dynamic /* String | Number */ = definedExternally
-    open var optionalFoo: dynamic /* String | Number */ = definedExternally
-    open var refs: `T$0` = definedExternally
+    open var foo: dynamic /* String | Number */
+    open var optionalFoo: dynamic /* String | Number */
+    open var refs: `T$0`
 }
