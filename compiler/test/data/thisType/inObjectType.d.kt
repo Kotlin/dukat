@@ -23,4 +23,4 @@ external interface `T$1` {
     var baz: Any /* this */
     fun boo(): Any /* this */
 }
-external fun foo(p: `T$0`): `T$1` = definedExternally
+external fun foo(p: `T$0`): `T$1`

@@ -58,16 +58,16 @@ external open class JJ {
     open fun trigger(eventType: String): MyQuery = definedExternally
     open fun trigger(event: MyEvent): MyQuery = definedExternally
 }
-external fun foo(data: String, context: HTMLElement? = definedExternally /* null */, keepScripts: Boolean? = definedExternally /* null */): Array<Any> = definedExternally
-external fun hide(duration: Number? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
-external fun hide(duration: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
-external fun hide(duration: Number? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
-external fun hide(duration: String? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery = definedExternally
-external fun hide(options: MyOptions): MyQuery = definedExternally
-external fun trigger(eventType: String, extraParameters: Array<Any>? = definedExternally /* null */): MyQuery = definedExternally
-external fun trigger(eventType: String, extraParameters: Any? = definedExternally /* null */): MyQuery = definedExternally
-external fun trigger(event: MyEvent, extraParameters: Array<Any>? = definedExternally /* null */): MyQuery = definedExternally
-external fun trigger(event: MyEvent, extraParameters: Any? = definedExternally /* null */): MyQuery = definedExternally
-external fun hide(): MyQuery = definedExternally
-external fun trigger(eventType: String): MyQuery = definedExternally
-external fun trigger(event: MyEvent): MyQuery = definedExternally
+external fun foo(data: String, context: HTMLElement? = definedExternally /* null */, keepScripts: Boolean? = definedExternally /* null */): Array<Any>
+external fun hide(duration: Number? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery
+external fun hide(duration: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery
+external fun hide(duration: Number? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery
+external fun hide(duration: String? = definedExternally /* null */, easing: String? = definedExternally /* null */, complete: Function<*>? = definedExternally /* null */): MyQuery
+external fun hide(options: MyOptions): MyQuery
+external fun trigger(eventType: String, extraParameters: Array<Any>? = definedExternally /* null */): MyQuery
+external fun trigger(eventType: String, extraParameters: Any? = definedExternally /* null */): MyQuery
+external fun trigger(event: MyEvent, extraParameters: Array<Any>? = definedExternally /* null */): MyQuery
+external fun trigger(event: MyEvent, extraParameters: Any? = definedExternally /* null */): MyQuery
+external fun hide(): MyQuery
+external fun trigger(eventType: String): MyQuery
+external fun trigger(event: MyEvent): MyQuery

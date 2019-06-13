@@ -18,5 +18,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsName("default")
-external fun bar(): String = definedExternally
-external fun baz(): Unit = definedExternally
+external fun bar(): String
+external fun baz(): Unit

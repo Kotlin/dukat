@@ -17,7 +17,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun foo(): String = definedExternally
+external fun foo(): String
 external var bar: Number = definedExternally
 external interface IBaz {
     fun doSomething()

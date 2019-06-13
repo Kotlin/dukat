@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Any = definedExternally
-external fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
+external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __A {
     open var __foo: Number = definedExternally
     open fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
@@ -29,7 +29,7 @@ external enum class __E {
     __A,
     __B
 }
-external fun <__T> foo(__a: __T, _b: __M.__N.__C): Unit = definedExternally
+external fun <__T> foo(__a: __T, _b: __M.__N.__C): Unit
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("atpl")
@@ -52,7 +52,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Any = definedExternally
-external fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
+external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("__M")
@@ -75,7 +75,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Number = definedExternally
-external fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
+external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("__M.__N")
@@ -98,5 +98,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Number = definedExternally
-external fun __express(filename: String, options: Any, callback: Function<*>): Any = definedExternally
+external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __C

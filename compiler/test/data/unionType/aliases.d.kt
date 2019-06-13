@@ -17,11 +17,11 @@ import org.w3c.xhr.*
 
 external open class Foo
 external var fooKey: dynamic /* String | Foo | Number */ = definedExternally
-external fun barKey(a: String): Unit = definedExternally
-external fun barKey(a: Foo): Unit = definedExternally
-external fun barKey(a: Number): Unit = definedExternally
-external fun barList(a: List<dynamic /* String | Foo | Number */>): Unit = definedExternally
-external fun barArray(a: Array<dynamic /* String | Foo | Number */>): Unit = definedExternally
+external fun barKey(a: String): Unit
+external fun barKey(a: Foo): Unit
+external fun barKey(a: Number): Unit
+external fun barList(a: List<dynamic /* String | Foo | Number */>): Unit
+external fun barArray(a: Array<dynamic /* String | Foo | Number */>): Unit
 external interface Parent {
     @nativeInvoke
     operator fun invoke(vararg children: String): Foo

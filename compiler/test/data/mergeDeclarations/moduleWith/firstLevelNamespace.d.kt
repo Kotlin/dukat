@@ -16,4 +16,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external fun func(opts: String? = definedExternally /* null */): Number = definedExternally
+external fun func(opts: String? = definedExternally /* null */): Number

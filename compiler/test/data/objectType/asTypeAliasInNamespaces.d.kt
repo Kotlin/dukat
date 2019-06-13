@@ -20,8 +20,8 @@ import org.w3c.xhr.*
 external interface I {
     fun foo(): String
 }
-external fun foo(): I = definedExternally
-external fun bar(): b.I = definedExternally
+external fun foo(): I
+external fun bar(): b.I
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("b")
@@ -46,5 +46,5 @@ import org.w3c.xhr.*
 external interface I {
     fun foo(): String
 }
-external fun foo(): I = definedExternally
-external fun bar(): a.I = definedExternally
+external fun foo(): I
+external fun bar(): a.I

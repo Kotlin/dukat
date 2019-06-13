@@ -17,6 +17,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun baz(): Unit = definedExternally
+external fun baz(): Unit
 @JsName("default")
 external open class C

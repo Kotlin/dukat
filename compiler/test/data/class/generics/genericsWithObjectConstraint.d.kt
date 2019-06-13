@@ -36,4 +36,4 @@ external interface OtherClassLikeInterface<T : `T$1`> {
 external interface `T$2` {
     var onTransformEnd: () -> Unit
 }
-external fun <T : `T$2`> transform(a: T): T = definedExternally
+external fun <T : `T$2`> transform(a: T): T

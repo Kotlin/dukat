@@ -17,5 +17,5 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun bar(): String = definedExternally
-external fun baz(): Unit = definedExternally
+external fun bar(): String
+external fun baz(): Unit

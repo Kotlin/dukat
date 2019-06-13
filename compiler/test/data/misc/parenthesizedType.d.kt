@@ -16,6 +16,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Interface
-external fun foo(p: Interface, p2: Number): String = definedExternally
+external fun foo(p: Interface, p2: Number): String
 external var a: Any = definedExternally
 external var b: Interface = definedExternally

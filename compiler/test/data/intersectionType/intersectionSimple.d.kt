@@ -16,4 +16,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var foo: Number /* Number & Foo */ = definedExternally
-external fun bar(a: Number /* Number & Foo */): Unit = definedExternally
+external fun bar(a: Number /* Number & Foo */): Unit

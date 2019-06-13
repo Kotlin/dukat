@@ -16,15 +16,15 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var foo: dynamic /* String | Number */ = definedExternally
-external fun bar(a: String): Unit = definedExternally
-external fun bar(a: Number): Unit = definedExternally
-external fun bar(a: Foo): Unit = definedExternally
-external fun baz(a: String, b: Number): Unit = definedExternally
-external fun baz(a: String, b: Foo): Unit = definedExternally
-external fun baz(a: Number, b: Number): Unit = definedExternally
-external fun baz(a: Number, b: Foo): Unit = definedExternally
-external fun baz(a: Foo, b: Number): Unit = definedExternally
-external fun baz(a: Foo, b: Foo): Unit = definedExternally
+external fun bar(a: String): Unit
+external fun bar(a: Number): Unit
+external fun bar(a: Foo): Unit
+external fun baz(a: String, b: Number): Unit
+external fun baz(a: String, b: Foo): Unit
+external fun baz(a: Number, b: Number): Unit
+external fun baz(a: Number, b: Foo): Unit
+external fun baz(a: Foo, b: Number): Unit
+external fun baz(a: Foo, b: Foo): Unit
 external interface `T$0` {
     @nativeGetter
     operator fun get(key: String): dynamic /* String | Number */

@@ -44,8 +44,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("browserify")
-external fun browserify(): BrowserifyObject = definedExternally
+external fun browserify(): BrowserifyObject
 @JsModule("browserify")
-external fun browserify(files: Array<String>): BrowserifyObject = definedExternally
+external fun browserify(files: Array<String>): BrowserifyObject
 @JsModule("browserify")
-external fun browserify(opts: Options): BrowserifyObject = definedExternally
+external fun browserify(opts: Options): BrowserifyObject

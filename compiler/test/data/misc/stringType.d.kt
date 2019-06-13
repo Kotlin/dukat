@@ -15,8 +15,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun foo(s: String /* "number" */): Number = definedExternally
-external fun foo(s: String /* "string" */): String = definedExternally
+external fun foo(s: String /* "number" */): Number
+external fun foo(s: String /* "string" */): String
 external interface I {
     fun bar(s: String /* "number" */): Number
     fun bar(s: String /* "string" */): String

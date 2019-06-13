@@ -25,15 +25,15 @@ external interface `T$0`<T> {
 }
 typealias Ping<T> = (packet: `T$0`<T>) -> Boolean
 external var fooMap: MultiMap<String, Number> = definedExternally
-external fun mapKey(a: MultiMap<Number, String>): Unit = definedExternally
+external fun mapKey(a: MultiMap<Number, String>): Unit
 external var fooStringOrMap: dynamic /* String | MultiMap<String, Number> */ = definedExternally
-external fun stringOrMapKey(a: String): Unit = definedExternally
-external fun stringOrMapKey(a: MultiMap<Number, String>): Unit = definedExternally
+external fun stringOrMapKey(a: String): Unit
+external fun stringOrMapKey(a: MultiMap<Number, String>): Unit
 external var listOfStringOrNumber: dynamic /* String | List<dynamic /* String | Number */> */ = definedExternally
-external fun listOfNumberOrString(a: List<dynamic /* Number | String */>): Unit = definedExternally
+external fun listOfNumberOrString(a: List<dynamic /* Number | String */>): Unit
 external var headers: MyHeaders = definedExternally
-external fun getHeaders(): MyHeaders = definedExternally
-external fun addHeaders(headers: MyHeaders): Unit = definedExternally
+external fun getHeaders(): MyHeaders
+external fun addHeaders(headers: MyHeaders): Unit
 external var someRef: dynamic /* String | (instance: Number) -> Any */ = definedExternally
-external fun addRef(ref: String): Unit = definedExternally
-external fun addRef(ref: (instance: Number) -> Any): Unit = definedExternally
+external fun addRef(ref: String): Unit
+external fun addRef(ref: (instance: Number) -> Any): Unit

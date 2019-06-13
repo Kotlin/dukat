@@ -26,7 +26,7 @@ external interface K {
 }
 external interface Q
 external interface W
-external fun f(a: I, b: J, c: I, q: Q, w: W): K = definedExternally
+external fun f(a: I, b: J, c: I, q: Q, w: W): K
 external var x: I = definedExternally
 external var y: I = definedExternally
 external var z: J = definedExternally

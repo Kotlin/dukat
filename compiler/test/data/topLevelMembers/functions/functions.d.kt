@@ -15,9 +15,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withoutArguments(): Unit = definedExternally
-external fun withOneAny(a: Any): Any = definedExternally
-external fun withOneString(s: String): String = definedExternally
-external fun withOneNumber(num: Number): Number = definedExternally
-external fun withOneBoolean(bool: Boolean): Boolean = definedExternally
-external fun withManyArguments(s: String, settings: JQueryAjaxSettings): Boolean = definedExternally
+external fun withoutArguments(): Unit
+external fun withOneAny(a: Any): Any
+external fun withOneString(s: String): String
+external fun withOneNumber(num: Number): Number
+external fun withOneBoolean(bool: Boolean): Boolean
+external fun withManyArguments(s: String, settings: JQueryAjaxSettings): Boolean

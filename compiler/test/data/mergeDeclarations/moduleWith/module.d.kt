@@ -23,10 +23,10 @@ external interface IAbstractComponent : Ext.IBase, Ext.util.IPositionable, Ext.u
     var autoRender: Any
 }
 external var num: Number = definedExternally
-external fun foo(): Unit = definedExternally
+external fun foo(): Unit
 external interface IAbstractPlugin : Ext.IBase {
     var pluginId: String? get() = definedExternally; set(value) = definedExternally
     var isPlugin: Boolean? get() = definedExternally; set(value) = definedExternally
 }
 external var str: String = definedExternally
-external fun bar(): Unit = definedExternally
+external fun bar(): Unit

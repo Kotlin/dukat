@@ -185,11 +185,11 @@ private fun FunctionModel.translate(): String {
     val operator = if (operator) " operator" else ""
 
     val body = if (body.isEmpty()) {
-        "= definedExternally"
+        ""
     } else {
-        "{ ${body.joinToString { statementNode -> statementNode.translate() }} }"
+        " { ${body.joinToString { statementNode -> statementNode.translate() }} }"
     }
-    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()} ${body}"
+    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()}${body}"
 }
 
 private fun MethodModel.translate(): List<String> {

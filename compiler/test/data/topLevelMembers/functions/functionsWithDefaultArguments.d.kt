@@ -15,6 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withOneAny(a: Any = definedExternally /* 0 */): Any = definedExternally
-external fun withOneString(s: String = definedExternally /* "foobar" */): String = definedExternally
-external fun withOneStringAndOptional(s: String = definedExternally /* "something" */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean = definedExternally
+external fun withOneAny(a: Any = definedExternally /* 0 */): Any
+external fun withOneString(s: String = definedExternally /* "foobar" */): String
+external fun withOneStringAndOptional(s: String = definedExternally /* "something" */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean

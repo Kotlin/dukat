@@ -19,6 +19,6 @@ external interface Coordinates {
     var longitude: Number
     var latitude: Number
 }
-external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` */, b: Coordinates /* Coordinates & `T$0` */): dynamic /* Coordinates | Coordinates */ = definedExternally
+external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` */, b: Coordinates /* Coordinates & `T$0` */): dynamic /* Coordinates | Coordinates */
 external open class WithTrickyConstuctor(scales: Coordinates /* Coordinates & `T$0` */)
 

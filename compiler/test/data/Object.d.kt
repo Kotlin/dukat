@@ -16,4 +16,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var a: Any = definedExternally
-external fun foo(o: Any): Any = definedExternally
+external fun foo(o: Any): Any

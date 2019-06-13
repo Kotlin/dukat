@@ -18,7 +18,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var variableFoo: Number = definedExternally
-external fun funcFoo(): Unit = definedExternally
+external fun funcFoo(): Unit
 external open class AFoo
 
 // ------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var variableFooBar: Number = definedExternally
-external fun funcFooBar(): Unit = definedExternally
+external fun funcFooBar(): Unit
 external open class AFooBar
 
 // ------------------------------------------------------------------------------------------
@@ -66,8 +66,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var variableFooBarBaz: Number = definedExternally
-external fun funcFooBarBaz(): Unit = definedExternally
+external fun funcFooBarBaz(): Unit
 external open class AFooBarBaz
 external var anotherVariableFooBarBaz: Number = definedExternally
-external fun anotherFuncFooBarBaz(): Unit = definedExternally
+external fun anotherFuncFooBarBaz(): Unit
 external open class AnotherAFooBarBaz

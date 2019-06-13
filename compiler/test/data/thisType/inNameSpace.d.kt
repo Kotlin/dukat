@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external fun app(): app.EventEmitter = definedExternally
+external fun app(): app.EventEmitter
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("<RESOLVED_MODULE_NAME>")

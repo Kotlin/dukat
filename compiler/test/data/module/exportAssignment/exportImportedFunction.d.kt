@@ -17,4 +17,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("c")
-external fun foo(): String = definedExternally
+external fun foo(): String

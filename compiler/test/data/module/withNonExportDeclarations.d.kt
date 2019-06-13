@@ -24,7 +24,7 @@ external open class B {
     open fun boo(): Unit = definedExternally
 }
 external var c: Number = definedExternally
-external fun d(a: Boolean, b: Any, c: SomeType): Unit = definedExternally
+external fun d(a: Boolean, b: Any, c: SomeType): Unit
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo.Bar")
@@ -53,4 +53,4 @@ external open class B {
     open fun boo(): Unit = definedExternally
 }
 external var c: Number = definedExternally
-external fun d(a: Boolean, b: Any, c: SomeType): Unit = definedExternally
+external fun d(a: Boolean, b: Any, c: SomeType): Unit

@@ -15,10 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun <T> withoutArgumentsReturnsT(): T = definedExternally
-external fun <T> withOneT(a: T): Any = definedExternally
-external fun <T> returnsT(s: String): T = definedExternally
-external fun <A, B> withManyArguments(a: A, b: B): Boolean = definedExternally
+external fun <T> withoutArgumentsReturnsT(): T
+external fun <T> withOneT(a: T): Any
+external fun <T> returnsT(s: String): T
+external fun <A, B> withManyArguments(a: A, b: B): Boolean
 external var arrayOfAny: Array<Any> = definedExternally
 external var arrayOfArray: Array<Array<String>> = definedExternally
 external var arrayOfList: Array<List<String>> = definedExternally

@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withOneAny(a: Any? = definedExternally /* null */): Any = definedExternally
-external fun withOneString(s: String? = definedExternally /* null */): String = definedExternally
-external fun withManyArguments(s: String? = definedExternally /* null */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean = definedExternally
-external fun withOptionalQualified(opts: ping.Options? = definedExternally /* null */): Unit = definedExternally
+external fun withOneAny(a: Any? = definedExternally /* null */): Any
+external fun withOneString(s: String? = definedExternally /* null */): String
+external fun withManyArguments(s: String? = definedExternally /* null */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean
+external fun withOptionalQualified(opts: ping.Options? = definedExternally /* null */): Unit

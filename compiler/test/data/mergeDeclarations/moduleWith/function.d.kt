@@ -41,7 +41,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("fibers")
-external fun Fiber(fn: Function<*>): Fiber_ = definedExternally
+external fun Fiber(fn: Function<*>): Fiber_
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("fibers")
@@ -64,4 +64,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var current: Fiber = definedExternally
-external fun yield(value: Any? = definedExternally /* null */): Any = definedExternally
+external fun yield(value: Any? = definedExternally /* null */): Any

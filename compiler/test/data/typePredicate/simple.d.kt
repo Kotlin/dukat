@@ -15,4 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun <P> isValidElement(`object`: Any): Boolean = definedExternally
+external fun <P> isValidElement(`object`: Any): Boolean
