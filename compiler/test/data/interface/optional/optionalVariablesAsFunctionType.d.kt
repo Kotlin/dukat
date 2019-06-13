@@ -16,5 +16,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Foo {
-    var bar: ((b: Boolean, baz: Any) -> Boolean)? get() = definedExternally; set(value) = definedExternally
+    var bar: ((b: Boolean, baz: Any) -> Boolean)?
 }

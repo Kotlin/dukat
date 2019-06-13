@@ -20,8 +20,8 @@ external interface BrowserifyObject : NodeJS.EventEmitter {
     fun require(file: String): BrowserifyObject
 }
 external interface Options {
-    var entries: Array<String>? get() = definedExternally; set(value) = definedExternally
-    var noParse: Array<String>? get() = definedExternally; set(value) = definedExternally
+    var entries: Array<String>?
+    var noParse: Array<String>?
 }
 
 // ------------------------------------------------------------------------------------------

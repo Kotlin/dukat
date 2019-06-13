@@ -17,12 +17,12 @@ import org.w3c.xhr.*
 
 external interface `T$0` {
     fun bar(a: Any): Number
-    var baz: Any? get() = definedExternally; set(value) = definedExternally
-    var boo: Any? get() = definedExternally; set(value) = definedExternally
+    var baz: Any?
+    var boo: Any?
     var show: (overrideChecks: Boolean) -> Unit
 }
 external interface `T$1` {
-    var value: Any? get() = definedExternally; set(value) = definedExternally
+    var value: Any?
     var done: Boolean
 }
 external interface `T$2` {
