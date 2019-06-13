@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("lodash")
-external val `_`: `_`.LoDashStatic = definedExternally
+external val `_`: `_`.LoDashStatic
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("_")

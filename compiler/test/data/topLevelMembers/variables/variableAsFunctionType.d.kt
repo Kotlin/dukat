@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var withoutArguments: () -> Unit = definedExternally
-external var withOneArgument: (withOutType: Any) -> String = definedExternally
-external var withManyArguments: (num: Number, s: String, a: Any) -> Boolean = definedExternally
-external var withOptionalArguments: (num: Number? /*= null*/, s: String? /*= null*/) -> Boolean = definedExternally
+external var withoutArguments: () -> Unit
+external var withOneArgument: (withOutType: Any) -> String
+external var withManyArguments: (num: Number, s: String, a: Any) -> Boolean
+external var withOptionalArguments: (num: Number? /*= null*/, s: String? /*= null*/) -> Boolean

@@ -15,8 +15,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var foo: String? = definedExternally
-external var bar: String? = definedExternally
+external var foo: String?
+external var bar: String?
 external fun bar(a: String?): Foo?
 external fun baz(a: Foo?, b: Number? = definedExternally /* null */): Any?
 external interface `T$0` {

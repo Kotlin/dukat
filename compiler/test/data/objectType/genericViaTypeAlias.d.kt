@@ -18,4 +18,4 @@ import org.w3c.xhr.*
 external interface A<T> {
     var x: T
 }
-external var foo: A<String> = definedExternally
+external var foo: A<String>

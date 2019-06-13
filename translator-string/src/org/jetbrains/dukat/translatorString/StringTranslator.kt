@@ -225,14 +225,14 @@ private fun TypeAliasModel.translate(): String {
 private fun VariableModel.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
     val modifier = if (inline) "inline" else "external"
-    val getter = "get() = ${get?.translate()};"
-    val setter = "set(value) { ${set?.translate()} }"
 
     val body = if (initializer != null) {
-        "= ${initializer?.translate()}"
-    } else {
-        "${getter} ${setter}"
-    }
+        " = ${initializer?.translate()}"
+    } else if ((get != null) && (set != null)) {
+        val getter = "get() = ${get?.translate()};"
+        val setter = "set(value) { ${set?.translate()} }"
+        " ${getter} ${setter}"
+    } else ""
 
     val typeParams = if (typeParameters.isEmpty()) {
         ""
@@ -240,7 +240,7 @@ private fun VariableModel.translate(): String {
         " ${translateTypeParameters(typeParameters)}"
     }
 
-    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${name.translate()}: ${type.translate()}${type.translateMeta()} ${body}"
+    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${name.translate()}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumNode.translate(): String {

@@ -15,9 +15,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var varWithoutTypeAnnotation: Any = definedExternally
-external var varAsAny: Any = definedExternally
-external var varAsNumber: Number = definedExternally
-external var varAsBoolean: Boolean = definedExternally
-external var varAsString: String = definedExternally
-external var varAsFoo: Foo = definedExternally
+external var varWithoutTypeAnnotation: Any
+external var varAsAny: Any
+external var varAsNumber: Number
+external var varAsBoolean: Boolean
+external var varAsString: String
+external var varAsFoo: Foo

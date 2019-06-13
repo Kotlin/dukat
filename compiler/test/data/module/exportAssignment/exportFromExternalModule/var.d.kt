@@ -42,4 +42,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("mixto")
-external val mixto: Mixto.IMixinStatic = definedExternally
+external val mixto: Mixto.IMixinStatic

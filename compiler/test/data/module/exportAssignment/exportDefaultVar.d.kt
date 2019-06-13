@@ -19,4 +19,4 @@ import org.w3c.xhr.*
 
 external fun baz(): Unit
 @JsName("default")
-external var bar: String = definedExternally
+external var bar: String

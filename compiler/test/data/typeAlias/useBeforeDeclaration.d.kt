@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface List<T>
-external var listOfString: Values<String> = definedExternally
+external var listOfString: Values<String>
 external fun listOfNumberFunction(a: Values<Number>): Unit
 typealias Values<V> = List<V>
 
@@ -40,8 +40,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var listOfString: Values<String> = definedExternally
+external var listOfString: Values<String>
 external fun listOfNumberFunction(a: Values<Number>): Unit
-external var myVar: Value = definedExternally
+external var myVar: Value
 external fun myFunction(a: Value): Unit
 typealias Value = String

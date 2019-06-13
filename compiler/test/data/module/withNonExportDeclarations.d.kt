@@ -23,7 +23,7 @@ external interface A {
 external open class B {
     open fun boo(): Unit = definedExternally
 }
-external var c: Number = definedExternally
+external var c: Number
 external fun d(a: Boolean, b: Any, c: SomeType): Unit
 
 // ------------------------------------------------------------------------------------------
@@ -52,5 +52,5 @@ external interface A {
 external open class B {
     open fun boo(): Unit = definedExternally
 }
-external var c: Number = definedExternally
+external var c: Number
 external fun d(a: Boolean, b: Any, c: SomeType): Unit

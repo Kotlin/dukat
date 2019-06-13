@@ -45,4 +45,4 @@ import org.w3c.xhr.*
 external open class B {
     open fun boo(): Foo.A = definedExternally
 }
-external var c: Number = definedExternally
+external var c: Number

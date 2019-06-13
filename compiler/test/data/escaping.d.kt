@@ -15,8 +15,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var `val`: Any = definedExternally
-external var `$foo`: Boolean = definedExternally
+external var `val`: Any
+external var `$foo`: Boolean
 external fun `bar$`(`ba$z`: Number): Unit
 external fun `fun`(): Unit
 external interface This {
@@ -38,7 +38,7 @@ external open class `is`<`interface`> {
     open fun `package`(a: Any): Boolean = definedExternally
 }
 external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>
-external var `_`: `__`.`___` = definedExternally
+external var `_`: `__`.`___`
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("when")
@@ -60,7 +60,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var `$`: Boolean = definedExternally
+external var `$`: Boolean
 external fun `package`(`as`: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
 external interface Promise<T>
 

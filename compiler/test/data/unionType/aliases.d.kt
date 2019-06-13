@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo
-external var fooKey: dynamic /* String | Foo | Number */ = definedExternally
+external var fooKey: dynamic /* String | Foo | Number */
 external fun barKey(a: String): Unit
 external fun barKey(a: Foo): Unit
 external fun barKey(a: Number): Unit

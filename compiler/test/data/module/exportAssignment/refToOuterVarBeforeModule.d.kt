@@ -22,4 +22,4 @@ external interface SinonStatic {
     fun restore(`object`: Any)
 }
 @JsModule("sinon")
-external val sinon: SinonStatic = definedExternally
+external val sinon: SinonStatic

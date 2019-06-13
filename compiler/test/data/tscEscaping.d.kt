@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var __foo: Any = definedExternally
+external var __foo: Any
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __A {
     open var __foo: Number = definedExternally
@@ -51,7 +51,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var __foo: Any = definedExternally
+external var __foo: Any
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var __foo: Number = definedExternally
+external var __foo: Number
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
@@ -97,6 +97,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var __foo: Number = definedExternally
+external var __foo: Number
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 external open class __C

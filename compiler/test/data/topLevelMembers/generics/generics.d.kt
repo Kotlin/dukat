@@ -19,9 +19,9 @@ external fun <T> withoutArgumentsReturnsT(): T
 external fun <T> withOneT(a: T): Any
 external fun <T> returnsT(s: String): T
 external fun <A, B> withManyArguments(a: A, b: B): Boolean
-external var arrayOfAny: Array<Any> = definedExternally
-external var arrayOfArray: Array<Array<String>> = definedExternally
-external var arrayOfList: Array<List<String>> = definedExternally
-external var arrayOfListBySquare: Array<List<Boolean>> = definedExternally
-external var listOfArray: List<Array<Any>> = definedExternally
-external var listOfArrayBySquare: List<Array<Number>> = definedExternally
+external var arrayOfAny: Array<Any>
+external var arrayOfArray: Array<Array<String>>
+external var arrayOfList: Array<List<String>>
+external var arrayOfListBySquare: Array<List<Boolean>>
+external var listOfArray: List<Array<Any>>
+external var listOfArrayBySquare: List<Array<Number>>

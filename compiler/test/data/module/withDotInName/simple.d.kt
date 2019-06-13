@@ -17,6 +17,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var variable: Number = definedExternally
+external var variable: Number
 external fun func(): Unit
 external open class A

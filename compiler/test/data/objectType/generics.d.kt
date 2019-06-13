@@ -44,8 +44,8 @@ external interface `T$4`<S> {
     fun bar(a: Any): S
 }
 external fun <S> returnsGenericObjectType(): `T$4`<S>
-external var Tokens: Array<Any> = definedExternally
+external var Tokens: Array<Any>
 external interface `T$5` {
     var ping: () -> Boolean
 }
-external var PingableTokens: Array<`T$5`> = definedExternally
+external var PingableTokens: Array<`T$5`>

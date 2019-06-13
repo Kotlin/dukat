@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var foo: Json = definedExternally
+external var foo: Json
 external interface `T$0` {
     @nativeGetter
     operator fun get(s: Number): Any?
@@ -47,7 +47,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var bar: Json = definedExternally
+external var bar: Json
 external fun withObjectTypeParam(bar: Json): Unit
 external open class Foo {
     open var prop: Json = definedExternally

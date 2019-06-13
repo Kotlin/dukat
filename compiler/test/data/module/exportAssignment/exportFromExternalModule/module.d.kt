@@ -18,4 +18,4 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun method(s: Any): String
-external var variable: Any = definedExternally
+external var variable: Any

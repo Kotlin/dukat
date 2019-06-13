@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 @JsModule("lazy.js")
-external val Lazy: LazyJS.LazyStatic = definedExternally
+external val Lazy: LazyJS.LazyStatic
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("LazyJS")
@@ -41,4 +41,4 @@ import org.w3c.xhr.*
 external interface LazyStatic {
     fun foo(a: Number)
 }
-external var a: Any = definedExternally
+external var a: Any

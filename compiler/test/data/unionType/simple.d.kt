@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var foo: dynamic /* String | Number */ = definedExternally
+external var foo: dynamic /* String | Number */
 external fun bar(a: String): Unit
 external fun bar(a: Number): Unit
 external fun bar(a: Foo): Unit

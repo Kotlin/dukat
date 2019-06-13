@@ -15,11 +15,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var varAsArrayOfAny: Array<Any> = definedExternally
-external var varAsArrayOfNumber: Array<Number> = definedExternally
-external var varAsGenericArrayOfNumber: Array<Number> = definedExternally
-external var varAsArrayOfArrayOfNumber: Array<Array<Number>> = definedExternally
-external var varAsArrayOfBoolean: Array<Boolean> = definedExternally
-external var varAsArrayOfString: Array<String> = definedExternally
-external var varAsArrayOfFoo: Array<Foo> = definedExternally
-external var varAsGenericArrayOfFoo: Array<Foo> = definedExternally
+external var varAsArrayOfAny: Array<Any>
+external var varAsArrayOfNumber: Array<Number>
+external var varAsGenericArrayOfNumber: Array<Number>
+external var varAsArrayOfArrayOfNumber: Array<Array<Number>>
+external var varAsArrayOfBoolean: Array<Boolean>
+external var varAsArrayOfString: Array<String>
+external var varAsArrayOfFoo: Array<Foo>
+external var varAsGenericArrayOfFoo: Array<Foo>
