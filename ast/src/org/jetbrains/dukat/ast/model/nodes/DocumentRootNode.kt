@@ -13,6 +13,8 @@ data class DocumentRootNode(
         val imports: Map<String, ImportNode>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,
 
+        val external: Boolean,
+
         var jsModule: NameEntity?,
         var jsQualifier: NameEntity?,
 

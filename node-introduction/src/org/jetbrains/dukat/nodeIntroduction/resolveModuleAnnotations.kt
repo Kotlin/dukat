@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
@@ -73,8 +74,7 @@ private class ExportAssignmentLowering(
     }
 
     private fun DocumentRootNode.resolveModule(): NameEntity? {
-        val moduleNameIsStringLiteral = packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
-        return if (moduleNameIsStringLiteral) {
+        return if (external) {
             packageName.process { unquote(it) }
         } else {
             moduleNameResolver.resolveName(fileName)
@@ -88,9 +88,7 @@ private class ExportAssignmentLowering(
             }
         } else {
             if (docRoot.uid != root.uid) {
-                val moduleNameIsStringLiteral = docRoot.packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
-
-                if (moduleNameIsStringLiteral) {
+                if (docRoot.external) {
                     docRoot.jsModule = docRoot.packageName.process { unquote(it) }
                 } else {
                     docRoot.jsQualifier = docRoot.qualifiedPackageName.process { unquote(it) }
@@ -140,7 +138,7 @@ private class ExportAssignmentLowering(
                         exportOwner.resolveModule()?.let {
                             declaration.exportQualifier = JsModule(it)
 
-                            if (exportOwner.uid == docRoot.uid) {
+                            if (exportOwner.external && (exportOwner.uid == docRoot.uid)) {
                                 declaration.name = exportOwner.qualifiedPackageName
                             }
 

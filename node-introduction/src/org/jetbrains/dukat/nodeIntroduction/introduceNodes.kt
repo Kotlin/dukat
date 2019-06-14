@@ -29,7 +29,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
-import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
@@ -671,6 +670,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner))
         }
 
+        val moduleNameIsStringLiteral = documentRoot.packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
         val docRoot = DocumentRootNode(
                 fileName = fileName,
                 packageName = documentRoot.packageName,
@@ -678,6 +678,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 declarations = nonImports,
                 imports = imports,
                 definitionsInfo = documentRoot.definitionsInfo,
+                external = moduleNameIsStringLiteral,
                 jsModule = null,
                 jsQualifier = null,
                 owner = null,
