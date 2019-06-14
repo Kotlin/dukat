@@ -4,10 +4,6 @@ import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.ModuleTranslationUnit
-import org.jetbrains.kotlin.cli.common.ExitCode
-import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
-import org.jetbrains.kotlin.cli.js.K2JSCompiler
-import org.jetbrains.kotlin.config.Services
 import translateModule
 import java.io.File
 import kotlin.test.assertEquals
@@ -20,23 +16,6 @@ abstract class OutputTests {
         if (System.getProperty("dukat.test.failure.always") == "true") {
             setPanicMode(PanicMode.ALWAYS_FAIL)
         }
-    }
-
-    private fun compile(sourcePath: String, targetPath: String): ExitCode {
-        val options =
-                K2JSCompilerArguments().apply {
-                    outputFile = targetPath
-                    metaInfo = false
-                    sourceMap = false
-                    kotlinHome = "./build"
-                }
-
-        options.freeArgs = listOf(sourcePath)
-        return K2JSCompiler().exec(
-                CompileMessageCollector(),
-                Services.EMPTY,
-                options
-        )
     }
 
     private fun concatenate(translated: List<ModuleTranslationUnit>): String {
@@ -88,28 +67,6 @@ abstract class OutputTests {
             outputFile.writeText(translated)
         }
     }
-
-    protected fun assertContentCompiles(
-            descriptor: String,
-            tsPath: String,
-            output: (String, InputTranslator) -> String? = ::output
-    ) {
-
-        val targetShortName = "${descriptor}.d.kt"
-
-        val translated = output(tsPath, getTranslator())
-
-        val outputDirectory = File("./build/tests/out")
-        translated?.let {
-            val outputFile = outputDirectory.resolve(targetShortName)
-            outputFile.parentFile.mkdirs()
-            outputFile.writeText(translated)
-
-            val sourcePath = outputFile.absolutePath
-            assertEquals(ExitCode.OK, compile(sourcePath, sourcePath.replace(".kt", ".js")), translated)
-        }
-    }
-
 
     companion object {
         val TS_POSTFIX = ".d.ts"

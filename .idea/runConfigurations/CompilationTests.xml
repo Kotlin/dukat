@@ -11,7 +11,7 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.CompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.failure.always=true -Ddukat.test.jsbackend.graal=true -Ddukat.test.extended=true -Ddukat.test.resources.definitelyTyped=$USER_HOME$/.gradle/definitelyTyped/DefinitelyTyped-10aca630788ef193f994ac31de63ea9cf44630a3/" />
+    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.failure.always=true -Ddukat.test.jsbackend.graal=true -Ddukat.test.extended=true -Ddukat.test.resources.definitelyTyped=$USER_HOME$/.gradle/definitelyTyped/DefinitelyTyped-10aca630788ef193f994ac31de63ea9cf44630a3/types" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">

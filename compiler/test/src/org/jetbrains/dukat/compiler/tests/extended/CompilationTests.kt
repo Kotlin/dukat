@@ -1,15 +1,41 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
+import org.jetbrains.dukat.ast.model.nodes.processing.process
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
+import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.kotlin.cli.common.ExitCode
+import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
+import org.jetbrains.kotlin.cli.js.K2JSCompiler
+import org.jetbrains.kotlin.config.Services
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import translateModule
+import java.io.File
+import kotlin.test.assertEquals
 
+private fun unescape(name: String): String {
+    return name.replace("(?:^`)|(?:`$)".toRegex(), "")
+}
+
+
+private fun NameEntity.fileNameFragment(): String {
+    val unprefixedName = shiftLeft()
+
+    return if (unprefixedName == null) {
+        ""
+    } else {
+        unprefixedName.process(::unescape).translate() + "."
+    }
+}
 
 class CompilationTests : OutputTests() {
 
@@ -23,12 +49,64 @@ class CompilationTests : OutputTests() {
         assertContentCompiles(name, tsPath)
     }
 
+
+    private fun compile(sourcePath: String, targetPath: String): ExitCode {
+        val options =
+                K2JSCompilerArguments().apply {
+                    outputFile = targetPath
+                    metaInfo = false
+                    sourceMap = false
+                    kotlinHome = "./build"
+                }
+
+        options.freeArgs = listOf(sourcePath)
+        return K2JSCompiler().exec(
+                CompileMessageCollector(),
+                Services.EMPTY,
+                options
+        )
+    }
+
+
+    private fun assertContentCompiles(
+            descriptor: String,
+            tsPath: String
+    ) {
+        val translated = translateModule(tsPath, translator)
+        val outputDirectory = File("./build/tests/out")
+        outputDirectory.mkdirs()
+
+        val sourceFile = File(tsPath)
+        val targetDir =
+                File(outputDirectory, sourceFile.parentFile.absolutePath.removePrefix(pathToTypes))
+
+        val targetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
+
+        targetDir.mkdirs()
+        translated.forEach { (fileName, packageName, content) ->
+
+            val targetFileName = File(fileName).name.removeSuffix(".d.ts")
+            val targetName = "${targetFileName}.${packageName.fileNameFragment()}kt"
+            val resolvedTarget = targetDir.resolve(targetName)
+
+            resolvedTarget.writeText(content)
+        }
+
+        val targetPath = targetDir.resolve(targetName).absolutePath
+        assertEquals(ExitCode.OK,
+                compile(
+                        targetPath,
+                        targetPath.replace(".kt", ".js")
+                ))
+    }
+
     companion object {
         val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, ConstNameResolver())
+        val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-            return fileSetWithDescriptors(System.getProperty("dukat.test.resources.definitelyTyped"))
+            return fileSetWithDescriptors(pathToTypes)
         }
 
     }
