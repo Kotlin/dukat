@@ -22,8 +22,8 @@ external interface CustomOptions {
     operator fun get(propName: String): Any?
     @nativeSetter
     operator fun set(propName: String, value: Any)
-    var basedir: String?
+    var basedir: String? get() = definedExternally; set(value) = definedExternally
 }
 external interface Options : CustomOptions {
-    var insertGlobalVars: insertGlobals.VarsOption?
+    var insertGlobalVars: insertGlobals.VarsOption? get() = definedExternally; set(value) = definedExternally
 }

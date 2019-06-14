@@ -26,6 +26,6 @@ external interface `T$0` {
 external interface ClientConfig {
     var mode: dynamic /* 'live' | 'rtc' */
     var codec: dynamic /* 'vp8' | 'h264' */
-    var proxyServer: String?
-    var turnServer: `T$0`?
+    var proxyServer: String? get() = definedExternally; set(value) = definedExternally
+    var turnServer: `T$0`? get() = definedExternally; set(value) = definedExternally
 }

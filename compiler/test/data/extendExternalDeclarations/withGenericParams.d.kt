@@ -47,7 +47,7 @@ external interface ArrayType<T> {
     @nativeSetter
     operator fun set(prop: String, value: Number)
     var someField: String
-    var optionalField: T?
+    var optionalField: T? get() = definedExternally; set(value) = definedExternally
     @nativeInvoke
     operator fun invoke(resourceId: String, hash: Any? = definedExternally /* null */, callback: Function<*>? = definedExternally /* null */)
 }

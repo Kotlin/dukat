@@ -279,8 +279,11 @@ private fun PropertyModel.translateSignature(): String {
     }
     val metaClause = type.translateMeta()
     var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${type.translate()}${metaClause}"
-    if (getter && !setter) {
+    if (getter) {
         res += " get() = definedExternally"
+    }
+    if (setter) {
+        res += "; set(value) = definedExternally"
     }
     return res
 }

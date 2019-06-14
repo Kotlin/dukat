@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface `T$0` {
-    var target: Any?
+    var target: Any? get() = definedExternally; set(value) = definedExternally
 }
 external open class SomeClass {
     open fun <T : `T$0`> ping(source: T): Unit
