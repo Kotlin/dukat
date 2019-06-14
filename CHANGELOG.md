@@ -1,5 +1,9 @@
 # Changelog
 
+#### [0.0.9] - 14'June, 2019
+ - [#55 - Don't rename exported variables in external modules](https://github.com/Kotlin/dukat/issues/55)
+ - [#31 - Remove redundant "definedExternally"](https://github.com/Kotlin/dukat/issues/31) 
+
 #### [0.0.8] - 12'June, 2019
  - Fixing behaviour for resolving JsModules and JsQualifier (see [#45 - Export with assignment should produce JSModule annotation](https://github.com/Kotlin/dukat/issues/45))
  - [cli] -m option added so one can resolve JsModule names manually for files that are not in node_modules 
