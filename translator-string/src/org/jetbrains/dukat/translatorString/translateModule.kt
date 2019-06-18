@@ -2,8 +2,13 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translatorString.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
+import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
+import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.StringTranslator
+import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import java.io.File
 
 private typealias SourceUnit = Pair<String, NameEntity>
 
@@ -16,7 +21,15 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
     }
 }
 
-fun translateModule(fileName: String, translator: InputTranslator): List<ModuleTranslationUnit> {
+fun translateModule(fileName: String, translator: InputTranslator): List<TranslationUnitResult> {
+    if (!fileName.endsWith(TS_DECLARATION_EXTENSION)) {
+        return listOf(TranslationErrorInvalidFile(fileName))
+    }
+
+    if (!File(fileName).exists()) {
+        return listOf(TranslationErrorFileNotFound(fileName))
+    }
+
     val sourceSet =
             translator.translate(fileName)
 

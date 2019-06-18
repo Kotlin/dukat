@@ -13,8 +13,14 @@ import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
+import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
+import org.jetbrains.dukat.translator.TranslationUnitResult
+import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import translateModule
 import java.io.File
 
@@ -35,11 +41,33 @@ private fun NameEntity.fileNameFragment(): String {
 @Serializable
 private data class Report(val outputs: List<String>)
 
+
+private fun ModuleTranslationUnit.resolveAsTargetName(): String?  {
+    val sourceFile = File(fileName)
+    val sourceFileName = sourceFile.name
+
+    val ktFileNamePrefix =
+            if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
+                sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+            } else {
+                printError("source file should have .ts extension")
+                return null
+            }
+
+    return "${ktFileNamePrefix}.${packageName.fileNameFragment()}kt"
+
+}
+
+private fun TranslationUnitResult.resolveAsError(source: String): String {
+    return when(this) {
+        is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.ts extension can be processed"
+        is TranslationErrorFileNotFound -> "file not found: ${fileName}"
+        else -> "failed to translate ${source} for unknown reason"
+    }
+}
+
 private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator, pathToReport: String?) {
     val sourceFile = File(filename)
-
-    val D_TS_SUFFIX = ".d.ts"
-    val TS_SUFFIX = ".ts"
 
     val translatedUnits = translateModule(sourceFile.absolutePath, translator)
 
@@ -52,31 +80,25 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
 
     val output = mutableListOf<String>()
 
-    translatedUnits.forEach { (fileName, packageName, content) ->
-        val sourceFile = File(fileName)
-        val sourceFileName = sourceFile.name
+    translatedUnits.forEach { translationUnitResult ->
 
-        val ktFileNamePrefix =
-                if (sourceFileName.endsWith(D_TS_SUFFIX)) {
-                    sourceFileName.removeSuffix(D_TS_SUFFIX)
-                } else if (sourceFileName.endsWith(TS_SUFFIX)) {
-                    printWarning("well-formed declaration file supposed to end with .d.ts")
-                    sourceFileName.removeSuffix(TS_SUFFIX)
-                } else {
-                    printError("source file should have .ts extension")
-                    return
+        if (translationUnitResult is ModuleTranslationUnit) {
+            val targetName = translationUnitResult.resolveAsTargetName()
+
+            if (targetName != null) {
+                val resolvedTarget = dirFile.resolve(targetName)
+
+                println(resolvedTarget.name)
+
+                if (buildReport) {
+                    output.add(resolvedTarget.name)
                 }
 
-        val targetName = "${ktFileNamePrefix}.${packageName.fileNameFragment()}kt"
-        val resolvedTarget = dirFile.resolve(targetName)
-
-        println(resolvedTarget.name)
-
-        if (buildReport) {
-            output.add(resolvedTarget.name)
+                resolvedTarget.writeText(translationUnitResult.content)
+            }
+        } else {
+            print("ERROR: ${translationUnitResult.resolveAsError(filename)}")
         }
-
-        resolvedTarget.writeText(content)
     }
 
     if (buildReport) {

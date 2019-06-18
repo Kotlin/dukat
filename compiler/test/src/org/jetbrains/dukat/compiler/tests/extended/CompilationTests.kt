@@ -10,6 +10,7 @@ import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -83,7 +84,16 @@ class CompilationTests : OutputTests() {
         val targetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
 
         targetDir.mkdirs()
-        translated.forEach { (fileName, packageName, content) ->
+
+        val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
+
+        if (failedTranslations.isNotEmpty()) {
+            throw Exception("translation failed")
+        }
+
+        val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
+
+        units.forEach { (fileName, packageName, content) ->
 
             val targetFileName = File(fileName).name.removeSuffix(".d.ts")
             val targetName = "${targetFileName}.${packageName.fileNameFragment()}kt"

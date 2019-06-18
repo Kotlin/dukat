@@ -3,7 +3,8 @@ package org.jetbrains.dukat.compiler.tests
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translatorString.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.TranslationUnitResult
 import translateModule
 import java.io.File
 import kotlin.test.assertEquals
@@ -18,9 +19,16 @@ abstract class OutputTests {
         }
     }
 
-    private fun concatenate(translated: List<ModuleTranslationUnit>): String {
+    private fun concatenate(translated: List<TranslationUnitResult>): String {
 
-        return if (translated.isEmpty()) {
+        val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
+
+        if (failedTranslations.isNotEmpty()) {
+            throw Exception("translation failed")
+        }
+
+        val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
+        return if (units.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
             val skipDeclarations = setOf(
@@ -31,7 +39,7 @@ abstract class OutputTests {
                     "Q.d.ts",
                     "_skippedReferenced.d.ts"
             )
-            translated.filter { (fileName, _, _) ->
+            units.filter { (fileName, _, _) ->
                 !skipDeclarations.contains(File(fileName).name)
             }.joinToString("""
 
