@@ -23,21 +23,6 @@ import translateModule
 import java.io.File
 import kotlin.test.assertEquals
 
-private fun unescape(name: String): String {
-    return name.replace("(?:^`)|(?:`$)".toRegex(), "")
-}
-
-
-private fun NameEntity.fileNameFragment(): String {
-    val unprefixedName = shiftLeft()
-
-    return if (unprefixedName == null) {
-        ""
-    } else {
-        unprefixedName.process(::unescape).translate() + "."
-    }
-}
-
 class CompilationTests : OutputTests() {
 
     override fun getTranslator(): InputTranslator = translator
@@ -93,10 +78,8 @@ class CompilationTests : OutputTests() {
 
         val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
 
-        units.forEach { (fileName, packageName, content) ->
-
-            val targetFileName = File(fileName).name.removeSuffix(".d.ts")
-            val targetName = "${targetFileName}.${packageName.fileNameFragment()}kt"
+        units.forEach { (name, fileName, packageName, content) ->
+            val targetName = "${name}.kt"
             val resolvedTarget = targetDir.resolve(targetName)
 
             resolvedTarget.writeText(content)

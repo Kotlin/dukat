@@ -27,11 +27,13 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -326,69 +328,74 @@ private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationNode> {
     }
 }
 
-fun DocumentRootNode.introduceModels(): ModuleModel {
-    val declarations = declarations.mapNotNull { declaration ->
-        when (declaration) {
-            is DocumentRootNode -> declaration.introduceModels()
-            is ClassNode -> declaration.convertToClassModel()
-            is InterfaceNode -> declaration.convertToInterfaceModel()
-            is FunctionNode -> FunctionModel(
-                    name = declaration.name,
-                    parameters = declaration.parameters.map { param -> param.process() },
-                    type = declaration.type.process(),
+private fun TopLevelEntity.convertToModel(): TopLevelNode? {
+    return when (this) {
+        is ClassNode -> convertToClassModel()
+        is InterfaceNode -> convertToInterfaceModel()
+        is FunctionNode -> FunctionModel(
+                name = name,
+                parameters = parameters.map { param -> param.process() },
+                type = type.process(),
 
-                    typeParameters = declaration.typeParameters.map { typeParam ->
-                        TypeParameterModel(
-                                name = typeParam.value,
-                                constraints = typeParam.params.map { param -> param.process() }
-                        )
-                    },
-                    generatedReferenceNodes = declaration.generatedReferenceNodes,
-                    annotations = declaration.exportQualifier.toAnnotation(),
-                    export = declaration.export,
-                    inline = declaration.inline,
-                    operator = declaration.operator,
-                    body = declaration.body
-            )
-            is EnumNode -> declaration
-            is VariableNode -> VariableModel(
-                    name = declaration.name,
-                    type = declaration.type.process(),
-                    annotations = declaration.exportQualifier.toAnnotation(),
-                    immutable = declaration.immutable,
-                    inline = declaration.inline,
-                    initializer = declaration.initializer,
-                    get = declaration.get,
-                    set = declaration.set,
-                    typeParameters = declaration.typeParameters.map { typeParam ->
-                        TypeParameterModel(
-                                name = typeParam.value,
-                                constraints = typeParam.params.map { param -> param.process() }
-                        )
-                    }
-            )
-            is ObjectNode -> ObjectModel(
-                    name = declaration.name,
-                    members = declaration.members.map { member -> member.process() },
-                    parentEntities = declaration.parentEntities.map { parentEntity -> parentEntity.convertToModel() }
-            )
-            is TypeAliasNode -> if (declaration.canBeTranslated) {
-                TypeAliasModel(
-                        name = declaration.name,
-                        typeReference = declaration.typeReference.process(),
-                        typeParameters = declaration.typeParameters.map { typeParameter -> TypeParameterModel(typeParameter, emptyList()) })
-            } else null
-            else -> {
-                println("skipping ${declaration::class.simpleName}")
-                null
-            }
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            name = typeParam.value,
+                            constraints = typeParam.params.map { param -> param.process() }
+                    )
+                },
+                generatedReferenceNodes = generatedReferenceNodes,
+                annotations = exportQualifier.toAnnotation(),
+                export = export,
+                inline = inline,
+                operator = operator,
+                body = body
+        )
+        is EnumNode -> this
+        is VariableNode -> VariableModel(
+                name = name,
+                type = type.process(),
+                annotations = exportQualifier.toAnnotation(),
+                immutable = immutable,
+                inline = inline,
+                initializer = initializer,
+                get = get,
+                set = set,
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            name = typeParam.value,
+                            constraints = typeParam.params.map { param -> param.process() }
+                    )
+                }
+        )
+        is ObjectNode -> ObjectModel(
+                name = name,
+                members = members.map { member -> member.process() },
+                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
+        )
+        is TypeAliasNode -> if (canBeTranslated) {
+            TypeAliasModel(
+                    name = name,
+                    typeReference = typeReference.process(),
+                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(typeParameter, emptyList()) })
+        } else null
+        else -> {
+            println("skipping ${this::class.simpleName}")
+            null
         }
     }
+}
 
+@Suppress("UNCHECKED_CAST")
+fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
+    val (roots, topDeclarations) = declarations.partition { it is DocumentRootNode }
+
+    val declarationsMapped = (roots as List<DocumentRootNode>).map { it.introduceModels(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        declaration.convertToModel()
+    }
 
     val declarationsFiltered = mutableListOf<TopLevelNode>()
     val submodules = mutableListOf<ModuleModel>()
-    declarations.forEach { declaration ->
+    declarationsMapped.forEach { declaration ->
         if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)
     }
 
@@ -402,7 +409,7 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
         annotations.add(AnnotationNode("file:JsQualifier", listOf(it)))
     }
 
-    return ModuleModel(
+    val module = ModuleModel(
             packageName = qualifiedPackageName,
             shortName = qualifiedPackageName.rightMost(),
             declarations = declarationsFiltered,
@@ -410,15 +417,53 @@ fun DocumentRootNode.introduceModels(): ModuleModel {
             sumbodules = submodules,
             imports = mutableListOf()
     )
+
+    val isJsModule = (jsModule != null) || (jsQualifier != null)
+
+    return if (isJsModule) {
+        val (aliases, ownDeclarations) = module.declarations.partition { it is TypeAliasModel }
+        if (aliases.isEmpty()) {
+            module
+        } else {
+
+            generated.add(SourceFileModel(
+                name = "types",
+                fileName = sourceFileName,
+                root = ModuleModel(
+                    packageName = module.packageName,
+                    shortName = module.shortName,
+                    declarations = aliases,
+                    annotations = mutableListOf(),
+                    sumbodules = mutableListOf(),
+                    imports = mutableListOf()
+                ),
+                referencedFiles = emptyList()
+            ))
+
+            module.copy(declarations = ownDeclarations)
+        }
+    } else {
+        module
+    }
 }
 
 fun SourceSetNode.introduceModels() = SourceSetModel(
-        sources = sources.map { source ->
+        sources = sources.flatMap { source ->
             val rootFile = File(source.fileName)
             val fileName = rootFile.normalize().absolutePath
-            SourceFileModel(fileName, source.root.introduceModels(), source.referencedFiles.map { referenceFile ->
-                val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
-                IdentifierEntity(absolutePath)
-            })
+
+            val generated = mutableListOf<SourceFileModel>()
+            val root = source.root.introduceModels(source.fileName, generated)
+
+            val module = SourceFileModel(
+                    name = null,
+                    fileName = fileName,
+                    root = root,
+                    referencedFiles = source.referencedFiles.map { referenceFile ->
+                        val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
+                        IdentifierEntity(absolutePath)
+                    })
+
+            generated + listOf(module)
         }
 )

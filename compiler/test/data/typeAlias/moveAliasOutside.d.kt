@@ -1,5 +1,5 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package foo
+package something
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -16,12 +16,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-typealias A = I
+typealias WithSource = String
 
 // ------------------------------------------------------------------------------------------
-@file:JsQualifier("foo")
+@file:JsModule("something")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-package foo
+package something
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -38,5 +38,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface J : A
-external interface I
+external fun ping(source: WithSource): Unit

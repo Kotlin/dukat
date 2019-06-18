@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class SourceFileModel(
+        val name: String?,
         val fileName: String,
         val root: ModuleModel,
         val referencedFiles: List<IdentifierEntity>

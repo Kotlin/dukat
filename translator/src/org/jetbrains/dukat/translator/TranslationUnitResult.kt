@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 sealed class TranslationUnitResult
 
 data class ModuleTranslationUnit(
+        val name: String,
         val fileName: String,
         val packageName: NameEntity,
         val content: String

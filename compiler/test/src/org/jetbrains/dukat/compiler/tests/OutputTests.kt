@@ -39,7 +39,7 @@ abstract class OutputTests {
                     "Q.d.ts",
                     "_skippedReferenced.d.ts"
             )
-            units.filter { (fileName, _, _) ->
+            units.filter { (name, fileName, _, _) ->
                 !skipDeclarations.contains(File(fileName).name)
             }.joinToString("""
 

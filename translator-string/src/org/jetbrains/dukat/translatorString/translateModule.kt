@@ -1,3 +1,6 @@
+import org.jetbrains.dukat.ast.model.nodes.processing.process
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
+import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
@@ -12,12 +15,47 @@ import java.io.File
 
 private typealias SourceUnit = Pair<String, NameEntity>
 
+private fun unescape(name: String): String {
+    return name.replace("(?:^`)|(?:`$)".toRegex(), "")
+}
+
+private fun NameEntity.fileNameFragment(): String? {
+    val unprefixedName = shiftLeft()
+
+    return if (unprefixedName == null) {
+        null
+    } else {
+        unprefixedName.process(::unescape).translate()
+    }
+}
+
+private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String  {
+    val sourceFile = File(fileName)
+    val sourceFileName = sourceFile.name
+    val ktFileNamePrefix =
+            if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
+                sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+            } else sourceFile.name
+
+    var res = ktFileNamePrefix
+
+    packageName.fileNameFragment()?.let { packageFragment ->
+        res += ".${packageFragment}"
+    }
+
+    name?.let {
+        res += ".${it}"
+    }
+
+    return res
+}
+
 private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
     val docRoot = sourceFile.root
     return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
         stringTranslator.process(module)
-        ModuleTranslationUnit(sourceFile.fileName, module.packageName, stringTranslator.output())
+        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.packageName), sourceFile.fileName, module.packageName, stringTranslator.output())
     }
 }
 

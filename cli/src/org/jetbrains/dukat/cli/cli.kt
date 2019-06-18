@@ -3,63 +3,28 @@ package org.jetbrains.dukat.cli
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
-import org.jetbrains.dukat.ast.model.nodes.processing.process
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import translateModule
 import java.io.File
 
-private fun unescape(name: String): String {
-    return name.replace("(?:^`)|(?:`$)".toRegex(), "")
-}
-
-private fun NameEntity.fileNameFragment(): String {
-    val unprefixedName = shiftLeft()
-
-    return if (unprefixedName == null) {
-        ""
-    } else {
-        unprefixedName.process(::unescape).translate() + "."
-    }
-}
 
 @Serializable
 private data class Report(val outputs: List<String>)
 
-
-private fun ModuleTranslationUnit.resolveAsTargetName(): String?  {
-    val sourceFile = File(fileName)
-    val sourceFileName = sourceFile.name
-
-    val ktFileNamePrefix =
-            if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
-                sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
-            } else {
-                printError("source file should have .ts extension")
-                return null
-            }
-
-    return "${ktFileNamePrefix}.${packageName.fileNameFragment()}kt"
-
-}
-
 private fun TranslationUnitResult.resolveAsError(source: String): String {
-    return when(this) {
+    return when (this) {
         is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.ts extension can be processed"
         is TranslationErrorFileNotFound -> "file not found: ${fileName}"
         else -> "failed to translate ${source} for unknown reason"
@@ -83,7 +48,7 @@ private fun compile(filename: String, outDir: String?, translator: TypescriptInp
     translatedUnits.forEach { translationUnitResult ->
 
         if (translationUnitResult is ModuleTranslationUnit) {
-            val targetName = translationUnitResult.resolveAsTargetName()
+            val targetName = "${translationUnitResult.name}.kt"
 
             if (targetName != null) {
                 val resolvedTarget = dirFile.resolve(targetName)
