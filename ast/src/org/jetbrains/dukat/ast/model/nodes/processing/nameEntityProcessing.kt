@@ -184,15 +184,3 @@ fun NameEntity.shiftLeft(): NameEntity? {
         else -> raiseConcern("unknown NameEntity") { this }
     }
 }
-
-fun QualifierEntity.debugTranslate(): String {
-    val nodeLeft = left
-    val leftTranslate = when (nodeLeft) {
-        is IdentifierEntity -> nodeLeft.value
-        is QualifierEntity -> nodeLeft.debugTranslate()
-        is GenericIdentifierNode -> nodeLeft.translate()
-        else -> raiseConcern("unknown QualifierEntity ${nodeLeft::class.simpleName}") { this.toString() }
-    }
-
-    return "${leftTranslate}.${right.value}"
-}

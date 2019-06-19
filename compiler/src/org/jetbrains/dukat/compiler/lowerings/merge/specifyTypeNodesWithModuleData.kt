@@ -2,7 +2,6 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
-import org.jetbrains.dukat.ast.model.nodes.processing.debugTranslate
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.size
@@ -106,16 +105,15 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
     override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
         val heritageClauseValue = heritageClause.value
-        val name = heritageClauseValue
 
         if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierEntity)) {
-            val name = (heritageClauseValue.value as IdentifierEntity)
+            val name = heritageClauseValue.value
             declarationResolver.resolve(name.translate(), ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
                     // TODO: use QualifierNode instead of IdentifierEntity
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
-                    return heritageClause.copy(value = TypeValueModel(IdentifierEntity(qualifiedNode.debugTranslate()), emptyList(), null))
+                    return heritageClause.copy(value = TypeValueModel(qualifiedNode, emptyList(), null))
                 }
             }
         }
