@@ -111,7 +111,6 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             declarationResolver.resolve(name.translate(), ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
-                    // TODO: use QualifierNode instead of IdentifierEntity
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
                     return heritageClause.copy(value = TypeValueModel(qualifiedNode, emptyList(), null))
                 }
