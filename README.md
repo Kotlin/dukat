@@ -46,15 +46,17 @@ where possible options include:
 
 # Recent Changes
 
+#### [0.0.10] - 19'June, 2019
+ - `<ROOT>` prefix should not end up in heritage clauses ([#56](https://github.com/Kotlin/dukat/issues/56))
+ - Type aliases are moved out from files with file-level `JsQualifier` and `JsModule` annotations ([#41](https://github.com/Kotlin/dukat/issues/41))
+ - Only files with `*.d.ts` extension are processed
+ - TypeScript dependency updated to 3.5.2  
+ - Graal-SDK updated to 19.0.0
+
 #### [0.0.9] - 14'June, 2019
  - [#55 - Don't rename exported variables in external modules](https://github.com/Kotlin/dukat/issues/55)
  - [#31 - Remove redundant "definedExternally"](https://github.com/Kotlin/dukat/issues/31)
 
-#### [0.0.8] - 12'June, 2019
- - Fixing behaviour for resolving JsModules and JsQualifier (see [#45 - Export with assignment should produce JSModule annotation](https://github.com/Kotlin/dukat/issues/45))
- - [cli] -m option added so one can resolve JsModule names manually for files that are not in node_modules 
- - [dev] Make it possible to save optionally minimal report on dukat run ([#35 - Generate JSON report based on run results](https://github.com/Kotlin/dukat/issues/35))
-  
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 
 # Useful links
