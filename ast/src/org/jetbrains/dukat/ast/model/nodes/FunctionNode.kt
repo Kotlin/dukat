@@ -19,7 +19,6 @@ data class FunctionNode(
         val inline: Boolean,
         val operator: Boolean,
 
-        var owner: DocumentRootNode?,
         val body: List<StatementNode>,
         val uid: String
 ) : MemberEntity, TopLevelEntity, MergableNode, MemberNode

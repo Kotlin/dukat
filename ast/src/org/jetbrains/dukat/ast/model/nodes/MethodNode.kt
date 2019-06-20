@@ -13,6 +13,5 @@ data class MethodNode(
         val override: Boolean,
         val operator: Boolean,
         val annotations: List<AnnotationNode>,
-
         val open: Boolean
 ) : MemberNode

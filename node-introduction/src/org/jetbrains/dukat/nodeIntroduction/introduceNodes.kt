@@ -208,7 +208,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 convertToHeritageNodes(parentEntities),
                 null,
 
-                owner,
                 uid,
                 exportQualifier
         )
@@ -237,7 +236,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 null,
-                null,
                 false,
                 uid
         )
@@ -261,7 +259,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                null,
                 null,
                 true,
                 uid
@@ -320,7 +317,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 hasExport,
                 false,
                 false,
-                null,
                 emptyList(),
                 uid
         )
@@ -394,7 +390,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         true,
                         true,
                         false,
-                        null,
                         listOf(
                                 if (declaration.type.isSimpleType("Unit")) {
                                     bodyStatement
@@ -434,7 +429,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             StatementCallNode(IdentifierEntity("value"), null)
                     ),
                     convertTypeParameters(interfaceDeclaration.typeParameters),
-                    null,
                     ""
             ))
             is IndexSignatureDeclaration -> listOf(
@@ -451,7 +445,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            null,
                             listOf(
                                     ReturnStatement(
                                             ChainCallNode(
@@ -476,7 +469,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            null,
                             listOf(ChainCallNode(
                                     StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
                                     StatementCallNode(IdentifierEntity("set"), listOf(
@@ -506,7 +498,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            null,
                             listOf(ChainCallNode(
                                     StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
                                     StatementCallNode(IdentifierEntity("invoke"), declaration.parameters.map { IdentifierEntity(it.name) }))
@@ -558,7 +549,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         null,
                         null,
                         emptyList(),
-                        null,
                         declaration.uid
                 )
             } else {
@@ -588,7 +578,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     null,
                     null,
                     emptyList(),
-                    null,
                     declaration.uid
             )
         }
@@ -681,28 +670,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 external = moduleNameIsStringLiteral,
                 jsModule = null,
                 jsQualifier = null,
-                owner = null,
                 uid = documentRoot.uid
         )
-
-
-        docRoot.declarations.forEach { declaration ->
-            if (declaration is DocumentRootNode) {
-                declaration.owner = docRoot
-            }
-            if (declaration is ClassNode) {
-                declaration.owner = docRoot
-            }
-            if (declaration is InterfaceNode) {
-                declaration.owner = docRoot
-            }
-            if (declaration is FunctionNode) {
-                declaration.owner = docRoot
-            }
-            if (declaration is VariableNode) {
-                declaration.owner = docRoot
-            }
-        }
 
         return docRoot
     }

@@ -122,11 +122,11 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
 }
 
 
-private fun DocumentRootNode.collectUidData(uidData: UidData): DocumentRootNode {
-    val head = if (owner == null) emptyList() else listOf(owner!!)
+private fun DocumentRootNode.collectUidData(uidData: UidData, anOwner: DocumentRootNode?): DocumentRootNode {
+    val head = if (anOwner == null) emptyList() else listOf(anOwner)
     uidData.register(uid, head + declarations.mapNotNull { declaration ->
         if (declaration is DocumentRootNode) {
-            declaration.collectUidData(uidData)
+            declaration.collectUidData(uidData, this)
         } else null
     })
 
@@ -135,7 +135,7 @@ private fun DocumentRootNode.collectUidData(uidData: UidData): DocumentRootNode 
 
 private fun DocumentRootNode.introduceQualifiedNode(): DocumentRootNode {
     val uidData = UidData()
-    collectUidData(uidData)
+    collectUidData(uidData, null)
 
     return LowerQualifiedDeclarations(uidData).lowerRoot(this, NodeOwner(this, null))
 }

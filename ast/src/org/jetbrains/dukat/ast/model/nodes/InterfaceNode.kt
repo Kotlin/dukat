@@ -9,7 +9,6 @@ data class InterfaceNode(
         val parentEntities: List<HeritageNode>,
         var exportQualifier: ExportQualifier?,
 
-        var owner: DocumentRootNode?,
         val generated: Boolean,
         val uid: String
 ) : ClassLikeNode

@@ -9,7 +9,6 @@ data class ClassNode(
         val parentEntities: List<HeritageNode>,
         val primaryConstructor: ConstructorNode?,
 
-        var owner: DocumentRootNode?,
         val uid: String,
         var exportQualifier: ExportQualifier?
 ) : ClassLikeNode

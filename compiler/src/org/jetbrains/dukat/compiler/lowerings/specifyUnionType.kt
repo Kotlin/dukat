@@ -76,7 +76,6 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
             declaration.copy(parameters = params)
         }.distinctBy { node ->
             node.copy(
-                    owner = null,
                     parameters = node.parameters.mapIndexed { index, param ->
                         val paramCopy = param.copy(
                                 name = "p${index}",

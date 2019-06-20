@@ -17,6 +17,5 @@ data class VariableNode(
         val get: StatementNode?,
         val set: StatementNode?,
         val typeParameters: List<TypeValueNode>,
-        var owner: DocumentRootNode?,
         val uid: String
 ) : TopLevelEntity, MergableNode
