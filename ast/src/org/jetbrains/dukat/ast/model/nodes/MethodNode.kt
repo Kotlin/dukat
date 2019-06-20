@@ -8,7 +8,6 @@ data class MethodNode(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
 
-        var owner: ClassLikeNode,
         val static: Boolean,
         val override: Boolean,
         val operator: Boolean,

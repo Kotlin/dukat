@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -75,13 +74,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
-    fun convertPropertyDeclaration(declaration: PropertyDeclaration, owner: ClassLikeNode): PropertyNode {
+    fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
         return PropertyNode(
                 declaration.name,
                 if (declaration.optional) declaration.type.makeNullable() else declaration.type,
                 convertTypeParameters(declaration.typeParameters),
 
-                owner,
                 declaration.isStatic(),
                 false,
                 declaration.optional,
@@ -104,7 +102,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode {
+    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode {
         return if (declaration.optional) {
             PropertyNode(
                     declaration.name,
@@ -115,7 +113,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             null
                     ),
                     convertTypeParameters(declaration.typeParameters),
-                    owner,
                     false,
                     false,
                     true,
@@ -128,7 +125,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     convertParameters(declaration.parameters),
                     declaration.type,
                     convertTypeParameters(declaration.typeParameters),
-                    owner,
                     false, //TODO: remove static, we don't need it for MethodSignatures
                     false,
                     false,
@@ -139,14 +135,13 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: ClassLikeNode): List<MethodNode> {
+    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<MethodNode> {
         return listOf(
                 MethodNode(
                         "get",
                         convertParameters(declaration.indexTypes),
                         declaration.returnType.makeNullable(),
                         emptyList(),
-                        owner,
                         false,
                         false,
                         true,
@@ -158,7 +153,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
                         TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
-                        owner,
                         false,
                         false,
                         true,
@@ -169,13 +163,12 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
 
-    private fun CallSignatureDeclaration.convert(owner: ClassLikeNode): MethodNode {
+    private fun CallSignatureDeclaration.convert(): MethodNode {
         return MethodNode(
                 "invoke",
                 convertParameters(parameters),
                 type,
                 convertTypeParameters(typeParameters),
-                owner,
                 false,
                 false,
                 true,
@@ -212,14 +205,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 exportQualifier
         )
 
-        declaration.members.forEach { member ->
-            when (member) {
-                is PropertyNode -> member.copy(owner = declaration)
-                is MethodNode -> member.copy(owner = declaration)
-                else -> member
-            }
-        }
-
         return declaration
     }
 
@@ -240,15 +225,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 uid
         )
 
-
-        declaration.members.forEach { member ->
-            when (member) {
-                is PropertyNode -> member.copy(owner = declaration)
-                is MethodNode -> member.copy(owner = declaration)
-                else -> member
-            }
-        }
-
         return listOf(declaration)
     }
 
@@ -263,14 +239,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 true,
                 uid
         )
-
-
-        declaration.members.forEach { member ->
-            when (member) {
-                is PropertyNode -> member.copy(owner = declaration)
-                is MethodNode -> member.copy(owner = declaration)
-            }
-        }
 
         return declaration
     }
@@ -322,8 +290,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         )
     }
 
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: ClassLikeNode): MemberNode? {
-        val memberDeclaration = convertMethodSignatureDeclaration(declaration, owner)
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode? {
+        val memberDeclaration = convertMethodSignatureDeclaration(declaration)
         return when (memberDeclaration) {
             is PropertyNode -> memberDeclaration
             is MethodNode -> memberDeclaration.copy(
@@ -511,24 +479,22 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
 
     fun lowerMemberDeclaration(declaration: MemberEntity): List<MemberNode> {
-        val owner = ROOT_CLASS_DECLARATION
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
                     convertParameters(declaration.parameters),
                     declaration.type,
                     convertTypeParameters(declaration.typeParameters),
-                    owner,
                     declaration.isStatic(),
                     false,
                     false,
                     emptyList(),
                     true
             ))
-            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration, owner)).mapNotNull { it }
-            is CallSignatureDeclaration -> listOf(declaration.convert(owner))
-            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, owner))
-            is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration, owner)
+            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
+            is CallSignatureDeclaration -> listOf(declaration.convert())
+            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration))
+            is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
             is ConstructorDeclaration -> listOf(declaration.convert())
             else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberNode>() }
         }
@@ -561,8 +527,8 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
                 objectNode.copy(members = objectNode.members.map {
                     when (it) {
-                        is PropertyNode -> it.copy(owner = objectNode, open = false)
-                        is MethodNode -> it.copy(owner = objectNode, open = false)
+                        is PropertyNode -> it.copy(open = false)
+                        is MethodNode -> it.copy(open = false)
                         else -> it
                     }
                 })
