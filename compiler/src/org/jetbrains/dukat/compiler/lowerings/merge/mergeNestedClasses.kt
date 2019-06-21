@@ -3,7 +3,6 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -11,7 +10,6 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import javax.naming.Name
 
 
 private data class ClassKey(val name: NameEntity, val moduleQualifiedName: String)
@@ -22,24 +20,24 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<NameEntity, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
-        myClassMap[ClassKey(IdentifierEntity(ownerContext.node.name), ownerContext.getQualifiedName().translate())] = ownerContext.node
+        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().translate())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
             (it is NodeOwner<*>) && (it.node is ModuleModel)
         } as NodeOwner<ModuleModel>
 
-        myModuleClassesMap.getOrPut(owner.node.packageName) { mutableListOf() }.add(ownerContext.node)
+        myModuleClassesMap.getOrPut(owner.node.name) { mutableListOf() }.add(ownerContext.node)
 
         return ownerContext.node
     }
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
-        myModuleClassesMap[moduleModel.packageName] = mutableListOf()
+        myModuleClassesMap[moduleModel.name] = mutableListOf()
         return super.lowerRoot(moduleModel, ownerContext)
     }
 
-    fun resolve(name: String, qualifiedNode: NameEntity): ClassModel? {
-        val key = ClassKey(IdentifierEntity(name), qualifiedNode.translate())
+    fun resolve(name: NameEntity, qualifiedNode: NameEntity): ClassModel? {
+        val key = ClassKey(name, qualifiedNode.translate())
         return myClassMap.get(key)
     }
 

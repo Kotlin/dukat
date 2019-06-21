@@ -27,7 +27,6 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
@@ -251,7 +250,7 @@ private fun ClassNode.convertToClassModel(): TopLevelNode {
     val membersSplitted = split(members)
 
     return ClassModel(
-            name = name,
+            name = IdentifierEntity(name),
             members = membersSplitted.dynamic,
             companionObject = CompanionObjectModel(
                     "",
@@ -302,7 +301,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     val membersSplitted = split(members)
 
     return InterfaceModel(
-            name = name,
+            name = IdentifierEntity(name),
             members = membersSplitted.dynamic,
             companionObject = CompanionObjectModel(
                     "",
@@ -368,7 +367,7 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                 }
         )
         is ObjectNode -> ObjectModel(
-                name = name,
+                name = IdentifierEntity(name),
                 members = members.map { member -> member.process() },
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
         )
@@ -410,7 +409,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
     }
 
     val module = ModuleModel(
-            packageName = qualifiedPackageName,
+            name = qualifiedPackageName,
             shortName = qualifiedPackageName.rightMost(),
             declarations = declarationsFiltered,
             annotations = annotations,
@@ -430,7 +429,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
                 name = "types",
                 fileName = sourceFileName,
                 root = ModuleModel(
-                    packageName = module.packageName,
+                    name = module.name,
                     shortName = module.shortName,
                     declarations = aliases,
                     annotations = mutableListOf(),

@@ -55,7 +55,7 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
     return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
         stringTranslator.process(module)
-        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.packageName), sourceFile.fileName, module.packageName, stringTranslator.output())
+        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.name), sourceFile.fileName, module.name, stringTranslator.output())
     }
 }
 
@@ -75,7 +75,7 @@ fun translateModule(fileName: String, translator: InputTranslator): List<Transla
 
     return sourceSet.sources.mapNotNull { sourceFile ->
         // TODO: investigate whether it's safe to check just fileName
-        val sourceKey = Pair(sourceFile.fileName, sourceFile.root.packageName)
+        val sourceKey = Pair(sourceFile.fileName, sourceFile.root.name)
         if (!visited.contains(sourceKey)) {
             visited.add(sourceKey)
             translateModule(sourceFile)

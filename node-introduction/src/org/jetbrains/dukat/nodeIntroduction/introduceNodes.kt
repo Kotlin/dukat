@@ -253,7 +253,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun EnumDeclaration.convert(): EnumNode {
         return EnumNode(
-                name = name,
+                name = IdentifierEntity(name),
                 values = values.map { value -> EnumTokenNode(value.value, value.meta) }
         )
     }

@@ -10,7 +10,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class FunctionModel(
-        val name: NameEntity,
+        override val name: NameEntity,
         val parameters: List<ParameterModel>,
         val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,

@@ -242,7 +242,7 @@ private fun VariableModel.translate(): String {
 }
 
 private fun EnumNode.translate(): String {
-    val res = mutableListOf("external enum class ${name} {")
+    val res = mutableListOf("external enum class ${name.translate()} {")
     res.add(values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
         "    ${value.value}${metaClause}"
@@ -345,7 +345,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
 
 private fun DelegationModel.translate(): String {
     return when (this) {
-        is ClassModel -> name
+        is ClassModel -> name.translate()
         is ExternalDelegationModel -> "definedExternally"
         else -> ""
     }
@@ -366,7 +366,7 @@ private fun ClassModel.translate(nested: Boolean, padding: Int): String {
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name}${translateTypeParameters(typeParameters)}${params}${parents}"
+    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
 
     val members = members
     val staticMembers = companionObject.members
@@ -422,7 +422,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitObject(objectNode: ObjectModel) {
-        val objectModel = "external object ${objectNode.name}"
+        val objectModel = "external object ${objectNode.name.translate()}"
 
         val members = objectNode.members
 
@@ -453,7 +453,7 @@ class StringTranslator : ModelVisitor {
         val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
         val parents = translateHeritagModels(interfaceModel.parentEntities)
 
-        addOutput("${translateAnnotations(interfaceModel.annotations)}external interface ${interfaceModel.name}${translateTypeParameters(interfaceModel.typeParameters)}${parents}" + if (isBlock) " {" else "")
+        addOutput("${translateAnnotations(interfaceModel.annotations)}external interface ${interfaceModel.name.translate()}${translateTypeParameters(interfaceModel.typeParameters)}${parents}" + if (isBlock) " {" else "")
         if (isBlock) {
             interfaceModel.members.flatMap { it.translateSignature() }.map { "    " + it }.forEach { addOutput(it) }
 
@@ -493,8 +493,8 @@ class StringTranslator : ModelVisitor {
         if (containsSomethingExceptDocRoot) {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
-            if (moduleModel.packageName != ROOT_PACKAGENAME) {
-                addOutput("${translateAnnotations}package ${moduleModel.packageName.translate()}")
+            if (moduleModel.name != ROOT_PACKAGENAME) {
+                addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {
                 addOutput(translateAnnotations)

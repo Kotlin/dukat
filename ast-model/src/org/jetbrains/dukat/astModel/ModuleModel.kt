@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class ModuleModel(
-        val packageName: NameEntity,
+        override val name: NameEntity,
         val shortName: NameEntity,
         val declarations: List<TopLevelNode> = emptyList(),
         val annotations: MutableList<AnnotationNode>,

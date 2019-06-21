@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -16,7 +17,7 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.panic.raiseConcern
 
 private data class ClassLikeKey(
-        val name: String,
+        val name: NameEntity,
         val typeParameters: List<TypeParameterModel>
 )
 

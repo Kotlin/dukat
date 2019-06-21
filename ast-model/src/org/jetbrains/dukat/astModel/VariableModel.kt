@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class VariableModel(
-        var name: NameEntity,
+        override var name: NameEntity,
         val type: TypeModel,
 
         val annotations: MutableList<AnnotationNode>,

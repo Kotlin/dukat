@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class DeclarationKey(
-        val classValue: String,
+        val name: NameEntity,
         val qualifiedPath: NameEntity
 )
 
@@ -30,11 +30,11 @@ class DeclarationResolver {
         }
     }
 
-    private fun register(name: String, moduleContext: NodeOwner<ModuleModel>) {
+    private fun register(name: NameEntity, moduleContext: NodeOwner<ModuleModel>) {
         myDeclarations[DeclarationKey(name, moduleContext.getQualifiedName())] = moduleContext
     }
 
-    fun resolve(name: String, path: NameEntity?): NodeOwner<ModuleModel>? {
+    fun resolve(name: NameEntity, path: NameEntity?): NodeOwner<ModuleModel>? {
         if (path == null) {
             return null
         }
@@ -58,7 +58,7 @@ class DeclarationResolver {
 
     }
 
-    fun resolveStrict(name: String, qualifiedPath: NameEntity?): NodeOwner<ModuleModel>? {
+    fun resolveStrict(name: NameEntity, qualifiedPath: NameEntity?): NodeOwner<ModuleModel>? {
         if (qualifiedPath == null) {
             return null
         }

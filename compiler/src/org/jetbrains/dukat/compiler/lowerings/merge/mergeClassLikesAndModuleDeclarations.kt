@@ -4,7 +4,9 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -15,6 +17,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
+import javax.naming.Name
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
@@ -57,7 +60,7 @@ private fun MergableNode.convert(): MemberNode {
     }
 }
 
-private fun CompanionObjectModel.merge(ownerName: String, modulesToBeMerged: Map<String, MutableList<ModuleModel>>): CompanionObjectModel {
+private fun CompanionObjectModel.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): CompanionObjectModel {
     val members = members.toMutableList()
     modulesToBeMerged.getOrDefault(ownerName, mutableListOf()).forEach { module ->
         val submoduleDecls = module.declarations
@@ -75,11 +78,9 @@ private fun unquote(name: String): String {
 }
 
 
-private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<String, ClassLikeNode>, modulesToBeMerged: MutableMap<String, MutableList<ModuleModel>>): List<ModuleModel> {
-
-
+private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeNode>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
     return submodules.map { subModule ->
-        val moduleKey = unquote(subModule.shortName.translate())
+        val moduleKey = IdentifierEntity(unquote(subModule.shortName.translate()))
         if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
             val bucket = modulesToBeMerged.getOrPut(moduleKey) { mutableListOf() }
             bucket.add(subModule)
@@ -98,9 +99,9 @@ fun InterfaceModel.merge(interfaceModel: InterfaceModel): InterfaceModel {
 
 
 fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
-    val interfacesInBucket = mutableMapOf<String, MutableList<InterfaceModel>>()
+    val interfacesInBucket = mutableMapOf<NameEntity, MutableList<InterfaceModel>>()
 
-    val classes = mutableMapOf<String, ClassModel>()
+    val classes = mutableMapOf<NameEntity, ClassModel>()
 
     declarations.forEach { declaration ->
         if (declaration is InterfaceModel) {
@@ -113,8 +114,8 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
 
     val interfaces = interfacesInBucket.mapValues { entry -> entry.value.reduceRight { interfaceModel, acc -> interfaceModel.merge(acc) } }.toMutableMap()
 
-    val modulesToBeMergedWithInterfaces = mutableMapOf<String, MutableList<ModuleModel>>()
-    val modulesToBeMergedWithClasses = mutableMapOf<String, MutableList<ModuleModel>>()
+    val modulesToBeMergedWithInterfaces = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
+    val modulesToBeMergedWithClasses = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
 
     var resolvedSubmodules = collectModelsToBeMerged(sumbodules, interfaces, modulesToBeMergedWithInterfaces)
     resolvedSubmodules = collectModelsToBeMerged(resolvedSubmodules, classes, modulesToBeMergedWithClasses)

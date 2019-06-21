@@ -57,7 +57,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             val declarationValue = declaration.value
 
             if (declarationValue is IdentifierEntity) {
-                declarationResolver.resolve(declarationValue.value, qualifiedName)?.let { declarationOwnerContext ->
+                declarationResolver.resolve(declarationValue, qualifiedName)?.let { declarationOwnerContext ->
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
                     if (declarationQualifiedName.size > 1) {
@@ -80,7 +80,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                         if (pathShifted is IdentifierEntity) {
                             val supposedModule = variableModel.name.appendRight(qualifiedName)
 
-                            declarationResolver.resolveStrict(pathShifted.value, supposedModule.process(::unescape))?.let {
+                            declarationResolver.resolveStrict(pathShifted, supposedModule.process(::unescape))?.let {
                                 return TypeValueModel(supposedModule.appendRight(pathShifted), emptyList(), null)
                             }
                         }
@@ -88,7 +88,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                 }
 
 
-                declarationResolver.resolveStrict(declarationValue.right.value, qualifiedPath)?.let { declarationOwnerContext ->
+                declarationResolver.resolveStrict(declarationValue.right, qualifiedPath)?.let { declarationOwnerContext ->
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
                     if (declarationQualifiedName != qualifiedName) {
@@ -108,7 +108,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 
         if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierEntity)) {
             val name = heritageClauseValue.value
-            declarationResolver.resolve(name.translate(), ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
+            declarationResolver.resolve(name, ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
