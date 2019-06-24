@@ -4,23 +4,14 @@ import java.util.*
 
 
 open class ExportContent<T>(
-        private val exportTable: MutableMap<T, String> = mutableMapOf(),
-        private val createKey: (node: T) -> T
+        private val exportTable: MutableMap<T, String> = mutableMapOf()
 ) {
+    private fun createKey(node: T): T {
+        return node
+    }
+
     fun getUID(node: T): String? {
         val nodeKey = createKey(node)
-
-        val uid = if (exportTable.contains(nodeKey)) {
-            exportTable[nodeKey]
-        } else {
-            UUID.randomUUID().toString()
-        }
-
-        exportTable[nodeKey] = uid!!
-        return uid
+        return exportTable.getOrPut(nodeKey) { UUID.randomUUID().toString() }
     }
 }
-
-class ExportContentNonGeneric(
-        val exportTable: MutableMap<Any, String> = mutableMapOf()
-) : ExportContent<Any>(exportTable, { it })
