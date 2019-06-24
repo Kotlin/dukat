@@ -9,6 +9,6 @@ data class ClassNode(
         val parentEntities: List<HeritageNode>,
         val primaryConstructor: ConstructorNode?,
 
-        val uid: String,
+        override val uid: String,
         var exportQualifier: ExportQualifier?
-) : ClassLikeNode
+) : ClassLikeNode, UniqueNode

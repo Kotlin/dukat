@@ -17,5 +17,5 @@ data class VariableNode(
         val get: StatementNode?,
         val set: StatementNode?,
         val typeParameters: List<TypeValueNode>,
-        val uid: String
-) : TopLevelEntity, MergableNode
+        override val uid: String
+) : TopLevelEntity, MergableNode, UniqueNode

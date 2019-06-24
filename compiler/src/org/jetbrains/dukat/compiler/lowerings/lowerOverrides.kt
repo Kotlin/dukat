@@ -50,7 +50,7 @@ private class OverrideResolver(private val astContext: AstContext) {
 
     private fun ClassNode.getKnownParents(): List<ClassLikeNode> {
         return parentEntities.flatMap {
-            listOf(astContext.resolveInterface(it.name), astContext.resolveClass(it.name))
+            listOf<ClassLikeNode?>(astContext.resolveInterface(it.name), astContext.resolveClass(it.name))
         }.filterNotNull()
     }
 
@@ -135,8 +135,8 @@ private class OverrideResolver(private val astContext: AstContext) {
 
         if ((this is TypeValueNode) && (otherParameterValue is TypeValueNode)) {
 
-            val classLike = astContext.resolveClass(value) ?: astContext.resolveInterface(value)
-            val otherClassLike = astContext.resolveClass(otherParameterValue.value)
+            val classLike: ClassLikeNode? = astContext.resolveClass(value) ?: astContext.resolveInterface(value)
+            val otherClassLike: ClassLikeNode? = astContext.resolveClass(otherParameterValue.value)
                     ?: astContext.resolveInterface(otherParameterValue.value)
 
 

@@ -20,5 +20,5 @@ data class FunctionNode(
         val operator: Boolean,
 
         val body: List<StatementNode>,
-        val uid: String
-) : MemberEntity, TopLevelEntity, MergableNode, MemberNode
+        override val uid: String
+) : MemberEntity, TopLevelEntity, MergableNode, MemberNode, UniqueNode

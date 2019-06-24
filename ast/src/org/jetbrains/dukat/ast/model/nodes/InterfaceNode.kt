@@ -10,5 +10,5 @@ data class InterfaceNode(
         var exportQualifier: ExportQualifier?,
 
         val generated: Boolean,
-        val uid: String
-) : ClassLikeNode
+        override val uid: String
+) : ClassLikeNode, UniqueNode
