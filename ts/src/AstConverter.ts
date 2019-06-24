@@ -277,19 +277,16 @@ class AstConverter {
         return this.astFactory.createIntersectionTypeDeclaration(params);
     }
 
-    convertEntityName(entityName: ts.EntityName) : NameDeclaration | null {
-        if (ts.isIdentifier(entityName)) {
-            return this.astFactory.createIdentifierDeclaration(entityName.text)
-        } else if (ts.isQualifiedName(entityName)) {
+    convertEntityName(entityName: ts.EntityName) : NameDeclaration {
+        if (ts.isQualifiedName(entityName)) {
             return this.astFactory.createQualifiedNameDeclaration(
-                this.convertEntityName(entityName.left) as ModuleReferenceDeclaration,
-                this.convertEntityName(entityName.right) as ModuleReferenceDeclaration
+              this.convertEntityName(entityName.left) as ModuleReferenceDeclaration,
+              this.convertEntityName(entityName.right) as ModuleReferenceDeclaration
             )
         }
 
-        return null
+        return this.astFactory.createIdentifierDeclaration(entityName.getText());
     }
-
 
     private convertTypeArguments(typeArguments: ts.NodeArray<ts.TypeNode> | undefined): Array<TypeDeclaration> {
         if (typeArguments == undefined) {
@@ -329,16 +326,10 @@ class AstConverter {
                 return this.createIntersectionType(params);
             } else if (ts.isTypeReferenceNode(type)) {
                 let params = this.convertTypeArguments(type.typeArguments);
+                let entity = this.convertEntityName(type.typeName);
 
-                if (ts.isQualifiedName(type.typeName)) {
-                    let entity = this.convertEntityName(type.typeName);
-                    if (entity) {
-                        return this.astFactory.createTypeDeclaration(entity,  params);
-                    }
-                }
-
-                return this.createTypeDeclaration(
-                    type.typeName.getText(),
+                return this.astFactory.createTypeDeclaration(
+                    entity,
                     params
                 );
             } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
