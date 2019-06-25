@@ -11,5 +11,6 @@ data class ClassModel(
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,
-        val annotations: MutableList<AnnotationNode>
+        val annotations: MutableList<AnnotationNode>,
+        val external: Boolean
 ) : ClassLikeModel, DelegationModel, MemberNode, MemberModel

@@ -88,7 +88,7 @@ private class IntroduceNestedClasses(private val classContext: ClassContext) : M
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         val resolvedClass = classContext.resolve(ownerContext.node.name, ownerContext.getQualifiedName())
-        return resolvedClass ?: ownerContext.node
+        return resolvedClass?.copy(external = false) ?: ownerContext.node
     }
 }
 

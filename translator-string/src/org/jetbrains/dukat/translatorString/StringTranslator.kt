@@ -263,7 +263,7 @@ private fun MemberModel.translate(): List<String> {
         is MethodModel -> translate()
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
-        is ClassModel -> listOf(translate(true, 1))
+        is ClassModel -> listOf(translate( 1))
         else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
     }
 }
@@ -357,12 +357,12 @@ private fun HeritageModel.translateAsHeritageClause(): String {
 }
 
 
-private fun ClassModel.translate(nested: Boolean, padding: Int): String {
+private fun ClassModel.translate(padding: Int): String {
     val res: MutableList<String> = kotlin.collections.mutableListOf()
     val primaryConstructor = primaryConstructor
 
     val parents = translateHeritagModels(parentEntities)
-    val externalClause = if (nested) "" else "external "
+    val externalClause = if (external) "" else "external "
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
@@ -476,7 +476,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitClass(classModel: ClassModel) {
-        addOutput(classModel.translate(false, 0))
+        addOutput(classModel.translate(0))
     }
 
     fun visitImport(import: NameEntity) {
