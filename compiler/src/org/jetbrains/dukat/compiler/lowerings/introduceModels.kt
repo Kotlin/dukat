@@ -319,7 +319,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                 )
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-            annotations = exportQualifier.toAnnotation()
+            annotations = exportQualifier.toAnnotation(),
+            external = true
     )
 }
 

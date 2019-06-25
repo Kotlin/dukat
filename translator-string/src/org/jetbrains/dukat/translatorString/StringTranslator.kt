@@ -181,7 +181,7 @@ private fun FunctionModel.translate(): String {
         typeParams = " " + typeParams
     }
 
-    val modifier = if (inline) "inline" else "external"
+    val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
     val operator = if (operator) " operator" else ""
 
     val body = if (body.isEmpty()) {
@@ -222,7 +222,7 @@ private fun TypeAliasModel.translate(): String {
 
 private fun VariableModel.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
-    val modifier = if (inline) "inline" else "external"
+    val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
 
     val body = if (initializer != null) {
         " = ${initializer?.translate()}"
@@ -242,7 +242,7 @@ private fun VariableModel.translate(): String {
 }
 
 private fun EnumNode.translate(): String {
-    val res = mutableListOf("external enum class ${name.translate()} {")
+    val res = mutableListOf("${KOTLIN_EXTERNAL_KEYWORD} enum class ${name.translate()} {")
     res.add(values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
         "    ${value.value}${metaClause}"
@@ -263,7 +263,7 @@ private fun MemberModel.translate(): List<String> {
         is MethodModel -> translate()
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
-        is ClassModel -> listOf(translate( 1))
+        is ClassModel -> listOf(translate(1))
         else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
     }
 }
@@ -356,13 +356,17 @@ private fun HeritageModel.translateAsHeritageClause(): String {
     return "${value.translateAsHeritageClause()}${delegationClause}"
 }
 
-
 private fun ClassModel.translate(padding: Int): String {
-    val res: MutableList<String> = kotlin.collections.mutableListOf()
+    val res = mutableListOf<String>()
+    translate(padding) { res.add(it) }
+    return res.joinToString(LINE_SEPARATOR)
+}
+
+private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
 
     val parents = translateHeritagModels(parentEntities)
-    val externalClause = if (external) "" else "external "
+    val externalClause = if (external) "" else "${KOTLIN_EXTERNAL_KEYWORD} "
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
@@ -377,24 +381,56 @@ private fun ClassModel.translate(padding: Int): String {
 
     val tab = "    "
 
-    res.add(classDeclaration + if (isBlock) " {" else "")
+    output(classDeclaration + if (isBlock) " {" else "")
 
     if (hasMembers) {
-        res.addAll(members.flatMap { it.translate() }.map({ tab.repeat(padding + 1) + it }))
+        members.flatMap { it.translate() }.map({ tab.repeat(padding + 1) + it }).forEach {
+            output(it)
+        }
     }
 
     if (staticMembers.isNotEmpty()) {
-        res.add(tab.repeat(padding + 1) + "companion object {")
-        res.addAll(staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding + 2) + it }))
-        res.add(tab.repeat(padding + 1) + "}")
+        output(tab.repeat(padding + 1) + "companion object {")
+        staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding + 2) + it }).forEach {
+            output(it)
+        }
+        output(tab.repeat(padding + 1) + "}")
     }
-
 
     if (isBlock) {
-        res.add(tab.repeat(padding) + "}")
+        output(tab.repeat(padding) + "}")
     }
+}
 
-    return res.joinToString(LINE_SEPARATOR)
+fun InterfaceModel.translate(output: (String) -> Unit) {
+    val hasMembers = members.isNotEmpty()
+    val staticMembers = companionObject.members
+
+    val showCompanionObject = staticMembers.isNotEmpty() || companionObject.parentEntities.isNotEmpty()
+
+    val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
+    val parents = translateHeritagModels(parentEntities)
+
+    val externalClause = if (external) KOTLIN_EXTERNAL_KEYWORD else ""
+    output("${translateAnnotations(annotations)}${externalClause} interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
+    if (isBlock) {
+        members.flatMap { it.translateSignature() }.map { "    " + it }.forEach { output(it) }
+
+        val parents = if (companionObject.parentEntities.isEmpty()) {
+            ""
+        } else {
+            " : ${companionObject.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
+        }
+
+        if (showCompanionObject) {
+            output("    companion object${parents} {")
+
+            staticMembers.flatMap { it.translate() }.map({ "        ${it}" }).forEach { output(it) }
+            output("    }")
+        }
+
+        output("}")
+    }
 }
 
 
@@ -422,7 +458,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitObject(objectNode: ObjectModel) {
-        val objectModel = "external object ${objectNode.name.translate()}"
+        val objectModel = "${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
 
@@ -445,38 +481,11 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
-        val hasMembers = interfaceModel.members.isNotEmpty()
-        val staticMembers = interfaceModel.companionObject.members
-
-        val showCompanionObject = staticMembers.isNotEmpty() || interfaceModel.companionObject.parentEntities.isNotEmpty()
-
-        val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
-        val parents = translateHeritagModels(interfaceModel.parentEntities)
-
-        addOutput("${translateAnnotations(interfaceModel.annotations)}external interface ${interfaceModel.name.translate()}${translateTypeParameters(interfaceModel.typeParameters)}${parents}" + if (isBlock) " {" else "")
-        if (isBlock) {
-            interfaceModel.members.flatMap { it.translateSignature() }.map { "    " + it }.forEach { addOutput(it) }
-
-            val parents = if (interfaceModel.companionObject.parentEntities.isEmpty()) {
-                ""
-            } else {
-                " : ${interfaceModel.companionObject.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
-            }
-
-            if (showCompanionObject) {
-                addOutput("    companion object${parents} {")
-
-                staticMembers.flatMap { it.translate() }.map({ "        ${it}" }).forEach { addOutput(it) }
-                addOutput("    }")
-            }
-
-            addOutput("}")
-        }
-
+        interfaceModel.translate(::addOutput)
     }
 
     override fun visitClass(classModel: ClassModel) {
-        addOutput(classModel.translate(0))
+        classModel.translate(0, ::addOutput)
     }
 
     fun visitImport(import: NameEntity) {

@@ -9,5 +9,6 @@ data class InterfaceModel(
         override val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,
-        val annotations: MutableList<AnnotationNode>
+        val annotations: MutableList<AnnotationNode>,
+        val external: Boolean
 ) : ClassLikeModel
