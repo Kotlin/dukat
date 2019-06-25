@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
@@ -20,6 +19,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
@@ -258,13 +258,13 @@ private fun PropertyModel.translate(): String {
     return "${modifier}var ${name}: ${type.translate()}${type.translateMeta()}"
 }
 
-private fun MemberNode.translate(): List<String> {
+private fun MemberModel.translate(): List<String> {
     return when (this) {
         is MethodModel -> translate()
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
         is ClassModel -> listOf(translate(true, 1))
-        else -> raiseConcern("can not translate MemberNode ${this::class.simpleName}") { listOf("") }
+        else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
     }
 }
 
@@ -306,7 +306,7 @@ private fun MethodModel.translateSignature(): List<String> {
     return annotations + listOf(methodNodeTranslation)
 }
 
-private fun MemberNode.translateSignature(): List<String> {
+private fun MemberModel.translateSignature(): List<String> {
     return when (this) {
         is MethodModel -> translateSignature()
         is PropertyModel -> listOf(translateSignature())

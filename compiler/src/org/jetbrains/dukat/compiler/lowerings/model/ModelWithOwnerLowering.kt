@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
@@ -23,7 +23,7 @@ interface ModelWithOwnerLowering {
     fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
 
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
-    fun lowerMemberNode(ownerContext: NodeOwner<MemberNode>): MemberNode
+    fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel
     fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
     fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
 

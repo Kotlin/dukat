@@ -1,18 +1,16 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -37,7 +35,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
-    override fun lowerMemberNode(ownerContext: NodeOwner<MemberNode>): MemberNode {
+    override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel {
         val declaration = ownerContext.node
         return when (declaration) {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
@@ -81,7 +79,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 members
-                = declaration.members.map { member -> lowerMemberNode(NodeOwner(member, ownerContext)) },
+                = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
                 }
@@ -99,7 +97,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberNode(NodeOwner(member, ownerContext)) }
+                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) }
         )
 
     }
@@ -107,7 +105,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberNode(NodeOwner(member, ownerContext)) },
+                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
                 }

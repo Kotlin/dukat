@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class ClassModel(
         override val name: IdentifierEntity,
-        override var members: List<MemberNode>,
+        override var members: List<MemberModel>,
         override val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,

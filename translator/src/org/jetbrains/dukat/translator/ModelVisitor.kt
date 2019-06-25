@@ -8,6 +8,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
@@ -29,7 +30,7 @@ interface ModelVisitor {
     }
 
     private fun processParameterModel(ownerContext: ParameterModel) {}
-    private fun processMemberNode(declaration: MemberNode) {}
+    private fun processMemberNode(declaration: MemberModel) {}
 
     fun visitObject(objectNode: ObjectModel)
     private fun processObjectModel(declaration: ObjectModel) {

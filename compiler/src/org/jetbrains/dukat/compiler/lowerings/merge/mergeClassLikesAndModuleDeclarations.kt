@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
@@ -23,7 +24,7 @@ private fun ModuleModel.canBeMerged(): Boolean {
     return declarations.any { declaration -> declaration is MemberEntity }
 }
 
-private fun VariableModel.convert(): MemberNode {
+private fun VariableModel.convert(): MemberModel {
     return PropertyModel(
             name = name.translate(),
             type = type,
@@ -36,7 +37,7 @@ private fun VariableModel.convert(): MemberNode {
     )
 }
 
-private fun FunctionModel.convert(): MemberNode {
+private fun FunctionModel.convert(): MemberModel {
 
     return MethodModel(
             name = name.translate(),
@@ -51,7 +52,7 @@ private fun FunctionModel.convert(): MemberNode {
     )
 }
 
-private fun MergableNode.convert(): MemberNode {
+private fun MergableNode.convert(): MemberModel {
     return when (this) {
         is FunctionModel -> convert()
         is VariableModel -> convert()

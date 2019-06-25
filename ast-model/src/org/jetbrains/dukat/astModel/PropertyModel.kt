@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
-
 data class PropertyModel(
         val name: String,
         val type: TypeModel,
@@ -14,4 +12,4 @@ data class PropertyModel(
         val setter: Boolean,
 
         val open: Boolean
-) : MemberNode, MemberModel
+) : MemberModel

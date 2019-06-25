@@ -40,6 +40,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
@@ -77,24 +78,27 @@ private enum class TranslationContext {
 }
 
 private data class Members(
-        val dynamic: List<MemberNode>,
-        val static: List<MemberNode>
+        val dynamic: List<MemberModel>,
+        val static: List<MemberModel>
 )
 
 private fun split(members: List<MemberNode>): Members {
-    val staticMembers = mutableListOf<MemberNode>()
-    val ownMembers = mutableListOf<MemberNode>()
+    val staticMembers = mutableListOf<MemberModel>()
+    val ownMembers = mutableListOf<MemberModel>()
 
     members.forEach { member ->
-        if (member.isStatic()) {
-            staticMembers.add(member.process())
-        } else ownMembers.add(member.process())
+        val memberProcessed = member.process()
+        if (memberProcessed != null) {
+            if (member.isStatic()) {
+                staticMembers.add(memberProcessed)
+            } else ownMembers.add(memberProcessed)
+        }
     }
 
     return Members(ownMembers, staticMembers)
 }
 
-private fun MemberNode.process(): MemberNode {
+private fun MemberNode.process(): MemberModel? {
     // TODO: how ClassModel end up here?
     return when (this) {
         is ConstructorNode -> ConstructorModel(
@@ -107,7 +111,6 @@ private fun MemberNode.process(): MemberNode {
                 },
                 generated = generated
         )
-        is ClassModel -> copy(members = members.map { member -> member.process() })
         is MethodNode -> MethodModel(
                 name = name,
                 parameters = parameters.map { param -> param.process() },
@@ -142,7 +145,7 @@ private fun MemberNode.process(): MemberNode {
                 setter = setter,
                 open = open
         )
-        else -> this
+        else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
     }
 }
 
@@ -368,7 +371,7 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
         )
         is ObjectNode -> ObjectModel(
                 name = IdentifierEntity(name),
-                members = members.map { member -> member.process() },
+                members = members.mapNotNull { member -> member.process() },
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
         )
         is TypeAliasNode -> if (canBeTranslated) {
@@ -426,17 +429,17 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
         } else {
 
             generated.add(SourceFileModel(
-                name = "types",
-                fileName = sourceFileName,
-                root = ModuleModel(
-                    name = module.name,
-                    shortName = module.shortName,
-                    declarations = aliases,
-                    annotations = mutableListOf(),
-                    sumbodules = mutableListOf(),
-                    imports = mutableListOf()
-                ),
-                referencedFiles = emptyList()
+                    name = "types",
+                    fileName = sourceFileName,
+                    root = ModuleModel(
+                            name = module.name,
+                            shortName = module.shortName,
+                            declarations = aliases,
+                            annotations = mutableListOf(),
+                            sumbodules = mutableListOf(),
+                            imports = mutableListOf()
+                    ),
+                    referencedFiles = emptyList()
             ))
 
             module.copy(declarations = ownDeclarations)
