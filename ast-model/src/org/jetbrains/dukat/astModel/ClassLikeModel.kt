@@ -1,6 +1,9 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 
-interface ClassLikeModel : TopLevelEntity, TopLevelNode
+interface ClassLikeModel : TopLevelNode {
+    val members: List<MemberNode>
+    val companionObject: CompanionObjectModel
+}

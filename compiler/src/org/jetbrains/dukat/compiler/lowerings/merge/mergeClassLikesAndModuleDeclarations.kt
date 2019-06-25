@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -17,7 +17,6 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
-import javax.naming.Name
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
@@ -78,7 +77,7 @@ private fun unquote(name: String): String {
 }
 
 
-private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeNode>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
+private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeModel>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
     return submodules.map { subModule ->
         val moduleKey = IdentifierEntity(unquote(subModule.shortName.translate()))
         if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
