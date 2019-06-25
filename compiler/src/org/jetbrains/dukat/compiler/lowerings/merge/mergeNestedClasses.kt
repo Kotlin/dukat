@@ -12,7 +12,7 @@ import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 
-private data class ClassKey(val name: NameEntity, val moduleQualifiedName: String)
+private data class ClassKey(val name: NameEntity, val moduleName: NameEntity)
 
 private class ClassContext : ModelWithOwnerTypeLowering {
 
@@ -20,7 +20,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<NameEntity, MutableList<ClassModel>> = mutableMapOf()
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
-        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName().translate())] = ownerContext.node
+        myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
             (it is NodeOwner<*>) && (it.node is ModuleModel)
@@ -37,25 +37,23 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     }
 
     fun resolve(name: NameEntity, qualifiedNode: NameEntity): ClassModel? {
-        val key = ClassKey(name, qualifiedNode.translate())
-        return myClassMap.get(key)
+        return myClassMap[ClassKey(name, qualifiedNode)]
     }
 
     fun resolveModule(moduleModel: ModuleModel, qualifiedNode: NameEntity): ModuleModel {
-        val classKey = ClassKey(moduleModel.shortName, qualifiedNode.translate())
+        val classKey = ClassKey(moduleModel.shortName, qualifiedNode)
         if (myClassMap.containsKey(classKey)) {
             val classDeclarations = mutableListOf<ClassModel>()
             val nonClassDeclarations = mutableListOf<TopLevelNode>()
             moduleModel.declarations.forEach { declaration ->
                 when (declaration) {
-                    is ClassModel -> classDeclarations.add(declaration)
+                    is ClassModel -> classDeclarations.add(declaration.copy(external = false))
                     else -> nonClassDeclarations.add(declaration)
                 }
             }
 
             val classModel =
                     myClassMap.get(classKey)!!
-
 
             val members = classModel.members + classDeclarations
             myClassMap.set(classKey, classModel.copy(members = members))
@@ -88,7 +86,7 @@ private class IntroduceNestedClasses(private val classContext: ClassContext) : M
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         val resolvedClass = classContext.resolve(ownerContext.node.name, ownerContext.getQualifiedName())
-        return resolvedClass?.copy(external = false) ?: ownerContext.node
+        return resolvedClass ?: ownerContext.node
     }
 }
 
