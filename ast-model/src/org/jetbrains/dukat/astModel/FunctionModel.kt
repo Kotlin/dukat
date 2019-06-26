@@ -2,7 +2,6 @@ package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
-import org.jetbrains.dukat.ast.model.nodes.MergableNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -23,4 +22,4 @@ data class FunctionModel(
         val operator: Boolean,
 
         val body: List<StatementNode>
-) : MemberEntity, TopLevelEntity, MergableNode, TopLevelNode
+) : MemberEntity, TopLevelEntity, MergeableModel, TopLevelNode
