@@ -349,7 +349,6 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
-                generatedReferenceNodes = generatedReferenceNodes,
                 annotations = exportQualifier.toAnnotation(),
                 export = export,
                 inline = inline,
