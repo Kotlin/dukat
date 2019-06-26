@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -21,6 +22,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
+private val logger = Logging.logger("TypeLowering")
 
 interface DeclarationTypeLowering : DeclarationLowering {
 
@@ -66,7 +68,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
             is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration)
             else -> {
-                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

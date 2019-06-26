@@ -18,9 +18,11 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
+private val logger = Logging.logger("TypeLowering")
 
 interface TypeLowering : Lowering<ParameterValueDeclaration> {
 
@@ -63,7 +65,7 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
             is PropertyNode -> lowerPropertyNode(declaration)
             is ConstructorNode -> lowerConstructorNode(declaration)
             else -> {
-                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

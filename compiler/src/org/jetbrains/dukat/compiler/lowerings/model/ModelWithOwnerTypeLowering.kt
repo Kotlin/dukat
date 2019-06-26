@@ -12,7 +12,11 @@ import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
+
+
+private val logger = Logging.logger("introduceModels")
 
 interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
 
@@ -42,7 +46,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
             else -> {
-                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

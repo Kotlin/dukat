@@ -18,6 +18,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -25,6 +26,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
+private val logger = Logging.logger("NodeWithOwnerLowering")
 
 interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclaration> {
 
@@ -82,7 +84,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
             is PropertyNode -> lowerPropertyNode(owner.wrap(declaration))
             is ConstructorNode -> lowerConstructorNode(owner.wrap(declaration))
             else -> {
-                println("[WARN] [${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
                 declaration
             }
         }

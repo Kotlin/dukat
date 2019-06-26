@@ -40,7 +40,3 @@ fun <T> cartesian(vararg lists: List<T>): List<List<T>> {
         else -> lists.drop(2).fold(cartesian(lists[0], lists[1])) { acc, a -> cartesian(acc as List<T>, a) }.map { deepFlatten(it) }
     }
 }
-
-fun main() {
-    println(cartesian(listOf("I"), listOf("J"), listOf("I"), listOf("Q"), listOf("W")))
-}

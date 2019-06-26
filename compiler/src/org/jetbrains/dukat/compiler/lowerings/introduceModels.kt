@@ -53,6 +53,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
@@ -60,6 +61,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import java.io.File
 
+private val logger = Logging.logger("introduceModels")
 
 private enum class MetaDataOptions {
     SKIP_NULLS
@@ -383,7 +385,7 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                     typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(typeParameter, emptyList()) })
         } else null
         else -> {
-            println("skipping ${this::class.simpleName}")
+            logger.debug("skipping ${this::class.simpleName}")
             null
         }
     }
