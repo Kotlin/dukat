@@ -15,6 +15,7 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeModules
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeVarsAndInterfaces
+import org.jetbrains.dukat.compiler.lowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.compiler.lowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.compiler.lowerings.model.addStandardImports
 import org.jetbrains.dukat.compiler.lowerings.model.omitStdLib
@@ -77,6 +78,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceMissedOverloads()
                 .introduceModels()
                 .mergeModules()
+                .mergeWithNameSpace()
                 .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()

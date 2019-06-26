@@ -1,7 +1,9 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.astCommon.NameEntity
+
 data class PropertyModel(
-        val name: String,
+        val name: NameEntity,
         val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 

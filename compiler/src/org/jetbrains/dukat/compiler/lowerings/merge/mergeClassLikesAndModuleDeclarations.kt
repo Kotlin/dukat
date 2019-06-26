@@ -26,7 +26,7 @@ private fun ModuleModel.canBeMerged(): Boolean {
 
 private fun VariableModel.convert(): MemberModel {
     return PropertyModel(
-            name = name.translate(),
+            name = name,
             type = type,
             typeParameters = emptyList(),
             static = false,
@@ -40,7 +40,7 @@ private fun VariableModel.convert(): MemberModel {
 private fun FunctionModel.convert(): MemberModel {
 
     return MethodModel(
-            name = name.translate(),
+            name = name,
             parameters = parameters,
             type = type,
             typeParameters = typeParameters,

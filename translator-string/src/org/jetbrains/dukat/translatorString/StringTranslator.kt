@@ -34,6 +34,7 @@ import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 
+const val FORMAT_TAB = "    "
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
@@ -208,7 +209,7 @@ private fun MethodModel.translate(): List<String> {
     val overrideClause = if (override) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters, !override)})${returnClause}$metaClause")
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters, !override)})${returnClause}$metaClause")
 }
 
 private fun ConstructorModel.translate(): List<String> {
@@ -255,7 +256,7 @@ private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
 
-    return "${modifier}var ${name}: ${type.translate()}${type.translateMeta()}"
+    return "${modifier}var ${name.translate()}: ${type.translate()}${type.translateMeta()}"
 }
 
 private fun MemberModel.translate(): List<String> {
@@ -264,6 +265,7 @@ private fun MemberModel.translate(): List<String> {
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
         is ClassModel -> listOf(translate(1))
+        is InterfaceModel -> listOf(translate(1))
         else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
     }
 }
@@ -278,7 +280,7 @@ private fun PropertyModel.translateSignature(): String {
         typeParams = " " + typeParams
     }
     val metaClause = type.translateMeta()
-    var res = "${overrideClause}${varModifier}${typeParams} ${this.name}: ${type.translate()}${metaClause}"
+    var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
     if (getter) {
         res += " get() = definedExternally"
     }
@@ -302,7 +304,7 @@ private fun MethodModel.translateSignature(): List<String> {
     val overrideClause = if (override) "override " else ""
 
     val metaClause = type.translateMeta()
-    val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name}(${translateParameters(parameters)})${returnClause}$metaClause"
+    val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
     return annotations + listOf(methodNodeTranslation)
 }
 
@@ -310,7 +312,9 @@ private fun MemberModel.translateSignature(): List<String> {
     return when (this) {
         is MethodModel -> translateSignature()
         is PropertyModel -> listOf(translateSignature())
-        else -> raiseConcern("can not translate singature ${this}") { emptyList<String>() }
+        is ClassModel -> listOf(translate(1))
+        is InterfaceModel -> listOf(translate(1))
+        else -> raiseConcern("can not translate signature ${this}") { emptyList<String>() }
     }
 }
 
@@ -379,30 +383,34 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val hasStaticMembers = staticMembers.isNotEmpty()
     val isBlock = hasMembers || hasStaticMembers
 
-    val tab = "    "
-
     output(classDeclaration + if (isBlock) " {" else "")
 
     if (hasMembers) {
-        members.flatMap { it.translate() }.map({ tab.repeat(padding + 1) + it }).forEach {
+        members.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(padding + 1) + it }).forEach {
             output(it)
         }
     }
 
     if (staticMembers.isNotEmpty()) {
-        output(tab.repeat(padding + 1) + "companion object {")
-        staticMembers.flatMap { it.translate() }.map({ tab.repeat(padding + 2) + it }).forEach {
+        output(FORMAT_TAB.repeat(padding + 1) + "companion object {")
+        staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(padding + 2) + it }).forEach {
             output(it)
         }
-        output(tab.repeat(padding + 1) + "}")
+        output(FORMAT_TAB.repeat(padding + 1) + "}")
     }
 
     if (isBlock) {
-        output(tab.repeat(padding) + "}")
+        output(FORMAT_TAB.repeat(padding) + "}")
     }
 }
 
-fun InterfaceModel.translate(output: (String) -> Unit) {
+private fun InterfaceModel.translate(padding: Int): String {
+    val res = mutableListOf<String>()
+    translate(padding) { res.add(it) }
+    return res.joinToString(LINE_SEPARATOR)
+}
+
+fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     val hasMembers = members.isNotEmpty()
     val staticMembers = companionObject.members
 
@@ -411,10 +419,10 @@ fun InterfaceModel.translate(output: (String) -> Unit) {
     val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
     val parents = translateHeritagModels(parentEntities)
 
-    val externalClause = if (external) KOTLIN_EXTERNAL_KEYWORD else ""
-    output("${translateAnnotations(annotations)}${externalClause} interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
+    val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
+    output("${translateAnnotations(annotations)}${externalClause}interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
     if (isBlock) {
-        members.flatMap { it.translateSignature() }.map { "    " + it }.forEach { output(it) }
+        members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
         val parents = if (companionObject.parentEntities.isEmpty()) {
             ""
@@ -423,13 +431,13 @@ fun InterfaceModel.translate(output: (String) -> Unit) {
         }
 
         if (showCompanionObject) {
-            output("    companion object${parents} {")
+            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents} {")
 
-            staticMembers.flatMap { it.translate() }.map({ "        ${it}" }).forEach { output(it) }
-            output("    }")
+            staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }.forEach { output(it) }
+            output("${FORMAT_TAB.repeat(padding + 1)}}")
         }
 
-        output("}")
+        output("${FORMAT_TAB.repeat(padding)}}")
     }
 }
 
@@ -481,7 +489,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
-        interfaceModel.translate(::addOutput)
+        interfaceModel.translate(0, ::addOutput)
     }
 
     override fun visitClass(classModel: ClassModel) {

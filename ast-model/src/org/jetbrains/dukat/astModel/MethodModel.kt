@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.astCommon.NameEntity
 
 
 data class MethodModel(
-        val name: String,
+        val name: NameEntity,
         val parameters: List<ParameterModel>,
         val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,

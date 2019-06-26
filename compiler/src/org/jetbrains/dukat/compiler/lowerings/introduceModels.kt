@@ -114,7 +114,7 @@ private fun MemberNode.process(): MemberModel? {
                 generated = generated
         )
         is MethodNode -> MethodModel(
-                name = name,
+                name = IdentifierEntity(name),
                 parameters = parameters.map { param -> param.process() },
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
@@ -133,7 +133,7 @@ private fun MemberNode.process(): MemberModel? {
                 open = open
         )
         is PropertyNode -> PropertyModel(
-                name = name,
+                name = IdentifierEntity(name),
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
