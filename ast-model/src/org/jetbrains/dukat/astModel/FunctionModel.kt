@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -12,7 +11,7 @@ data class FunctionModel(
         val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 
-        val annotations: MutableList<AnnotationNode>,
+        val annotations: MutableList<AnnotationModel>,
 
         val export: Boolean,
         val inline: Boolean,

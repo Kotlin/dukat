@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -9,7 +8,7 @@ data class VariableModel(
         override var name: NameEntity,
         val type: TypeModel,
 
-        val annotations: MutableList<AnnotationNode>,
+        val annotations: MutableList<AnnotationModel>,
 
         var immutable: Boolean,
         val inline: Boolean,

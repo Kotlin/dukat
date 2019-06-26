@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.astCommon.NameEntity
 
 
@@ -13,7 +12,7 @@ data class MethodModel(
         val static: Boolean,
         val override: Boolean,
         val operator: Boolean,
-        val annotations: List<AnnotationNode>,
+        val annotations: List<AnnotationModel>,
 
         val open: Boolean
 ) : MemberModel

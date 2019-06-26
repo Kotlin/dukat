@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class InterfaceModel(
@@ -9,6 +8,6 @@ data class InterfaceModel(
         override val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,
-        val annotations: MutableList<AnnotationNode>,
+        val annotations: MutableList<AnnotationModel>,
         val external: Boolean
 ) : ClassLikeModel

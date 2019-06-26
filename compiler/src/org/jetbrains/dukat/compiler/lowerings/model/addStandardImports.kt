@@ -1,13 +1,13 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
 private fun ModuleModel.addStandardImports() {
 
-    annotations.add(AnnotationNode("file:Suppress", listOf(
+    annotations.add(AnnotationModel("file:Suppress", listOf(
             "INTERFACE_WITH_SUPERCLASS",
             "OVERRIDING_FINAL_MEMBER",
             "RETURN_TYPE_MISMATCH_ON_OVERRIDE",

@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
@@ -11,6 +10,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
@@ -146,7 +146,7 @@ private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boo
             .joinToString(", ")
 }
 
-private fun translateAnnotations(annotations: List<AnnotationNode>): String {
+private fun translateAnnotations(annotations: List<AnnotationModel>): String {
     val annotations = annotations.map { annotationNode ->
         var res = "@" + annotationNode.name
         if (annotationNode.params.isNotEmpty()) {

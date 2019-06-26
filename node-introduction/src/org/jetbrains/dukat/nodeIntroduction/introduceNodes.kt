@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
 import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -128,7 +127,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false, //TODO: remove static, we don't need it for MethodSignatures
                     false,
                     false,
-                    emptyList(),
                     true
             )
         }
@@ -145,7 +143,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         false,
                         true,
-                        listOf(AnnotationNode("nativeGetter", emptyList())),
                         true
                 ),
                 MethodNode(
@@ -156,7 +153,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         false,
                         true,
-                        listOf(AnnotationNode("nativeSetter", emptyList())),
                         true
                 )
         )
@@ -172,7 +168,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 false,
                 false,
                 true,
-                listOf(AnnotationNode("nativeInvoke", emptyList())),
                 true
         )
     }
@@ -488,7 +483,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     declaration.isStatic(),
                     false,
                     false,
-                    emptyList(),
                     true
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }

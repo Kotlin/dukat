@@ -1,9 +1,9 @@
-package org.jetbrains.dukat.ast.model.nodes
+package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.NameEntity
 
-data class AnnotationNode(
+data class AnnotationModel(
         val name: String,
         val params: List<NameEntity>
 ) : Entity

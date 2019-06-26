@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.AnnotationNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -33,6 +32,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -100,6 +100,19 @@ private fun split(members: List<MemberNode>): Members {
     return Members(ownMembers, staticMembers)
 }
 
+private fun MethodNode.resolveAnnotations(): List<AnnotationModel> {
+    if (operator) {
+        return when(name) {
+            "get" -> listOf(AnnotationModel("nativeGetter", emptyList()))
+            "set" -> listOf(AnnotationModel("nativeSetter", emptyList()))
+            "invoke" -> listOf(AnnotationModel("nativeInvoke", emptyList()))
+            else -> emptyList()
+        }
+    }
+
+    return emptyList()
+}
+
 private fun MemberNode.process(): MemberModel? {
     // TODO: how ClassModel end up here?
     return when (this) {
@@ -128,7 +141,7 @@ private fun MemberNode.process(): MemberModel? {
 
                 override = override,
                 operator = operator,
-                annotations = annotations,
+                annotations = resolveAnnotations(),
 
                 open = open
         )
@@ -326,10 +339,10 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     )
 }
 
-private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationNode> {
+private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
     return when (this) {
-        is JsModule -> mutableListOf(AnnotationNode("JsModule", listOf(name)))
-        is JsDefault -> mutableListOf(AnnotationNode("JsName", listOf(IdentifierEntity("default"))))
+        is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name)))
+        is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
         else -> mutableListOf()
     }
 }
@@ -404,14 +417,14 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
         if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)
     }
 
-    val annotations = mutableListOf<AnnotationNode>()
+    val annotations = mutableListOf<AnnotationModel>()
 
     jsModule?.let {
-        annotations.add(AnnotationNode("file:JsModule", listOf(it)))
+        annotations.add(AnnotationModel("file:JsModule", listOf(it)))
     }
 
     jsQualifier?.let {
-        annotations.add(AnnotationNode("file:JsQualifier", listOf(it)))
+        annotations.add(AnnotationModel("file:JsQualifier", listOf(it)))
     }
 
     val module = ModuleModel(
