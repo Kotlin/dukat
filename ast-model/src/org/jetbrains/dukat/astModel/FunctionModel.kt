@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class FunctionModel(
         override val name: NameEntity,
@@ -22,4 +21,4 @@ data class FunctionModel(
         val operator: Boolean,
 
         val body: List<StatementNode>
-) : MemberEntity, TopLevelEntity, MergeableModel, TopLevelNode
+) : MemberEntity, MergeableModel, TopLevelNode
