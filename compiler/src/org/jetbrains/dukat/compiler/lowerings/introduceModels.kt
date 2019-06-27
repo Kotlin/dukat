@@ -29,8 +29,13 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.statements.AssignmentStatementNode
+import org.jetbrains.dukat.ast.model.nodes.statements.ChainCallNode
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementCallNode
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -102,7 +107,7 @@ private fun split(members: List<MemberNode>): Members {
 
 private fun MethodNode.resolveAnnotations(): List<AnnotationModel> {
     if (operator) {
-        return when(name) {
+        return when (name) {
             "get" -> listOf(AnnotationModel("nativeGetter", emptyList()))
             "set" -> listOf(AnnotationModel("nativeSetter", emptyList()))
             "invoke" -> listOf(AnnotationModel("nativeInvoke", emptyList()))
@@ -347,6 +352,29 @@ private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
     }
 }
 
+private fun VariableNode.resolveGetter(): StatementNode? {
+    return if (inline) {
+        ChainCallNode(
+                StatementCallNode(
+                        QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
+                ),
+                StatementCallNode(name.rightMost(), null)
+        )
+    } else null
+}
+
+private fun VariableNode.resolveSetter(): StatementNode? {
+    return if (inline) {
+        AssignmentStatementNode(
+                ChainCallNode(
+                        StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                        StatementCallNode(name.rightMost(), null)
+                ),
+                StatementCallNode(IdentifierEntity("value"), null)
+        )
+    } else null
+}
+
 private fun TopLevelEntity.convertToModel(): TopLevelNode? {
     return when (this) {
         is ClassNode -> convertToClassModel()
@@ -375,9 +403,9 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                 annotations = exportQualifier.toAnnotation(),
                 immutable = immutable,
                 inline = inline,
-                initializer = initializer,
-                get = get,
-                set = set,
+                initializer = null,
+                get = resolveGetter(),
+                set = resolveSetter(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
                             name = typeParam.value,

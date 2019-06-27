@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity

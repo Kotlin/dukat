@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
-import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
+import org.jetbrains.dukat.ast.model.nodes.statements.AssignmentStatementNode
+import org.jetbrains.dukat.ast.model.nodes.statements.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
-import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
-import org.jetbrains.dukat.ast.model.nodes.StatementNode
+import org.jetbrains.dukat.ast.model.nodes.statements.ReturnStatement
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementCallNode
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementNode
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity

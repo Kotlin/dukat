@@ -1,8 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.AssignmentStatementNode
-import org.jetbrains.dukat.ast.model.nodes.ChainCallNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -19,10 +17,8 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.ReturnStatement
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.StatementCallNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -31,6 +27,9 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.statements.ChainCallNode
+import org.jetbrains.dukat.ast.model.nodes.statements.ReturnStatement
+import org.jetbrains.dukat.ast.model.nodes.statements.StatementCallNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -377,20 +376,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     null,
                     false,
                     true,
-                    null,
-                    ChainCallNode(
-                            StatementCallNode(
-                                    QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
-                            ),
-                            StatementCallNode(IdentifierEntity(declaration.name), null)
-                    ),
-                    AssignmentStatementNode(
-                            ChainCallNode(
-                                    StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                    StatementCallNode(IdentifierEntity(declaration.name), null)
-                            ),
-                            StatementCallNode(IdentifierEntity("value"), null)
-                    ),
                     convertTypeParameters(interfaceDeclaration.typeParameters),
                     ""
             ))
@@ -505,9 +490,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         null,
                         false,
                         false,
-                        null,
-                        null,
-                        null,
                         emptyList(),
                         declaration.uid
                 )
@@ -534,9 +516,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     null,
                     false,
                     false,
-                    null,
-                    null,
-                    null,
                     emptyList(),
                     declaration.uid
             )
