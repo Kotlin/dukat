@@ -14,5 +14,6 @@ data class VariableModel(
         val initializer: StatementModel?,
         val get: StatementModel?,
         val set: StatementModel?,
-        val typeParameters: List<TypeParameterModel>
+        val typeParameters: List<TypeParameterModel>,
+        val extend: ClassLikeReferenceModel?
 ) : MergeableModel, TopLevelModel

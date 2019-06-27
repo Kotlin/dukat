@@ -14,5 +14,6 @@ data class VariableNode(
         var immutable: Boolean,
         val inline: Boolean,
         val typeParameters: List<TypeValueNode>,
+        val extend: ClassLikeReferenceNode?,
         override val uid: String
 ) : TopLevelEntity, UniqueNode

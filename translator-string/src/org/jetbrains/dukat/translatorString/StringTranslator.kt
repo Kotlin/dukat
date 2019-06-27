@@ -176,11 +176,11 @@ private fun StatementModel.translate(): String {
 }
 
 private fun ClassLikeReferenceModel.translate(): String {
-        return name.translate() + if (typeParameters.isNotEmpty()) {
-            "<${typeParameters.map { it.translate() }.joinToString(", ")}>"
-        } else {
-            ""
-        }
+    return name.translate() + if (typeParameters.isNotEmpty()) {
+        "<${typeParameters.map { it.translate() }.joinToString(", ")}>"
+    } else {
+        ""
+    }
 }
 
 private fun FunctionModel.translate(): String {
@@ -200,7 +200,9 @@ private fun FunctionModel.translate(): String {
         " { ${body.joinToString { statementNode -> statementNode.translate() }} }"
     }
 
-    val funName = if (extend == null) { name.translate() } else {
+    val funName = if (extend == null) {
+        name.translate()
+    } else {
         extend?.translate() + "." + name.translate()
     }
     return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()}${body}"
@@ -252,7 +254,12 @@ private fun VariableModel.translate(): String {
         " ${translateTypeParameters(typeParameters)}"
     }
 
-    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${name.translate()}: ${type.translate()}${type.translateMeta()}${body}"
+    val varName = if (extend == null) {
+        name.translate()
+    } else {
+        extend?.translate() + "." + name.translate()
+    }
+    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumModel.translate(): String {

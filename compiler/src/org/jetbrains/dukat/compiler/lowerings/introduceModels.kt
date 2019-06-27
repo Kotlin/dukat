@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings
 
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -433,6 +434,12 @@ private fun FunctionNode.resolveBody(): List<StatementModel> {
     }
 }
 
+private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
+    return this?.let { extendNode ->
+        ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
+    }
+}
+
 fun TopLevelEntity.convertToModel(): TopLevelModel? {
     return when (this) {
         is ClassNode -> convertToClassModel()
@@ -458,9 +465,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 export = export,
                 inline = inline,
                 operator = operator,
-                extend = extend?.let { extendNode ->
-                    ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
-                },
+                extend = extend.convert(),
                 body = resolveBody()
         )
         is VariableNode -> VariableModel(
@@ -477,7 +482,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                             name = typeParam.value,
                             constraints = typeParam.params.map { param -> param.process() }
                     )
-                }
+                },
+                extend = extend.convert()
         )
         is ObjectNode -> ObjectModel(
                 name = IdentifierEntity(name),

@@ -12,7 +12,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaratio
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
@@ -346,20 +345,15 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 ))
             }
             is PropertyDeclaration -> listOf(VariableNode(
-                    QualifierEntity(
-                            if (interfaceDeclaration.typeParameters.isEmpty()) {
-                                IdentifierEntity(name)
-                            } else {
-                                GenericIdentifierNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
-                                    TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
-                                })
-                            }, IdentifierEntity(declaration.name)
-                    ),
+                    IdentifierEntity(declaration.name),
                     if (declaration.optional) declaration.type.makeNullable() else declaration.type,
                     null,
                     false,
                     true,
                     convertTypeParameters(interfaceDeclaration.typeParameters),
+                    ClassLikeReferenceNode(IdentifierEntity(name), interfaceDeclaration.typeParameters.map { typeParam ->
+                        typeParam.name
+                    }),
                     ""
             ))
             is IndexSignatureDeclaration -> listOf(
@@ -459,6 +453,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         false,
                         false,
                         emptyList(),
+                        null,
                         declaration.uid
                 )
             } else {
@@ -485,6 +480,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     false,
                     emptyList(),
+                    null,
                     declaration.uid
             )
         }
