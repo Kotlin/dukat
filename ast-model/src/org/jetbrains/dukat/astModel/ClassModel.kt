@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class ClassModel(
@@ -12,4 +11,4 @@ data class ClassModel(
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationModel>,
         val external: Boolean
-) : ClassLikeModel, DelegationModel, MemberNode, MemberModel
+) : ClassLikeModel, DelegationModel, MemberModel

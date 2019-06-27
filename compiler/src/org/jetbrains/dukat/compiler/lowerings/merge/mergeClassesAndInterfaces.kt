@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -119,7 +119,7 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
                 entry.value.reduceRight { classLikeModel, acc -> classLikeModel.merge(acc) }
             }.toMutableMap()
 
-    val declarationResolved = mutableListOf<TopLevelNode>()
+    val declarationResolved = mutableListOf<TopLevelModel>()
     declarations.forEach { declaration ->
         if (declaration is ClassLikeModel) {
             val classLikeModel = classlikeBucketsMerged.remove(declaration.createKey())

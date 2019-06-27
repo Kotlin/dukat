@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
@@ -18,4 +17,4 @@ data class FunctionModel(
         val operator: Boolean,
 
         val body: List<StatementModel>
-) : MemberEntity, MergeableModel, TopLevelNode
+) : MemberEntity, MergeableModel, TopLevelModel

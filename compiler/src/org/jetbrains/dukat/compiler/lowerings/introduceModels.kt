@@ -18,7 +18,7 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -276,7 +276,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
     }
 }
 
-private fun ClassNode.convertToClassModel(): TopLevelNode {
+private fun ClassNode.convertToClassModel(): TopLevelModel {
     val membersSplitted = split(members)
 
     return ClassModel(
@@ -430,7 +430,7 @@ private fun FunctionNode.resolveBody(): List<StatementModel> {
     }
 }
 
-private fun TopLevelEntity.convertToModel(): TopLevelNode? {
+private fun TopLevelEntity.convertToModel(): TopLevelModel? {
     return when (this) {
         is ClassNode -> convertToClassModel()
         is InterfaceNode -> convertToInterfaceModel()
@@ -499,7 +499,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
         declaration.convertToModel()
     }
 
-    val declarationsFiltered = mutableListOf<TopLevelNode>()
+    val declarationsFiltered = mutableListOf<TopLevelModel>()
     val submodules = mutableListOf<ModuleModel>()
     declarationsMapped.forEach { declaration ->
         if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)

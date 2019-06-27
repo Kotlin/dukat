@@ -1,8 +1,6 @@
 package org.jetbrains.dukat.translator
 
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -87,7 +85,7 @@ interface ModelVisitor {
         }
     }
 
-    private fun processTopLevelDeclaration(declaration: TopLevelNode) {
+    private fun processTopLevelDeclaration(declaration: TopLevelModel) {
         when (declaration) {
             is VariableModel -> processVariableModel(declaration)
             is FunctionModel -> processFunctionModel(declaration)

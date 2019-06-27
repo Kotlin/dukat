@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -38,7 +38,7 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelNode>): TopLevelNode {
+    fun lowerTopLevelDeclaration(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
         val declaration = ownerContext.node
         return when (declaration) {
             is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
@@ -51,7 +51,7 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, ownerContext: NodeOwner<ModuleModel>): List<TopLevelNode> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelModel>, ownerContext: NodeOwner<ModuleModel>): List<TopLevelModel> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(NodeOwner(declaration, ownerContext))
         }

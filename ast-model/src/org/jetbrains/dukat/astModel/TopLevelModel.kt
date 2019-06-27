@@ -1,8 +1,8 @@
-package org.jetbrains.dukat.ast.model.nodes
+package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.NameEntity
 
-interface TopLevelNode : Entity {
+interface TopLevelModel : Entity {
     val name: NameEntity
 }

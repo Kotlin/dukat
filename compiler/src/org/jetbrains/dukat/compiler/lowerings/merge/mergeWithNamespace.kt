@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -18,13 +18,13 @@ private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     sumbodules.forEach { submodule -> submodule.visit(visitor) }
 }
 
-private fun ModuleModel.visitTopLevelNode(visitor: (TopLevelNode, ModuleModel) -> Unit) {
+private fun ModuleModel.visitTopLevelNode(visitor: (TopLevelModel, ModuleModel) -> Unit) {
     visitor(this, this)
     declarations.forEach { declaration -> visitor(declaration, this) }
     sumbodules.forEach { submodule -> submodule.visitTopLevelNode(visitor) }
 }
 
-private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelNode) -> TopLevelNode?): TopLevelNode? {
+private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelModel) -> TopLevelModel?): TopLevelModel? {
     val moduleResolved = visitor(this)
     return if (moduleResolved is ModuleModel) {
         return (moduleResolved as ModuleModel).copy(

@@ -6,10 +6,10 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class TypeAliasNode(
-        override val name: NameEntity,
+        val name: NameEntity,
         val typeReference: ParameterValueDeclaration,
         val typeParameters: List<IdentifierEntity>,
         val uid: String,
 
         var canBeTranslated: Boolean
-) : TopLevelEntity, TopLevelNode
+) : TopLevelEntity
