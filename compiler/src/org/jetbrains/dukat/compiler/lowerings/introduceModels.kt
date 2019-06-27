@@ -46,6 +46,8 @@ import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.EnumModel
+import org.jetbrains.dukat.astModel.EnumTokenModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
@@ -432,6 +434,12 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
     return when (this) {
         is ClassNode -> convertToClassModel()
         is InterfaceNode -> convertToInterfaceModel()
+        is EnumNode -> {
+            EnumModel(
+                    name = name,
+                    values = values.map { token -> EnumTokenModel(token.value, token.meta) }
+            )
+        }
         is FunctionNode -> FunctionModel(
                 name = name,
                 parameters = parameters.map { param -> param.process() },
@@ -449,7 +457,6 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                 operator = operator,
                 body = resolveBody()
         )
-        is EnumNode -> this
         is VariableNode -> VariableModel(
                 name = name,
                 type = type.process(),

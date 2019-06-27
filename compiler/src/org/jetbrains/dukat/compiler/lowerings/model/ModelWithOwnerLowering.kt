@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -25,7 +25,7 @@ interface ModelWithOwnerLowering {
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
     fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel
     fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
-    fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode
+    fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>): EnumModel
 
     fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel = ownerContext.node
 
@@ -45,7 +45,7 @@ interface ModelWithOwnerLowering {
             is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
-            is EnumNode -> lowerEnumNode(NodeOwner(declaration, ownerContext))
+            is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
             is TypeAliasModel -> declaration
             else -> raiseConcern("unknown TopeLevelDeclaration ${declaration::class.simpleName}") { declaration }
         }

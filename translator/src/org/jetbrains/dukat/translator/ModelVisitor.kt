@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -37,8 +38,8 @@ interface ModelVisitor {
         visitObject(declaration)
     }
 
-    fun visitEnum(enumNode: EnumNode)
-    private fun processEnumNode(declaration: EnumNode) {
+    fun visitEnum(enumNode: EnumModel)
+    private fun processEnumNode(declaration: EnumModel) {
         visitEnum(declaration)
     }
 
@@ -92,7 +93,7 @@ interface ModelVisitor {
             is FunctionModel -> processFunctionModel(declaration)
             is ClassLikeModel -> processClassLikeModel(declaration)
             is ObjectModel -> processObjectModel(declaration)
-            is EnumNode -> processEnumNode(declaration)
+            is EnumModel -> processEnumNode(declaration)
             is TypeAliasModel -> processTypeAliasModel(declaration)
             else -> raiseConcern("unable to process TopeLevelDeclaration ${declaration::class.simpleName}") {  }
         }

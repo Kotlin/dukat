@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -20,7 +20,7 @@ private val logger = Logging.logger("introduceModels")
 
 interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
 
-    override fun lowerEnumNode(ownerContext: NodeOwner<EnumNode>): EnumNode {
+    override fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>): EnumModel {
         return ownerContext.node
     }
 

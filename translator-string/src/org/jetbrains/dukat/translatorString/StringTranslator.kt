@@ -1,11 +1,5 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -14,6 +8,7 @@ import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
+import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -31,6 +26,11 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 
@@ -242,7 +242,7 @@ private fun VariableModel.translate(): String {
     return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${name.translate()}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
-private fun EnumNode.translate(): String {
+private fun EnumModel.translate(): String {
     val res = mutableListOf("${KOTLIN_EXTERNAL_KEYWORD} enum class ${name.translate()} {")
     res.add(values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
@@ -484,7 +484,7 @@ class StringTranslator : ModelVisitor {
         addOutput("}")
     }
 
-    override fun visitEnum(enumNode: EnumNode) {
+    override fun visitEnum(enumNode: EnumModel) {
         addOutput(enumNode.translate())
     }
 
