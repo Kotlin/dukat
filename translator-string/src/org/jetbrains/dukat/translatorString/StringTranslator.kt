@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -36,6 +35,7 @@ import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import translate
 
 const val FORMAT_TAB = "    "

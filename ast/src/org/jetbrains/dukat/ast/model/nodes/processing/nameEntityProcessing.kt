@@ -5,8 +5,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.panic.raiseConcern
 
-val ROOT_PACKAGENAME = IdentifierEntity("<ROOT>")
-
 fun NameEntity.toNode(): NameEntity {
     return when (this) {
         is IdentifierEntity -> IdentifierEntity(value)

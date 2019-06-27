@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
