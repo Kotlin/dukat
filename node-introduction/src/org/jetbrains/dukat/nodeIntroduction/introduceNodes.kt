@@ -31,6 +31,7 @@ import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
+import org.jetbrains.dukat.ast.model.nodes.processing.unquote
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -515,22 +516,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    private fun unquote(name: String): String {
-        return name.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
-    }
-
-    //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
-    private fun escapeName(name: String): String {
-        return name
-                .replace("/".toRegex(), ".")
-                .replace("-".toRegex(), "_")
-                .replace("^_$".toRegex(), "`_`")
-                .replace("^class$".toRegex(), "`class`")
-                .replace("^var$".toRegex(), "`var`")
-                .replace("^val$".toRegex(), "`val`")
-                .replace("^interface$".toRegex(), "`interface`")
-    }
-
     private fun isExternal(definitionsInfo: List<DefinitionInfoDeclaration>): Boolean {
         return definitionsInfo.any { definition ->
             definition.fileName.replace("/", File.separator) != fileName
@@ -541,13 +526,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         return when (this) {
             is IdentifierEntity -> value.matches("^[\"\'].*[\"\']$".toRegex())
             else -> false
-        }
-    }
-
-    private fun NameEntity.unquote(): NameEntity {
-        return when (this) {
-            is IdentifierEntity -> copy(value = escapeName(unquote(value)))
-            else -> this
         }
     }
 

@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
@@ -30,7 +29,6 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
             }
         }
     }
-
 
     val declarationsMerged = declarations.flatMap { declaration ->
         when (declaration) {

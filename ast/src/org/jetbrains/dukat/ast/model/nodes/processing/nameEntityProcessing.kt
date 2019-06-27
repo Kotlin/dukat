@@ -7,18 +7,6 @@ import org.jetbrains.dukat.panic.raiseConcern
 
 val ROOT_PACKAGENAME = IdentifierEntity("<ROOT>")
 
-fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        if (leftMost() == ROOT_PACKAGENAME) {
-            shiftLeft()!!.translate()
-        } else {
-            "${left.translate()}.${right.translate()}"
-        }
-    }
-    else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
-}
-
 fun NameEntity.toNode(): NameEntity {
     return when (this) {
         is IdentifierEntity -> IdentifierEntity(value)
@@ -176,5 +164,28 @@ fun NameEntity.shiftLeft(): NameEntity? {
             }
         }
         else -> raiseConcern("unknown NameEntity") { this }
+    }
+}
+
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+private fun escapeName(name: String): String {
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
+}
+
+private fun unquote(name: String): String {
+    return name.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
+}
+
+fun NameEntity.unquote(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> copy(value = escapeName(unquote(value)))
+        else -> this
     }
 }

@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.ast.model.nodes.processing.unquote
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -71,15 +70,9 @@ private fun CompanionObjectModel.merge(ownerName: NameEntity, modulesToBeMerged:
     return copy(members = members)
 }
 
-// TODO: duplication, think of separate place to have this (but please don't call it utils )))
-private fun unquote(name: String): String {
-    return name.replace("(?:^\"|\')|(?:\"|\'$)".toRegex(), "")
-}
-
-
 private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeModel>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
     return submodules.map { subModule ->
-        val moduleKey = IdentifierEntity(unquote(subModule.shortName.translate()))
+        val moduleKey = subModule.shortName.unquote()
         if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
             val bucket = modulesToBeMerged.getOrPut(moduleKey) { mutableListOf() }
             bucket.add(subModule)

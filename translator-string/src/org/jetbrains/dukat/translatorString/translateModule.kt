@@ -1,9 +1,13 @@
+import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
+import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
@@ -19,6 +23,18 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
+internal fun NameEntity.translate(): String = when (this) {
+    is IdentifierEntity -> value
+    is QualifierEntity -> {
+        if (leftMost() == ROOT_PACKAGENAME) {
+            shiftLeft()!!.translate()
+        } else {
+            "${left.translate()}.${right.translate()}"
+        }
+    }
+    else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
+}
+
 private fun NameEntity.fileNameFragment(): String? {
     val unprefixedName = shiftLeft()
 
@@ -29,7 +45,7 @@ private fun NameEntity.fileNameFragment(): String? {
     }
 }
 
-private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String  {
+private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String {
     val sourceFile = File(fileName)
     val sourceFileName = sourceFile.name
     val ktFileNamePrefix =

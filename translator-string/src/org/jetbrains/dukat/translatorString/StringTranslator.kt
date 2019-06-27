@@ -1,9 +1,11 @@
 package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
+import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -34,6 +36,7 @@ import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
+import translate
 
 const val FORMAT_TAB = "    "
 
@@ -60,7 +63,6 @@ private fun TypeModel.translateMeta(): String {
 private fun translateTypeParams(params: List<TypeModel>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
-
 
 fun TypeModel.translate(): String {
     return when (this) {
