@@ -32,7 +32,6 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -316,12 +315,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
 }
 
 private fun NameEntity.toTypeValueModel(): TypeValueModel {
-    val nameTranslated = when (this) {
-        is NameEntity -> translate()
-        else -> raiseConcern("unknown HeritageSymbolNode ${this}") { this.toString() }
-    }
-
-    return TypeValueModel(IdentifierEntity(nameTranslated), emptyList(), null)
+    return TypeValueModel(this, emptyList(), null)
 }
 
 private fun HeritageNode.convertToModel(): HeritageModel {

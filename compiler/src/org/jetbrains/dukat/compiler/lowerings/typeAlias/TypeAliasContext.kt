@@ -6,22 +6,9 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-
-
-private fun NameEntity.getAliasKey(): String {
-    return when (this) {
-        is IdentifierEntity -> translate()
-        is QualifierEntity -> translate()
-        else -> raiseConcern("unknown NameEntity ${this}") { "" }
-    }
-}
 
 class TypeAliasContext {
 
@@ -29,19 +16,19 @@ class TypeAliasContext {
         return (!canBeTranslated) && (name == heritageNode.name)
     }
 
-    private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<String, ParameterValueDeclaration>): ParameterValueDeclaration {
+    private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<NameEntity, ParameterValueDeclaration>): ParameterValueDeclaration {
         return when (this) {
             is TypeValueNode -> {
                 val paramsSpecified = params.map { param ->
                     when (param) {
                         is TypeValueNode -> {
-                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value.getAliasKey(), param.specify(aliasParamsMap)))
+                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
                         }
                         else -> param
                     }
                 }
 
-                val valueAliasResolved = aliasParamsMap.get(value.getAliasKey())
+                val valueAliasResolved = aliasParamsMap.get(value)
 
                 val valueResolved = if (valueAliasResolved is TypeValueNode) {
                     valueAliasResolved.value
@@ -79,7 +66,7 @@ class TypeAliasContext {
             is TypeValueNode -> {
                 if (type.value == name) {
                     if (typeParameters.size == type.params.size) {
-                        val aliasParamsMap = typeParameters.zip(type.params).associateBy({ it.first.value }, { it.second })
+                        val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = typeParameters.zip(type.params).associateBy({ it.first }, { it.second })
 
                         when (typeReference) {
                             is TypeValueNode -> return typeReference.specify(aliasParamsMap)

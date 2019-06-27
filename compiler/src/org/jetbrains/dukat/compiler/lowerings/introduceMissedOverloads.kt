@@ -8,7 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -19,7 +20,7 @@ private data class NodeData<T>(
 )
 
 private typealias NodeDataRecord<T> = MutableMap<List<ParameterValueDeclaration>, NodeData<T>>
-private typealias NodesDataMap<T> = MutableMap<String, NodeDataRecord<T>>
+private typealias NodesDataMap<T> = MutableMap<NameEntity, NodeDataRecord<T>>
 
 private fun MethodNode.process(nodesDataMap: NodesDataMap<MethodNode>) {
     val params = parameters
@@ -30,7 +31,7 @@ private fun MethodNode.process(nodesDataMap: NodesDataMap<MethodNode>) {
     val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
     val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
 
-    val methodNodeRecord = nodesDataMap.getOrPut(name) { mutableMapOf() }
+    val methodNodeRecord = nodesDataMap.getOrPut(IdentifierEntity(name)) { mutableMapOf() }
     val methodData = methodNodeRecord.getOrPut(headTypes) { NodeData(mutableListOf(), headNames, this) }
     methodData.optionalArgs.add(params.size - nonOptionalHead.size)
 }
@@ -45,7 +46,7 @@ private fun FunctionNode.process(nodesDataMap: NodesDataMap<FunctionNode>) {
     val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
     val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
 
-    val methodNodeRecord = nodesDataMap.getOrPut(name.translate()) { mutableMapOf() }
+    val methodNodeRecord = nodesDataMap.getOrPut(name) { mutableMapOf() }
     val methodData = methodNodeRecord.getOrPut(headTypes) { NodeData(mutableListOf(), headNames, this) }
     methodData.optionalArgs.add(params.size - nonOptionalHead.size)
 }
@@ -87,7 +88,7 @@ private fun DocumentRootNode.createDataMap(): NodesDataMap<FunctionNode> {
 }
 
 
-private fun <T> Map.Entry<String, NodeDataRecord<T>>.process(
+private fun <T> Map.Entry<NameEntity, NodeDataRecord<T>>.process(
         generatedMethods: MutableList<T>,
         paramsResolved: (node: T, params: List<ParameterNode>) -> T
 ) {

@@ -8,10 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
-import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver

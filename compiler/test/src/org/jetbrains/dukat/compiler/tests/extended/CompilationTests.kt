@@ -1,10 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
-import org.jetbrains.dukat.ast.model.nodes.processing.process
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.OutputTests
