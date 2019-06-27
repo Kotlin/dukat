@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes.processing
 
-import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -17,7 +16,6 @@ fun NameEntity.translate(): String = when (this) {
             "${left.translate()}.${right.translate()}"
         }
     }
-    is GenericIdentifierNode -> value + "<${typeParameters.joinToString(", ") { typeParameter -> typeParameter.value.translate() }}>"
     else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
 }
 
@@ -41,7 +39,6 @@ fun NameEntity.process(handler: (String) -> String): NameEntity {
     return when (this) {
         is IdentifierEntity -> IdentifierEntity(handler(value))
         is QualifierEntity -> copy(left = left.process(handler), right = right.process(handler) as IdentifierEntity)
-        is GenericIdentifierNode -> copy(value = handler(value))
         else -> raiseConcern("failed to process NameEntity ${this}") { this }
     }
 }
@@ -70,7 +67,7 @@ private fun QualifierEntity.appendLeft(qualifiedNode: NameEntity): QualifierEnti
 }
 
 fun NameEntity.appendLeft(qualifiedNode: NameEntity): NameEntity {
-    return when(this) {
+    return when (this) {
         is IdentifierEntity -> this.appendLeft(qualifiedNode)
         is QualifierEntity -> this.appendLeft(qualifiedNode)
         else -> raiseConcern("unknown NameEntity ${this}") { this }
@@ -145,7 +142,6 @@ fun NameEntity.appendRight(qualifiedNode: NameEntity): NameEntity {
 
 fun NameEntity.shiftRight(): NameEntity? {
     return when (this) {
-        is GenericIdentifierNode -> null
         is IdentifierEntity -> null
         is QualifierEntity -> left
         else -> raiseConcern("unknown NameEntity") { this }
@@ -154,7 +150,6 @@ fun NameEntity.shiftRight(): NameEntity? {
 
 fun NameEntity.leftMost(): NameEntity {
     return when (this) {
-        is GenericIdentifierNode -> this
         is IdentifierEntity -> this
         is QualifierEntity -> left.leftMost()
         else -> raiseConcern("unknown NameEntity ${this}") { this }
@@ -163,7 +158,6 @@ fun NameEntity.leftMost(): NameEntity {
 
 fun NameEntity.rightMost(): NameEntity {
     return when (this) {
-        is GenericIdentifierNode -> this
         is IdentifierEntity -> this
         is QualifierEntity -> right
         else -> raiseConcern("unknown NameEntity ${this}") { this }

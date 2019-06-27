@@ -1,11 +1,9 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.process
 import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.size
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -24,7 +22,6 @@ private fun NameEntity.shiftLeft(): NameEntity {
     if (this is QualifierEntity) {
         return when (left) {
             is IdentifierEntity -> right
-            is GenericIdentifierNode -> right
             is QualifierEntity -> QualifierEntity((left as QualifierEntity).right, right)
             else -> raiseConcern("unknown org.jetbrains.dukat.astCommon.NameEntity") { this }
         }
