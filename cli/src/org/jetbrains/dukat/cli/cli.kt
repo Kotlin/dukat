@@ -2,7 +2,6 @@ package org.jetbrains.dukat.cli
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.ast.model.nodes.processing.ROOT_PACKAGENAME
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -13,6 +12,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
