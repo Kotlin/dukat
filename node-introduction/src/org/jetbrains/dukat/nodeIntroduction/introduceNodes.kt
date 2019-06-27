@@ -31,7 +31,6 @@ import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
-import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -521,9 +520,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
-    private fun escapePackageName(name: String): String {
+    private fun escapeName(name: String): String {
         return name
-                .replace("/".toRegex(), "")
+                .replace("/".toRegex(), ".")
                 .replace("-".toRegex(), "_")
                 .replace("^_$".toRegex(), "`_`")
                 .replace("^class$".toRegex(), "`class`")
@@ -538,21 +537,31 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
+    private fun NameEntity.isStringLiteral(): Boolean {
+        return when (this) {
+            is IdentifierEntity -> value.matches("^[\"\'].*[\"\']$".toRegex())
+            else -> false
+        }
+    }
+
+    private fun NameEntity.unquote(): NameEntity {
+        return when (this) {
+            is IdentifierEntity -> copy(value = escapeName(unquote(value)))
+            else -> this
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): DocumentRootNode {
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
 
-        val qualifiers = parentDocRoots.map { unquote(it.node.packageName.translate()) }
-
-        val qualifierIdentifiers = qualifiers
-                .flatMap { it.split("/") }
-                .map { IdentifierEntity(escapePackageName(it)) }
-
-        val fullPackageName = qualifierIdentifiers.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
-
+        val qualifiers = parentDocRoots.map { it.node.packageName.unquote() }
+        val fullPackageName = qualifiers.reduce { acc, identifier -> identifier.appendRight(acc) }
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelEntity>()
+
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
                 imports[declaration.name] = ImportNode(
@@ -562,8 +571,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner))
         }
 
-        val moduleNameIsStringLiteral = documentRoot.packageName.translate().matches("^[\"\'].*[\"\']$".toRegex())
-        val docRoot = DocumentRootNode(
+        val moduleNameIsStringLiteral = documentRoot.packageName.isStringLiteral()
+
+        return DocumentRootNode(
                 fileName = fileName,
                 packageName = documentRoot.packageName,
                 qualifiedPackageName = fullPackageName,
@@ -575,8 +585,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 jsQualifier = null,
                 uid = documentRoot.uid
         )
-
-        return docRoot
     }
 }
 
