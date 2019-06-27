@@ -4,9 +4,13 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -29,10 +33,11 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.ast.model.nodes.statements.AssignmentStatementNode
-import org.jetbrains.dukat.ast.model.nodes.statements.ChainCallNode
-import org.jetbrains.dukat.ast.model.nodes.statements.StatementCallNode
-import org.jetbrains.dukat.ast.model.nodes.statements.StatementNode
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -352,27 +357,75 @@ private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
     }
 }
 
-private fun VariableNode.resolveGetter(): StatementNode? {
+private fun VariableNode.resolveGetter(): StatementModel? {
     return if (inline) {
-        ChainCallNode(
-                StatementCallNode(
+        ChainCallModel(
+                StatementCallModel(
                         QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
                 ),
-                StatementCallNode(name.rightMost(), null)
+                StatementCallModel(name.rightMost(), null)
         )
     } else null
 }
 
-private fun VariableNode.resolveSetter(): StatementNode? {
+private fun VariableNode.resolveSetter(): StatementModel? {
     return if (inline) {
-        AssignmentStatementNode(
-                ChainCallNode(
-                        StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                        StatementCallNode(name.rightMost(), null)
+        AssignmentStatementModel(
+                ChainCallModel(
+                        StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                        StatementCallModel(name.rightMost(), null)
                 ),
-                StatementCallNode(IdentifierEntity("value"), null)
+                StatementCallModel(IdentifierEntity("value"), null)
         )
     } else null
+}
+
+private fun FunctionNode.resolveBody(): List<StatementModel> {
+    val nodeContext = this.context
+    return when (nodeContext) {
+        is IndexSignatureGetter -> listOf(
+                ReturnStatementModel(
+                        ChainCallModel(
+                                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                StatementCallModel(IdentifierEntity("get"), listOf(
+                                        IdentifierEntity(nodeContext.name)
+                                ))
+                        )
+                )
+        )
+
+        is IndexSignatureSetter -> listOf(ChainCallModel(
+                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                StatementCallModel(IdentifierEntity("set"), listOf(
+                        IdentifierEntity(nodeContext.name),
+                        IdentifierEntity("value")
+                )))
+        )
+
+        is FunctionFromCallSignature -> listOf(ChainCallModel(
+                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
+        )
+
+        is FunctionFromMethodSignatureDeclaration -> {
+            val bodyStatement = ChainCallModel(
+                    StatementCallModel(
+                            QualifierEntity(
+                                    IdentifierEntity("this"),
+                                    IdentifierEntity("asDynamic")
+                            )
+                            , emptyList()),
+                    StatementCallModel(IdentifierEntity(nodeContext.name), nodeContext.params)
+            )
+
+            listOf(if (type == TypeValueNode.UNIT) {
+                bodyStatement
+            } else {
+                ReturnStatementModel(bodyStatement)
+            })
+        }
+        else -> emptyList()
+    }
 }
 
 private fun TopLevelEntity.convertToModel(): TopLevelNode? {
@@ -394,7 +447,7 @@ private fun TopLevelEntity.convertToModel(): TopLevelNode? {
                 export = export,
                 inline = inline,
                 operator = operator,
-                body = body
+                body = resolveBody()
         )
         is EnumNode -> this
         is VariableNode -> VariableModel(

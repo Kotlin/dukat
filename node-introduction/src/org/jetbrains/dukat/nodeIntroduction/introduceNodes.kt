@@ -6,11 +6,16 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GenericIdentifierNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -27,9 +32,6 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.ast.model.nodes.statements.ChainCallNode
-import org.jetbrains.dukat.ast.model.nodes.statements.ReturnStatement
-import org.jetbrains.dukat.ast.model.nodes.statements.StatementCallNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -279,7 +281,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 hasExport,
                 false,
                 false,
-                emptyList(),
+                FunctionNodeContextIrrelevant(),
                 uid
         )
     }
@@ -324,16 +326,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             is MethodSignatureDeclaration -> {
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
-                val bodyStatement = ChainCallNode(
-                        StatementCallNode(
-                                QualifierEntity(
-                                        IdentifierEntity("this"),
-                                        IdentifierEntity("asDynamic")
-                                )
-                                , emptyList()),
-                        StatementCallNode(IdentifierEntity(declaration.name), declaration.parameters.map { parameter -> IdentifierEntity(parameter.name) })
-                )
-
                 listOf(FunctionNode(
                         QualifierEntity(
                                 if (interfaceDeclaration.typeParameters.isEmpty()) {
@@ -352,13 +344,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         true,
                         true,
                         false,
-                        listOf(
-                                if (declaration.type.isSimpleType("Unit")) {
-                                    bodyStatement
-                                } else {
-                                    ReturnStatement(bodyStatement)
-                                }
-                        ),
+                        FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
                         ""
                 ))
             }
@@ -393,16 +379,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            listOf(
-                                    ReturnStatement(
-                                            ChainCallNode(
-                                                    StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                                    StatementCallNode(IdentifierEntity("get"), listOf(
-                                                            IdentifierEntity(declaration.indexTypes.get(0).name)
-                                                    ))
-                                            )
-                                    )
-                            ),
+                            IndexSignatureGetter(declaration.indexTypes[0].name),
                             ""
                     ),
                     FunctionNode(
@@ -417,13 +394,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            listOf(ChainCallNode(
-                                    StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                    StatementCallNode(IdentifierEntity("set"), listOf(
-                                            IdentifierEntity(declaration.indexTypes.get(0).name),
-                                            IdentifierEntity("value")
-                                    )))
-                            ),
+                            IndexSignatureSetter(declaration.indexTypes[0].name),
                             ""
                     )
             )
@@ -446,10 +417,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
-                            listOf(ChainCallNode(
-                                    StatementCallNode(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                    StatementCallNode(IdentifierEntity("invoke"), declaration.parameters.map { IdentifierEntity(it.name) }))
-                            ),
+                            FunctionFromCallSignature(declaration.parameters.map { IdentifierEntity(it.name) }),
                             ""
                     )
             )

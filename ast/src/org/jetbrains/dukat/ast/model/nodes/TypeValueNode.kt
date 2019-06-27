@@ -10,7 +10,11 @@ data class TypeValueNode(
 
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : TypeNode
+) : TypeNode {
+    companion object {
+        val UNIT = TypeValueNode(IdentifierEntity("Unit"), emptyList(), false, null)
+    }
+}
 
 fun TypeValueNode.isPrimitive(primitive: String): Boolean {
     return when (this.value) {
