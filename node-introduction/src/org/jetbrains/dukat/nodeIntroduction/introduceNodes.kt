@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -281,6 +282,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 hasExport,
                 false,
                 false,
+                null,
                 FunctionNodeContextIrrelevant(),
                 uid
         )
@@ -327,15 +329,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
                 listOf(FunctionNode(
-                        QualifierEntity(
-                                if (interfaceDeclaration.typeParameters.isEmpty()) {
-                                    IdentifierEntity(name)
-                                } else {
-                                    GenericIdentifierNode(name, mergeTypeParameters.map { typeParam ->
-                                        TypeValueNode(typeParam.name.toNode(), typeParam.constraints)
-                                    })
-                                }
-                                , IdentifierEntity(declaration.name)),
+                        IdentifierEntity(declaration.name),
                         convertParameters(declaration.parameters),
                         declaration.type,
                         convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
@@ -344,6 +338,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         true,
                         true,
                         false,
+                        ClassLikeReferenceNode(IdentifierEntity(name), mergeTypeParameters.map { typeParam ->
+                            typeParam.name
+                        }),
                         FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
                         ""
                 ))
@@ -379,6 +376,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
+                            null,
                             IndexSignatureGetter(declaration.indexTypes[0].name),
                             ""
                     ),
@@ -394,6 +392,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
+                            null,
                             IndexSignatureSetter(declaration.indexTypes[0].name),
                             ""
                     )
@@ -417,6 +416,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             true,
                             true,
                             true,
+                            null,
                             FunctionFromCallSignature(declaration.parameters.map { IdentifierEntity(it.name) }),
                             ""
                     )

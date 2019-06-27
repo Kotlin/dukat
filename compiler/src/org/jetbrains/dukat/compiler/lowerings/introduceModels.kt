@@ -18,7 +18,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -33,16 +32,12 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.ast.model.nodes.processing.rightMost
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.ast.model.nodes.processing.translate
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -60,11 +55,17 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
@@ -215,6 +216,8 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
     }
 }
 
+
+//private fun TypeValueModel.tra
 
 private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
@@ -430,7 +433,7 @@ private fun FunctionNode.resolveBody(): List<StatementModel> {
     }
 }
 
-private fun TopLevelEntity.convertToModel(): TopLevelModel? {
+fun TopLevelEntity.convertToModel(): TopLevelModel? {
     return when (this) {
         is ClassNode -> convertToClassModel()
         is InterfaceNode -> convertToInterfaceModel()
@@ -455,6 +458,9 @@ private fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 export = export,
                 inline = inline,
                 operator = operator,
+                extend = extend?.let { extendNode ->
+                    ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
+                },
                 body = resolveBody()
         )
         is VariableNode -> VariableModel(

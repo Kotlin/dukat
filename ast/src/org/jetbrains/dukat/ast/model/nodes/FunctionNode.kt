@@ -27,6 +27,7 @@ data class FunctionNode(
         val inline: Boolean,
         val operator: Boolean,
 
+        val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
         override val uid: String
 ) : MemberEntity, TopLevelEntity, MemberNode, UniqueNode

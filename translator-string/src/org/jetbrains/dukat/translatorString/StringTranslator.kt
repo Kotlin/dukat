@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.translate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
@@ -174,6 +175,14 @@ private fun StatementModel.translate(): String {
     }
 }
 
+private fun ClassLikeReferenceModel.translate(): String {
+        return name.translate() + if (typeParameters.isNotEmpty()) {
+            "<${typeParameters.map { it.translate() }.joinToString(", ")}>"
+        } else {
+            ""
+        }
+}
+
 private fun FunctionModel.translate(): String {
     val returnType = type.translate()
 
@@ -190,7 +199,11 @@ private fun FunctionModel.translate(): String {
     } else {
         " { ${body.joinToString { statementNode -> statementNode.translate() }} }"
     }
-    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${name.translate()}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()}${body}"
+
+    val funName = if (extend == null) { name.translate() } else {
+        extend?.translate() + "." + name.translate()
+    }
+    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()}${body}"
 }
 
 private fun MethodModel.translate(): List<String> {

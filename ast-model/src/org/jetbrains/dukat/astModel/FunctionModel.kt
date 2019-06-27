@@ -16,5 +16,6 @@ data class FunctionModel(
         val inline: Boolean,
         val operator: Boolean,
 
+        val extend: ClassLikeReferenceModel?,
         val body: List<StatementModel>
 ) : MemberEntity, MergeableModel, TopLevelModel
