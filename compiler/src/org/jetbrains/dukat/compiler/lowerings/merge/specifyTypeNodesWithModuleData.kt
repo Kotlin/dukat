@@ -16,14 +16,12 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.panic.raiseConcern
 
 private fun NameEntity.shiftLeft(): NameEntity {
     if (this is QualifierEntity) {
         return when (left) {
             is IdentifierEntity -> right
             is QualifierEntity -> QualifierEntity((left as QualifierEntity).right, right)
-            else -> raiseConcern("unknown org.jetbrains.dukat.astCommon.NameEntity") { this }
         }
     }
 

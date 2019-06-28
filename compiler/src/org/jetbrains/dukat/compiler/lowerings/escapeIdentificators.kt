@@ -55,7 +55,6 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when (typeNodeValue) {
             is IdentifierEntity -> copy(value = typeNodeValue.escape())
             is QualifierEntity -> copy(value = typeNodeValue.escape())
-            else -> this
         }
     }
 
@@ -64,7 +63,6 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when(nodeLeft) {
             is IdentifierEntity -> QualifierEntity(nodeLeft.escape(), right.escape())
             is QualifierEntity -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
-            else -> raiseConcern("unknown QualifiedLeftNode ${nodeLeft}") { this }
         }
     }
 
@@ -72,7 +70,6 @@ private class EscapeIdentificators : NodeTypeLowering {
         return when(this) {
             is IdentifierEntity -> escape()
             is QualifierEntity -> escape()
-            else -> raiseConcern("unknown NameEntity ${this}") { this }
         }
     }
 

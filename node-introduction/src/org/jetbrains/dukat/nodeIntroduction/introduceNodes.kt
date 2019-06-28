@@ -312,7 +312,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     is QualifierEntity -> {
                         name.copy(right = name.right.copy(value = name.right.value + "0"))
                     }
-                    else -> name
                 }
             } else {
                 name
@@ -512,7 +511,6 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     left = left.convert(),
                     right = right.convert()
             )
-            else -> raiseConcern("unknown QualifiedLeftDeclaration ${this}") { IdentifierEntity("INVALID_ENTITY") }
         }
     }
 
