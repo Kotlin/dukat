@@ -1,19 +1,21 @@
 package org.jetbrains.dukat.compiler.lowerings.model
 
 import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.visitors.visitTopLevelModel
 
-private fun ModuleModel.addStandardImports() {
+private fun ModuleModel.addStandardImportsAndAnnotations() {
 
     annotations.add(AnnotationModel("file:Suppress", listOf(
             "INTERFACE_WITH_SUPERCLASS",
             "OVERRIDING_FINAL_MEMBER",
             "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
             "CONFLICTING_OVERLOADS",
-            "EXTERNAL_DELEGATION",
-            "NESTED_CLASS_IN_EXTERNAL_INTERFACE"
+            "EXTERNAL_DELEGATION"
     ).map { it.toNameEntity() }))
 
     imports.addAll(
@@ -34,16 +36,22 @@ private fun ModuleModel.addStandardImports() {
                     "org.w3c.xhr.*"
             ).map { it.toNameEntity() }
     )
-
-    sumbodules.forEach { submodule ->  submodule.addStandardImports() }
 }
 
-fun SourceSetModel.addStandardImports(): SourceSetModel {
+fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
 
-    copy(sources = sources.map { source ->
-        source.root.addStandardImports()
-        source
-    })
+    visitTopLevelModel { topLevelModel ->
+        when (topLevelModel) {
+            is InterfaceModel -> {
+                if (topLevelModel.companionObject.members.isNotEmpty()) {
+                    topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+                }
+            }
+            is ModuleModel -> {
+                topLevelModel.addStandardImportsAndAnnotations()
+            }
+        }
+    }
 
     return this
 }
