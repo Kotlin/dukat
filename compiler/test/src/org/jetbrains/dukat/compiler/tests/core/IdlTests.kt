@@ -1,20 +1,18 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class CoreSetTests : OutputTests() {
+class IdlTests : OutputTests() {
 
-    @DisplayName("core test set")
+    @DisplayName("idl test set")
     @ParameterizedTest(name = "{0}")
-    @MethodSource("coreSet")
+    @MethodSource("idlSet")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEquals(name, tsPath, ktPath)
     }
@@ -22,14 +20,14 @@ class CoreSetTests : OutputTests() {
     override fun getTranslator(): InputTranslator = translator
 
     companion object : FileFetcher() {
-
-        override val postfix = ".d.ts"
+        override val postfix = ".idl"
 
         @JvmStatic
-        fun coreSet(): Array<Array<String>> {
+        fun idlSet(): Array<Array<String>> {
             return fileSetWithDescriptors("./test/data")
         }
 
-        val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, ConstNameResolver())
+        val translator: InputTranslator = IdlInputTranslator()
     }
+
 }

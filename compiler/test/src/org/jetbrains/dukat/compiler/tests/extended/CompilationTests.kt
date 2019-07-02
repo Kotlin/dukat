@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
+import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
@@ -89,7 +90,10 @@ class CompilationTests : OutputTests() {
                 ))
     }
 
-    companion object {
+    companion object : FileFetcher() {
+
+        override val postfix = ".d.ts"
+
         val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, ConstNameResolver())
         val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
 

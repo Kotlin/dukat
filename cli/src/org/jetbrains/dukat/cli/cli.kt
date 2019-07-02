@@ -6,16 +6,14 @@ import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
-import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
+import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
-import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
-import org.jetbrains.dukat.translator.TranslationUnitResult
+import org.jetbrains.dukat.translator.*
+import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import translateModule
 import java.io.File
 
@@ -31,7 +29,7 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(filename: String, outDir: String?, translator: TypescriptInputTranslator, pathToReport: String?) {
+private fun compile(filename: String, outDir: String?, translator: InputTranslator, pathToReport: String?) {
     val sourceFile = File(filename)
 
     val translatedUnits = translateModule(sourceFile.absolutePath, translator)
@@ -232,9 +230,23 @@ fun main(vararg args: String) {
         }
 
         options.sources.forEach { sourceName ->
-            compile(sourceName, options.outDir, when (options.engine) {
-                Engine.GRAAL -> createGraalTranslator(options.basePackageName, moduleResolver)
-            }, options.reportPath)
+            when {
+                sourceName.endsWith(TS_DECLARATION_EXTENSION) -> compile(
+                        sourceName,
+                        options.outDir,
+                        when (options.engine) {
+                            Engine.GRAAL -> createGraalTranslator(options.basePackageName, moduleResolver)
+                        },
+                        options.reportPath
+                )
+                sourceName.endsWith(IDL_DECLARATION_EXTENSION) -> compile(
+                        sourceName,
+                        options.outDir,
+                        IdlInputTranslator(),
+                        options.reportPath
+                )
+                else -> printError("only *.d.ts and *.idl files are allowed")
+            }
         }
     }
 }

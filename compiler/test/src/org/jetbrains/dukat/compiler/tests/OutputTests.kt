@@ -64,8 +64,8 @@ abstract class OutputTests {
         val translated = output(tsPath, getTranslator())
 
         assertEquals(
-                translated,
-                File(ktPath).readText().trimEnd()
+                File(ktPath).readText().trimEnd(),
+                translated
         )
 
         val outputDirectory = File("./build/tests/out")
@@ -75,38 +75,5 @@ abstract class OutputTests {
             outputFile.writeText(translated)
         }
     }
-
-    companion object {
-        val TS_POSTFIX = ".d.ts"
-
-        fun fileSet(path: String, postfix: String, recursive: Boolean = false): Sequence<File> {
-            val rootFolder = File(path)
-
-            val files = if (recursive) rootFolder.walk() else rootFolder.walkTopDown()
-
-            return files.filter { file ->
-                file.path.endsWith(postfix)
-            }
-        }
-
-        fun fileSetWithDescriptors(path: String, recursive: Boolean = false): Array<Array<String>> {
-            val rootFolder = File(path)
-            return fileSet(path, TS_POSTFIX, recursive).mapNotNull { file ->
-                val tsPath = file.absolutePath
-                val ktPath = tsPath.replace(TS_POSTFIX, ".d.kt")
-                val descriptor = file.relativeTo(rootFolder).path.replace(path, "").replace(TS_POSTFIX, "")
-
-                if (!file.name.startsWith("_")) {
-                    arrayOf(
-                            descriptor,
-                            tsPath,
-                            ktPath
-                    )
-                } else null
-            }.toList().toTypedArray()
-        }
-
-    }
-
 
 }

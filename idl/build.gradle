@@ -1,0 +1,48 @@
+buildscript {
+    ext.antlr4_version = '4.7.1'
+}
+
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+}
+
+
+apply plugin: "antlr"
+
+project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
+
+
+version 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":ast-model"))
+    implementation(project(":translator"))
+    implementation(project(":translator-string"))
+    
+    antlr "org.antlr:antlr4:$antlr4_version"
+    implementation "org.antlr:antlr4-runtime:$antlr4_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+sourceSets.main.kotlin.srcDirs += file("$buildDir/generated-src/antlr/main/")
+
+generateGrammarSource {
+    arguments += ["-visitor", "-long-messages", "-package", "org.antlr.webidl"]
+}
+
+
+compileKotlin.dependsOn generateGrammarSource
+compileTestKotlin.dependsOn generateTestGrammarSource
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
