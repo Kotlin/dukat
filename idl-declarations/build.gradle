@@ -1,0 +1,49 @@
+plugins {
+    id 'kotlin'
+    id 'antlr'
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+
+    antlr "org.antlr:antlr4:${gradle.antlr4_version}"
+    implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
+
+sourceSets {
+    generated {
+        java.srcDir "${buildDir}/generated-src/antlr/main"
+    }
+
+    main {
+        compileClasspath += generated.output
+        runtimeClasspath += generated.output
+    }
+
+    test {
+        compileClasspath += generated.output
+        runtimeClasspath += generated.output
+    }
+}
+
+task createDirectory {
+    mkdir "${buildDir}/classes/kotlin/generated"
+}
+
+compileGeneratedJava{
+    dependsOn(createDirectory)
+    dependsOn(generateGrammarSource)
+    classpath = configurations.compile
+}
+
+compileKotlin{
+    dependsOn(compileGeneratedJava)
+    source += sourceSets.generated.java
+}
+
+generateGrammarSource {
+    arguments += ["-visitor", "-long-messages", "-package", "org.antlr.webidl"]
+}

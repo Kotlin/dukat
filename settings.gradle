@@ -32,6 +32,7 @@ gradle.ext {
   npmVersion = "6.9.0"
   nodePluginVersion = "1.3.1"
   kotlinSerializationRuntimeVersion = "0.11.0"
+  antlr4_version = "4.7.1"
 }
 
 
@@ -40,7 +41,8 @@ include 'ast-common'
 include 'ast-model'
 include 'cli'
 include 'compiler'
-include 'idl'
+include 'idl-declarations'
+include 'idl-modules'
 include 'itertools'
 include 'interop'
 include 'interop-graal'

@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":ownerContext"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))
-    implementation(project(":idl"))
+    implementation(project(":idl-declarations"))
 
     implementation(project(":logging"))
     implementation(project(":panic"))
