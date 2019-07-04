@@ -15,7 +15,7 @@ project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
 
 sourceSets {
     generated {
-        java.srcDir "build/generated-src/antlr/main"
+        java.srcDir "${buildDir}/generated-src/antlr/main"
     }
 
     main {
@@ -29,15 +29,20 @@ sourceSets {
     }
 }
 
-compileGeneratedJava{
+task createDirectory {
+    println("${buildDir}")
+    mkdir "${buildDir}/classes/kotlin/generated"
+}
+
+compileGeneratedJava {
     dependsOn(generateGrammarSource)
-    dependsOn(compileGeneratedKotlin)
     classpath = configurations.compile
 }
 
-compileKotlin{
-    dependsOn(compileGeneratedJava)
+compileKotlin {
+    dependsOn(createDirectory)
 }
+
 
 generateGrammarSource {
     outputDirectory = file("${buildDir}/generated-src/antlr/main")
