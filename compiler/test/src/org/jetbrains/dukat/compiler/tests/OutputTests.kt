@@ -64,8 +64,8 @@ abstract class OutputTests {
         val translated = output(tsPath, getTranslator())
 
         assertEquals(
-                File(ktPath).readText().trimEnd(),
-                translated
+                translated,
+                File(ktPath).readText().trimEnd()
         )
 
         val outputDirectory = File("./build/tests/out")
