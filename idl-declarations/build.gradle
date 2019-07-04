@@ -30,7 +30,9 @@ sourceSets {
 }
 
 task createDirectory {
-    mkdir "${buildDir}/classes/kotlin/generated"
+    doFirst {
+        mkdir "${buildDir}/classes/kotlin/generated"
+    }
 }
 
 compileGeneratedKotlin.enabled = false
@@ -38,6 +40,7 @@ compileGeneratedKotlin.enabled = false
 
 
 compileGeneratedJava {
+    dependsOn(createDirectory)
     dependsOn(generateGrammarSource)
     classpath = configurations.compile
 }
@@ -47,6 +50,5 @@ compileKotlin {
 }
 
 generateGrammarSource {
-    outputDirectory = file("${buildDir}/generated-src/antlr/main")
     arguments += ["-visitor", "-long-messages", "-package", "org.antlr.webidl"]
 }
