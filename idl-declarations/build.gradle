@@ -15,7 +15,7 @@ project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
 
 sourceSets {
     generated {
-        java.srcDir "${buildDir}/generated-src/antlr/main"
+        java.srcDir "build/generated-src/antlr/main"
     }
 
     main {
@@ -45,5 +45,6 @@ compileKotlin{
 }
 
 generateGrammarSource {
+    outputDirectory = file("${buildDir}/generated-src/antlr/main")
     arguments += ["-visitor", "-long-messages", "-package", "org.antlr.webidl"]
 }
