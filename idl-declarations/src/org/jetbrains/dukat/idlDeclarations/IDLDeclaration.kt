@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.idlDeclarations
 
-import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.Entity
 
-interface IDLDeclaration : TopLevelEntity
+interface IDLDeclaration : Entity

@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.idlDeclarations
 
 import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
@@ -15,7 +16,7 @@ class DefinitionVisitor : WebIDLBaseVisitor<IDLDeclaration>() {
     override fun visitInterface_(ctx: Interface_Context): IDLDeclaration {
         val name = getName(ctx)
         visitChildren(ctx)
-        return InterfaceIDLDeclaration(name)
+        return IDLInterfaceDeclaration(name)
     }
 }
 
@@ -33,11 +34,15 @@ private fun List<ParseTree>?.filterIdentifiers(): List<ParseTree> = this?.filter
 
 private fun getName(ctx: ParserRuleContext) = ctx.children.filterIdentifiers().first().text
 
-fun parseIDL(reader: CharStream): ArrayList<IDLDeclaration> {
+fun parseIDL(fileName: String): IDLFileDeclaration {
+    val reader = CharStreams.fromFileName(fileName, Charsets.UTF_8)
+
     val lexer = WebIDLLexer(reader)
     val parser = WebIDLParser(CommonTokenStream(lexer))
     val idl = parser.webIDL()
+
     val declarations = ArrayList<IDLDeclaration>()
     ModuleVisitor(declarations).visit(idl)
-    return declarations
+
+    return IDLFileDeclaration(fileName, declarations)
 }
