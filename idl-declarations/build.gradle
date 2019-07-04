@@ -30,7 +30,6 @@ sourceSets {
 }
 
 task createDirectory {
-    println("${buildDir}")
     mkdir "${buildDir}/classes/kotlin/generated"
 }
 
@@ -40,9 +39,10 @@ compileGeneratedJava {
 }
 
 compileKotlin {
-    dependsOn(createDirectory)
+    source += sourceSets.generated.java
 }
 
+compileGeneratedKotlin.finalizedBy createDirectory
 
 generateGrammarSource {
     outputDirectory = file("${buildDir}/generated-src/antlr/main")
