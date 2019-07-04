@@ -42,7 +42,11 @@ compileKotlin {
     source += sourceSets.generated.java
 }
 
-compileGeneratedKotlin.finalizedBy createDirectory
+gradle.taskGraph.beforeTask {tsk ->
+    if (tsk.name == "compileGeneratedJava") {
+        createDirectory
+    }
+}
 
 generateGrammarSource {
     outputDirectory = file("${buildDir}/generated-src/antlr/main")
