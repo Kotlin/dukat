@@ -33,6 +33,10 @@ task createDirectory {
     mkdir "${buildDir}/classes/kotlin/generated"
 }
 
+compileGeneratedKotlin.enabled = false
+// ^ this task deletes created directory even if there aren't any generated kotlin files
+
+
 compileGeneratedJava {
     dependsOn(generateGrammarSource)
     classpath = configurations.compile
@@ -40,12 +44,6 @@ compileGeneratedJava {
 
 compileKotlin {
     source += sourceSets.generated.java
-}
-
-gradle.taskGraph.beforeTask {tsk ->
-    if (tsk.name == "compileGeneratedJava") {
-        createDirectory
-    }
 }
 
 generateGrammarSource {
