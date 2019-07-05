@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.idlDeclarations
+package org.jetbrains.dukat.idlParser
 
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -9,6 +9,7 @@ import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLLexer
 import org.antlr.webidl.WebIDLParser
 import org.antlr.webidl.WebIDLParser.Interface_Context
+import org.jetbrains.dukat.idlDeclarations.*
 
 class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     private var type: IDLTypeDeclaration = IDLTypeDeclaration("")

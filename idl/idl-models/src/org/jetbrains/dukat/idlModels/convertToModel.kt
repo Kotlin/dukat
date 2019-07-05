@@ -1,4 +1,4 @@
-package main.org.jetbrains.dukat.idlModels
+package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
