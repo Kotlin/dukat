@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.idlDeclarations
 
-class IDLInterfaceDeclaration(
+class IDLAttributeDeclaration(
         val name: String,
-        val attributes: List<IDLAttributeDeclaration>
+        val type: IDLTypeDeclaration
 ) : IDLDeclaration

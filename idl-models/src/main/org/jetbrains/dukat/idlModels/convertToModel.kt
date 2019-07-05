@@ -1,6 +1,8 @@
 package main.org.jetbrains.dukat.idlModels
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
@@ -8,11 +10,23 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-fun IDLDeclaration.convertToModel() : TopLevelModel? {
+fun convertPrimitiveType(type: String): String {
+    return when (type) {
+        "float" -> "Float"
+        "double" -> "Double"
+        "long" -> "Int"
+        "byte" -> "Byte"
+        "short" -> "Short"
+        "longlong" -> "Long"
+        else -> "Any"
+    }
+}
+
+fun IDLDeclaration.convertToModel() : MemberModel? {
     return when (this) {
         is IDLInterfaceDeclaration -> InterfaceModel(
-                name = org.jetbrains.dukat.astCommon.IdentifierEntity(name),
-                members = listOf(),
+                name = IdentifierEntity(name),
+                members = attributes.mapNotNull { d -> d.convertToModel() },
                 companionObject = CompanionObjectModel(
                         name = "",
                         members = listOf(),
@@ -23,12 +37,26 @@ fun IDLDeclaration.convertToModel() : TopLevelModel? {
                 annotations = mutableListOf(),
                 external = false
         )
+        is IDLAttributeDeclaration -> PropertyModel(
+                name = IdentifierEntity(name),
+                type = TypeValueModel(
+                        value = IdentifierEntity(convertPrimitiveType(type.name)),
+                        params = listOf(),
+                        metaDescription = null
+                ),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                getter = false,
+                setter = false,
+                open = false
+        )
         else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
     }
 }
 
 fun IDLFileDeclaration.process() : SourceSetModel {
-    val modelDeclarations = declarations.mapNotNull { d -> d.convertToModel() }
+    val modelDeclarations = declarations.mapNotNull { d -> d.convertToModel() }.map { d -> d as TopLevelModel }
 
     val module = ModuleModel(
             name = ROOT_PACKAGENAME,
