@@ -3,6 +3,12 @@ package main.org.jetbrains.dukat.idlModels
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.idlDeclarations.IDLDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration

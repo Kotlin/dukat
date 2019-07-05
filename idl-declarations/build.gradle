@@ -1,14 +1,14 @@
 plugins {
-    id 'kotlin'
     id 'antlr'
+    id 'kotlin'
 }
 
 dependencies {
-    implementation(project(":ast-common"))
-
     antlr "org.antlr:antlr4:${gradle.antlr4_version}"
+
     implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation(project(":ast-common"))
 }
 
 project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
@@ -29,18 +29,14 @@ sourceSets {
     }
 }
 
-task createDirectory {
+task createGeneratedSourcesDir {
     doFirst {
         mkdir "${buildDir}/classes/kotlin/generated"
     }
 }
 
-compileGeneratedKotlin.enabled = false
-// ^ this task deletes created directory even if there aren't any generated kotlin files
-
-
 compileGeneratedJava {
-    dependsOn(createDirectory)
+    dependsOn(createGeneratedSourcesDir)
     dependsOn(generateGrammarSource)
     classpath = configurations.compile
 }
