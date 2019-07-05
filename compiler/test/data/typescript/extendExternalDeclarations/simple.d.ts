@@ -1,4 +1,4 @@
-/// <reference path="../../testDefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts" />
 
 interface Event {
     foo()
