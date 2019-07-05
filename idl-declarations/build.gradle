@@ -29,7 +29,14 @@ sourceSets {
     }
 }
 
+task createGeneratedSourcesDir {
+    doFirst {
+        mkdir "${buildDir}/classes/kotlin/generated"
+    }
+}
+
 compileGeneratedJava {
+    dependsOn(createGeneratedSourcesDir)
     dependsOn(generateGrammarSource)
     classpath = configurations.compile
 }
