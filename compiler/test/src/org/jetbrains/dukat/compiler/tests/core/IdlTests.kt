@@ -4,6 +4,7 @@ import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -20,7 +21,7 @@ class IdlTests : OutputTests() {
     override fun getTranslator(): InputTranslator = translator
 
     companion object : FileFetcher() {
-        override val postfix = ".webidl"
+        override val postfix = WEBIDL_DECLARATION_EXTENSION
 
         @JvmStatic
         fun idlSet(): Array<Array<String>> {
