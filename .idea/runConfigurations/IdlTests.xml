@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="IdlTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+    <module name="compiler_test" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.core.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.core" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.IdlTests" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -Ddukat.test.failure.always=true" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
