@@ -3,5 +3,6 @@ package org.jetbrains.dukat.idlDeclarations
 data class IDLInterfaceDeclaration(
         val name: String,
         val attributes: List<IDLAttributeDeclaration>,
-        val operations: List<IDLOperationDeclaration>
+        val operations: List<IDLOperationDeclaration>,
+        val parents: List<IDLTypeDeclaration>
 ) : IDLTopLevelDeclaration

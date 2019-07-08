@@ -12,21 +12,17 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-fun convertPrimitiveType(type: String): String {
-    return when (type) {
-        "float" -> "Float"
-        "double" -> "Double"
-        "long" -> "Int"
-        "byte" -> "Byte"
-        "short" -> "Short"
-        "longlong" -> "Long"
-        else -> "Any"
-    }
-}
-
-fun IDLTypeDeclaration.process() : TypeModel {
+fun IDLTypeDeclaration.process(): TypeModel {
     return TypeValueModel(
-            value = IdentifierEntity(convertPrimitiveType(name)),
+            value = IdentifierEntity(when (name) {
+                "float" -> "Float"
+                "double" -> "Double"
+                "long" -> "Int"
+                "byte" -> "Byte"
+                "short" -> "Short"
+                "longlong" -> "Long"
+                else -> name
+            }),
             params = listOf(),
             metaDescription = null
     )
@@ -38,23 +34,29 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
             type = type.process(),
             initializer = null,
             vararg = false,
-            optional = false
+            optional = optional
     )
 }
 
-fun IDLTopLevelDeclaration.convertToModel() : TopLevelModel? {
+fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
     return when (this) {
         is IDLInterfaceDeclaration -> ClassModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull {d -> d.process()},
+                        operations.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
                         members = listOf(),
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
-                parentEntities = listOf(),
+                parentEntities = parents.map {
+                    HeritageModel(
+                            it.process(),
+                            listOf(),
+                            null
+                    )
+                },
                 primaryConstructor = null,
                 annotations = mutableListOf(),
                 external = true,
@@ -64,7 +66,7 @@ fun IDLTopLevelDeclaration.convertToModel() : TopLevelModel? {
     }
 }
 
-fun IDLMemberDeclaration.process() : MemberModel? {
+fun IDLMemberDeclaration.process(): MemberModel? {
     return when (this) {
         is IDLAttributeDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
@@ -78,7 +80,7 @@ fun IDLMemberDeclaration.process() : MemberModel? {
         )
         is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
-                parameters = arguments.map {d -> d.process()},
+                parameters = arguments.map { it.process() },
                 type = returnType.process(),
                 typeParameters = listOf(),
                 static = false,
@@ -91,7 +93,7 @@ fun IDLMemberDeclaration.process() : MemberModel? {
     }
 }
 
-fun IDLFileDeclaration.process() : SourceSetModel {
+fun IDLFileDeclaration.process(): SourceSetModel {
     val modelDeclarations = declarations.mapNotNull { it.convertToModel() }
 
     val module = ModuleModel(
