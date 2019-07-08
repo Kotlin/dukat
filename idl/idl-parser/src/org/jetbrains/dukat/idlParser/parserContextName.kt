@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLLexer
 
-internal fun filterIdentifiers(list: List<ParseTree>?): List<ParseTree> = list?.filter {
+private fun filterIdentifiers(list: List<ParseTree>?): List<ParseTree> = list?.filter {
     it is TerminalNode && it.symbol.type == WebIDLLexer.IDENTIFIER_WEBIDL
 } ?: emptyList()
 
