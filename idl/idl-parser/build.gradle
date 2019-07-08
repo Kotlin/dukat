@@ -3,17 +3,6 @@ plugins {
     id 'kotlin'
 }
 
-dependencies {
-    antlr "org.antlr:antlr4:${gradle.antlr4_version}"
-
-    implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
-
-    implementation(project(":idl-declarations"))
-    implementation(project(":ast-common"))
-}
-
-project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
-
 sourceSets {
     generated {
         java.srcDir "${buildDir}/generated-src/antlr/generated"
@@ -29,6 +18,19 @@ sourceSets {
         runtimeClasspath += generated.output
     }
 }
+
+dependencies {
+    antlr "org.antlr:antlr4:${gradle.antlr4_version}"
+
+    implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
+
+    implementation(project(":idl-declarations"))
+    implementation(project(":ast-common"))
+
+    runtime files(project.sourceSets.generated.output.classesDirs)
+}
+
+project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
 
 task createGeneratedSourcesDir {
     doFirst {
