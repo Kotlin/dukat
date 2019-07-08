@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.webidl.WebIDLLexer
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.IDLDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlParser.visitors.ModuleVisitor
 
 fun parseIDL(fileName: String): IDLFileDeclaration {
@@ -15,7 +15,7 @@ fun parseIDL(fileName: String): IDLFileDeclaration {
     val parser = WebIDLParser(CommonTokenStream(lexer))
     val idl = parser.webIDL()
 
-    val declarations = ArrayList<IDLDeclaration>()
+    val declarations = ArrayList<IDLTopLevelDeclaration>()
     ModuleVisitor(declarations).visit(idl)
 
     return IDLFileDeclaration(fileName, declarations)
