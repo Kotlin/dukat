@@ -4,4 +4,4 @@ data class IDLInterfaceDeclaration(
         val name: String,
         val attributes: List<IDLAttributeDeclaration>,
         val operations: List<IDLOperationDeclaration>
-) : IDLDeclaration
+) : IDLTopLevelDeclaration

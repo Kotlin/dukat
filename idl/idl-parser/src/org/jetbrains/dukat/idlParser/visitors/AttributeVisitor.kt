@@ -19,7 +19,7 @@ internal class AttributeVisitor : WebIDLBaseVisitor<IDLAttributeDeclaration>() {
     }
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLAttributeDeclaration {
-        name = getNameOrNull(ctx) ?: ctx.children.filter { it is TerminalNode }.filter { it.text != ";" }.last().text
+        name = ctx.getNameOrNull() ?: ctx.children.filterIsInstance<TerminalNode>().last { it.text != ";" }.text
         visitChildren(ctx)
         return defaultResult()
     }

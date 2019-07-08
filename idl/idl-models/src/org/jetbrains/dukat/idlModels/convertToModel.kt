@@ -43,12 +43,12 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     )
 }
 
-fun IDLDeclaration.convertToModel() : MemberModel? {
+fun IDLTopLevelDeclaration.convertToModel() : TopLevelModel? {
     return when (this) {
         is IDLInterfaceDeclaration -> InterfaceModel(
                 name = IdentifierEntity(name),
-                members = attributes.mapNotNull { d -> d.convertToModel() } +
-                        operations.mapNotNull {d -> d.convertToModel()},
+                members = attributes.mapNotNull { it.process() } +
+                        operations.mapNotNull {d -> d.process()},
                 companionObject = CompanionObjectModel(
                         name = "",
                         members = listOf(),
@@ -59,6 +59,12 @@ fun IDLDeclaration.convertToModel() : MemberModel? {
                 annotations = mutableListOf(),
                 external = false
         )
+        else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
+    }
+}
+
+fun IDLMemberDeclaration.process() : MemberModel? {
+    return when (this) {
         is IDLAttributeDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
                 type = type.process(),
@@ -80,12 +86,12 @@ fun IDLDeclaration.convertToModel() : MemberModel? {
                 annotations = listOf(),
                 open = false
         )
-        else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
+        else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
 }
 
 fun IDLFileDeclaration.process() : SourceSetModel {
-    val modelDeclarations = declarations.mapNotNull { d -> d.convertToModel() }.map { d -> d as TopLevelModel }
+    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }
 
     val module = ModuleModel(
             name = ROOT_PACKAGENAME,
