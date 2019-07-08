@@ -396,7 +396,8 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
-    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}open class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
+    val openClause = if (abstract) "abstract" else "open"
+    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
 
     val members = members
     val staticMembers = companionObject.members
