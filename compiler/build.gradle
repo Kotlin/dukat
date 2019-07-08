@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":translator"))
     implementation(project(":translator-string"))
     implementation(project(":idl-declarations"))
+    implementation(project(":idl-parser"))
     implementation(project(":idl-models"))
 
     implementation(project(":logging"))

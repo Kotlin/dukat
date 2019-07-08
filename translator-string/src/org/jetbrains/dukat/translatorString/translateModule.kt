@@ -16,6 +16,7 @@ import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.StringTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import java.io.File
 
 private typealias SourceUnit = Pair<String, NameEntity>
@@ -54,6 +55,8 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
                 sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
             } else if (sourceFileName.endsWith(IDL_DECLARATION_EXTENSION)) {
                 sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
+            } else if (sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
+                sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
             } else sourceFile.name
 
     var res = ktFileNamePrefix
@@ -79,7 +82,9 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
 }
 
 fun translateModule(fileName: String, translator: InputTranslator): List<TranslationUnitResult> {
-    if (!fileName.endsWith(TS_DECLARATION_EXTENSION) && !fileName.endsWith(IDL_DECLARATION_EXTENSION)) {
+    if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
+            !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
+            !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
         return listOf(TranslationErrorInvalidFile(fileName))
     }
 

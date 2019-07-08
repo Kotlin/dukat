@@ -43,6 +43,7 @@ include 'cli'
 include 'compiler'
 include 'idl-declarations'
 include 'idl-models'
+include 'idl-parser'
 include 'itertools'
 include 'interop'
 include 'interop-graal'
@@ -58,3 +59,7 @@ include 'ts'
 include 'tsmodel'
 include 'tsinterop'
 include 'translator'
+
+project(':idl-declarations').projectDir = "$rootDir/idl/idl-declarations" as File
+project(':idl-models').projectDir = "$rootDir/idl/idl-models" as File
+project(':idl-parser').projectDir = "$rootDir/idl/idl-parser" as File

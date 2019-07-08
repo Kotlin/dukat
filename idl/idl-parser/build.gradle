@@ -8,6 +8,7 @@ dependencies {
 
     implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
 
+    implementation(project(":idl-declarations"))
     implementation(project(":ast-common"))
 }
 
@@ -15,7 +16,7 @@ project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
 
 sourceSets {
     generated {
-        java.srcDir "${buildDir}/generated-src/antlr/main"
+        java.srcDir "${buildDir}/generated-src/antlr/generated"
     }
 
     main {
@@ -46,5 +47,6 @@ compileKotlin {
 }
 
 generateGrammarSource {
+    outputDirectory = file("${buildDir}/generated-src/antlr/generated")
     arguments += ["-visitor", "-long-messages", "-package", "org.antlr.webidl"]
 }

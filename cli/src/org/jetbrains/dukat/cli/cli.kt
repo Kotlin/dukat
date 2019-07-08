@@ -19,6 +19,7 @@ import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import translateModule
 import java.io.File
 
@@ -244,7 +245,8 @@ fun main(vararg args: String) {
                         },
                         options.reportPath
                 )
-                sourceName.endsWith(IDL_DECLARATION_EXTENSION) -> {
+                sourceName.endsWith(IDL_DECLARATION_EXTENSION) ||
+                sourceName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
                     printWarning("Web IDL support is at early alpha stage and is not supposed to produce any production-quality code")
                     compile(
                             sourceName,
