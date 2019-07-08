@@ -310,7 +310,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = exportQualifier.toAnnotation(),
-            external = true
+            external = true,
+            abstract = false
     )
 }
 
