@@ -189,7 +189,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         } else null
 
         val declaration = ClassNode(
-                name,
+                IdentifierEntity(name),
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
                     TypeValueNode(typeParameter.name.toNode(), typeParameter.constraints)
@@ -212,7 +212,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         val declaration = InterfaceNode(
-                name,
+                IdentifierEntity(name),
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
@@ -227,7 +227,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
         val declaration = InterfaceNode(
-                name,
+                IdentifierEntity(name),
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
@@ -458,7 +458,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             } else {
                 //TODO: don't forget to create owner
                 val objectNode = ObjectNode(
-                        declaration.name,
+                        IdentifierEntity(declaration.name),
                         type.members.flatMap { member -> lowerMemberDeclaration(member) },
                         emptyList()
                 )

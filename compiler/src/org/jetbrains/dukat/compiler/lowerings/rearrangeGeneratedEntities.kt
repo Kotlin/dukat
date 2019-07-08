@@ -11,6 +11,8 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -25,7 +27,7 @@ private fun Entity.getKey(): String {
         is InterfaceNode -> uid
         is VariableNode -> uid
         is FunctionNode -> uid
-        is ObjectNode -> name
+        is ObjectNode -> ""
         is TypeAliasNode -> uid
         is EnumNode -> ""
         is DocumentRootNode -> ""
@@ -34,9 +36,9 @@ private fun Entity.getKey(): String {
 }
 
 private class RearrangeLowering() : NodeWithOwnerTypeLowering {
-    val myReferences = mutableMapOf<String, MutableList<String>>()
+    val myReferences = mutableMapOf<String, MutableList<NameEntity>>()
 
-    fun getReferences(): Map<String, List<String>> {
+    fun getReferences(): Map<String, List<NameEntity>> {
         return myReferences
     }
 
@@ -66,17 +68,16 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
 
         if (declaration is GeneratedInterfaceReferenceDeclaration) {
             findTopLevelOwner(ownerContext)?.let {
-                myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(declaration.name)
+                myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(IdentifierEntity(declaration.name))
             }
         }
 
         return super.lowerParameterValue(ownerContext)
     }
 
-
 }
 
-private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, InterfaceNode>, List<TopLevelEntity>> {
+private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<NameEntity, InterfaceNode>, List<TopLevelEntity>> {
     val generatedDeclarations = mutableListOf<InterfaceNode>()
     val nonGeneratedDeclarations = declarations.mapNotNull { declaration ->
         if ((declaration is InterfaceNode) && (declaration.generated)) {
@@ -87,7 +88,7 @@ private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, Int
         }
     }
 
-    val generatedDeclarationsMap = mutableMapOf<String, InterfaceNode>()
+    val generatedDeclarationsMap = mutableMapOf<NameEntity, InterfaceNode>()
     generatedDeclarations.map { declaration ->
         generatedDeclarationsMap.put(declaration.name, declaration)
     }
@@ -95,7 +96,7 @@ private fun DocumentRootNode.generatedEntitiesMap(): Pair<MutableMap<String, Int
     return Pair(generatedDeclarationsMap, nonGeneratedDeclarations)
 }
 
-private fun TopLevelEntity.generateEntites(references: Map<String, List<String>>, generatedDeclarationsMap: MutableMap<String, InterfaceNode>): List<TopLevelEntity> {
+private fun TopLevelEntity.generateEntites(references: Map<String, List<NameEntity>>, generatedDeclarationsMap: MutableMap<NameEntity, InterfaceNode>): List<TopLevelEntity> {
     val genRefs = references.getOrDefault(getKey(), emptyList())
     val genEntities = genRefs.mapNotNull {
         val interfaceNode = generatedDeclarationsMap.get(it)
