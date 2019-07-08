@@ -3,7 +3,6 @@ package org.jetbrains.dukat.idlModels
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.CompanionObjectModel
-import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -45,7 +44,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
 
 fun IDLTopLevelDeclaration.convertToModel() : TopLevelModel? {
     return when (this) {
-        is IDLInterfaceDeclaration -> InterfaceModel(
+        is IDLInterfaceDeclaration -> ClassModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
                         operations.mapNotNull {d -> d.process()},
@@ -56,8 +55,10 @@ fun IDLTopLevelDeclaration.convertToModel() : TopLevelModel? {
                 ),
                 typeParameters = listOf(),
                 parentEntities = listOf(),
+                primaryConstructor = null,
                 annotations = mutableListOf(),
-                external = false
+                external = true,
+                abstract = true
         )
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
