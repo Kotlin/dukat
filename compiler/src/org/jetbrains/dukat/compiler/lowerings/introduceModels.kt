@@ -261,7 +261,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         }
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
-                    IdentifierEntity(name),
+                    name,
                     typeParameters.map { typeParam -> TypeValueModel(typeParam.name.toNode(), emptyList(), null) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable

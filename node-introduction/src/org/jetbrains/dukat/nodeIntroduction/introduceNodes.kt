@@ -189,7 +189,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         } else null
 
         val declaration = ClassNode(
-                IdentifierEntity(name),
+                name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
                     TypeValueNode(typeParameter.name.toNode(), typeParameter.constraints)
@@ -212,7 +212,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
 
         val declaration = InterfaceNode(
-                IdentifierEntity(name),
+                name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
@@ -227,7 +227,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
 
     private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
         val declaration = InterfaceNode(
-                IdentifierEntity(name),
+                name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
@@ -336,7 +336,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                         true,
                         true,
                         false,
-                        ClassLikeReferenceNode(IdentifierEntity(name), mergeTypeParameters.map { typeParam ->
+                        ClassLikeReferenceNode(name, mergeTypeParameters.map { typeParam ->
                             typeParam.name
                         }),
                         FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
@@ -350,7 +350,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     false,
                     true,
                     convertTypeParameters(interfaceDeclaration.typeParameters),
-                    ClassLikeReferenceNode(IdentifierEntity(name), interfaceDeclaration.typeParameters.map { typeParam ->
+                    ClassLikeReferenceNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
                         typeParam.name
                     }),
                     ""
@@ -360,7 +360,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                     // TODO: discuss what we actually gonna do when there's more than one key
 
                     FunctionNode(
-                            QualifierEntity(IdentifierEntity(name), IdentifierEntity("get")),
+                            QualifierEntity(name, IdentifierEntity("get")),
                             convertParameters(declaration.indexTypes),
                             declaration.returnType.makeNullable(),
                             emptyList(),
@@ -374,7 +374,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
                             ""
                     ),
                     FunctionNode(
-                            QualifierEntity(IdentifierEntity(name), IdentifierEntity("set")),
+                            QualifierEntity(name, IdentifierEntity("set")),
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
                             ))),
@@ -392,7 +392,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
             )
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
-                            QualifierEntity(IdentifierEntity(name), IdentifierEntity("invoke")),
+                            QualifierEntity(name, IdentifierEntity("invoke")),
                             convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
                                     ExpressionDeclaration(TypeDeclaration(IdentifierEntity("null"), emptyList()), null)

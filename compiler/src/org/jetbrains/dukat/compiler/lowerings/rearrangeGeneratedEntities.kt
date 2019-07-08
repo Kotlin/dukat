@@ -11,7 +11,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.Entity
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -68,7 +67,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
 
         if (declaration is GeneratedInterfaceReferenceDeclaration) {
             findTopLevelOwner(ownerContext)?.let {
-                myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(IdentifierEntity(declaration.name))
+                myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(declaration.name)
             }
         }
 
