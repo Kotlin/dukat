@@ -1,3 +1,3 @@
 
-interface int1
-interface int2
+external abstract class int1
+external abstract class int2

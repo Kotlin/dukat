@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.idlDeclarations
 
-data class IDLAttributeDeclaration(
+data class IDLArgumentDeclaration(
         val name: String,
         val type: IDLTypeDeclaration
-) : IDLMemberDeclaration
+): IDLDeclaration
