@@ -34,7 +34,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
             type = type.process(),
             initializer = null,
             vararg = false,
-            optional = optional
+            optional = false
     )
 }
 
