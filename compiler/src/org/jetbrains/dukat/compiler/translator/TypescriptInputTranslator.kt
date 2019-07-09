@@ -2,13 +2,13 @@ package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceModels
 import org.jetbrains.dukat.compiler.lowerings.lowerNullable
-import org.jetbrains.dukat.compiler.lowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.compiler.lowerings.merge.mergeClassesAndInterfaces
@@ -44,8 +44,8 @@ interface TypescriptInputTranslator : InputTranslator {
     fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration
     fun release()
 
-    val packageName: NameEntity;
-    val moduleNameResolver: ModuleNameResolver;
+    val packageName: NameEntity
+    val moduleNameResolver: ModuleNameResolver
 
     override fun translate(fileName: String): SourceSetModel {
         return lower(translateFile(fileName, packageName))
@@ -70,7 +70,6 @@ interface TypescriptInputTranslator : InputTranslator {
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerThisType()
-                .lowerOverrides()
                 .resolveTypeAliases()
                 .specifyUnionType()
                 .rearrangeGeneratedEntities()
@@ -83,6 +82,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
+                .lowerOverrides()
                 .specifyTypeNodesWithModuleData()
                 .addStandardImportsAndAnnotations()
                 .omitStdLib()
