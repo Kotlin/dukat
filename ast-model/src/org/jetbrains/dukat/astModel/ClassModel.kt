@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 
 data class ClassModel(
-        override val name: IdentifierEntity,
+        override val name: NameEntity,
         override var members: List<MemberModel>,
         override val companionObject: CompanionObjectModel,
         val typeParameters: List<TypeParameterModel>,

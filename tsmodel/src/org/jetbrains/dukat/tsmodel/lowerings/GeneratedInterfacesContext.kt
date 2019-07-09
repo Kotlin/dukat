@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -197,7 +198,7 @@ private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: Generated
 }
 
 class GeneratedInterfacesContext {
-    private val myGeneratedInterfaces = mutableMapOf<String, GeneratedInterfaceDeclaration>()
+    private val myGeneratedInterfaces = mutableMapOf<NameEntity, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
 
     private fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
@@ -246,7 +247,7 @@ class GeneratedInterfacesContext {
 
         val generatedTypeParameters = typeParams.toList()
 
-        val name = "`T$${myGeneratedInterfaces.size}`"
+        val name = IdentifierEntity("`T$${myGeneratedInterfaces.size}`")
         val interfaceNode =
                 GeneratedInterfaceDeclaration(
                         name = name,

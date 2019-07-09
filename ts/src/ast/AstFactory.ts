@@ -30,10 +30,10 @@ declare interface AstFactory {
 
     createModifierDeclaration(name: string): ModifierDeclaration;
 
-    createClassDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
+    createClassDeclaration(name: NameDeclaration, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
 
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral
-    createInterfaceDeclaration(name: string, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration;
+    createInterfaceDeclaration(name: NameDeclaration, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: string): Expression;
 

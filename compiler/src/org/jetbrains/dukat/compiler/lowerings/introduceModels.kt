@@ -261,7 +261,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         }
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
-                    IdentifierEntity(name),
+                    name,
                     typeParameters.map { typeParam -> TypeValueModel(typeParam.name.toNode(), emptyList(), null) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
@@ -283,7 +283,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
     val membersSplitted = split(members)
 
     return ClassModel(
-            name = IdentifierEntity(name),
+            name = name,
             members = membersSplitted.dynamic,
             companionObject = CompanionObjectModel(
                     "",
@@ -331,7 +331,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     val membersSplitted = split(members)
 
     return InterfaceModel(
-            name = IdentifierEntity(name),
+            name = name,
             members = membersSplitted.dynamic,
             companionObject = CompanionObjectModel(
                     "",
@@ -481,7 +481,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 extend = extend.convert()
         )
         is ObjectNode -> ObjectModel(
-                name = IdentifierEntity(name),
+                name = name,
                 members = members.mapNotNull { member -> member.process() },
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
         )

@@ -534,7 +534,7 @@ class AstConverter {
 
     convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): InterfaceDeclaration {
         return this.astFactory.createInterfaceDeclaration(
-            name,
+            this.astFactory.createIdentifierDeclaration(name),
             this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
             this.convertTypeParams(typeParams),
             [],
@@ -673,7 +673,7 @@ class AstConverter {
         }
 
         let classDeclaration = this.astFactory.createClassDeclaration(
-          statement.name.getText(),
+          this.astFactory.createIdentifierDeclaration(statement.name.getText()),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
@@ -700,7 +700,7 @@ class AstConverter {
     convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, computeDefinitions: boolean = true): InterfaceDeclaration  {
 
         let interfaceDeclaration = this.astFactory.createInterfaceDeclaration(
-          statement.name.getText(),
+          this.astFactory.createIdentifierDeclaration(statement.name.getText()),
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
