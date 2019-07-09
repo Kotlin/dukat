@@ -6,7 +6,6 @@ import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -34,7 +33,6 @@ internal fun NameEntity.translate(): String = when (this) {
             "${left.translate()}.${right.translate()}"
         }
     }
-    else -> raiseConcern("unknown NameEntity ${this}") { this.toString() }
 }
 
 private fun NameEntity.fileNameFragment(): String? {
