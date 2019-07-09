@@ -12,6 +12,13 @@ data class QualifierEntity(
 ) : NameEntity()
 
 
+private operator fun NameEntity.plus(b: NameEntity): NameEntity {
+    return  when (b) {
+        is IdentifierEntity -> QualifierEntity(this, b)
+        is QualifierEntity -> ((this + b.left) + b.right)
+    }
+}
+
 fun NameEntity.process(handler: (String) -> String): NameEntity {
     return when (this) {
         is IdentifierEntity -> IdentifierEntity(handler(value))
@@ -19,84 +26,12 @@ fun NameEntity.process(handler: (String) -> String): NameEntity {
     }
 }
 
-private fun IdentifierEntity.appendLeft(qualifiedLeftNode: NameEntity): QualifierEntity {
-    return when (qualifiedLeftNode) {
-        is IdentifierEntity -> this.appendLeft(qualifiedLeftNode)
-        is QualifierEntity -> this.appendLeft(qualifiedLeftNode)
-    }
-}
-
-private fun QualifierEntity.appendLeft(qualifiedNode: NameEntity): QualifierEntity {
-    return when (left) {
-        is IdentifierEntity -> copy(left = (left as IdentifierEntity).appendLeft(qualifiedNode))
-        is QualifierEntity -> copy(left = (left as QualifierEntity).appendLeft(qualifiedNode))
-    }
-}
-
 fun NameEntity.appendLeft(qualifiedNode: NameEntity): NameEntity {
-    return when (this) {
-        is IdentifierEntity -> this.appendLeft(qualifiedNode)
-        is QualifierEntity -> this.appendLeft(qualifiedNode)
-    }
-}
-
-fun IdentifierEntity.appendLeft(identifierNode: IdentifierEntity): QualifierEntity {
-    return QualifierEntity(this, identifierNode)
-}
-
-fun IdentifierEntity.appendLeft(qualifiedNode: QualifierEntity): QualifierEntity {
-    val nodeLeft = qualifiedNode.left
-    val left = when (nodeLeft) {
-        is IdentifierEntity -> QualifierEntity(this, nodeLeft)
-        is QualifierEntity -> {
-            val left = nodeLeft.left
-            QualifierEntity(when (left) {
-                is IdentifierEntity -> this.appendLeft(left)
-                is QualifierEntity -> this.appendLeft(left)
-            }, nodeLeft.right)
-        }
-    }
-    return QualifierEntity(left, qualifiedNode.right)
-}
-
-fun IdentifierEntity.appendRight(qualifiedLeftNode: NameEntity): QualifierEntity {
-    return when (qualifiedLeftNode) {
-        is IdentifierEntity -> this.appendRight(qualifiedLeftNode)
-        is QualifierEntity -> this.appendRight(qualifiedLeftNode)
-    }
-}
-
-fun IdentifierEntity.appendRight(qualifiedNode: IdentifierEntity): QualifierEntity {
-    return QualifierEntity(qualifiedNode, this)
-}
-
-fun IdentifierEntity.appendRight(qualifiedNode: QualifierEntity): QualifierEntity {
-    return QualifierEntity(qualifiedNode, this)
-}
-
-fun QualifierEntity.appendRight(identifierNode: IdentifierEntity): QualifierEntity {
-    return QualifierEntity(this, identifierNode)
-}
-
-fun QualifierEntity.appendRight(qualifiedNode: QualifierEntity): QualifierEntity {
-    val nodeLeft = qualifiedNode.left
-    return when (nodeLeft) {
-        is IdentifierEntity -> appendRight(nodeLeft).appendRight(qualifiedNode.right)
-        is QualifierEntity -> appendRight(nodeLeft).appendRight(qualifiedNode.right)
-    }
+    return this + qualifiedNode
 }
 
 fun NameEntity.appendRight(qualifiedNode: NameEntity): NameEntity {
-    return when (this) {
-        is IdentifierEntity -> when (qualifiedNode) {
-            is IdentifierEntity -> appendRight(qualifiedNode)
-            is QualifierEntity -> appendRight(qualifiedNode)
-        }
-        is QualifierEntity -> when (qualifiedNode) {
-            is IdentifierEntity -> appendRight(qualifiedNode)
-            is QualifierEntity -> appendRight(qualifiedNode)
-        }
-    }
+    return qualifiedNode + this
 }
 
 fun NameEntity.shiftRight(): NameEntity? {

@@ -6,9 +6,9 @@ declare interface AstFactory {
 
     createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration, uid: string): ImportEqualsDeclaration
 
-    createIdentifierDeclaration(value: string): IdentifierDeclaration;
+    createIdentifierDeclaration(value: string): IdentifierEntity;
 
-    createQualifiedNameDeclaration(left: ParameterValue, right: IdentifierDeclaration): QualifierDeclaration;
+    createQualifiedNameDeclaration(left: ParameterValue, right: IdentifierEntity): QualifierEntity;
 
     createThisTypeDeclaration(): ThisTypeDeclaration;
 
@@ -16,11 +16,11 @@ declare interface AstFactory {
     createEnumTokenDeclaration(value: String, meta: String): EnumTokenDeclaration;
 
     createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration;
-    createHeritageClauseDeclaration(name: IdentifierDeclaration, typeArguments: Array<ParameterValue>, extending: boolean): HeritageClauseDeclaration
+    createHeritageClauseDeclaration(name: IdentifierEntity, typeArguments: Array<ParameterValue>, extending: boolean): HeritageClauseDeclaration
 
     createTypeAliasDeclaration(
-        aliasName: NameDeclaration,
-        typeParams: Array<IdentifierDeclaration>,
+        aliasName: NameEntity,
+        typeParams: Array<IdentifierEntity>,
         typeReference: ParameterValue,
         uid: String
     ): TypeAliasDeclaration;
@@ -30,10 +30,10 @@ declare interface AstFactory {
 
     createModifierDeclaration(name: string): ModifierDeclaration;
 
-    createClassDeclaration(name: NameDeclaration, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
+    createClassDeclaration(name: NameEntity, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration;
 
     createObjectLiteral(methods: Array<MemberDeclaration>): ObjectLiteral
-    createInterfaceDeclaration(name: NameDeclaration, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration;
+    createInterfaceDeclaration(name: NameEntity, methods: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration;
 
     createExpression(kind: TypeDeclaration, meta: string): Expression;
 
@@ -97,11 +97,11 @@ declare interface AstFactory {
 
     createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;
     createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
-    createTypeDeclaration(value: IdentifierDeclaration, params: Array<ParameterValue>): TypeDeclaration;
-    createTypeParam(name: NameDeclaration, constraints: Array<ParameterValue>): TypeParameter;
+    createTypeDeclaration(value: IdentifierEntity, params: Array<ParameterValue>): TypeDeclaration;
+    createTypeParam(name: NameEntity, constraints: Array<ParameterValue>): TypeParameter;
 
     createModuleDeclaration(
-        packageName: NameDeclaration,
+        packageName: NameEntity,
         declarations: Declaration[],
         modifiers: Array<ModifierDeclaration>,
         definitionsInfo: Array<DefinitionInfoDeclaration>,
@@ -109,7 +109,7 @@ declare interface AstFactory {
         resourceName: string,
         root: boolean
     ): PackageDeclaration;
-    createSourceFileDeclaration(fileName: string, root: PackageDeclaration, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration;
+    createSourceFileDeclaration(fileName: string, root: PackageDeclaration, referencedFiles: Array<IdentifierEntity>): SourceFileDeclaration;
 
     createSourceSet(sources: Array<SourceFileDeclaration>): SourceSet
 }
