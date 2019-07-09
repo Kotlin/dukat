@@ -70,7 +70,7 @@ class AstConverter {
 
         this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
             sources.push(this.astFactory.createSourceFileDeclaration(
-              "<LIBROOT>", this.astFactory.createDocumentRoot(
+              "<LIBROOT>", this.astFactory.createModuleDeclaration(
                 this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
                 libDeclarations,
                 [],
@@ -95,7 +95,7 @@ class AstConverter {
     }
 
     createDocumentRoot(packageName: NameDeclaration, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
+        return this.astFactory.createModuleDeclaration(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {

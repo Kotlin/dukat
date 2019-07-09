@@ -100,7 +100,7 @@ declare interface AstFactory {
     createTypeDeclaration(value: IdentifierDeclaration, params: Array<ParameterValue>): TypeDeclaration;
     createTypeParam(name: NameDeclaration, constraints: Array<ParameterValue>): TypeParameter;
 
-    createDocumentRoot(
+    createModuleDeclaration(
         packageName: NameDeclaration,
         declarations: Declaration[],
         modifiers: Array<ModifierDeclaration>,

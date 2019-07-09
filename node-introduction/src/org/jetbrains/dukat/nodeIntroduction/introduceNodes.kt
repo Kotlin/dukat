@@ -52,7 +52,7 @@ import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -485,14 +485,14 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<PackageDeclaration>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): List<TopLevelEntity> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> listOf(declaration.convert())
             is ClassDeclaration -> listOf(declaration.convert(null))
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
-            is PackageDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
+            is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
             is EnumDeclaration -> listOf(declaration.convert())
             is TypeAliasDeclaration -> listOf(declaration.convert())
             else -> listOf(declaration)
@@ -528,9 +528,9 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): DocumentRootNode {
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode {
         val parentDocRoots =
-                owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<PackageDeclaration>>
+                owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<ModuleDeclaration>>
 
         val qualifiers = parentDocRoots.map { it.node.packageName.unquote() }
         val fullPackageName = qualifiers.reduce { acc, identifier -> identifier.appendRight(acc) }
@@ -564,7 +564,7 @@ private class LowerDeclarationsToNodes(private val fileName: String) {
     }
 }
 
-private fun PackageDeclaration.introduceNodes(fileName: String) = org.jetbrains.dukat.nodeIntroduction.LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, NodeOwner(this, null))
+private fun ModuleDeclaration.introduceNodes(fileName: String) = org.jetbrains.dukat.nodeIntroduction.LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, NodeOwner(this, null))
 
 fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath

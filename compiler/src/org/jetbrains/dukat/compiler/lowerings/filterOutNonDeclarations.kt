@@ -3,7 +3,7 @@ package org.jetbrains.dukat.compiler.lowerings
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -14,7 +14,7 @@ private fun hasExportModifiers(modifiers: List<ModifierDeclaration>): Boolean {
             || modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
 }
 
-fun PackageDeclaration.filterOutNonDeclarations(isSubModule: Boolean): PackageDeclaration {
+fun ModuleDeclaration.filterOutNonDeclarations(isSubModule: Boolean): ModuleDeclaration {
 
     val declarations = declarations.map { declaration ->
         when (declaration) {
@@ -33,7 +33,7 @@ fun PackageDeclaration.filterOutNonDeclarations(isSubModule: Boolean): PackageDe
                     listOf(declaration)
                 } else emptyList()
             }
-            is PackageDeclaration -> {
+            is ModuleDeclaration -> {
                 if (isSubModule || hasExportModifiers(declaration.modifiers)) {
                     listOf(declaration.filterOutNonDeclarations(true))
                 } else emptyList()

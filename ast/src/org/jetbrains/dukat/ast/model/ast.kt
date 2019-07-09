@@ -18,7 +18,7 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.lowerings.GeneratedInterfaceReferenceDeclaration
@@ -58,7 +58,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is InterfaceDeclaration -> copy() as T
         is InterfaceNode -> copy() as T
         is ObjectNode -> copy() as T
-        is PackageDeclaration -> copy() as T
+        is ModuleDeclaration -> copy() as T
         is ParameterDeclaration -> copy() as T
         is TupleTypeNode -> copy() as T
         is TypeAliasNode -> copy() as T
