@@ -17,15 +17,6 @@ import org.jetbrains.dukat.compiler.AstContext
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-
-private fun ClassLikeNode.translate(): String {
-    return when (this) {
-        is ClassNode -> "<${name}:${uid}>"
-        is InterfaceNode -> "<${name}:${uid}>"
-        else -> "<UNKNOWN>"
-    }
-}
-
 private class OverrideResolver(private val astContext: AstContext) {
     private fun ClassLikeNode.getKnownParents(): List<ClassLikeNode> {
         return when (this) {

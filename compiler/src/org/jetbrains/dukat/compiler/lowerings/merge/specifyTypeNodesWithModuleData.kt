@@ -1,12 +1,12 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.appendRight
-import org.jetbrains.dukat.ast.model.nodes.processing.process
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftRight
 import org.jetbrains.dukat.ast.model.nodes.processing.size
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.appendRight
+import org.jetbrains.dukat.astCommon.process
+import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel

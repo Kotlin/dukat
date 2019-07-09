@@ -1,9 +1,9 @@
-import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
-import org.jetbrains.dukat.ast.model.nodes.processing.process
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.process
+import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.panic.raiseConcern
@@ -13,9 +13,9 @@ import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
+import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.StringTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import java.io.File
 
@@ -83,8 +83,8 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
 
 fun translateModule(fileName: String, translator: InputTranslator): List<TranslationUnitResult> {
     if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
-            !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
-            !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
+        !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
+        !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
         return listOf(TranslationErrorInvalidFile(fileName))
     }
 

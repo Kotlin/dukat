@@ -1,10 +1,7 @@
 package org.jetbrains.dukat.translatorString
 
-import org.jetbrains.dukat.ast.model.nodes.processing.leftMost
-import org.jetbrains.dukat.ast.model.nodes.processing.shiftLeft
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel

@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.appendLeft
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.OwnerContext
