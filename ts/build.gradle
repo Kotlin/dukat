@@ -67,11 +67,3 @@ configurations {
 }
 
 configurations.default.extendsFrom(configurations.dukatTsResources)
-
-
-artifacts {
-  dukatTsResources(createJar.archivePath) {
-    builtBy createJar
-    type "jar"
-  }
-}
