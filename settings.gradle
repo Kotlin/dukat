@@ -60,7 +60,7 @@ include 'tsmodel'
 include 'tsinterop'
 include 'translator'
 
-project(':idl-declarations').projectDir = new File("$rootDir/idl/idl-declarations")
-project(':idl-models').projectDir = new File("$rootDir/idl/idl-models")
-project(':idl-parser').projectDir = new File("$rootDir/idl/idl-parser")
+project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
+project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
+project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 

@@ -60,6 +60,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
+    testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
 
     compile(project(path: ':ts', configuration: 'dukatTsResources'))
 
