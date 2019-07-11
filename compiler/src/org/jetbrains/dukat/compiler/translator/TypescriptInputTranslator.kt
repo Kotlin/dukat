@@ -19,6 +19,7 @@ import org.jetbrains.dukat.compiler.lowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.compiler.lowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.compiler.lowerings.model.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.compiler.lowerings.model.omitStdLib
+import org.jetbrains.dukat.compiler.lowerings.moveTypeAliasesOutside
 import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
 import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
 import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
@@ -76,6 +77,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .rearrangeGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
+                .moveTypeAliasesOutside()
                 .introduceModels()
                 .mergeModules()
                 .mergeWithNameSpace()
