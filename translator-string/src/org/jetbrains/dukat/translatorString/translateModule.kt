@@ -96,7 +96,7 @@ fun translateModule(fileName: String, translator: InputTranslator): List<Transla
     val visited = mutableSetOf<SourceUnit>()
 
     return sourceSet.sources.mapNotNull { sourceFile ->
-        // TODO: investigate whether it's safe to check just fileName
+        // TODO: investigate whether it's safe to check just moduleName
         val sourceKey = Pair(sourceFile.fileName, sourceFile.root.name)
         if (!visited.contains(sourceKey)) {
             visited.add(sourceKey)
