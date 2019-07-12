@@ -1,0 +1,2 @@
+
+external interface A

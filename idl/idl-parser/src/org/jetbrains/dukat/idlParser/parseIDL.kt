@@ -17,6 +17,5 @@ fun parseIDL(fileName: String): IDLFileDeclaration {
 
     val declarations = ArrayList<IDLTopLevelDeclaration>()
     ModuleVisitor(declarations).visit(idl)
-
     return IDLFileDeclaration(fileName, declarations)
 }

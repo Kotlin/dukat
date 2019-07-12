@@ -15,6 +15,7 @@ import java.io.File
 fun IDLTypeDeclaration.process(): TypeModel {
     return TypeValueModel(
             value = IdentifierEntity(when (name) {
+                "void" -> "Unit"
                 "float" -> "Float"
                 "double" -> "Double"
                 "long" -> "Int"
@@ -38,9 +39,30 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     )
 }
 
-fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
-    return when (this) {
-        is IDLInterfaceDeclaration -> ClassModel(
+fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
+    return if (extendedAttributes.contains(IDLExtendedAttributeDeclaration("NoInterfaceObject", null, listOf()))) {
+        InterfaceModel(
+                name = IdentifierEntity(name),
+                members = attributes.mapNotNull { it.process() } +
+                        operations.mapNotNull { it.process() },
+                companionObject = CompanionObjectModel(
+                        name = "",
+                        members = listOf(),
+                        parentEntities = listOf()
+                ),
+                typeParameters = listOf(),
+                parentEntities = parents.map {
+                    HeritageModel(
+                            it.process(),
+                            listOf(),
+                            null
+                    )
+                },
+                annotations = mutableListOf(),
+                external = true
+        )
+    } else {
+        ClassModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
                         operations.mapNotNull { it.process() },
@@ -62,6 +84,12 @@ fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
                 external = true,
                 abstract = true
         )
+    }
+}
+
+fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
+    return when (this) {
+        is IDLInterfaceDeclaration -> convertToModel()
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
@@ -94,7 +122,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
 }
 
 fun IDLFileDeclaration.process(): SourceSetModel {
-    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }
+    val modelDeclarations = declarations.mapNotNull {it.convertToModel() }
 
     val module = ModuleModel(
             name = ROOT_PACKAGENAME,

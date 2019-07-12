@@ -1,0 +1,4 @@
+[NoInterfaceObject]
+interface A {
+
+};
