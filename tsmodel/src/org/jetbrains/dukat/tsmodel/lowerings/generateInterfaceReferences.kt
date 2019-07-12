@@ -13,7 +13,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -30,7 +30,6 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-import javax.xml.stream.events.EntityDeclaration
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {
@@ -144,7 +143,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     private fun NodeOwner<*>.topmostEntity(): TopLevelEntity? {
         val topOwner = generateSequence(this) {
             it.owner
-        }.lastOrNull { (it.node is TopLevelEntity) && (it.node !is PackageDeclaration) }
+        }.lastOrNull { (it.node is TopLevelEntity) && (it.node !is ModuleDeclaration) }
 
         return (topOwner?.node as? TopLevelEntity)
     }
@@ -237,7 +236,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
         }
     }
 
-    override fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): PackageDeclaration {
+    override fun lowerDocumentRoot(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): ModuleDeclaration {
 
         val declarations = documentRoot.declarations.map { declaration ->
             when (declaration) {
@@ -255,7 +254,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     }
 }
 
-fun PackageDeclaration.generateInterfaceReferences(): PackageDeclaration {
+fun ModuleDeclaration.generateInterfaceReferences(): ModuleDeclaration {
     val generateInterfaceReferences = GenerateInterfaceReferences()
     return generateInterfaceReferences.getContext().introduceGeneratedEntities(generateInterfaceReferences.lowerDocumentRoot(this, NodeOwner(this, null)))
 }

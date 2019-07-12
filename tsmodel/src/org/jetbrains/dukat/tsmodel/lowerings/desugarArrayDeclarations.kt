@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -17,7 +17,7 @@ private class NativeArrayLowering : DeclarationTypeLowering {
 
 }
 
-fun PackageDeclaration.desugarArrayDeclarations(): PackageDeclaration {
+fun ModuleDeclaration.desugarArrayDeclarations(): ModuleDeclaration {
     return org.jetbrains.dukat.tsmodel.lowerings.NativeArrayLowering().lowerDocumentRoot(this)
 }
 

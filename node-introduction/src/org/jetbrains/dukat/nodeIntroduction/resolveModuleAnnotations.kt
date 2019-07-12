@@ -12,7 +12,6 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 
 private data class ExportTable(
@@ -48,8 +47,7 @@ private fun DocumentRootNode.removeExportQualifiers() {
 }
 
 private class ExportAssignmentLowering(
-        private val root: DocumentRootNode,
-        private val moduleNameResolver: ModuleNameResolver
+        private val root: DocumentRootNode
 ) {
     private val myExports: ExportTable = buildExportAssignmentTable(root)
 
@@ -71,18 +69,10 @@ private class ExportAssignmentLowering(
         docRoot.declarations.filterIsInstance(DocumentRootNode::class.java).forEach { mergeDocumentRoot(it, mergedDocs) }
     }
 
-    private fun DocumentRootNode.resolveModule(): NameEntity? {
-        return if (external) {
-            packageName.process { unquote(it) }
-        } else {
-            moduleNameResolver.resolveName(fileName)
-        }
-    }
-
     fun lower(docRoot: DocumentRootNode, mergedDocs: MutableMap<String, NameEntity?>): DocumentRootNode {
         if (myExports.assignments.contains(docRoot.uid)) {
             myExports.assignments[docRoot.uid]?.let { exportOwner ->
-                docRoot.jsModule = exportOwner.resolveModule()
+                docRoot.jsModule = exportOwner.moduleName
             }
         } else {
             if (docRoot.uid != root.uid) {
@@ -101,7 +91,7 @@ private class ExportAssignmentLowering(
                 is DocumentRootNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
                     assignments[declaration.uid]?.let { exportOwner ->
-                        exportOwner.resolveModule()?.let { moduleName ->
+                        exportOwner.moduleName?.let { moduleName ->
 
                             docRoot.declarations
                                     .filterIsInstance(FunctionNode::class.java)
@@ -118,7 +108,7 @@ private class ExportAssignmentLowering(
                             docRoot.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
                                 submodule.qualifiedPackageName.rightMost() == declaration.name
                             }?.let { eponymousDeclaration ->
-                                mergedDocs.put(eponymousDeclaration.uid, docRoot.resolveModule())
+                                mergedDocs.put(eponymousDeclaration.uid, docRoot.moduleName)
                             }
                         }
                     }
@@ -133,7 +123,7 @@ private class ExportAssignmentLowering(
                 }
                 is VariableNode -> {
                     assignments[declaration.uid]?.let { exportOwner ->
-                        exportOwner.resolveModule()?.let {
+                        exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
 
                             if (exportOwner.external && (exportOwner.uid == docRoot.uid)) {
@@ -155,7 +145,7 @@ private class ExportAssignmentLowering(
                 }
                 is ClassNode -> {
                     assignments[declaration.uid]?.let { exportOwner ->
-                        exportOwner.resolveModule()?.let {
+                        exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null
 
@@ -166,7 +156,7 @@ private class ExportAssignmentLowering(
                 }
                 is InterfaceNode -> {
                     assignments[declaration.uid]?.let { exportOwner ->
-                        exportOwner.resolveModule()?.let {
+                        exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null
 
@@ -189,10 +179,10 @@ private class ExportAssignmentLowering(
 }
 
 
-fun DocumentRootNode.resolveModuleAnnotations(moduleNameResolver: ModuleNameResolver): DocumentRootNode {
-    return ExportAssignmentLowering(this, moduleNameResolver).lower()
+fun DocumentRootNode.resolveModuleAnnotations(): DocumentRootNode {
+    return ExportAssignmentLowering(this).lower()
 }
 
-fun SourceSetNode.resolveModuleAnnotations(moduleNameResolver: ModuleNameResolver) = transform {
-    it.resolveModuleAnnotations(moduleNameResolver)
+fun SourceSetNode.resolveModuleAnnotations() = transform {
+    it.resolveModuleAnnotations()
 }

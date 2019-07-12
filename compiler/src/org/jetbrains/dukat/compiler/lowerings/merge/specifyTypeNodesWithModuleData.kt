@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.processing.size
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftRight
@@ -41,7 +42,6 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
     override fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel {
@@ -65,7 +65,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             } else if (declarationValue is QualifierEntity) {
 
                 // TODO: Double check deeply nested qualifiedNames
-                val qualifiedPath = qualifiedName.appendRight(declarationValue).shiftRight()
+                val qualifiedPath = qualifiedName.appendLeft(declarationValue).shiftRight()
 
                 if (ownerContext.owner?.node is VariableModel) {
                     val variableModel = ownerContext.owner?.node as VariableModel
@@ -87,8 +87,10 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
 
                     if (declarationQualifiedName != qualifiedName) {
-                        val qualifiedNode = qualifiedPath?.shiftLeft()?.appendRight(declarationValue.right)
-                        return TypeValueModel(qualifiedNode!!, emptyList(), null)
+                        val qualifiedNode = qualifiedPath?.shiftLeft()?.appendLeft(declarationValue.right)
+                                ?: declarationValue.right
+
+                        return TypeValueModel(qualifiedNode, declaration.params, null)
                     }
                 }
 
