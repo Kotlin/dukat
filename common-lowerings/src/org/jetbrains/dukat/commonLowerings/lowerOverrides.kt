@@ -3,9 +3,9 @@ package org.jetbrains.dukat.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.translatorString.translate
 
 private class OverrideResolver(val context: ModelContext) {
+
     private fun ClassLikeModel.getKnownParents(): List<ClassLikeModel> {
         return when (this) {
             is InterfaceModel -> getKnownParents()
@@ -16,8 +16,7 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun InterfaceModel.getKnownParents(): List<InterfaceModel> {
         return parentEntities.flatMap { heritageModel ->
-            val interfaceNode = context.resolveInterface(IdentifierEntity(
-                    heritageModel.value.translate()))
+            val interfaceNode = context.resolveInterface(heritageModel.value.value)
             if (interfaceNode == null) {
                 emptyList()
             } else {
@@ -28,8 +27,8 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun ClassModel.getKnownParents(): List<ClassLikeModel> {
         return parentEntities.flatMap {
-            listOf(context.resolveInterface(IdentifierEntity(it.value.translate())),
-                    context.resolveClass(IdentifierEntity(it.value.translate())))
+            listOf(context.resolveInterface(it.value.value),
+                    context.resolveClass(it.value.value))
         }.filterNotNull()
     }
 
@@ -91,15 +90,22 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun MethodModel.isSpecialCase(): Boolean {
 
-        if ((name == IdentifierEntity("equals")) && (parameters.size == 1) && (parameters[0].type == TypeValueModel(IdentifierEntity("Any"), emptyList(), null))) {
+        val returnType = type
+
+        if (name == IdentifierEntity("equals") && parameters.size == 1) {
+            val firstParameterType = parameters[0].type
+            if (firstParameterType is TypeValueModel && firstParameterType.value == IdentifierEntity("Any")) {
+                return true
+            }
+        }
+
+        if (name == IdentifierEntity("hashCode") && parameters.isEmpty() &&
+                returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
             return true
         }
 
-        if ((name == IdentifierEntity("hashCode") && parameters.isEmpty() && type == TypeValueModel(IdentifierEntity("Number"), emptyList(), null))) {
-            return true
-        }
-
-        if ((name == IdentifierEntity("toString") && parameters.isEmpty() && type == TypeValueModel(IdentifierEntity("String"), emptyList(), null))) {
+        if (name == IdentifierEntity("toString") && parameters.isEmpty() &&
+                returnType is TypeValueModel && returnType.value == IdentifierEntity("String")) {
             return true
         }
 
@@ -127,7 +133,7 @@ private class OverrideResolver(val context: ModelContext) {
             }
         }
 
-        if (otherParameterType == TypeValueModel(IdentifierEntity("Any"), emptyList(), null)) {
+        if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("Any")) {
             return true
         }
 
