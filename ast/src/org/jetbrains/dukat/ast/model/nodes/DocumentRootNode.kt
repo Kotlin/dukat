@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 
 data class DocumentRootNode(
-        val fileName: String,
+        val moduleName: NameEntity?,
 
         val packageName: NameEntity,
         var qualifiedPackageName: NameEntity,

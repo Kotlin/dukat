@@ -25,7 +25,7 @@ class AstConverter {
 
     constructor(
         private sourceName: string,
-        private rootPackageName: NameDeclaration,
+        private rootPackageName: NameEntity,
         private typeChecker: ts.TypeChecker,
         private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
         private declarationResolver: (node: ts.Node, fileName: string) => readonly ts.DefinitionInfo[] | undefined,
@@ -70,7 +70,7 @@ class AstConverter {
 
         this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
             sources.push(this.astFactory.createSourceFileDeclaration(
-              "<LIBROOT>", this.astFactory.createDocumentRoot(
+              "<LIBROOT>", this.astFactory.createModuleDeclaration(
                 this.astFactory.createIdentifierDeclaration("<LIBROOT>"),
                 libDeclarations,
                 [],
@@ -94,8 +94,8 @@ class AstConverter {
         return this.convertSourceSet(sources);
     }
 
-    createDocumentRoot(packageName: NameDeclaration, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
-        return this.astFactory.createDocumentRoot(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
+    createDocumentRoot(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): PackageDeclaration {
+        return this.astFactory.createModuleDeclaration(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
     }
 
     convertName(name: ts.BindingName | ts.PropertyName) : string | null {
@@ -141,8 +141,8 @@ class AstConverter {
         return typeParameterDeclarations;
     }
 
-    convertTypeParamsToTokens(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<IdentifierDeclaration> {
-        let typeParameterDeclarations: Array<IdentifierDeclaration> = [];
+    convertTypeParamsToTokens(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined) : Array<IdentifierEntity> {
+        let typeParameterDeclarations: Array<IdentifierEntity> = [];
 
         if (nativeTypeDeclarations) {
             typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
@@ -277,7 +277,7 @@ class AstConverter {
         return this.astFactory.createIntersectionTypeDeclaration(params);
     }
 
-    convertEntityName(entityName: ts.EntityName) : NameDeclaration {
+    convertEntityName(entityName: ts.EntityName) : NameEntity {
         if (ts.isQualifiedName(entityName)) {
             return this.astFactory.createQualifiedNameDeclaration(
               this.convertEntityName(entityName.left) as ModuleReferenceDeclaration,
@@ -591,8 +591,8 @@ class AstConverter {
         )
     }
 
-    private convertPropertyAccessExpression(propertyAccessExpression: ts.PropertyAccessExpression): QualifierDeclaration  {
-        let convertedExpression: NameDeclaration | null;
+    private convertPropertyAccessExpression(propertyAccessExpression: ts.PropertyAccessExpression): QualifierEntity  {
+        let convertedExpression: NameEntity | null;
         let name = this.astFactory.createIdentifierDeclaration(propertyAccessExpression.name.text);
 
         if (ts.isIdentifier(propertyAccessExpression.expression)) {
@@ -607,14 +607,14 @@ class AstConverter {
         return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
     }
 
-    private convertValue(entity: ts.TypeNode | ts.Identifier): NameDeclaration {
+    private convertValue(entity: ts.TypeNode | ts.Identifier): NameEntity {
         let convertedEntity = this.convertType(entity) as any;
 
         // TODO: getValue() we get in Graal, .value in Nashorn and J2V8 - I need to create a minimal example and report it
         let value = typeof convertedEntity.getValue == "function" ?
             (convertedEntity).getValue() : convertedEntity.value;
 
-        return value as NameDeclaration;
+        return value as NameEntity;
     }
 
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
@@ -627,7 +627,7 @@ class AstConverter {
                     let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                     for (let type of heritageClause.types) {
-                        let typeArguments: Array<IdentifierDeclaration> = [];
+                        let typeArguments: Array<IdentifierEntity> = [];
 
                         if (type.typeArguments) {
                             for (let typeArgument of type.typeArguments) {
@@ -711,7 +711,7 @@ class AstConverter {
         return interfaceDeclaration;
     }
 
-    private convertStatement(statement: ts.Node, resourceName: NameDeclaration): Array<Declaration> {
+    private convertStatement(statement: ts.Node, resourceName: NameEntity): Array<Declaration> {
         let res: Array<Declaration> = [];
 
         if (ts.isEnumDeclaration(statement)) {
@@ -814,7 +814,7 @@ class AstConverter {
         return res;
     }
 
-    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameDeclaration) : Array<Declaration> {
+    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameEntity) : Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
             for (let decl of this.convertStatement(statement, resourceName)) {
@@ -825,7 +825,7 @@ class AstConverter {
         return declarations;
     }
 
-    convertModule(module: ts.ModuleDeclaration, resourceName: NameDeclaration): Array<Declaration> {
+    convertModule(module: ts.ModuleDeclaration, resourceName: NameEntity): Array<Declaration> {
         let definitionInfos = this.declarationResolver(module.name, this.sourceName);
 
         const declarations: Declaration[] = [];

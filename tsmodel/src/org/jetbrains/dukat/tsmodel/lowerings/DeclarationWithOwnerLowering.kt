@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -67,19 +67,19 @@ interface DeclarationWithOwnerLowering {
             is VariableDeclaration -> lowerVariableDeclaration(owner as NodeOwner<VariableDeclaration>)
             is FunctionDeclaration -> lowerFunctionDeclaration(owner as NodeOwner<FunctionDeclaration>)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner as NodeOwner<ClassLikeDeclaration>)
-            is PackageDeclaration -> lowerDocumentRoot(declaration, owner as NodeOwner<PackageDeclaration>)
+            is ModuleDeclaration -> lowerDocumentRoot(declaration, owner as NodeOwner<ModuleDeclaration>)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(owner as NodeOwner<TypeAliasDeclaration>)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<PackageDeclaration>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<ModuleDeclaration>): List<TopLevelEntity> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(owner.wrap(declaration))
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: PackageDeclaration, owner: NodeOwner<PackageDeclaration>): PackageDeclaration {
+    fun lowerDocumentRoot(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): ModuleDeclaration {
         return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations, owner))
     }
 

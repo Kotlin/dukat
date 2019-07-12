@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -65,7 +65,7 @@ interface DeclarationLowering {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
-            is PackageDeclaration -> lowerDocumentRoot(declaration)
+            is ModuleDeclaration -> lowerDocumentRoot(declaration)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
             else -> declaration
         }
@@ -77,7 +77,7 @@ interface DeclarationLowering {
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: PackageDeclaration): PackageDeclaration {
+    fun lowerDocumentRoot(documentRoot: ModuleDeclaration): ModuleDeclaration {
         return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations))
     }
 

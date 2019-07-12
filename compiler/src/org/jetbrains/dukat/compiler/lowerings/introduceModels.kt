@@ -531,33 +531,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
             imports = mutableListOf()
     )
 
-    val isJsModule = (jsModule != null) || (jsQualifier != null)
-
-    return if (isJsModule) {
-        val (aliases, ownDeclarations) = module.declarations.partition { it is TypeAliasModel }
-        if (aliases.isEmpty()) {
-            module
-        } else {
-
-            generated.add(SourceFileModel(
-                    name = "types",
-                    fileName = sourceFileName,
-                    root = ModuleModel(
-                            name = module.name,
-                            shortName = module.shortName,
-                            declarations = aliases,
-                            annotations = mutableListOf(),
-                            sumbodules = mutableListOf(),
-                            imports = mutableListOf()
-                    ),
-                    referencedFiles = emptyList()
-            ))
-
-            module.copy(declarations = ownDeclarations)
-        }
-    } else {
-        module
-    }
+    return module
 }
 
 fun SourceSetNode.introduceModels() = SourceSetModel(

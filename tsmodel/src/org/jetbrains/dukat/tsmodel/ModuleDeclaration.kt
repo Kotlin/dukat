@@ -3,7 +3,7 @@ package org.jetbrains.dukat.tsmodel
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
-data class PackageDeclaration(
+data class ModuleDeclaration(
         val packageName: NameEntity,
         val declarations: List<TopLevelEntity> = emptyList(),
 

@@ -2,7 +2,7 @@ package org.jetbrains.dukat.tsmodel.lowerings
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -38,7 +38,7 @@ private class PartialLowering : DeclarationTypeLowering {
     }
 }
 
-private fun PackageDeclaration.resolvePartials(): PackageDeclaration {
+private fun ModuleDeclaration.resolvePartials(): ModuleDeclaration {
     return PartialLowering().lowerDocumentRoot(this)
 }
 

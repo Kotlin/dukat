@@ -25,9 +25,9 @@ pluginManagement {
 }
 
 gradle.ext {
-  kotlinVersion = "1.3.40"
+  kotlinVersion = "1.3.41"
   jupiterVersion = "5.4.1"
-  graalVersion = "19.0.0"
+  graalVersion = "19.1.0"
   nodeVersion = "10.15.3"
   npmVersion = "6.9.0"
   nodePluginVersion = "1.3.1"
@@ -60,7 +60,7 @@ include 'tsmodel'
 include 'tsinterop'
 include 'translator'
 
-project(':idl-declarations').projectDir = new File("$rootDir/idl/idl-declarations")
-project(':idl-models').projectDir = new File("$rootDir/idl/idl-models")
-project(':idl-parser').projectDir = new File("$rootDir/idl/idl-parser")
+project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
+project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
+project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 

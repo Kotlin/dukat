@@ -60,23 +60,27 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
+    testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
 
     compile(project(path: ':ts', configuration: 'dukatTsResources'))
 
     toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
 
+def getTsDependency() {
+    return zipTree(project(":ts").getTasksByName("createJar", true).archivePath[0])
+}
 
 processResources {
-    from(zipTree(configurations.compile.find { it.name == "dukatts.jar" })) {
+    dependsOn = [":ts:createJar"]
+    from(getTsDependency()) {
         into "/"
     }
 }
 
-
 task propagateToIdeaRuntime(type: Copy) {
     dependsOn = [":ts:createJar"]
-    from(zipTree(configurations.compile.find { it.name == "dukatts.jar" }))
+    from(getTsDependency())
     into "out/production/resources/"
 }
 

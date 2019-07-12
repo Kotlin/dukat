@@ -11,14 +11,14 @@ declare interface DefinitionInfoDeclaration extends AstNode {
 
 declare interface TupleDeclaration extends ParameterValue {}
 
-declare interface NameDeclaration extends Declaration {}
+declare interface NameEntity extends Declaration {}
 
-declare interface QualifierDeclaration extends ModuleReferenceDeclaration, ParameterValue, NameDeclaration {
+declare interface IdentifierEntity extends ParameterValue, ModuleReferenceDeclaration, NameEntity {}
+declare interface QualifierEntity extends ModuleReferenceDeclaration, ParameterValue, NameEntity {
     left: ParameterValue,
     right: ParameterValue
 }
 
-declare interface IdentifierDeclaration extends ParameterValue, ModuleReferenceDeclaration, NameDeclaration {}
 declare interface ThisTypeDeclaration extends Declaration {}
 declare interface ModuleReferenceDeclaration extends Declaration {}
 

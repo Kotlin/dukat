@@ -12,7 +12,7 @@ declare interface DocumentCache {
     getDocument(key: string, path: string): ts.SourceFile | undefined;
 }
 
-function main(fileName: string, packageName: NameDeclaration, cache?: DocumentCache) {
+function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) {
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 

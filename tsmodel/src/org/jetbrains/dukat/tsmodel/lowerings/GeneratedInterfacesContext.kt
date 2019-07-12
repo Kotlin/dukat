@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.PackageDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -38,10 +38,10 @@ internal fun Entity.getUID(): String {
     }
 }
 
-private fun NodeOwner<*>.findOwnerPackage(): PackageDeclaration {
+private fun NodeOwner<*>.findOwnerPackage(): ModuleDeclaration {
     val ownerPackage = getOwners().first() {
-        (it is NodeOwner<*>) && (it.node is PackageDeclaration)
-    } as NodeOwner<PackageDeclaration>
+        (it is NodeOwner<*>) && (it.node is ModuleDeclaration)
+    } as NodeOwner<ModuleDeclaration>
 
     return ownerPackage.node
 }
@@ -294,12 +294,12 @@ class GeneratedInterfacesContext {
             is VariableDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
             is FunctionDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
             is TypeAliasDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is PackageDeclaration -> listOf(introduceGeneratedEntities(declaration))
+            is ModuleDeclaration -> listOf(introduceGeneratedEntities(declaration))
             else -> listOf(declaration)
         }
     }
 
-    fun introduceGeneratedEntities(packageDeclaration: PackageDeclaration): PackageDeclaration {
+    fun introduceGeneratedEntities(packageDeclaration: ModuleDeclaration): ModuleDeclaration {
         val declarations = packageDeclaration.declarations.flatMap { declaration ->
             introduceGeneratedEntities(declaration)
         }
