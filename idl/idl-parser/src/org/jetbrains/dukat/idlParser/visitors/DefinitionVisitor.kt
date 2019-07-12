@@ -37,7 +37,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitInheritance(ctx: WebIDLParser.InheritanceContext): IDLTopLevelDeclaration {
-        parents.addAll(filterIdentifiers(ctx.children).map { IDLTypeDeclaration(it.text) })
+        parents.addAll(ctx.filterIdentifiers().map { IDLTypeDeclaration(it.text) })
         return defaultResult()
     }
 }

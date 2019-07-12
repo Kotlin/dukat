@@ -40,7 +40,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
-    return if (extendedAttributes.contains(IDLExtendedAttributeDeclaration("NoInterfaceObject", null, listOf()))) {
+    return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
