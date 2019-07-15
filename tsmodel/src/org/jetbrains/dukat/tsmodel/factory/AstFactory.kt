@@ -141,7 +141,7 @@ class AstFactory {
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>) = IntersectionTypeDeclaration(params)
 
     fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(params)
-    fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>) = TypeDeclaration(value, params.toList())
+    fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>, typeReference: String?) = TypeDeclaration(value, params.toList(), typeReference)
 
     fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean) = ParameterDeclaration(name, type, initializer, vararg, optional)
 
