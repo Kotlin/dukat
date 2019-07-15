@@ -95,9 +95,11 @@ declare interface AstFactory {
 
     createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration;
 
+    createReferenceEntity<T extends Declaration>(uid: string): ReferenceEntity<T>;
+
     createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;
     createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
-    createTypeDeclaration(value: IdentifierEntity, params: Array<ParameterValue>, typeReference: string | null): TypeDeclaration;
+    createTypeDeclaration(value: IdentifierEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity<Declaration> | null): TypeDeclaration;
     createTypeParam(name: NameEntity, constraints: Array<ParameterValue>): TypeParameter;
 
     createModuleDeclaration(
