@@ -112,7 +112,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 static = false,
                 override = false,
                 getter = true,
-                setter = true,
+                setter = !readOnly,
                 open = false
         )
         is IDLOperationDeclaration -> MethodModel(

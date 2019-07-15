@@ -14,11 +14,12 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var type : IDLTypeDeclaration = IDLTypeDeclaration("")
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var static: Boolean = false
+    private var readOnly: Boolean = false
 
     override fun defaultResult() : IDLMemberDeclaration {
         return when (kind) {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
-            MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static)
+            MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
         }
     }
@@ -71,6 +72,19 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     override fun visitStaticMemberRest(ctx: WebIDLParser.StaticMemberRestContext?): IDLMemberDeclaration {
         static = true
         visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitReadonlyMemberRest(ctx: WebIDLParser.ReadonlyMemberRestContext?): IDLMemberDeclaration {
+        readOnly = true
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitReadOnly(ctx: WebIDLParser.ReadOnlyContext): IDLMemberDeclaration {
+        if (ctx.text.isNotEmpty()) {
+            readOnly = true
+        }
         return defaultResult()
     }
 

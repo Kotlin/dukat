@@ -27,8 +27,15 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         )
     }
 
-    override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
+    override fun visitReadWriteAttribute(ctx: WebIDLParser.ReadWriteAttributeContext): IDLTopLevelDeclaration {
         myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
+        return defaultResult()
+    }
+
+    override fun visitReadonlyMember(ctx: WebIDLParser.ReadonlyMemberContext?): IDLTopLevelDeclaration {
+        when (val readOnlyMember = MemberVisitor().visit(ctx)) {
+            is IDLAttributeDeclaration -> myAttributes.add(readOnlyMember)
+        }
         return defaultResult()
     }
 
