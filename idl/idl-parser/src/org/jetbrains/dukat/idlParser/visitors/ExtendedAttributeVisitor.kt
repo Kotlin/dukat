@@ -10,8 +10,8 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 
 class ExtendedAttributeVisitor : WebIDLBaseVisitor<IDLExtendedAttributeDeclaration>() {
 
-    private var firstString: String = ""
-    private var secondString: String? = null
+    private var name: String = ""
+    private var rightSideOfAssignment: String? = null
     private var functionArguments = mutableListOf<IDLArgumentDeclaration>()
     private var identifiers = mutableListOf<String>()
 
@@ -20,35 +20,35 @@ class ExtendedAttributeVisitor : WebIDLBaseVisitor<IDLExtendedAttributeDeclarati
 
     override fun defaultResult(): IDLExtendedAttributeDeclaration {
         if (hasIdentifierList) {
-            return IDLListAssignmentExtendedAttributeDeclaration(firstString, identifiers)
+            return IDLListAssignmentExtendedAttributeDeclaration(name, identifiers)
         }
-        return if (secondString != null) {
+        return if (rightSideOfAssignment != null) {
             if (hasArgumentList) {
-                IDLNamedFunctionExtendedAttributeDeclaration(firstString, secondString!!, functionArguments)
+                IDLNamedFunctionExtendedAttributeDeclaration(name, rightSideOfAssignment!!, functionArguments)
             } else {
-                IDLAssignmentExtendedAttributeDeclaration(firstString, secondString!!)
+                IDLAssignmentExtendedAttributeDeclaration(name, rightSideOfAssignment!!)
             }
         } else {
             if (hasArgumentList) {
-                IDLFunctionExtendedAttributeDeclaration(firstString, functionArguments)
+                IDLFunctionExtendedAttributeDeclaration(name, functionArguments)
             } else {
-                IDLSimpleExtendedAttributeDeclaration(firstString)
+                IDLSimpleExtendedAttributeDeclaration(name)
             }
         }
     }
 
     override fun visitExtendedAttribute(ctx: WebIDLParser.ExtendedAttributeContext): IDLExtendedAttributeDeclaration {
         visitChildren(ctx)
-        if (firstString == "") {
-            firstString = ctx.getName()
+        if (name == "") {
+            name = ctx.getName()
         } else {
-            secondString = ctx.getNameOrNull()
+            rightSideOfAssignment = ctx.getNameOrNull()
         }
         return defaultResult()
     }
 
     override fun visitExtendedAttributeNamePart(ctx: WebIDLParser.ExtendedAttributeNamePartContext): IDLExtendedAttributeDeclaration {
-        firstString = ctx.getName()
+        name = ctx.getName()
         return defaultResult()
     }
 
@@ -66,8 +66,9 @@ class ExtendedAttributeVisitor : WebIDLBaseVisitor<IDLExtendedAttributeDeclarati
         hasIdentifierList = true
         object : WebIDLBaseVisitor<Unit>() {
             override fun visitTerminal(node: TerminalNode) {
-                if (node.symbol.type == WebIDLLexer.IDENTIFIER_WEBIDL)
-                identifiers.add(node.text)
+                if (node.symbol.type == WebIDLLexer.IDENTIFIER_WEBIDL) {
+                    identifiers.add(node.text)
+                }
             }
         }.visit(ctx)
         return defaultResult()

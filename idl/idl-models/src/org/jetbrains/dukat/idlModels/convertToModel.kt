@@ -65,7 +65,8 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
         ClassModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull { it.process() },
+                        operations.mapNotNull { it.process() } +
+                        constructors.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
                         members = listOf(),
@@ -117,12 +118,17 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 annotations = listOf(),
                 open = false
         )
+        is IDLConstructorDeclaration -> ConstructorModel(
+                parameters = arguments.map { it.process() },
+                typeParameters = listOf(),
+                generated = false
+        )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
 }
 
 fun IDLFileDeclaration.process(): SourceSetModel {
-    val modelDeclarations = declarations.mapNotNull {it.convertToModel() }
+    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }
 
     val module = ModuleModel(
             name = ROOT_PACKAGENAME,

@@ -14,7 +14,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
 
     override fun defaultResult(): IDLTopLevelDeclaration {
-        return IDLInterfaceDeclaration(name, myAttributes, operations, parents, extendedAttributes)
+        return IDLInterfaceDeclaration(
+                name = name,
+                attributes = myAttributes,
+                operations = operations,
+                constructors = listOf(),
+                parents = parents,
+                extendedAttributes = extendedAttributes
+        )
     }
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
