@@ -87,7 +87,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 },
                 annotations = mutableListOf(),
                 external = true,
-                abstract = true
+                abstract = constructors.size == 0 && primaryConstructor == null
         )
     }
 }
