@@ -9,6 +9,12 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
 
+    override fun visitReturnType(ctx: WebIDLParser.ReturnTypeContext): IDLTypeDeclaration {
+        type = IDLTypeDeclaration(ctx.text)
+        visitChildren(ctx)
+        return type
+    }
+
     override fun visitNonAnyType(ctx: WebIDLParser.NonAnyTypeContext): IDLTypeDeclaration {
         val name : String? = ctx.getNameOrNull()
         if (name != null) {
