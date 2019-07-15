@@ -97,7 +97,7 @@ declare interface AstFactory {
 
     createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration;
     createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation;
-    createTypeDeclaration(value: IdentifierEntity, params: Array<ParameterValue>): TypeDeclaration;
+    createTypeDeclaration(value: IdentifierEntity, params: Array<ParameterValue>, typeReference: string | null): TypeDeclaration;
     createTypeParam(name: NameEntity, constraints: Array<ParameterValue>): TypeParameter;
 
     createModuleDeclaration(

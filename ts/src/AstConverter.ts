@@ -260,8 +260,8 @@ class AstConverter {
         return this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, "__NO_UID__");
     }
 
-    private createTypeDeclaration(value: string, params: Array<ParameterValue> = []): TypeDeclaration {
-        return this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclaration(value), params);
+    private createTypeDeclaration(value: string, params: Array<ParameterValue> = [], typeReference: string | null = null): TypeDeclaration {
+        return this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclaration(value), params, null);
     }
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
@@ -328,9 +328,22 @@ class AstConverter {
                 let params = this.convertTypeArguments(type.typeArguments);
                 let entity = this.convertEntityName(type.typeName);
 
+                let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
+                let typeReference: string | null = null;
+                if (symbol) {
+                    if (Array.isArray(symbol.declarations)){
+                      let declaration = symbol.declarations[0];
+
+                      if (declaration) {
+                        typeReference = this.exportContext.getUID(declaration);
+                      }
+                    }
+                }
+
                 return this.astFactory.createTypeDeclaration(
                     entity,
-                    params
+                    params,
+                    typeReference
                 );
             } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
                 let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
