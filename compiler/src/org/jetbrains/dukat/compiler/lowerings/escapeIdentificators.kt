@@ -45,22 +45,18 @@ private fun escapeIdentificator(identificator: String): String {
 private class EscapeIdentificators : NodeTypeLowering {
 
     private fun IdentifierEntity.escape(): IdentifierEntity {
-        return IdentifierEntity(
-                value.split(".").joinToString(".") { lowerIdentificator(it) }
-        )
+        return copy(value = lowerIdentificator(value))
     }
 
     private fun TypeValueNode.escape(): TypeValueNode {
-        val typeNodeValue = value
-        return when (typeNodeValue) {
+        return when (val typeNodeValue = value) {
             is IdentifierEntity -> copy(value = typeNodeValue.escape())
             is QualifierEntity -> copy(value = typeNodeValue.escape())
         }
     }
 
     private fun QualifierEntity.escape(): QualifierEntity {
-        val nodeLeft = left
-        return when(nodeLeft) {
+        return when(val nodeLeft = left) {
             is IdentifierEntity -> QualifierEntity(nodeLeft.escape(), right.escape())
             is QualifierEntity -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
         }
