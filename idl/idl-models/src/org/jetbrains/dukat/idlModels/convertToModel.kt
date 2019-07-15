@@ -80,7 +80,11 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                             null
                     )
                 },
-                primaryConstructor = null,
+                primaryConstructor = if (primaryConstructor != null) {
+                    primaryConstructor!!.process() as ConstructorModel
+                } else {
+                    null
+                },
                 annotations = mutableListOf(),
                 external = true,
                 abstract = true

@@ -1,11 +1,7 @@
 
-external abstract class A {
-    constructor()
-}
+external abstract class A
 external abstract class B {
     constructor()
     constructor(x: Double)
 }
-external abstract class C : B {
-    constructor(x: Double)
-}
+external abstract class C(x: Double) : B

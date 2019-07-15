@@ -26,7 +26,11 @@ private class ConstructorLowering : IDLLowering {
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val constructors = declaration.extendedAttributes.mapNotNull { it.convertToConstructor() }
-        return declaration.copy(constructors = constructors)
+        return if (constructors.size == 1) {
+            declaration.copy(primaryConstructor = constructors.single())
+        } else {
+            declaration.copy(constructors = constructors)
+        }
     }
 }
 

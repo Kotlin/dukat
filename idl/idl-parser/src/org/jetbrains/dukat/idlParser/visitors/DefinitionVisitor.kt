@@ -18,6 +18,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                 name = name,
                 attributes = myAttributes,
                 operations = operations,
+                primaryConstructor = null,
                 constructors = listOf(),
                 parents = parents,
                 extendedAttributes = extendedAttributes
