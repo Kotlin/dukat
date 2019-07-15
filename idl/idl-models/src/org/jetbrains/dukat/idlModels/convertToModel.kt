@@ -12,7 +12,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-fun IDLTypeDeclaration.process(): TypeModel {
+fun IDLTypeDeclaration.process(): TypeValueModel {
     return TypeValueModel(
             value = IdentifierEntity(when (name) {
                 "void" -> "Unit"

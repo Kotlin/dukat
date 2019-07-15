@@ -1,14 +1,7 @@
 package org.jetbrains.dukat.compiler.lowerings.merge
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.CompanionObjectModel
-import org.jetbrains.dukat.astModel.ExternalDelegationModel
-import org.jetbrains.dukat.astModel.HeritageModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.*
 
 
 fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
@@ -42,7 +35,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
             }
             is InterfaceModel -> {
                 val correspondingVariable = mergeMap.get(declaration.name)
-                if (correspondingVariable == null) {
+                if (correspondingVariable == null || correspondingVariable.type !is TypeValueModel) {
                     listOf(declaration)
                 } else {
                     listOf(declaration.copy(
@@ -50,7 +43,11 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                     "__",
                                     emptyList(),
                                     listOf(
-                                            HeritageModel(correspondingVariable.type, emptyList(), ExternalDelegationModel())
+                                            HeritageModel(
+                                                    correspondingVariable.type as TypeValueModel,
+                                                    emptyList(),
+                                                    ExternalDelegationModel()
+                                            )
                                     )
                             )))
                 }

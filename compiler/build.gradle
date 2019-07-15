@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":idl-lowerings"))
     implementation(project(":idl-parser"))
     implementation(project(":idl-models"))
+    implementation(project(":common-lowerings"))
 
     implementation(project(":logging"))
     implementation(project(":panic"))
