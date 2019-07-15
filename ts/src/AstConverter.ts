@@ -329,13 +329,13 @@ class AstConverter {
                 let entity = this.convertEntityName(type.typeName);
 
                 let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
-                let typeReference: string | null = null;
+                let typeReference: ReferenceEntity<Declaration> | null = null;
                 if (symbol) {
                     if (Array.isArray(symbol.declarations)){
                       let declaration = symbol.declarations[0];
 
                       if (declaration) {
-                        typeReference = this.exportContext.getUID(declaration);
+                        typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
                       }
                     }
                 }

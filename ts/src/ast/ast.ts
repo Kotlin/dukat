@@ -5,6 +5,10 @@ declare interface AstNode {
 
 declare interface Declaration extends AstNode {}
 
+declare interface ReferenceEntity<T extends Declaration> {
+    uid: String;
+}
+
 declare interface DefinitionInfoDeclaration extends AstNode {
     fileName: string;
 }

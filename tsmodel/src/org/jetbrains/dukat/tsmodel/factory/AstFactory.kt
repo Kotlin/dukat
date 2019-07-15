@@ -5,10 +5,12 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
@@ -40,6 +42,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 class AstFactory {
+
+    fun <T:Declaration> createReferenceEntity(uid: String): ReferenceEntity<T> {
+        return ReferenceEntity(uid)
+    }
 
     fun createDefinitionInfoDeclaration(fileName: String): Entity {
         return DefinitionInfoDeclaration(fileName)
@@ -141,7 +147,7 @@ class AstFactory {
     fun createIntersectionTypeDeclaration(params: List<ParameterValueDeclaration>) = IntersectionTypeDeclaration(params)
 
     fun createUnionTypeDeclaration(params: List<ParameterValueDeclaration>) = UnionTypeDeclaration(params)
-    fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>, typeReference: String?) = TypeDeclaration(value, params.toList(), typeReference)
+    fun createTypeDeclaration(value: NameEntity, params: Array<ParameterValueDeclaration>, typeReference: ReferenceEntity<Declaration>?) = TypeDeclaration(value, params.toList(), typeReference)
 
     fun createParameterDeclaration(name: String, type: ParameterValueDeclaration, initializer: ExpressionDeclaration?, vararg: Boolean, optional: Boolean) = ParameterDeclaration(name, type, initializer, vararg, optional)
 
