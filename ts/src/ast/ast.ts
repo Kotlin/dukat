@@ -45,7 +45,12 @@ declare interface ExportAssignmentDeclaration extends Declaration {
 
 declare interface IntersectionTypeDeclaration extends Declaration {}
 declare interface UnionTypeDeclatation extends Declaration {}
-declare interface HeritageClauseDeclaration extends Declaration {}
+declare interface HeritageClauseDeclaration extends Declaration {
+    name: NameEntity,
+    typeArguments: Array<ParameterValue>,
+    extending: boolean,
+    typeReference: ReferenceEntity<ClassLikeDeclaration> | null
+}
 declare interface TypeAliasDeclaration extends Declaration {}
 declare interface IndexSignatureDeclaration extends ParameterValue {}
 declare interface StringLiteralDeclaration

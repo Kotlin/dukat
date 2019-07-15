@@ -9,6 +9,7 @@ import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
@@ -81,8 +82,7 @@ class AstFactory {
 
     fun createExportAssignmentDeclaration(name: String, isExportEquals: Boolean) = ExportAssignmentDeclaration(name, isExportEquals)
 
-
-    fun createHeritageClauseDeclaration(name: NameEntity, typeArguments: List<ParameterValueDeclaration>, extending: Boolean) = HeritageClauseDeclaration(name, typeArguments, extending)
+    fun createHeritageClauseDeclaration(name: NameEntity, typeArguments: List<ParameterValueDeclaration>, extending: Boolean, typeReference: ReferenceEntity<ClassLikeDeclaration>?) = HeritageClauseDeclaration(name, typeArguments, extending, typeReference)
 
     fun createTypeAliasDeclaration(
             aliasName: NameEntity,
