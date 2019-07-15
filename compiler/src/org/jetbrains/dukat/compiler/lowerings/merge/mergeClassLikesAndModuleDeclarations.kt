@@ -109,7 +109,7 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
     val modulesToBeMergedWithInterfaces = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
     val modulesToBeMergedWithClasses = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
 
-    var resolvedSubmodules = collectModelsToBeMerged(sumbodules, interfaces, modulesToBeMergedWithInterfaces)
+    var resolvedSubmodules = collectModelsToBeMerged(submodules, interfaces, modulesToBeMergedWithInterfaces)
     resolvedSubmodules = collectModelsToBeMerged(resolvedSubmodules, classes, modulesToBeMergedWithClasses)
             .map { moduleModel -> moduleModel.mergeClassLikesAndModuleDeclarations() }
 
@@ -141,7 +141,7 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
             }
 
 
-    return copy(declarations = mergedDeclarations, sumbodules = resolvedSubmodules)
+    return copy(declarations = mergedDeclarations, submodules = resolvedSubmodules)
 }
 
 fun SourceSetModel.mergeClassLikesAndModuleDeclarations() = transform { it.mergeClassLikesAndModuleDeclarations() }

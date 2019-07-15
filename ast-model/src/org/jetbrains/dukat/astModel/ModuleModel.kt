@@ -7,11 +7,11 @@ data class ModuleModel(
         val shortName: NameEntity,
         val declarations: List<TopLevelModel> = emptyList(),
         val annotations: MutableList<AnnotationModel>,
-        val sumbodules: List<ModuleModel>,
+        val submodules: List<ModuleModel>,
         val imports: MutableList<NameEntity>
 ) : TopLevelModel
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
-    return (listOf(this.copy(sumbodules = emptyList())) + sumbodules.flatMap { submodule -> submodule.flattenDeclarations() })
+    return (listOf(this.copy(submodules = emptyList())) + submodules.flatMap { submodule -> submodule.flattenDeclarations() })
             .filter { module -> module.declarations.isNotEmpty() }
 }

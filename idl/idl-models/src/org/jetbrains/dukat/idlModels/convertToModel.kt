@@ -101,7 +101,7 @@ fun IDLFileDeclaration.process(): SourceSetModel {
             shortName = ROOT_PACKAGENAME,
             declarations = modelDeclarations,
             annotations = mutableListOf(),
-            sumbodules = listOf(),
+            submodules = listOf(),
             imports = mutableListOf()
     )
 

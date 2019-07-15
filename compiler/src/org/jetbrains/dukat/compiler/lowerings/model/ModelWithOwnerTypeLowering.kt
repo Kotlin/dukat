@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -28,14 +29,14 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
-                type = lowerTypeNode(NodeOwner(declaration.type, ownerContext))
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
         )
     }
 
     fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                type = lowerTypeNode(NodeOwner(declaration.type, ownerContext))
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
         )
     }
 
@@ -56,24 +57,32 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
-                type = lowerTypeNode(NodeOwner(declaration.type, ownerContext))
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
+        )
+    }
+
+    override fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel {
+        val declaration = ownerContext.node
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
         )
     }
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
-        return declaration.copy(type = lowerTypeNode(NodeOwner(declaration.type, ownerContext)))
+        return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
     }
 
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {
         val declaration = ownerContext.node
-        return declaration.copy(type = lowerTypeNode(NodeOwner(declaration.type, ownerContext)))
+        return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
     }
 
     fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
         val typeParams = heritageClause.typeParams.map {
-            lowerTypeNode(ownerContext.wrap(it))
+            lowerTypeModel(ownerContext.wrap(it))
         }
         return heritageClause.copy(typeParams = typeParams)
     }

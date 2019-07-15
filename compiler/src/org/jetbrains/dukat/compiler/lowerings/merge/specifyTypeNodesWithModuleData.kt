@@ -44,7 +44,7 @@ private fun unescape(name: String): String {
 
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
-    override fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel {
+    override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
         val declaration = ownerContext.node
         val qualifiedName = ownerContext.getQualifiedName()
 
@@ -96,7 +96,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 
             }
         }
-        return super.lowerTypeNode(ownerContext)
+        return super.lowerTypeModel(ownerContext)
     }
 
     override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {

@@ -521,7 +521,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitModule(moduleModel: ModuleModel) {
-        if (moduleModel.declarations.isEmpty() && moduleModel.sumbodules.isEmpty()) {
+        if (moduleModel.declarations.isEmpty() && moduleModel.submodules.isEmpty()) {
             return
         }
 

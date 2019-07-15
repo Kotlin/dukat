@@ -7,7 +7,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 fun ModuleModel.visitTopLevelModel(visitor: (TopLevelModel) -> Unit) {
     visitor(this)
     declarations.forEach(visitor)
-    sumbodules.forEach { it.visitTopLevelModel(visitor) }
+    submodules.forEach { it.visitTopLevelModel(visitor) }
 }
 
 fun SourceSetModel.visitTopLevelModel(visitor: (TopLevelModel) -> Unit) {

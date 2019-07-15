@@ -130,11 +130,11 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
     }
 
 
-    val submodulesResolved = sumbodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
+    val submodulesResolved = submodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
 
     return copy(
             declarations = declarationResolved,
-            sumbodules = submodulesResolved
+            submodules = submodulesResolved
     )
 }
 

@@ -527,7 +527,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
             shortName = qualifiedPackageName.rightMost(),
             declarations = declarationsFiltered,
             annotations = annotations,
-            sumbodules = submodules,
+            submodules = submodules,
             imports = mutableListOf()
     )
 

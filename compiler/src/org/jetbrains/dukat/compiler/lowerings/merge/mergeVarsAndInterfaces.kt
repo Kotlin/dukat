@@ -56,7 +56,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
         }
     }
 
-    return copy(declarations = declarationsMerged, sumbodules = sumbodules.map(ModuleModel::mergeVarsAndInterfaces))
+    return copy(declarations = declarationsMerged, submodules = submodules.map(ModuleModel::mergeVarsAndInterfaces))
 }
 
 fun SourceSetModel.mergeVarsAndInterfaces() = transform { it.mergeVarsAndInterfaces() }

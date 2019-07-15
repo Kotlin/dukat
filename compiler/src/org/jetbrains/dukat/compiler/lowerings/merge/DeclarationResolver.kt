@@ -25,7 +25,7 @@ class DeclarationResolver {
             }
         }
 
-        documentRoot.sumbodules.forEach { submodule ->
+        documentRoot.submodules.forEach { submodule ->
             process(submodule, NodeOwner(submodule, moduleContext))
         }
     }

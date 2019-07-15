@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.compiler.lowerPrimitives
-import org.jetbrains.dukat.compiler.lowerings.escapeIdentificators
+import org.jetbrains.dukat.compiler.lowerings.merge.escapeIdentificators
 import org.jetbrains.dukat.compiler.lowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
 import org.jetbrains.dukat.compiler.lowerings.introduceModels
@@ -67,7 +67,6 @@ interface TypescriptInputTranslator : InputTranslator {
                 .lowerUnionType()
                 .lowerNullable()
                 .lowerPrimitives()
-                .escapeIdentificators()
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerThisType()
@@ -78,6 +77,7 @@ interface TypescriptInputTranslator : InputTranslator {
                 .introduceMissedOverloads()
                 .moveTypeAliasesOutside()
                 .introduceModels()
+                .escapeIdentificators()
                 .mergeModules()
                 .mergeWithNameSpace()
                 .mergeClassesAndInterfaces()

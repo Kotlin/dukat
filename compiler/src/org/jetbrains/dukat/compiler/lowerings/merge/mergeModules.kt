@@ -9,7 +9,7 @@ import org.jetbrains.dukat.astModel.transform
 private fun ModuleModel.merge(module: ModuleModel): ModuleModel {
     return copy(
             declarations = (declarations + module.declarations),
-            sumbodules = (sumbodules + module.sumbodules)
+            submodules = (submodules + module.submodules)
     )
 }
 
@@ -18,7 +18,7 @@ fun ModuleModel.mergeModules(): ModuleModel {
 
     val modulesInBuckets = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
 
-    sumbodules.forEach { submodule ->
+    submodules.forEach { submodule ->
         modulesInBuckets.getOrPut(submodule.shortName) { mutableListOf() }.add(submodule)
     }
 
@@ -27,14 +27,14 @@ fun ModuleModel.mergeModules(): ModuleModel {
             .toMutableMap()
 
     val submodulesResolved = mutableListOf<ModuleModel>()
-    sumbodules.forEach { submodule ->
+    submodules.forEach { submodule ->
         val submodule = modulesInBucketsMerged.remove(submodule.shortName)
         if (submodule != null) {
             submodulesResolved.add(submodule.mergeModules())
         }
     }
 
-    return copy(sumbodules = submodulesResolved)
+    return copy(submodules = submodulesResolved)
 }
 
 fun SourceSetModel.mergeModules() = transform { it.mergeModules() }
