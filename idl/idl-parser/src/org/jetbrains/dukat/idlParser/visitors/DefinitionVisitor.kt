@@ -28,15 +28,12 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
-        myAttributes.add(with(AttributeVisitor()) {
-            visit(ctx)
-            visitAttributeRest(ctx)
-        })
+        myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
         return defaultResult()
     }
 
     override fun visitConst_(ctx: WebIDLParser.Const_Context?): IDLTopLevelDeclaration {
-        constants.add(ConstantVisitor().visit(ctx))
+        constants.add(MemberVisitor().visit(ctx) as IDLConstantDeclaration)
         return defaultResult()
     }
 
@@ -46,8 +43,16 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitStaticMember(ctx: WebIDLParser.StaticMemberContext?): IDLTopLevelDeclaration {
+        when (val staticMember = MemberVisitor().visit(ctx)) {
+            is IDLOperationDeclaration -> operations.add(staticMember)
+            is IDLAttributeDeclaration -> myAttributes.add(staticMember)
+        }
+        return defaultResult()
+    }
+
     override fun visitOperation(ctx: WebIDLParser.OperationContext): IDLTopLevelDeclaration {
-        operations.add(OperationVisitor().visit(ctx))
+        operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
         return defaultResult()
     }
 

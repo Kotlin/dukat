@@ -43,11 +43,13 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
     return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
-                members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull { it.process() },
+                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
+                        operations.filterNot { it.static }.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = constants.mapNotNull { it.process() },
+                        members = constants.mapNotNull { it.process() } +
+                                operations.filter { it.static }.mapNotNull { it.process() } +
+                                attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
@@ -64,12 +66,14 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull { it.process() } +
+                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
+                        operations.filterNot { it.static }.mapNotNull { it.process() } +
                         constructors.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = constants.mapNotNull { it.process() },
+                        members = constants.mapNotNull { it.process() } +
+                                operations.filter { it.static }.mapNotNull { it.process() } +
+                                attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
