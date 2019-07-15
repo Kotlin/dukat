@@ -12,10 +12,12 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val myAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
     private val operations: MutableList<IDLOperationDeclaration> = mutableListOf()
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
+    private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
 
     override fun defaultResult(): IDLTopLevelDeclaration {
         return IDLInterfaceDeclaration(
                 name = name,
+                constants = constants,
                 attributes = myAttributes,
                 operations = operations,
                 primaryConstructor = null,
@@ -30,6 +32,11 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             visit(ctx)
             visitAttributeRest(ctx)
         })
+        return defaultResult()
+    }
+
+    override fun visitConst_(ctx: WebIDLParser.Const_Context?): IDLTopLevelDeclaration {
+        constants.add(ConstantVisitor().visit(ctx))
         return defaultResult()
     }
 

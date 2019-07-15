@@ -47,7 +47,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                         operations.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = listOf(),
+                        members = constants.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
@@ -69,7 +69,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                         constructors.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = listOf(),
+                        members = constants.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
@@ -107,8 +107,8 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = false,
-                setter = false,
+                getter = true,
+                setter = true,
                 open = false
         )
         is IDLOperationDeclaration -> MethodModel(
@@ -126,6 +126,16 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 parameters = arguments.map { it.process() },
                 typeParameters = listOf(),
                 generated = false
+        )
+        is IDLConstantDeclaration -> PropertyModel(
+                name = IdentifierEntity(name),
+                type = type.process(),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                getter = true,
+                setter = false,
+                open = false
         )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
