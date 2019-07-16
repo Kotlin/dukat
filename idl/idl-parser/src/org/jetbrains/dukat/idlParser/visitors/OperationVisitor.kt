@@ -12,9 +12,7 @@ internal class OperationVisitor : WebIDLBaseVisitor<IDLOperationDeclaration>() {
     private var type : IDLTypeDeclaration = IDLTypeDeclaration("")
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
 
-    override fun defaultResult(): IDLOperationDeclaration {
-        return IDLOperationDeclaration(name, type, arguments)
-    }
+    override fun defaultResult() = IDLOperationDeclaration(name, type, arguments)
 
     override fun visitReturnType(ctx: WebIDLParser.ReturnTypeContext?): IDLOperationDeclaration {
         type = TypeVisitor().visit(ctx)

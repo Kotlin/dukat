@@ -15,6 +15,7 @@ import java.io.File
 fun IDLTypeDeclaration.process(): TypeValueModel {
     return TypeValueModel(
             value = IdentifierEntity(when (name) {
+                "void" -> "Unit"
                 "float" -> "Float"
                 "double" -> "Double"
                 "long" -> "Int"
@@ -38,9 +39,9 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     )
 }
 
-fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
-    return when (this) {
-        is IDLInterfaceDeclaration -> ClassModel(
+fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
+    return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
+        InterfaceModel(
                 name = IdentifierEntity(name),
                 members = attributes.mapNotNull { it.process() } +
                         operations.mapNotNull { it.process() },
@@ -57,11 +58,43 @@ fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
                             null
                     )
                 },
-                primaryConstructor = null,
+                annotations = mutableListOf(),
+                external = true
+        )
+    } else {
+        ClassModel(
+                name = IdentifierEntity(name),
+                members = attributes.mapNotNull { it.process() } +
+                        operations.mapNotNull { it.process() } +
+                        constructors.mapNotNull { it.process() },
+                companionObject = CompanionObjectModel(
+                        name = "",
+                        members = listOf(),
+                        parentEntities = listOf()
+                ),
+                typeParameters = listOf(),
+                parentEntities = parents.map {
+                    HeritageModel(
+                            it.process(),
+                            listOf(),
+                            null
+                    )
+                },
+                primaryConstructor = if (primaryConstructor != null) {
+                    primaryConstructor!!.process() as ConstructorModel
+                } else {
+                    null
+                },
                 annotations = mutableListOf(),
                 external = true,
-                abstract = true
+                abstract = constructors.isEmpty() && primaryConstructor == null
         )
+    }
+}
+
+fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
+    return when (this) {
+        is IDLInterfaceDeclaration -> convertToModel()
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
@@ -88,6 +121,11 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 operator = false,
                 annotations = listOf(),
                 open = false
+        )
+        is IDLConstructorDeclaration -> ConstructorModel(
+                parameters = arguments.map { it.process() },
+                typeParameters = listOf(),
+                generated = false
         )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
