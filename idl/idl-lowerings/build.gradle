@@ -1,0 +1,8 @@
+plugins {
+    id 'kotlin'
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":idl-declarations"))
+}

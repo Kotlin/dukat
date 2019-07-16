@@ -5,10 +5,10 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLLexer
 
-internal fun filterIdentifiers(list: List<ParseTree>?): List<ParseTree> = list?.filter {
+internal fun ParserRuleContext.filterIdentifiers(): List<ParseTree> = children?.filter {
     it is TerminalNode && it.symbol.type == WebIDLLexer.IDENTIFIER_WEBIDL
 } ?: emptyList()
 
-internal fun ParserRuleContext.getName(): String = filterIdentifiers(children).first().text
+internal fun ParserRuleContext.getName(): String = filterIdentifiers().first().text
 
-internal fun ParserRuleContext.getNameOrNull(): String? = filterIdentifiers(children).firstOrNull()?.text
+internal fun ParserRuleContext.getNameOrNull(): String? = filterIdentifiers().firstOrNull()?.text

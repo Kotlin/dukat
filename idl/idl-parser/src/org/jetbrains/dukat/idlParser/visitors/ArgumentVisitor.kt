@@ -10,9 +10,7 @@ internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
     private var name: String = ""
     private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
 
-    override fun defaultResult(): IDLArgumentDeclaration {
-        return IDLArgumentDeclaration(name, type)
-    }
+    override fun defaultResult() = IDLArgumentDeclaration(name, type)
 
     override fun visitType(ctx: WebIDLParser.TypeContext): IDLArgumentDeclaration {
         type = TypeVisitor().visit(ctx)

@@ -6,14 +6,23 @@ import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlParser.filterIdentifiers
 import org.jetbrains.dukat.idlParser.getName
 
-internal class DefinitionVisitor : WebIDLBaseVisitor<IDLTopLevelDeclaration>() {
+internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtendedAttributeDeclaration>) :
+        WebIDLBaseVisitor<IDLTopLevelDeclaration>() {
     private var name: String = ""
     private val myAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
     private val operations: MutableList<IDLOperationDeclaration> = mutableListOf()
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
 
     override fun defaultResult(): IDLTopLevelDeclaration {
-        return IDLInterfaceDeclaration(name, myAttributes, operations, parents)
+        return IDLInterfaceDeclaration(
+                name = name,
+                attributes = myAttributes,
+                operations = operations,
+                primaryConstructor = null,
+                constructors = listOf(),
+                parents = parents,
+                extendedAttributes = extendedAttributes
+        )
     }
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
@@ -36,7 +45,7 @@ internal class DefinitionVisitor : WebIDLBaseVisitor<IDLTopLevelDeclaration>() {
     }
 
     override fun visitInheritance(ctx: WebIDLParser.InheritanceContext): IDLTopLevelDeclaration {
-        parents.addAll(filterIdentifiers(ctx.children).map { IDLTypeDeclaration(it.text) })
+        parents.addAll(ctx.filterIdentifiers().map { IDLTypeDeclaration(it.text) })
         return defaultResult()
     }
 }

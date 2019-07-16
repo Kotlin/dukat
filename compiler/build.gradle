@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":translator-string"))
     implementation(project(":tsinterop"))
     implementation(project(":tsmodel"))
+    implementation(project(":idl-lowerings"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
