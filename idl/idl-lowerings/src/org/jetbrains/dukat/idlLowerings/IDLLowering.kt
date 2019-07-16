@@ -37,6 +37,7 @@ interface IDLLowering {
                 attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
                 } else {
