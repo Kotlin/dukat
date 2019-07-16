@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
@@ -56,7 +56,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
         }
     }
 
-    return copy(declarations = declarationsMerged, sumbodules = sumbodules.map(ModuleModel::mergeVarsAndInterfaces))
+    return copy(declarations = declarationsMerged, submodules = submodules.map(ModuleModel::mergeVarsAndInterfaces))
 }
 
 fun SourceSetModel.mergeVarsAndInterfaces() = transform { it.mergeVarsAndInterfaces() }

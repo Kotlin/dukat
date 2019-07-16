@@ -1,8 +1,8 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.unquote
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
@@ -109,7 +109,7 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
     val modulesToBeMergedWithInterfaces = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
     val modulesToBeMergedWithClasses = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
 
-    var resolvedSubmodules = collectModelsToBeMerged(sumbodules, interfaces, modulesToBeMergedWithInterfaces)
+    var resolvedSubmodules = collectModelsToBeMerged(submodules, interfaces, modulesToBeMergedWithInterfaces)
     resolvedSubmodules = collectModelsToBeMerged(resolvedSubmodules, classes, modulesToBeMergedWithClasses)
             .map { moduleModel -> moduleModel.mergeClassLikesAndModuleDeclarations() }
 
@@ -141,7 +141,7 @@ fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
             }
 
 
-    return copy(declarations = mergedDeclarations, sumbodules = resolvedSubmodules)
+    return copy(declarations = mergedDeclarations, submodules = resolvedSubmodules)
 }
 
 fun SourceSetModel.mergeClassLikesAndModuleDeclarations() = transform { it.mergeClassLikesAndModuleDeclarations() }

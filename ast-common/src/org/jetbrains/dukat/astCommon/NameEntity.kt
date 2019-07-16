@@ -68,3 +68,41 @@ fun NameEntity.shiftLeft(): NameEntity? {
         }
     }
 }
+
+fun String.toNameEntity(): NameEntity {
+    return split(".").map { IdentifierEntity(it) }.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
+}
+
+
+private fun NameEntity.countDepth(current: Int): Int {
+    return when (this) {
+        is IdentifierEntity -> current + 1
+        is QualifierEntity -> left.countDepth(current) + right.countDepth(current)
+    }
+}
+
+val NameEntity.size: Int
+    get() = countDepth(0)
+
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+private fun escapeName(name: String): String {
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
+}
+
+private fun unquote(name: String): String {
+    return name.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
+}
+
+fun NameEntity.unquote(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> copy(value = escapeName(unquote(value)))
+        else -> this
+    }
+}

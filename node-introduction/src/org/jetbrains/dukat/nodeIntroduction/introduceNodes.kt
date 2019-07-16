@@ -30,7 +30,6 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.processing.toNode
-import org.jetbrains.dukat.ast.model.nodes.processing.unquote
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -38,6 +37,7 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.process
+import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -70,7 +70,6 @@ import org.jetbrains.dukat.tsmodel.types.isSimpleType
 import java.io.File
 
 
-// TODO: duplication, think of separate place to have this (but please don't call it utils )))
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }

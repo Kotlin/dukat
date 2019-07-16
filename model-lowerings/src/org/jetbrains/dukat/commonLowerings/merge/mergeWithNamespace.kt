@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -15,13 +15,13 @@ import org.jetbrains.dukat.astModel.VariableModel
 
 private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     visitor(this)
-    sumbodules.forEach { submodule -> submodule.visit(visitor) }
+    submodules.forEach { submodule -> submodule.visit(visitor) }
 }
 
 private fun ModuleModel.visitTopLevelNode(visitor: (TopLevelModel, ModuleModel) -> Unit) {
     visitor(this, this)
     declarations.forEach { declaration -> visitor(declaration, this) }
-    sumbodules.forEach { submodule -> submodule.visitTopLevelNode(visitor) }
+    submodules.forEach { submodule -> submodule.visitTopLevelNode(visitor) }
 }
 
 private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelModel) -> TopLevelModel?): TopLevelModel? {
@@ -29,7 +29,7 @@ private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelModel) -> TopLev
     return if (moduleResolved is ModuleModel) {
         return (moduleResolved as ModuleModel).copy(
                 declarations = declarations.mapNotNull { declaration -> visitor(declaration) },
-                sumbodules = sumbodules.mapNotNull { submodule -> (submodule.transformTopLevelNode(visitor) as ModuleModel?) }
+                submodules = submodules.mapNotNull { submodule -> (submodule.transformTopLevelNode(visitor) as ModuleModel?) }
         )
     } else null
 }
@@ -121,7 +121,7 @@ fun SourceSetModel.mergeWithNameSpace(): SourceSetModel {
     sources.forEach { source ->
         val rootModule = source.root
         rootModule.visit { module ->
-            module.sumbodules.forEach { submodule ->
+            module.submodules.forEach { submodule ->
                 moduleMap[Pair(rootModule.name, submodule.shortName)] = submodule
             }
         }

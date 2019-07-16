@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.model
+package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.SourceSetModel

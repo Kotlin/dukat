@@ -188,8 +188,8 @@ private class OverrideResolver(val context: ModelContext) {
                 }
             }
         }
-        val loweredSubmodules = moduleModel.sumbodules.map { lowerOverrides(it) }
-        return moduleModel.copy(declarations = loweredDeclarations, sumbodules = loweredSubmodules)
+        val loweredSubmodules = moduleModel.submodules.map { lowerOverrides(it) }
+        return moduleModel.copy(declarations = loweredDeclarations, submodules = loweredSubmodules)
     }
 }
 

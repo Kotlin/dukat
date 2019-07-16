@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -130,11 +130,11 @@ fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
     }
 
 
-    val submodulesResolved = sumbodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
+    val submodulesResolved = submodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
 
     return copy(
             declarations = declarationResolved,
-            sumbodules = submodulesResolved
+            submodules = submodulesResolved
     )
 }
 

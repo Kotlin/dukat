@@ -650,28 +650,33 @@ class AstConverter {
 
                         let expression = type.expression;
 
+                        let name: NameEntity | null = null;
                         if (ts.isPropertyAccessExpression(expression)) {
-                            let name = this.convertPropertyAccessExpression(expression);
-
-                            this.registerDeclaration(
-                                this.astFactory.createHeritageClauseDeclaration(
-                                    name,
-                                    typeArguments,
-                                    extending
-                                ), parentEntities
-                            );
+                            name = this.convertPropertyAccessExpression(expression);
                         } else if (ts.isIdentifier(expression)) {
-                            let name = this.astFactory.createIdentifierDeclaration(expression.getText());
-
-                            this.registerDeclaration(
-                                this.astFactory.createHeritageClauseDeclaration(
-                                    name,
-                                    typeArguments,
-                                    extending
-                                ), parentEntities
-                            );
+                            name = this.astFactory.createIdentifierDeclaration(expression.getText());
                         }
 
+                        let typeReference: ReferenceEntity<ClassLikeDeclaration> | null = null;
+                        let typeResolved = this.typeChecker.getTypeFromTypeNode(type) as ts.InterfaceType;
+                        let symbol = typeResolved.symbol;
+
+                        if (symbol) {
+                          if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
+                              typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
+                          }
+                        }
+
+                        if (name) {
+                            this.registerDeclaration(
+                              this.astFactory.createHeritageClauseDeclaration(
+                                name,
+                                typeArguments,
+                                extending,
+                                typeReference,
+                              ), parentEntities
+                            );
+                        }
 
                     }
                 }

@@ -1,6 +1,5 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
-import org.jetbrains.dukat.ast.model.nodes.processing.size
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -8,6 +7,7 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftRight
+import org.jetbrains.dukat.astCommon.size
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -15,7 +15,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.compiler.lowerings.model.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun NameEntity.shiftLeft(): NameEntity {
@@ -44,7 +44,7 @@ private fun unescape(name: String): String {
 
 private class SpecifyTypeNodes(private val declarationResolver: DeclarationResolver) : ModelWithOwnerTypeLowering {
 
-    override fun lowerTypeNode(ownerContext: NodeOwner<TypeModel>): TypeModel {
+    override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
         val declaration = ownerContext.node
         val qualifiedName = ownerContext.getQualifiedName()
 
@@ -96,7 +96,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
 
             }
         }
-        return super.lowerTypeNode(ownerContext)
+        return super.lowerTypeModel(ownerContext)
     }
 
     override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
