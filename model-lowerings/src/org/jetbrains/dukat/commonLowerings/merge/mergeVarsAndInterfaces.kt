@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings.merge
+package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*

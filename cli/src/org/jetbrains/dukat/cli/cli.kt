@@ -2,9 +2,9 @@ package org.jetbrains.dukat.cli
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver

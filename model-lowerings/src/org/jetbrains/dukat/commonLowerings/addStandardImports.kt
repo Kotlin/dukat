@@ -1,7 +1,7 @@
-package org.jetbrains.dukat.compiler.lowerings.model
+package org.jetbrains.dukat.commonLowerings
 
-import org.jetbrains.dukat.ast.model.nodes.processing.toNameEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
