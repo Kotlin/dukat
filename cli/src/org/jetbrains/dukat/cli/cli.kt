@@ -22,6 +22,7 @@ import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import translateModule
 import java.io.File
+import kotlin.system.exitProcess
 
 
 @Serializable
@@ -213,7 +214,24 @@ private fun process(args: List<String>): CliOptions? {
 
             }
 
-            else -> sources.add(arg)
+            else -> when {
+                arg.endsWith(TS_DECLARATION_EXTENSION) -> {
+                    sources.add(arg)
+                }
+                arg.endsWith(IDL_DECLARATION_EXTENSION) ||
+                arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
+                    printWarning("Web IDL support is at early alpha stage and is not supposed to produce any production-quality code")
+                    sources.add(arg)
+                }
+                else -> {
+                    printError("""
+following file extensions are supported:
+    *.d.ts - for TypeScript declarations
+    *.idl, *.webidl - [EXPERIMENTAL] for Web IDL declarations                            
+                """.trimIndent())
+                    return null
+                }
+            }
         }
     }
 
@@ -226,7 +244,11 @@ fun main(vararg args: String) {
         return
     }
 
-    process(args.toList())?.let { options ->
+    val options = process(args.toList())
+
+    if (options == null) {
+            exitProcess(1)
+    } else {
         options.engine == Engine.GRAAL
 
         val moduleResolver = if (options.jsModuleName != null) {
@@ -247,7 +269,6 @@ fun main(vararg args: String) {
                 )
                 sourceName.endsWith(IDL_DECLARATION_EXTENSION) ||
                 sourceName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
-                    printWarning("Web IDL support is at early alpha stage and is not supposed to produce any production-quality code")
                     compile(
                             sourceName,
                             options.outDir,
@@ -256,11 +277,6 @@ fun main(vararg args: String) {
                     )
 
                 }
-                else -> printError("""
-following file extensions are supported:
-    *.d.ts - for TypeScript declarations
-    *.idl, *.webidl - [EXPERIMENTAL] for Web IDL declarations                            
-                """.trimIndent())
             }
         }
     }
