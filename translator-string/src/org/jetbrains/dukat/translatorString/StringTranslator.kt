@@ -274,8 +274,9 @@ private fun EnumModel.translate(): String {
 private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
+    val varModifier = if (getter && !setter) "val" else "var"
 
-    return "${modifier}var ${name.translate()}: ${type.translate()}${type.translateMeta()}"
+    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
 }
 
 private fun MemberModel.translate(): List<String> {

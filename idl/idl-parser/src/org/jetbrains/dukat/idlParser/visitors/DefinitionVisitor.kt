@@ -15,11 +15,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("")
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
+    private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
 
     override fun defaultResult(): IDLTopLevelDeclaration {
         return when (kind) {
             DefinitionKind.INTERFACE -> IDLInterfaceDeclaration(
                     name = name,
+                    constants = constants,
                     attributes = myAttributes,
                     operations = operations,
                     primaryConstructor = null,
@@ -34,11 +36,20 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         }
     }
 
-    override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
-        myAttributes.add(with(AttributeVisitor()) {
-            visit(ctx)
-            visitAttributeRest(ctx)
-        })
+    override fun visitReadWriteAttribute(ctx: WebIDLParser.ReadWriteAttributeContext): IDLTopLevelDeclaration {
+        myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
+        return defaultResult()
+    }
+
+    override fun visitReadonlyMember(ctx: WebIDLParser.ReadonlyMemberContext?): IDLTopLevelDeclaration {
+        when (val readOnlyMember = MemberVisitor().visit(ctx)) {
+            is IDLAttributeDeclaration -> myAttributes.add(readOnlyMember)
+        }
+        return defaultResult()
+    }
+
+    override fun visitConst_(ctx: WebIDLParser.Const_Context?): IDLTopLevelDeclaration {
+        constants.add(MemberVisitor().visit(ctx) as IDLConstantDeclaration)
         return defaultResult()
     }
 
@@ -49,8 +60,16 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitStaticMember(ctx: WebIDLParser.StaticMemberContext?): IDLTopLevelDeclaration {
+        when (val staticMember = MemberVisitor().visit(ctx)) {
+            is IDLOperationDeclaration -> operations.add(staticMember)
+            is IDLAttributeDeclaration -> myAttributes.add(staticMember)
+        }
+        return defaultResult()
+    }
+
     override fun visitOperation(ctx: WebIDLParser.OperationContext): IDLTopLevelDeclaration {
-        operations.add(OperationVisitor().visit(ctx))
+        operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
         return defaultResult()
     }
 
