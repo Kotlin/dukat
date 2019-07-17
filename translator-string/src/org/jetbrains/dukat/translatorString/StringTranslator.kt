@@ -25,11 +25,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -169,6 +165,7 @@ private fun StatementModel.translate(): String {
         is AssignmentStatementModel -> "${left.translate()} = ${right.translate()}"
         is ChainCallModel -> "${left.translate()}.${right.translate()}"
         is ReturnStatementModel -> "return ${statement.translate()}"
+        is IndexStatementModel -> "${array.translate()}[${index.translate()}]"
         is StatementCallModel -> translate()
         else -> raiseConcern("unkown StatementNode ${this}") { "" }
     }

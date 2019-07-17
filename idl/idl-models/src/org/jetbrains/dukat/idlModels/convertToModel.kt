@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -96,9 +97,99 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
     }
 }
 
-fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
+fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
+    return ParameterModel(
+            name = name,
+            type = type.process().copy(nullable = true),
+            initializer = null,
+            vararg = false,
+            optional = false
+    )
+}
+
+fun IDLDictionaryMemberDeclaration.convertToAssignmentStatementModel(): AssignmentStatementModel {
+    return AssignmentStatementModel(
+            IndexStatementModel(
+                    StatementCallModel(
+                            IdentifierEntity("o"),
+                            null
+                    ),
+                    StatementCallModel(
+                            IdentifierEntity("\"$name\""),
+                            null
+                    )),
+            StatementCallModel(
+                    IdentifierEntity(name),
+                    null
+            )
+    )
+}
+
+fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
+    val functionBody: MutableList<StatementModel> = mutableListOf(AssignmentStatementModel(
+            StatementCallModel(
+                    IdentifierEntity("val o"),
+                    null
+            ),
+            StatementCallModel(
+                    IdentifierEntity("js"),
+                    listOf(IdentifierEntity("\"({})\""))
+            )
+    ))
+    functionBody.addAll(members.map { it.convertToAssignmentStatementModel() })
+    functionBody.add(ReturnStatementModel(StatementCallModel(
+            IdentifierEntity("o"),
+            null
+    )))
+    return functionBody
+}
+
+fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
+    val declaration = InterfaceModel(
+            name = IdentifierEntity(name),
+            members = members.mapNotNull { it.process() },
+            companionObject = CompanionObjectModel(
+                    name = "",
+                    members = listOf(),
+                    parentEntities = listOf()
+            ),
+            typeParameters = listOf(),
+            parentEntities = parents.map {
+                HeritageModel(
+                        it.process(),
+                        listOf(),
+                        null
+                )
+            },
+            annotations = mutableListOf(),
+            external = true
+    )
+    val generatedFunction = FunctionModel(
+            name = IdentifierEntity(name),
+            parameters = members.map { it.convertToParameterModel() },
+            type = TypeValueModel(
+                    value = IdentifierEntity(name),
+                    params = listOf(),
+                    metaDescription = null
+            ),
+            typeParameters = listOf(),
+            annotations = mutableListOf(AnnotationModel(
+                    name = "kotlin.internal.InlineOnly",
+                    params = listOf()
+            )),
+            export = false,
+            inline = true,
+            operator = false,
+            extend = null,
+            body = generateFunctionBody()
+    )
+    return listOf(declaration, generatedFunction)
+}
+
+fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
     return when (this) {
-        is IDLInterfaceDeclaration -> convertToModel()
+        is IDLInterfaceDeclaration -> listOf(convertToModel())
+        is IDLDictionaryDeclaration -> convertToModel()
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
@@ -141,12 +232,22 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 setter = false,
                 open = false
         )
+        is IDLDictionaryMemberDeclaration -> PropertyModel(
+                name = IdentifierEntity(name),
+                type = type.process().copy(nullable = true),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                getter = true,
+                setter = true,
+                open = false
+        )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
 }
 
 fun IDLFileDeclaration.process(): SourceSetModel {
-    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }
+    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
             name = ROOT_PACKAGENAME,
