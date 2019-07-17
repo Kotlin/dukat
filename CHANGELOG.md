@@ -1,5 +1,10 @@
 # Changelog
 
+#### [0.0.11] - 17'July, 2019
+ - Experimental (and definitely incomplete) support for idl conversion
+ - Add NESTED_CLASS_IN_EXTERNAL_INTERFACE only when it's needed
+ - Merge modules into top level declarations with the same name whenever it's possible
+
 #### [0.0.10] - 19'June, 2019
  - `<ROOT>` prefix should not end up in heritage clauses ([#56](https://github.com/Kotlin/dukat/issues/56))
  - Type aliases are moved out from files with file-level `JsQualifier` and `JsModule` annotations ([#41](https://github.com/Kotlin/dukat/issues/41))
