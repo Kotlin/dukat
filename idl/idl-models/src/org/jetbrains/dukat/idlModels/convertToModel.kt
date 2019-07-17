@@ -17,11 +17,14 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
             value = IdentifierEntity(when (name) {
                 "void" -> "Unit"
                 "float" -> "Float"
+                "unrestrictedfloat" -> "Float"
                 "double" -> "Double"
                 "long" -> "Int"
+                "unsignedlong" -> "Int"
                 "byte" -> "Byte"
                 "short" -> "Short"
                 "longlong" -> "Long"
+                "boolean" -> "Boolean"
                 else -> name
             }),
             params = listOf(),
@@ -99,6 +102,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
 fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
     return when (this) {
         is IDLInterfaceDeclaration -> convertToModel()
+        is IDLTypedefDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
