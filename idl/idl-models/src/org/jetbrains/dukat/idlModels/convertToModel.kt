@@ -46,11 +46,13 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
     return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
-                members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull { it.process() },
+                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
+                        operations.filterNot { it.static }.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = listOf(),
+                        members = constants.mapNotNull { it.process() } +
+                                operations.filter { it.static }.mapNotNull { it.process() } +
+                                attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
@@ -67,12 +69,14 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = attributes.mapNotNull { it.process() } +
-                        operations.mapNotNull { it.process() } +
+                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
+                        operations.filterNot { it.static }.mapNotNull { it.process() } +
                         constructors.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = listOf(),
+                        members = constants.mapNotNull { it.process() } +
+                                operations.filter { it.static }.mapNotNull { it.process() } +
+                                attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
                 typeParameters = listOf(),
@@ -111,8 +115,8 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = false,
-                setter = false,
+                getter = true,
+                setter = !readOnly,
                 open = false
         )
         is IDLOperationDeclaration -> MethodModel(
@@ -130,6 +134,16 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 parameters = arguments.map { it.process() },
                 typeParameters = listOf(),
                 generated = false
+        )
+        is IDLConstantDeclaration -> PropertyModel(
+                name = IdentifierEntity(name),
+                type = type.process(),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                getter = true,
+                setter = false,
+                open = false
         )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
