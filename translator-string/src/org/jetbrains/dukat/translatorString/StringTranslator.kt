@@ -53,6 +53,10 @@ private fun TypeModel.translateMeta(): String {
     }
 }
 
+private fun StatementModel.translateMeta(): String {
+    return metaDescription.translateMeta()
+}
+
 private fun translateTypeParams(params: List<TypeModel>): String {
     return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
@@ -94,8 +98,15 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res = "vararg $res"
     }
 
+    if (needsMeta) {
+        res += type.translateMeta()
+    }
+
     if (defaultValue != null) {
         res += " = ${defaultValue!!.translate()}"
+        if (needsMeta) {
+            res += defaultValue!!.translateMeta()
+        }
     }
 
     return res

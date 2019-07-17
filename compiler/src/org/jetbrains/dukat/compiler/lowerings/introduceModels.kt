@@ -183,7 +183,7 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             name = name,
             defaultValue = initializer?.let { valueNode ->
                 // TODO: don't like this particular cast
-                StatementCallModel(valueNode.value, null)
+                StatementCallModel(valueNode.value, null, meta)
             },
             vararg = vararg,
             optional = optional
