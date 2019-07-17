@@ -37,7 +37,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process(),
-            initializer = null,
+            defaultValue = null,
             vararg = false,
             optional = false
     )
@@ -104,7 +104,14 @@ fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process().copy(nullable = true),
-            initializer = null,
+            defaultValue = if (defaultValue != null) {
+                StatementCallModel(
+                        IdentifierEntity(defaultValue!!),
+                        null
+                )
+            } else {
+                null
+            },
             vararg = false,
             optional = false
     )

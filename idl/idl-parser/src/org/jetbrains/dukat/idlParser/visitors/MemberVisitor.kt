@@ -10,17 +10,19 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
-    private var name : String = ""
-    private var type : IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var name: String = ""
+    private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
+    private var constValue: String? = null
     private var static: Boolean = false
     private var readOnly: Boolean = false
 
-    override fun defaultResult() : IDLMemberDeclaration {
+    override fun defaultResult(): IDLMemberDeclaration {
         return when (kind) {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
+            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
         }
     }
 
@@ -39,6 +41,13 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
 
     override fun visitConst_(ctx: WebIDLParser.Const_Context): IDLMemberDeclaration {
         kind = MemberKind.CONSTANT
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLMemberDeclaration {
+        kind = MemberKind.DICTIONARY_MEMBER
         name = ctx.getName()
         visitChildren(ctx)
         return defaultResult()
@@ -69,6 +78,15 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitConstValue(ctx: WebIDLParser.ConstValueContext): IDLMemberDeclaration {
+        constValue = object : WebIDLBaseVisitor<String>() {
+            override fun visitTerminal(node: TerminalNode): String {
+                return node.text
+            }
+        }.visit(ctx)
+        return defaultResult()
+    }
+
     override fun visitStaticMemberRest(ctx: WebIDLParser.StaticMemberRestContext?): IDLMemberDeclaration {
         static = true
         visitChildren(ctx)
@@ -91,5 +109,5 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
 }
 
 private enum class MemberKind {
-    OPERATION, ATTRIBUTE, CONSTANT
+    OPERATION, ATTRIBUTE, CONSTANT, DICTIONARY_MEMBER
 }

@@ -17,6 +17,10 @@ interface IDLLowering {
         return declaration.copy(type = lowerTypeDeclaration(declaration.type))
     }
 
+    fun lowerConstantDeclaration(declaration: IDLConstantDeclaration) : IDLConstantDeclaration {
+        return declaration.copy(type = lowerTypeDeclaration(declaration.type))
+    }
+
     fun lowerOperationDeclaration(declaration: IDLOperationDeclaration): IDLOperationDeclaration {
         return declaration.copy(
                 returnType = lowerTypeDeclaration(declaration.returnType),
@@ -32,11 +36,23 @@ interface IDLLowering {
         return declaration
     }
 
+    fun lowerDictionaryMemberDeclaration(declaration: IDLDictionaryMemberDeclaration): IDLDictionaryMemberDeclaration {
+        return declaration.copy(type = lowerTypeDeclaration(declaration.type))
+    }
+
+    fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+        return declaration.copy(
+                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                members = declaration.members.map { lowerDictionaryMemberDeclaration(it) }
+        )
+    }
+
     fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
+                constants = declaration.constants.map { lowerConstantDeclaration(it) },
                 parents = declaration.parents.map { lowerTypeDeclaration(it) },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
@@ -50,6 +66,7 @@ interface IDLLowering {
         return when (declaration) {
             is IDLInterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is IDLTypedefDeclaration -> lowerTypedefDeclaration(declaration)
+            is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
             else -> declaration
         }
     }

@@ -94,17 +94,8 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res = "vararg $res"
     }
 
-    if (initializer is TypeValueModel) {
-        if (needsMeta) {
-            val typeValueModel = initializer as TypeValueModel
-
-            res += " = ${typeValueModel.value.translate()}"
-            typeValueModel.metaDescription?.let { meta ->
-                res += " /* ${meta} */"
-            }
-        }
-    } else {
-        res += type.translateMeta()
+    if (defaultValue != null) {
+        res += " = ${defaultValue!!.translate()}"
     }
 
     return res
@@ -193,7 +184,7 @@ private fun FunctionModel.translate(): String {
     val body = if (body.isEmpty()) {
         ""
     } else {
-        " { ${body.joinToString { statementNode -> statementNode.translate() }} }"
+        " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
     }
 
     val funName = if (extend == null) {
