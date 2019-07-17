@@ -15,11 +15,20 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
         return type
     }
 
-    override fun visitNonAnyType(ctx: WebIDLParser.NonAnyTypeContext): IDLTypeDeclaration {
-        val name : String? = ctx.getNameOrNull()
-        if (name != null) {
+    override fun visitConstType(ctx: WebIDLParser.ConstTypeContext): IDLTypeDeclaration {
+        ctx.getNameOrNull()?.let { name ->
             type = IDLTypeDeclaration(name)
         }
+
+        visitChildren(ctx)
+        return type
+    }
+
+    override fun visitNonAnyType(ctx: WebIDLParser.NonAnyTypeContext): IDLTypeDeclaration {
+        ctx.getNameOrNull()?.let { name ->
+            type = IDLTypeDeclaration(name)
+        }
+
         visitChildren(ctx)
         return type
     }
