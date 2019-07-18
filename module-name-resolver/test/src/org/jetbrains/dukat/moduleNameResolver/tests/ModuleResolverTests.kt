@@ -37,6 +37,11 @@ class ModuleResolverTests {
     }
 
     @Test
+    fun resolveModuleF() {
+        resolve("@types/moduleF/lib/index.d.ts", IdentifierEntity("moduleF"))
+    }
+
+    @Test
     fun resolveModuleWithName() {
         resolve("whatever/path/we/pass.txt", IdentifierEntity("mylib"), ConstNameResolver(IdentifierEntity("mylib")))
     }
