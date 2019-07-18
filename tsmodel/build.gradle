@@ -4,7 +4,4 @@ plugins {
 
 dependencies {
     implementation(project(":ast-common"))
-    implementation(project(":logging"))
-    implementation(project(":ownerContext"))
-    implementation(project(":panic"))
 }

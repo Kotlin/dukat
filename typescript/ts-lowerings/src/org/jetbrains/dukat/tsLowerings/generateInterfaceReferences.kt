@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.tsmodel.lowerings
+package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -30,6 +30,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import org.jetbrains.dukat.tsmodel.types.isSimpleType
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {
@@ -52,7 +53,6 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         else -> raiseConcern("unknown Entity ${this::class.simpleName}") { emptyList<TypeParameterDeclaration>() };
     }
 }
-
 
 private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
@@ -226,13 +226,14 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
     override fun lowerVariableDeclaration(owner: NodeOwner<VariableDeclaration>): VariableDeclaration {
         val declaration = owner.node
-        return when (declaration.type) {
+        val type = declaration.type
+        return when (type) {
             is ObjectLiteralDeclaration -> {
-                declaration.copy(type = declaration.type.copy(
-                        members = declaration.type.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
+                declaration.copy(type = type.copy(
+                        members = type.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
                 ))
             }
-            else -> declaration.copy(type = lowerParameterValue(owner.wrap(declaration.type)))
+            else -> declaration.copy(type = lowerParameterValue(owner.wrap(type)))
         }
     }
 

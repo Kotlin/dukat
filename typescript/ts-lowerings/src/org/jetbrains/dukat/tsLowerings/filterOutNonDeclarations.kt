@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.tsmodel.lowerings
+package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -8,7 +8,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return if ((declaration.value is IdentifierEntity) && (declaration.value.value == "@@ArraySugar")) {
+        val value = declaration.value
+        return if ((value is IdentifierEntity) && (value.value == "@@ArraySugar")) {
             declaration.copy(value = IdentifierEntity("Array"), params = declaration.params.map { param -> lowerParameterValue(param) })
         } else {
             declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
@@ -18,7 +19,7 @@ private class NativeArrayLowering : DeclarationTypeLowering {
 }
 
 fun ModuleDeclaration.desugarArrayDeclarations(): ModuleDeclaration {
-    return org.jetbrains.dukat.tsmodel.lowerings.NativeArrayLowering().lowerDocumentRoot(this)
+    return NativeArrayLowering().lowerDocumentRoot(this)
 }
 
 fun SourceFileDeclaration.desugarArrayDeclarations() = copy(root = root.desugarArrayDeclarations())

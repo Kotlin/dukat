@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.tsmodel.lowerings
+package org.jetbrains.dukat.tsmodel
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration

@@ -13,7 +13,7 @@ fun ObjectLiteralDeclaration.canBeJson(): Boolean {
         return false
     }
 
-    if (members.get(0) !is IndexSignatureDeclaration) {
+    if (members[0] !is IndexSignatureDeclaration) {
         return false
     }
 

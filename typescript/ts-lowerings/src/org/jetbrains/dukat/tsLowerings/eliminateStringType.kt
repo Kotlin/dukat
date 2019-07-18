@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.tsmodel.lowerings
+package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration

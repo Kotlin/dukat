@@ -61,9 +61,11 @@ include 'ts'
 include 'tsmodel'
 include 'tsinterop'
 include 'translator'
+include 'ts-lowerings'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
+project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
 

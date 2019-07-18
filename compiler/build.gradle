@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":tsinterop"))
     implementation(project(":tsmodel"))
     implementation(project(":idl-lowerings"))
+    implementation(project(":ts-lowerings"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
