@@ -28,7 +28,7 @@ external interface `T$0` {
     operator fun set(key: String, value: AnimatedValue)
 }
 external fun foo(): dynamic /* `T$0` | AnimatedValue */
-external fun bar(d: `T$0`): Unit
-external fun bar(d: AnimatedValue): Unit
+external fun bar(d: `T$0`)
+external fun bar(d: AnimatedValue)
 external fun boo(): Rec
-external fun baz(d: Rec): Unit
+external fun baz(d: Rec)

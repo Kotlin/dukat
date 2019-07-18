@@ -25,15 +25,15 @@ external interface `T$0`<T> {
 }
 typealias Ping<T> = (packet: `T$0`<T>) -> Boolean
 external var fooMap: MultiMap<String, Number>
-external fun mapKey(a: MultiMap<Number, String>): Unit
+external fun mapKey(a: MultiMap<Number, String>)
 external var fooStringOrMap: dynamic /* String | MultiMap<String, Number> */
-external fun stringOrMapKey(a: String): Unit
-external fun stringOrMapKey(a: MultiMap<Number, String>): Unit
+external fun stringOrMapKey(a: String)
+external fun stringOrMapKey(a: MultiMap<Number, String>)
 external var listOfStringOrNumber: dynamic /* String | List<dynamic /* String | Number */> */
-external fun listOfNumberOrString(a: List<dynamic /* Number | String */>): Unit
+external fun listOfNumberOrString(a: List<dynamic /* Number | String */>)
 external var headers: MyHeaders
 external fun getHeaders(): MyHeaders
-external fun addHeaders(headers: MyHeaders): Unit
+external fun addHeaders(headers: MyHeaders)
 external var someRef: dynamic /* String | (instance: Number) -> Any */
-external fun addRef(ref: String): Unit
-external fun addRef(ref: (instance: Number) -> Any): Unit
+external fun addRef(ref: String)
+external fun addRef(ref: (instance: Number) -> Any)

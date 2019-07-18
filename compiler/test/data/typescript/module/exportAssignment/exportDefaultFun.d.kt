@@ -19,4 +19,4 @@ import org.w3c.xhr.*
 
 @JsName("default")
 external fun bar(): String
-external fun baz(): Unit
+external fun baz()

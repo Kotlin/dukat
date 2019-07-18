@@ -48,7 +48,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var bar: Json
-external fun withObjectTypeParam(bar: Json): Unit
+external fun withObjectTypeParam(bar: Json)
 external open class Foo {
     open var prop: Json
 }

@@ -16,17 +16,17 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class ExpectedOverrides {
-    override fun equals(a: Any): Unit
+    override fun equals(a: Any)
     override fun hashCode(): Number
     override fun toString(): String
 }
 external open class ExpectedOverrides2 {
-    override fun equals(a: Any): Unit
+    override fun equals(a: Any)
 }
 external open class ExpectedNoOverrides {
-    open fun equals(): Unit
-    open fun equals(a: Number): Unit
-    open fun equals(a: String): Unit
+    open fun equals()
+    open fun equals(a: Number)
+    open fun equals(a: String)
     open fun hashCode(a: String): Number
-    open fun toString(a: Number = definedExternally /* 1 */): Unit
+    open fun toString(a: Number = definedExternally /* 1 */)
 }

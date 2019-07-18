@@ -18,4 +18,4 @@ import org.w3c.xhr.*
 external fun withOneAny(a: Any? = definedExternally /* null */): Any
 external fun withOneString(s: String? = definedExternally /* null */): String
 external fun withManyArguments(s: String? = definedExternally /* null */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean
-external fun withOptionalQualified(opts: ping.Options? = definedExternally /* null */): Unit
+external fun withOptionalQualified(opts: ping.Options? = definedExternally /* null */)

@@ -19,7 +19,7 @@ import org.w3c.xhr.*
 external interface Foo {
     fun bar(): Number
     companion object {
-        fun baz(a: Any): Unit
+        fun baz(a: Any)
         fun bar(): Number
     }
 }

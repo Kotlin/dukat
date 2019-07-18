@@ -19,7 +19,7 @@ external interface Map<K, V>
 external interface List<T>
 typealias Values<V> = List<V>
 external var aliasUnionVar: dynamic /* List<Number> | Map<String, Values<Number>> */
-external fun aliasUnionFunction(a: List<String>): Unit
-external fun aliasUnionFunction(a: Map<Number, Values<String>>): Unit
+external fun aliasUnionFunction(a: List<String>)
+external fun aliasUnionFunction(a: Map<Number, Values<String>>)
 external var listOfUnionVar: Values<dynamic /* String | Number */>
-external fun listOfUnionFunction(a: Values<dynamic /* Number | String */>): Unit
+external fun listOfUnionFunction(a: Values<dynamic /* Number | String */>)

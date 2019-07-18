@@ -21,10 +21,10 @@ external interface A {
     fun baz()
 }
 external open class B {
-    open fun boo(): Unit
+    open fun boo()
 }
 external var c: Number
-external fun d(a: Boolean, b: Any, c: SomeType): Unit
+external fun d(a: Boolean, b: Any, c: SomeType)
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo.Bar")
@@ -50,7 +50,7 @@ external interface A {
     fun baz()
 }
 external open class B {
-    open fun boo(): Unit
+    open fun boo()
 }
 external var c: Number
-external fun d(a: Boolean, b: Any, c: SomeType): Unit
+external fun d(a: Boolean, b: Any, c: SomeType)

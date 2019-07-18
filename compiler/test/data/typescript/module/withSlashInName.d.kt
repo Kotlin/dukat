@@ -17,4 +17,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun baz(): Unit
+external fun baz()
