@@ -12,4 +12,5 @@ external abstract class A {
     var intSequence: Array<Int>
     fun f(x: Array<Int>): Array<Int>
     fun g(x: A<Int>): A<Int>
+    fun h(): Any?
 }

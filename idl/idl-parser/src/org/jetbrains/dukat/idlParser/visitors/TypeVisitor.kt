@@ -21,6 +21,12 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
         )
     }
 
+    override fun visitSingleType(ctx: WebIDLParser.SingleTypeContext): IDLTypeDeclaration {
+        ctx.getFirstValueOrNull()?.let { name = it }
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitReturnType(ctx: WebIDLParser.ReturnTypeContext): IDLTypeDeclaration {
         ctx.getFirstValueOrNull()?.let { name = it }
         visitChildren(ctx)
@@ -28,10 +34,7 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     }
 
     override fun visitConstType(ctx: WebIDLParser.ConstTypeContext): IDLTypeDeclaration {
-        ctx.getNameOrNull()?.let { constName ->
-            name = constName
-        }
-
+        ctx.getFirstValueOrNull()?.let { name = it }
         visitChildren(ctx)
         return defaultResult()
     }

@@ -14,4 +14,5 @@ interface A {
 
     sequence<long> f(sequence<long> x);
     A<long> g(A<long> x);
+    any h();
 };

@@ -36,16 +36,17 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
                 "sequence" -> "Array"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
+                "any" -> "Any"
                 else -> name
             }),
             params = listOfNotNull(typeParameter?.process()),
             metaDescription = null
     )
     return typeModel.copy(
-            nullable = if (typeModel.value == IdentifierEntity("dynamic")) {
-                false
-            } else {
-                nullable
+            nullable = when (typeModel.value) {
+                IdentifierEntity("dynamic") -> false
+                IdentifierEntity("Any") -> true
+                else -> nullable
             }
     )
 }
