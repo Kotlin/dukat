@@ -12,3 +12,6 @@ internal fun ParserRuleContext.filterIdentifiers(): List<ParseTree> = children?.
 internal fun ParserRuleContext.getName(): String = filterIdentifiers().first().text
 
 internal fun ParserRuleContext.getNameOrNull(): String? = filterIdentifiers().firstOrNull()?.text
+
+internal fun ParserRuleContext.getFirstValueOrNull(): String? =
+        children?.filterIsInstance(TerminalNode::class.java)?.firstOrNull()?.text

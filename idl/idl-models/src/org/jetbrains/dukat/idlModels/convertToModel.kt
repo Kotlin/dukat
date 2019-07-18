@@ -13,22 +13,40 @@ import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
 fun IDLTypeDeclaration.process(): TypeValueModel {
-    return TypeValueModel(
+    val typeModel = TypeValueModel(
             value = IdentifierEntity(when (name) {
                 "void" -> "Unit"
                 "float" -> "Float"
                 "unrestrictedfloat" -> "Float"
                 "double" -> "Double"
+                "unrestricteddouble" -> "Double"
                 "long" -> "Int"
                 "unsignedlong" -> "Int"
+                "longlong" -> "Int"
+                "unsignedlonglong" -> "Int"
+                "octet" -> "Byte"
                 "byte" -> "Byte"
                 "short" -> "Short"
-                "longlong" -> "Long"
+                "unsignedshort" -> "Short"
                 "boolean" -> "Boolean"
+                "ByteString" -> "String"
+                "DOMString" -> "String"
+                "USVString" -> "String"
+                "\$Array" -> "Array"
+                "sequence" -> "Array"
+                "object" -> "dynamic"
+                "DOMError" -> "dynamic"
                 else -> name
             }),
-            params = listOf(),
+            params = listOfNotNull(typeParameter?.process()),
             metaDescription = null
+    )
+    return typeModel.copy(
+            nullable = if (typeModel.value == IdentifierEntity("dynamic")) {
+                false
+            } else {
+                nullable
+            }
     )
 }
 
