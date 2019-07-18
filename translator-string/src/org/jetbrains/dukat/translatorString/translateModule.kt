@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -50,7 +51,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
     val sourceFileName = sourceFile.name
     val ktFileNamePrefix =
             if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
-                sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+                CommonJsNameResolver().resolveName(sourceFile) ?: sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
             } else if (sourceFileName.endsWith(IDL_DECLARATION_EXTENSION)) {
                 sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
             } else if (sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {

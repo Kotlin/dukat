@@ -13,12 +13,12 @@ class ModuleResolverTests {
 
     @Test
     fun resolveModuleA() {
-        resolve("moduleA/lib/moduleA.d.ts", IdentifierEntity("moduleA"))
+        resolve("moduleA/lib/moduleA.d.ts", "moduleA")
     }
 
     @Test
     fun resolveModuleB() {
-        resolve("moduleB/lib/moduleB.d.ts", IdentifierEntity("moduleB"))
+        resolve("moduleB/lib/moduleB.d.ts", "moduleB")
     }
 
     @Test
@@ -28,7 +28,7 @@ class ModuleResolverTests {
 
     @Test
     fun resolveModuleD() {
-        resolve("moduleD/lib/deeply/nested/moduleD.d.ts", IdentifierEntity("moduleD"))
+        resolve("moduleD/lib/deeply/nested/moduleD.d.ts", "moduleD")
     }
 
     @Test
@@ -38,15 +38,15 @@ class ModuleResolverTests {
 
     @Test
     fun resolveModuleF() {
-        resolve("@types/moduleF/lib/index.d.ts", IdentifierEntity("moduleF"))
+        resolve("@types/moduleF/lib/index.d.ts", "moduleF")
     }
 
     @Test
     fun resolveModuleWithName() {
-        resolve("whatever/path/we/pass.txt", IdentifierEntity("mylib"), ConstNameResolver(IdentifierEntity("mylib")))
+        resolve("whatever/path/we/pass.txt", "mylib", ConstNameResolver("mylib"))
     }
 
-    private fun resolve(path: String, expected: NameEntity?, resolver: ModuleNameResolver = CommonJsNameResolver()) {
+    private fun resolve(path: String, expected: String?, resolver: ModuleNameResolver = CommonJsNameResolver()) {
         val prefix = "./test/data/node_modules"
         val fullPath = File(prefix, path).absolutePath
         assertEquals(resolver.resolveName(fullPath), expected)

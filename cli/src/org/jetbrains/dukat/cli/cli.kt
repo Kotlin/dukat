@@ -252,7 +252,7 @@ fun main(vararg args: String) {
         options.engine == Engine.GRAAL
 
         val moduleResolver = if (options.jsModuleName != null) {
-            ConstNameResolver(IdentifierEntity(options.jsModuleName))
+            ConstNameResolver(options.jsModuleName)
         } else {
             CommonJsNameResolver()
         }

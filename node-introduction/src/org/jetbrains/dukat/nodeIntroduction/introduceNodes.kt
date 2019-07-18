@@ -559,7 +559,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         val moduleName = if (moduleNameIsStringLiteral) {
             documentRoot.packageName.process { unquote(it) }
         } else {
-            moduleNameResolver.resolveName(fileName)
+            moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
         return DocumentRootNode(

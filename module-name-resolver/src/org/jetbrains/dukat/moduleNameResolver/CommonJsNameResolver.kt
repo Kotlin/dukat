@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
-    fun resolveName(sourceFile: File): NameEntity? {
+    fun resolveName(sourceFile: File): String? {
         val parentDirs = generateSequence(File(sourceFile.parent)) { if (it.parent != null) File(it.parent) else null }
 
         val packageJsonOwner = parentDirs.find { parentDir ->
@@ -23,14 +23,14 @@ class CommonJsNameResolver : ModuleNameResolver {
             val packageJson = Json.nonstrict.parse(PackageJsonModel.serializer(), packageJsonContent)
 
             packageJson.name?.let { name ->
-                return IdentifierEntity(name.removePrefix("@types/"))
+                return name.removePrefix("@types/")
             }
         }
 
         return null;
     }
 
-    override fun resolveName(sourceName: String): NameEntity? {
+    override fun resolveName(sourceName: String): String? {
         return resolveName(File(sourceName))
     }
 }
