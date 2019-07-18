@@ -1,13 +1,11 @@
 package org.jetbrains.dukat.moduleNameResolver
 
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
 import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
     fun resolveName(sourceFile: File): String? {
-        val parentDirs = generateSequence(File(sourceFile.parent)) { if (it.parent != null) File(it.parent) else null }
+        val parentDirs = generateSequence(sourceFile.parentFile) { it.parentFile }
 
         val packageJsonOwner = parentDirs.find { parentDir ->
             File(parentDir, "package.json").exists()
