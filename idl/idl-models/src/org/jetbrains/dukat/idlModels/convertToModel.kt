@@ -103,6 +103,7 @@ fun IDLTopLevelDeclaration.convertToModel(): TopLevelModel? {
     return when (this) {
         is IDLInterfaceDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
+        is IDLImplementsStatementDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }

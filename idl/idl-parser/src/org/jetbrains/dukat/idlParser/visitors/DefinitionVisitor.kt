@@ -15,6 +15,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var childType: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("")
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -32,6 +34,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name,
                     typeReference
+            )
+            DefinitionKind.IMPLEMENTS_STATEMENT -> IDLImplementsStatementDeclaration(
+                    child = childType,
+                    parent = parentType
             )
         }
     }
@@ -89,8 +95,16 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         typeReference = TypeVisitor().visit(ctx)
         return defaultResult()
     }
+
+    override fun visitImplementsStatement(ctx: WebIDLParser.ImplementsStatementContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.IMPLEMENTS_STATEMENT
+        val identifiers = ctx.filterIdentifiers()
+        childType = IDLTypeDeclaration(identifiers[0].text)
+        parentType = IDLTypeDeclaration(identifiers[1].text)
+        return defaultResult()
+    }
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT
 }

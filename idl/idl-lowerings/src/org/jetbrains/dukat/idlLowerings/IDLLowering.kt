@@ -32,6 +32,13 @@ interface IDLLowering {
         return declaration
     }
 
+    fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLTopLevelDeclaration {
+        return declaration.copy(
+                child = lowerTypeDeclaration(declaration.child),
+                parent = lowerTypeDeclaration(declaration.parent)
+        )
+    }
+
     fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
@@ -50,6 +57,7 @@ interface IDLLowering {
         return when (declaration) {
             is IDLInterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is IDLTypedefDeclaration -> lowerTypedefDeclaration(declaration)
+            is IDLImplementsStatementDeclaration -> lowerImplementStatementDeclaration(declaration)
             else -> declaration
         }
     }
