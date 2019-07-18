@@ -24,8 +24,8 @@ compileTestKotlin {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
-    implementation(project(":ast"))
     implementation(project(":ast-common"))
+    implementation(project(":ast-declarations"))
     implementation(project(":ast-model"))
     implementation(project(":idl-declarations"))
     implementation(project(":idl-models"))

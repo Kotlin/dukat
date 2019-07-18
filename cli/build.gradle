@@ -11,7 +11,7 @@ configurations {
 dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
-  implementation(project(":ast"))
+  implementation(project(":ast-declarations"))
   implementation(project(":ast-common"))
   implementation(project(":ast-model"))
   implementation(project(":module-name-resolver"))

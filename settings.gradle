@@ -36,7 +36,7 @@ gradle.ext {
 }
 
 
-include 'ast'
+include 'ast-declarations'
 include 'ast-common'
 include 'ast-model'
 include 'cli'
@@ -68,4 +68,5 @@ project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
+project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
 
