@@ -51,7 +51,13 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
     val sourceFileName = sourceFile.name
     val ktFileNamePrefix =
             if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
-                CommonJsNameResolver().resolveName(sourceFile) ?: sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+                val moduleName = CommonJsNameResolver().resolveName(sourceFile)
+                val sourceName = sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+                if (moduleName != null) {
+                    "$moduleName.$sourceName"
+                } else {
+                    sourceName
+                }
             } else if (sourceFileName.endsWith(IDL_DECLARATION_EXTENSION)) {
                 sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
             } else if (sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
