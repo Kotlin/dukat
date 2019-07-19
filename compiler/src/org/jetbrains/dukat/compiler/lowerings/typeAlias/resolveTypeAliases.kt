@@ -80,10 +80,18 @@ private fun DocumentRootNode.registerTypeAliases(astContext: TypeAliasContext) {
     }
 }
 
-fun DocumentRootNode.resolveTypeAliases(): DocumentRootNode {
-    val astContext = TypeAliasContext()
-    registerTypeAliases(astContext)
+fun DocumentRootNode.resolveTypeAliases(astContext: TypeAliasContext): DocumentRootNode {
     return LowerTypeAliases(astContext).lowerDocumentRoot(this)
 }
 
-fun SourceSetNode.resolveTypeAliases() = transform { it.resolveTypeAliases() }
+fun SourceSetNode.resolveTypeAliases(): SourceSetNode  {
+    val astContext = TypeAliasContext()
+
+    sources.forEach { source ->
+        source.root.registerTypeAliases(astContext)
+    }
+
+    return copy(sources = sources.map { source ->
+        source.copy(root = source.root.resolveTypeAliases(astContext))
+    })
+}
