@@ -1,5 +1,10 @@
 # Changelog
 
+#### [0.0.12] - 19'July, 2019
+ - package name (if found) is added as a prefix to the name of the translated entity
+ - [#73 - Union type unrolling is broken when it's aliased in a referenced file](https://github.com/Kotlin/dukat/issues/73)
+ - [idl] Support typedefs in inheritance declarations 
+
 #### [0.0.11] - 17'July, 2019
  - Experimental (and definitely incomplete) support for idl conversion
  - Add NESTED_CLASS_IN_EXTERNAL_INTERFACE only when it's needed
