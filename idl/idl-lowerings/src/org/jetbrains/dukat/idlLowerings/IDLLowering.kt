@@ -17,8 +17,8 @@ import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 
 interface IDLLowering {
 
-    fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        return declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
+    fun lowerTypeDeclaration(declaration: IDLTypeDeclaration) : IDLTypeDeclaration {
+        return declaration
     }
 
     fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration): IDLAttributeDeclaration {

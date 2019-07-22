@@ -1,27 +1,35 @@
 package org.jetbrains.dukat.idlParser.visitors
 
-import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlParser.getFirstValueOrNull
-import org.jetbrains.dukat.idlParser.getName
-import org.jetbrains.dukat.idlParser.getNameOrNull
 
-internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
-    private var name: String = ""
-    private var typeParameter: IDLTypeDeclaration? = null
+internal class TypeVisitor(private var name: String = "",
+                           private var typeParameter: IDLTypeDeclaration? = null
+) : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     private var nullable: Boolean = false
+    private var unionMembers: MutableList<IDLTypeDeclaration> = mutableListOf()
+    private var kind: TypeKind = TypeKind.SINGLE
 
     override fun defaultResult(): IDLTypeDeclaration {
-        return IDLTypeDeclaration(
-                name = name,
-                typeParameter = typeParameter,
-                nullable = nullable
-        )
+        return when (kind) {
+            TypeKind.SINGLE -> IDLSingleTypeDeclaration(
+                    name = name,
+                    typeParameter = typeParameter,
+                    nullable = nullable
+            )
+            TypeKind.UNION -> IDLUnionTypeDeclaration(
+                    unionMembers = unionMembers,
+                    nullable = nullable
+            )
+        }
     }
 
     override fun visitSingleType(ctx: WebIDLParser.SingleTypeContext): IDLTypeDeclaration {
+        kind = TypeKind.SINGLE
         ctx.getFirstValueOrNull()?.let { name = it }
         visitChildren(ctx)
         return defaultResult()
@@ -34,6 +42,7 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     }
 
     override fun visitConstType(ctx: WebIDLParser.ConstTypeContext): IDLTypeDeclaration {
+        kind = TypeKind.SINGLE
         ctx.getFirstValueOrNull()?.let { name = it }
         visitChildren(ctx)
         return defaultResult()
@@ -78,9 +87,10 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
         if (suffix == "?") {
             nullable = true
         } else if (suffix == "[") {
-            typeParameter = IDLTypeDeclaration(name, typeParameter, nullable)
+            typeParameter = defaultResult()
             name = "\$Array"
             nullable = false
+            kind = TypeKind.SINGLE
         }
         visitChildren(ctx)
         return defaultResult()
@@ -89,9 +99,10 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     override fun visitTypeSuffixStartingWithArray(ctx: WebIDLParser.TypeSuffixStartingWithArrayContext): IDLTypeDeclaration {
         val suffix = ctx.getFirstValueOrNull()
         if (suffix == "[") {
-            typeParameter = IDLTypeDeclaration(name, typeParameter, nullable)
+            typeParameter = defaultResult()
             name = "\$Array"
             nullable = false
+            kind = TypeKind.SINGLE
         }
         visitChildren(ctx)
         return defaultResult()
@@ -104,4 +115,30 @@ internal class TypeVisitor : WebIDLBaseVisitor<IDLTypeDeclaration>() {
         }
         return defaultResult()
     }
+
+    override fun visitUnionType(ctx: WebIDLParser.UnionTypeContext): IDLTypeDeclaration {
+        kind = TypeKind.UNION
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitUnionMemberType(ctx: WebIDLParser.UnionMemberTypeContext): IDLTypeDeclaration {
+        if (ctx.getFirstValueOrNull() == "any") {
+            //array of any's
+            unionMembers.add(TypeVisitor(
+                    name = "\$Array",
+                    typeParameter = IDLSingleTypeDeclaration(
+                            "any",
+                            null,
+                            false
+                    )
+            ).visitChildren(ctx))
+        }
+        unionMembers.add(TypeVisitor().visitChildren(ctx))
+        return defaultResult()
+    }
+}
+
+private enum class TypeKind {
+    SINGLE, UNION
 }

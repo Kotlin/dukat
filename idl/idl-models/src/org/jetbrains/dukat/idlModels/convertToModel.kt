@@ -13,7 +13,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-fun IDLTypeDeclaration.process(): TypeValueModel {
+fun IDLSingleTypeDeclaration.process(): TypeValueModel {
     val typeModel = TypeValueModel(
             value = IdentifierEntity(when (name) {
                 "void" -> "Unit"
@@ -52,10 +52,22 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
     )
 }
 
+fun IDLTypeDeclaration.process(): TypeValueModel? {
+    return when (this) {
+        is IDLSingleTypeDeclaration -> process()
+        is IDLUnionTypeDeclaration -> TypeValueModel(
+                value = IdentifierEntity("dynamic"),
+                params = listOf(),
+                metaDescription = null
+        )
+        else -> raiseConcern("unprocessed type declaration: ${this}") { null }
+    }
+}
+
 fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
-            type = type.process(),
+            type = type.process()!!,
             initializer = null,
             vararg = false,
             optional = false
@@ -78,7 +90,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 typeParameters = listOf(),
                 parentEntities = parents.map {
                     HeritageModel(
-                            it.process(),
+                            it.process()!!,
                             listOf(),
                             null
                     )
@@ -102,7 +114,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 typeParameters = listOf(),
                 parentEntities = parents.map {
                     HeritageModel(
-                            it.process(),
+                            it.process()!!,
                             listOf(),
                             null
                     )
@@ -229,7 +241,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
     return when (this) {
         is IDLAttributeDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
-                type = type.process(),
+                type = type.process()!!,
                 typeParameters = listOf(),
                 static = false,
                 override = false,
@@ -240,7 +252,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
         is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
                 parameters = arguments.map { it.process() },
-                type = returnType.process(),
+                type = returnType.process()!!,
                 typeParameters = listOf(),
                 static = false,
                 override = false,
@@ -255,7 +267,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
         )
         is IDLConstantDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
-                type = type.process(),
+                type = type.process()!!,
                 typeParameters = listOf(),
                 static = false,
                 override = false,

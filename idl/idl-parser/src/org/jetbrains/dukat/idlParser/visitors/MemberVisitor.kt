@@ -11,7 +11,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
     private var name : String = ""
-    private var type : IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var type : IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var constValue: String? = null
     private var static: Boolean = false

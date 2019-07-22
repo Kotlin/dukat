@@ -1,29 +1,39 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.*
 
 private class TypedefResolver(val context: TypedefContext) : IDLLowering {
 
     override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        return declaration.copy(
-                typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) },
-                name = context.resolveType(declaration) ?: declaration.name
-        )
+        return when (declaration) {
+            is IDLUnionTypeDeclaration -> declaration.copy(unionMembers = declaration.unionMembers.map { lowerTypeDeclaration(it) })
+            is IDLSingleTypeDeclaration -> when (val newType = context.resolveType(declaration)) {
+                is IDLSingleTypeDeclaration -> newType.copy(
+                        typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) }
+                )
+                is IDLUnionTypeDeclaration -> newType.copy(
+                        unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) }
+                )
+                else -> declaration
+            }
+            else -> declaration
+        }
     }
-
 }
 
 private class TypedefContext : IDLLowering {
-    private val typedefs: MutableMap<String, String> = mutableMapOf()
+    private val typedefs: MutableMap<String, IDLTypeDeclaration> = mutableMapOf()
 
     fun registerTypedef(declaration: IDLTypedefDeclaration) {
-        typedefs[declaration.name] = declaration.typeReference.name
+        typedefs[declaration.name] = declaration.typeReference
     }
 
-    fun resolveType(declaration: IDLTypeDeclaration): String? {
-        return typedefs[declaration.name]
+    fun resolveType(declaration: IDLSingleTypeDeclaration): IDLTypeDeclaration {
+        return if (typedefs.containsKey(declaration.name)) {
+            typedefs[declaration.name]!!
+        } else {
+            declaration
+        }
     }
 
     override fun lowerTypedefDeclaration(declaration: IDLTypedefDeclaration): IDLTypedefDeclaration {

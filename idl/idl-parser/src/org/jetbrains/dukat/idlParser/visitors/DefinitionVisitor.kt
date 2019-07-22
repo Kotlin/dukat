@@ -22,13 +22,12 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var name: String = ""
     private val myAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
     private val operations: MutableList<IDLOperationDeclaration> = mutableListOf()
-    private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
+    private val parents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
-    private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var typeReference: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
-
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -97,7 +96,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitInheritance(ctx: WebIDLParser.InheritanceContext): IDLTopLevelDeclaration {
-        parents.addAll(ctx.filterIdentifiers().map { IDLTypeDeclaration(it.text, null, false) })
+        parents.addAll(ctx.filterIdentifiers().map { IDLSingleTypeDeclaration(it.text, null, false) })
         return defaultResult()
     }
 
