@@ -1,12 +1,15 @@
 package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -39,6 +42,55 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
             initializer = null,
             vararg = false,
             optional = false
+    )
+}
+
+fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+    return FunctionModel(
+            name = IdentifierEntity(name),
+            parameters = listOf(key.process(), value.process()),
+            type = TypeValueModel(
+                    value = IdentifierEntity("Unit"),
+                    params = listOf(),
+                    metaDescription = null
+            ),
+            typeParameters = listOf(),
+            annotations = mutableListOf(AnnotationModel(
+                    name = "kotlin.internal.InlineOnly",
+                    params = listOf()
+            )),
+            export = false,
+            inline = true,
+            operator = true,
+            extend = ClassLikeReferenceModel(
+                    name = ownerName,
+                    typeParameters = listOf()
+            ),
+            body = listOf(AssignmentStatementModel(
+                    StatementCallModel(IdentifierEntity("asDynamic"), listOf()),
+                    StatementCallModel(IdentifierEntity("value"), null)
+            ))
+    )
+}
+
+fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+    return FunctionModel(
+            name = IdentifierEntity(name),
+            parameters = listOf(key.process()),
+            type = valueType.process(),
+            typeParameters = listOf(),
+            annotations = mutableListOf(AnnotationModel(
+                    name = "kotlin.internal.InlineOnly",
+                    params = listOf()
+            )),
+            export = false,
+            inline = true,
+            operator = true,
+            extend = ClassLikeReferenceModel(
+                    name = ownerName,
+                    typeParameters = listOf()
+            ),
+            body = listOf()
     )
 }
 

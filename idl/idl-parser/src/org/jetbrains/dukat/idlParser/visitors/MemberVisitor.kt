@@ -10,22 +10,34 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
-    private var name : String = ""
-    private var type : IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var name: String = ""
+    private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var static: Boolean = false
     private var readOnly: Boolean = false
 
-    override fun defaultResult() : IDLMemberDeclaration {
+    override fun defaultResult(): IDLMemberDeclaration {
         return when (kind) {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
+            MemberKind.GETTER -> IDLGetterDeclaration(
+                    name,
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) },
+                    type
+            )
+            MemberKind.SETTER -> IDLSetterDeclaration(
+                    name,
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) },
+                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) }
+            )
         }
     }
 
     override fun visitOperationRest(ctx: WebIDLParser.OperationRestContext?): IDLMemberDeclaration {
-        kind = MemberKind.OPERATION
+        if (kind != MemberKind.SETTER && kind != MemberKind.GETTER) {
+            kind = MemberKind.OPERATION
+        }
         visitChildren(ctx)
         return defaultResult()
     }
@@ -88,8 +100,16 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitSpecial(ctx: WebIDLParser.SpecialContext): IDLMemberDeclaration {
+        when (ctx.text) {
+            "getter" -> kind = MemberKind.GETTER
+            "setter" -> kind = MemberKind.SETTER
+        }
+        return defaultResult()
+    }
+
 }
 
 private enum class MemberKind {
-    OPERATION, ATTRIBUTE, CONSTANT
+    OPERATION, ATTRIBUTE, CONSTANT, GETTER, SETTER
 }

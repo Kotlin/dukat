@@ -15,6 +15,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var getters: MutableList<IDLGetterDeclaration> = mutableListOf()
+    private var setters: MutableList<IDLSetterDeclaration> = mutableListOf()
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -27,7 +29,9 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     primaryConstructor = null,
                     constructors = listOf(),
                     parents = parents,
-                    extendedAttributes = extendedAttributes
+                    extendedAttributes = extendedAttributes,
+                    getters = getters,
+                    setters = setters
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name,
@@ -69,7 +73,11 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitOperation(ctx: WebIDLParser.OperationContext): IDLTopLevelDeclaration {
-        operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
+        when (val operation = MemberVisitor().visit(ctx)) {
+            is IDLGetterDeclaration -> getters.add(operation)
+            is IDLSetterDeclaration -> setters.add(operation)
+            is IDLOperationDeclaration -> operations.add(operation)
+        }
         return defaultResult()
     }
 
