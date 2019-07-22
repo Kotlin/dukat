@@ -5,5 +5,5 @@ data class FunctionTypeModel(
         val type: TypeModel,
 
         val metaDescription: String?,
-        var nullable: Boolean = false
+        override var nullable: Boolean = false
 ) : TypeModel

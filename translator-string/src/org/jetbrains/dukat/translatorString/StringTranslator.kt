@@ -306,9 +306,7 @@ private fun PropertyModel.translateSignature(): String {
     }
     val metaClause = type.translateMeta()
     var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
-    val propertyType = type
-    if ((propertyType is TypeValueModel && propertyType.nullable) ||
-            (propertyType is FunctionTypeModel && propertyType.nullable)) {
+    if (type.nullable) {
         if (getter) {
             res += " get() = definedExternally"
         }
