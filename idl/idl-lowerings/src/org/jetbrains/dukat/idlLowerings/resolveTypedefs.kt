@@ -9,10 +9,13 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
             is IDLUnionTypeDeclaration -> declaration.copy(unionMembers = declaration.unionMembers.map { lowerTypeDeclaration(it) })
             is IDLSingleTypeDeclaration -> when (val newType = context.resolveType(declaration)) {
                 is IDLSingleTypeDeclaration -> newType.copy(
-                        typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) }
+                        typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) },
+                        nullable = declaration.nullable
                 )
                 is IDLUnionTypeDeclaration -> newType.copy(
-                        unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) }
+                        unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) },
+                        name = declaration.name,
+                        nullable = declaration.nullable
                 )
                 else -> declaration
             }

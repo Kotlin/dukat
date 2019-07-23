@@ -37,6 +37,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "sequence" -> "Array"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
+                "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name
             }),
@@ -56,7 +57,7 @@ fun IDLTypeDeclaration.process(): TypeValueModel? {
     return when (this) {
         is IDLSingleTypeDeclaration -> process()
         is IDLUnionTypeDeclaration -> TypeValueModel(
-                value = IdentifierEntity("dynamic"),
+                value = IdentifierEntity(name ?: "dynamic"),
                 params = listOf(),
                 metaDescription = null
         )

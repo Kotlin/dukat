@@ -22,6 +22,10 @@ internal class TypeVisitor(private var name: String = "",
                     nullable = nullable
             )
             TypeKind.UNION -> IDLUnionTypeDeclaration(
+                    name = unionMembers.joinToString(
+                            separator = "Or",
+                            prefix = "Union"
+                    ) { it.name },
                     unionMembers = unionMembers,
                     nullable = nullable
             )
