@@ -1,6 +1,6 @@
 {
   "name": "dukat",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Converter definition files to Kotlin declarations. Currently support TypeScript declarations",
   "bin": {
     "dukat": "./bin/dukat-cli.js"

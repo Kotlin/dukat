@@ -46,15 +46,15 @@ where possible options include:
 
 # Recent Changes
 
+#### [0.0.13] - 24'July, 2019
+ - [idl] support for translating dictionaries, nullable types, array types and parameter types
+ - [idl] support "implements" statement
+ - redundant Unit return type in not printed anymore
+
 #### [0.0.12] - 19'July, 2019
  - package name (if found) is added as a prefix to the name of the translated entity
  - [#73 - Union type unrolling is broken when it's aliased in a referenced file](https://github.com/Kotlin/dukat/issues/73)
  - [idl] Support typedefs in inheritance declarations
-
-#### [0.0.11] - 17'July, 2019
- - Experimental (and definitely incomplete) support for idl conversion
- - Add NESTED_CLASS_IN_EXTERNAL_INTERFACE only when it's needed
- - Merge modules into top level declarations with the same name whenever it's possible
 
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 
