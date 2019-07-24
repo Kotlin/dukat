@@ -17,6 +17,9 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
                         name = declaration.name,
                         nullable = declaration.nullable
                 )
+                is IDLFunctionTypeDeclaration -> newType.copy(
+                        nullable = declaration.nullable
+                )
                 else -> declaration
             }
             else -> declaration

@@ -7,7 +7,7 @@ data class IDLInterfaceDeclaration(
         val operations: List<IDLOperationDeclaration>,
         val primaryConstructor: IDLConstructorDeclaration?,
         val constructors: List<IDLConstructorDeclaration>,
-        val parents: List<IDLTypeDeclaration>,
+        val parents: List<IDLSingleTypeDeclaration>,
         val extendedAttributes: List<IDLExtendedAttributeDeclaration>,
         val generated: Boolean = false
 ) : IDLTopLevelDeclaration

@@ -53,9 +53,19 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
     )
 }
 
-fun IDLTypeDeclaration.process(): TypeValueModel? {
+fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
+    return FunctionTypeModel(
+            parameters = arguments.map {it.process()},
+            type = returnType.process()!!,
+            metaDescription = null,
+            nullable = nullable
+    )
+}
+
+fun IDLTypeDeclaration.process(): TypeModel? {
     return when (this) {
         is IDLSingleTypeDeclaration -> process()
+        is IDLFunctionTypeDeclaration -> process()
         //there shouldn't be any UnionTypeDeclarations at this stage
         else -> raiseConcern("unprocessed type declaration: ${this}") { null }
     }
@@ -87,7 +97,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 typeParameters = listOf(),
                 parentEntities = parents.map {
                     HeritageModel(
-                            it.process()!!,
+                            it.process(),
                             listOf(),
                             null
                     )
@@ -111,7 +121,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 typeParameters = listOf(),
                 parentEntities = parents.map {
                     HeritageModel(
-                            it.process()!!,
+                            it.process(),
                             listOf(),
                             null
                     )

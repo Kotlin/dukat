@@ -1,21 +1,22 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.panic.raiseConcern
 
 private class TypeResolver : IDLLowering {
 
     private val resolvedUnionTypes: MutableSet<String> = mutableSetOf()
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
-    private val dependenciesToAdd: MutableMap<String, MutableSet<IDLTypeDeclaration>> = mutableMapOf()
+    private val dependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
 
     private var file: IDLFileDeclaration = IDLFileDeclaration("", listOf())
 
-    fun getDependencies(declaration: IDLInterfaceDeclaration): List<IDLTypeDeclaration> {
+    fun getDependencies(declaration: IDLInterfaceDeclaration): List<IDLSingleTypeDeclaration> {
         return dependenciesToAdd[declaration.name]?.toList() ?: listOf()
     }
 
     private fun processUnionType(unionType: IDLUnionTypeDeclaration) {
-        val newDependenciesToAdd: MutableMap<String, MutableSet<IDLTypeDeclaration>> = mutableMapOf()
+        val newDependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
         for (member in unionType.unionMembers) {
             when (member) {
                 is IDLUnionTypeDeclaration -> {
@@ -60,6 +61,19 @@ private class TypeResolver : IDLLowering {
                 processUnionType(declaration)
                 declaration.unionMembers.forEach { lowerTypeDeclaration(it) }
             }
+            return when (declaration.name) {
+                in resolvedUnionTypes -> IDLSingleTypeDeclaration(
+                        name = declaration.name,
+                        typeParameter = null,
+                        nullable = declaration.nullable
+                )
+                in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
+                        name = "\$dynamic",
+                        typeParameter = null,
+                        nullable = false
+                )
+                else -> raiseConcern("unprocessed UnionTypeDeclaration: $this") { declaration }
+            }
         }
         if (declaration is IDLSingleTypeDeclaration) {
             return if (!declaration.isPrimitive() && !file.containsInterface(declaration.name)) {
@@ -68,21 +82,13 @@ private class TypeResolver : IDLLowering {
                 declaration
             }
         }
-        return when (declaration.name) {
-            in resolvedUnionTypes -> IDLSingleTypeDeclaration(
-                    name = declaration.name,
-                    typeParameter = null,
-                    nullable = declaration.nullable
+        if (declaration is IDLFunctionTypeDeclaration) {
+            return declaration.copy(
+                    returnType = lowerTypeDeclaration(declaration.returnType),
+                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it) }
             )
-            in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
-                    name = "\$dynamic",
-                    typeParameter = null,
-                    nullable = false
-            )
-            else -> {
-                declaration
-            }
         }
+        return declaration
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {

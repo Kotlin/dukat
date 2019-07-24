@@ -2,16 +2,17 @@ package org.jetbrains.dukat.idlParser.visitors
 
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlParser.getFirstValueOrNull
+import org.jetbrains.dukat.idlParser.getName
 
 internal class TypeVisitor(private var name: String = "",
                            private var typeParameter: IDLTypeDeclaration? = null
 ) : WebIDLBaseVisitor<IDLTypeDeclaration>() {
     private var nullable: Boolean = false
     private var unionMembers: MutableList<IDLTypeDeclaration> = mutableListOf()
+    private var returnType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var kind: TypeKind = TypeKind.SINGLE
 
     override fun defaultResult(): IDLTypeDeclaration {
@@ -27,6 +28,12 @@ internal class TypeVisitor(private var name: String = "",
                             prefix = "Union"
                     ) { it.name },
                     unionMembers = unionMembers,
+                    nullable = nullable
+            )
+            TypeKind.FUNCTION -> IDLFunctionTypeDeclaration(
+                    name = name,
+                    returnType = returnType,
+                    arguments = arguments,
                     nullable = nullable
             )
         }
@@ -141,8 +148,23 @@ internal class TypeVisitor(private var name: String = "",
         unionMembers.add(TypeVisitor().visitChildren(ctx))
         return defaultResult()
     }
+
+    override fun visitCallbackRest(ctx: WebIDLParser.CallbackRestContext): IDLTypeDeclaration {
+        kind = TypeKind.FUNCTION
+        name = ctx.getName()
+        //visit return type
+        returnType = TypeVisitor().visit(ctx.children?.getOrNull(2))
+        //visit argument list
+        visit(ctx.children?.getOrNull(4))
+        return defaultResult()
+    }
+
+    override fun visitArgument(ctx: WebIDLParser.ArgumentContext?): IDLTypeDeclaration {
+        arguments.add(ArgumentVisitor().visit(ctx))
+        return defaultResult()
+    }
 }
 
 private enum class TypeKind {
-    SINGLE, UNION
+    SINGLE, UNION, FUNCTION
 }

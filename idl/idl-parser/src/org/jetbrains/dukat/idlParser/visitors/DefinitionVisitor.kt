@@ -131,6 +131,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         dictionaryMembers.add(MemberVisitor().visit(ctx) as IDLDictionaryMemberDeclaration)
         return defaultResult()
     }
+
+    override fun visitCallbackRest(ctx: WebIDLParser.CallbackRestContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.TYPEDEF
+        name = ctx.getName()
+        typeReference = TypeVisitor().visit(ctx)
+        return defaultResult()
+    }
 }
 
 private enum class DefinitionKind {
