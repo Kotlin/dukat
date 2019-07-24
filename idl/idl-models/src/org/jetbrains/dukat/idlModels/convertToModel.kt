@@ -141,7 +141,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
 fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
-            type = type.process().copy(nullable = true),
+            type = type.toNullable().process()!!,
             initializer = if (defaultValue != null) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
@@ -284,7 +284,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
         )
         is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
-                type = type.process().copy(nullable = true),
+                type = type.toNullable().process()!!,
                 typeParameters = listOf(),
                 static = false,
                 override = false,

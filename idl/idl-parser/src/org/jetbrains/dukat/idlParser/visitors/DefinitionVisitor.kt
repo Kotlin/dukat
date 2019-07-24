@@ -2,17 +2,7 @@ package org.jetbrains.dukat.idlParser.visitors
 
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlParser.filterIdentifiers
 import org.jetbrains.dukat.idlParser.getName
 
@@ -25,8 +15,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
-    private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
-    private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var childType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var parentType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
     private var isCallback: Boolean = false
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
@@ -124,8 +114,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     override fun visitImplementsStatement(ctx: WebIDLParser.ImplementsStatementContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.IMPLEMENTS_STATEMENT
         val identifiers = ctx.filterIdentifiers()
-        childType = IDLTypeDeclaration(identifiers[0].text, null, false)
-        parentType = IDLTypeDeclaration(identifiers[1].text, null, false)
+        childType = IDLSingleTypeDeclaration(identifiers[0].text, null, false)
+        parentType = IDLSingleTypeDeclaration(identifiers[1].text, null, false)
         return defaultResult()
     }
 

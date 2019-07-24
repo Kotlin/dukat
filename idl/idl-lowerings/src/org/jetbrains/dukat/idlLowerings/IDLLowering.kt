@@ -1,18 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.*
 
 
 interface IDLLowering {
@@ -61,7 +49,7 @@ interface IDLLowering {
 
     fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         return declaration.copy(
-                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 members = declaration.members.map { lowerDictionaryMemberDeclaration(it) }
         )
     }
