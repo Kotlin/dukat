@@ -201,6 +201,7 @@ fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
         is IDLInterfaceDeclaration -> listOf(convertToModel())
         is IDLDictionaryDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
+        is IDLImplementsStatementDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }

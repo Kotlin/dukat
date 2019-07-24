@@ -2,7 +2,17 @@ package org.jetbrains.dukat.idlParser.visitors
 
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlParser.filterIdentifiers
 import org.jetbrains.dukat.idlParser.getName
 
@@ -15,6 +25,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var childType: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("")
     private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
 
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
@@ -39,6 +51,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     name = name,
                     members = dictionaryMembers,
                     parents = parents
+            )
+            DefinitionKind.IMPLEMENTS_STATEMENT -> IDLImplementsStatementDeclaration(
+                    child = childType,
+                    parent = parentType
             )
         }
     }
@@ -97,6 +113,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitImplementsStatement(ctx: WebIDLParser.ImplementsStatementContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.IMPLEMENTS_STATEMENT
+        val identifiers = ctx.filterIdentifiers()
+        childType = IDLTypeDeclaration(identifiers[0].text)
+        parentType = IDLTypeDeclaration(identifiers[1].text)
+        return defaultResult()
+    }
+
     override fun visitDictionary(ctx: WebIDLParser.DictionaryContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.DICTIONARY
         name = ctx.getName()
@@ -111,5 +135,5 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 }
 
 private enum class DefinitionKind {
-    INTERFACE, DICTIONARY, TYPEDEF
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, DICTIONARY
 }
