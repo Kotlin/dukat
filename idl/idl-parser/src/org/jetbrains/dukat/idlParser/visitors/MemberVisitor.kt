@@ -13,6 +13,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var name: String = ""
     private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
+    private var constValue: String? = null
     private var static: Boolean = false
     private var readOnly: Boolean = false
 
@@ -21,6 +22,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
+            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name,
                     arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) },
@@ -56,6 +58,13 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLMemberDeclaration {
+        kind = MemberKind.DICTIONARY_MEMBER
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitReturnType(ctx: WebIDLParser.ReturnTypeContext?): IDLMemberDeclaration {
         type = TypeVisitor().visit(ctx)
         return defaultResult()
@@ -78,6 +87,15 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
 
     override fun visitConstType(ctx: WebIDLParser.ConstTypeContext): IDLMemberDeclaration {
         type = TypeVisitor().visit(ctx)
+        return defaultResult()
+    }
+
+    override fun visitConstValue(ctx: WebIDLParser.ConstValueContext): IDLMemberDeclaration {
+        constValue = object : WebIDLBaseVisitor<String>() {
+            override fun visitTerminal(node: TerminalNode): String {
+                return node.text
+            }
+        }.visit(ctx)
         return defaultResult()
     }
 
@@ -111,5 +129,5 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
 }
 
 private enum class MemberKind {
-    OPERATION, ATTRIBUTE, CONSTANT, GETTER, SETTER
+    OPERATION, ATTRIBUTE, CONSTANT, DICTIONARY_MEMBER, GETTER, SETTER
 }

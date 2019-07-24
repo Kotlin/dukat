@@ -1,7 +1,17 @@
 package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.panic.raiseConcern
 
 private class OverrideResolver(val context: ModelContext) {
@@ -100,12 +110,12 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if (name == IdentifierEntity("hashCode") && parameters.isEmpty() &&
-                returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
+            returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
             return true
         }
 
         if (name == IdentifierEntity("toString") && parameters.isEmpty() &&
-                returnType is TypeValueModel && returnType.value == IdentifierEntity("String")) {
+            returnType is TypeValueModel && returnType.value == IdentifierEntity("String")) {
             return true
         }
 
@@ -148,7 +158,12 @@ private class OverrideResolver(val context: ModelContext) {
             is MethodModel -> {
                 val override =
                         allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
-                copy(override = override)
+
+                if (override) {
+                    copy(override = override, parameters = parameters.map { param -> param.copy(initializer = null) })
+                } else {
+                    copy(override = override)
+                }
             }
             is PropertyModel -> {
                 val override = allSuperProperties.any { superMethod ->

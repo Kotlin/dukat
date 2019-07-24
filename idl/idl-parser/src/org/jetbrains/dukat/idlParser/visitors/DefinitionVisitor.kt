@@ -17,6 +17,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("")
     private var getters: MutableList<IDLGetterDeclaration> = mutableListOf()
     private var setters: MutableList<IDLSetterDeclaration> = mutableListOf()
+    private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
+
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -34,8 +36,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     setters = setters
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
-                    name,
-                    typeReference
+                    name = name,
+                    typeReference = typeReference
+            )
+            DefinitionKind.DICTIONARY -> IDLDictionaryDeclaration(
+                    name = name,
+                    members = dictionaryMembers,
+                    parents = parents
             )
         }
     }
@@ -97,8 +104,20 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         typeReference = TypeVisitor().visit(ctx)
         return defaultResult()
     }
+
+    override fun visitDictionary(ctx: WebIDLParser.DictionaryContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.DICTIONARY
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLTopLevelDeclaration {
+        dictionaryMembers.add(MemberVisitor().visit(ctx) as IDLDictionaryMemberDeclaration)
+        return defaultResult()
+    }
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF
+    INTERFACE, DICTIONARY, TYPEDEF
 }

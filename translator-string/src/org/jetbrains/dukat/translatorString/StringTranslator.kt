@@ -25,11 +25,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.isGeneric
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -55,6 +51,10 @@ private fun TypeModel.translateMeta(): String {
         is FunctionTypeModel -> metaDescription.translateMeta()
         else -> ""
     }
+}
+
+private fun StatementModel.translateMeta(): String {
+    return metaDescription.translateMeta()
 }
 
 private fun translateTypeParams(params: List<TypeModel>): String {
@@ -98,17 +98,15 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res = "vararg $res"
     }
 
-    if (initializer is TypeValueModel) {
-        if (needsMeta) {
-            val typeValueModel = initializer as TypeValueModel
-
-            res += " = ${typeValueModel.value.translate()}"
-            typeValueModel.metaDescription?.let { meta ->
-                res += " /* ${meta} */"
-            }
-        }
-    } else {
+    if (needsMeta) {
         res += type.translateMeta()
+    }
+
+    if (initializer != null) {
+        res += " = ${initializer!!.translate()}"
+        if (needsMeta) {
+            res += initializer!!.translateMeta()
+        }
     }
 
     return res
@@ -169,6 +167,7 @@ private fun StatementModel.translate(): String {
         is AssignmentStatementModel -> "${left.translate()} = ${right.translate()}"
         is ChainCallModel -> "${left.translate()}.${right.translate()}"
         is ReturnStatementModel -> "return ${statement.translate()}"
+        is IndexStatementModel -> "${array.translate()}[${index.translate()}]"
         is StatementCallModel -> translate()
         else -> raiseConcern("unkown StatementNode ${this}") { "" }
     }
@@ -196,7 +195,7 @@ private fun FunctionModel.translate(): String {
     val body = if (body.isEmpty()) {
         ""
     } else {
-        " { ${body.joinToString { statementNode -> statementNode.translate() }} }"
+        " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
     }
 
     val funName = if (extend == null) {

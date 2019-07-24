@@ -89,7 +89,8 @@ private fun MemberNode.isStatic() = when (this) {
 
 private enum class TranslationContext {
     IRRELEVANT,
-    FUNCTION_TYPE
+    FUNCTION_TYPE,
+    CONSTRUCTOR
 }
 
 private data class Members(
@@ -130,7 +131,7 @@ private fun MemberNode.process(): MemberModel? {
     // TODO: how ClassModel end up here?
     return when (this) {
         is ConstructorNode -> ConstructorModel(
-                parameters = parameters.map { param -> param.process() },
+                parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
                             name = typeParam.value,
@@ -181,9 +182,13 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
     return ParameterModel(
             type = type.process(context),
             name = name,
-            initializer = initializer?.let { valueNode ->
-                // TODO: don't like this particular cast
-                TypeValueModel(valueNode.value, emptyList(), meta, valueNode.nullable)
+            initializer = if (context == TranslationContext.CONSTRUCTOR) {
+                null
+            } else {
+                initializer?.let { valueNode ->
+                    // TODO: don't like this particular cast
+                    StatementCallModel(valueNode.value, null, meta)
+                }
             },
             vararg = vararg,
             optional = optional
