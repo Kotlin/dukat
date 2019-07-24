@@ -159,7 +159,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
 }
 
 private fun StatementCallModel.translate(): String {
-    return "${value.translate()}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
+    return "${value.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
 }
 
 private fun StatementModel.translate(): String {
@@ -251,6 +251,9 @@ private fun VariableModel.translate(): String {
         val getter = "get() = ${get?.translate()};"
         val setter = "set(value) { ${set?.translate()} }"
         " ${getter} ${setter}"
+    } else if (get != null) {
+        val getter = "get() = ${get?.translate()}"
+        " ${getter}"
     } else ""
 
     val typeParams = if (typeParameters.isEmpty()) {

@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.idlParser.visitors
 
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
+import org.antlr.webidl.WebIDLLexer
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlParser.filterIdentifiers
@@ -17,10 +19,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
-    private var getters: MutableList<IDLGetterDeclaration> = mutableListOf()
-    private var setters: MutableList<IDLSetterDeclaration> = mutableListOf()
-    private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
-
+    private val getters: MutableList<IDLGetterDeclaration> = mutableListOf()
+    private val setters: MutableList<IDLSetterDeclaration> = mutableListOf()
+    private val dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
+    private val enumMembers: MutableList<String> = mutableListOf()
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -49,6 +51,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.IMPLEMENTS_STATEMENT -> IDLImplementsStatementDeclaration(
                     child = childType,
                     parent = parentType
+            )
+            DefinitionKind.ENUM -> IDLEnumDeclaration(
+                    name = name,
+                    members = enumMembers
             )
         }
     }
@@ -130,8 +136,26 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         dictionaryMembers.add(MemberVisitor().visit(ctx) as IDLDictionaryMemberDeclaration)
         return defaultResult()
     }
+
+    override fun visitEnum_(ctx: WebIDLParser.Enum_Context): IDLTopLevelDeclaration {
+        kind = DefinitionKind.ENUM
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitEnumValueList(ctx: WebIDLParser.EnumValueListContext): IDLTopLevelDeclaration {
+        object : WebIDLBaseVisitor<Unit>() {
+            override fun visitTerminal(node: TerminalNode) {
+                if (node.symbol.type == WebIDLLexer.STRING_WEBIDL) {
+                    enumMembers.add(node.text.removeSurrounding("\""))
+                }
+            }
+        }.visit(ctx)
+        return defaultResult()
+    }
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, DICTIONARY
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, DICTIONARY, ENUM
 }

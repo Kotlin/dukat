@@ -2,6 +2,7 @@ package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -293,10 +294,65 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration, generatedFunction)
 }
 
+fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
+    val declaration = InterfaceModel(
+            name = IdentifierEntity(name),
+            members = listOf(),
+            companionObject = CompanionObjectModel(
+                    name = "",
+                    members = listOf(),
+                    parentEntities = listOf()
+            ),
+            typeParameters = listOf(),
+            parentEntities = listOf(),
+            annotations = mutableListOf(),
+            external = true
+    )
+    val generatedVariables = members.map {memberName ->
+        VariableModel(
+                name = IdentifierEntity(memberName.toUpperCase()),
+                type = TypeValueModel(
+                        value = declaration.name,
+                        params = listOf(),
+                        metaDescription = null
+                ),
+                annotations = mutableListOf(),
+                immutable = true,
+                inline = true,
+                initializer = null,
+                get = ChainCallModel(
+                        StatementCallModel(
+                                value = QualifierEntity(
+                                        left = IdentifierEntity("\"$memberName\""),
+                                        right = IdentifierEntity("asDynamic")
+                                ),
+                                params = listOf()
+                        ),
+                        StatementCallModel(
+                                value = IdentifierEntity("unsafeCast"),
+                                params = listOf(),
+                                typeParameters = listOf(IdentifierEntity(name))
+                        )
+                ),
+                set = null,
+                typeParameters = listOf(),
+                extend = ClassLikeReferenceModel(
+                        name = QualifierEntity(
+                                IdentifierEntity(name),
+                                IdentifierEntity("Companion")
+                        ),
+                        typeParameters = listOf()
+                )
+        )
+    }
+    return listOf(declaration) + generatedVariables
+}
+
 fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
     return when (this) {
         is IDLInterfaceDeclaration -> convertToModel()
         is IDLDictionaryDeclaration -> convertToModel()
+        is IDLEnumDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }

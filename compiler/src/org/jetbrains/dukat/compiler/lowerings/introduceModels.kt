@@ -187,7 +187,7 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             } else {
                 initializer?.let { valueNode ->
                     // TODO: don't like this particular cast
-                    StatementCallModel(valueNode.value, null, meta)
+                    StatementCallModel(valueNode.value, null, listOf(), meta)
                 }
             },
             vararg = vararg,
