@@ -2,7 +2,7 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.*
 
-private class UnionTypeResolver : IDLLowering {
+private class TypeResolver : IDLLowering {
 
     private val resolvedUnionTypes: MutableSet<String> = mutableSetOf()
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
@@ -61,6 +61,13 @@ private class UnionTypeResolver : IDLLowering {
                 declaration.unionMembers.forEach { lowerTypeDeclaration(it) }
             }
         }
+        if (declaration is IDLSingleTypeDeclaration) {
+            return if (!declaration.isPrimitive() && !file.containsInterface(declaration.name)) {
+                IDLSingleTypeDeclaration("\$dynamic", null, false)
+            } else {
+                declaration
+            }
+        }
         return when (declaration.name) {
             in resolvedUnionTypes -> IDLSingleTypeDeclaration(
                     name = declaration.name,
@@ -101,19 +108,19 @@ private class UnionTypeResolver : IDLLowering {
     }
 }
 
-private class DependencyResolver(val unionTypeResolver: UnionTypeResolver) : IDLLowering {
+private class DependencyResolver(val typeResolver: TypeResolver) : IDLLowering {
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
-                parents = declaration.parents + unionTypeResolver.getDependencies(declaration)
+                parents = declaration.parents + typeResolver.getDependencies(declaration)
         )
     }
 }
 
-fun IDLFileDeclaration.resolveUnionTypes(): IDLFileDeclaration {
-    val unionTypeResolver = UnionTypeResolver()
-    val dependencyResolver = DependencyResolver(unionTypeResolver)
+fun IDLFileDeclaration.resolveTypes(): IDLFileDeclaration {
+    val typeResolver = TypeResolver()
+    val dependencyResolver = DependencyResolver(typeResolver)
     return dependencyResolver.lowerFileDeclaration(
-            unionTypeResolver.lowerFileDeclaration(this)
+            typeResolver.lowerFileDeclaration(this)
     )
 }

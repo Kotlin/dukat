@@ -56,11 +56,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 fun IDLTypeDeclaration.process(): TypeValueModel? {
     return when (this) {
         is IDLSingleTypeDeclaration -> process()
-        is IDLUnionTypeDeclaration -> TypeValueModel(
-                value = IdentifierEntity(name ?: "dynamic"),
-                params = listOf(),
-                metaDescription = null
-        )
+        //there shouldn't be any UnionTypeDeclarations at this stage
         else -> raiseConcern("unprocessed type declaration: ${this}") { null }
     }
 }
