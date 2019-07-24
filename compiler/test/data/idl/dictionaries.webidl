@@ -8,3 +8,7 @@ dictionary WebGLContextAttributes {
     boolean preferLowPowerToHighPerformance = false;
     boolean failIfMajorPerformanceCaveat = false;
 };
+
+interface A {
+    attribute WebGLContextAttributes attributes;
+};
