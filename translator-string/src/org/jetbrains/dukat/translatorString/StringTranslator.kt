@@ -182,7 +182,10 @@ private fun ClassLikeReferenceModel.translate(): String {
 }
 
 private fun FunctionModel.translate(): String {
-    val returnType = type.translate()
+    val returnsUnit = (type is TypeValueModel) &&
+            (type as TypeValueModel).value == IdentifierEntity("Unit")
+
+    val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
@@ -203,11 +206,13 @@ private fun FunctionModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)}): ${returnType}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${body}"
 }
 
 private fun MethodModel.translate(): List<String> {
-    val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("@@None"))
+    val returnsUnit = (type is TypeValueModel) &&
+            ((type as TypeValueModel).value == IdentifierEntity("@@None")
+                    || (type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -300,11 +305,13 @@ private fun PropertyModel.translateSignature(): String {
     }
     val metaClause = type.translateMeta()
     var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
-    if (getter) {
-        res += " get() = definedExternally"
-    }
-    if (setter) {
-        res += "; set(value) = definedExternally"
+    if (type.nullable) {
+        if (getter) {
+            res += " get() = definedExternally"
+        }
+        if (setter) {
+            res += "; set(value) = definedExternally"
+        }
     }
     return res
 }

@@ -29,7 +29,7 @@ external enum class __E {
     __A,
     __B
 }
-external fun <__T> foo(__a: __T, _b: __M.__N.__C): Unit
+external fun <__T> foo(__a: __T, _b: __M.__N.__C)
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("atpl")

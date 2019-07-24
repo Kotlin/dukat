@@ -25,6 +25,6 @@ external interface `T$1`<T> {
     var bar: Any
 }
 external open class FooTypedUnion {
-    open fun <T> baz(p: `T$0`<T>): Unit
-    open fun <T> bar(p: `T$1`<T> /* `T$1`<T> & FooPart<T> */): Unit
+    open fun <T> baz(p: `T$0`<T>)
+    open fun <T> bar(p: `T$1`<T> /* `T$1`<T> & FooPart<T> */)
 }

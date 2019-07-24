@@ -20,6 +20,6 @@ import org.w3c.xhr.*
 external open class WebSocket(address: String) : events.EventEmitter {
     open fun connect(): Boolean
     open class Server {
-        open fun start(): Unit
+        open fun start()
     }
 }

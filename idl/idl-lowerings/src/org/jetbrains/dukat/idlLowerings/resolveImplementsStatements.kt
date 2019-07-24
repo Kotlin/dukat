@@ -7,7 +7,7 @@ private class ImplementsStatementContext : IDLLowering {
 
     private fun registerImplementsStatement(declaration: IDLImplementsStatementDeclaration) {
         missingInheritances.putIfAbsent(declaration.child.name, mutableListOf())
-        missingInheritances[declaration.child.name]!!.add(IDLTypeDeclaration(declaration.parent.name))
+        missingInheritances[declaration.child.name]!!.add(IDLTypeDeclaration(declaration.parent.name, null, false))
     }
 
     fun getMissingInheritances(declaration: IDLInterfaceDeclaration): List<IDLTypeDeclaration> {

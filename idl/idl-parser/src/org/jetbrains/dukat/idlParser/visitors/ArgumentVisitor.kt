@@ -8,7 +8,7 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 
 internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
     private var name: String = ""
-    private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var type: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
 
     override fun defaultResult() = IDLArgumentDeclaration(name, type)
 

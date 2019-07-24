@@ -15,7 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withoutArguments(): Unit
+external fun withoutArguments()
 external fun withOneAny(a: Any): Any
 external fun withOneString(s: String): String
 external fun withOneNumber(num: Number): Number

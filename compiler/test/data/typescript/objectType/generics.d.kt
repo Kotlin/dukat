@@ -27,7 +27,7 @@ external interface `T$1`<T> {
     var boo: T? get() = definedExternally; set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
-external fun <T> withGenericObjectTypeParam(opt: `T$1`<T>): Unit
+external fun <T> withGenericObjectTypeParam(opt: `T$1`<T>)
 external interface `T$2`<T> {
     var a: T
 }
@@ -39,7 +39,7 @@ external interface `T$3`<T, S> {
     var boo: S? get() = definedExternally; set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
-external fun <T, S> withDoublyGenericObjectTypeParam(opt: `T$3`<T, S>): Unit
+external fun <T, S> withDoublyGenericObjectTypeParam(opt: `T$3`<T, S>)
 external interface `T$4`<S> {
     fun bar(a: Any): S
 }

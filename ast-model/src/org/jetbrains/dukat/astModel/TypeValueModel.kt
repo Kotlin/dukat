@@ -9,7 +9,7 @@ data class TypeValueModel(
         val params: List<TypeModel>,
 
         val metaDescription: String?,
-        val nullable: Boolean = false
+        override val nullable: Boolean = false
 ) : Entity, TypeModel
 
 fun TypeValueModel.isGeneric() = params.isNotEmpty()

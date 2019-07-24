@@ -87,4 +87,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun foo(x: lib1.lib2.J, y: lib1.I, z: lib1.lib3.K, v: lib1.lib3.K): Unit
+external fun foo(x: lib1.lib2.J, y: lib1.I, z: lib1.lib3.K, v: lib1.lib3.K)

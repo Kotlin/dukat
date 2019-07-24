@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open fun methodWithOutArgs(): Unit
+    open fun methodWithOutArgs()
     open fun methodWithString(s: String): String
     open fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }

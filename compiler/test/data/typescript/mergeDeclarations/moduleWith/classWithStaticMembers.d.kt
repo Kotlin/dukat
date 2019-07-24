@@ -19,7 +19,7 @@ external open class Foo {
     open fun bar(): Number
     companion object {
         var variable: String
-        fun bar(): Unit
-        fun baz(a: Any): Unit
+        fun bar()
+        fun baz(a: Any)
     }
 }
