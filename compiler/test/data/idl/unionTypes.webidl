@@ -28,7 +28,7 @@ typedef (A<Int> or B) AIntOrB;
 
 interface ResolvedUnions {
     attribute ABC? x;
-    attribute ABCD y;
+    attribute sequence<ABCD> y;
     attribute (C or D)? z;
     attribute AIntOrB w;
     ABC f(ABC? x);

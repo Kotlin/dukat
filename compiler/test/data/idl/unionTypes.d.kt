@@ -10,7 +10,7 @@ external abstract class C : ABC, UnionCOrD
 external abstract class D : ABCD, UnionCOrD
 external abstract class ResolvedUnions {
     var x: ABC?
-    var y: ABCD
+    var y: Array<ABCD>
     var z: UnionCOrD?
     var w: dynamic
     fun f(x: ABC?): ABC

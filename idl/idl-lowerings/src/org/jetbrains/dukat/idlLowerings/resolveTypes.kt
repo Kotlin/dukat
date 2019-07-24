@@ -79,7 +79,7 @@ private class TypeResolver : IDLLowering {
             return if (!declaration.isPrimitive() && !file.containsInterface(declaration.name)) {
                 IDLSingleTypeDeclaration("\$dynamic", null, false)
             } else {
-                declaration
+                declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
             }
         }
         if (declaration is IDLFunctionTypeDeclaration) {
