@@ -194,6 +194,8 @@ private fun FunctionModel.translate(): String {
 
     val body = if (body.isEmpty()) {
         ""
+    } else if (body.size == 1 && body[0] is ReturnStatementModel) {
+        " = ${(body[0] as ReturnStatementModel).statement.translate()}"
     } else {
         " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
     }

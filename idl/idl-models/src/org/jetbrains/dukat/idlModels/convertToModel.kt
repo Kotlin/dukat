@@ -68,8 +68,20 @@ fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
                     typeParameters = listOf()
             ),
             body = listOf(AssignmentStatementModel(
-                    StatementCallModel(IdentifierEntity("asDynamic"), listOf()),
-                    StatementCallModel(IdentifierEntity("value"), null)
+                    IndexStatementModel(
+                            StatementCallModel(
+                                    IdentifierEntity("asDynamic"),
+                                    listOf()
+                            ),
+                            StatementCallModel(
+                                    IdentifierEntity(key.name),
+                                    null
+                            )
+                    ),
+                    StatementCallModel(
+                            IdentifierEntity(value.name),
+                            null
+                    )
             ))
     )
 }
@@ -91,12 +103,23 @@ fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
                     name = ownerName,
                     typeParameters = listOf()
             ),
-            body = listOf()
+            body = listOf(ReturnStatementModel(
+                    IndexStatementModel(
+                            StatementCallModel(
+                                    IdentifierEntity("asDynamic"),
+                                    listOf()
+                            ),
+                            StatementCallModel(
+                                    IdentifierEntity(key.name),
+                                    null
+                            )
+                    )
+            ))
     )
 }
 
-fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
-    return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
+fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
+    val declaration = if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
@@ -150,6 +173,9 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                 abstract = constructors.isEmpty() && primaryConstructor == null
         )
     }
+    val getterModels = getters.map { it.process(declaration.name) }
+    val setterModels = setters.map { it.process(declaration.name) }
+    return listOf(declaration) + getterModels + setterModels
 }
 
 fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
@@ -250,7 +276,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
 
 fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
     return when (this) {
-        is IDLInterfaceDeclaration -> listOf(convertToModel())
+        is IDLInterfaceDeclaration -> convertToModel()
         is IDLDictionaryDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
