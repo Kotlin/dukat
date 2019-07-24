@@ -107,6 +107,7 @@ private class TypeResolver : IDLLowering {
                             extendedAttributes = listOf(
                                     IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
                             ),
+                            callback = false,
                             generated = true
                     )
                 }

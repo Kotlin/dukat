@@ -28,6 +28,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
+    private var isCallback: Boolean = false
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -40,7 +41,9 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     primaryConstructor = null,
                     constructors = listOf(),
                     parents = parents,
-                    extendedAttributes = extendedAttributes
+                    extendedAttributes = extendedAttributes,
+                    callback = isCallback,
+                    generated = false
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -109,6 +112,12 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitType(ctx: WebIDLParser.TypeContext): IDLTopLevelDeclaration {
         typeReference = TypeVisitor().visit(ctx)
+        return defaultResult()
+    }
+
+    override fun visitCallbackRestOrInterface(ctx: WebIDLParser.CallbackRestOrInterfaceContext): IDLTopLevelDeclaration {
+        isCallback = true
+        visitChildren(ctx)
         return defaultResult()
     }
 
