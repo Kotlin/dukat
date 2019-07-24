@@ -16,8 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open fun bar(a: Number): Unit
+    open fun bar(a: Number)
 }
 external open class Boo : Foo {
-    open fun bar(a: String): Unit
+    open fun bar(a: String)
 }

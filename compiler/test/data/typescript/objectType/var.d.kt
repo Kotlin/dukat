@@ -28,5 +28,5 @@ external object foo {
     @nativeGetter
     operator fun get(s: String): Any?
     @nativeSetter
-    operator fun set(s: String, value: Any): Unit
+    operator fun set(s: String, value: Any)
 }

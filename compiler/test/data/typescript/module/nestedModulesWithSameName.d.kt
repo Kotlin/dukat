@@ -20,7 +20,7 @@ import org.w3c.xhr.*
 external interface A {
     fun baz()
 }
-external fun d(a: A, b: Any, c: Foo.Foo.B): Unit
+external fun d(a: A, b: Any, c: Foo.Foo.B)
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo.Foo")

@@ -18,7 +18,7 @@ import org.w3c.xhr.*
 external open class Foo {
     open fun bar(): Number
     companion object {
-        fun baz(a: Any): Unit
+        fun baz(a: Any)
         fun bar(): Number
     }
 }

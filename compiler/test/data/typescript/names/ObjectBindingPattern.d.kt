@@ -19,9 +19,9 @@ external interface `T$0` {
     var a: Any
     var s: String
 }
-external fun f4(__0: `T$0`): Unit
-external fun f5(__0: `T$0`, p: `T$0`, __2: `T$0`): Unit
+external fun f4(__0: `T$0`)
+external fun f5(__0: `T$0`, p: `T$0`, __2: `T$0`)
 external interface `T$1` {
     var mode: String /* "something" */
 }
-external fun f6(__0: `T$1`): Unit
+external fun f6(__0: `T$1`)

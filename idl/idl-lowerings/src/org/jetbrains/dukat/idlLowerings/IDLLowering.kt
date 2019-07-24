@@ -1,12 +1,24 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 
 
 interface IDLLowering {
 
     fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        return declaration
+        return declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
     }
 
     fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration): IDLAttributeDeclaration {
@@ -17,7 +29,7 @@ interface IDLLowering {
         return declaration.copy(type = lowerTypeDeclaration(declaration.type))
     }
 
-    fun lowerConstantDeclaration(declaration: IDLConstantDeclaration) : IDLConstantDeclaration {
+    fun lowerConstantDeclaration(declaration: IDLConstantDeclaration): IDLConstantDeclaration {
         return declaration.copy(type = lowerTypeDeclaration(declaration.type))
     }
 
@@ -34,6 +46,13 @@ interface IDLLowering {
 
     fun lowerTypedefDeclaration(declaration: IDLTypedefDeclaration): IDLTypedefDeclaration {
         return declaration
+    }
+
+    fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLTopLevelDeclaration {
+        return declaration.copy(
+                child = lowerTypeDeclaration(declaration.child),
+                parent = lowerTypeDeclaration(declaration.parent)
+        )
     }
 
     fun lowerDictionaryMemberDeclaration(declaration: IDLDictionaryMemberDeclaration): IDLDictionaryMemberDeclaration {
@@ -66,6 +85,7 @@ interface IDLLowering {
         return when (declaration) {
             is IDLInterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is IDLTypedefDeclaration -> lowerTypedefDeclaration(declaration)
+            is IDLImplementsStatementDeclaration -> lowerImplementStatementDeclaration(declaration)
             is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
             else -> declaration
         }

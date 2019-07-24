@@ -16,13 +16,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo {
-    open fun bar(): Unit
-    open fun bar(a: Number): Unit
+    open fun bar()
+    open fun bar(a: Number)
     open var baz: Any
 }
 external open class Boo : Foo {
-    override fun bar(): Unit
-    override fun bar(a: Number): Unit
-    open fun bar(a: String): Unit
+    override fun bar()
+    override fun bar(a: Number)
+    open fun bar(a: String)
     override var baz: Number
 }

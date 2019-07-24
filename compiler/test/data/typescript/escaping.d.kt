@@ -17,8 +17,8 @@ import org.w3c.xhr.*
 
 external var `val`: Any
 external var `$foo`: Boolean
-external fun `bar$`(`ba$z`: Number): Unit
-external fun `fun`(): Unit
+external fun `bar$`(`ba$z`: Number)
+external fun `fun`()
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
     var `string-literal`: Boolean
@@ -29,7 +29,7 @@ external interface This {
     fun `in`(`object`: Foo)
     companion object {
         var `$foo`: Boolean
-        fun `bar$`(`ba$z`: Number): Unit
+        fun `bar$`(`ba$z`: Number)
         var aaa: `when`.`interface`
         var bbb: `when`.`$foo`
     }

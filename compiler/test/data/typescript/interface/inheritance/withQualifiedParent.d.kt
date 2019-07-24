@@ -20,5 +20,5 @@ external interface SignStream : stream.Readable {
     var secret: Any
     var key: Any
     var privateKey: Any
-    var encoding: dynamic /* String | stream.Readable */ get() = definedExternally; set(value) = definedExternally
+    var encoding: dynamic /* String | stream.Readable */
 }

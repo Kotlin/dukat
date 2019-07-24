@@ -10,8 +10,8 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
-    private var name: String = ""
-    private var type: IDLTypeDeclaration = IDLTypeDeclaration("")
+    private var name : String = ""
+    private var type : IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var constValue: String? = null
     private var static: Boolean = false
@@ -25,13 +25,13 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name,
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) },
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) },
                     type
             )
             MemberKind.SETTER -> IDLSetterDeclaration(
                     name,
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) },
-                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLTypeDeclaration("")) }
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) },
+                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) }
             )
         }
     }

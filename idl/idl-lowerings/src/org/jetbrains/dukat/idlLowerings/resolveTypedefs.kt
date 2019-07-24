@@ -7,20 +7,22 @@ import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 private class TypedefResolver(val context: TypedefContext) : IDLLowering {
 
     override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        val newType = context.resolveType(declaration)
-        return newType ?: declaration
+        return declaration.copy(
+                typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) },
+                name = context.resolveType(declaration) ?: declaration.name
+        )
     }
 
 }
 
 private class TypedefContext : IDLLowering {
-    private val typedefs: MutableMap<String, IDLTypeDeclaration> = mutableMapOf()
+    private val typedefs: MutableMap<String, String> = mutableMapOf()
 
     fun registerTypedef(declaration: IDLTypedefDeclaration) {
-        typedefs[declaration.name] = declaration.typeReference
+        typedefs[declaration.name] = declaration.typeReference.name
     }
 
-    fun resolveType(declaration: IDLTypeDeclaration): IDLTypeDeclaration? {
+    fun resolveType(declaration: IDLTypeDeclaration): String? {
         return typedefs[declaration.name]
     }
 

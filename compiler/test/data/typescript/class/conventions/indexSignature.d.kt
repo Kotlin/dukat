@@ -19,7 +19,7 @@ external object foo {
     @nativeGetter
     operator fun get(someKey: String): Number?
     @nativeSetter
-    operator fun set(someKey: String, value: Number): Unit
+    operator fun set(someKey: String, value: Number)
 }
 external interface `T$0` {
     @nativeGetter
@@ -37,12 +37,12 @@ external open class Foo {
     @nativeGetter
     open operator fun get(n: Number): Bar?
     @nativeSetter
-    open operator fun set(n: Number, value: Bar): Unit
+    open operator fun set(n: Number, value: Bar)
     @nativeGetter
     open operator fun get(s: String): dynamic /* String | Array<String> */
     @nativeSetter
-    open operator fun set(s: String, value: String): Unit
+    open operator fun set(s: String, value: String)
     @nativeSetter
-    open operator fun set(s: String, value: Array<String>): Unit
+    open operator fun set(s: String, value: Array<String>)
     open var props: `T$1`
 }

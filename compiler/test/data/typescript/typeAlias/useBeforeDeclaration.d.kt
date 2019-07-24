@@ -38,7 +38,7 @@ import org.w3c.xhr.*
 
 external interface List<T>
 external var listOfString: Values<String>
-external fun listOfNumberFunction(a: Values<Number>): Unit
+external fun listOfNumberFunction(a: Values<Number>)
 typealias Values<V> = List<V>
 
 // ------------------------------------------------------------------------------------------
@@ -62,6 +62,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var listOfString: Values<String>
-external fun listOfNumberFunction(a: Values<Number>): Unit
+external fun listOfNumberFunction(a: Values<Number>)
 external var myVar: Value
-external fun myFunction(a: Value): Unit
+external fun myFunction(a: Value)

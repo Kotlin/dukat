@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external open class Foo {
     companion object {
-        fun methodWithOutArgs(): Unit
+        fun methodWithOutArgs()
         fun methodWithString(s: String): String
         fun methodWithManyArgs(n: Number, settings: Bar): Boolean
     }
