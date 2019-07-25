@@ -70,8 +70,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                         operations.filterNot { it.static }.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = constants.mapNotNull { it.process() } +
-                                operations.filter { it.static }.mapNotNull { it.process() } +
+                        members = operations.filter { it.static }.mapNotNull { it.process() } +
                                 attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
@@ -94,8 +93,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
                         constructors.mapNotNull { it.process() },
                 companionObject = CompanionObjectModel(
                         name = "",
-                        members = constants.mapNotNull { it.process() } +
-                                operations.filter { it.static }.mapNotNull { it.process() } +
+                        members = operations.filter { it.static }.mapNotNull { it.process() } +
                                 attributes.filter { it.static }.mapNotNull { it.process() },
                         parentEntities = listOf()
                 ),
@@ -252,16 +250,6 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 parameters = arguments.map { it.process() },
                 typeParameters = listOf(),
                 generated = false
-        )
-        is IDLConstantDeclaration -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.process(),
-                typeParameters = listOf(),
-                static = false,
-                override = false,
-                getter = true,
-                setter = false,
-                open = false
         )
         is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),

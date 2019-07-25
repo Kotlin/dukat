@@ -21,7 +21,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return when (kind) {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
-            MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
+            MemberKind.CONSTANT -> IDLAttributeDeclaration(name, type, static = true, readOnly = true)
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
         }
     }

@@ -2,7 +2,6 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
@@ -26,10 +25,6 @@ interface IDLLowering {
     }
 
     fun lowerArgumentDeclaration(declaration: IDLArgumentDeclaration): IDLArgumentDeclaration {
-        return declaration.copy(type = lowerTypeDeclaration(declaration.type))
-    }
-
-    fun lowerConstantDeclaration(declaration: IDLConstantDeclaration): IDLConstantDeclaration {
         return declaration.copy(type = lowerTypeDeclaration(declaration.type))
     }
 
@@ -71,7 +66,6 @@ interface IDLLowering {
                 attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
-                constants = declaration.constants.map { lowerConstantDeclaration(it) },
                 parents = declaration.parents.map { lowerTypeDeclaration(it) },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
