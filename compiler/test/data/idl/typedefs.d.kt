@@ -10,4 +10,7 @@ external abstract class A {
 }
 external abstract class B : A {
     var x: A<Int>
+    companion object {
+        val y: Int
+    }
 }

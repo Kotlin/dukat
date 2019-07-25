@@ -2,7 +2,7 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.*
 
-private class OverrideResolver(val context: OverrideContext) : IDLLowering {
+private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowering {
 
     fun getAllParents(declaration: IDLInterfaceDeclaration): List<IDLInterfaceDeclaration> {
         val firstLevelParents = declaration.parents.mapNotNull { context.resolveInterface(it.name) }
@@ -26,29 +26,34 @@ private class OverrideResolver(val context: OverrideContext) : IDLLowering {
                 !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
     }
 
+    private fun IDLInterfaceDeclaration.isInterface(): Boolean {
+        return IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject") in extendedAttributes
+    }
+
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        if (IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject") in declaration.extendedAttributes
-                || declaration.constructors.isEmpty()) {
-            //if this is interface or abstract class, it should not implement parent members
-            return declaration
-        }
         val allParents = getAllParents(declaration)
-        val interfaceParents = allParents.filter {
-            IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject") in it.extendedAttributes
-        }
         val newAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val newOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
-        for (parent in interfaceParents) {
+        for (parent in allParents) {
             for (parentOperation in parent.operations) {
-                if (declaration.operations.none { it.isOverriding(parentOperation) }) {
-                    newOperations += parentOperation
+                if (parentOperation.static || parent.isInterface()) {
+                    if (declaration.operations.none { it.isOverriding(parentOperation) }) {
+                        newOperations += parentOperation
+                    }
                 }
             }
             for (parentAttribute in parent.attributes) {
-                if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
-                    newAttributes += parentAttribute
+                if (parentAttribute.static || parent.isInterface()) {
+                    if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
+                        newAttributes += parentAttribute
+                    }
                 }
             }
+        }
+        if (declaration.isInterface() ||
+                (declaration.constructors.isEmpty() && declaration.primaryConstructor == null)) {
+            newAttributes.removeIf { !it.static }
+            newOperations.removeIf { !it.static }
         }
         return declaration.copy(
                 attributes = declaration.attributes + newAttributes,
@@ -61,7 +66,7 @@ private class OverrideResolver(val context: OverrideContext) : IDLLowering {
     }
 }
 
-private class OverrideContext : IDLLowering {
+private class MissingMemberContext : IDLLowering {
     private val interfaces: MutableMap<String, IDLInterfaceDeclaration> = mutableMapOf()
     private val dictionaries: MutableMap<String, IDLDictionaryDeclaration> = mutableMapOf()
 
@@ -80,9 +85,9 @@ private class OverrideContext : IDLLowering {
     fun resolveClass(name: String): IDLDictionaryDeclaration? = dictionaries[name]
 }
 
-fun IDLFileDeclaration.resolveOverrides(): IDLFileDeclaration {
-    val context = OverrideContext()
-    return OverrideResolver(context).lowerFileDeclaration(
+fun IDLFileDeclaration.addMissingMembers(): IDLFileDeclaration {
+    val context = MissingMemberContext()
+    return MissingMemberResolver(context).lowerFileDeclaration(
             context.lowerFileDeclaration(this)
     )
 
