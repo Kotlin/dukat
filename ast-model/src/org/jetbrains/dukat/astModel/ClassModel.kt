@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 data class ClassModel(
         override val name: NameEntity,
         override var members: List<MemberModel>,
-        override val companionObject: CompanionObjectModel,
+        override val companionObject: CompanionObjectModel?,
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,

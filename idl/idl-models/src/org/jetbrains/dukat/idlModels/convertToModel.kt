@@ -139,50 +139,48 @@ fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
+    val dynamicMemberModels = (attributes.filterNot { it.static } +
+            operations.filterNot { it.static } +
+            constructors).mapNotNull { it.process() }
+    val staticMemberModels = (constants +
+            operations.filter { it.static } +
+            attributes.filter { it.static }).mapNotNull { it.process() }
+
+    val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
+        CompanionObjectModel(
+                name = "",
+                members = staticMemberModels,
+                parentEntities = listOf()
+        )
+    } else {
+        null
+    }
+
+    val parentModels = parents.map {
+        HeritageModel(
+                it.process(),
+                listOf(),
+                null
+        )
+    }
+
     val declaration = if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
-                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
-                        operations.filterNot { it.static }.mapNotNull { it.process() },
-                companionObject = CompanionObjectModel(
-                        name = "",
-                        members = constants.mapNotNull { it.process() } +
-                                operations.filter { it.static }.mapNotNull { it.process() } +
-                                attributes.filter { it.static }.mapNotNull { it.process() },
-                        parentEntities = listOf()
-                ),
+                members = dynamicMemberModels,
+                companionObject = companionObjectModel,
                 typeParameters = listOf(),
-                parentEntities = parents.map {
-                    HeritageModel(
-                            it.process(),
-                            listOf(),
-                            null
-                    )
-                },
+                parentEntities = parentModels,
                 annotations = mutableListOf(),
                 external = true
         )
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
-                        operations.filterNot { it.static }.mapNotNull { it.process() } +
-                        constructors.mapNotNull { it.process() },
-                companionObject = CompanionObjectModel(
-                        name = "",
-                        members = constants.mapNotNull { it.process() } +
-                                operations.filter { it.static }.mapNotNull { it.process() } +
-                                attributes.filter { it.static }.mapNotNull { it.process() },
-                        parentEntities = listOf()
-                ),
+                members = dynamicMemberModels,
+                companionObject = companionObjectModel,
                 typeParameters = listOf(),
-                parentEntities = parents.map {
-                    HeritageModel(
-                            it.process(),
-                            listOf(),
-                            null
-                    )
-                },
+                parentEntities = parentModels,
                 primaryConstructor = if (primaryConstructor != null) {
                     primaryConstructor!!.process() as ConstructorModel
                 } else {
@@ -256,11 +254,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
             members = members.mapNotNull { it.process() },
-            companionObject = CompanionObjectModel(
-                    name = "",
-                    members = listOf(),
-                    parentEntities = listOf()
-            ),
+            companionObject = null,
             typeParameters = listOf(),
             parentEntities = parents.map {
                 HeritageModel(
@@ -308,7 +302,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             annotations = mutableListOf(),
             external = true
     )
-    val generatedVariables = members.map {memberName ->
+    val generatedVariables = members.map { memberName ->
         VariableModel(
                 name = IdentifierEntity(memberName.toUpperCase()),
                 type = TypeValueModel(

@@ -290,11 +290,15 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
     return ClassModel(
             name = name,
             members = membersSplitted.dynamic,
-            companionObject = CompanionObjectModel(
-                    "",
-                    membersSplitted.static,
-                    emptyList()
-            ),
+            companionObject = if (membersSplitted.static.isNotEmpty()) {
+                CompanionObjectModel(
+                        "",
+                        membersSplitted.static,
+                        emptyList()
+                )
+            } else {
+                null
+            },
             primaryConstructor = if (primaryConstructor != null) {
                 ConstructorModel(
                         parameters = primaryConstructor!!.parameters.map { param -> param.process() },
@@ -338,11 +342,15 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     return InterfaceModel(
             name = name,
             members = membersSplitted.dynamic,
-            companionObject = CompanionObjectModel(
-                    "",
-                    membersSplitted.static,
-                    emptyList()
-            ),
+            companionObject = if (membersSplitted.static.isNotEmpty()) {
+                CompanionObjectModel(
+                        "",
+                        membersSplitted.static,
+                        emptyList()
+                )
+            } else {
+                null
+            },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
                         name = typeParam.value,
