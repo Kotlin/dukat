@@ -174,7 +174,7 @@ fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
 fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
-            members = members.mapNotNull { it.process() },
+            members = members.filterNot { it.inherited }.mapNotNull { it.process() },
             companionObject = CompanionObjectModel(
                     name = "",
                     members = listOf(),

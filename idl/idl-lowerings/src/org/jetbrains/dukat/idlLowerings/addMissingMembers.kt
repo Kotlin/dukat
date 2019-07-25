@@ -4,18 +4,26 @@ import org.jetbrains.dukat.idlDeclarations.*
 
 private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowering {
 
-    fun getAllParents(declaration: IDLInterfaceDeclaration): List<IDLInterfaceDeclaration> {
+    fun getAllInterfaceParents(declaration: IDLInterfaceDeclaration): List<IDLInterfaceDeclaration> {
         val firstLevelParents = declaration.parents.mapNotNull { context.resolveInterface(it.name) }
-        return firstLevelParents + firstLevelParents.flatMap { getAllParents(it) }
+        return firstLevelParents + firstLevelParents.flatMap { getAllInterfaceParents(it) }
+    }
+
+    fun getAllDictionaryParents(declaration: IDLDictionaryDeclaration): List<IDLDictionaryDeclaration> {
+        val firstLevelParents = declaration.parents.mapNotNull { context.resolveDictionary(it.name) }
+        return firstLevelParents + firstLevelParents.flatMap { getAllDictionaryParents(it) }
     }
 
     fun IDLTypeDeclaration.isOverriding(parentType: IDLTypeDeclaration): Boolean {
         return this == parentType
     }
 
+    fun IDLDictionaryMemberDeclaration.isOverriding(parentMember: IDLDictionaryMemberDeclaration): Boolean {
+        return name == parentMember.name
+    }
+
     fun IDLAttributeDeclaration.isOverriding(parentMember: IDLAttributeDeclaration): Boolean {
         return name == parentMember.name &&
-                type.isOverriding(parentMember.type) &&
                 static == parentMember.static
     }
 
@@ -31,7 +39,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
     }
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        val allParents = getAllParents(declaration)
+        val allParents = getAllInterfaceParents(declaration)
         val newAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val newOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         for (parent in allParents) {
@@ -62,7 +70,18 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
-        return declaration
+        val allParents = getAllDictionaryParents(declaration)
+        val newMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
+        for (parent in allParents) {
+            for (parentMember in parent.members) {
+                if (declaration.members.none { it.isOverriding(parentMember) }) {
+                    newMembers += parentMember
+                }
+            }
+        }
+        return declaration.copy(
+                members = declaration.members + newMembers.map { it.copy(inherited = true) }
+        )
     }
 }
 
@@ -82,7 +101,7 @@ private class MissingMemberContext : IDLLowering {
 
     fun resolveInterface(name: String): IDLInterfaceDeclaration? = interfaces[name]
 
-    fun resolveClass(name: String): IDLDictionaryDeclaration? = dictionaries[name]
+    fun resolveDictionary(name: String): IDLDictionaryDeclaration? = dictionaries[name]
 }
 
 fun IDLFileDeclaration.addMissingMembers(): IDLFileDeclaration {
