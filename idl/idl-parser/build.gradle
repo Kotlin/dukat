@@ -26,6 +26,7 @@ dependencies {
 
     implementation(project(":idl-declarations"))
     implementation(project(":ast-common"))
+    implementation(project(":translator-string"))
 
     runtime files(project.sourceSets.generated.output.classesDirs)
 }

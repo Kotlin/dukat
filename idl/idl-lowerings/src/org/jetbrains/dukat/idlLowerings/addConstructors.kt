@@ -34,6 +34,6 @@ private class ConstructorLowering : IDLLowering {
     }
 }
 
-fun IDLFileDeclaration.addConstructors() : IDLFileDeclaration {
-    return ConstructorLowering().lowerFileDeclaration(this)
+fun IDLSourceSetDeclaration.addConstructors() : IDLSourceSetDeclaration {
+    return ConstructorLowering().lowerSourceSetDeclaration(this)
 }

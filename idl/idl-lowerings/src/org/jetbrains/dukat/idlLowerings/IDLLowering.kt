@@ -1,18 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.*
 
 
 interface IDLLowering {
@@ -100,6 +88,12 @@ interface IDLLowering {
     fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
         return fileDeclaration.copy(
                 declarations = lowerTopLevelDeclarations(fileDeclaration.declarations)
+        )
+    }
+
+    fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
+        return sourceSet.copy(
+                files = sourceSet.files.map { lowerFileDeclaration(it) }
         )
     }
 }

@@ -26,7 +26,9 @@ private class ImplementsStatementResolver(val context: ImplementsStatementContex
     }
 }
 
-fun IDLFileDeclaration.resolveImplementsStatemets(): IDLFileDeclaration {
+fun IDLSourceSetDeclaration.resolveImplementsStatemets(): IDLSourceSetDeclaration {
     val context = ImplementsStatementContext()
-    return ImplementsStatementResolver(context).lowerFileDeclaration(context.lowerFileDeclaration(this))
+    return ImplementsStatementResolver(context).lowerSourceSetDeclaration(
+            context.lowerSourceSetDeclaration(this)
+    )
 }

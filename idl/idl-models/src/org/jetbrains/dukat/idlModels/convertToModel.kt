@@ -277,7 +277,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
     }
 }
 
-fun IDLFileDeclaration.process(): SourceSetModel {
+fun IDLFileDeclaration.process(): SourceFileModel {
     val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
@@ -289,12 +289,16 @@ fun IDLFileDeclaration.process(): SourceSetModel {
             imports = mutableListOf()
     )
 
-    val source = SourceFileModel(
+    return SourceFileModel(
             name = null,
             fileName = File(fileName).normalize().absolutePath,
             root = module,
             referencedFiles = listOf()
     )
+}
 
-    return SourceSetModel(listOf(source))
+fun IDLSourceSetDeclaration.process(): SourceSetModel {
+    return SourceSetModel(
+            sources = files.map { it.process() }
+    )
 }
