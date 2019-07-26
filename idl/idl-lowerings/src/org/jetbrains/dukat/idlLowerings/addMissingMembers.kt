@@ -15,7 +15,18 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
     }
 
     fun IDLTypeDeclaration.isOverriding(parentType: IDLTypeDeclaration): Boolean {
-        return this == parentType
+        if (this == parentType) {
+            return true
+        }
+        val classLike = context.resolveInterface(name)
+                ?: context.resolveDictionary(name)
+        val parentClassLike = context.resolveInterface(parentType.name)
+                ?: context.resolveDictionary(parentType.name)
+        return when (classLike) {
+            is IDLInterfaceDeclaration -> parentClassLike in getAllInterfaceParents(classLike)
+            is IDLDictionaryDeclaration -> parentClassLike in getAllDictionaryParents(classLike)
+            else -> false
+        }
     }
 
     fun IDLDictionaryMemberDeclaration.isOverriding(parentMember: IDLDictionaryMemberDeclaration): Boolean {

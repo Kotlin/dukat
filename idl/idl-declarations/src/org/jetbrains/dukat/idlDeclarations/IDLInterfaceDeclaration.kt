@@ -8,4 +8,4 @@ data class IDLInterfaceDeclaration(
         val constructors: List<IDLConstructorDeclaration>,
         val parents: List<IDLTypeDeclaration>,
         val extendedAttributes: List<IDLExtendedAttributeDeclaration>
-) : IDLTopLevelDeclaration
+) : IDLClassLikeDeclaration
