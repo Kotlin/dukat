@@ -91,6 +91,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitStringifier(ctx: WebIDLParser.StringifierContext): IDLTopLevelDeclaration {
+        when (val stringifier = MemberVisitor().visit(ctx)) {
+            is IDLOperationDeclaration -> operations.add(stringifier)
+            is IDLAttributeDeclaration -> myAttributes.add(stringifier)
+        }
+        return defaultResult()
+    }
+
     override fun visitOperation(ctx: WebIDLParser.OperationContext): IDLTopLevelDeclaration {
         operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
         return defaultResult()
