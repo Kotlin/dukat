@@ -56,7 +56,14 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process(),
-            initializer = null,
+            initializer = if (optional) {
+                StatementCallModel(
+                        IdentifierEntity("definedExternally"),
+                        null
+                )
+            } else {
+                null
+            },
             vararg = false,
             optional = false
     )
