@@ -1,6 +1,9 @@
 package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.CompanionObjectModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -281,12 +284,12 @@ fun IDLFileDeclaration.process(): SourceFileModel {
     val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
-            name = ROOT_PACKAGENAME,
-            shortName = ROOT_PACKAGENAME,
+            name = packageName ?: ROOT_PACKAGENAME,
+            shortName = packageName?.rightMost() ?: ROOT_PACKAGENAME,
             declarations = modelDeclarations,
             annotations = mutableListOf(),
             submodules = listOf(),
-            imports = mutableListOf()
+            imports = mutableListOf("kotlin.js.*".toNameEntity())
     )
 
     return SourceFileModel(
