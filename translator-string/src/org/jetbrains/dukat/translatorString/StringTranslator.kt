@@ -35,11 +35,7 @@ const val FORMAT_TAB = "    "
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
-        if (this.startsWith("=")) {
-            " /*${this}*/"
-        } else {
-            " /* ${this} */"
-        }
+        " /* ${this} */"
     } else {
         ""
     }

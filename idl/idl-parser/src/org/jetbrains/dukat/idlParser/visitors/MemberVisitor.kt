@@ -22,7 +22,11 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
-            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
+            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(
+                    name,
+                    type.changeComment("= $constValue"),
+                    constValue
+            )
         }
     }
 

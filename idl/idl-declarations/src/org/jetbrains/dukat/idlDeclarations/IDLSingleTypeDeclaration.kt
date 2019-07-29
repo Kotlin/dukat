@@ -3,7 +3,8 @@ package org.jetbrains.dukat.idlDeclarations
 data class IDLSingleTypeDeclaration(
         override val name: String,
         val typeParameter: IDLTypeDeclaration?,
-        override val nullable: Boolean
+        override val nullable: Boolean,
+        override val comment: String? = null
 ) : IDLTypeDeclaration
 
 fun IDLSingleTypeDeclaration.isPrimitive(): Boolean {

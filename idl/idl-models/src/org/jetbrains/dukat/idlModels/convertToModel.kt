@@ -42,7 +42,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 else -> name
             }),
             params = listOfNotNull(typeParameter?.process()),
-            metaDescription = null
+            metaDescription = comment
     )
     return typeModel.copy(
             nullable = when (typeModel.value) {
@@ -57,7 +57,7 @@ fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
     return FunctionTypeModel(
             parameters = arguments.map {it.process()},
             type = returnType.process()!!,
-            metaDescription = null,
+            metaDescription = comment,
             nullable = nullable
     )
 }
@@ -141,7 +141,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
 fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
-            type = type.toNullable().process()!!,
+            type = type.toNullable().changeComment(null).process()!!,
             initializer = if (defaultValue != null) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
