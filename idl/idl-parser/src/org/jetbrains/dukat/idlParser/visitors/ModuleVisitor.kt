@@ -12,7 +12,7 @@ internal class ModuleVisitor(private val fileName: String) : WebIDLBaseVisitor<I
     private var extendedAttributes: MutableList<IDLExtendedAttributeDeclaration> = mutableListOf()
     private val declarations: MutableList<IDLTopLevelDeclaration> = mutableListOf()
 
-    override fun defaultResult() = IDLFileDeclaration(fileName, declarations)
+    override fun defaultResult() = IDLFileDeclaration(fileName, declarations, listOf())
 
     override fun visitDefinition(ctx: WebIDLParser.DefinitionContext?) : IDLFileDeclaration {
         declarations.add(DefinitionVisitor(extendedAttributes).visitDefinition(ctx))

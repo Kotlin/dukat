@@ -17,7 +17,9 @@ fun parseIDL(mainFileName: String, referencesResolver: IdlReferencesResolver): I
                 val parser = WebIDLParser(CommonTokenStream(lexer))
                 val idl = parser.webIDL()
 
-                ModuleVisitor(fileName).visit(idl)
+                ModuleVisitor(fileName).visit(idl).copy(
+                        referencedFiles = referencesResolver.resolveReferences(fileName)
+                )
             }
     )
 }

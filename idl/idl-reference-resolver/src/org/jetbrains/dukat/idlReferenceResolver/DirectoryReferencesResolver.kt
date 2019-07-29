@@ -8,7 +8,7 @@ class DirectoryReferencesResolver : IdlReferencesResolver {
 
     override fun resolveReferences(fileName: String): List<String> {
         val directory = File(fileName).parentFile
-        return directory.listFiles()?.filter {
+        return directory.listFiles()?.map { it.canonicalFile }?.filter {
             it.isFile &&
                     (it.name.endsWith(WEBIDL_DECLARATION_EXTENSION)
                             || it.name.endsWith(IDL_DECLARATION_EXTENSION)) &&

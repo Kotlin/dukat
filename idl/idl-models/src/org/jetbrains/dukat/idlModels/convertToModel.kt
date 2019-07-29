@@ -293,7 +293,7 @@ fun IDLFileDeclaration.process(): SourceFileModel {
             name = null,
             fileName = File(fileName).normalize().absolutePath,
             root = module,
-            referencedFiles = listOf()
+            referencedFiles = referencedFiles
     )
 }
 

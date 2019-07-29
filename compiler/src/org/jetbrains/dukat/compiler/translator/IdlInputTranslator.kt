@@ -4,6 +4,7 @@ import org.jetbrains.dukat.idlModels.process
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
+import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatemets
 import org.jetbrains.dukat.idlLowerings.resolveTypedefs
 import org.jetbrains.dukat.idlParser.parseIDL
@@ -19,6 +20,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .resolveImplementsStatemets()
                 .process()
                 .lowerOverrides()
+                .addImportsForReferencedFiles()
     }
 
 }
