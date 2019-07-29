@@ -19,7 +19,7 @@ abstract class OutputTests {
         }
     }
 
-    private fun concatenate(translated: List<TranslationUnitResult>): String {
+    open fun concatenate(translated: List<TranslationUnitResult>): String {
 
         val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
 

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.tests.core
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
+import org.jetbrains.dukat.idlReferenceResolver.EmptyReferencesResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
@@ -28,7 +29,7 @@ class IdlTests : OutputTests() {
             return fileSetWithDescriptors("./test/data/idl")
         }
 
-        val translator: InputTranslator = IdlInputTranslator()
+        val translator: InputTranslator = IdlInputTranslator(EmptyReferencesResolver())
     }
 
 }

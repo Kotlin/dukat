@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":idl-declarations"))
     implementation(project(":idl-models"))
     implementation(project(":idl-parser"))
+    implementation(project(":idl-reference-resolver"))
     implementation(project(":interop-graal"))
     implementation(project(":itertools"))
     implementation(project(":logging"))

@@ -46,6 +46,7 @@ include 'idl-declarations'
 include 'idl-lowerings'
 include 'idl-models'
 include 'idl-parser'
+include 'idl-reference-resolver'
 include 'itertools'
 include 'interop'
 include 'interop-graal'
@@ -67,6 +68,7 @@ project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
+project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
 project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
 
