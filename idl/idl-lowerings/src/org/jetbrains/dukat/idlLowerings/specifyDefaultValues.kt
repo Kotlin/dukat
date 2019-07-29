@@ -1,0 +1,52 @@
+package org.jetbrains.dukat.idlLowerings
+
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.changeComment
+import java.math.BigInteger
+
+private class DefaultValueSpecifier : IDLLowering {
+
+    private fun toBigInteger(string: String): BigInteger {
+        return if (string.startsWith("0x")) {
+            BigInteger(string.substring(2), 16)
+        } else {
+            BigInteger(string)
+        }
+    }
+
+    private fun IDLDictionaryMemberDeclaration.specifyDefaultValue(): String? {
+        if (defaultValue == null || this.type !is IDLSingleTypeDeclaration) {
+            return defaultValue
+        }
+        return when (this.type.name) {
+            "float", "unrestrictedfloat" -> "${defaultValue}f"
+            "double", "unrestricteddouble" -> if (defaultValue!!.matches("[0-9]+".toRegex())) {
+                "${defaultValue}.0"
+            } else {
+                defaultValue
+            }
+            "unsignedlong", "longlong", "unsignedlonglong" -> if (
+                    defaultValue!!.toBigInteger() > BigInteger.valueOf(Int.MAX_VALUE.toLong()) ||
+                    defaultValue!!.toBigInteger() < BigInteger.valueOf(Int.MIN_VALUE.toLong())) {
+                "definedExternally"
+            } else {
+                defaultValue
+            }
+            else -> defaultValue
+        }
+    }
+
+    override fun lowerDictionaryMemberDeclaration(declaration: IDLDictionaryMemberDeclaration): IDLDictionaryMemberDeclaration {
+        val specifiedDefaultValue = declaration.specifyDefaultValue()
+        return declaration.copy(
+                defaultValue = specifiedDefaultValue,
+                type = declaration.type.changeComment("= $specifiedDefaultValue")
+        )
+    }
+}
+
+fun IDLFileDeclaration.specifyDefaultValues(): IDLFileDeclaration {
+    return DefaultValueSpecifier().lowerFileDeclaration(this)
+}

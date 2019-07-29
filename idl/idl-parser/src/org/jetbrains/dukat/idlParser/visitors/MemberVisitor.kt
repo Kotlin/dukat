@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 import org.jetbrains.dukat.idlParser.getNameOrNull
 
@@ -22,11 +23,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
-            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(
-                    name,
-                    type.changeComment("= $constValue"),
-                    constValue
-            )
+            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
         }
     }
 
@@ -88,6 +85,15 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
                 return node.text
             }
         }.visit(ctx)
+        return defaultResult()
+    }
+
+    override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLMemberDeclaration {
+        when (ctx.getFirstValueOrNull()) {
+            "[" -> constValue = "[]"
+            null -> visitChildren(ctx)
+            else -> constValue = ctx.getFirstValueOrNull()
+        }
         return defaultResult()
     }
 

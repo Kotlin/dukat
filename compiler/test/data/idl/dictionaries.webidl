@@ -9,6 +9,19 @@ dictionary WebGLContextAttributes {
     boolean failIfMajorPerformanceCaveat = false;
 };
 
+dictionary PointerEventInit : MouseEventInit {
+    long pointerId = 0;
+    double width = 1;
+    double height = 1;
+    float pressure = 0;
+    float tangentialPressure = 0;
+    long tiltX = 0;
+    long tiltY = 0;
+    long twist = 0;
+    DOMString pointerType = "";
+    boolean isPrimary = false;
+};
+
 interface A {
     attribute WebGLContextAttributes attributes;
 };
