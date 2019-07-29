@@ -139,9 +139,9 @@ fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
-    val dynamicMemberModels = (attributes.filterNot { it.static } +
-            operations.filterNot { it.static } +
-            constructors).mapNotNull { it.process() }
+    val dynamicMemberModels = (constructors +
+            attributes.filterNot { it.static } +
+            operations.filterNot { it.static }).mapNotNull { it.process() }
     val staticMemberModels = (constants +
             operations.filter { it.static } +
             attributes.filter { it.static }).mapNotNull { it.process() }
