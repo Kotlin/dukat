@@ -93,8 +93,8 @@ private class TypeResolver : IDLLowering {
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
         file = fileDeclaration
-        val newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
-        return newFileDeclaration.copy(
+        var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
+        newFileDeclaration = newFileDeclaration.copy(
                 declarations = newFileDeclaration.declarations + resolvedUnionTypes.map {
                     IDLInterfaceDeclaration(
                             name = it,
@@ -112,6 +112,8 @@ private class TypeResolver : IDLLowering {
                     )
                 }
         )
+        resolvedUnionTypes.clear()
+        return newFileDeclaration
     }
 }
 
