@@ -24,20 +24,16 @@ class Idl2KtTests : OutputTests() {
         assertContentEquals(name, tsPath, ktPath)
     }
 
-    override fun concatenate(translated: List<TranslationUnitResult>): String {
+    override fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
 
         val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
 
         if (failedTranslations.isNotEmpty()) {
             throw Exception("translation failed")
         }
-
         val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
-        return if (units.isEmpty()) {
-            "// NO DECLARATIONS"
-        } else {
-            units[0].content
-        }
+        return units.find { File(it.fileName).canonicalFile == File(fileName).canonicalFile }?.
+                content ?: "//NO DECLARATIONS"
     }
 
     override fun getTranslator(): InputTranslator = translator

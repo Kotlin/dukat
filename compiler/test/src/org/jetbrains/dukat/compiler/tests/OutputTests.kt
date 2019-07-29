@@ -19,7 +19,7 @@ abstract class OutputTests {
         }
     }
 
-    open fun concatenate(translated: List<TranslationUnitResult>): String {
+    open fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
 
         val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
 
@@ -49,7 +49,7 @@ abstract class OutputTests {
     }
 
     private fun output(fileName: String, translator: InputTranslator): String {
-        return concatenate(translateModule(fileName, translator))
+        return concatenate(fileName, translateModule(fileName, translator))
     }
 
 
