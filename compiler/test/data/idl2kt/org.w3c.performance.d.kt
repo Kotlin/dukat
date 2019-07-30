@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.performance
 
@@ -27,9 +19,6 @@ import org.w3c.notifications.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [Performance](https://developer.mozilla.org/en/docs/Web/API/Performance) to Kotlin
- */
 external abstract class Performance : EventTarget {
     open val timing: PerformanceTiming
     open val navigation: PerformanceNavigation
@@ -40,9 +29,6 @@ external interface GlobalPerformance {
     val performance: Performance
 }
 
-/**
- * Exposes the JavaScript [PerformanceTiming](https://developer.mozilla.org/en/docs/Web/API/PerformanceTiming) to Kotlin
- */
 external abstract class PerformanceTiming {
     open val navigationStart: Int
     open val unloadEventStart: Int
@@ -67,9 +53,6 @@ external abstract class PerformanceTiming {
     open val loadEventEnd: Int
 }
 
-/**
- * Exposes the JavaScript [PerformanceNavigation](https://developer.mozilla.org/en/docs/Web/API/PerformanceNavigation) to Kotlin
- */
 external abstract class PerformanceNavigation {
     open val type: Short
     open val redirectCount: Short

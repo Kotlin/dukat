@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom.url
 
@@ -27,9 +19,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [URL](https://developer.mozilla.org/en/docs/Web/API/URL) to Kotlin
- */
 external open class URL(url: String, base: String = definedExternally) {
     var href: String
     open val origin: String
@@ -53,9 +42,6 @@ external open class URL(url: String, base: String = definedExternally) {
     }
 }
 
-/**
- * Exposes the JavaScript [URLSearchParams](https://developer.mozilla.org/en/docs/Web/API/URLSearchParams) to Kotlin
- */
 external open class URLSearchParams(init: dynamic = definedExternally) {
     fun append(name: String, value: String)
     fun delete(name: String)

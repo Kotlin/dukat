@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.fetch
 
@@ -27,9 +19,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [Headers](https://developer.mozilla.org/en/docs/Web/API/Headers) to Kotlin
- */
 external open class Headers(init: dynamic = definedExternally) {
     fun append(name: String, value: String)
     fun delete(name: String)
@@ -38,9 +27,6 @@ external open class Headers(init: dynamic = definedExternally) {
     fun set(name: String, value: String)
 }
 
-/**
- * Exposes the JavaScript [Body](https://developer.mozilla.org/en/docs/Web/API/Body) to Kotlin
- */
 external interface Body {
     val bodyUsed: Boolean
     fun arrayBuffer(): Promise<ArrayBuffer>
@@ -50,9 +36,6 @@ external interface Body {
     fun text(): Promise<String>
 }
 
-/**
- * Exposes the JavaScript [Request](https://developer.mozilla.org/en/docs/Web/API/Request) to Kotlin
- */
 external open class Request(input: dynamic, init: RequestInit = definedExternally) : Body {
     open val method: String
     open val url: String
@@ -135,9 +118,6 @@ inline fun RequestInit(method: String? = undefined, headers: dynamic = undefined
     return o
 }
 
-/**
- * Exposes the JavaScript [Response](https://developer.mozilla.org/en/docs/Web/API/Response) to Kotlin
- */
 external open class Response(body: dynamic = definedExternally, init: ResponseInit = definedExternally) : Body {
     open val type: ResponseType
     open val url: String

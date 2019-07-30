@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom.mediacapture
 
@@ -27,9 +19,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [MediaStream](https://developer.mozilla.org/en/docs/Web/API/MediaStream) to Kotlin
- */
 external open class MediaStream() : EventTarget {
     constructor(stream: MediaStream)
     constructor(tracks: Array<MediaStreamTrack>)
@@ -46,9 +35,6 @@ external open class MediaStream() : EventTarget {
     fun clone(): MediaStream
 }
 
-/**
- * Exposes the JavaScript [MediaStreamTrack](https://developer.mozilla.org/en/docs/Web/API/MediaStreamTrack) to Kotlin
- */
 external abstract class MediaStreamTrack : EventTarget {
     open val kind: String
     open val id: String
@@ -68,9 +54,6 @@ external abstract class MediaStreamTrack : EventTarget {
     fun applyConstraints(constraints: MediaTrackConstraints = definedExternally): Promise<Unit>
 }
 
-/**
- * Exposes the JavaScript [MediaTrackSupportedConstraints](https://developer.mozilla.org/en/docs/Web/API/MediaTrackSupportedConstraints) to Kotlin
- */
 external interface MediaTrackSupportedConstraints {
     var width: Boolean? /* = true */
         get() = definedExternally
@@ -221,9 +204,6 @@ inline fun MediaTrackCapabilities(width: ULongRange? = undefined, height: ULongR
     return o
 }
 
-/**
- * Exposes the JavaScript [MediaTrackConstraints](https://developer.mozilla.org/en/docs/Web/API/MediaTrackConstraints) to Kotlin
- */
 external interface MediaTrackConstraints : MediaTrackConstraintSet {
     var advanced: Array<MediaTrackConstraintSet>?
         get() = definedExternally
@@ -330,9 +310,6 @@ inline fun MediaTrackConstraintSet(width: dynamic = undefined, height: dynamic =
     return o
 }
 
-/**
- * Exposes the JavaScript [MediaTrackSettings](https://developer.mozilla.org/en/docs/Web/API/MediaTrackSettings) to Kotlin
- */
 external interface MediaTrackSettings {
     var width: Int?
         get() = definedExternally
@@ -408,9 +385,6 @@ inline fun MediaTrackSettings(width: Int? = undefined, height: Int? = undefined,
     return o
 }
 
-/**
- * Exposes the JavaScript [MediaStreamTrackEvent](https://developer.mozilla.org/en/docs/Web/API/MediaStreamTrackEvent) to Kotlin
- */
 external open class MediaStreamTrackEvent(type: String, eventInitDict: MediaStreamTrackEventInit) : Event {
     open val track: MediaStreamTrack
 }
@@ -455,9 +429,6 @@ inline fun OverconstrainedErrorEventInit(error: dynamic = null, bubbles: Boolean
     return o
 }
 
-/**
- * Exposes the JavaScript [MediaDevices](https://developer.mozilla.org/en/docs/Web/API/MediaDevices) to Kotlin
- */
 external abstract class MediaDevices : EventTarget {
     open var ondevicechange: ((Event) -> dynamic)?
     fun enumerateDevices(): Promise<dynamic>
@@ -465,9 +436,6 @@ external abstract class MediaDevices : EventTarget {
     fun getUserMedia(constraints: MediaStreamConstraints = definedExternally): Promise<MediaStream>
 }
 
-/**
- * Exposes the JavaScript [MediaDeviceInfo](https://developer.mozilla.org/en/docs/Web/API/MediaDeviceInfo) to Kotlin
- */
 external abstract class MediaDeviceInfo {
     open val deviceId: String
     open val kind: MediaDeviceKind
@@ -480,9 +448,6 @@ external abstract class InputDeviceInfo : MediaDeviceInfo {
     fun getCapabilities(): MediaTrackCapabilities
 }
 
-/**
- * Exposes the JavaScript [MediaStreamConstraints](https://developer.mozilla.org/en/docs/Web/API/MediaStreamConstraints) to Kotlin
- */
 external interface MediaStreamConstraints {
     var video: dynamic /* = false */
         get() = definedExternally
@@ -510,9 +475,6 @@ external interface ConstrainablePattern {
     fun applyConstraints(constraints: Constraints = definedExternally): Promise<Unit>
 }
 
-/**
- * Exposes the JavaScript [DoubleRange](https://developer.mozilla.org/en/docs/Web/API/DoubleRange) to Kotlin
- */
 external interface DoubleRange {
     var max: Double?
         get() = definedExternally
@@ -593,9 +555,6 @@ inline fun ConstrainULongRange(exact: Int? = undefined, ideal: Int? = undefined,
     return o
 }
 
-/**
- * Exposes the JavaScript [ConstrainBooleanParameters](https://developer.mozilla.org/en/docs/Web/API/ConstrainBooleanParameters) to Kotlin
- */
 external interface ConstrainBooleanParameters {
     var exact: Boolean?
         get() = definedExternally
@@ -615,9 +574,6 @@ inline fun ConstrainBooleanParameters(exact: Boolean? = undefined, ideal: Boolea
     return o
 }
 
-/**
- * Exposes the JavaScript [ConstrainDOMStringParameters](https://developer.mozilla.org/en/docs/Web/API/ConstrainDOMStringParameters) to Kotlin
- */
 external interface ConstrainDOMStringParameters {
     var exact: dynamic
         get() = definedExternally

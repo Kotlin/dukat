@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom
 
@@ -27,9 +19,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [Navigator](https://developer.mozilla.org/en/docs/Web/API/Navigator) to Kotlin
- */
 external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
     open val serviceWorker: ServiceWorkerContainer
     open val maxTouchPoints: Int
@@ -39,9 +28,6 @@ external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnL
     fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
 }
 
-/**
- * Exposes the JavaScript [Document](https://developer.mozilla.org/en/docs/Web/API/Document) to Kotlin
- */
 external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
     open val fullscreenEnabled: Boolean
     open val fullscreen: Boolean
@@ -221,9 +207,6 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
 }
 @kotlin.internal.InlineOnly inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
- */
 external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
     override val performance: Performance
     open val window: Window
@@ -300,24 +283,15 @@ external abstract class HTMLAllCollection {
 //@kotlin.internal.InlineOnly inline operator fun HTMLAllCollection.get(index: Int): Element? = asDynamic()[index]
 //@kotlin.internal.InlineOnly inline operator fun HTMLAllCollection.get(name: String): UnionElementOrHTMLCollection? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [HTMLFormControlsCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection) to Kotlin
- */
 external abstract class HTMLFormControlsCollection : HTMLCollection {
 //    override fun namedItem(name: String): UnionElementOrRadioNodeList?
 }
 //@kotlin.internal.InlineOnly override inline operator fun HTMLFormControlsCollection.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [RadioNodeList](https://developer.mozilla.org/en/docs/Web/API/RadioNodeList) to Kotlin
- */
 external abstract class RadioNodeList : NodeList, UnionElementOrRadioNodeList {
     open var value: String
 }
 
-/**
- * Exposes the JavaScript [HTMLOptionsCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLOptionsCollection) to Kotlin
- */
 external abstract class HTMLOptionsCollection : HTMLCollection {
     override var length: Int
     open var selectedIndex: Int
@@ -326,9 +300,6 @@ external abstract class HTMLOptionsCollection : HTMLCollection {
 }
 @kotlin.internal.InlineOnly inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option; }
 
-/**
- * Exposes the JavaScript [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) to Kotlin
- */
 external abstract class HTMLElement : Element, ElementCSSInlineStyle, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable {
     open var title: String
     open var lang: String
@@ -355,51 +326,30 @@ external abstract class HTMLElement : Element, ElementCSSInlineStyle, GlobalEven
     fun forceSpellCheck()
 }
 
-/**
- * Exposes the JavaScript [HTMLUnknownElement](https://developer.mozilla.org/en/docs/Web/API/HTMLUnknownElement) to Kotlin
- */
 external abstract class HTMLUnknownElement : HTMLElement {
 }
 
-/**
- * Exposes the JavaScript [DOMStringMap](https://developer.mozilla.org/en/docs/Web/API/DOMStringMap) to Kotlin
- */
 external abstract class DOMStringMap {
 }
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value; }
 
-/**
- * Exposes the JavaScript [HTMLHtmlElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHtmlElement) to Kotlin
- */
 external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
 }
 
-/**
- * Exposes the JavaScript [HTMLHeadElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHeadElement) to Kotlin
- */
 external abstract class HTMLHeadElement : HTMLElement {
 }
 
-/**
- * Exposes the JavaScript [HTMLTitleElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTitleElement) to Kotlin
- */
 external abstract class HTMLTitleElement : HTMLElement {
     open var text: String
 }
 
-/**
- * Exposes the JavaScript [HTMLBaseElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBaseElement) to Kotlin
- */
 external abstract class HTMLBaseElement : HTMLElement {
     open var href: String
     open var target: String
 }
 
-/**
- * Exposes the JavaScript [HTMLLinkElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLinkElement) to Kotlin
- */
 external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var scope: String
     open var workerType: WorkerType
@@ -419,9 +369,6 @@ external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var target: String
 }
 
-/**
- * Exposes the JavaScript [HTMLMetaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMetaElement) to Kotlin
- */
 external abstract class HTMLMetaElement : HTMLElement {
     open var name: String
     open var httpEquiv: String
@@ -429,18 +376,12 @@ external abstract class HTMLMetaElement : HTMLElement {
     open var scheme: String
 }
 
-/**
- * Exposes the JavaScript [HTMLStyleElement](https://developer.mozilla.org/en/docs/Web/API/HTMLStyleElement) to Kotlin
- */
 external abstract class HTMLStyleElement : HTMLElement, LinkStyle {
     open var media: String
     open var nonce: String
     open var type: String
 }
 
-/**
- * Exposes the JavaScript [HTMLBodyElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBodyElement) to Kotlin
- */
 external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
     open var text: String
     open var link: String
@@ -450,23 +391,14 @@ external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
     open var background: String
 }
 
-/**
- * Exposes the JavaScript [HTMLHeadingElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHeadingElement) to Kotlin
- */
 external abstract class HTMLHeadingElement : HTMLElement {
     open var align: String
 }
 
-/**
- * Exposes the JavaScript [HTMLParagraphElement](https://developer.mozilla.org/en/docs/Web/API/HTMLParagraphElement) to Kotlin
- */
 external abstract class HTMLParagraphElement : HTMLElement {
     open var align: String
 }
 
-/**
- * Exposes the JavaScript [HTMLHRElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHRElement) to Kotlin
- */
 external abstract class HTMLHRElement : HTMLElement {
     open var align: String
     open var color: String
@@ -475,23 +407,14 @@ external abstract class HTMLHRElement : HTMLElement {
     open var width: String
 }
 
-/**
- * Exposes the JavaScript [HTMLPreElement](https://developer.mozilla.org/en/docs/Web/API/HTMLPreElement) to Kotlin
- */
 external abstract class HTMLPreElement : HTMLElement {
     open var width: Int
 }
 
-/**
- * Exposes the JavaScript [HTMLQuoteElement](https://developer.mozilla.org/en/docs/Web/API/HTMLQuoteElement) to Kotlin
- */
 external abstract class HTMLQuoteElement : HTMLElement {
     open var cite: String
 }
 
-/**
- * Exposes the JavaScript [HTMLOListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOListElement) to Kotlin
- */
 external abstract class HTMLOListElement : HTMLElement {
     open var reversed: Boolean
     open var start: Int
@@ -499,39 +422,24 @@ external abstract class HTMLOListElement : HTMLElement {
     open var compact: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLUListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLUListElement) to Kotlin
- */
 external abstract class HTMLUListElement : HTMLElement {
     open var compact: Boolean
     open var type: String
 }
 
-/**
- * Exposes the JavaScript [HTMLLIElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLIElement) to Kotlin
- */
 external abstract class HTMLLIElement : HTMLElement {
     open var value: Int
     open var type: String
 }
 
-/**
- * Exposes the JavaScript [HTMLDListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDListElement) to Kotlin
- */
 external abstract class HTMLDListElement : HTMLElement {
     open var compact: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLDivElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDivElement) to Kotlin
- */
 external abstract class HTMLDivElement : HTMLElement {
     open var align: String
 }
 
-/**
- * Exposes the JavaScript [HTMLAnchorElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAnchorElement) to Kotlin
- */
 external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUtils {
     open var target: String
     open var download: String
@@ -549,36 +457,21 @@ external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUti
     open var shape: String
 }
 
-/**
- * Exposes the JavaScript [HTMLDataElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDataElement) to Kotlin
- */
 external abstract class HTMLDataElement : HTMLElement {
     open var value: String
 }
 
-/**
- * Exposes the JavaScript [HTMLTimeElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTimeElement) to Kotlin
- */
 external abstract class HTMLTimeElement : HTMLElement {
     open var dateTime: String
 }
 
-/**
- * Exposes the JavaScript [HTMLSpanElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSpanElement) to Kotlin
- */
 external abstract class HTMLSpanElement : HTMLElement {
 }
 
-/**
- * Exposes the JavaScript [HTMLBRElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBRElement) to Kotlin
- */
 external abstract class HTMLBRElement : HTMLElement {
     open var clear: String
 }
 
-/**
- * Exposes the JavaScript [HTMLHyperlinkElementUtils](https://developer.mozilla.org/en/docs/Web/API/HTMLHyperlinkElementUtils) to Kotlin
- */
 external interface HTMLHyperlinkElementUtils {
     var href: String
     val origin: String
@@ -593,23 +486,14 @@ external interface HTMLHyperlinkElementUtils {
     var hash: String
 }
 
-/**
- * Exposes the JavaScript [HTMLModElement](https://developer.mozilla.org/en/docs/Web/API/HTMLModElement) to Kotlin
- */
 external abstract class HTMLModElement : HTMLElement {
     open var cite: String
     open var dateTime: String
 }
 
-/**
- * Exposes the JavaScript [HTMLPictureElement](https://developer.mozilla.org/en/docs/Web/API/HTMLPictureElement) to Kotlin
- */
 external abstract class HTMLPictureElement : HTMLElement {
 }
 
-/**
- * Exposes the JavaScript [HTMLSourceElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSourceElement) to Kotlin
- */
 external abstract class HTMLSourceElement : HTMLElement {
     open var src: String
     open var type: String
@@ -618,9 +502,6 @@ external abstract class HTMLSourceElement : HTMLElement {
     open var media: String
 }
 
-/**
- * Exposes the JavaScript [HTMLImageElement](https://developer.mozilla.org/en/docs/Web/API/HTMLImageElement) to Kotlin
- */
 external abstract class HTMLImageElement : HTMLElement, TexImageSource, HTMLOrSVGImageElement {
     open var alt: String
     open var src: String
@@ -647,9 +528,6 @@ external abstract class HTMLImageElement : HTMLElement, TexImageSource, HTMLOrSV
     open val y: Int
 }
 
-/**
- * Exposes the JavaScript [Image](https://developer.mozilla.org/en/docs/Web/API/Image) to Kotlin
- */
 external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
     override val children: HTMLCollection
     override val firstElementChild: Element?
@@ -749,9 +627,6 @@ external open class Image(width: Int = definedExternally, height: Int = definedE
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [HTMLIFrameElement](https://developer.mozilla.org/en/docs/Web/API/HTMLIFrameElement) to Kotlin
- */
 external abstract class HTMLIFrameElement : HTMLElement {
     open var src: String
     open var srcdoc: String
@@ -773,9 +648,6 @@ external abstract class HTMLIFrameElement : HTMLElement {
     fun getSVGDocument(): Document?
 }
 
-/**
- * Exposes the JavaScript [HTMLEmbedElement](https://developer.mozilla.org/en/docs/Web/API/HTMLEmbedElement) to Kotlin
- */
 external abstract class HTMLEmbedElement : HTMLElement {
     open var src: String
     open var type: String
@@ -786,9 +658,6 @@ external abstract class HTMLEmbedElement : HTMLElement {
     fun getSVGDocument(): Document?
 }
 
-/**
- * Exposes the JavaScript [HTMLObjectElement](https://developer.mozilla.org/en/docs/Web/API/HTMLObjectElement) to Kotlin
- */
 external abstract class HTMLObjectElement : HTMLElement {
     open var data: String
     open var type: String
@@ -819,9 +688,6 @@ external abstract class HTMLObjectElement : HTMLElement {
     fun setCustomValidity(error: String)
 }
 
-/**
- * Exposes the JavaScript [HTMLParamElement](https://developer.mozilla.org/en/docs/Web/API/HTMLParamElement) to Kotlin
- */
 external abstract class HTMLParamElement : HTMLElement {
     open var name: String
     open var value: String
@@ -829,9 +695,6 @@ external abstract class HTMLParamElement : HTMLElement {
     open var valueType: String
 }
 
-/**
- * Exposes the JavaScript [HTMLVideoElement](https://developer.mozilla.org/en/docs/Web/API/HTMLVideoElement) to Kotlin
- */
 external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
     open var width: Int
     open var height: Int
@@ -841,9 +704,6 @@ external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
     open var playsInline: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLAudioElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAudioElement) to Kotlin
- */
 external abstract class HTMLAudioElement : HTMLMediaElement {
 }
 
@@ -946,9 +806,6 @@ external open class Audio(src: String = definedExternally) : HTMLAudioElement {
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [HTMLTrackElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTrackElement) to Kotlin
- */
 external abstract class HTMLTrackElement : HTMLElement {
     open var kind: String
     open var src: String
@@ -966,9 +823,6 @@ external abstract class HTMLTrackElement : HTMLElement {
     }
 }
 
-/**
- * Exposes the JavaScript [HTMLMediaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMediaElement) to Kotlin
- */
 external abstract class HTMLMediaElement : HTMLElement {
     open val error: MediaError?
     open var src: String
@@ -1018,9 +872,6 @@ external abstract class HTMLMediaElement : HTMLElement {
     }
 }
 
-/**
- * Exposes the JavaScript [MediaError](https://developer.mozilla.org/en/docs/Web/API/MediaError) to Kotlin
- */
 external abstract class MediaError {
     open val code: Short
 
@@ -1032,9 +883,6 @@ external abstract class MediaError {
     }
 }
 
-/**
- * Exposes the JavaScript [AudioTrackList](https://developer.mozilla.org/en/docs/Web/API/AudioTrackList) to Kotlin
- */
 external abstract class AudioTrackList : EventTarget {
     open val length: Int
     open var onchange: ((Event) -> dynamic)?
@@ -1044,9 +892,6 @@ external abstract class AudioTrackList : EventTarget {
 }
 @kotlin.internal.InlineOnly inline operator fun AudioTrackList.get(index: Int): AudioTrack? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [AudioTrack](https://developer.mozilla.org/en/docs/Web/API/AudioTrack) to Kotlin
- */
 external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
     open val kind: String
@@ -1055,9 +900,6 @@ external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open var enabled: Boolean
 }
 
-/**
- * Exposes the JavaScript [VideoTrackList](https://developer.mozilla.org/en/docs/Web/API/VideoTrackList) to Kotlin
- */
 external abstract class VideoTrackList : EventTarget {
     open val length: Int
     open val selectedIndex: Int
@@ -1068,9 +910,6 @@ external abstract class VideoTrackList : EventTarget {
 }
 @kotlin.internal.InlineOnly inline operator fun VideoTrackList.get(index: Int): VideoTrack? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [VideoTrack](https://developer.mozilla.org/en/docs/Web/API/VideoTrack) to Kotlin
- */
 external abstract class VideoTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
     open val kind: String
@@ -1088,9 +927,6 @@ external abstract class TextTrackList : EventTarget {
 }
 @kotlin.internal.InlineOnly inline operator fun TextTrackList.get(index: Int): TextTrack? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [TextTrack](https://developer.mozilla.org/en/docs/Web/API/TextTrack) to Kotlin
- */
 external abstract class TextTrack : EventTarget, UnionAudioTrackOrTextTrackOrVideoTrack {
     open val kind: TextTrackKind
     open val label: String
@@ -1111,9 +947,6 @@ external abstract class TextTrackCueList {
 }
 @kotlin.internal.InlineOnly inline operator fun TextTrackCueList.get(index: Int): TextTrackCue? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [TextTrackCue](https://developer.mozilla.org/en/docs/Web/API/TextTrackCue) to Kotlin
- */
 external abstract class TextTrackCue : EventTarget {
     open val track: TextTrack?
     open var id: String
@@ -1124,18 +957,12 @@ external abstract class TextTrackCue : EventTarget {
     open var onexit: ((Event) -> dynamic)?
 }
 
-/**
- * Exposes the JavaScript [TimeRanges](https://developer.mozilla.org/en/docs/Web/API/TimeRanges) to Kotlin
- */
 external abstract class TimeRanges {
     open val length: Int
     fun start(index: Int): Double
     fun end(index: Int): Double
 }
 
-/**
- * Exposes the JavaScript [TrackEvent](https://developer.mozilla.org/en/docs/Web/API/TrackEvent) to Kotlin
- */
 external open class TrackEvent(type: String, eventInitDict: TrackEventInit = definedExternally) : Event {
     open val track: UnionAudioTrackOrTextTrackOrVideoTrack?
 }
@@ -1158,17 +985,11 @@ inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null,
     return o
 }
 
-/**
- * Exposes the JavaScript [HTMLMapElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMapElement) to Kotlin
- */
 external abstract class HTMLMapElement : HTMLElement {
     open var name: String
     open val areas: HTMLCollection
 }
 
-/**
- * Exposes the JavaScript [HTMLAreaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAreaElement) to Kotlin
- */
 external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils {
     open var alt: String
     open var coords: String
@@ -1182,9 +1003,6 @@ external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils
     open var noHref: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLTableElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableElement) to Kotlin
- */
 external abstract class HTMLTableElement : HTMLElement {
     open var caption: HTMLTableCaptionElement?
     open var tHead: HTMLTableSectionElement?
@@ -1211,16 +1029,10 @@ external abstract class HTMLTableElement : HTMLElement {
     fun deleteRow(index: Int)
 }
 
-/**
- * Exposes the JavaScript [HTMLTableCaptionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableCaptionElement) to Kotlin
- */
 external abstract class HTMLTableCaptionElement : HTMLElement {
     open var align: String
 }
 
-/**
- * Exposes the JavaScript [HTMLTableColElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableColElement) to Kotlin
- */
 external abstract class HTMLTableColElement : HTMLElement {
     open var span: Int
     open var align: String
@@ -1230,9 +1042,6 @@ external abstract class HTMLTableColElement : HTMLElement {
     open var width: String
 }
 
-/**
- * Exposes the JavaScript [HTMLTableSectionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableSectionElement) to Kotlin
- */
 external abstract class HTMLTableSectionElement : HTMLElement {
     open val rows: HTMLCollection
     open var align: String
@@ -1243,9 +1052,6 @@ external abstract class HTMLTableSectionElement : HTMLElement {
     fun deleteRow(index: Int)
 }
 
-/**
- * Exposes the JavaScript [HTMLTableRowElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableRowElement) to Kotlin
- */
 external abstract class HTMLTableRowElement : HTMLElement {
     open val rowIndex: Int
     open val sectionRowIndex: Int
@@ -1259,9 +1065,6 @@ external abstract class HTMLTableRowElement : HTMLElement {
     fun deleteCell(index: Int)
 }
 
-/**
- * Exposes the JavaScript [HTMLTableCellElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableCellElement) to Kotlin
- */
 external abstract class HTMLTableCellElement : HTMLElement {
     open var colSpan: Int
     open var rowSpan: Int
@@ -1280,9 +1083,6 @@ external abstract class HTMLTableCellElement : HTMLElement {
     open var bgColor: String
 }
 
-/**
- * Exposes the JavaScript [HTMLFormElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFormElement) to Kotlin
- */
 external abstract class HTMLFormElement : HTMLElement {
     open var acceptCharset: String
     open var action: String
@@ -1303,18 +1103,12 @@ external abstract class HTMLFormElement : HTMLElement {
 @kotlin.internal.InlineOnly inline operator fun HTMLFormElement.get(index: Int): Element? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun HTMLFormElement.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [HTMLLabelElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLabelElement) to Kotlin
- */
 external abstract class HTMLLabelElement : HTMLElement {
     open val form: HTMLFormElement?
     open var htmlFor: String
     open val control: HTMLElement?
 }
 
-/**
- * Exposes the JavaScript [HTMLInputElement](https://developer.mozilla.org/en/docs/Web/API/HTMLInputElement) to Kotlin
- */
 external abstract class HTMLInputElement : HTMLElement {
     open var accept: String
     open var alt: String
@@ -1374,9 +1168,6 @@ external abstract class HTMLInputElement : HTMLElement {
     fun setSelectionRange(start: Int, end: Int, direction: String = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [HTMLButtonElement](https://developer.mozilla.org/en/docs/Web/API/HTMLButtonElement) to Kotlin
- */
 external abstract class HTMLButtonElement : HTMLElement {
     open var autofocus: Boolean
     open var disabled: Boolean
@@ -1399,9 +1190,6 @@ external abstract class HTMLButtonElement : HTMLElement {
     fun setCustomValidity(error: String)
 }
 
-/**
- * Exposes the JavaScript [HTMLSelectElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSelectElement) to Kotlin
- */
 external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> {
     open var autocomplete: String
     open var autofocus: Boolean
@@ -1432,24 +1220,15 @@ external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> 
 @kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option; }
 
-/**
- * Exposes the JavaScript [HTMLDataListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDataListElement) to Kotlin
- */
 external abstract class HTMLDataListElement : HTMLElement {
     open val options: HTMLCollection
 }
 
-/**
- * Exposes the JavaScript [HTMLOptGroupElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOptGroupElement) to Kotlin
- */
 external abstract class HTMLOptGroupElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
     open var disabled: Boolean
     open var label: String
 }
 
-/**
- * Exposes the JavaScript [HTMLOptionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOptionElement) to Kotlin
- */
 external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
     open var disabled: Boolean
     open val form: HTMLFormElement?
@@ -1461,9 +1240,6 @@ external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElemen
     open val index: Int
 }
 
-/**
- * Exposes the JavaScript [Option](https://developer.mozilla.org/en/docs/Web/API/Option) to Kotlin
- */
 external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
     override val children: HTMLCollection
     override val firstElementChild: Element?
@@ -1563,9 +1339,6 @@ external open class Option(text: String = definedExternally, value: String = def
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [HTMLTextAreaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTextAreaElement) to Kotlin
- */
 external abstract class HTMLTextAreaElement : HTMLElement {
     open var autocomplete: String
     open var autofocus: Boolean
@@ -1602,9 +1375,6 @@ external abstract class HTMLTextAreaElement : HTMLElement {
     fun setSelectionRange(start: Int, end: Int, direction: String = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [HTMLKeygenElement](https://developer.mozilla.org/en/docs/Web/API/HTMLKeygenElement) to Kotlin
- */
 external abstract class HTMLKeygenElement : HTMLElement {
     open var autofocus: Boolean
     open var challenge: String
@@ -1622,9 +1392,6 @@ external abstract class HTMLKeygenElement : HTMLElement {
     fun setCustomValidity(error: String)
 }
 
-/**
- * Exposes the JavaScript [HTMLOutputElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOutputElement) to Kotlin
- */
 external abstract class HTMLOutputElement : HTMLElement {
     open val htmlFor: DOMTokenList
     open val form: HTMLFormElement?
@@ -1641,9 +1408,6 @@ external abstract class HTMLOutputElement : HTMLElement {
     fun setCustomValidity(error: String)
 }
 
-/**
- * Exposes the JavaScript [HTMLProgressElement](https://developer.mozilla.org/en/docs/Web/API/HTMLProgressElement) to Kotlin
- */
 external abstract class HTMLProgressElement : HTMLElement {
     open var value: Double
     open var max: Double
@@ -1651,9 +1415,6 @@ external abstract class HTMLProgressElement : HTMLElement {
     open val labels: NodeList
 }
 
-/**
- * Exposes the JavaScript [HTMLMeterElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMeterElement) to Kotlin
- */
 external abstract class HTMLMeterElement : HTMLElement {
     open var value: Double
     open var min: Double
@@ -1664,9 +1425,6 @@ external abstract class HTMLMeterElement : HTMLElement {
     open val labels: NodeList
 }
 
-/**
- * Exposes the JavaScript [HTMLFieldSetElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFieldSetElement) to Kotlin
- */
 external abstract class HTMLFieldSetElement : HTMLElement {
     open var disabled: Boolean
     open val form: HTMLFormElement?
@@ -1681,17 +1439,11 @@ external abstract class HTMLFieldSetElement : HTMLElement {
     fun setCustomValidity(error: String)
 }
 
-/**
- * Exposes the JavaScript [HTMLLegendElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLegendElement) to Kotlin
- */
 external abstract class HTMLLegendElement : HTMLElement {
     open val form: HTMLFormElement?
     open var align: String
 }
 
-/**
- * Exposes the JavaScript [ValidityState](https://developer.mozilla.org/en/docs/Web/API/ValidityState) to Kotlin
- */
 external abstract class ValidityState {
     open val valueMissing: Boolean
     open val typeMismatch: Boolean
@@ -1706,9 +1458,6 @@ external abstract class ValidityState {
     open val valid: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLDetailsElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDetailsElement) to Kotlin
- */
 external abstract class HTMLDetailsElement : HTMLElement {
     open var open: Boolean
 }
@@ -1751,9 +1500,6 @@ inline fun RelatedEventInit(relatedTarget: EventTarget? = null, bubbles: Boolean
     return o
 }
 
-/**
- * Exposes the JavaScript [HTMLDialogElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDialogElement) to Kotlin
- */
 external abstract class HTMLDialogElement : HTMLElement {
     open var open: Boolean
     open var returnValue: String
@@ -1762,9 +1508,6 @@ external abstract class HTMLDialogElement : HTMLElement {
     fun close(returnValue: String = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [HTMLScriptElement](https://developer.mozilla.org/en/docs/Web/API/HTMLScriptElement) to Kotlin
- */
 external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement {
     open var src: String
     open var type: String
@@ -1778,16 +1521,10 @@ external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement 
     open var htmlFor: String
 }
 
-/**
- * Exposes the JavaScript [HTMLTemplateElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTemplateElement) to Kotlin
- */
 external abstract class HTMLTemplateElement : HTMLElement {
     open val content: DocumentFragment
 }
 
-/**
- * Exposes the JavaScript [HTMLSlotElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSlotElement) to Kotlin
- */
 external abstract class HTMLSlotElement : HTMLElement {
     open var name: String
     fun assignedNodes(options: AssignedNodesOptions = definedExternally): Array<Node>
@@ -1808,9 +1545,6 @@ inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions
     return o
 }
 
-/**
- * Exposes the JavaScript [HTMLCanvasElement](https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement) to Kotlin
- */
 external abstract class HTMLCanvasElement : HTMLElement, TexImageSource {
     open var width: Int
     open var height: Int
@@ -1834,9 +1568,6 @@ inline fun CanvasRenderingContext2DSettings(alpha: Boolean? = true): CanvasRende
     return o
 }
 
-/**
- * Exposes the JavaScript [CanvasRenderingContext2D](https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D) to Kotlin
- */
 external abstract class CanvasRenderingContext2D : CanvasState, CanvasTransform, CanvasCompositing, CanvasImageSmoothing, CanvasFillStrokeStyles, CanvasShadowStyles, CanvasFilters, CanvasRect, CanvasDrawPath, CanvasUserInterface, CanvasText, CanvasDrawImage, CanvasHitRegion, CanvasImageData, CanvasPathDrawingStyles, CanvasTextDrawingStyles, CanvasPath, RenderingContext {
     open val canvas: HTMLCanvasElement
 }
@@ -1970,23 +1701,14 @@ external interface CanvasPath {
     fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [CanvasGradient](https://developer.mozilla.org/en/docs/Web/API/CanvasGradient) to Kotlin
- */
 external abstract class CanvasGradient {
     fun addColorStop(offset: Double, color: String)
 }
 
-/**
- * Exposes the JavaScript [CanvasPattern](https://developer.mozilla.org/en/docs/Web/API/CanvasPattern) to Kotlin
- */
 external abstract class CanvasPattern {
     fun setTransform(transform: dynamic = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [TextMetrics](https://developer.mozilla.org/en/docs/Web/API/TextMetrics) to Kotlin
- */
 external abstract class TextMetrics {
     open val width: Double
     open val actualBoundingBoxLeft: Double
@@ -2045,9 +1767,6 @@ inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = Ca
     return o
 }
 
-/**
- * Exposes the JavaScript [ImageData](https://developer.mozilla.org/en/docs/Web/API/ImageData) to Kotlin
- */
 external open class ImageData : TexImageSource {
     constructor(sw: Int, sh: Int)
     constructor(data: Uint8ClampedArray, sw: Int, sh: Int = definedExternally)
@@ -2056,9 +1775,6 @@ external open class ImageData : TexImageSource {
     open val data: Uint8ClampedArray
 }
 
-/**
- * Exposes the JavaScript [Path2D](https://developer.mozilla.org/en/docs/Web/API/Path2D) to Kotlin
- */
 external open class Path2D() : CanvasPath {
     constructor(path: Path2D)
     constructor(paths: Array<Path2D>, fillRule: CanvasFillRule = definedExternally)
@@ -2076,16 +1792,10 @@ external open class Path2D() : CanvasPath {
     override fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean /* = definedExternally */)
 }
 
-/**
- * Exposes the JavaScript [Touch](https://developer.mozilla.org/en/docs/Web/API/Touch) to Kotlin
- */
 external abstract class Touch {
     open val region: String?
 }
 
-/**
- * Exposes the JavaScript [ImageBitmapRenderingContext](https://developer.mozilla.org/en/docs/Web/API/ImageBitmapRenderingContext) to Kotlin
- */
 external abstract class ImageBitmapRenderingContext {
     open val canvas: HTMLCanvasElement
     fun transferFromImageBitmap(bitmap: ImageBitmap?)
@@ -2106,9 +1816,6 @@ inline fun ImageBitmapRenderingContextSettings(alpha: Boolean? = true): ImageBit
     return o
 }
 
-/**
- * Exposes the JavaScript [CustomElementRegistry](https://developer.mozilla.org/en/docs/Web/API/CustomElementRegistry) to Kotlin
- */
 external abstract class CustomElementRegistry {
     fun define(name: String, constructor: () -> dynamic, options: ElementDefinitionOptions = definedExternally)
     fun get(name: String): Any?
@@ -2135,9 +1842,6 @@ external interface ElementContentEditable {
     val isContentEditable: Boolean
 }
 
-/**
- * Exposes the JavaScript [DataTransfer](https://developer.mozilla.org/en/docs/Web/API/DataTransfer) to Kotlin
- */
 external abstract class DataTransfer {
     open var dropEffect: String
     open var effectAllowed: String
@@ -2150,9 +1854,6 @@ external abstract class DataTransfer {
     fun clearData(format: String = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [DataTransferItemList](https://developer.mozilla.org/en/docs/Web/API/DataTransferItemList) to Kotlin
- */
 external abstract class DataTransferItemList {
     open val length: Int
     fun add(data: String, type: String): DataTransferItem?
@@ -2162,9 +1863,6 @@ external abstract class DataTransferItemList {
 }
 @kotlin.internal.InlineOnly inline operator fun DataTransferItemList.get(index: Int): DataTransferItem? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [DataTransferItem](https://developer.mozilla.org/en/docs/Web/API/DataTransferItem) to Kotlin
- */
 external abstract class DataTransferItem {
     open val kind: String
     open val type: String
@@ -2172,9 +1870,7 @@ external abstract class DataTransferItem {
     fun getAsFile(): File?
 }
 
-/**
- * Exposes the JavaScript [DragEvent](https://developer.mozilla.org/en/docs/Web/API/DragEvent) to Kotlin
- */
+
 external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
     open val dataTransfer: DataTransfer?
 }
@@ -2224,9 +1920,6 @@ external abstract class BarProp {
     open val visible: Boolean
 }
 
-/**
- * Exposes the JavaScript [History](https://developer.mozilla.org/en/docs/Web/API/History) to Kotlin
- */
 external abstract class History {
     open val length: Int
     open var scrollRestoration: ScrollRestoration
@@ -2238,9 +1931,6 @@ external abstract class History {
     fun replaceState(data: Any?, title: String, url: String? = definedExternally)
 }
 
-/**
- * Exposes the JavaScript [Location](https://developer.mozilla.org/en/docs/Web/API/Location) to Kotlin
- */
 external abstract class Location {
     open var href: String
     open val origin: String
@@ -2257,9 +1947,6 @@ external abstract class Location {
     fun reload()
 }
 
-/**
- * Exposes the JavaScript [PopStateEvent](https://developer.mozilla.org/en/docs/Web/API/PopStateEvent) to Kotlin
- */
 external open class PopStateEvent(type: String, eventInitDict: PopStateEventInit = definedExternally) : Event {
     open val state: Any?
 }
@@ -2282,9 +1969,6 @@ inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, canc
     return o
 }
 
-/**
- * Exposes the JavaScript [HashChangeEvent](https://developer.mozilla.org/en/docs/Web/API/HashChangeEvent) to Kotlin
- */
 external open class HashChangeEvent(type: String, eventInitDict: HashChangeEventInit = definedExternally) : Event {
     open val oldURL: String
     open val newURL: String
@@ -2312,9 +1996,6 @@ inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbl
     return o
 }
 
-/**
- * Exposes the JavaScript [PageTransitionEvent](https://developer.mozilla.org/en/docs/Web/API/PageTransitionEvent) to Kotlin
- */
 external open class PageTransitionEvent(type: String, eventInitDict: PageTransitionEventInit = definedExternally) : Event {
     open val persisted: Boolean
 }
@@ -2337,9 +2018,6 @@ inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean
     return o
 }
 
-/**
- * Exposes the JavaScript [BeforeUnloadEvent](https://developer.mozilla.org/en/docs/Web/API/BeforeUnloadEvent) to Kotlin
- */
 external open class BeforeUnloadEvent : Event {
     var returnValue: String
 }
@@ -2368,16 +2046,10 @@ external abstract class ApplicationCache : EventTarget {
     }
 }
 
-/**
- * Exposes the JavaScript [NavigatorOnLine](https://developer.mozilla.org/en/docs/Web/API/NavigatorOnLine) to Kotlin
- */
 external interface NavigatorOnLine {
     val onLine: Boolean
 }
 
-/**
- * Exposes the JavaScript [ErrorEvent](https://developer.mozilla.org/en/docs/Web/API/ErrorEvent) to Kotlin
- */
 external open class ErrorEvent(type: String, eventInitDict: ErrorEventInit = definedExternally) : Event {
     open val message: String
     open val filename: String
@@ -2420,9 +2092,6 @@ inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno:
     return o
 }
 
-/**
- * Exposes the JavaScript [PromiseRejectionEvent](https://developer.mozilla.org/en/docs/Web/API/PromiseRejectionEvent) to Kotlin
- */
 external open class PromiseRejectionEvent(type: String, eventInitDict: PromiseRejectionEventInit) : Event {
     open val promise: Promise<Any?>
     open val reason: Any?
@@ -2450,9 +2119,6 @@ inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = und
     return o
 }
 
-/**
- * Exposes the JavaScript [GlobalEventHandlers](https://developer.mozilla.org/en/docs/Web/API/GlobalEventHandlers) to Kotlin
- */
 external interface GlobalEventHandlers {
     var ongotpointercapture: ((PointerEvent) -> dynamic)?
     var onlostpointercapture: ((PointerEvent) -> dynamic)?
@@ -2527,9 +2193,6 @@ external interface GlobalEventHandlers {
     var onwaiting: ((Event) -> dynamic)?
 }
 
-/**
- * Exposes the JavaScript [WindowEventHandlers](https://developer.mozilla.org/en/docs/Web/API/WindowEventHandlers) to Kotlin
- */
 external interface WindowEventHandlers {
     var onafterprint: ((Event) -> dynamic)?
     var onbeforeprint: ((Event) -> dynamic)?
@@ -2554,9 +2217,6 @@ external interface DocumentAndElementEventHandlers {
     var onpaste: ((ClipboardEvent) -> dynamic)?
 }
 
-/**
- * Exposes the JavaScript [WindowOrWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/WindowOrWorkerGlobalScope) to Kotlin
- */
 external interface WindowOrWorkerGlobalScope {
     val caches: CacheStorage
     val origin: String
@@ -2571,9 +2231,6 @@ external interface WindowOrWorkerGlobalScope {
     fun createImageBitmap(image: dynamic, sx: Int, sy: Int, sw: Int, sh: Int, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
 }
 
-/**
- * Exposes the JavaScript [NavigatorID](https://developer.mozilla.org/en/docs/Web/API/NavigatorID) to Kotlin
- */
 external interface NavigatorID {
     val appCodeName: String
     val appName: String
@@ -2588,9 +2245,6 @@ external interface NavigatorID {
     fun taintEnabled(): Boolean
 }
 
-/**
- * Exposes the JavaScript [NavigatorLanguage](https://developer.mozilla.org/en/docs/Web/API/NavigatorLanguage) to Kotlin
- */
 external interface NavigatorLanguage {
     val language: String
     val languages: Array<out String>
@@ -2609,18 +2263,12 @@ external interface NavigatorCookies {
     val cookieEnabled: Boolean
 }
 
-/**
- * Exposes the JavaScript [NavigatorPlugins](https://developer.mozilla.org/en/docs/Web/API/NavigatorPlugins) to Kotlin
- */
 external interface NavigatorPlugins {
     val plugins: PluginArray
     val mimeTypes: MimeTypeArray
     fun javaEnabled(): Boolean
 }
 
-/**
- * Exposes the JavaScript [PluginArray](https://developer.mozilla.org/en/docs/Web/API/PluginArray) to Kotlin
- */
 external abstract class PluginArray : ItemArrayLike<Plugin> {
     override val length: Int
     fun refresh(reload: Boolean = definedExternally)
@@ -2630,9 +2278,6 @@ external abstract class PluginArray : ItemArrayLike<Plugin> {
 @kotlin.internal.InlineOnly inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [MimeTypeArray](https://developer.mozilla.org/en/docs/Web/API/MimeTypeArray) to Kotlin
- */
 external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
     override val length: Int
     override fun item(index: Int): MimeType?
@@ -2641,9 +2286,6 @@ external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
 @kotlin.internal.InlineOnly inline operator fun MimeTypeArray.get(index: Int): MimeType? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun MimeTypeArray.get(name: String): MimeType? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [Plugin](https://developer.mozilla.org/en/docs/Web/API/Plugin) to Kotlin
- */
 external abstract class Plugin : ItemArrayLike<MimeType> {
     open val name: String
     open val description: String
@@ -2655,9 +2297,6 @@ external abstract class Plugin : ItemArrayLike<MimeType> {
 @kotlin.internal.InlineOnly inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [MimeType](https://developer.mozilla.org/en/docs/Web/API/MimeType) to Kotlin
- */
 external abstract class MimeType {
     open val type: String
     open val description: String
@@ -2665,9 +2304,6 @@ external abstract class MimeType {
     open val enabledPlugin: Plugin
 }
 
-/**
- * Exposes the JavaScript [ImageBitmap](https://developer.mozilla.org/en/docs/Web/API/ImageBitmap) to Kotlin
- */
 external abstract class ImageBitmap : TexImageSource {
     open val width: Int
     open val height: Int
@@ -2709,9 +2345,6 @@ inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrienta
     return o
 }
 
-/**
- * Exposes the JavaScript [MessageEvent](https://developer.mozilla.org/en/docs/Web/API/MessageEvent) to Kotlin
- */
 external open class MessageEvent(type: String, eventInitDict: MessageEventInit = definedExternally) : Event {
     open val data: Any?
     open val origin: String
@@ -2755,9 +2388,6 @@ inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId
     return o
 }
 
-/**
- * Exposes the JavaScript [EventSource](https://developer.mozilla.org/en/docs/Web/API/EventSource) to Kotlin
- */
 external open class EventSource(url: String, eventSourceInitDict: EventSourceInit = definedExternally) : EventTarget {
     open val url: String
     open val withCredentials: Boolean
@@ -2789,9 +2419,6 @@ inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
     return o
 }
 
-/**
- * Exposes the JavaScript [WebSocket](https://developer.mozilla.org/en/docs/Web/API/WebSocket) to Kotlin
- */
 external open class WebSocket(url: String, protocols: dynamic = definedExternally) : EventTarget {
     open val url: String
     open val readyState: Short
@@ -2817,9 +2444,6 @@ external open class WebSocket(url: String, protocols: dynamic = definedExternall
     }
 }
 
-/**
- * Exposes the JavaScript [CloseEvent](https://developer.mozilla.org/en/docs/Web/API/CloseEvent) to Kotlin
- */
 external open class CloseEvent(type: String, eventInitDict: CloseEventInit = definedExternally) : Event {
     open val wasClean: Boolean
     open val code: Short
@@ -2852,17 +2476,11 @@ inline fun CloseEventInit(wasClean: Boolean? = false, code: Short? = 0, reason: 
     return o
 }
 
-/**
- * Exposes the JavaScript [MessageChannel](https://developer.mozilla.org/en/docs/Web/API/MessageChannel) to Kotlin
- */
 external open class MessageChannel {
     open val port1: MessagePort
     open val port2: MessagePort
 }
 
-/**
- * Exposes the JavaScript [MessagePort](https://developer.mozilla.org/en/docs/Web/API/MessagePort) to Kotlin
- */
 external abstract class MessagePort : EventTarget, UnionMessagePortOrWindow, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
@@ -2870,9 +2488,6 @@ external abstract class MessagePort : EventTarget, UnionMessagePortOrWindow, Uni
     fun close()
 }
 
-/**
- * Exposes the JavaScript [BroadcastChannel](https://developer.mozilla.org/en/docs/Web/API/BroadcastChannel) to Kotlin
- */
 external open class BroadcastChannel(name: String) : EventTarget {
     open val name: String
     var onmessage: ((MessageEvent) -> dynamic)?
@@ -2880,9 +2495,6 @@ external open class BroadcastChannel(name: String) : EventTarget {
     fun close()
 }
 
-/**
- * Exposes the JavaScript [WorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/WorkerGlobalScope) to Kotlin
- */
 external abstract class WorkerGlobalScope : EventTarget, WindowOrWorkerGlobalScope, GlobalPerformance {
     open val self: WorkerGlobalScope
     open val location: WorkerLocation
@@ -2896,18 +2508,12 @@ external abstract class WorkerGlobalScope : EventTarget, WindowOrWorkerGlobalSco
     fun importScripts(vararg urls: String)
 }
 
-/**
- * Exposes the JavaScript [DedicatedWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/DedicatedWorkerGlobalScope) to Kotlin
- */
 external abstract class DedicatedWorkerGlobalScope : WorkerGlobalScope {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
     fun close()
 }
 
-/**
- * Exposes the JavaScript [SharedWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/SharedWorkerGlobalScope) to Kotlin
- */
 external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
     open val name: String
     open val applicationCache: ApplicationCache
@@ -2915,16 +2521,10 @@ external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
     fun close()
 }
 
-/**
- * Exposes the JavaScript [AbstractWorker](https://developer.mozilla.org/en/docs/Web/API/AbstractWorker) to Kotlin
- */
 external interface AbstractWorker {
     var onerror: ((Event) -> dynamic)?
 }
 
-/**
- * Exposes the JavaScript [Worker](https://developer.mozilla.org/en/docs/Web/API/Worker) to Kotlin
- */
 external open class Worker(scriptURL: String, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
     var onmessage: ((MessageEvent) -> dynamic)?
     override var onerror: ((Event) -> dynamic)?
@@ -2951,31 +2551,19 @@ inline fun WorkerOptions(type: WorkerType? = WorkerType.CLASSIC, credentials: Re
     return o
 }
 
-/**
- * Exposes the JavaScript [SharedWorker](https://developer.mozilla.org/en/docs/Web/API/SharedWorker) to Kotlin
- */
 external open class SharedWorker(scriptURL: String, name: String = definedExternally, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
     open val port: MessagePort
     override var onerror: ((Event) -> dynamic)?
 }
 
-/**
- * Exposes the JavaScript [NavigatorConcurrentHardware](https://developer.mozilla.org/en/docs/Web/API/NavigatorConcurrentHardware) to Kotlin
- */
 external interface NavigatorConcurrentHardware {
     val hardwareConcurrency: Int
 }
 
-/**
- * Exposes the JavaScript [WorkerNavigator](https://developer.mozilla.org/en/docs/Web/API/WorkerNavigator) to Kotlin
- */
 external abstract class WorkerNavigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorConcurrentHardware {
     open val serviceWorker: ServiceWorkerContainer
 }
 
-/**
- * Exposes the JavaScript [WorkerLocation](https://developer.mozilla.org/en/docs/Web/API/WorkerLocation) to Kotlin
- */
 external abstract class WorkerLocation {
     open var href: String
     open val origin: String
@@ -2988,9 +2576,6 @@ external abstract class WorkerLocation {
     open val hash: String
 }
 
-/**
- * Exposes the JavaScript [Storage](https://developer.mozilla.org/en/docs/Web/API/Storage) to Kotlin
- */
 external abstract class Storage {
     open val length: Int
     fun key(index: Int): String?
@@ -3002,23 +2587,14 @@ external abstract class Storage {
 @kotlin.internal.InlineOnly inline operator fun Storage.get(key: String): String? = asDynamic()[key]
 @kotlin.internal.InlineOnly inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value; }
 
-/**
- * Exposes the JavaScript [WindowSessionStorage](https://developer.mozilla.org/en/docs/Web/API/WindowSessionStorage) to Kotlin
- */
 external interface WindowSessionStorage {
     val sessionStorage: Storage
 }
 
-/**
- * Exposes the JavaScript [WindowLocalStorage](https://developer.mozilla.org/en/docs/Web/API/WindowLocalStorage) to Kotlin
- */
 external interface WindowLocalStorage {
     val localStorage: Storage
 }
 
-/**
- * Exposes the JavaScript [StorageEvent](https://developer.mozilla.org/en/docs/Web/API/StorageEvent) to Kotlin
- */
 external open class StorageEvent(type: String, eventInitDict: StorageEventInit = definedExternally) : Event {
     open val key: String?
     open val oldValue: String?
@@ -3075,9 +2651,6 @@ external abstract class HTMLAppletElement : HTMLElement {
     open var width: String
 }
 
-/**
- * Exposes the JavaScript [HTMLMarqueeElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMarqueeElement) to Kotlin
- */
 external abstract class HTMLMarqueeElement : HTMLElement {
     open var behavior: String
     open var bgColor: String
@@ -3097,9 +2670,6 @@ external abstract class HTMLMarqueeElement : HTMLElement {
     fun stop()
 }
 
-/**
- * Exposes the JavaScript [HTMLFrameSetElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFrameSetElement) to Kotlin
- */
 external abstract class HTMLFrameSetElement : HTMLElement, WindowEventHandlers {
     open var cols: String
     open var rows: String
@@ -3122,9 +2692,6 @@ external abstract class HTMLDirectoryElement : HTMLElement {
     open var compact: Boolean
 }
 
-/**
- * Exposes the JavaScript [HTMLFontElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFontElement) to Kotlin
- */
 external abstract class HTMLFontElement : HTMLElement {
     open var color: String
     open var face: String
@@ -3159,9 +2726,6 @@ inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, co
     return o
 }
 
-/**
- * Exposes the JavaScript [CustomEvent](https://developer.mozilla.org/en/docs/Web/API/CustomEvent) to Kotlin
- */
 external open class CustomEvent(type: String, eventInitDict: CustomEventInit = definedExternally) : Event {
     open val detail: Any?
     fun initCustomEvent(type: String, bubbles: Boolean, cancelable: Boolean, detail: Any?)
@@ -3224,16 +2788,10 @@ external interface NonElementParentNode {
     fun getElementById(elementId: String): Element?
 }
 
-/**
- * Exposes the JavaScript [DocumentOrShadowRoot](https://developer.mozilla.org/en/docs/Web/API/DocumentOrShadowRoot) to Kotlin
- */
 external interface DocumentOrShadowRoot {
     val fullscreenElement: Element?
 }
 
-/**
- * Exposes the JavaScript [ParentNode](https://developer.mozilla.org/en/docs/Web/API/ParentNode) to Kotlin
- */
 external interface ParentNode {
     val children: HTMLCollection
     val firstElementChild: Element?
@@ -3245,17 +2803,11 @@ external interface ParentNode {
     fun querySelectorAll(selectors: String): NodeList
 }
 
-/**
- * Exposes the JavaScript [NonDocumentTypeChildNode](https://developer.mozilla.org/en/docs/Web/API/NonDocumentTypeChildNode) to Kotlin
- */
 external interface NonDocumentTypeChildNode {
     val previousElementSibling: Element?
     val nextElementSibling: Element?
 }
 
-/**
- * Exposes the JavaScript [ChildNode](https://developer.mozilla.org/en/docs/Web/API/ChildNode) to Kotlin
- */
 external interface ChildNode {
     fun before(vararg nodes: dynamic)
     fun after(vararg nodes: dynamic)
@@ -3263,25 +2815,16 @@ external interface ChildNode {
     fun remove()
 }
 
-/**
- * Exposes the JavaScript [Slotable](https://developer.mozilla.org/en/docs/Web/API/Slotable) to Kotlin
- */
 external interface Slotable {
     val assignedSlot: HTMLSlotElement?
 }
 
-/**
- * Exposes the JavaScript [NodeList](https://developer.mozilla.org/en/docs/Web/API/NodeList) to Kotlin
- */
 external abstract class NodeList : ItemArrayLike<Node> {
     override val length: Int
     override fun item(index: Int): Node?
 }
 @kotlin.internal.InlineOnly inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [HTMLCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLCollection) to Kotlin
- */
 external abstract class HTMLCollection : UnionElementOrHTMLCollection, ItemArrayLike<Element> {
     override val length: Int
     override fun item(index: Int): Element?
@@ -3290,18 +2833,12 @@ external abstract class HTMLCollection : UnionElementOrHTMLCollection, ItemArray
 @kotlin.internal.InlineOnly inline operator fun HTMLCollection.get(index: Int): Element? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun HTMLCollection.get(name: String): Element? = asDynamic()[name]
 
-/**
- * Exposes the JavaScript [MutationObserver](https://developer.mozilla.org/en/docs/Web/API/MutationObserver) to Kotlin
- */
 external open class MutationObserver(callback: (Array<MutationRecord>, MutationObserver) -> Unit) {
     fun observe(target: Node, options: MutationObserverInit = definedExternally)
     fun disconnect()
     fun takeRecords(): Array<MutationRecord>
 }
 
-/**
- * Exposes the JavaScript [MutationObserverInit](https://developer.mozilla.org/en/docs/Web/API/MutationObserverInit) to Kotlin
- */
 external interface MutationObserverInit {
     var childList: Boolean? /* = false */
         get() = definedExternally
@@ -3341,9 +2878,6 @@ inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean
     return o
 }
 
-/**
- * Exposes the JavaScript [MutationRecord](https://developer.mozilla.org/en/docs/Web/API/MutationRecord) to Kotlin
- */
 external abstract class MutationRecord {
     open val type: String
     open val target: Node
@@ -3356,9 +2890,6 @@ external abstract class MutationRecord {
     open val oldValue: String?
 }
 
-/**
- * Exposes the JavaScript [Node](https://developer.mozilla.org/en/docs/Web/API/Node) to Kotlin
- */
 external abstract class Node : EventTarget {
     open val nodeType: Short
     open val nodeName: String
@@ -3427,9 +2958,6 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
     return o
 }
 
-/**
- * Exposes the JavaScript [XMLDocument](https://developer.mozilla.org/en/docs/Web/API/XMLDocument) to Kotlin
- */
 external open class XMLDocument : Document {
     override fun getElementById(elementId: String): Element?
     override fun prepend(vararg nodes: dynamic)
@@ -3457,9 +2985,6 @@ inline fun ElementCreationOptions(is_: String? = undefined): ElementCreationOpti
     return o
 }
 
-/**
- * Exposes the JavaScript [DOMImplementation](https://developer.mozilla.org/en/docs/Web/API/DOMImplementation) to Kotlin
- */
 external abstract class DOMImplementation {
     fun createDocumentType(qualifiedName: String, publicId: String, systemId: String): DocumentType
     fun createDocument(namespace: String?, qualifiedName: String, doctype: DocumentType? = definedExternally): XMLDocument
@@ -3467,18 +2992,12 @@ external abstract class DOMImplementation {
     fun hasFeature(): Boolean
 }
 
-/**
- * Exposes the JavaScript [DocumentType](https://developer.mozilla.org/en/docs/Web/API/DocumentType) to Kotlin
- */
 external abstract class DocumentType : Node, ChildNode {
     open val name: String
     open val publicId: String
     open val systemId: String
 }
 
-/**
- * Exposes the JavaScript [DocumentFragment](https://developer.mozilla.org/en/docs/Web/API/DocumentFragment) to Kotlin
- */
 external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
     override val children: HTMLCollection
     override val firstElementChild: Element?
@@ -3491,9 +3010,6 @@ external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
     override fun querySelectorAll(selectors: String): NodeList
 }
 
-/**
- * Exposes the JavaScript [ShadowRoot](https://developer.mozilla.org/en/docs/Web/API/ShadowRoot) to Kotlin
- */
 external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
     open val mode: ShadowRootMode
     open val host: Element
@@ -3505,9 +3021,6 @@ external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
     override fun querySelectorAll(selectors: String): NodeList
 }
 
-/**
- * Exposes the JavaScript [Element](https://developer.mozilla.org/en/docs/Web/API/Element) to Kotlin
- */
 external abstract class Element : Node, ParentNode, NonDocumentTypeChildNode, ChildNode, Slotable, GeometryUtils, UnionElementOrProcessingInstruction, UnionElementOrHTMLCollection, UnionElementOrRadioNodeList, UnionElementOrMouseEvent {
     open var innerHTML: String
     open var outerHTML: String
@@ -3585,9 +3098,6 @@ inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
     return o
 }
 
-/**
- * Exposes the JavaScript [NamedNodeMap](https://developer.mozilla.org/en/docs/Web/API/NamedNodeMap) to Kotlin
- */
 external abstract class NamedNodeMap : ItemArrayLike<Attr> {
     override val length: Int
     override fun item(index: Int): Attr?
@@ -3601,9 +3111,6 @@ external abstract class NamedNodeMap : ItemArrayLike<Attr> {
 @kotlin.internal.InlineOnly inline operator fun NamedNodeMap.get(index: Int): Attr? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun NamedNodeMap.get(qualifiedName: String): Attr? = asDynamic()[qualifiedName]
 
-/**
- * Exposes the JavaScript [Attr](https://developer.mozilla.org/en/docs/Web/API/Attr) to Kotlin
- */
 external abstract class Attr : Node {
     open val namespaceURI: String?
     open val prefix: String?
@@ -3614,9 +3121,6 @@ external abstract class Attr : Node {
     open val specified: Boolean
 }
 
-/**
- * Exposes the JavaScript [CharacterData](https://developer.mozilla.org/en/docs/Web/API/CharacterData) to Kotlin
- */
 external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNode {
     open var data: String
     open val length: Int
@@ -3627,9 +3131,6 @@ external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNod
     fun replaceData(offset: Int, count: Int, data: String)
 }
 
-/**
- * Exposes the JavaScript [Text](https://developer.mozilla.org/en/docs/Web/API/Text) to Kotlin
- */
 external open class Text(data: String = definedExternally) : CharacterData, Slotable, GeometryUtils {
     open val wholeText: String
     override val previousElementSibling: Element?
@@ -3646,9 +3147,6 @@ external open class Text(data: String = definedExternally) : CharacterData, Slot
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [CDATASection](https://developer.mozilla.org/en/docs/Web/API/CDATASection) to Kotlin
- */
 external open class CDATASection : Text {
     override fun before(vararg nodes: dynamic)
     override fun after(vararg nodes: dynamic)
@@ -3660,16 +3158,10 @@ external open class CDATASection : Text {
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [ProcessingInstruction](https://developer.mozilla.org/en/docs/Web/API/ProcessingInstruction) to Kotlin
- */
 external abstract class ProcessingInstruction : CharacterData, LinkStyle, UnionElementOrProcessingInstruction {
     open val target: String
 }
 
-/**
- * Exposes the JavaScript [Comment](https://developer.mozilla.org/en/docs/Web/API/Comment) to Kotlin
- */
 external open class Comment(data: String = definedExternally) : CharacterData {
     override val previousElementSibling: Element?
     override val nextElementSibling: Element?
@@ -3679,9 +3171,6 @@ external open class Comment(data: String = definedExternally) : CharacterData {
     override fun remove()
 }
 
-/**
- * Exposes the JavaScript [Range](https://developer.mozilla.org/en/docs/Web/API/Range) to Kotlin
- */
 external open class Range {
     open val startContainer: Node
     open val startOffset: Int
@@ -3721,9 +3210,6 @@ external open class Range {
     }
 }
 
-/**
- * Exposes the JavaScript [NodeIterator](https://developer.mozilla.org/en/docs/Web/API/NodeIterator) to Kotlin
- */
 external abstract class NodeIterator {
     open val root: Node
     open val referenceNode: Node
@@ -3735,9 +3221,6 @@ external abstract class NodeIterator {
     fun detach()
 }
 
-/**
- * Exposes the JavaScript [TreeWalker](https://developer.mozilla.org/en/docs/Web/API/TreeWalker) to Kotlin
- */
 external abstract class TreeWalker {
     open val root: Node
     open val whatToShow: Int
@@ -3752,9 +3235,6 @@ external abstract class TreeWalker {
     fun nextNode(): Node?
 }
 
-/**
- * Exposes the JavaScript [NodeFilter](https://developer.mozilla.org/en/docs/Web/API/NodeFilter) to Kotlin
- */
 external interface NodeFilter {
     fun acceptNode(node: Node): Short
 
@@ -3778,9 +3258,6 @@ external interface NodeFilter {
     }
 }
 
-/**
- * Exposes the JavaScript [DOMTokenList](https://developer.mozilla.org/en/docs/Web/API/DOMTokenList) to Kotlin
- */
 external abstract class DOMTokenList : ItemArrayLike<String> {
     override val length: Int
     open var value: String
@@ -3794,9 +3271,6 @@ external abstract class DOMTokenList : ItemArrayLike<String> {
 }
 @kotlin.internal.InlineOnly inline operator fun DOMTokenList.get(index: Int): String? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [DOMPointReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMPointReadOnly) to Kotlin
- */
 external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double) {
     open val x: Double
     open val y: Double
@@ -3805,9 +3279,6 @@ external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double)
     fun matrixTransform(matrix: DOMMatrixReadOnly): DOMPoint
 }
 
-/**
- * Exposes the JavaScript [DOMPoint](https://developer.mozilla.org/en/docs/Web/API/DOMPoint) to Kotlin
- */
 external open class DOMPoint : DOMPointReadOnly {
     constructor(point: DOMPointInit)
     constructor(x: Double = definedExternally, y: Double = definedExternally, z: Double = definedExternally, w: Double = definedExternally)
@@ -3817,9 +3288,6 @@ external open class DOMPoint : DOMPointReadOnly {
     override var w: Double
 }
 
-/**
- * Exposes the JavaScript [DOMPointInit](https://developer.mozilla.org/en/docs/Web/API/DOMPointInit) to Kotlin
- */
 external interface DOMPointInit {
     var x: Double? /* = 0.0 */
         get() = definedExternally
@@ -3847,9 +3315,6 @@ inline fun DOMPointInit(x: Double? = 0.0, y: Double? = 0.0, z: Double? = 0.0, w:
     return o
 }
 
-/**
- * Exposes the JavaScript [DOMRect](https://developer.mozilla.org/en/docs/Web/API/DOMRect) to Kotlin
- */
 external open class DOMRect(x: Double = definedExternally, y: Double = definedExternally, width: Double = definedExternally, height: Double = definedExternally) : DOMRectReadOnly {
     override var x: Double
     override var y: Double
@@ -3857,9 +3322,6 @@ external open class DOMRect(x: Double = definedExternally, y: Double = definedEx
     override var height: Double
 }
 
-/**
- * Exposes the JavaScript [DOMRectReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMRectReadOnly) to Kotlin
- */
 external open class DOMRectReadOnly(x: Double, y: Double, width: Double, height: Double) {
     open val x: Double
     open val y: Double
@@ -3903,9 +3365,6 @@ external interface DOMRectList : ItemArrayLike<DOMRect> {
 }
 @kotlin.internal.InlineOnly inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
 
-/**
- * Exposes the JavaScript [DOMQuad](https://developer.mozilla.org/en/docs/Web/API/DOMQuad) to Kotlin
- */
 external open class DOMQuad {
     constructor(p1: DOMPointInit = definedExternally, p2: DOMPointInit = definedExternally, p3: DOMPointInit = definedExternally, p4: DOMPointInit = definedExternally)
     constructor(rect: DOMRectInit)
@@ -3916,9 +3375,6 @@ external open class DOMQuad {
     open val bounds: DOMRectReadOnly
 }
 
-/**
- * Exposes the JavaScript [DOMMatrixReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMMatrixReadOnly) to Kotlin
- */
 external open class DOMMatrixReadOnly(numberSequence: Array<Double>) {
     open val a: Double
     open val b: Double
@@ -3962,9 +3418,6 @@ external open class DOMMatrixReadOnly(numberSequence: Array<Double>) {
     fun toFloat64Array(): Float64Array
 }
 
-/**
- * Exposes the JavaScript [DOMMatrix](https://developer.mozilla.org/en/docs/Web/API/DOMMatrix) to Kotlin
- */
 external open class DOMMatrix() : DOMMatrixReadOnly {
     constructor(transformList: String)
     constructor(other: DOMMatrixReadOnly)
@@ -4023,9 +3476,6 @@ inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO): Scrol
     return o
 }
 
-/**
- * Exposes the JavaScript [ScrollToOptions](https://developer.mozilla.org/en/docs/Web/API/ScrollToOptions) to Kotlin
- */
 external interface ScrollToOptions : ScrollOptions {
     var left: Double?
         get() = definedExternally
@@ -4046,9 +3496,6 @@ inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, 
     return o
 }
 
-/**
- * Exposes the JavaScript [MediaQueryList](https://developer.mozilla.org/en/docs/Web/API/MediaQueryList) to Kotlin
- */
 external abstract class MediaQueryList : EventTarget {
     open val media: String
     open val matches: Boolean
@@ -4059,9 +3506,6 @@ external abstract class MediaQueryList : EventTarget {
     fun removeListener(listener: ((Event) -> Unit)?)
 }
 
-/**
- * Exposes the JavaScript [MediaQueryListEvent](https://developer.mozilla.org/en/docs/Web/API/MediaQueryListEvent) to Kotlin
- */
 external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryListEventInit = definedExternally) : Event {
     open val media: String
     open val matches: Boolean
@@ -4089,9 +3533,6 @@ inline fun MediaQueryListEventInit(media: String? = "", matches: Boolean? = fals
     return o
 }
 
-/**
- * Exposes the JavaScript [Screen](https://developer.mozilla.org/en/docs/Web/API/Screen) to Kotlin
- */
 external abstract class Screen {
     open val availWidth: Int
     open val availHeight: Int
@@ -4101,9 +3542,6 @@ external abstract class Screen {
     open val pixelDepth: Int
 }
 
-/**
- * Exposes the JavaScript [CaretPosition](https://developer.mozilla.org/en/docs/Web/API/CaretPosition) to Kotlin
- */
 external abstract class CaretPosition {
     open val offsetNode: Node
     open val offset: Int
@@ -4168,9 +3606,6 @@ inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BORDER, to
     return o
 }
 
-/**
- * Exposes the JavaScript [GeometryUtils](https://developer.mozilla.org/en/docs/Web/API/GeometryUtils) to Kotlin
- */
 external interface GeometryUtils {
     fun getBoxQuads(options: BoxQuadOptions = definedExternally): Array<DOMQuad>
     fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad

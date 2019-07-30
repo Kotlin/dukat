@@ -1,11 +1,3 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
-// NOTE: THIS FILE IS AUTO-GENERATED, DO NOT EDIT!
-// See libraries/tools/idl2k for details
-
 @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.css.masking
 
@@ -27,9 +19,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/**
- * Exposes the JavaScript [SVGClipPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGClipPathElement) to Kotlin
- */
 external abstract class SVGClipPathElement : SVGElement, SVGUnitTypes {
     open val clipPathUnits: SVGAnimatedEnumeration
     open val transform: SVGAnimatedTransformList
@@ -41,9 +30,6 @@ external abstract class SVGClipPathElement : SVGElement, SVGUnitTypes {
     }
 }
 
-/**
- * Exposes the JavaScript [SVGMaskElement](https://developer.mozilla.org/en/docs/Web/API/SVGMaskElement) to Kotlin
- */
 external abstract class SVGMaskElement : SVGElement, SVGUnitTypes {
     open val maskUnits: SVGAnimatedEnumeration
     open val maskContentUnits: SVGAnimatedEnumeration
