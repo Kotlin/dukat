@@ -35,12 +35,22 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
                 "USVString" -> "String"
                 "\$Array" -> "Array"
                 "sequence" -> "Array"
+                "FrozenArray" -> "Array"
+                "Promise" -> "Promise"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
                 "any" -> "Any"
                 else -> name
             }),
-            params = listOfNotNull(typeParameter?.process()),
+            params = listOfNotNull(typeParameter?.process())
+                    .map { TypeParameterModel(it, listOf()) }
+                    .map {
+                        if (name == "FrozenArray") {
+                            it.copy(variance = Variance.COVARIANT)
+                        } else {
+                            it
+                        }
+                    },
             metaDescription = null
     )
     return typeModel.copy(

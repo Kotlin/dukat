@@ -10,6 +10,8 @@ external abstract class A {
     var intArray: Array<Int>
     var intArray2D: Array<Array<Int>>
     var intSequence: Array<Int>
+    var promise: Promise<Unit>
+    var readArray: Array<out Int>
     fun f(x: Array<Int>): Array<Int>
     fun g(x: A<Int>): A<Int>
     fun h(): Any?

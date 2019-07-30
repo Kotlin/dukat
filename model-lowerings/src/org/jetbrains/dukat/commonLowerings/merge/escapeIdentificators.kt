@@ -3,20 +3,7 @@ package org.jetbrains.dukat.commonLowerings.merge
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.EnumModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.TopLevelModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -111,11 +98,23 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = escapeIdentificator(declaration.name))))
     }
 
+    private fun TypeParameterModel.escape(): TypeParameterModel {
+        return copy(
+                type = if (type is TypeValueModel) {
+                    (type as TypeValueModel).copy(
+                            value = (type as TypeValueModel).value.escape()
+                    )
+                } else {
+                    type
+                }
+        )
+    }
+
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape(),
-                typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.copy(name = typeParameter.name.escape()) }
+                typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape()}
         )))
     }
 
@@ -124,7 +123,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerClassModel(
                 ownerContext.copy(node = declaration.copy(
                         name = declaration.name.escape(),
-                        typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.copy(name = typeParameter.name.escape()) }
+                        typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape() }
                 )))
     }
 

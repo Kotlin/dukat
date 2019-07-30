@@ -2,29 +2,7 @@ package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.AnnotationModel
-import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.ConstructorModel
-import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.EnumModel
-import org.jetbrains.dukat.astModel.ExternalDelegationModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.FunctionTypeModel
-import org.jetbrains.dukat.astModel.HeritageModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
-import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TypeAliasModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
@@ -66,7 +44,7 @@ fun TypeModel.translate(): String {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
             if (isGeneric()) {
-                res.add(translateTypeParams(params))
+                res.add(translateTypeParameters(params))
             }
             if (nullable) {
                 res.add("?")
@@ -117,12 +95,18 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
         ""
     } else {
         "<" + typeParameters.map { typeParameter ->
+            val varianceDescription = when (typeParameter.variance) {
+                Variance.INVARIANT -> ""
+                Variance.COVARIANT -> "out "
+                Variance.CONTRAVARIANT -> "in "
+            }
             val constraintDescription = if (typeParameter.constraints.isEmpty()) {
                 ""
             } else {
                 " : ${typeParameter.constraints[0].translate()}"
             }
-            typeParameter.name.translate() + constraintDescription
+            varianceDescription + typeParameter.type.translate() +
+                    typeParameter.type.translateMeta() + constraintDescription
         }.joinToString(", ") + ">"
     }
 }
@@ -361,7 +345,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
             val typeParams = if (params.isEmpty()) {
                 ""
             } else {
-                "<${params.joinToString("::") { it.translateAsHeritageClause() }}>"
+                "<${params.joinToString("::") { it.type.translateAsHeritageClause() }}>"
             }
 
             when (value) {
