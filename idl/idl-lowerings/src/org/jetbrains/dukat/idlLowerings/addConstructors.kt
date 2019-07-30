@@ -26,14 +26,21 @@ private class ConstructorLowering : IDLLowering {
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val constructors = declaration.extendedAttributes.mapNotNull { it.convertToConstructor() }
-        return if (constructors.size == 1) {
-            declaration.copy(primaryConstructor = constructors[0])
-        } else {
-            declaration.copy(constructors = constructors)
+        return when {
+            constructors.size == 1 -> declaration.copy(
+                    primaryConstructor = constructors[0]
+            )
+            constructors.any { it.arguments.isEmpty() } -> declaration.copy(
+                    primaryConstructor = constructors.find { it.arguments.isEmpty() },
+                    constructors = constructors.filterNot { it.arguments.isEmpty() }
+            )
+            else -> declaration.copy(
+                    constructors = constructors
+            )
         }
     }
 }
 
-fun IDLFileDeclaration.addConstructors() : IDLFileDeclaration {
+fun IDLFileDeclaration.addConstructors(): IDLFileDeclaration {
     return ConstructorLowering().lowerFileDeclaration(this)
 }

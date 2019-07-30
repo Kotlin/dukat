@@ -378,11 +378,12 @@ private fun ClassModel.translate(padding: Int): String {
 
 private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
+    val hasSecondaryConstructors = members.any { it is ConstructorModel }
 
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
+        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
     val openClause = if (abstract) "abstract" else "open"
     val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
