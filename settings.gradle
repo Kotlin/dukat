@@ -17,6 +17,8 @@ pluginManagement {
         useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
       } else if (pluginId == "kotlinx-serialization"){
         useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
+      } else if (pluginId == 'com.google.protobuf') {
+        useModule("com.google.protobuf:protobuf-gradle-plugin:${gradle.protobufGradlePluginVersion}")
       } else  if (pluginId == "com.moowork.node") {
         useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
       }
@@ -33,6 +35,8 @@ gradle.ext {
   nodePluginVersion = "1.3.1"
   kotlinSerializationRuntimeVersion = "0.11.0"
   antlr4_version = "4.7.1"
+  protobufGradlePluginVersion = "0.8.10"
+  protobufImplementationVersion = "3.9.0"
 }
 
 
@@ -59,6 +63,7 @@ include 'panic'
 include 'translator-string'
 include 'ts'
 include 'tsmodel'
+include 'tsmodel-proto'
 include 'tsinterop'
 include 'translator'
 include 'ts-lowerings'
@@ -67,6 +72,7 @@ project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
+project(':tsmodel-proto').projectDir = file("$rootDir/typescript/tsmodel-proto")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
 project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
 
