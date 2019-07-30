@@ -33,7 +33,7 @@ internal class TypeVisitor(private var name: String = "",
             TypeKind.FUNCTION -> IDLFunctionTypeDeclaration(
                     name = name,
                     returnType = returnType,
-                    arguments = arguments,
+                    arguments = arguments.map { it.copy(name = "") },
                     nullable = nullable
             )
         }

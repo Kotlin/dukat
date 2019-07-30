@@ -73,7 +73,12 @@ fun TypeModel.translate(): String {
             val res = mutableListOf("(")
             val paramsList = mutableListOf<String>()
             for (param in parameters) {
-                val paramSerialized = param.name + ": " + param.type.translate() + param.type.translateMeta()
+                val paramNameSerialized = if (param.name != "") {
+                    param.name + ": "
+                } else {
+                    ""
+                }
+                val paramSerialized = paramNameSerialized + param.type.translate() + param.type.translateMeta()
                 paramsList.add(paramSerialized)
             }
             res.add(paramsList.joinToString(", ") + ")")
