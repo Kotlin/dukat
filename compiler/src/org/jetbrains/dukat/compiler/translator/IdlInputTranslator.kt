@@ -6,6 +6,7 @@ import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatemets
+import org.jetbrains.dukat.idlLowerings.resolvePartials
 import org.jetbrains.dukat.idlLowerings.resolveTypedefs
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
@@ -15,6 +16,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
 
     override fun translate(fileName: String): SourceSetModel {
         return parseIDL(fileName, nameResolver)
+                .resolvePartials()
                 .addConstructors()
                 .resolveTypedefs()
                 .resolveImplementsStatemets()

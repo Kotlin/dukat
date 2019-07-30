@@ -28,6 +28,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
     private var dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
+    private var partial = false
 
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
@@ -41,7 +42,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     primaryConstructor = null,
                     constructors = listOf(),
                     parents = parents,
-                    extendedAttributes = extendedAttributes
+                    extendedAttributes = extendedAttributes,
+                    partial = partial
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -50,7 +52,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.DICTIONARY -> IDLDictionaryDeclaration(
                     name = name,
                     members = dictionaryMembers,
-                    parents = parents
+                    parents = parents,
+                    partial = partial
             )
             DefinitionKind.IMPLEMENTS_STATEMENT -> IDLImplementsStatementDeclaration(
                     child = childType,
@@ -77,6 +80,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitInterface_(ctx: WebIDLParser.Interface_Context): IDLTopLevelDeclaration {
+        kind = DefinitionKind.INTERFACE
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitPartialInterface(ctx: WebIDLParser.PartialInterfaceContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
         name = ctx.getName()
         visitChildren(ctx)
@@ -128,8 +138,21 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitPartialDictionary(ctx: WebIDLParser.PartialDictionaryContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.DICTIONARY
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLTopLevelDeclaration {
         dictionaryMembers.add(MemberVisitor().visit(ctx) as IDLDictionaryMemberDeclaration)
+        return defaultResult()
+    }
+
+    override fun visitPartial(ctx: WebIDLParser.PartialContext): IDLTopLevelDeclaration {
+        partial = true
+        visitChildren(ctx)
         return defaultResult()
     }
 }
