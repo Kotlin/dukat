@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external interface Fiber {
     var reset: () -> Any
-    var run: (param: Any? /*= null*/) -> Any
+    var run: (param: Any? /* = null */) -> Any
     var throwInto: (ex: Any) -> Any
 }
 
