@@ -7,20 +7,29 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
     override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
         return when (declaration) {
             is IDLUnionTypeDeclaration -> declaration.copy(unionMembers = declaration.unionMembers.map { lowerTypeDeclaration(it) })
-            is IDLSingleTypeDeclaration -> when (val newType = context.resolveType(declaration)) {
-                is IDLSingleTypeDeclaration -> newType.copy(
-                        typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) },
-                        nullable = declaration.nullable
-                )
-                is IDLUnionTypeDeclaration -> newType.copy(
-                        unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) },
-                        name = declaration.name,
-                        nullable = declaration.nullable
-                )
-                is IDLFunctionTypeDeclaration -> newType.copy(
-                        nullable = declaration.nullable
-                )
-                else -> declaration
+            is IDLSingleTypeDeclaration -> {
+                var newType = context.resolveType(declaration)
+                if (newType is IDLSingleTypeDeclaration && newType != context.resolveType(newType)) {
+                    newType = lowerTypeDeclaration(newType)
+                }
+                when (newType) {
+                    is IDLSingleTypeDeclaration -> {
+                        newType.copy(
+                                typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) }
+                                        ?: newType.typeParameter?.let { lowerTypeDeclaration(it) },
+                                nullable = declaration.nullable || newType.nullable
+                        )
+                    }
+                    is IDLUnionTypeDeclaration -> newType.copy(
+                            unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) },
+                            name = declaration.name,
+                            nullable = declaration.nullable
+                    )
+                    is IDLFunctionTypeDeclaration -> newType.copy(
+                            nullable = declaration.nullable || newType.nullable
+                    )
+                    else -> declaration
+                }
             }
             else -> declaration
         }
