@@ -177,7 +177,13 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = dynamicMemberModels,
+                members = dynamicMemberModels.map {
+                    if (it is PropertyModel && !it.setter) {
+                        it.copy(open = true)
+                    } else {
+                        it
+                    }
+                },
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
