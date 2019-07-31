@@ -2,6 +2,9 @@
 /// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 /// <reference path="../build/package/node_modules/typescript/lib/typescript.d.ts"/>
 
+declare function require(path: string): any;
+
+let declarations = require("declarations");
 
 interface FileResolver {
     resolve(fileName: string): string;
@@ -44,3 +47,6 @@ function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) 
         return astConverter.createSourceSet();
     }
 }
+
+declare var global: any;
+global.main = main;

@@ -4,14 +4,15 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 import org.jetbrains.dukat.idlParser.getNameOrNull
 
 internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
-    private var name : String = ""
-    private var type : IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var name: String = ""
+    private var type: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var constValue: String? = null
     private var static: Boolean = false
@@ -25,13 +26,13 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name,
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) },
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) },
                     type
             )
             MemberKind.SETTER -> IDLSetterDeclaration(
                     name,
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) },
-                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLTypeDeclaration("", null, false)) }
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) },
+                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) }
             )
         }
     }
@@ -96,6 +97,15 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
                 return node.text
             }
         }.visit(ctx)
+        return defaultResult()
+    }
+
+    override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLMemberDeclaration {
+        when (ctx.getFirstValueOrNull()) {
+            "[" -> constValue = "[]"
+            null -> visitChildren(ctx)
+            else -> constValue = ctx.getFirstValueOrNull()
+        }
         return defaultResult()
     }
 

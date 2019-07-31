@@ -10,7 +10,7 @@ def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.5.2"
 node {
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
   version = gradle.nodeVersion
-  yarnVersion = '1.16.0'
+  yarnVersion = '1.17.3'
 
   download = true
 
@@ -41,16 +41,16 @@ task compileTs(type: NodeTask) {
   args = ["-p", "tsconfig.json"]
 }
 
+task webpack(type: NodeTask) {
+  dependsOn = ["compileTs", ":tsmodel-proto:build"]
+  script = file("${project.buildDir}/package/node_modules/webpack/bin/webpack.js")
+}
 
 task createJar(type: Zip) {
-  dependsOn = [compileTs]
+  dependsOn = [webpack]
   baseName 'dukatts'
   extension 'jar'
   destinationDir file("${project.buildDir}/jar")
-
-  from('build/ts') {
-    into 'js'
-  }
 
   from("${packagePath}/node_modules/typescript/lib/tsserverlibrary.js") {
     into 'ts'
@@ -60,6 +60,11 @@ task createJar(type: Zip) {
     include "**/*.d.ts"
     into 'ts'
   }
+
+  from('build/bundle/converter.js') {
+    into 'js'
+  }
+
 }
 
 configurations {

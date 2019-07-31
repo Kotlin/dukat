@@ -4,7 +4,13 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLLexer
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLAssignmentExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFunctionExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLListAssignmentExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamedFunctionExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlParser.getName
 import org.jetbrains.dukat.idlParser.getNameOrNull
 
@@ -54,7 +60,7 @@ class ExtendedAttributeVisitor : WebIDLBaseVisitor<IDLExtendedAttributeDeclarati
 
     override fun visitArgumentList(ctx: WebIDLParser.ArgumentListContext): IDLExtendedAttributeDeclaration {
         hasArgumentList = true
-        object: WebIDLBaseVisitor<Unit>() {
+        object : WebIDLBaseVisitor<Unit>() {
             override fun visitArgument(ctx: WebIDLParser.ArgumentContext) {
                 functionArguments.add(ArgumentVisitor().visit(ctx))
             }

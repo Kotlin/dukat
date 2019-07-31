@@ -6,7 +6,7 @@ import org.jetbrains.dukat.idlDeclarations.*
 interface IDLLowering {
 
     fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        return declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
+        return declaration
     }
 
     fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration): IDLAttributeDeclaration {
@@ -49,7 +49,7 @@ interface IDLLowering {
 
     fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         return declaration.copy(
-                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 members = declaration.members.map { lowerDictionaryMemberDeclaration(it) }
         )
     }
@@ -74,7 +74,7 @@ interface IDLLowering {
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
                 constants = declaration.constants.map { lowerConstantDeclaration(it) },
-                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
                 } else {

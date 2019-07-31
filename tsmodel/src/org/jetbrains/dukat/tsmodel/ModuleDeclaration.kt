@@ -12,4 +12,4 @@ data class ModuleDeclaration(
         val uid: String,
         val resourceName: String,
         val root: Boolean
-) : TopLevelEntity
+) : TopLevelDeclaration

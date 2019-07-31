@@ -1,6 +1,11 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFunctionExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 
 private class ConstructorLowering : IDLLowering {
 
@@ -34,6 +39,6 @@ private class ConstructorLowering : IDLLowering {
     }
 }
 
-fun IDLFileDeclaration.addConstructors() : IDLFileDeclaration {
+fun IDLFileDeclaration.addConstructors(): IDLFileDeclaration {
     return ConstructorLowering().lowerFileDeclaration(this)
 }

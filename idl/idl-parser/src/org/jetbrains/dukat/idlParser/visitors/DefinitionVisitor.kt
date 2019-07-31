@@ -14,15 +14,16 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private var name: String = ""
     private val myAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
     private val operations: MutableList<IDLOperationDeclaration> = mutableListOf()
-    private val parents: MutableList<IDLTypeDeclaration> = mutableListOf()
+    private val parents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
     private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
-    private var typeReference: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
-    private var childType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
-    private var parentType: IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var typeReference: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var childType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var parentType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private val getters: MutableList<IDLGetterDeclaration> = mutableListOf()
     private val setters: MutableList<IDLSetterDeclaration> = mutableListOf()
     private val dictionaryMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
     private val enumMembers: MutableList<String> = mutableListOf()
+    private var isCallback: Boolean = false
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
     override fun defaultResult(): IDLTopLevelDeclaration {
@@ -37,7 +38,9 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     parents = parents,
                     extendedAttributes = extendedAttributes,
                     getters = getters,
-                    setters = setters
+                    setters = setters,
+                    callback = isCallback,
+                    generated = false
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -101,7 +104,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitInheritance(ctx: WebIDLParser.InheritanceContext): IDLTopLevelDeclaration {
-        parents.addAll(ctx.filterIdentifiers().map { IDLTypeDeclaration(it.text, null, false) })
+        parents.addAll(ctx.filterIdentifiers().map { IDLSingleTypeDeclaration(it.text, null, false) })
         return defaultResult()
     }
 
@@ -117,11 +120,17 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitCallbackRestOrInterface(ctx: WebIDLParser.CallbackRestOrInterfaceContext): IDLTopLevelDeclaration {
+        isCallback = true
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitImplementsStatement(ctx: WebIDLParser.ImplementsStatementContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.IMPLEMENTS_STATEMENT
         val identifiers = ctx.filterIdentifiers()
-        childType = IDLTypeDeclaration(identifiers[0].text, null, false)
-        parentType = IDLTypeDeclaration(identifiers[1].text, null, false)
+        childType = IDLSingleTypeDeclaration(identifiers[0].text, null, false)
+        parentType = IDLSingleTypeDeclaration(identifiers[1].text, null, false)
         return defaultResult()
     }
 
@@ -134,6 +143,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLTopLevelDeclaration {
         dictionaryMembers.add(MemberVisitor().visit(ctx) as IDLDictionaryMemberDeclaration)
+        return defaultResult()
+    }
+
+    override fun visitCallbackRest(ctx: WebIDLParser.CallbackRestContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.TYPEDEF
+        name = ctx.getName()
+        typeReference = TypeVisitor().visit(ctx)
         return defaultResult()
     }
 
