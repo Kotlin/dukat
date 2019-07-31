@@ -294,6 +294,10 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration, generatedFunction)
 }
 
+fun processEnumMember(memberName: String): String {
+    return memberName.toUpperCase().replace('-', '_').ifEmpty { "EMPTY" }
+}
+
 fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
@@ -310,7 +314,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(
-                name = IdentifierEntity(memberName.toUpperCase()),
+                name = IdentifierEntity(processEnumMember(memberName)),
                 type = TypeValueModel(
                         value = declaration.name,
                         params = listOf(),
