@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom.parsing
 
 import kotlin.js.*

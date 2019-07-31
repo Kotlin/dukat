@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom
 
 import kotlin.js.*
@@ -3235,6 +3234,7 @@ external abstract class TreeWalker {
     fun nextNode(): Node?
 }
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface NodeFilter {
     fun acceptNode(node: Node): Short
 
@@ -3647,6 +3647,7 @@ external @marker interface HTMLOrSVGImageElement {
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface DocumentReadyState {
     companion object
 }
@@ -3655,6 +3656,7 @@ inline val DocumentReadyState.Companion.INTERACTIVE: DocumentReadyState get() = 
 inline val DocumentReadyState.Companion.COMPLETE: DocumentReadyState get() = "complete".asDynamic().unsafeCast<DocumentReadyState>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanPlayTypeResult {
     companion object
 }
@@ -3663,6 +3665,7 @@ inline val CanPlayTypeResult.Companion.MAYBE: CanPlayTypeResult get() = "maybe".
 inline val CanPlayTypeResult.Companion.PROBABLY: CanPlayTypeResult get() = "probably".asDynamic().unsafeCast<CanPlayTypeResult>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface TextTrackMode {
     companion object
 }
@@ -3671,6 +3674,7 @@ inline val TextTrackMode.Companion.HIDDEN: TextTrackMode get() = "hidden".asDyna
 inline val TextTrackMode.Companion.SHOWING: TextTrackMode get() = "showing".asDynamic().unsafeCast<TextTrackMode>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface TextTrackKind {
     companion object
 }
@@ -3681,6 +3685,7 @@ inline val TextTrackKind.Companion.CHAPTERS: TextTrackKind get() = "chapters".as
 inline val TextTrackKind.Companion.METADATA: TextTrackKind get() = "metadata".asDynamic().unsafeCast<TextTrackKind>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SelectionMode {
     companion object
 }
@@ -3690,6 +3695,7 @@ inline val SelectionMode.Companion.END: SelectionMode get() = "end".asDynamic().
 inline val SelectionMode.Companion.PRESERVE: SelectionMode get() = "preserve".asDynamic().unsafeCast<SelectionMode>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasFillRule {
     companion object
 }
@@ -3697,6 +3703,7 @@ inline val CanvasFillRule.Companion.NONZERO: CanvasFillRule get() = "nonzero".as
 inline val CanvasFillRule.Companion.EVENODD: CanvasFillRule get() = "evenodd".asDynamic().unsafeCast<CanvasFillRule>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ImageSmoothingQuality {
     companion object
 }
@@ -3705,6 +3712,7 @@ inline val ImageSmoothingQuality.Companion.MEDIUM: ImageSmoothingQuality get() =
 inline val ImageSmoothingQuality.Companion.HIGH: ImageSmoothingQuality get() = "high".asDynamic().unsafeCast<ImageSmoothingQuality>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasLineCap {
     companion object
 }
@@ -3713,6 +3721,7 @@ inline val CanvasLineCap.Companion.ROUND: CanvasLineCap get() = "round".asDynami
 inline val CanvasLineCap.Companion.SQUARE: CanvasLineCap get() = "square".asDynamic().unsafeCast<CanvasLineCap>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasLineJoin {
     companion object
 }
@@ -3721,6 +3730,7 @@ inline val CanvasLineJoin.Companion.BEVEL: CanvasLineJoin get() = "bevel".asDyna
 inline val CanvasLineJoin.Companion.MITER: CanvasLineJoin get() = "miter".asDynamic().unsafeCast<CanvasLineJoin>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasTextAlign {
     companion object
 }
@@ -3731,6 +3741,7 @@ inline val CanvasTextAlign.Companion.RIGHT: CanvasTextAlign get() = "right".asDy
 inline val CanvasTextAlign.Companion.CENTER: CanvasTextAlign get() = "center".asDynamic().unsafeCast<CanvasTextAlign>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasTextBaseline {
     companion object
 }
@@ -3742,6 +3753,7 @@ inline val CanvasTextBaseline.Companion.IDEOGRAPHIC: CanvasTextBaseline get() = 
 inline val CanvasTextBaseline.Companion.BOTTOM: CanvasTextBaseline get() = "bottom".asDynamic().unsafeCast<CanvasTextBaseline>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CanvasDirection {
     companion object
 }
@@ -3750,6 +3762,7 @@ inline val CanvasDirection.Companion.RTL: CanvasDirection get() = "rtl".asDynami
 inline val CanvasDirection.Companion.INHERIT: CanvasDirection get() = "inherit".asDynamic().unsafeCast<CanvasDirection>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ScrollRestoration {
     companion object
 }
@@ -3757,6 +3770,7 @@ inline val ScrollRestoration.Companion.AUTO: ScrollRestoration get() = "auto".as
 inline val ScrollRestoration.Companion.MANUAL: ScrollRestoration get() = "manual".asDynamic().unsafeCast<ScrollRestoration>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ImageOrientation {
     companion object
 }
@@ -3764,6 +3778,7 @@ inline val ImageOrientation.Companion.NONE: ImageOrientation get() = "none".asDy
 inline val ImageOrientation.Companion.FLIPY: ImageOrientation get() = "flipY".asDynamic().unsafeCast<ImageOrientation>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface PremultiplyAlpha {
     companion object
 }
@@ -3772,6 +3787,7 @@ inline val PremultiplyAlpha.Companion.PREMULTIPLY: PremultiplyAlpha get() = "pre
 inline val PremultiplyAlpha.Companion.DEFAULT: PremultiplyAlpha get() = "default".asDynamic().unsafeCast<PremultiplyAlpha>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ColorSpaceConversion {
     companion object
 }
@@ -3779,6 +3795,7 @@ inline val ColorSpaceConversion.Companion.NONE: ColorSpaceConversion get() = "no
 inline val ColorSpaceConversion.Companion.DEFAULT: ColorSpaceConversion get() = "default".asDynamic().unsafeCast<ColorSpaceConversion>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ResizeQuality {
     companion object
 }
@@ -3788,6 +3805,7 @@ inline val ResizeQuality.Companion.MEDIUM: ResizeQuality get() = "medium".asDyna
 inline val ResizeQuality.Companion.HIGH: ResizeQuality get() = "high".asDynamic().unsafeCast<ResizeQuality>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface BinaryType {
     companion object
 }
@@ -3795,6 +3813,7 @@ inline val BinaryType.Companion.BLOB: BinaryType get() = "blob".asDynamic().unsa
 inline val BinaryType.Companion.ARRAYBUFFER: BinaryType get() = "arraybuffer".asDynamic().unsafeCast<BinaryType>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface WorkerType {
     companion object
 }
@@ -3802,6 +3821,7 @@ inline val WorkerType.Companion.CLASSIC: WorkerType get() = "classic".asDynamic(
 inline val WorkerType.Companion.MODULE: WorkerType get() = "module".asDynamic().unsafeCast<WorkerType>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ShadowRootMode {
     companion object
 }
@@ -3809,6 +3829,7 @@ inline val ShadowRootMode.Companion.OPEN: ShadowRootMode get() = "open".asDynami
 inline val ShadowRootMode.Companion.CLOSED: ShadowRootMode get() = "closed".asDynamic().unsafeCast<ShadowRootMode>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ScrollBehavior {
     companion object
 }
@@ -3817,6 +3838,7 @@ inline val ScrollBehavior.Companion.INSTANT: ScrollBehavior get() = "instant".as
 inline val ScrollBehavior.Companion.SMOOTH: ScrollBehavior get() = "smooth".asDynamic().unsafeCast<ScrollBehavior>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ScrollLogicalPosition {
     companion object
 }
@@ -3826,6 +3848,7 @@ inline val ScrollLogicalPosition.Companion.END: ScrollLogicalPosition get() = "e
 inline val ScrollLogicalPosition.Companion.NEAREST: ScrollLogicalPosition get() = "nearest".asDynamic().unsafeCast<ScrollLogicalPosition>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface CSSBoxType {
     companion object
 }

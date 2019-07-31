@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.dom.svg
 
 import kotlin.js.*
@@ -220,6 +219,7 @@ external abstract class SVGStringList {
 @kotlin.internal.InlineOnly inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem; }
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGUnitTypes {
 
     companion object {
@@ -239,6 +239,7 @@ external interface SVGFitToViewBox {
     val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
 }
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGZoomAndPan {
     var zoomAndPan: Short
 

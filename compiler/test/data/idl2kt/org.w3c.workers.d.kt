@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.workers
 
 import kotlin.js.*
@@ -412,6 +411,7 @@ external @marker interface UnionClientOrMessagePortOrServiceWorker {
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ServiceWorkerState {
     companion object
 }
@@ -422,6 +422,7 @@ inline val ServiceWorkerState.Companion.ACTIVATED: ServiceWorkerState get() = "a
 inline val ServiceWorkerState.Companion.REDUNDANT: ServiceWorkerState get() = "redundant".asDynamic().unsafeCast<ServiceWorkerState>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface FrameType {
     companion object
 }
@@ -431,6 +432,7 @@ inline val FrameType.Companion.NESTED: FrameType get() = "nested".asDynamic().un
 inline val FrameType.Companion.NONE: FrameType get() = "none".asDynamic().unsafeCast<FrameType>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ClientType {
     companion object
 }

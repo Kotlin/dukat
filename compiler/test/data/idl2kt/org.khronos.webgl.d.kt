@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.khronos.webgl
 
 import kotlin.js.*
@@ -98,6 +97,7 @@ external abstract class WebGLShaderPrecisionFormat {
     open val precision: Int
 }
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface WebGLRenderingContextBase {
     val canvas: HTMLCanvasElement
     val drawingBufferWidth: Int

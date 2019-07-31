@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.fetch
 
 import kotlin.js.*
@@ -166,6 +165,7 @@ inline fun ResponseInit(status: Short? = 200, statusText: String? = "OK", header
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestType {
     companion object
 }
@@ -179,6 +179,7 @@ inline val RequestType.Companion.TRACK: RequestType get() = "track".asDynamic().
 inline val RequestType.Companion.VIDEO: RequestType get() = "video".asDynamic().unsafeCast<RequestType>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestDestination {
     companion object
 }
@@ -199,6 +200,7 @@ inline val RequestDestination.Companion.WORKER: RequestDestination get() = "work
 inline val RequestDestination.Companion.XSLT: RequestDestination get() = "xslt".asDynamic().unsafeCast<RequestDestination>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestMode {
     companion object
 }
@@ -208,6 +210,7 @@ inline val RequestMode.Companion.NO_CORS: RequestMode get() = "no-cors".asDynami
 inline val RequestMode.Companion.CORS: RequestMode get() = "cors".asDynamic().unsafeCast<RequestMode>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestCredentials {
     companion object
 }
@@ -216,6 +219,7 @@ inline val RequestCredentials.Companion.SAME_ORIGIN: RequestCredentials get() = 
 inline val RequestCredentials.Companion.INCLUDE: RequestCredentials get() = "include".asDynamic().unsafeCast<RequestCredentials>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestCache {
     companion object
 }
@@ -227,6 +231,7 @@ inline val RequestCache.Companion.FORCE_CACHE: RequestCache get() = "force-cache
 inline val RequestCache.Companion.ONLY_IF_CACHED: RequestCache get() = "only-if-cached".asDynamic().unsafeCast<RequestCache>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface RequestRedirect {
     companion object
 }
@@ -235,6 +240,7 @@ inline val RequestRedirect.Companion.ERROR: RequestRedirect get() = "error".asDy
 inline val RequestRedirect.Companion.MANUAL: RequestRedirect get() = "manual".asDynamic().unsafeCast<RequestRedirect>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ResponseType {
     companion object
 }

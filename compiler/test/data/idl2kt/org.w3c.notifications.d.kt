@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.notifications
 
 import kotlin.js.*
@@ -194,6 +193,7 @@ inline fun NotificationEventInit(notification: Notification?, action: String? = 
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface NotificationPermission {
     companion object
 }
@@ -202,6 +202,7 @@ inline val NotificationPermission.Companion.DENIED: NotificationPermission get()
 inline val NotificationPermission.Companion.GRANTED: NotificationPermission get() = "granted".asDynamic().unsafeCast<NotificationPermission>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface NotificationDirection {
     companion object
 }

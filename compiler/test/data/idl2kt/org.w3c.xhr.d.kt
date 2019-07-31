@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 package org.w3c.xhr
 
 import kotlin.js.*
@@ -107,6 +106,7 @@ inline fun ProgressEventInit(lengthComputable: Boolean? = false, loaded: Int? = 
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface XMLHttpRequestResponseType {
     companion object
 }
