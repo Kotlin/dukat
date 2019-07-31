@@ -3,9 +3,7 @@ package org.jetbrains.dukat.compiler.translator
 import org.jetbrains.dukat.idlModels.process
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
-import org.jetbrains.dukat.idlLowerings.addConstructors
-import org.jetbrains.dukat.idlLowerings.resolveImplementsStatemets
-import org.jetbrains.dukat.idlLowerings.resolveTypedefs
+import org.jetbrains.dukat.idlLowerings.*
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.translator.InputTranslator
 
@@ -15,7 +13,9 @@ class IdlInputTranslator: InputTranslator {
         return parseIDL(fileName)
                 .addConstructors()
                 .resolveTypedefs()
-                .resolveImplementsStatemets()
+                .specifyDefaultValues()
+                .resolveImplementsStatements()
+                .resolveTypes()
                 .process()
                 .lowerOverrides()
     }

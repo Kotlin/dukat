@@ -1,19 +1,53 @@
 package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
-import org.jetbrains.dukat.astModel.statements.*
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.changeComment
+import org.jetbrains.dukat.idlDeclarations.toNullable
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-fun IDLTypeDeclaration.process(): TypeValueModel {
+fun IDLSingleTypeDeclaration.process(): TypeValueModel {
     val typeModel = TypeValueModel(
             value = IdentifierEntity(when (name) {
                 "void" -> "Unit"
@@ -37,11 +71,12 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
                 "sequence" -> "Array"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
+                "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name
             }),
             params = listOfNotNull(typeParameter?.process()),
-            metaDescription = null
+            metaDescription = comment
     )
     return typeModel.copy(
             nullable = when (typeModel.value) {
@@ -50,6 +85,24 @@ fun IDLTypeDeclaration.process(): TypeValueModel {
                 else -> nullable
             }
     )
+}
+
+fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
+    return FunctionTypeModel(
+            parameters = arguments.map { it.process() },
+            type = returnType.process(),
+            metaDescription = comment,
+            nullable = nullable
+    )
+}
+
+fun IDLTypeDeclaration.process(): TypeModel {
+    return when (this) {
+        is IDLSingleTypeDeclaration -> process()
+        is IDLFunctionTypeDeclaration -> process()
+        //there shouldn't be any UnionTypeDeclarations at this stage
+        else -> raiseConcern("unprocessed type declaration: ${this}") { TypeValueModel(IdentifierEntity("IMPOSSIBLE"), listOf(), null) }
+    }
 }
 
 fun IDLArgumentDeclaration.process(): ParameterModel {
@@ -63,7 +116,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
-    return if (extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
+    return if (callback || extendedAttributes.contains(IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject"))) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = attributes.filterNot { it.static }.mapNotNull { it.process() } +
@@ -122,7 +175,7 @@ fun IDLInterfaceDeclaration.convertToModel(): TopLevelModel {
 fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
-            type = type.process().copy(nullable = true),
+            type = type.toNullable().changeComment(null).process(),
             initializer = if (defaultValue != null) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
@@ -265,7 +318,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
         )
         is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
-                type = type.process().copy(nullable = true),
+                type = type.toNullable().process(),
                 typeParameters = listOf(),
                 static = false,
                 override = false,

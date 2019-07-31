@@ -2,6 +2,7 @@
 external abstract class A {
     var x: Int
     var y: Int
+    var z: A<Int>?
     var intArray: Array<Int>
     fun f(x: Int): Int
     companion object {
