@@ -23,7 +23,7 @@ internal class TypeVisitor(private var name: String = "",
                     nullable = nullable
             )
             TypeKind.UNION -> IDLUnionTypeDeclaration(
-                    name = unionMembers.joinToString(
+                    name = unionMembers.sortedBy { it.name }.joinToString(
                             separator = "Or",
                             prefix = "Union"
                     ) { it.name },
