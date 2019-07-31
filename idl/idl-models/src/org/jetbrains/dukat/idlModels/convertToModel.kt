@@ -74,7 +74,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
             } else {
                 null
             },
-            vararg = false,
+            vararg = variadic,
             optional = false
     )
 }
