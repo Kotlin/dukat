@@ -11,8 +11,8 @@ external open class A(a: Int) {
     }
 }
 external interface B {
-    var a: Boolean? get() = definedExternally; set(value) = definedExternally
-    var b: Boolean? get() = definedExternally; set(value) = definedExternally
+    var a: Boolean? /* = true */ get() = definedExternally; set(value) = definedExternally
+    var b: Boolean? /* = false */ get() = definedExternally; set(value) = definedExternally
 }
 @kotlin.internal.InlineOnly
 inline fun B(a: Boolean? = true, b: Boolean? = false): B { val o = js("({})"); o["a"] = a; o["b"] = b; return o }

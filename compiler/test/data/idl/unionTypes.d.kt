@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class UnresolvedUnions {
     var x: dynamic
     var y: dynamic

@@ -4,6 +4,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 
 private class ImplementsStatementContext : IDLLowering {

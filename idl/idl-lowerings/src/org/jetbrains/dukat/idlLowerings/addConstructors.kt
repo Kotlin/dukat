@@ -6,6 +6,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 
 private class ConstructorLowering : IDLLowering {
 

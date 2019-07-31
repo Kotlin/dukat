@@ -5,7 +5,6 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.idlDeclarations.*

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlLowerings
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import java.math.BigInteger
 
@@ -54,6 +55,6 @@ private class DefaultValueSpecifier : IDLLowering {
     }
 }
 
-fun IDLFileDeclaration.specifyDefaultValues(): IDLFileDeclaration {
-    return DefaultValueSpecifier().lowerFileDeclaration(this)
+fun IDLSourceSetDeclaration.specifyDefaultValues(): IDLSourceSetDeclaration {
+    return DefaultValueSpecifier().lowerSourceSetDeclaration(this)
 }

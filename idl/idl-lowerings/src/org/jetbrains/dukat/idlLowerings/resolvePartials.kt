@@ -63,6 +63,10 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                 constructors = listOf(),
                 parents = partials.flatMap { it.parents }.distinct(),
                 extendedAttributes = partials.flatMap { it.extendedAttributes }.distinct(),
+                getters = partials.flatMap { it.getters }.distinct(),
+                setters = partials.flatMap { it.setters }.distinct(),
+                callback = partials.any { it.callback },
+                generated = partials.any { it.generated },
                 partial = false
         )
     }
