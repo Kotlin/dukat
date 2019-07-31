@@ -13,6 +13,6 @@ class DirectoryReferencesResolver : IdlReferencesResolver {
                     (it.name.endsWith(WEBIDL_DECLARATION_EXTENSION)
                             || it.name.endsWith(IDL_DECLARATION_EXTENSION)) &&
                     it.absolutePath != File(fileName).canonicalFile.absolutePath
-        }?.map { it.absolutePath }.orEmpty()
+        }?.map { it.absolutePath }.orEmpty().sorted()
     }
 }
