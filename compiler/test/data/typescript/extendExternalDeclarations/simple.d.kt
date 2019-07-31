@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 inline fun Event.foo() { this.asDynamic().foo() }
 inline var Event.bar: Any get() = this.asDynamic().bar; set(value) { this.asDynamic().bar = value }
-inline operator fun Event.get(prop: String): Number? { return this.asDynamic().get(prop) }
+inline operator fun Event.get(prop: String): Number? = this.asDynamic().get(prop)
 inline operator fun Event.set(prop: String, value: Number) { this.asDynamic().set(prop, value) }
 inline var Event.someField: String get() = this.asDynamic().someField; set(value) { this.asDynamic().someField = value }
 inline var Event.optionalField: Any? get() = this.asDynamic().optionalField; set(value) { this.asDynamic().optionalField = value }

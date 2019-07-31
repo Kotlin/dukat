@@ -17,8 +17,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-inline fun <T, B> Promise<T>.foo(b: B): T { return this.asDynamic().foo(b) }
-inline fun <T0, T, B> Promise<T0>.foo(a: Any, b: B): T { return this.asDynamic().foo(a, b) }
+inline fun <T, B> Promise<T>.foo(b: B): T = this.asDynamic().foo(b)
+inline fun <T0, T, B> Promise<T0>.foo(a: Any, b: B): T = this.asDynamic().foo(a, b)
 inline var <T> Promise<T>.bar: Array<T> get() = this.asDynamic().bar; set(value) { this.asDynamic().bar = value }
 
 // ------------------------------------------------------------------------------------------

@@ -25,8 +25,7 @@ external interface KeyBinding {
     fun getKeyboardHandler(): Any
     fun onCommandKey(e: Any, hashId: Any, keyCode: Any)
     fun onTextInput(text: Any)
-    companion object : Foo by definedExternally {
-    }
+    companion object : Foo by definedExternally
 }
 external interface Foo {
     fun foo(editor: Editor): Boolean
