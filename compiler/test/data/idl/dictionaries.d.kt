@@ -28,3 +28,8 @@ inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: D
 external abstract class A {
     var attributes: WebGLContextAttributes
 }
+external interface UndefinedMemberDictionary {
+    var str: String? get() = definedExternally; set(value) = definedExternally
+}
+@kotlin.internal.InlineOnly
+inline fun UndefinedMemberDictionary(str: String? = undefined): UndefinedMemberDictionary { val o = js("({})"); o["str"] = str; return o }

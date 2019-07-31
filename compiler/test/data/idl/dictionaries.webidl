@@ -25,3 +25,7 @@ dictionary PointerEventInit : MouseEventInit {
 interface A {
     attribute WebGLContextAttributes attributes;
 };
+
+dictionary UndefinedMemberDictionary {
+    DOMString str;
+};

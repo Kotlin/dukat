@@ -17,7 +17,10 @@ private class DefaultValueSpecifier : IDLLowering {
     }
 
     private fun IDLDictionaryMemberDeclaration.specifyDefaultValue(): String? {
-        if (defaultValue == null || this.type !is IDLSingleTypeDeclaration) {
+        if (defaultValue == null) {
+            return "undefined"
+        }
+        if (this.type !is IDLSingleTypeDeclaration) {
             return defaultValue
         }
         return when (this.type.name) {
@@ -42,7 +45,11 @@ private class DefaultValueSpecifier : IDLLowering {
         val specifiedDefaultValue = declaration.specifyDefaultValue()
         return declaration.copy(
                 defaultValue = specifiedDefaultValue,
-                type = declaration.type.changeComment("= $specifiedDefaultValue")
+                type = if (declaration.defaultValue != null) {
+                    declaration.type.changeComment("= $specifiedDefaultValue")
+                } else {
+                    declaration.type
+                }
         )
     }
 }
