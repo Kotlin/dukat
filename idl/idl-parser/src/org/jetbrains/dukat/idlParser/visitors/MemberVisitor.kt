@@ -4,14 +4,15 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 import org.jetbrains.dukat.idlParser.getNameOrNull
 
 internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
     private var kind: MemberKind = MemberKind.ATTRIBUTE
 
-    private var name : String = ""
-    private var type : IDLTypeDeclaration = IDLTypeDeclaration("", null, false)
+    private var name: String = ""
+    private var type: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private val arguments: MutableList<IDLArgumentDeclaration> = mutableListOf()
     private var constValue: String? = null
     private var static: Boolean = false
@@ -23,11 +24,23 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
+            MemberKind.GETTER -> IDLGetterDeclaration(
+                    name,
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) },
+                    type
+            )
+            MemberKind.SETTER -> IDLSetterDeclaration(
+                    name,
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) },
+                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false)) }
+            )
         }
     }
 
     override fun visitOperationRest(ctx: WebIDLParser.OperationRestContext?): IDLMemberDeclaration {
-        kind = MemberKind.OPERATION
+        if (kind != MemberKind.SETTER && kind != MemberKind.GETTER) {
+            kind = MemberKind.OPERATION
+        }
         visitChildren(ctx)
         return defaultResult()
     }
@@ -87,6 +100,15 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLMemberDeclaration {
+        when (ctx.getFirstValueOrNull()) {
+            "[" -> constValue = "[]"
+            null -> visitChildren(ctx)
+            else -> constValue = ctx.getFirstValueOrNull()
+        }
+        return defaultResult()
+    }
+
     override fun visitStaticMemberRest(ctx: WebIDLParser.StaticMemberRestContext?): IDLMemberDeclaration {
         static = true
         visitChildren(ctx)
@@ -106,8 +128,16 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitSpecial(ctx: WebIDLParser.SpecialContext): IDLMemberDeclaration {
+        when (ctx.text) {
+            "getter" -> kind = MemberKind.GETTER
+            "setter" -> kind = MemberKind.SETTER
+        }
+        return defaultResult()
+    }
+
 }
 
 private enum class MemberKind {
-    OPERATION, ATTRIBUTE, CONSTANT, DICTIONARY_MEMBER
+    OPERATION, ATTRIBUTE, CONSTANT, DICTIONARY_MEMBER, GETTER, SETTER
 }

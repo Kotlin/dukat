@@ -1,17 +1,7 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.ClassLikeModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.*
 
 private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     visitor(this)
@@ -82,20 +72,38 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                             else -> it
                         }
                     }
-
+    val staticProperties = module.topLevelAsStaticProperties()
     return when (this) {
         is InterfaceModel -> copy(
                 members = members + mergedMembers,
-                companionObject = companionObject.copy(
-                        members = companionObject.members + module.topLevelAsStaticProperties()
-                )
+                companionObject = if (staticProperties.isNotEmpty()) {
+                    companionObject?.copy(
+                            members = companionObject!!.members + staticProperties)
+                            ?: CompanionObjectModel(
+                                    "",
+                                    staticProperties,
+                                    listOf()
+                            )
+                } else {
+                    companionObject
+                }
         )
-        is ClassModel -> copy(
-                members = members + mergedMembers,
-                companionObject = companionObject.copy(
-                        members = companionObject.members + module.topLevelAsStaticProperties()
-                )
-        )
+        is ClassModel -> {
+            copy(
+                    members = members + mergedMembers,
+                    companionObject = if (staticProperties.isNotEmpty()) {
+                        companionObject?.copy(
+                                members = companionObject!!.members + staticProperties)
+                                ?: CompanionObjectModel(
+                                        "",
+                                        staticProperties,
+                                        listOf()
+                                )
+                    } else {
+                        companionObject
+                    }
+            )
+        }
         else -> this
     }
 }

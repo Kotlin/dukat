@@ -3,19 +3,7 @@ package org.jetbrains.dukat.commonLowerings.merge
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.unquote
-import org.jetbrains.dukat.astModel.ClassLikeModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MergeableModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.*
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
@@ -58,8 +46,8 @@ private fun MergeableModel.convert(): MemberModel {
     }
 }
 
-private fun CompanionObjectModel.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): CompanionObjectModel {
-    val members = members.toMutableList()
+private fun CompanionObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): CompanionObjectModel? {
+    val members = this?.members.orEmpty().toMutableList()
     modulesToBeMerged.getOrDefault(ownerName, mutableListOf()).forEach { module ->
         val submoduleDecls = module.declarations
                 .filterIsInstance(MergeableModel::class.java)
@@ -67,7 +55,11 @@ private fun CompanionObjectModel.merge(ownerName: NameEntity, modulesToBeMerged:
         members.addAll(submoduleDecls)
     }
 
-    return copy(members = members)
+    return this?.copy(members = members) ?: if (members.isEmpty()) {
+        null
+    } else {
+        CompanionObjectModel("", members, listOf())
+    }
 }
 
 private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeModel>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
@@ -85,7 +77,7 @@ private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<
 fun InterfaceModel.merge(interfaceModel: InterfaceModel): InterfaceModel {
     return copy(
             members = members + interfaceModel.members,
-            companionObject = companionObject.copy(members = companionObject.members + interfaceModel.companionObject.members)
+            companionObject = companionObject.mergeWith(interfaceModel.companionObject)
     )
 }
 
