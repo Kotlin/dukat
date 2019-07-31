@@ -4,20 +4,12 @@ sealed class NameEntity : Entity
 
 data class IdentifierEntity(
         val value: String
-) : NameEntity() {
-    override fun toString(): String {
-        return value
-    }
-}
+) : NameEntity()
 
 data class QualifierEntity(
         val left: NameEntity,
         val right: IdentifierEntity
-) : NameEntity() {
-    override fun toString(): String {
-        return left.toString() + "." + right.value
-    }
-}
+) : NameEntity()
 
 
 private operator fun NameEntity.plus(b: NameEntity): NameEntity {
