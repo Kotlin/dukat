@@ -561,7 +561,7 @@ fun SourceSetNode.introduceModels() = SourceSetModel(
                     root = root,
                     referencedFiles = source.referencedFiles.map { referenceFile ->
                         val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
-                        IdentifierEntity(absolutePath)
+                        absolutePath
                     })
 
             generated + listOf(module)

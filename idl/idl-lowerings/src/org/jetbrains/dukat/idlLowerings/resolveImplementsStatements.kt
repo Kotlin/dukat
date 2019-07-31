@@ -4,6 +4,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 
 private class ImplementsStatementContext : IDLLowering {
@@ -30,7 +31,9 @@ private class ImplementsStatementResolver(val context: ImplementsStatementContex
     }
 }
 
-fun IDLFileDeclaration.resolveImplementsStatements(): IDLFileDeclaration {
+fun IDLSourceSetDeclaration.resolveImplementsStatements(): IDLSourceSetDeclaration {
     val context = ImplementsStatementContext()
-    return ImplementsStatementResolver(context).lowerFileDeclaration(context.lowerFileDeclaration(this))
+    return ImplementsStatementResolver(context).lowerSourceSetDeclaration(
+            context.lowerSourceSetDeclaration(this)
+    )
 }

@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class A {
     var s1: String
     var s2: String

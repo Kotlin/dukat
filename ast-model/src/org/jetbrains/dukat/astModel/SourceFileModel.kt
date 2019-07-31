@@ -7,7 +7,7 @@ data class SourceFileModel(
         val name: String?,
         val fileName: String,
         val root: ModuleModel,
-        val referencedFiles: List<IdentifierEntity>
+        val referencedFiles: List<String>
 ) : Entity
 
 fun SourceFileModel.transform(rootHandler: (ModuleModel) -> ModuleModel)

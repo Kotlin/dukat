@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class A {
     var intVar: Int
     fun f1(): Double

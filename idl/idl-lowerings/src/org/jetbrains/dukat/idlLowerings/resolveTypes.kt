@@ -5,6 +5,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
@@ -16,7 +17,7 @@ private class TypeResolver : IDLLowering {
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
     private val dependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
 
-    private var file: IDLFileDeclaration = IDLFileDeclaration("", listOf())
+    private var sourceSet: IDLSourceSetDeclaration = IDLSourceSetDeclaration(listOf())
 
     fun getDependencies(declaration: IDLInterfaceDeclaration): List<IDLSingleTypeDeclaration> {
         return dependenciesToAdd[declaration.name]?.toList() ?: listOf()
@@ -42,7 +43,7 @@ private class TypeResolver : IDLLowering {
                     ))
                 }
                 is IDLSingleTypeDeclaration -> {
-                    if (member.typeParameter != null || !file.containsInterface(member.name)) {
+                    if (member.typeParameter != null || !sourceSet.containsInterface(member.name)) {
                         failedToResolveUnionTypes += unionType.name
                         return
                     }
@@ -83,7 +84,7 @@ private class TypeResolver : IDLLowering {
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !file.containsInterface(declaration.name)) {
+            return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
                 IDLSingleTypeDeclaration("\$dynamic", null, false)
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
@@ -99,7 +100,6 @@ private class TypeResolver : IDLLowering {
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
-        file = fileDeclaration
         var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         newFileDeclaration = newFileDeclaration.copy(
                 declarations = newFileDeclaration.declarations + resolvedUnionTypes.map {
@@ -117,12 +117,18 @@ private class TypeResolver : IDLLowering {
                             getters = listOf(),
                             setters = listOf(),
                             callback = false,
-                            generated = true
+                            generated = true,
+                            partial = false
                     )
                 }
         )
         resolvedUnionTypes.clear()
         return newFileDeclaration
+    }
+
+    override fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
+        this.sourceSet = sourceSet
+        return super.lowerSourceSetDeclaration(sourceSet)
     }
 }
 
@@ -135,10 +141,10 @@ private class DependencyResolver(val typeResolver: TypeResolver) : IDLLowering {
     }
 }
 
-fun IDLFileDeclaration.resolveTypes(): IDLFileDeclaration {
+fun IDLSourceSetDeclaration.resolveTypes(): IDLSourceSetDeclaration {
     val typeResolver = TypeResolver()
     val dependencyResolver = DependencyResolver(typeResolver)
-    return dependencyResolver.lowerFileDeclaration(
-            typeResolver.lowerFileDeclaration(this)
+    return dependencyResolver.lowerSourceSetDeclaration(
+            typeResolver.lowerSourceSetDeclaration(this)
     )
 }

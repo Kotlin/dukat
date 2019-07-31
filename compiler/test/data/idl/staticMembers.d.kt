@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class A {
     companion object {
         fun f(x: Int)

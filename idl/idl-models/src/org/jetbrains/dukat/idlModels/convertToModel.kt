@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.idlModels
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astCommon.toNameEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.*
 import org.jetbrains.dukat.idlDeclarations.*
@@ -431,24 +433,28 @@ fun IDLMemberDeclaration.process(): MemberModel? {
     }
 }
 
-fun IDLFileDeclaration.process(): SourceSetModel {
+fun IDLFileDeclaration.process(): SourceFileModel {
     val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
-            name = ROOT_PACKAGENAME,
-            shortName = ROOT_PACKAGENAME,
+            name = packageName ?: ROOT_PACKAGENAME,
+            shortName = packageName?.rightMost() ?: ROOT_PACKAGENAME,
             declarations = modelDeclarations,
             annotations = mutableListOf(),
             submodules = listOf(),
-            imports = mutableListOf()
+            imports = mutableListOf("kotlin.js.*".toNameEntity())
     )
 
-    val source = SourceFileModel(
+    return SourceFileModel(
             name = null,
             fileName = File(fileName).normalize().absolutePath,
             root = module,
-            referencedFiles = listOf()
+            referencedFiles = referencedFiles
     )
+}
 
-    return SourceSetModel(listOf(source))
+fun IDLSourceSetDeclaration.process(): SourceSetModel {
+    return SourceSetModel(
+            sources = files.map { it.process() }
+    )
 }

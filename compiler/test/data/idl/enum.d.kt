@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external interface ScrollBehavior {
     companion object
 }

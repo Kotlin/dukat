@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlLowerings
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
@@ -62,7 +63,9 @@ private class TypedefContext : IDLLowering {
     }
 }
 
-fun IDLFileDeclaration.resolveTypedefs(): IDLFileDeclaration {
+fun IDLSourceSetDeclaration.resolveTypedefs(): IDLSourceSetDeclaration {
     val context = TypedefContext()
-    return TypedefResolver(context).lowerFileDeclaration(context.lowerFileDeclaration(this))
+    return TypedefResolver(context).lowerSourceSetDeclaration(
+            context.lowerSourceSetDeclaration(this)
+    )
 }

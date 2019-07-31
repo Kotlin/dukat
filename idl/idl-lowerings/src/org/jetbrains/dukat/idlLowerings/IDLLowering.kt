@@ -106,4 +106,10 @@ interface IDLLowering {
                 declarations = lowerTopLevelDeclarations(fileDeclaration.declarations)
         )
     }
+
+    fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
+        return sourceSet.copy(
+                files = sourceSet.files.map { lowerFileDeclaration(it) }
+        )
+    }
 }

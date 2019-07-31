@@ -2,21 +2,16 @@ package org.jetbrains.dukat.cli
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
+import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
-import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
-import org.jetbrains.dukat.translator.TranslationUnitResult
+import org.jetbrains.dukat.translator.*
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
@@ -272,7 +267,7 @@ fun main(vararg args: String) {
                     compile(
                             sourceName,
                             options.outDir,
-                            IdlInputTranslator(),
+                            IdlInputTranslator(DirectoryReferencesResolver()),
                             options.reportPath
                     )
 

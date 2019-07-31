@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external interface WebGLContextAttributes {
     var alpha: Boolean? /* = true */ get() = definedExternally; set(value) = definedExternally
     var depth: Boolean? /* = true */ get() = definedExternally; set(value) = definedExternally

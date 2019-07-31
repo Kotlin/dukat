@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class A
 @kotlin.internal.InlineOnly
 inline operator fun A.get(x: Double): Int = asDynamic()[x]
