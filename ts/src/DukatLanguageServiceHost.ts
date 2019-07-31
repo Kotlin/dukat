@@ -1,7 +1,5 @@
 /// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
 
-import fromString = ts.ScriptSnapshot.fromString;
-
 class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     constructor(
@@ -41,7 +39,7 @@ class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
         try {
             var contents = this.fileResolver.resolve(fileName);
-            return fromString(contents);
+            return ts.ScriptSnapshot.fromString(contents);
         } catch (e) {
             // TODO: need to pass error logger from frontend here
         }

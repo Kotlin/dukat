@@ -9,4 +9,4 @@ data class VariableDeclaration(
         val modifiers: List<ModifierDeclaration>,
 
         val uid: String
-) : TopLevelEntity
+) : TopLevelDeclaration

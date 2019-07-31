@@ -83,6 +83,7 @@ processResources {
 
 task propagateToIdeaRuntime(type: Copy) {
     dependsOn = [":ts:createJar"]
+
     from(getTsDependency())
     into "out/production/resources/"
 }

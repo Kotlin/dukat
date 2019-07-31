@@ -16,7 +16,7 @@ import java.util.function.Supplier
 private fun InteropEngine.loadAstBuilder() {
     val fileResolver = FileResolver()
     eval(fileResolver.readResource("ts/tsserverlibrary.js"))
-    eval(fileResolver.readResource("js/dukat-ast-builder.js"))
+    eval(fileResolver.readResource("js/converter.js"))
 }
 
 private fun createGraalInterop(): InteropGraal {

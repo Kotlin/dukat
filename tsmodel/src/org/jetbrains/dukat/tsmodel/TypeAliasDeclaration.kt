@@ -11,4 +11,4 @@ data class TypeAliasDeclaration(
         val typeReference: ParameterValueDeclaration,
 
         val uid: String
-): TopLevelEntity
+): TopLevelDeclaration

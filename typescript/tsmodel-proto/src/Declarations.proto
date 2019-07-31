@@ -1,0 +1,18 @@
+syntax = "proto3";
+package dukat.ast.proto;
+
+option java_outer_classname = "Declarations";
+
+message DefinitionInfoDeclaration {
+    string fileName = 1;
+}
+
+message EnumTokenDeclaration {
+    string value = 1;
+    string meta = 2;
+}
+
+message EnumDeclaration {
+    string name = 1;
+    repeated EnumTokenDeclaration values = 2;
+}
