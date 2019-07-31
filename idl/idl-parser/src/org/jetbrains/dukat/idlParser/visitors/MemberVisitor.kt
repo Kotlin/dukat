@@ -3,7 +3,16 @@ package org.jetbrains.dukat.idlParser.visitors
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 import org.jetbrains.dukat.idlParser.getNameOrNull

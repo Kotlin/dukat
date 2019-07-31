@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.astCommon.*
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 

@@ -1,6 +1,22 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.idlDeclarations.*
+import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 
 
 interface IDLLowering {
@@ -80,8 +96,8 @@ interface IDLLowering {
                 } else {
                     lowerConstructorDeclaration(declaration.primaryConstructor!!)
                 },
-                getters = declaration.getters.map {lowerGetterDeclaration(it) },
-                setters = declaration.setters.map {lowerSetterDeclaration(it) }
+                getters = declaration.getters.map { lowerGetterDeclaration(it) },
+                setters = declaration.setters.map { lowerSetterDeclaration(it) }
         )
     }
 
