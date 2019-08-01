@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
@@ -8,6 +9,8 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 private class PartialContext : IDLLowering {
     private val interfaces: MutableMap<String, MutableList<IDLInterfaceDeclaration>> = mutableMapOf()
     private val dictionaries: MutableMap<String, MutableList<IDLDictionaryDeclaration>> = mutableMapOf()
+    private val enums: MutableMap<String, MutableList<IDLEnumDeclaration>> = mutableMapOf()
+
     private val alreadyResolvedPartials: MutableList<String> = mutableListOf()
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
@@ -26,12 +29,24 @@ private class PartialContext : IDLLowering {
         return declaration
     }
 
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+        if (!enums.containsKey(declaration.name)) {
+            enums[declaration.name] = mutableListOf()
+        }
+        enums[declaration.name]!!.add(declaration)
+        return declaration
+    }
+
     fun getInterfaces(name: String): List<IDLInterfaceDeclaration> {
         return interfaces[name].orEmpty()
     }
 
     fun getDictionaries(name: String): List<IDLDictionaryDeclaration> {
         return dictionaries[name].orEmpty()
+    }
+
+    fun getEnums(name: String): List<IDLEnumDeclaration> {
+        return enums[name].orEmpty()
     }
 
     fun addResolvedPartial(name: String) {
@@ -87,6 +102,20 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         )
     }
 
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+        if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
+            return declaration.copy(
+                    partial = true
+            )
+        }
+        val partials = context.getEnums(declaration.name)
+        context.addResolvedPartial(declaration.name)
+        return IDLEnumDeclaration(
+                name = declaration.name,
+                members = partials.flatMap { it.members }.distinct()
+        )
+    }
+
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
         val newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         return newFileDeclaration.copy(
@@ -94,6 +123,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                     when (it) {
                         is IDLInterfaceDeclaration -> !it.partial
                         is IDLDictionaryDeclaration -> !it.partial
+                        is IDLEnumDeclaration -> !it.partial
                         else -> true
                     }
                 }
