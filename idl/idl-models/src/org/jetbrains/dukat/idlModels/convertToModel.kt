@@ -225,9 +225,9 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     }
 
     val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
-        )
+            callback || extendedAttributes.contains(
+                    IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
+            )
     ) {
         InterfaceModel(
                 name = IdentifierEntity(name),
@@ -480,12 +480,20 @@ fun IDLMemberDeclaration.process(): MemberModel? {
 }
 
 fun IDLFileDeclaration.process(): SourceFileModel {
-    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
+    val modelsExceptEnumsAndGenerated = declarations.filterNot {
+        it is IDLEnumDeclaration || (it is IDLInterfaceDeclaration && it.generated)
+    }.mapNotNull { it.convertToModel() }.flatten()
+
+    val enumModels = declarations.filterIsInstance<IDLEnumDeclaration>().map { it.convertToModel() }.flatten()
+
+    val generatedModels = declarations.filter {
+        it is IDLInterfaceDeclaration && it.generated
+    }.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
             name = packageName ?: ROOT_PACKAGENAME,
             shortName = packageName?.rightMost() ?: ROOT_PACKAGENAME,
-            declarations = modelDeclarations,
+            declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
             imports = mutableListOf("kotlin.js.*".toNameEntity())
