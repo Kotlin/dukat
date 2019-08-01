@@ -59,29 +59,21 @@ inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true
     return o
 }
 
-external abstract class WebGLObject {
-}
+external abstract class WebGLObject
 
-external abstract class WebGLBuffer : WebGLObject {
-}
+external abstract class WebGLBuffer : WebGLObject
 
-external abstract class WebGLFramebuffer : WebGLObject {
-}
+external abstract class WebGLFramebuffer : WebGLObject
 
-external abstract class WebGLProgram : WebGLObject {
-}
+external abstract class WebGLProgram : WebGLObject
 
-external abstract class WebGLRenderbuffer : WebGLObject {
-}
+external abstract class WebGLRenderbuffer : WebGLObject
 
-external abstract class WebGLShader : WebGLObject {
-}
+external abstract class WebGLShader : WebGLObject
 
-external abstract class WebGLTexture : WebGLObject {
-}
+external abstract class WebGLTexture : WebGLObject
 
-external abstract class WebGLUniformLocation {
-}
+external abstract class WebGLUniformLocation
 
 external abstract class WebGLActiveInfo {
     open val size: Int
@@ -1092,9 +1084,7 @@ external open class DataView(buffer: ArrayBuffer, byteOffset: Int = definedExter
     fun setFloat64(byteOffset: Int, value: Double, littleEndian: Boolean = definedExternally)
 }
 
-external @marker interface BufferDataSource {
-}
+external @marker interface BufferDataSource
 
-external @marker interface TexImageSource {
-}
+external @marker interface TexImageSource
 

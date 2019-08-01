@@ -564,8 +564,7 @@ inline fun ConstrainDOMStringParameters(exact: dynamic = undefined, ideal: dynam
     return o
 }
 
-external interface Capabilities {
-}
+external interface Capabilities
 
 @kotlin.internal.InlineOnly
 inline fun Capabilities(): Capabilities {
@@ -573,8 +572,7 @@ inline fun Capabilities(): Capabilities {
     return o
 }
 
-external interface Settings {
-}
+external interface Settings
 
 @kotlin.internal.InlineOnly
 inline fun Settings(): Settings {
@@ -582,8 +580,7 @@ inline fun Settings(): Settings {
     return o
 }
 
-external interface ConstraintSet {
-}
+external interface ConstraintSet
 
 @kotlin.internal.InlineOnly
 inline fun ConstraintSet(): ConstraintSet {

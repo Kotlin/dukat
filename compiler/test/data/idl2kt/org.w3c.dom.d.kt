@@ -325,11 +325,9 @@ external abstract class HTMLElement : Element, ElementCSSInlineStyle, GlobalEven
     fun forceSpellCheck()
 }
 
-external abstract class HTMLUnknownElement : HTMLElement {
-}
+external abstract class HTMLUnknownElement : HTMLElement
 
-external abstract class DOMStringMap {
-}
+external abstract class DOMStringMap
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value; }
 
@@ -337,8 +335,7 @@ external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
 }
 
-external abstract class HTMLHeadElement : HTMLElement {
-}
+external abstract class HTMLHeadElement : HTMLElement
 
 external abstract class HTMLTitleElement : HTMLElement {
     open var text: String
@@ -464,8 +461,7 @@ external abstract class HTMLTimeElement : HTMLElement {
     open var dateTime: String
 }
 
-external abstract class HTMLSpanElement : HTMLElement {
-}
+external abstract class HTMLSpanElement : HTMLElement
 
 external abstract class HTMLBRElement : HTMLElement {
     open var clear: String
@@ -490,8 +486,7 @@ external abstract class HTMLModElement : HTMLElement {
     open var dateTime: String
 }
 
-external abstract class HTMLPictureElement : HTMLElement {
-}
+external abstract class HTMLPictureElement : HTMLElement
 
 external abstract class HTMLSourceElement : HTMLElement {
     open var src: String
@@ -703,8 +698,7 @@ external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
     open var playsInline: Boolean
 }
 
-external abstract class HTMLAudioElement : HTMLMediaElement {
-}
+external abstract class HTMLAudioElement : HTMLMediaElement
 
 external open class Audio(src: String = definedExternally) : HTMLAudioElement {
     override val children: HTMLCollection
@@ -3543,38 +3537,27 @@ external interface GeometryUtils {
     fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMPoint
 }
 
-external @marker interface UnionElementOrProcessingInstruction {
-}
+external @marker interface UnionElementOrProcessingInstruction
 
-external @marker interface UnionElementOrHTMLCollection {
-}
+external @marker interface UnionElementOrHTMLCollection
 
-external @marker interface UnionElementOrRadioNodeList {
-}
+external @marker interface UnionElementOrRadioNodeList
 
-external @marker interface UnionHTMLOptGroupElementOrHTMLOptionElement {
-}
+external @marker interface UnionHTMLOptGroupElementOrHTMLOptionElement
 
-external @marker interface UnionAudioTrackOrTextTrackOrVideoTrack {
-}
+external @marker interface UnionAudioTrackOrTextTrackOrVideoTrack
 
-external @marker interface UnionElementOrMouseEvent {
-}
+external @marker interface UnionElementOrMouseEvent
 
-external @marker interface UnionMessagePortOrWindow {
-}
+external @marker interface UnionMessagePortOrWindow
 
-external @marker interface UnionMessagePortOrServiceWorker {
-}
+external @marker interface UnionMessagePortOrServiceWorker
 
-external @marker interface HTMLOrSVGScriptElement {
-}
+external @marker interface HTMLOrSVGScriptElement
 
-external @marker interface RenderingContext {
-}
+external @marker interface RenderingContext
 
-external @marker interface HTMLOrSVGImageElement {
-}
+external @marker interface HTMLOrSVGImageElement
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

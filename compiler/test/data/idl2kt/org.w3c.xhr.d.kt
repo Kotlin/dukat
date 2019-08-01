@@ -28,8 +28,7 @@ external abstract class XMLHttpRequestEventTarget : EventTarget {
     open var onloadend: ((Event) -> dynamic)?
 }
 
-external abstract class XMLHttpRequestUpload : XMLHttpRequestEventTarget {
-}
+external abstract class XMLHttpRequestUpload : XMLHttpRequestEventTarget
 
 external open class XMLHttpRequest : XMLHttpRequestEventTarget {
     var onreadystatechange: ((Event) -> dynamic)?

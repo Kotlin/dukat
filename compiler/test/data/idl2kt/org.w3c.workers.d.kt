@@ -163,8 +163,7 @@ external open class ExtendableEvent(type: String, eventInitDict: ExtendableEvent
     fun waitUntil(f: Promise<Any?>)
 }
 
-external interface ExtendableEventInit : EventInit {
-}
+external interface ExtendableEventInit : EventInit
 
 @kotlin.internal.InlineOnly
 inline fun ExtendableEventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ExtendableEventInit {
@@ -382,11 +381,9 @@ external abstract class CacheStorage {
     fun keys(): Promise<dynamic>
 }
 
-external open class FunctionalEvent : ExtendableEvent {
-}
+external open class FunctionalEvent : ExtendableEvent
 
-external @marker interface UnionClientOrMessagePortOrServiceWorker {
-}
+external @marker interface UnionClientOrMessagePortOrServiceWorker
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
