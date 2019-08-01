@@ -16,6 +16,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface I {
-    companion object : I by definedExternally {
-    }
+    companion object : I by definedExternally
 }

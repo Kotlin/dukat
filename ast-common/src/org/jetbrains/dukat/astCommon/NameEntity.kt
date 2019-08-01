@@ -13,7 +13,7 @@ data class QualifierEntity(
 
 
 private operator fun NameEntity.plus(b: NameEntity): NameEntity {
-    return  when (b) {
+    return when (b) {
         is IdentifierEntity -> QualifierEntity(this, b)
         is QualifierEntity -> ((this + b.left) + b.right)
     }

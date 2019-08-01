@@ -115,10 +115,10 @@ private class MissingMemberContext : IDLLowering {
     fun resolveDictionary(name: String): IDLDictionaryDeclaration? = dictionaries[name]
 }
 
-fun IDLFileDeclaration.addMissingMembers(): IDLFileDeclaration {
+fun IDLSourceSetDeclaration.addMissingMembers(): IDLSourceSetDeclaration {
     val context = MissingMemberContext()
-    return MissingMemberResolver(context).lowerFileDeclaration(
-            context.lowerFileDeclaration(this)
+    return MissingMemberResolver(context).lowerSourceSetDeclaration(
+            context.lowerSourceSetDeclaration(this)
     )
 
 }

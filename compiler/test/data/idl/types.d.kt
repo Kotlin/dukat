@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external abstract class A {
     var s1: String
     var s2: String
@@ -6,6 +8,7 @@ external abstract class A {
     var nullableString: String?
     var obj: dynamic
     var nullableObject: dynamic
+    var value: dynamic
     var child: A<Int>?
     var intArray: Array<Int>
     var intArray2D: Array<Array<Int>>

@@ -25,6 +25,7 @@ dependencies {
     implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
 
     implementation(project(":idl-declarations"))
+    implementation(project(":idl-reference-resolver"))
     implementation(project(":ast-common"))
 
     runtime files(project.sourceSets.generated.output.classesDirs)

@@ -1,0 +1,40 @@
+plugins {
+    id "java"
+    id "com.google.protobuf"
+}
+
+dependencies {
+    implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
+}
+
+sourceSets {
+    generated {
+        java.srcDir("${project.buildDir}/generated/source/proto/main/java")
+    }
+
+    main {
+        proto {
+            srcDirs = ['src']
+        }
+
+        java {
+            srcDirs = ["${project.buildDir}/generated/source/proto/main/java"]
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${gradle.protobufImplementationVersion}"
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                js {
+                    option "import_style=commonjs"
+                    option "binary"
+                }
+            }
+        }
+    }
+}

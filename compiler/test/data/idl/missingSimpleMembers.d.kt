@@ -1,4 +1,6 @@
 
+import kotlin.js.*
+
 external interface A {
     var x: Int
     fun f()

@@ -6,6 +6,11 @@ data class IDLInterfaceDeclaration(
         val operations: List<IDLOperationDeclaration>,
         val primaryConstructor: IDLConstructorDeclaration?,
         val constructors: List<IDLConstructorDeclaration>,
-        val parents: List<IDLTypeDeclaration>,
-        val extendedAttributes: List<IDLExtendedAttributeDeclaration>
+        val parents: List<IDLSingleTypeDeclaration>,
+        val extendedAttributes: List<IDLExtendedAttributeDeclaration>,
+        val getters: List<IDLGetterDeclaration>,
+        val setters: List<IDLSetterDeclaration>,
+        val callback: Boolean,
+        val generated: Boolean,
+        val partial: Boolean
 ) : IDLClassLikeDeclaration
