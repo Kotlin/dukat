@@ -16,6 +16,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.mergeWith
+import org.jetbrains.dukat.astModel.transform
 
 
 private fun ModuleModel.canBeMerged(): Boolean {
