@@ -6,6 +6,7 @@ interface A {
 
     attribute object obj;
     attribute object? nullableObject;
+    attribute UnknownType value;
 
     attribute A<long>? child;
     attribute long[] intArray;

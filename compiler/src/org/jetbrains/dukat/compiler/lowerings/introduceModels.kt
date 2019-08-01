@@ -187,7 +187,7 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             } else {
                 initializer?.let { valueNode ->
                     // TODO: don't like this particular cast
-                    StatementCallModel(valueNode.value, null, meta)
+                    StatementCallModel(valueNode.value, null, listOf(), meta)
                 }
             },
             vararg = vararg,
@@ -291,11 +291,15 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
     return ClassModel(
             name = name,
             members = membersSplitted.dynamic,
-            companionObject = CompanionObjectModel(
-                    "",
-                    membersSplitted.static,
-                    emptyList()
-            ),
+            companionObject = if (membersSplitted.static.isNotEmpty()) {
+                CompanionObjectModel(
+                        "",
+                        membersSplitted.static,
+                        emptyList()
+                )
+            } else {
+                null
+            },
             primaryConstructor = if (primaryConstructor != null) {
                 ConstructorModel(
                         parameters = primaryConstructor!!.parameters.map { param -> param.process() },
@@ -339,11 +343,15 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
     return InterfaceModel(
             name = name,
             members = membersSplitted.dynamic,
-            companionObject = CompanionObjectModel(
-                    "",
-                    membersSplitted.static,
-                    emptyList()
-            ),
+            companionObject = if (membersSplitted.static.isNotEmpty()) {
+                CompanionObjectModel(
+                        "",
+                        membersSplitted.static,
+                        emptyList()
+                )
+            } else {
+                null
+            },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
                         type = TypeValueModel(typeParam.value, listOf(), null),
@@ -554,7 +562,7 @@ fun SourceSetNode.introduceModels() = SourceSetModel(
                     root = root,
                     referencedFiles = source.referencedFiles.map { referenceFile ->
                         val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
-                        IdentifierEntity(absolutePath)
+                        absolutePath
                     })
 
             generated + listOf(module)

@@ -13,11 +13,7 @@ const val FORMAT_TAB = "    "
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
-        if (this.startsWith("=")) {
-            " /*${this}*/"
-        } else {
-            " /* ${this} */"
-        }
+        " /* ${this} */"
     } else {
         ""
     }
@@ -55,7 +51,12 @@ fun TypeModel.translate(): String {
             val res = mutableListOf("(")
             val paramsList = mutableListOf<String>()
             for (param in parameters) {
-                val paramSerialized = param.name + ": " + param.type.translate() + param.type.translateMeta()
+                val paramNameSerialized = if (param.name != "") {
+                    param.name + ": "
+                } else {
+                    ""
+                }
+                val paramSerialized = paramNameSerialized + param.type.translate() + param.type.translateMeta()
                 paramsList.add(paramSerialized)
             }
             res.add(paramsList.joinToString(", ") + ")")
@@ -143,7 +144,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
 }
 
 private fun StatementCallModel.translate(): String {
-    return "${value.translate()}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
+    return "${value.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
 }
 
 private fun StatementModel.translate(): String {
@@ -181,6 +182,8 @@ private fun FunctionModel.translate(): String {
 
     val body = if (body.isEmpty()) {
         ""
+    } else if (body.size == 1 && body[0] is ReturnStatementModel) {
+        " = ${(body[0] as ReturnStatementModel).statement.translate()}"
     } else {
         " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
     }
@@ -233,6 +236,9 @@ private fun VariableModel.translate(): String {
         val getter = "get() = ${get?.translate()};"
         val setter = "set(value) { ${set?.translate()} }"
         " ${getter} ${setter}"
+    } else if (get != null) {
+        val getter = "get() = ${get?.translate()}"
+        " ${getter}"
     } else ""
 
     val typeParams = if (typeParameters.isEmpty()) {
@@ -389,7 +395,7 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
 
     val members = members
-    val staticMembers = companionObject.members
+    val staticMembers = companionObject?.members.orEmpty()
 
     val hasMembers = members.isNotEmpty()
     val hasStaticMembers = staticMembers.isNotEmpty()
@@ -403,8 +409,10 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
         }
     }
 
-    if (staticMembers.isNotEmpty()) {
-        output(FORMAT_TAB.repeat(padding + 1) + "companion object {")
+    if (companionObject != null) {
+        output(FORMAT_TAB.repeat(padding + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
+    }
+    if (hasStaticMembers) {
         staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(padding + 2) + it }).forEach {
             output(it)
         }
@@ -424,11 +432,9 @@ private fun InterfaceModel.translate(padding: Int): String {
 
 fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     val hasMembers = members.isNotEmpty()
-    val staticMembers = companionObject.members
+    val staticMembers = companionObject?.members.orEmpty()
 
-    val showCompanionObject = staticMembers.isNotEmpty() || companionObject.parentEntities.isNotEmpty()
-
-    val isBlock = hasMembers || staticMembers.isNotEmpty() || showCompanionObject
+    val isBlock = hasMembers || staticMembers.isNotEmpty() || companionObject != null
     val parents = translateHeritagModels(parentEntities)
 
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
@@ -436,17 +442,19 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     if (isBlock) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
-        val parents = if (companionObject.parentEntities.isEmpty()) {
-            ""
-        } else {
-            " : ${companionObject.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
-        }
+        if (companionObject != null) {
+            val parents = if (companionObject!!.parentEntities.isEmpty()) {
+                ""
+            } else {
+                " : ${companionObject!!.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
+            }
 
-        if (showCompanionObject) {
-            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents} {")
+            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents}${if (staticMembers.isEmpty()) "" else " {"}")
 
-            staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }.forEach { output(it) }
-            output("${FORMAT_TAB.repeat(padding + 1)}}")
+            if (staticMembers.isNotEmpty()) {
+                staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }.forEach { output(it) }
+                output("${FORMAT_TAB.repeat(padding + 1)}}")
+            }
         }
 
         output("${FORMAT_TAB.repeat(padding)}}")

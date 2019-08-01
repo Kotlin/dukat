@@ -1,19 +1,8 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.ClassLikeModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.panic.raiseConcern
 
 private data class ClassLikeKey(
@@ -42,7 +31,7 @@ private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
             name = name,
             typeParameters = typeParameters,
             members = members + otherClass.members,
-            companionObject = companionObject.copy(members = companionObject.members + otherClass.companionObject.members),
+            companionObject = companionObject.mergeWith(otherClass.companionObject),
             parentEntities = parentEntities + otherClass.parentEntities
     )
 }
@@ -70,7 +59,7 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
             name = name,
             typeParameters = typeParameters,
             members = members + openInterfaceMembers,
-            companionObject = companionObject.copy(members = companionObject.members + otherInterface.companionObject.members),
+            companionObject = companionObject.mergeWith(otherInterface.companionObject),
             parentEntities = parentEntities + otherInterface.parentEntities
     )
 }
@@ -80,7 +69,7 @@ private fun InterfaceModel.mergeWithInterface(otherInterface: InterfaceModel): I
             name = name,
             typeParameters = typeParameters,
             members = members + otherInterface.members,
-            companionObject = companionObject.copy(members = companionObject.members + otherInterface.companionObject.members),
+            companionObject = companionObject.mergeWith(otherInterface.companionObject),
             parentEntities = parentEntities + otherInterface.parentEntities
     )
 }

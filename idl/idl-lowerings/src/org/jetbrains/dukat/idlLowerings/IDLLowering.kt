@@ -7,9 +7,13 @@ import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
@@ -18,7 +22,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 interface IDLLowering {
 
     fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
-        return declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
+        return declaration
     }
 
     fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration): IDLAttributeDeclaration {
@@ -61,8 +65,22 @@ interface IDLLowering {
 
     fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         return declaration.copy(
-                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 members = declaration.members.map { lowerDictionaryMemberDeclaration(it) }
+        )
+    }
+
+    fun lowerGetterDeclaration(declaration: IDLGetterDeclaration): IDLGetterDeclaration {
+        return declaration.copy(
+                key = lowerArgumentDeclaration(declaration.key),
+                valueType = lowerTypeDeclaration(declaration.valueType)
+        )
+    }
+
+    fun lowerSetterDeclaration(declaration: IDLSetterDeclaration): IDLSetterDeclaration {
+        return declaration.copy(
+                key = lowerArgumentDeclaration(declaration.key),
+                value = lowerArgumentDeclaration(declaration.value)
         )
     }
 
@@ -72,12 +90,14 @@ interface IDLLowering {
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
                 constants = declaration.constants.map { lowerConstantDeclaration(it) },
-                parents = declaration.parents.map { lowerTypeDeclaration(it) },
+                parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
                 } else {
                     lowerConstructorDeclaration(declaration.primaryConstructor!!)
-                }
+                },
+                getters = declaration.getters.map { lowerGetterDeclaration(it) },
+                setters = declaration.setters.map { lowerSetterDeclaration(it) }
         )
     }
 
@@ -100,6 +120,12 @@ interface IDLLowering {
     fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
         return fileDeclaration.copy(
                 declarations = lowerTopLevelDeclarations(fileDeclaration.declarations)
+        )
+    }
+
+    fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
+        return sourceSet.copy(
+                files = sourceSet.files.map { lowerFileDeclaration(it) }
         )
     }
 }
