@@ -7,4 +7,5 @@ dependencies {
     implementation(project(":ast-model"))
     implementation(project(":idl-declarations"))
     implementation(project(":panic"))
+    implementation(project(":translator-string"))
 }

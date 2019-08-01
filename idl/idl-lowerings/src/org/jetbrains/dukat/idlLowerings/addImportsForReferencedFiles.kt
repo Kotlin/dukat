@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import translate
 
 private class ImportContext(sourceSetModel: SourceSetModel) {
     private val packageNames: MutableMap<String, NameEntity> = mutableMapOf()
@@ -28,7 +29,7 @@ private fun SourceFileModel.addImportsForReferencedFiles(context: ImportContext)
     val newImports = (root.imports +
             referencedFiles.mapNotNull {
                 context.getPackageName(it)?.appendLeft(IdentifierEntity("*"))
-            }).distinct().sortedBy { it.toString() }
+            }).distinct().sortedBy { it.translate() }
     return copy(root = root.copy(
             imports = newImports.toMutableList()
     ))
