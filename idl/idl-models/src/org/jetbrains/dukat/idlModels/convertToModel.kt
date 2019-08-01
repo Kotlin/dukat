@@ -298,7 +298,7 @@ fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.toNullable().changeComment(null).process(),
-            initializer = if (defaultValue != null) {
+            initializer = if (defaultValue != null && !required) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
                         null

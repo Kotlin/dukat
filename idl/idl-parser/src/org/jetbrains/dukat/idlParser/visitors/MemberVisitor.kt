@@ -26,13 +26,14 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
     private var constValue: String? = null
     private var static: Boolean = false
     private var readOnly: Boolean = false
+    private var required: Boolean = false
 
     override fun defaultResult(): IDLMemberDeclaration? {
         return when (kind) {
             MemberKind.OPERATION -> IDLOperationDeclaration(name, type, arguments, static)
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
-            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue)
+            MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue, required)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name,
                     arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) },
@@ -142,6 +143,13 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
         when (ctx.text) {
             "getter" -> kind = MemberKind.GETTER
             "setter" -> kind = MemberKind.SETTER
+        }
+        return defaultResult()
+    }
+
+    override fun visitRequired(ctx: WebIDLParser.RequiredContext): IDLMemberDeclaration? {
+        if (ctx.text.isNotEmpty()) {
+            required = true
         }
         return defaultResult()
     }

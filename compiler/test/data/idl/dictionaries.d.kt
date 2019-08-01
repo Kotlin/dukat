@@ -32,6 +32,7 @@ external abstract class A {
 }
 external interface UndefinedMemberDictionary {
     var str: String? get() = definedExternally; set(value) = definedExternally
+    var str2: String? get() = definedExternally; set(value) = definedExternally
 }
 @kotlin.internal.InlineOnly
-inline fun UndefinedMemberDictionary(str: String? = undefined): UndefinedMemberDictionary { val o = js("({})"); o["str"] = str; return o }
+inline fun UndefinedMemberDictionary(str: String?, str2: String? = undefined): UndefinedMemberDictionary { val o = js("({})"); o["str"] = str; o["str2"] = str2; return o }
