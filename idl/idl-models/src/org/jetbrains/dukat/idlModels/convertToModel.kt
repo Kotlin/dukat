@@ -243,10 +243,19 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         )
     }
 
-    val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
+    val annotationModels = listOfNotNull(if (companionObjectModel != null) {
+        AnnotationModel(
+                "Suppress",
+                listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
         )
+    } else {
+        null
+    }).toMutableList()
+
+    val declaration = if (
+            callback || extendedAttributes.contains(
+                    IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
+            )
     ) {
         InterfaceModel(
                 name = IdentifierEntity(name),
@@ -254,7 +263,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
-                annotations = mutableListOf(),
+                annotations = annotationModels,
                 external = true
         )
     } else {
@@ -392,7 +401,12 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            annotations = mutableListOf(),
+            annotations = mutableListOf(
+                    AnnotationModel(
+                            "Suppress",
+                            listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                    )
+            ),
             external = true
     )
     val generatedVariables = members.map { memberName ->
