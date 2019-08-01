@@ -45,12 +45,10 @@ external interface SVGBoundingBoxOptions {
 @kotlin.internal.InlineOnly
 inline fun SVGBoundingBoxOptions(fill: Boolean? = true, stroke: Boolean? = false, markers: Boolean? = false, clipped: Boolean? = false): SVGBoundingBoxOptions {
     val o = js("({})")
-
     o["fill"] = fill
     o["stroke"] = stroke
     o["markers"] = markers
     o["clipped"] = clipped
-
     return o
 }
 

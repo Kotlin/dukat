@@ -100,7 +100,6 @@ external interface RequestInit {
 @kotlin.internal.InlineOnly
 inline fun RequestInit(method: String? = undefined, headers: dynamic = undefined, body: dynamic = undefined, referrer: String? = undefined, referrerPolicy: dynamic = undefined, mode: RequestMode? = undefined, credentials: RequestCredentials? = undefined, cache: RequestCache? = undefined, redirect: RequestRedirect? = undefined, integrity: String? = undefined, keepalive: Boolean? = undefined, window: Any? = undefined): RequestInit {
     val o = js("({})")
-
     o["method"] = method
     o["headers"] = headers
     o["body"] = body
@@ -113,7 +112,6 @@ inline fun RequestInit(method: String? = undefined, headers: dynamic = undefined
     o["integrity"] = integrity
     o["keepalive"] = keepalive
     o["window"] = window
-
     return o
 }
 
@@ -156,11 +154,9 @@ external interface ResponseInit {
 @kotlin.internal.InlineOnly
 inline fun ResponseInit(status: Short? = 200, statusText: String? = "OK", headers: dynamic = undefined): ResponseInit {
     val o = js("({})")
-
     o["status"] = status
     o["statusText"] = statusText
     o["headers"] = headers
-
     return o
 }
 

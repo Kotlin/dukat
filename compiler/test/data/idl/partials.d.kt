@@ -15,4 +15,9 @@ external interface B {
     var b: Boolean? /* = false */ get() = definedExternally; set(value) = definedExternally
 }
 @kotlin.internal.InlineOnly
-inline fun B(a: Boolean? = true, b: Boolean? = false): B { val o = js("({})"); o["a"] = a; o["b"] = b; return o }
+inline fun B(a: Boolean? = true, b: Boolean? = false): B {
+    val o = js("({})")
+    o["a"] = a
+    o["b"] = b
+    return o
+}

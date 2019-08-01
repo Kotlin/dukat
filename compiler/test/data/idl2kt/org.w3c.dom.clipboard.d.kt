@@ -27,12 +27,10 @@ external interface ClipboardEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ClipboardEventInit {
     val o = js("({})")
-
     o["clipboardData"] = clipboardData
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -56,9 +54,7 @@ external interface ClipboardPermissionDescriptor {
 @kotlin.internal.InlineOnly
 inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = false): ClipboardPermissionDescriptor {
     val o = js("({})")
-
     o["allowWithoutGesture"] = allowWithoutGesture
-
     return o
 }
 

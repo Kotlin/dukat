@@ -182,7 +182,7 @@ private fun ClassLikeReferenceModel.translate(): String {
     }
 }
 
-private fun FunctionModel.translate(): String {
+private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val returnsUnit = (type is TypeValueModel) &&
             (type as TypeValueModel).value == IdentifierEntity("Unit")
 
@@ -196,12 +196,16 @@ private fun FunctionModel.translate(): String {
     val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
     val operator = if (operator) " operator" else ""
 
-    val body = if (body.isEmpty()) {
+    val bodyFirstLine = if (body.isEmpty()) {
         ""
-    } else if (body.size == 1 && body[0] is ReturnStatementModel) {
-        " = ${(body[0] as ReturnStatementModel).statement.translate()}"
+    } else if (body.size == 1) {
+        if (body[0] is ReturnStatementModel) {
+            " = ${(body[0] as ReturnStatementModel).statement.translate()}"
+        } else {
+            " { ${body[0].translate()} }"
+        }
     } else {
-        " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
+        " {"
     }
 
     val funName = if (extend == null) {
@@ -209,7 +213,16 @@ private fun FunctionModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${body}"
+
+    output(FORMAT_TAB.repeat(padding) +
+            "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${bodyFirstLine}")
+
+    if (body.size > 1) {
+        body.forEach { statement ->
+            output(FORMAT_TAB.repeat(padding + 1) + statement.translate())
+        }
+        output(FORMAT_TAB.repeat(padding) + "}")
+    }
 }
 
 private fun MethodModel.translate(): List<String> {
@@ -497,7 +510,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitFunction(function: FunctionModel) {
-        addOutput(function.translate())
+        function.translate(0, ::addOutput)
     }
 
     override fun visitObject(objectNode: ObjectModel) {

@@ -48,7 +48,6 @@ external interface WebGLContextAttributes {
 @kotlin.internal.InlineOnly
 inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true, stencil: Boolean? = false, antialias: Boolean? = true, premultipliedAlpha: Boolean? = true, preserveDrawingBuffer: Boolean? = false, preferLowPowerToHighPerformance: Boolean? = false, failIfMajorPerformanceCaveat: Boolean? = false): WebGLContextAttributes {
     val o = js("({})")
-
     o["alpha"] = alpha
     o["depth"] = depth
     o["stencil"] = stencil
@@ -57,7 +56,6 @@ inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true
     o["preserveDrawingBuffer"] = preserveDrawingBuffer
     o["preferLowPowerToHighPerformance"] = preferLowPowerToHighPerformance
     o["failIfMajorPerformanceCaveat"] = failIfMajorPerformanceCaveat
-
     return o
 }
 
@@ -870,12 +868,10 @@ external interface WebGLContextEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun WebGLContextEventInit(statusMessage: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): WebGLContextEventInit {
     val o = js("({})")
-
     o["statusMessage"] = statusMessage
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 

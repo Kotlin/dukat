@@ -975,12 +975,10 @@ external interface TrackEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): TrackEventInit {
     val o = js("({})")
-
     o["track"] = track
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -1490,12 +1488,10 @@ external interface RelatedEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun RelatedEventInit(relatedTarget: EventTarget? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): RelatedEventInit {
     val o = js("({})")
-
     o["relatedTarget"] = relatedTarget
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -1538,9 +1534,7 @@ external interface AssignedNodesOptions {
 @kotlin.internal.InlineOnly
 inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions {
     val o = js("({})")
-
     o["flatten"] = flatten
-
     return o
 }
 
@@ -1561,9 +1555,7 @@ external interface CanvasRenderingContext2DSettings {
 @kotlin.internal.InlineOnly
 inline fun CanvasRenderingContext2DSettings(alpha: Boolean? = true): CanvasRenderingContext2DSettings {
     val o = js("({})")
-
     o["alpha"] = alpha
-
     return o
 }
 
@@ -1753,7 +1745,6 @@ external interface HitRegionOptions {
 @kotlin.internal.InlineOnly
 inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = CanvasFillRule.NONZERO, id: String? = "", parentID: String? = null, cursor: String? = "inherit", control: Element? = null, label: String? = null, role: String? = null): HitRegionOptions {
     val o = js("({})")
-
     o["path"] = path
     o["fillRule"] = fillRule
     o["id"] = id
@@ -1762,7 +1753,6 @@ inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = Ca
     o["control"] = control
     o["label"] = label
     o["role"] = role
-
     return o
 }
 
@@ -1809,9 +1799,7 @@ external interface ImageBitmapRenderingContextSettings {
 @kotlin.internal.InlineOnly
 inline fun ImageBitmapRenderingContextSettings(alpha: Boolean? = true): ImageBitmapRenderingContextSettings {
     val o = js("({})")
-
     o["alpha"] = alpha
-
     return o
 }
 
@@ -1830,9 +1818,7 @@ external interface ElementDefinitionOptions {
 @kotlin.internal.InlineOnly
 inline fun ElementDefinitionOptions(extends: String? = undefined): ElementDefinitionOptions {
     val o = js("({})")
-
     o["extends"] = extends
-
     return o
 }
 
@@ -1883,7 +1869,6 @@ external interface DragEventInit : MouseEventInit {
 @kotlin.internal.InlineOnly
 inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, screenY: Int? = 0, clientX: Int? = 0, clientY: Int? = 0, button: Short? = 0, buttons: Short? = 0, relatedTarget: EventTarget? = null, ctrlKey: Boolean? = false, shiftKey: Boolean? = false, altKey: Boolean? = false, metaKey: Boolean? = false, modifierAltGraph: Boolean? = false, modifierCapsLock: Boolean? = false, modifierFn: Boolean? = false, modifierFnLock: Boolean? = false, modifierHyper: Boolean? = false, modifierNumLock: Boolean? = false, modifierScrollLock: Boolean? = false, modifierSuper: Boolean? = false, modifierSymbol: Boolean? = false, modifierSymbolLock: Boolean? = false, view: Window? = null, detail: Int? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): DragEventInit {
     val o = js("({})")
-
     o["dataTransfer"] = dataTransfer
     o["screenX"] = screenX
     o["screenY"] = screenY
@@ -1911,7 +1896,6 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -1959,12 +1943,10 @@ external interface PopStateEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PopStateEventInit {
     val o = js("({})")
-
     o["state"] = state
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -1985,13 +1967,11 @@ external interface HashChangeEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): HashChangeEventInit {
     val o = js("({})")
-
     o["oldURL"] = oldURL
     o["newURL"] = newURL
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2008,12 +1988,10 @@ external interface PageTransitionEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PageTransitionEventInit {
     val o = js("({})")
-
     o["persisted"] = persisted
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2078,7 +2056,6 @@ external interface ErrorEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno: Int? = 0, colno: Int? = 0, error: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ErrorEventInit {
     val o = js("({})")
-
     o["message"] = message
     o["filename"] = filename
     o["lineno"] = lineno
@@ -2087,7 +2064,6 @@ inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno:
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2108,13 +2084,11 @@ external interface PromiseRejectionEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PromiseRejectionEventInit {
     val o = js("({})")
-
     o["promise"] = promise
     o["reason"] = reason
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2333,14 +2307,12 @@ external interface ImageBitmapOptions {
 @kotlin.internal.InlineOnly
 inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrientation.NONE, premultiplyAlpha: PremultiplyAlpha? = PremultiplyAlpha.DEFAULT, colorSpaceConversion: ColorSpaceConversion? = ColorSpaceConversion.DEFAULT, resizeWidth: Int? = undefined, resizeHeight: Int? = undefined, resizeQuality: ResizeQuality? = ResizeQuality.LOW): ImageBitmapOptions {
     val o = js("({})")
-
     o["imageOrientation"] = imageOrientation
     o["premultiplyAlpha"] = premultiplyAlpha
     o["colorSpaceConversion"] = colorSpaceConversion
     o["resizeWidth"] = resizeWidth
     o["resizeHeight"] = resizeHeight
     o["resizeQuality"] = resizeQuality
-
     return o
 }
 
@@ -2374,7 +2346,6 @@ external interface MessageEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId: String? = "", source: UnionMessagePortOrWindow? = null, ports: Array<MessagePort>? = arrayOf(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MessageEventInit {
     val o = js("({})")
-
     o["data"] = data
     o["origin"] = origin
     o["lastEventId"] = lastEventId
@@ -2383,7 +2354,6 @@ inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2412,9 +2382,7 @@ external interface EventSourceInit {
 @kotlin.internal.InlineOnly
 inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
     val o = js("({})")
-
     o["withCredentials"] = withCredentials
-
     return o
 }
 
@@ -2464,14 +2432,12 @@ external interface CloseEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun CloseEventInit(wasClean: Boolean? = false, code: Short? = 0, reason: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CloseEventInit {
     val o = js("({})")
-
     o["wasClean"] = wasClean
     o["code"] = code
     o["reason"] = reason
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2543,10 +2509,8 @@ external interface WorkerOptions {
 @kotlin.internal.InlineOnly
 inline fun WorkerOptions(type: WorkerType? = WorkerType.CLASSIC, credentials: RequestCredentials? = RequestCredentials.OMIT): WorkerOptions {
     val o = js("({})")
-
     o["type"] = type
     o["credentials"] = credentials
-
     return o
 }
 
@@ -2623,7 +2587,6 @@ external interface StorageEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun StorageEventInit(key: String? = null, oldValue: String? = null, newValue: String? = null, url: String? = "", storageArea: Storage? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): StorageEventInit {
     val o = js("({})")
-
     o["key"] = key
     o["oldValue"] = oldValue
     o["newValue"] = newValue
@@ -2632,7 +2595,6 @@ inline fun StorageEventInit(key: String? = null, oldValue: String? = null, newVa
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2717,11 +2679,9 @@ external interface EventInit {
 @kotlin.internal.InlineOnly
 inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): EventInit {
     val o = js("({})")
-
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2739,12 +2699,10 @@ external interface CustomEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun CustomEventInit(detail: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CustomEventInit {
     val o = js("({})")
-
     o["detail"] = detail
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -2757,9 +2715,7 @@ external interface EventListenerOptions {
 @kotlin.internal.InlineOnly
 inline fun EventListenerOptions(capture: Boolean? = false): EventListenerOptions {
     val o = js("({})")
-
     o["capture"] = capture
-
     return o
 }
 
@@ -2775,11 +2731,9 @@ external interface AddEventListenerOptions : EventListenerOptions {
 @kotlin.internal.InlineOnly
 inline fun AddEventListenerOptions(passive: Boolean? = false, once: Boolean? = false, capture: Boolean? = false): AddEventListenerOptions {
     val o = js("({})")
-
     o["passive"] = passive
     o["once"] = once
     o["capture"] = capture
-
     return o
 }
 
@@ -2865,7 +2819,6 @@ external interface MutationObserverInit {
 @kotlin.internal.InlineOnly
 inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean? = undefined, characterData: Boolean? = undefined, subtree: Boolean? = false, attributeOldValue: Boolean? = undefined, characterDataOldValue: Boolean? = undefined, attributeFilter: Array<String>? = undefined): MutationObserverInit {
     val o = js("({})")
-
     o["childList"] = childList
     o["attributes"] = attributes
     o["characterData"] = characterData
@@ -2873,7 +2826,6 @@ inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean
     o["attributeOldValue"] = attributeOldValue
     o["characterDataOldValue"] = characterDataOldValue
     o["attributeFilter"] = attributeFilter
-
     return o
 }
 
@@ -2951,9 +2903,7 @@ external interface GetRootNodeOptions {
 @kotlin.internal.InlineOnly
 inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
     val o = js("({})")
-
     o["composed"] = composed
-
     return o
 }
 
@@ -2978,9 +2928,7 @@ external interface ElementCreationOptions {
 @kotlin.internal.InlineOnly
 inline fun ElementCreationOptions(is_: String? = undefined): ElementCreationOptions {
     val o = js("({})")
-
     o["is"] = is_
-
     return o
 }
 
@@ -3091,9 +3039,7 @@ external interface ShadowRootInit {
 @kotlin.internal.InlineOnly
 inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
     val o = js("({})")
-
     o["mode"] = mode
-
     return o
 }
 
@@ -3306,12 +3252,10 @@ external interface DOMPointInit {
 @kotlin.internal.InlineOnly
 inline fun DOMPointInit(x: Double? = 0.0, y: Double? = 0.0, z: Double? = 0.0, w: Double? = 1.0): DOMPointInit {
     val o = js("({})")
-
     o["x"] = x
     o["y"] = y
     o["z"] = z
     o["w"] = w
-
     return o
 }
 
@@ -3351,12 +3295,10 @@ external interface DOMRectInit {
 @kotlin.internal.InlineOnly
 inline fun DOMRectInit(x: Double? = 0.0, y: Double? = 0.0, width: Double? = 0.0, height: Double? = 0.0): DOMRectInit {
     val o = js("({})")
-
     o["x"] = x
     o["y"] = y
     o["width"] = width
     o["height"] = height
-
     return o
 }
 
@@ -3470,9 +3412,7 @@ external interface ScrollOptions {
 @kotlin.internal.InlineOnly
 inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollOptions {
     val o = js("({})")
-
     o["behavior"] = behavior
-
     return o
 }
 
@@ -3488,11 +3428,9 @@ external interface ScrollToOptions : ScrollOptions {
 @kotlin.internal.InlineOnly
 inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollToOptions {
     val o = js("({})")
-
     o["left"] = left
     o["top"] = top
     o["behavior"] = behavior
-
     return o
 }
 
@@ -3523,13 +3461,11 @@ external interface MediaQueryListEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun MediaQueryListEventInit(media: String? = "", matches: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MediaQueryListEventInit {
     val o = js("({})")
-
     o["media"] = media
     o["matches"] = matches
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -3560,11 +3496,9 @@ external interface ScrollIntoViewOptions : ScrollOptions {
 @kotlin.internal.InlineOnly
 inline fun ScrollIntoViewOptions(block: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, inline: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollIntoViewOptions {
     val o = js("({})")
-
     o["block"] = block
     o["inline"] = inline
     o["behavior"] = behavior
-
     return o
 }
 
@@ -3580,10 +3514,8 @@ external interface BoxQuadOptions {
 @kotlin.internal.InlineOnly
 inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeTo: dynamic = undefined): BoxQuadOptions {
     val o = js("({})")
-
     o["box"] = box
     o["relativeTo"] = relativeTo
-
     return o
 }
 
@@ -3599,10 +3531,8 @@ external interface ConvertCoordinateOptions {
 @kotlin.internal.InlineOnly
 inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BORDER, toBox: CSSBoxType? = CSSBoxType.BORDER): ConvertCoordinateOptions {
     val o = js("({})")
-
     o["fromBox"] = fromBox
     o["toBox"] = toBox
-
     return o
 }
 

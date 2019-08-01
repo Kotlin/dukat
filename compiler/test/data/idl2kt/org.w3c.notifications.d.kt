@@ -105,7 +105,6 @@ external interface NotificationOptions {
 @kotlin.internal.InlineOnly
 inline fun NotificationOptions(dir: NotificationDirection? = NotificationDirection.AUTO, lang: String? = "", body: String? = "", tag: String? = "", image: String? = undefined, icon: String? = undefined, badge: String? = undefined, sound: String? = undefined, vibrate: dynamic = undefined, timestamp: Number? = undefined, renotify: Boolean? = false, silent: Boolean? = false, noscreen: Boolean? = false, requireInteraction: Boolean? = false, sticky: Boolean? = false, data: Any? = null, actions: Array<NotificationAction>? = arrayOf()): NotificationOptions {
     val o = js("({})")
-
     o["dir"] = dir
     o["lang"] = lang
     o["body"] = body
@@ -123,7 +122,6 @@ inline fun NotificationOptions(dir: NotificationDirection? = NotificationDirecti
     o["sticky"] = sticky
     o["data"] = data
     o["actions"] = actions
-
     return o
 }
 
@@ -142,11 +140,9 @@ external interface NotificationAction {
 @kotlin.internal.InlineOnly
 inline fun NotificationAction(action: String?, title: String?, icon: String? = undefined): NotificationAction {
     val o = js("({})")
-
     o["action"] = action
     o["title"] = title
     o["icon"] = icon
-
     return o
 }
 
@@ -159,9 +155,7 @@ external interface GetNotificationOptions {
 @kotlin.internal.InlineOnly
 inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
     val o = js("({})")
-
     o["tag"] = tag
-
     return o
 }
 
@@ -182,13 +176,11 @@ external interface NotificationEventInit : ExtendableEventInit {
 @kotlin.internal.InlineOnly
 inline fun NotificationEventInit(notification: Notification?, action: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): NotificationEventInit {
     val o = js("({})")
-
     o["notification"] = notification
     o["action"] = action
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 

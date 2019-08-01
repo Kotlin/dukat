@@ -76,10 +76,8 @@ external interface RegistrationOptions {
 @kotlin.internal.InlineOnly
 inline fun RegistrationOptions(scope: String? = undefined, type: WorkerType? = WorkerType.CLASSIC): RegistrationOptions {
     val o = js("({})")
-
     o["scope"] = scope
     o["type"] = type
-
     return o
 }
 
@@ -112,7 +110,6 @@ external interface ServiceWorkerMessageEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ServiceWorkerMessageEventInit(data: Any? = undefined, origin: String? = undefined, lastEventId: String? = undefined, source: UnionMessagePortOrServiceWorker? = undefined, ports: Array<MessagePort>? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ServiceWorkerMessageEventInit {
     val o = js("({})")
-
     o["data"] = data
     o["origin"] = origin
     o["lastEventId"] = lastEventId
@@ -121,7 +118,6 @@ inline fun ServiceWorkerMessageEventInit(data: Any? = undefined, origin: String?
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -158,10 +154,8 @@ external interface ClientQueryOptions {
 @kotlin.internal.InlineOnly
 inline fun ClientQueryOptions(includeUncontrolled: Boolean? = false, type: ClientType? = ClientType.WINDOW): ClientQueryOptions {
     val o = js("({})")
-
     o["includeUncontrolled"] = includeUncontrolled
     o["type"] = type
-
     return o
 }
 
@@ -175,11 +169,9 @@ external interface ExtendableEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ExtendableEventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ExtendableEventInit {
     val o = js("({})")
-
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -199,10 +191,8 @@ external interface ForeignFetchOptions {
 @kotlin.internal.InlineOnly
 inline fun ForeignFetchOptions(scopes: Array<String>?, origins: Array<String>?): ForeignFetchOptions {
     val o = js("({})")
-
     o["scopes"] = scopes
     o["origins"] = origins
-
     return o
 }
 
@@ -228,14 +218,12 @@ external interface FetchEventInit : ExtendableEventInit {
 @kotlin.internal.InlineOnly
 inline fun FetchEventInit(request: Request?, clientId: String? = null, isReload: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): FetchEventInit {
     val o = js("({})")
-
     o["request"] = request
     o["clientId"] = clientId
     o["isReload"] = isReload
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -257,13 +245,11 @@ external interface ForeignFetchEventInit : ExtendableEventInit {
 @kotlin.internal.InlineOnly
 inline fun ForeignFetchEventInit(request: Request?, origin: String? = "null", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ForeignFetchEventInit {
     val o = js("({})")
-
     o["request"] = request
     o["origin"] = origin
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -282,11 +268,9 @@ external interface ForeignFetchResponse {
 @kotlin.internal.InlineOnly
 inline fun ForeignFetchResponse(response: Response?, origin: String? = undefined, headers: Array<String>? = undefined): ForeignFetchResponse {
     val o = js("({})")
-
     o["response"] = response
     o["origin"] = origin
     o["headers"] = headers
-
     return o
 }
 
@@ -319,7 +303,6 @@ external interface ExtendableMessageEventInit : ExtendableEventInit {
 @kotlin.internal.InlineOnly
 inline fun ExtendableMessageEventInit(data: Any? = undefined, origin: String? = undefined, lastEventId: String? = undefined, source: UnionClientOrMessagePortOrServiceWorker? = undefined, ports: Array<MessagePort>? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ExtendableMessageEventInit {
     val o = js("({})")
-
     o["data"] = data
     o["origin"] = origin
     o["lastEventId"] = lastEventId
@@ -328,7 +311,6 @@ inline fun ExtendableMessageEventInit(data: Any? = undefined, origin: String? = 
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
@@ -360,12 +342,10 @@ external interface CacheQueryOptions {
 @kotlin.internal.InlineOnly
 inline fun CacheQueryOptions(ignoreSearch: Boolean? = false, ignoreMethod: Boolean? = false, ignoreVary: Boolean? = false, cacheName: String? = undefined): CacheQueryOptions {
     val o = js("({})")
-
     o["ignoreSearch"] = ignoreSearch
     o["ignoreMethod"] = ignoreMethod
     o["ignoreVary"] = ignoreVary
     o["cacheName"] = cacheName
-
     return o
 }
 
@@ -387,12 +367,10 @@ external interface CacheBatchOperation {
 @kotlin.internal.InlineOnly
 inline fun CacheBatchOperation(type: String? = undefined, request: Request? = undefined, response: Response? = undefined, options: CacheQueryOptions? = undefined): CacheBatchOperation {
     val o = js("({})")
-
     o["type"] = type
     o["request"] = request
     o["response"] = response
     o["options"] = options
-
     return o
 }
 
