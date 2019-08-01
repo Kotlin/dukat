@@ -99,9 +99,15 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 }
 
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
+
+    var returnTypeModel = if (returnType.name == "any") {
+        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null)
+    } else {
+        returnType.process()
+    }
     return FunctionTypeModel(
             parameters = arguments.map { it.process() },
-            type = returnType.process(),
+            type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
     )
