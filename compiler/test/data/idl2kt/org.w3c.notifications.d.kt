@@ -168,6 +168,13 @@ inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
 external open class NotificationEvent(type: String, eventInitDict: NotificationEventInit) : ExtendableEvent {
     open val notification: Notification
     open val action: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface NotificationEventInit : ExtendableEventInit {

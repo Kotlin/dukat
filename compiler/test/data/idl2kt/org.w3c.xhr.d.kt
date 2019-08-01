@@ -77,6 +77,13 @@ external open class ProgressEvent(type: String, eventInitDict: ProgressEventInit
     open val lengthComputable: Boolean
     open val loaded: Int
     open val total: Int
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ProgressEventInit : EventInit {

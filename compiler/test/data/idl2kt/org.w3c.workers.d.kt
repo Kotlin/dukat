@@ -89,6 +89,13 @@ external open class ServiceWorkerMessageEvent(type: String, eventInitDict: Servi
     open val lastEventId: String
     open val source: UnionMessagePortOrServiceWorker?
     open val ports: Array<out MessagePort>?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ServiceWorkerMessageEventInit : EventInit {
@@ -170,6 +177,13 @@ external open class ExtendableEvent(type: String, eventInitDict: ExtendableEvent
 }
 
 external interface ExtendableEventInit : EventInit {
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 @kotlin.internal.InlineOnly
@@ -185,6 +199,13 @@ inline fun ExtendableEventInit(bubbles: Boolean? = false, cancelable: Boolean? =
 
 external open class InstallEvent(type: String, eventInitDict: ExtendableEventInit = definedExternally) : ExtendableEvent {
     fun registerForeignFetch(options: ForeignFetchOptions)
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ForeignFetchOptions {
@@ -211,6 +232,13 @@ external open class FetchEvent(type: String, eventInitDict: FetchEventInit) : Ex
     open val clientId: String?
     open val isReload: Boolean
     fun respondWith(r: Promise<Response>)
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface FetchEventInit : ExtendableEventInit {
@@ -243,6 +271,13 @@ external open class ForeignFetchEvent(type: String, eventInitDict: ForeignFetchE
     open val request: Request
     open val origin: String
     fun respondWith(r: Promise<ForeignFetchResponse>)
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ForeignFetchEventInit : ExtendableEventInit {
@@ -296,6 +331,13 @@ external open class ExtendableMessageEvent(type: String, eventInitDict: Extendab
     open val lastEventId: String
     open val source: UnionClientOrMessagePortOrServiceWorker?
     open val ports: Array<out MessagePort>?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ExtendableMessageEventInit : ExtendableEventInit {
@@ -405,10 +447,16 @@ external abstract class CacheStorage {
 }
 
 external open class FunctionalEvent : ExtendableEvent {
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
-external @marker interface UnionClientOrMessagePortOrServiceWorker {
-}
+external @marker interface UnionClientOrMessagePortOrServiceWorker
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

@@ -21,6 +21,13 @@ import org.w3c.xhr.*
 external open class UIEvent(type: String, eventInitDict: UIEventInit = definedExternally) : Event {
     open val view: Window?
     open val detail: Int
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface UIEventInit : EventInit {
@@ -47,6 +54,13 @@ inline fun UIEventInit(view: Window? = null, detail: Int? = 0, bubbles: Boolean?
 
 external open class FocusEvent(type: String, eventInitDict: FocusEventInit = definedExternally) : UIEvent {
     open val relatedTarget: EventTarget?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface FocusEventInit : UIEventInit {
@@ -87,6 +101,13 @@ external open class MouseEvent(type: String, eventInitDict: MouseEventInit = def
     open val buttons: Short
     open val relatedTarget: EventTarget?
     fun getModifierState(keyArg: String): Boolean
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface MouseEventInit : EventModifierInit {
@@ -229,6 +250,10 @@ external open class WheelEvent(type: String, eventInitDict: WheelEventInit = def
         val DOM_DELTA_PIXEL: Int
         val DOM_DELTA_LINE: Int
         val DOM_DELTA_PAGE: Int
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
     }
 }
 
@@ -288,6 +313,13 @@ inline fun WheelEventInit(deltaX: Double? = 0.0, deltaY: Double? = 0.0, deltaZ: 
 external open class InputEvent(type: String, eventInitDict: InputEventInit = definedExternally) : UIEvent {
     open val data: String
     open val isComposing: Boolean
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface InputEventInit : UIEventInit {
@@ -334,6 +366,10 @@ external open class KeyboardEvent(type: String, eventInitDict: KeyboardEventInit
         val DOM_KEY_LOCATION_LEFT: Int
         val DOM_KEY_LOCATION_RIGHT: Int
         val DOM_KEY_LOCATION_NUMPAD: Int
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
     }
 }
 
@@ -389,6 +425,13 @@ inline fun KeyboardEventInit(key: String? = "", code: String? = "", location: In
 
 external open class CompositionEvent(type: String, eventInitDict: CompositionEventInit = definedExternally) : UIEvent {
     open val data: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface CompositionEventInit : UIEventInit {

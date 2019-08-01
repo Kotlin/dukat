@@ -38,6 +38,13 @@ inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Bool
 
 external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventInit = definedExternally) : Event {
     open val clipboardData: DataTransfer?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external abstract class Clipboard : EventTarget {
