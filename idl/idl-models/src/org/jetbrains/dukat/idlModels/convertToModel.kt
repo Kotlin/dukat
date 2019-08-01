@@ -374,7 +374,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             typeParameters = listOf(),
             parentEntities = listOf(),
             annotations = mutableListOf(),
-            external = true
+            external = true,
+            metaDescription = "please, don't implement this interface!"
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(

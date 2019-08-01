@@ -465,6 +465,10 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     val isBlock = hasMembers || staticMembers.isNotEmpty() || companionObject != null
     val parents = translateHeritagModels(parentEntities)
 
+    if (metaDescription != null) {
+        output(metaDescription.translateMeta().trim())
+    }
+
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     output("${translateAnnotations(annotations)}${externalClause}interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
     if (isBlock) {
