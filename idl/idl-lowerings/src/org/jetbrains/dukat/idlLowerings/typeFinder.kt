@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 
@@ -16,6 +16,13 @@ private class TypeFinder(private val nameToFind: String): IDLLowering {
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+        if (declaration.name == nameToFind) {
+            found = true
+        }
+        return declaration
+    }
+
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
         if (declaration.name == nameToFind) {
             found = true
         }
