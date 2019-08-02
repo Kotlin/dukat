@@ -1,7 +1,10 @@
 
 import kotlin.js.*
 
-external abstract class A
+external abstract class A {
+    fun get2(x: Float): Byte
+    fun set2(index: Byte, value: Double)
+}
 @kotlin.internal.InlineOnly
 inline operator fun A.get(x: Double): Int = asDynamic()[x]
 @kotlin.internal.InlineOnly

@@ -126,7 +126,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     )
 }
 
-fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
             name = IdentifierEntity(name),
             parameters = listOf(key.process(), value.process()),
@@ -166,7 +166,7 @@ fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
     )
 }
 
-fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
             name = IdentifierEntity(name),
             parameters = listOf(key.process()),
@@ -201,7 +201,9 @@ fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
 fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     val dynamicMemberModels = (constructors +
             attributes.filterNot { it.static } +
-            operations.filterNot { it.static }).mapNotNull { it.process() }
+            operations.filterNot { it.static } +
+            getters.filterNot { it.name == "get" } +
+            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }
     val staticMemberModels = (constants +
             operations.filter { it.static } +
             attributes.filter { it.static }).mapNotNull { it.process() }
@@ -225,9 +227,9 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     }
 
     val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
-        )
+            callback || extendedAttributes.contains(
+                    IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
+            )
     ) {
         InterfaceModel(
                 name = IdentifierEntity(name),
@@ -261,8 +263,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 abstract = constructors.isEmpty() && primaryConstructor == null
         )
     }
-    val getterModels = getters.map { it.process(declaration.name) }
-    val setterModels = setters.map { it.process(declaration.name) }
+    val getterModels = getters.map { it.processAsTopLevel(declaration.name) }
+    val setterModels = setters.map { it.processAsTopLevel(declaration.name) }
     return listOf(declaration) + getterModels + setterModels
 }
 
@@ -473,6 +475,32 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 override = false,
                 getter = true,
                 setter = true,
+                open = false
+        )
+        is IDLGetterDeclaration -> MethodModel(
+                name = IdentifierEntity(name),
+                parameters = listOf(key.process()),
+                type = valueType.process(),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                operator = false,
+                annotations = listOf(),
+                open = false
+        )
+        is IDLSetterDeclaration -> MethodModel(
+                name = IdentifierEntity(name),
+                parameters = listOf(key.process(), value.process()),
+                type = TypeValueModel(
+                        value = IdentifierEntity("Unit"),
+                        params = listOf(),
+                        metaDescription = null
+                ),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                operator = false,
+                annotations = listOf(),
                 open = false
         )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
