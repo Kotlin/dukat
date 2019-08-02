@@ -203,8 +203,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             attributes.filterNot { it.static } +
             operations.filterNot { it.static }).mapNotNull { it.process() }
     val staticMemberModels = (constants +
-            operations.filter { it.static } +
-            attributes.filter { it.static }).mapNotNull { it.process() }
+            attributes.filter { it.static } +
+            operations.filter { it.static }).mapNotNull { it.process() }
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
         CompanionObjectModel(
