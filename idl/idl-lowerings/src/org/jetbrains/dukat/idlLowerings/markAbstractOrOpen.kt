@@ -47,6 +47,7 @@ private class AbstractOrOpenMarker(val context: AbstractOrOpenContext) : IDLLowe
                 },
                 attributes = declaration.attributes.map {
                     it.copy(open = when {
+                        it.static -> false
                         declaration.shouldBeConvertedToOpenClass() -> true
                         !declaration.shouldBeConvertedToInterface() && it.readOnly -> true
                         else -> false
