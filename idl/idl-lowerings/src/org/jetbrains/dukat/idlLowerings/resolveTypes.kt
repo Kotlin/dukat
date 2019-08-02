@@ -78,14 +78,20 @@ private class TypeResolver : IDLLowering {
                 in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
-                        nullable = false
+                        nullable = false,
+                        comment = declaration.comment
                 )
                 else -> raiseConcern("unprocessed UnionTypeDeclaration: $this") { declaration }
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
             return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
-                IDLSingleTypeDeclaration("\$dynamic", null, false)
+                IDLSingleTypeDeclaration(
+                        name = "\$dynamic",
+                        typeParameter = null,
+                        nullable = false,
+                        comment = declaration.comment
+                )
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
             }
