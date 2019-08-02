@@ -2,8 +2,8 @@
 import kotlin.js.*
 
 external open class A(a: Int) {
-    open var x: Int
-    open var y: Int
+    var x: Int
+    var y: Int
     fun f()
     fun g()
     companion object {

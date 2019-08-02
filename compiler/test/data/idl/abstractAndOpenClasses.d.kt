@@ -6,14 +6,14 @@ external interface ShouldBeInterface {
     val b: Int
 }
 external abstract class ShouldBeAbstract {
-    var a: Int
-    open val b: Int
-}
-external open class ShouldBeOpen {
     open var a: Int
     open val b: Int
 }
+external open class ShouldBeOpen {
+    var a: Int
+    open val b: Int
+}
 external open class ShouldBeOpenToo : ShouldBeOpen {
-    open var c: Int
+    var c: Int
     open val d: Int
 }

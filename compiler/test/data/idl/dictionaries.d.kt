@@ -28,7 +28,7 @@ external interface PointerEventInit : dynamic {
 @kotlin.internal.InlineOnly
 inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: Double? = 1.0, pressure: Float? = 0f, tangentialPressure: Float? = 0f, tiltX: Int? = 0, tiltY: Int? = 0, twist: Int? = 0, pointerType: String? = "", isPrimary: Boolean? = false): PointerEventInit { val o = js("({})"); o["pointerId"] = pointerId; o["width"] = width; o["height"] = height; o["pressure"] = pressure; o["tangentialPressure"] = tangentialPressure; o["tiltX"] = tiltX; o["tiltY"] = tiltY; o["twist"] = twist; o["pointerType"] = pointerType; o["isPrimary"] = isPrimary; return o }
 external abstract class A {
-    var attributes: WebGLContextAttributes
+    open var attributes: WebGLContextAttributes
 }
 external interface UndefinedMemberDictionary {
     var str: String? get() = definedExternally; set(value) = definedExternally

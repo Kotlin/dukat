@@ -38,6 +38,10 @@ private class AbstractOrOpenMarker(val context: AbstractOrOpenContext) : IDLLowe
         }
     }
 
+    private fun IDLInterfaceDeclaration.shouldBeConvertedToAbstractClass(): Boolean {
+        return !shouldBeConvertedToInterface() && !shouldBeConvertedToOpenClass()
+    }
+
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 kind = when {
@@ -48,8 +52,8 @@ private class AbstractOrOpenMarker(val context: AbstractOrOpenContext) : IDLLowe
                 attributes = declaration.attributes.map {
                     it.copy(open = when {
                         it.static -> false
-                        declaration.shouldBeConvertedToOpenClass() -> true
-                        !declaration.shouldBeConvertedToInterface() && it.readOnly -> true
+                        declaration.shouldBeConvertedToAbstractClass() -> true
+                        declaration.shouldBeConvertedToOpenClass() && it.readOnly -> true
                         else -> false
                     })
                 }
