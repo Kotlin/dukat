@@ -238,13 +238,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = dynamicMemberModels.map {
-                    if (it is PropertyModel && !it.setter) {
-                        it.copy(open = true)
-                    } else {
-                        it
-                    }
-                },
+                members = dynamicMemberModels,
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
@@ -255,7 +249,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 },
                 annotations = mutableListOf(),
                 external = true,
-                abstract = constructors.isEmpty() && primaryConstructor == null
+                abstract = kind == InterfaceKind.ABSTRACT_CLASS
         )
     }
     val getterModels = getters.map { it.process(declaration.name) }
@@ -434,7 +428,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 override = false,
                 getter = true,
                 setter = !readOnly,
-                open = false
+                open = open
         )
         is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
