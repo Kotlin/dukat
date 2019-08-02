@@ -174,9 +174,6 @@ inline fun ClientQueryOptions(includeUncontrolled: Boolean? = false, type: Clien
 
 external open class ExtendableEvent(type: String, eventInitDict: ExtendableEventInit = definedExternally) : Event {
     fun waitUntil(f: Promise<Any?>)
-}
-
-external interface ExtendableEventInit : EventInit {
 
     companion object {
         val NONE: Short
@@ -184,6 +181,9 @@ external interface ExtendableEventInit : EventInit {
         val AT_TARGET: Short
         val BUBBLING_PHASE: Short
     }
+}
+
+external interface ExtendableEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
