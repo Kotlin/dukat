@@ -18,15 +18,15 @@ private class ItemArrayLikeLowering : IDLLowering {
         val lengthAttribute = declaration.attributes.find {
             it.name == "length" && it.type == IDLSingleTypeDeclaration("unsignedlong", null, false)
         }
-        val itemOperation = declaration.operations.find {
-            it.name == "item" && it.arguments.size == 1 &&
-                    it.arguments[0].type == IDLSingleTypeDeclaration("unsignedlong", null, false) &&
-                    it.returnType.nullable
+        val itemGetter = declaration.getters.find {
+            it.name == "item" &&
+                    it.key.type == IDLSingleTypeDeclaration("unsignedlong", null, false) &&
+                    it.valueType.nullable
         }
-        if (lengthAttribute != null && itemOperation != null) {
+        if (lengthAttribute != null && itemGetter != null) {
             return declaration.copy(parents = declaration.parents + IDLSingleTypeDeclaration(
                     name = "ItemArrayLike",
-                    typeParameter = itemOperation.returnType.toNotNullable(),
+                    typeParameter = itemGetter.valueType.toNotNullable(),
                     nullable = false
             ))
         }
