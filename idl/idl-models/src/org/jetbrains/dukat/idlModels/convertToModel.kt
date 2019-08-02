@@ -54,6 +54,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.toNullable
+import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
@@ -170,7 +171,7 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
     return FunctionModel(
             name = IdentifierEntity("get"),
             parameters = listOf(key.process()),
-            type = valueType.process(),
+            type = valueType.toNullableIfNotPrimitive().process(),
             typeParameters = listOf(),
             annotations = mutableListOf(AnnotationModel(
                     name = "kotlin.internal.InlineOnly",

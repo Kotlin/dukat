@@ -15,6 +15,13 @@ fun IDLTypeDeclaration.toNullable(): IDLTypeDeclaration {
     }
 }
 
+fun IDLTypeDeclaration.toNullableIfNotPrimitive(): IDLTypeDeclaration {
+    return when (this) {
+        is IDLSingleTypeDeclaration -> if (isPrimitive()) this else toNullable()
+        else -> toNullable()
+    }
+}
+
 fun IDLTypeDeclaration.changeComment(newComment: String?): IDLTypeDeclaration {
     return when (this) {
         is IDLSingleTypeDeclaration -> copy(comment = newComment)
