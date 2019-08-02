@@ -239,7 +239,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 typeParameters = listOf(),
                 parentEntities = parentModels,
                 annotations = mutableListOf(),
-                external = true
+                external = true,
+                fromStdlib = fromStdlib
         )
     } else {
         ClassModel(

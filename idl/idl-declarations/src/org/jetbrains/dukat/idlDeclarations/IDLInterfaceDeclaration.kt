@@ -13,5 +13,6 @@ data class IDLInterfaceDeclaration(
         val setters: List<IDLSetterDeclaration>,
         val callback: Boolean,
         val generated: Boolean,
-        val partial: Boolean
+        val partial: Boolean,
+        val fromStdlib: Boolean = false
 ) : IDLTopLevelDeclaration
