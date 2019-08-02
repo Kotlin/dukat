@@ -8,6 +8,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
 import org.jetbrains.dukat.panic.raiseConcern
 
@@ -118,7 +119,8 @@ private class TypeResolver : IDLLowering {
                             setters = listOf(),
                             callback = false,
                             generated = true,
-                            partial = false
+                            partial = false,
+                            kind = InterfaceKind.INTERFACE
                     )
                 }
         )

@@ -52,6 +52,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.toNullable
 import org.jetbrains.dukat.panic.raiseConcern
@@ -224,11 +225,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         )
     }
 
-    val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
-        )
-    ) {
+    val declaration = if (kind == InterfaceKind.INTERFACE) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = dynamicMemberModels,
