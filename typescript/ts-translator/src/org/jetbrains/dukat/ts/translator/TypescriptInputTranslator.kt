@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.translator
+package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -14,15 +14,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.omitStdLib
 import org.jetbrains.dukat.compiler.lowerPrimitives
-import org.jetbrains.dukat.compiler.lowerings.introduceMissedOverloads
-import org.jetbrains.dukat.compiler.lowerings.introduceModels
-import org.jetbrains.dukat.compiler.lowerings.lowerNullable
-import org.jetbrains.dukat.compiler.lowerings.lowerVarargs
-import org.jetbrains.dukat.compiler.lowerings.moveTypeAliasesOutside
-import org.jetbrains.dukat.compiler.lowerings.rearrangeConstructors
-import org.jetbrains.dukat.compiler.lowerings.rearrangeGeneratedEntities
-import org.jetbrains.dukat.compiler.lowerings.specifyUnionType
-import org.jetbrains.dukat.compiler.lowerings.typeAlias.resolveTypeAliases
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
@@ -33,12 +24,21 @@ import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.lowerUnionType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
+import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.resolvePartials
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
+import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
+import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
+import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
+import org.jetrbains.dukat.nodeLowering.lowerings.moveTypeAliasesOutside
+import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
+import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeGeneratedEntities
+import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
+import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 
 
 interface TypescriptInputTranslator : InputTranslator {

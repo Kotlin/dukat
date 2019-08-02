@@ -1,0 +1,19 @@
+plugins {
+    id("kotlin")
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":ast-declarations"))
+    implementation(project(":ast-model"))
+    implementation(project(":interop-graal"))
+    implementation(project(":logging"))
+    implementation(project(":model-lowerings"))
+    implementation(project(":module-name-resolver"))
+    implementation(project(":node-introduction"))
+    implementation(project(":node-lowering"))
+    implementation(project(":translator"))
+    implementation(project(":ts-lowerings"))
+    implementation(project(":tsinterop"))
+    implementation(project(":tsmodel"))
+}

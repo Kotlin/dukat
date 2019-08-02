@@ -1,7 +1,6 @@
-package org.jetbrains.dukat.compiler
+package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.compiler.translator.TypescriptInputTranslator
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.interop.graal.DocumentCache
 import org.jetbrains.dukat.interop.graal.InteropGraal

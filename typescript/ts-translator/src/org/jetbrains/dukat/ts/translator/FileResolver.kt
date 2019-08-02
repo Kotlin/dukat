@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler
+package org.jetbrains.dukat.ts.translator
 
 import java.io.File
 
