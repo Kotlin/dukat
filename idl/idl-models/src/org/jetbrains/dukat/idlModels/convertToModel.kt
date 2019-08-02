@@ -128,7 +128,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
 
 fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
-            name = IdentifierEntity(name),
+            name = IdentifierEntity("set"),
             parameters = listOf(key.process(), value.process()),
             type = TypeValueModel(
                     value = IdentifierEntity("Unit"),
@@ -168,7 +168,7 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
 
 fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
-            name = IdentifierEntity(name),
+            name = IdentifierEntity("get"),
             parameters = listOf(key.process()),
             type = valueType.process(),
             typeParameters = listOf(),
