@@ -19,14 +19,20 @@ import org.w3c.xhr.*
 
 external interface IAbstractComponent : Ext.IBase, Ext.util.IPositionable, Ext.util.IObservable, Ext.util.IAnimate, Ext.util.IElementContainer, Ext.util.IRenderable, Ext.state.IStateful {
     var autoEl: Any
-    var autoLoad: Any? get() = definedExternally; set(value) = definedExternally
+    var autoLoad: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var autoRender: Any
 }
 external var num: Number
 external fun foo()
 external interface IAbstractPlugin : Ext.IBase {
-    var pluginId: String? get() = definedExternally; set(value) = definedExternally
-    var isPlugin: Boolean? get() = definedExternally; set(value) = definedExternally
+    var pluginId: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var isPlugin: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 external var str: String
 external fun bar()

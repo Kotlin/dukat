@@ -17,13 +17,19 @@ import org.w3c.xhr.*
 
 external interface `T$4` {
     fun bar(a: Any): Number
-    var baz: Any? get() = definedExternally; set(value) = definedExternally
-    var boo: Any? get() = definedExternally; set(value) = definedExternally
+    var baz: Any?
+        get() = definedExternally
+        set(value) = definedExternally
+    var boo: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
 external fun withObjectTypeParam(opt: `T$4`)
 external interface `T$5` {
-    var value: Any? get() = definedExternally; set(value) = definedExternally
+    var value: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var done: Boolean
 }
 external fun returnsObjectType(): `T$5`
@@ -54,13 +60,19 @@ import org.w3c.xhr.*
 
 external interface `T$0` {
     fun bar(a: Any): Number
-    var baz: Any? get() = definedExternally; set(value) = definedExternally
-    var boo: Any? get() = definedExternally; set(value) = definedExternally
+    var baz: Any?
+        get() = definedExternally
+        set(value) = definedExternally
+    var boo: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
 external fun withObjectTypeParam(opt: `T$0`)
 external interface `T$1` {
-    var value: Any? get() = definedExternally; set(value) = definedExternally
+    var value: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var done: Boolean
 }
 external fun returnsObjectType(): `T$1`
@@ -91,13 +103,19 @@ import org.w3c.xhr.*
 
 external interface `T$2` {
     fun bar(a: Any): Number
-    var baz: Any? get() = definedExternally; set(value) = definedExternally
-    var boo: Any? get() = definedExternally; set(value) = definedExternally
+    var baz: Any?
+        get() = definedExternally
+        set(value) = definedExternally
+    var boo: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
 external fun someFunction(opt: `T$2`)
 external interface `T$3` {
-    var value: Any? get() = definedExternally; set(value) = definedExternally
+    var value: Any?
+        get() = definedExternally
+        set(value) = definedExternally
     var done: Boolean
 }
 external fun anotherReturnsObjectType(): `T$3`

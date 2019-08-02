@@ -313,7 +313,7 @@ private fun MemberModel.translate(): List<String> {
     }
 }
 
-private fun PropertyModel.translateSignature(): String {
+private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (getter && !setter) "val" else "var"
     val overrideClause = if (override) "override " else ""
 
@@ -323,13 +323,15 @@ private fun PropertyModel.translateSignature(): String {
         typeParams = " " + typeParams
     }
     val metaClause = type.translateMeta()
-    var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
+    var res = mutableListOf(
+            "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
+    )
     if (type.nullable) {
         if (getter) {
-            res += " get() = definedExternally"
+            res.add(FORMAT_TAB + "get() = definedExternally")
         }
         if (setter) {
-            res += "; set(value) = definedExternally"
+            res.add(FORMAT_TAB + "set(value) = definedExternally")
         }
     }
     return res
@@ -356,7 +358,7 @@ private fun MethodModel.translateSignature(): List<String> {
 private fun MemberModel.translateSignature(): List<String> {
     return when (this) {
         is MethodModel -> translateSignature()
-        is PropertyModel -> listOf(translateSignature())
+        is PropertyModel -> translateSignature()
         is ClassModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
         else -> raiseConcern("can not translate signature ${this}") { emptyList<String>() }

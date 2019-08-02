@@ -16,7 +16,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Foo {
-    val methodWithOutArgs: (() -> Unit)? get() = definedExternally
-    val methodWithString: ((s: String) -> String)? get() = definedExternally
-    val methodWithManyArgs: ((n: Number, settings: Bar) -> Boolean)? get() = definedExternally
+    val methodWithOutArgs: (() -> Unit)?
+        get() = definedExternally
+    val methodWithString: ((s: String) -> String)?
+        get() = definedExternally
+    val methodWithManyArgs: ((n: Number, settings: Bar) -> Boolean)?
+        get() = definedExternally
 }
