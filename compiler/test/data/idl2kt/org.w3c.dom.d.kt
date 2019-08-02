@@ -297,7 +297,7 @@ external abstract class HTMLOptionsCollection : HTMLCollection {
     fun add(element: UnionHTMLOptGroupElementOrHTMLOptionElement, before: dynamic = definedExternally)
     fun remove(index: Int)
 }
-@kotlin.internal.InlineOnly inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option; }
+@kotlin.internal.InlineOnly inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 external abstract class HTMLElement : Element, ElementCSSInlineStyle, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable {
     open var title: String
@@ -329,7 +329,7 @@ external abstract class HTMLUnknownElement : HTMLElement
 
 external abstract class DOMStringMap
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
-@kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value; }
+@kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value }
 
 external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
@@ -1209,7 +1209,7 @@ external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> 
     fun setCustomValidity(error: String)
 }
 @kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option; }
+@kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 external abstract class HTMLDataListElement : HTMLElement {
     open val options: HTMLCollection
@@ -2542,7 +2542,7 @@ external abstract class Storage {
     fun clear()
 }
 @kotlin.internal.InlineOnly inline operator fun Storage.get(key: String): String? = asDynamic()[key]
-@kotlin.internal.InlineOnly inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value; }
+@kotlin.internal.InlineOnly inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value }
 
 external interface WindowSessionStorage {
     val sessionStorage: Storage

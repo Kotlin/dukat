@@ -900,7 +900,7 @@ external open class Int8Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Int8Array.get(index: Int): Byte = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Int8Array.set(index: Int, value: Byte) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Int8Array.set(index: Int, value: Byte) { asDynamic()[index] = value }
 
 external open class Uint8Array : ArrayBufferView {
     constructor(length: Int)
@@ -920,7 +920,7 @@ external open class Uint8Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Uint8Array.get(index: Int): Byte = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Uint8Array.set(index: Int, value: Byte) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Uint8Array.set(index: Int, value: Byte) { asDynamic()[index] = value }
 
 external open class Uint8ClampedArray : ArrayBufferView {
     constructor(length: Int)
@@ -940,7 +940,7 @@ external open class Uint8ClampedArray : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Uint8ClampedArray.get(index: Int): Byte = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Uint8ClampedArray.set(index: Int, value: Byte) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Uint8ClampedArray.set(index: Int, value: Byte) { asDynamic()[index] = value }
 
 external open class Int16Array : ArrayBufferView {
     constructor(length: Int)
@@ -960,7 +960,7 @@ external open class Int16Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Int16Array.get(index: Int): Short = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Int16Array.set(index: Int, value: Short) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Int16Array.set(index: Int, value: Short) { asDynamic()[index] = value }
 
 external open class Uint16Array : ArrayBufferView {
     constructor(length: Int)
@@ -980,7 +980,7 @@ external open class Uint16Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Uint16Array.get(index: Int): Short = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Uint16Array.set(index: Int, value: Short) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Uint16Array.set(index: Int, value: Short) { asDynamic()[index] = value }
 
 external open class Int32Array : ArrayBufferView {
     constructor(length: Int)
@@ -1000,7 +1000,7 @@ external open class Int32Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Int32Array.get(index: Int): Int = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Int32Array.set(index: Int, value: Int) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Int32Array.set(index: Int, value: Int) { asDynamic()[index] = value }
 
 external open class Uint32Array : ArrayBufferView {
     constructor(length: Int)
@@ -1020,7 +1020,7 @@ external open class Uint32Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Uint32Array.get(index: Int): Int = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Uint32Array.set(index: Int, value: Int) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Uint32Array.set(index: Int, value: Int) { asDynamic()[index] = value }
 
 external open class Float32Array : ArrayBufferView {
     constructor(length: Int)
@@ -1040,7 +1040,7 @@ external open class Float32Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Float32Array.get(index: Int): Float = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Float32Array.set(index: Int, value: Float) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Float32Array.set(index: Int, value: Float) { asDynamic()[index] = value }
 
 external open class Float64Array : ArrayBufferView {
     constructor(length: Int)
@@ -1060,7 +1060,7 @@ external open class Float64Array : ArrayBufferView {
     }
 }
 @kotlin.internal.InlineOnly inline operator fun Float64Array.get(index: Int): Double = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Float64Array.set(index: Int, value: Double) { asDynamic()[index] = value; }
+@kotlin.internal.InlineOnly inline operator fun Float64Array.set(index: Int, value: Double) { asDynamic()[index] = value }
 
 external open class DataView(buffer: ArrayBuffer, byteOffset: Int = definedExternally, byteLength: Int = definedExternally) : ArrayBufferView {
     override val buffer: ArrayBuffer
