@@ -20,8 +20,7 @@ private class ItemArrayLikeLowering : IDLLowering {
         }
         val itemGetter = declaration.getters.find {
             it.name == "item" &&
-                    it.key.type == IDLSingleTypeDeclaration("unsignedlong", null, false) &&
-                    it.valueType.nullable
+                    it.key.type == IDLSingleTypeDeclaration("unsignedlong", null, false)
         }
         if (lengthAttribute != null && itemGetter != null) {
             return declaration.copy(parents = declaration.parents + IDLSingleTypeDeclaration(
