@@ -10,8 +10,9 @@ import org.jetbrains.dukat.idlParser.getNameOrNull
 internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
     private var name: String = ""
     private var type: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var defaultValue: String? = null
 
-    override fun defaultResult() = IDLArgumentDeclaration(name, type)
+    override fun defaultResult() = IDLArgumentDeclaration(name, type, defaultValue)
 
     override fun visitType(ctx: WebIDLParser.TypeContext): IDLArgumentDeclaration {
         type = TypeVisitor().visit(ctx)
@@ -20,6 +21,11 @@ internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
 
     override fun visitArgumentName(ctx: WebIDLParser.ArgumentNameContext): IDLArgumentDeclaration {
         name = ctx.text
+        return defaultResult()
+    }
+
+    override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLArgumentDeclaration {
+        defaultValue = ctx.text
         return defaultResult()
     }
 }
