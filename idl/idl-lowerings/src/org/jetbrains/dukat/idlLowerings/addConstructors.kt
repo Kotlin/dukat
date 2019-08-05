@@ -74,7 +74,7 @@ private class ConstructorLowering : IDLLowering {
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
-        val newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
+        var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         return newFileDeclaration.copy(
                 declarations = newFileDeclaration.declarations + namedConstructors.map {
                     IDLInterfaceDeclaration(
@@ -95,7 +95,7 @@ private class ConstructorLowering : IDLLowering {
                             partial = false
                     )
                 }
-        )
+        ).also { namedConstructors.clear() }
     }
 }
 
