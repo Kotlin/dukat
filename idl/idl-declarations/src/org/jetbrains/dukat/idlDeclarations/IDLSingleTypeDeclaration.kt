@@ -12,6 +12,7 @@ fun IDLSingleTypeDeclaration.isKnown(): Boolean {
             "ByteString",
             "DOMError",
             "DOMString",
+            "String",
             "USVString",
             "\$Array",
             "\$dynamic",

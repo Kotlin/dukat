@@ -78,6 +78,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "boolean" -> "Boolean"
                 "ByteString" -> "String"
                 "DOMString" -> "String"
+                "String" -> "String"
                 "USVString" -> "String"
                 "\$Array" -> "Array"
                 "sequence" -> "Array"

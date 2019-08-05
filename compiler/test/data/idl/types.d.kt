@@ -5,6 +5,7 @@ external abstract class A {
     var s1: String
     var s2: String
     var s3: String
+    var s4: String
     var nullableString: String?
     var obj: dynamic
     var nullableObject: dynamic
