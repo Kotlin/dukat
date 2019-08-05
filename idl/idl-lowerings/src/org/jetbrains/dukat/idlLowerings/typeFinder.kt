@@ -5,33 +5,43 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 
+private enum class TypeKind {
+    NOT_FOUND, INTERFACE, DICTIONARY, ENUM
+}
+
 private class TypeFinder(private val nameToFind: String): IDLLowering {
-    var found: Boolean = false
+    var kind: TypeKind = TypeKind.NOT_FOUND
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         if (declaration.name == nameToFind) {
-            found = true
+            kind = TypeKind.INTERFACE
         }
         return declaration
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         if (declaration.name == nameToFind) {
-            found = true
+            kind = TypeKind.DICTIONARY
         }
         return declaration
     }
 
     override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
         if (declaration.name == nameToFind) {
-            found = true
+            kind = TypeKind.ENUM
         }
         return declaration
     }
 }
 
-fun IDLSourceSetDeclaration.containsInterface(name: String): Boolean {
+fun IDLSourceSetDeclaration.containsType(name: String): Boolean {
     val finder = TypeFinder(name)
     finder.lowerSourceSetDeclaration(this)
-    return finder.found
+    return finder.kind != TypeKind.NOT_FOUND
+}
+
+fun IDLSourceSetDeclaration.containsEnum(name: String): Boolean {
+    val finder = TypeFinder(name)
+    finder.lowerSourceSetDeclaration(this)
+    return finder.kind == TypeKind.ENUM
 }

@@ -43,7 +43,7 @@ private class TypeResolver : IDLLowering {
                     ))
                 }
                 is IDLSingleTypeDeclaration -> {
-                    if (member.typeParameter != null || !sourceSet.containsInterface(member.name)) {
+                    if (member.typeParameter != null || !sourceSet.containsType(member.name)) {
                         failedToResolveUnionTypes += unionType.name
                         return
                     }
@@ -84,7 +84,7 @@ private class TypeResolver : IDLLowering {
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
+            return if (!declaration.isPrimitive() && !sourceSet.containsType(declaration.name)) {
                 IDLSingleTypeDeclaration("\$dynamic", null, false)
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
