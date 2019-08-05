@@ -18,6 +18,13 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.xhr.*
 
+external abstract class ServiceWorker : EventTarget, AbstractWorker, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
+    open val scriptURL: String
+    open val state: ServiceWorkerState
+    open var onstatechange: ((Event) -> dynamic)?
+    fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
+}
+
 external abstract class ServiceWorkerRegistration : EventTarget {
     open val installing: ServiceWorker?
     open val waiting: ServiceWorker?
@@ -30,27 +37,6 @@ external abstract class ServiceWorkerRegistration : EventTarget {
     fun methodName(): Promise<dynamic>
     fun showNotification(title: String, options: NotificationOptions = definedExternally): Promise<Unit>
     fun getNotifications(filter: GetNotificationOptions = definedExternally): Promise<dynamic>
-}
-
-external abstract class ServiceWorkerGlobalScope : WorkerGlobalScope {
-    open val clients: Clients
-    open val registration: ServiceWorkerRegistration
-    open var oninstall: ((Event) -> dynamic)?
-    open var onactivate: ((Event) -> dynamic)?
-    open var onfetch: ((FetchEvent) -> dynamic)?
-    open var onforeignfetch: ((Event) -> dynamic)?
-    open var onmessage: ((MessageEvent) -> dynamic)?
-    open var onfunctionalevent: ((Event) -> dynamic)?
-    open var onnotificationclick: ((NotificationEvent) -> dynamic)?
-    open var onnotificationclose: ((NotificationEvent) -> dynamic)?
-    fun skipWaiting(): Promise<Unit>
-}
-
-external abstract class ServiceWorker : EventTarget, AbstractWorker, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
-    open val scriptURL: String
-    open val state: ServiceWorkerState
-    open var onstatechange: ((Event) -> dynamic)?
-    fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
 }
 
 external abstract class ServiceWorkerContainer : EventTarget {
@@ -119,6 +105,20 @@ inline fun ServiceWorkerMessageEventInit(data: Any? = undefined, origin: String?
     o["cancelable"] = cancelable
     o["composed"] = composed
     return o
+}
+
+external abstract class ServiceWorkerGlobalScope : WorkerGlobalScope {
+    open val clients: Clients
+    open val registration: ServiceWorkerRegistration
+    open var oninstall: ((Event) -> dynamic)?
+    open var onactivate: ((Event) -> dynamic)?
+    open var onfetch: ((FetchEvent) -> dynamic)?
+    open var onforeignfetch: ((Event) -> dynamic)?
+    open var onmessage: ((MessageEvent) -> dynamic)?
+    open var onfunctionalevent: ((Event) -> dynamic)?
+    open var onnotificationclick: ((NotificationEvent) -> dynamic)?
+    open var onnotificationclose: ((NotificationEvent) -> dynamic)?
+    fun skipWaiting(): Promise<Unit>
 }
 
 external abstract class Client : UnionClientOrMessagePortOrServiceWorker {
