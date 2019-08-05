@@ -33,11 +33,11 @@ external open class URL(url: String, base: String = definedExternally) {
     var hash: String
 
     companion object {
+        fun domainToASCII(domain: String): String
+        fun domainToUnicode(domain: String): String
         fun createObjectURL(blob: Blob): String
         fun createFor(blob: Blob): String
         fun revokeObjectURL(url: String)
-        fun domainToASCII(domain: String): String
-        fun domainToUnicode(domain: String): String
     }
 }
 
