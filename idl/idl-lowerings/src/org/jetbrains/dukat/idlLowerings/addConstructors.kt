@@ -5,12 +5,22 @@ import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamedFunctionExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 
 private class ConstructorLowering : IDLLowering {
 
-    private fun IDLExtendedAttributeDeclaration.convertToConstructor(): IDLConstructorDeclaration? {
+    private data class NamedConstructor(
+            val interfaceName: String,
+            val constructorName: String,
+            val constructor: IDLConstructorDeclaration
+    )
+
+    private val namedConstructors: MutableSet<NamedConstructor> = mutableSetOf()
+
+    private fun IDLExtendedAttributeDeclaration.convertToOrdinaryConstructor(): IDLConstructorDeclaration? {
         return when (this) {
             is IDLFunctionExtendedAttributeDeclaration -> {
                 if (functionName == "Constructor") {
@@ -30,13 +40,62 @@ private class ConstructorLowering : IDLLowering {
         }
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        val constructors = declaration.extendedAttributes.mapNotNull { it.convertToConstructor() }
-        return if (constructors.size == 1) {
-            declaration.copy(primaryConstructor = constructors[0])
-        } else {
-            declaration.copy(constructors = constructors)
+    private fun IDLExtendedAttributeDeclaration.convertToNamedConstructor(interfaceName: String): NamedConstructor? {
+        return when (this) {
+            is IDLNamedFunctionExtendedAttributeDeclaration -> {
+                if (functionName == "NamedConstructor") {
+                    NamedConstructor(
+                            interfaceName,
+                            functionName,
+                            IDLConstructorDeclaration(arguments)
+                    )
+                } else {
+                    null
+                }
+            }
+            else -> null
         }
+    }
+
+    private fun addNamedConstructors(declaration: IDLInterfaceDeclaration) {
+        namedConstructors.addAll(declaration.extendedAttributes.mapNotNull {
+            it.convertToNamedConstructor(declaration.name)
+        })
+    }
+
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+        val ordinaryConstructors = declaration.extendedAttributes.mapNotNull { it.convertToOrdinaryConstructor() }
+        addNamedConstructors(declaration)
+        return if (ordinaryConstructors.size == 1) {
+            declaration.copy(primaryConstructor = ordinaryConstructors[0])
+        } else {
+            declaration.copy(constructors = ordinaryConstructors)
+        }
+    }
+
+    override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
+        val newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
+        return newFileDeclaration.copy(
+                declarations = newFileDeclaration.declarations + namedConstructors.map {
+                    IDLInterfaceDeclaration(
+                            name = it.constructorName,
+                            attributes = listOf(),
+                            constants = listOf(),
+                            operations = listOf(),
+                            primaryConstructor = it.constructor,
+                            constructors = listOf(),
+                            parents = listOf(
+                                    IDLSingleTypeDeclaration(it.interfaceName, null, false)
+                            ),
+                            extendedAttributes = listOf(),
+                            getters = listOf(),
+                            setters = listOf(),
+                            callback = false,
+                            generated = false,
+                            partial = false
+                    )
+                }
+        )
     }
 }
 
