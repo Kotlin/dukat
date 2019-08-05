@@ -18,6 +18,102 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external abstract class MediaList : ItemArrayLike<String> {
+    open var mediaText: String
+    override val length: Int
+    override fun item(index: Int): String?
+    fun appendMedium(medium: String)
+    fun deleteMedium(medium: String)
+}
+@kotlin.internal.InlineOnly inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
+
+external abstract class StyleSheet {
+    open val type: String
+    open val href: String?
+    open val ownerNode: UnionElementOrProcessingInstruction?
+    open val parentStyleSheet: StyleSheet?
+    open val title: String?
+    open val media: MediaList
+    open var disabled: Boolean
+}
+
+external abstract class CSSStyleSheet : StyleSheet {
+    open val ownerRule: CSSRule?
+    open val cssRules: CSSRuleList
+    fun insertRule(rule: String, index: Int): Int
+    fun deleteRule(index: Int)
+}
+
+external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
+    override val length: Int
+    override fun item(index: Int): StyleSheet?
+}
+@kotlin.internal.InlineOnly inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[index]
+
+external interface LinkStyle {
+    val sheet: StyleSheet?
+}
+
+external abstract class CSSRuleList : ItemArrayLike<CSSRule> {
+    override val length: Int
+    override fun item(index: Int): CSSRule?
+}
+@kotlin.internal.InlineOnly inline operator fun CSSRuleList.get(index: Int): CSSRule? = asDynamic()[index]
+
+external abstract class CSSRule {
+    open val type: Short
+    open var cssText: String
+    open val parentRule: CSSRule?
+    open val parentStyleSheet: CSSStyleSheet?
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
+}
+
+external abstract class CSSStyleRule : CSSRule {
+    open var selectorText: String
+    open val style: CSSStyleDeclaration
+}
+
+external abstract class CSSImportRule : CSSRule {
+    open val href: String
+    open val media: MediaList
+    open val styleSheet: CSSStyleSheet
+}
+
+external abstract class CSSGroupingRule : CSSRule {
+    open val cssRules: CSSRuleList
+    fun insertRule(rule: String, index: Int): Int
+    fun deleteRule(index: Int)
+}
+
+external abstract class CSSMediaRule : CSSGroupingRule {
+    open val media: MediaList
+}
+
+external abstract class CSSPageRule : CSSGroupingRule {
+    open var selectorText: String
+    open val style: CSSStyleDeclaration
+}
+
+external abstract class CSSMarginRule : CSSRule {
+    open val name: String
+    open val style: CSSStyleDeclaration
+}
+
+external abstract class CSSNamespaceRule : CSSRule {
+    open val namespaceURI: String
+    open val prefix: String
+}
+
 external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     open var cssText: String
     override val length: Int
@@ -258,102 +354,6 @@ external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     fun removeProperty(property: String): String
 }
 @kotlin.internal.InlineOnly inline operator fun CSSStyleDeclaration.get(index: Int): String? = asDynamic()[index]
-
-external abstract class MediaList : ItemArrayLike<String> {
-    open var mediaText: String
-    override val length: Int
-    override fun item(index: Int): String?
-    fun appendMedium(medium: String)
-    fun deleteMedium(medium: String)
-}
-@kotlin.internal.InlineOnly inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
-
-external abstract class StyleSheet {
-    open val type: String
-    open val href: String?
-    open val ownerNode: UnionElementOrProcessingInstruction?
-    open val parentStyleSheet: StyleSheet?
-    open val title: String?
-    open val media: MediaList
-    open var disabled: Boolean
-}
-
-external abstract class CSSStyleSheet : StyleSheet {
-    open val ownerRule: CSSRule?
-    open val cssRules: CSSRuleList
-    fun insertRule(rule: String, index: Int): Int
-    fun deleteRule(index: Int)
-}
-
-external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
-    override val length: Int
-    override fun item(index: Int): StyleSheet?
-}
-@kotlin.internal.InlineOnly inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[index]
-
-external interface LinkStyle {
-    val sheet: StyleSheet?
-}
-
-external abstract class CSSRuleList : ItemArrayLike<CSSRule> {
-    override val length: Int
-    override fun item(index: Int): CSSRule?
-}
-@kotlin.internal.InlineOnly inline operator fun CSSRuleList.get(index: Int): CSSRule? = asDynamic()[index]
-
-external abstract class CSSRule {
-    open val type: Short
-    open var cssText: String
-    open val parentRule: CSSRule?
-    open val parentStyleSheet: CSSStyleSheet?
-
-    companion object {
-        val STYLE_RULE: Short
-        val CHARSET_RULE: Short
-        val IMPORT_RULE: Short
-        val MEDIA_RULE: Short
-        val FONT_FACE_RULE: Short
-        val PAGE_RULE: Short
-        val MARGIN_RULE: Short
-        val NAMESPACE_RULE: Short
-    }
-}
-
-external abstract class CSSStyleRule : CSSRule {
-    open var selectorText: String
-    open val style: CSSStyleDeclaration
-}
-
-external abstract class CSSImportRule : CSSRule {
-    open val href: String
-    open val media: MediaList
-    open val styleSheet: CSSStyleSheet
-}
-
-external abstract class CSSGroupingRule : CSSRule {
-    open val cssRules: CSSRuleList
-    fun insertRule(rule: String, index: Int): Int
-    fun deleteRule(index: Int)
-}
-
-external abstract class CSSMediaRule : CSSGroupingRule {
-    open val media: MediaList
-}
-
-external abstract class CSSPageRule : CSSGroupingRule {
-    open var selectorText: String
-    open val style: CSSStyleDeclaration
-}
-
-external abstract class CSSMarginRule : CSSRule {
-    open val name: String
-    open val style: CSSStyleDeclaration
-}
-
-external abstract class CSSNamespaceRule : CSSRule {
-    open val namespaceURI: String
-    open val prefix: String
-}
 
 external interface ElementCSSInlineStyle {
     val style: CSSStyleDeclaration
