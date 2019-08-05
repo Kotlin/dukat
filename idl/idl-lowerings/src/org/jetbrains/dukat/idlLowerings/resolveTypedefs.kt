@@ -23,16 +23,19 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
                         newType.copy(
                                 typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) }
                                         ?: newType.typeParameter?.let { lowerTypeDeclaration(it) },
-                                nullable = declaration.nullable || newType.nullable
+                                nullable = declaration.nullable || newType.nullable,
+                                comment = declaration.comment
                         )
                     }
                     is IDLUnionTypeDeclaration -> newType.copy(
                             unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) },
                             name = declaration.name,
-                            nullable = declaration.nullable
+                            nullable = declaration.nullable,
+                            comment = declaration.comment
                     )
                     is IDLFunctionTypeDeclaration -> newType.copy(
-                            nullable = declaration.nullable || newType.nullable
+                            nullable = declaration.nullable || newType.nullable,
+                            comment = declaration.comment
                     )
                     else -> declaration
                 }
