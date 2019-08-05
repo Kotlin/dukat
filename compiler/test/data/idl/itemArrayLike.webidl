@@ -1,4 +1,4 @@
 interface A {
     readonly attribute unsigned long length;
-    getter DOMString? item(unsigned long index);
+    getter DOMString item(unsigned long index);
 };

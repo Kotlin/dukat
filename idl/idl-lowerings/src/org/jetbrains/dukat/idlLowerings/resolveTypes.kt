@@ -8,7 +8,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.isPrimitive
+import org.jetbrains.dukat.idlDeclarations.isKnown
 import org.jetbrains.dukat.panic.raiseConcern
 
 private class TypeResolver : IDLLowering {
@@ -84,7 +84,7 @@ private class TypeResolver : IDLLowering {
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
+            return if (!declaration.isKnown() && !sourceSet.containsInterface(declaration.name)) {
                 IDLSingleTypeDeclaration("\$dynamic", null, false)
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })

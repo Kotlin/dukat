@@ -7,7 +7,7 @@ data class IDLSingleTypeDeclaration(
         override val comment: String? = null
 ) : IDLTypeDeclaration
 
-fun IDLSingleTypeDeclaration.isPrimitive(): Boolean {
+fun IDLSingleTypeDeclaration.isKnown(): Boolean {
     return name in setOf(
             "ByteString",
             "DOMError",
@@ -32,5 +32,23 @@ fun IDLSingleTypeDeclaration.isPrimitive(): Boolean {
             "unsignedlonglong",
             "unsignedshort",
             "void"
+    )
+}
+
+fun IDLSingleTypeDeclaration.isPrimitive(): Boolean {
+    return name in setOf(
+            "boolean",
+            "byte",
+            "double",
+            "float",
+            "long",
+            "longlong",
+            "octet",
+            "short",
+            "unrestricteddouble",
+            "unrestrictedfloat",
+            "unsignedlong",
+            "unsignedlonglong",
+            "unsignedshort"
     )
 }
