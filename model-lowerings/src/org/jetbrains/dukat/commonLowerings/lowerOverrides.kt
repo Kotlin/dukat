@@ -134,6 +134,12 @@ private class OverrideResolver(val context: ModelContext) {
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
 
+            if (value == otherParameterType.value
+                    && params == otherParameterType.params
+                    && nullable == otherParameterType.nullable) {
+                return true
+            }
+
             val classLike: ClassLikeModel? = context.resolveClass(value) ?: context.resolveInterface(value)
             val otherClassLike: ClassLikeModel? = context.resolveClass(otherParameterType.value)
                     ?: context.resolveInterface(otherParameterType.value)

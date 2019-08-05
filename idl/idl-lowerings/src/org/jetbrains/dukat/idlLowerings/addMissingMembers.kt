@@ -70,7 +70,17 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
             for (parentOperation in parent.operations) {
                 if (parentOperation.static || parent.isInterface()) {
                     if (declaration.operations.none { it.isOverriding(parentOperation) }) {
-                        newOperations += parentOperation
+                        newOperations += parentOperation.copy(
+                                arguments = parentOperation.arguments.map {
+                                    it.copy(
+                                            type = if (it.defaultValue != null) {
+                                                it.type.changeComment("= definedExternally")
+                                            } else {
+                                                it.type
+                                            }
+                                    )
+                                }
+                        )
                     }
                 }
             }
