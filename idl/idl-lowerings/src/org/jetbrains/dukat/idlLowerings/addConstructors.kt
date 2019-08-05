@@ -43,7 +43,7 @@ private class ConstructorLowering : IDLLowering {
     private fun IDLExtendedAttributeDeclaration.convertToNamedConstructor(interfaceName: String): NamedConstructor? {
         return when (this) {
             is IDLNamedFunctionExtendedAttributeDeclaration -> {
-                if (functionName == "NamedConstructor") {
+                if (name == "NamedConstructor") {
                     NamedConstructor(
                             interfaceName,
                             functionName,
