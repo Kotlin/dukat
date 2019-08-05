@@ -355,7 +355,7 @@ external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var href: String
     open var crossOrigin: String?
     open var rel: String
-    @JsName("as") open var as_: RequestDestination
+    open var `as`: RequestDestination
     open val relList: DOMTokenList
     open var media: String
     open var nonce: String
@@ -2970,16 +2970,16 @@ external open class XMLDocument : Document {
 }
 
 external interface ElementCreationOptions {
-    @JsName("is") var is_: String?
+    var `is`: String?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ElementCreationOptions(is_: String? = undefined): ElementCreationOptions {
+inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOptions {
     val o = js("({})")
 
-    o["is"] = is_
+    o["is"] = `is`
 
     return o
 }
