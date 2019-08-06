@@ -112,7 +112,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
     return FunctionTypeModel(
-            parameters = arguments.map { it.process() },
+            parameters = arguments.filterNot { it.variadic }.map { it.process() },
             type = returnType.process(),
             metaDescription = comment,
             nullable = nullable
