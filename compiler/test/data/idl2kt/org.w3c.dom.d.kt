@@ -185,7 +185,7 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     fun adoptNode(node: Node): Node
     fun createAttribute(localName: String): Attr
     fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
-    fun createEvent(interface_: String): Event
+    fun createEvent(`interface`: String): Event
     fun createRange(): Range
     fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
     fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
