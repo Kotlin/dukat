@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
-import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -8,6 +7,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
+import org.jetbrains.dukat.ts.translator.createGraalTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetrbains.dukat.nodeLowering.lowerings
 
 import cartesian
 import org.jetbrains.dukat.ast.model.duplicate

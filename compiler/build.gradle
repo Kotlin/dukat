@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":translator"))
     implementation(project(":translator-string"))
     implementation(project(":tsinterop"))
+    implementation(project(":ts-translator"))
     implementation(project(":tsmodel"))
     implementation(project(":idl-lowerings"))
     implementation(project(":ts-lowerings"))

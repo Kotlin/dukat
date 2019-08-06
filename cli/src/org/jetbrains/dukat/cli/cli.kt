@@ -4,17 +4,22 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
-import org.jetbrains.dukat.compiler.createGraalTranslator
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translator.*
+import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
+import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
+import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
+import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.ts.translator.createGraalTranslator
 import translateModule
 import java.io.File
 import kotlin.system.exitProcess
@@ -214,7 +219,7 @@ private fun process(args: List<String>): CliOptions? {
                     sources.add(arg)
                 }
                 arg.endsWith(IDL_DECLARATION_EXTENSION) ||
-                arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
+                        arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
                     printWarning("Web IDL support is at early alpha stage and is not supposed to produce any production-quality code")
                     sources.add(arg)
                 }
@@ -242,7 +247,7 @@ fun main(vararg args: String) {
     val options = process(args.toList())
 
     if (options == null) {
-            exitProcess(1)
+        exitProcess(1)
     } else {
         options.engine == Engine.GRAAL
 
@@ -263,7 +268,7 @@ fun main(vararg args: String) {
                         options.reportPath
                 )
                 sourceName.endsWith(IDL_DECLARATION_EXTENSION) ||
-                sourceName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
+                        sourceName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
                     compile(
                             sourceName,
                             options.outDir,
