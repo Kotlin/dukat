@@ -18,262 +18,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
-    open val serviceWorker: ServiceWorkerContainer
-    open val maxTouchPoints: Int
-    open val mediaDevices: MediaDevices
-    open val clipboard: Clipboard
-    fun vibrate(pattern: dynamic): Boolean
-    fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
-}
-
-external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
-    open val fullscreenEnabled: Boolean
-    open val fullscreen: Boolean
-    var onfullscreenchange: ((Event) -> dynamic)?
-    var onfullscreenerror: ((Event) -> dynamic)?
-    open val rootElement: SVGSVGElement?
-    var title: String
-    open val referrer: String
-    var domain: String
-    open val activeElement: Element?
-    open val location: Location?
-    var cookie: String
-    open val lastModified: String
-    open val readyState: DocumentReadyState
-    var dir: String
-    var body: HTMLElement?
-    open val head: HTMLHeadElement?
-    open val images: HTMLCollection
-    open val embeds: HTMLCollection
-    open val plugins: HTMLCollection
-    open val links: HTMLCollection
-    open val forms: HTMLCollection
-    open val scripts: HTMLCollection
-    open val currentScript: HTMLOrSVGScriptElement?
-    open val defaultView: Window?
-    var designMode: String
-    var onreadystatechange: ((Event) -> dynamic)?
-    var fgColor: String
-    var linkColor: String
-    var vlinkColor: String
-    var alinkColor: String
-    var bgColor: String
-    open val anchors: HTMLCollection
-    open val applets: HTMLCollection
-    open val all: HTMLAllCollection
-    open val implementation: DOMImplementation
-    open val URL: String
-    open val documentURI: String
-    open val origin: String
-    open val compatMode: String
-    open val characterSet: String
-    open val charset: String
-    open val inputEncoding: String
-    open val contentType: String
-    open val doctype: DocumentType?
-    open val documentElement: Element?
-    open val scrollingElement: Element?
-    open val styleSheets: StyleSheetList
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
-    override var onabort: ((Event) -> dynamic)?
-    override var onblur: ((FocusEvent) -> dynamic)?
-    override var oncancel: ((Event) -> dynamic)?
-    override var oncanplay: ((Event) -> dynamic)?
-    override var oncanplaythrough: ((Event) -> dynamic)?
-    override var onchange: ((Event) -> dynamic)?
-    override var onclick: ((MouseEvent) -> dynamic)?
-    override var onclose: ((Event) -> dynamic)?
-    override var oncontextmenu: ((MouseEvent) -> dynamic)?
-    override var oncuechange: ((Event) -> dynamic)?
-    override var ondblclick: ((MouseEvent) -> dynamic)?
-    override var ondrag: ((DragEvent) -> dynamic)?
-    override var ondragend: ((DragEvent) -> dynamic)?
-    override var ondragenter: ((DragEvent) -> dynamic)?
-    override var ondragexit: ((DragEvent) -> dynamic)?
-    override var ondragleave: ((DragEvent) -> dynamic)?
-    override var ondragover: ((DragEvent) -> dynamic)?
-    override var ondragstart: ((DragEvent) -> dynamic)?
-    override var ondrop: ((DragEvent) -> dynamic)?
-    override var ondurationchange: ((Event) -> dynamic)?
-    override var onemptied: ((Event) -> dynamic)?
-    override var onended: ((Event) -> dynamic)?
-    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
-    override var onfocus: ((FocusEvent) -> dynamic)?
-    override var oninput: ((InputEvent) -> dynamic)?
-    override var oninvalid: ((Event) -> dynamic)?
-    override var onkeydown: ((KeyboardEvent) -> dynamic)?
-    override var onkeypress: ((KeyboardEvent) -> dynamic)?
-    override var onkeyup: ((KeyboardEvent) -> dynamic)?
-    override var onload: ((Event) -> dynamic)?
-    override var onloadeddata: ((Event) -> dynamic)?
-    override var onloadedmetadata: ((Event) -> dynamic)?
-    override var onloadend: ((Event) -> dynamic)?
-    override var onloadstart: ((ProgressEvent) -> dynamic)?
-    override var onmousedown: ((MouseEvent) -> dynamic)?
-    override var onmouseenter: ((MouseEvent) -> dynamic)?
-    override var onmouseleave: ((MouseEvent) -> dynamic)?
-    override var onmousemove: ((MouseEvent) -> dynamic)?
-    override var onmouseout: ((MouseEvent) -> dynamic)?
-    override var onmouseover: ((MouseEvent) -> dynamic)?
-    override var onmouseup: ((MouseEvent) -> dynamic)?
-    override var onwheel: ((WheelEvent) -> dynamic)?
-    override var onpause: ((Event) -> dynamic)?
-    override var onplay: ((Event) -> dynamic)?
-    override var onplaying: ((Event) -> dynamic)?
-    override var onprogress: ((ProgressEvent) -> dynamic)?
-    override var onratechange: ((Event) -> dynamic)?
-    override var onreset: ((Event) -> dynamic)?
-    override var onresize: ((Event) -> dynamic)?
-    override var onscroll: ((Event) -> dynamic)?
-    override var onseeked: ((Event) -> dynamic)?
-    override var onseeking: ((Event) -> dynamic)?
-    override var onselect: ((Event) -> dynamic)?
-    override var onshow: ((Event) -> dynamic)?
-    override var onstalled: ((Event) -> dynamic)?
-    override var onsubmit: ((Event) -> dynamic)?
-    override var onsuspend: ((Event) -> dynamic)?
-    override var ontimeupdate: ((Event) -> dynamic)?
-    override var ontoggle: ((Event) -> dynamic)?
-    override var onvolumechange: ((Event) -> dynamic)?
-    override var onwaiting: ((Event) -> dynamic)?
-    override var oncopy: ((ClipboardEvent) -> dynamic)?
-    override var oncut: ((ClipboardEvent) -> dynamic)?
-    override var onpaste: ((ClipboardEvent) -> dynamic)?
-    override val fullscreenElement: Element?
-    override val children: HTMLCollection
-    override val firstElementChild: Element?
-    override val lastElementChild: Element?
-    override val childElementCount: Int
-    fun exitFullscreen(): Promise<Unit>
-    fun getElementsByName(elementName: String): NodeList
-    fun open(type: String = definedExternally, replace: String = definedExternally): Document
-    fun open(url: String, name: String, features: String): Window
-    fun close()
-    fun write(vararg text: String)
-    fun writeln(vararg text: String)
-    fun hasFocus(): Boolean
-    fun execCommand(commandId: String, showUI: Boolean = definedExternally, value: String = definedExternally): Boolean
-    fun queryCommandEnabled(commandId: String): Boolean
-    fun queryCommandIndeterm(commandId: String): Boolean
-    fun queryCommandState(commandId: String): Boolean
-    fun queryCommandSupported(commandId: String): Boolean
-    fun queryCommandValue(commandId: String): String
-    fun clear()
-    fun captureEvents()
-    fun releaseEvents()
-    fun getElementsByTagName(qualifiedName: String): HTMLCollection
-    fun getElementsByTagNameNS(namespace: String?, localName: String): HTMLCollection
-    fun getElementsByClassName(classNames: String): HTMLCollection
-    fun createElement(localName: String, options: ElementCreationOptions = definedExternally): Element
-    fun createElementNS(namespace: String?, qualifiedName: String, options: ElementCreationOptions = definedExternally): Element
-    fun createDocumentFragment(): DocumentFragment
-    fun createTextNode(data: String): Text
-    fun createCDATASection(data: String): CDATASection
-    fun createComment(data: String): Comment
-    fun createProcessingInstruction(target: String, data: String): ProcessingInstruction
-    fun importNode(node: Node, deep: Boolean = definedExternally): Node
-    fun adoptNode(node: Node): Node
-    fun createAttribute(localName: String): Attr
-    fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
-    fun createEvent(interface_: String): Event
-    fun createRange(): Range
-    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
-    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
-    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): TreeWalker
-    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): TreeWalker
-    fun elementFromPoint(x: Double, y: Double): Element?
-    fun elementsFromPoint(x: Double, y: Double): Array<Element>
-    fun caretPositionFromPoint(x: Double, y: Double): CaretPosition?
-    override fun getElementById(elementId: String): Element?
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
-}
-@kotlin.internal.InlineOnly inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
-
-external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
-    override val performance: Performance
-    open val window: Window
-    open val self: Window
-    open val document: Document
-    open var name: String
-    open val location: Location
-    open val history: History
-    open val customElements: CustomElementRegistry
-    open val locationbar: BarProp
-    open val menubar: BarProp
-    open val personalbar: BarProp
-    open val scrollbars: BarProp
-    open val statusbar: BarProp
-    open val toolbar: BarProp
-    open var status: String
-    open val closed: Boolean
-    open val frames: Window
-    open val length: Int
-    open val top: Window
-    open var opener: Any?
-    open val parent: Window
-    open val frameElement: Element?
-    open val navigator: Navigator
-    open val applicationCache: ApplicationCache
-    open val external: External
-    open val screen: Screen
-    open val innerWidth: Int
-    open val innerHeight: Int
-    open val scrollX: Double
-    open val pageXOffset: Double
-    open val scrollY: Double
-    open val pageYOffset: Double
-    open val screenX: Int
-    open val screenY: Int
-    open val outerWidth: Int
-    open val outerHeight: Int
-    open val devicePixelRatio: Double
-    fun close()
-    fun stop()
-    fun focus()
-    fun blur()
-    fun open(url: String = definedExternally, target: String = definedExternally, features: String = definedExternally): Window?
-    fun alert()
-    fun alert(message: String)
-    fun confirm(message: String = definedExternally): Boolean
-    fun prompt(message: String = definedExternally, default: String = definedExternally): String?
-    fun print()
-    fun requestAnimationFrame(callback: (Double) -> Unit): Int
-    fun cancelAnimationFrame(handle: Int)
-    fun postMessage(message: Any?, targetOrigin: String, transfer: Array<dynamic> = definedExternally)
-    fun captureEvents()
-    fun releaseEvents()
-    fun matchMedia(query: String): MediaQueryList
-    fun moveTo(x: Int, y: Int)
-    fun moveBy(x: Int, y: Int)
-    fun resizeTo(x: Int, y: Int)
-    fun resizeBy(x: Int, y: Int)
-    fun scroll(options: ScrollToOptions = definedExternally)
-    fun scroll(x: Double, y: Double)
-    fun scrollTo(options: ScrollToOptions = definedExternally)
-    fun scrollTo(x: Double, y: Double)
-    fun scrollBy(options: ScrollToOptions = definedExternally)
-    fun scrollBy(x: Double, y: Double)
-    fun getComputedStyle(elt: Element, pseudoElt: String? = definedExternally): CSSStyleDeclaration
-}
-@kotlin.internal.InlineOnly inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
-
 external abstract class HTMLAllCollection {
     open val length: Int
 //    fun namedItem(name: String): UnionElementOrHTMLCollection?
@@ -522,105 +266,6 @@ external abstract class HTMLImageElement : HTMLElement, TexImageSource, HTMLOrSV
     open val y: Int
 }
 
-external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
-    override val children: HTMLCollection
-    override val firstElementChild: Element?
-    override val lastElementChild: Element?
-    override val childElementCount: Int
-    override val previousElementSibling: Element?
-    override val nextElementSibling: Element?
-    override val assignedSlot: HTMLSlotElement?
-    override val style: CSSStyleDeclaration
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
-    override var onabort: ((Event) -> dynamic)?
-    override var onblur: ((FocusEvent) -> dynamic)?
-    override var oncancel: ((Event) -> dynamic)?
-    override var oncanplay: ((Event) -> dynamic)?
-    override var oncanplaythrough: ((Event) -> dynamic)?
-    override var onchange: ((Event) -> dynamic)?
-    override var onclick: ((MouseEvent) -> dynamic)?
-    override var onclose: ((Event) -> dynamic)?
-    override var oncontextmenu: ((MouseEvent) -> dynamic)?
-    override var oncuechange: ((Event) -> dynamic)?
-    override var ondblclick: ((MouseEvent) -> dynamic)?
-    override var ondrag: ((DragEvent) -> dynamic)?
-    override var ondragend: ((DragEvent) -> dynamic)?
-    override var ondragenter: ((DragEvent) -> dynamic)?
-    override var ondragexit: ((DragEvent) -> dynamic)?
-    override var ondragleave: ((DragEvent) -> dynamic)?
-    override var ondragover: ((DragEvent) -> dynamic)?
-    override var ondragstart: ((DragEvent) -> dynamic)?
-    override var ondrop: ((DragEvent) -> dynamic)?
-    override var ondurationchange: ((Event) -> dynamic)?
-    override var onemptied: ((Event) -> dynamic)?
-    override var onended: ((Event) -> dynamic)?
-    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
-    override var onfocus: ((FocusEvent) -> dynamic)?
-    override var oninput: ((InputEvent) -> dynamic)?
-    override var oninvalid: ((Event) -> dynamic)?
-    override var onkeydown: ((KeyboardEvent) -> dynamic)?
-    override var onkeypress: ((KeyboardEvent) -> dynamic)?
-    override var onkeyup: ((KeyboardEvent) -> dynamic)?
-    override var onload: ((Event) -> dynamic)?
-    override var onloadeddata: ((Event) -> dynamic)?
-    override var onloadedmetadata: ((Event) -> dynamic)?
-    override var onloadend: ((Event) -> dynamic)?
-    override var onloadstart: ((ProgressEvent) -> dynamic)?
-    override var onmousedown: ((MouseEvent) -> dynamic)?
-    override var onmouseenter: ((MouseEvent) -> dynamic)?
-    override var onmouseleave: ((MouseEvent) -> dynamic)?
-    override var onmousemove: ((MouseEvent) -> dynamic)?
-    override var onmouseout: ((MouseEvent) -> dynamic)?
-    override var onmouseover: ((MouseEvent) -> dynamic)?
-    override var onmouseup: ((MouseEvent) -> dynamic)?
-    override var onwheel: ((WheelEvent) -> dynamic)?
-    override var onpause: ((Event) -> dynamic)?
-    override var onplay: ((Event) -> dynamic)?
-    override var onplaying: ((Event) -> dynamic)?
-    override var onprogress: ((ProgressEvent) -> dynamic)?
-    override var onratechange: ((Event) -> dynamic)?
-    override var onreset: ((Event) -> dynamic)?
-    override var onresize: ((Event) -> dynamic)?
-    override var onscroll: ((Event) -> dynamic)?
-    override var onseeked: ((Event) -> dynamic)?
-    override var onseeking: ((Event) -> dynamic)?
-    override var onselect: ((Event) -> dynamic)?
-    override var onshow: ((Event) -> dynamic)?
-    override var onstalled: ((Event) -> dynamic)?
-    override var onsubmit: ((Event) -> dynamic)?
-    override var onsuspend: ((Event) -> dynamic)?
-    override var ontimeupdate: ((Event) -> dynamic)?
-    override var ontoggle: ((Event) -> dynamic)?
-    override var onvolumechange: ((Event) -> dynamic)?
-    override var onwaiting: ((Event) -> dynamic)?
-    override var oncopy: ((ClipboardEvent) -> dynamic)?
-    override var oncut: ((ClipboardEvent) -> dynamic)?
-    override var onpaste: ((ClipboardEvent) -> dynamic)?
-    override var contentEditable: String
-    override val isContentEditable: Boolean
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-    override fun before(vararg nodes: dynamic)
-    override fun after(vararg nodes: dynamic)
-    override fun replaceWith(vararg nodes: dynamic)
-    override fun remove()
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
-}
-
 external abstract class HTMLIFrameElement : HTMLElement {
     open var src: String
     open var srcdoc: String
@@ -699,105 +344,6 @@ external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
 }
 
 external abstract class HTMLAudioElement : HTMLMediaElement
-
-external open class Audio(src: String = definedExternally) : HTMLAudioElement {
-    override val children: HTMLCollection
-    override val firstElementChild: Element?
-    override val lastElementChild: Element?
-    override val childElementCount: Int
-    override val previousElementSibling: Element?
-    override val nextElementSibling: Element?
-    override val assignedSlot: HTMLSlotElement?
-    override val style: CSSStyleDeclaration
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
-    override var onabort: ((Event) -> dynamic)?
-    override var onblur: ((FocusEvent) -> dynamic)?
-    override var oncancel: ((Event) -> dynamic)?
-    override var oncanplay: ((Event) -> dynamic)?
-    override var oncanplaythrough: ((Event) -> dynamic)?
-    override var onchange: ((Event) -> dynamic)?
-    override var onclick: ((MouseEvent) -> dynamic)?
-    override var onclose: ((Event) -> dynamic)?
-    override var oncontextmenu: ((MouseEvent) -> dynamic)?
-    override var oncuechange: ((Event) -> dynamic)?
-    override var ondblclick: ((MouseEvent) -> dynamic)?
-    override var ondrag: ((DragEvent) -> dynamic)?
-    override var ondragend: ((DragEvent) -> dynamic)?
-    override var ondragenter: ((DragEvent) -> dynamic)?
-    override var ondragexit: ((DragEvent) -> dynamic)?
-    override var ondragleave: ((DragEvent) -> dynamic)?
-    override var ondragover: ((DragEvent) -> dynamic)?
-    override var ondragstart: ((DragEvent) -> dynamic)?
-    override var ondrop: ((DragEvent) -> dynamic)?
-    override var ondurationchange: ((Event) -> dynamic)?
-    override var onemptied: ((Event) -> dynamic)?
-    override var onended: ((Event) -> dynamic)?
-    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
-    override var onfocus: ((FocusEvent) -> dynamic)?
-    override var oninput: ((InputEvent) -> dynamic)?
-    override var oninvalid: ((Event) -> dynamic)?
-    override var onkeydown: ((KeyboardEvent) -> dynamic)?
-    override var onkeypress: ((KeyboardEvent) -> dynamic)?
-    override var onkeyup: ((KeyboardEvent) -> dynamic)?
-    override var onload: ((Event) -> dynamic)?
-    override var onloadeddata: ((Event) -> dynamic)?
-    override var onloadedmetadata: ((Event) -> dynamic)?
-    override var onloadend: ((Event) -> dynamic)?
-    override var onloadstart: ((ProgressEvent) -> dynamic)?
-    override var onmousedown: ((MouseEvent) -> dynamic)?
-    override var onmouseenter: ((MouseEvent) -> dynamic)?
-    override var onmouseleave: ((MouseEvent) -> dynamic)?
-    override var onmousemove: ((MouseEvent) -> dynamic)?
-    override var onmouseout: ((MouseEvent) -> dynamic)?
-    override var onmouseover: ((MouseEvent) -> dynamic)?
-    override var onmouseup: ((MouseEvent) -> dynamic)?
-    override var onwheel: ((WheelEvent) -> dynamic)?
-    override var onpause: ((Event) -> dynamic)?
-    override var onplay: ((Event) -> dynamic)?
-    override var onplaying: ((Event) -> dynamic)?
-    override var onprogress: ((ProgressEvent) -> dynamic)?
-    override var onratechange: ((Event) -> dynamic)?
-    override var onreset: ((Event) -> dynamic)?
-    override var onresize: ((Event) -> dynamic)?
-    override var onscroll: ((Event) -> dynamic)?
-    override var onseeked: ((Event) -> dynamic)?
-    override var onseeking: ((Event) -> dynamic)?
-    override var onselect: ((Event) -> dynamic)?
-    override var onshow: ((Event) -> dynamic)?
-    override var onstalled: ((Event) -> dynamic)?
-    override var onsubmit: ((Event) -> dynamic)?
-    override var onsuspend: ((Event) -> dynamic)?
-    override var ontimeupdate: ((Event) -> dynamic)?
-    override var ontoggle: ((Event) -> dynamic)?
-    override var onvolumechange: ((Event) -> dynamic)?
-    override var onwaiting: ((Event) -> dynamic)?
-    override var oncopy: ((ClipboardEvent) -> dynamic)?
-    override var oncut: ((ClipboardEvent) -> dynamic)?
-    override var onpaste: ((ClipboardEvent) -> dynamic)?
-    override var contentEditable: String
-    override val isContentEditable: Boolean
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-    override fun before(vararg nodes: dynamic)
-    override fun after(vararg nodes: dynamic)
-    override fun replaceWith(vararg nodes: dynamic)
-    override fun remove()
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
-}
 
 external abstract class HTMLTrackElement : HTMLElement {
     open var kind: String
@@ -1229,105 +775,6 @@ external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElemen
     open var value: String
     open var text: String
     open val index: Int
-}
-
-external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
-    override val children: HTMLCollection
-    override val firstElementChild: Element?
-    override val lastElementChild: Element?
-    override val childElementCount: Int
-    override val previousElementSibling: Element?
-    override val nextElementSibling: Element?
-    override val assignedSlot: HTMLSlotElement?
-    override val style: CSSStyleDeclaration
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
-    override var onabort: ((Event) -> dynamic)?
-    override var onblur: ((FocusEvent) -> dynamic)?
-    override var oncancel: ((Event) -> dynamic)?
-    override var oncanplay: ((Event) -> dynamic)?
-    override var oncanplaythrough: ((Event) -> dynamic)?
-    override var onchange: ((Event) -> dynamic)?
-    override var onclick: ((MouseEvent) -> dynamic)?
-    override var onclose: ((Event) -> dynamic)?
-    override var oncontextmenu: ((MouseEvent) -> dynamic)?
-    override var oncuechange: ((Event) -> dynamic)?
-    override var ondblclick: ((MouseEvent) -> dynamic)?
-    override var ondrag: ((DragEvent) -> dynamic)?
-    override var ondragend: ((DragEvent) -> dynamic)?
-    override var ondragenter: ((DragEvent) -> dynamic)?
-    override var ondragexit: ((DragEvent) -> dynamic)?
-    override var ondragleave: ((DragEvent) -> dynamic)?
-    override var ondragover: ((DragEvent) -> dynamic)?
-    override var ondragstart: ((DragEvent) -> dynamic)?
-    override var ondrop: ((DragEvent) -> dynamic)?
-    override var ondurationchange: ((Event) -> dynamic)?
-    override var onemptied: ((Event) -> dynamic)?
-    override var onended: ((Event) -> dynamic)?
-    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
-    override var onfocus: ((FocusEvent) -> dynamic)?
-    override var oninput: ((InputEvent) -> dynamic)?
-    override var oninvalid: ((Event) -> dynamic)?
-    override var onkeydown: ((KeyboardEvent) -> dynamic)?
-    override var onkeypress: ((KeyboardEvent) -> dynamic)?
-    override var onkeyup: ((KeyboardEvent) -> dynamic)?
-    override var onload: ((Event) -> dynamic)?
-    override var onloadeddata: ((Event) -> dynamic)?
-    override var onloadedmetadata: ((Event) -> dynamic)?
-    override var onloadend: ((Event) -> dynamic)?
-    override var onloadstart: ((ProgressEvent) -> dynamic)?
-    override var onmousedown: ((MouseEvent) -> dynamic)?
-    override var onmouseenter: ((MouseEvent) -> dynamic)?
-    override var onmouseleave: ((MouseEvent) -> dynamic)?
-    override var onmousemove: ((MouseEvent) -> dynamic)?
-    override var onmouseout: ((MouseEvent) -> dynamic)?
-    override var onmouseover: ((MouseEvent) -> dynamic)?
-    override var onmouseup: ((MouseEvent) -> dynamic)?
-    override var onwheel: ((WheelEvent) -> dynamic)?
-    override var onpause: ((Event) -> dynamic)?
-    override var onplay: ((Event) -> dynamic)?
-    override var onplaying: ((Event) -> dynamic)?
-    override var onprogress: ((ProgressEvent) -> dynamic)?
-    override var onratechange: ((Event) -> dynamic)?
-    override var onreset: ((Event) -> dynamic)?
-    override var onresize: ((Event) -> dynamic)?
-    override var onscroll: ((Event) -> dynamic)?
-    override var onseeked: ((Event) -> dynamic)?
-    override var onseeking: ((Event) -> dynamic)?
-    override var onselect: ((Event) -> dynamic)?
-    override var onshow: ((Event) -> dynamic)?
-    override var onstalled: ((Event) -> dynamic)?
-    override var onsubmit: ((Event) -> dynamic)?
-    override var onsuspend: ((Event) -> dynamic)?
-    override var ontimeupdate: ((Event) -> dynamic)?
-    override var ontoggle: ((Event) -> dynamic)?
-    override var onvolumechange: ((Event) -> dynamic)?
-    override var onwaiting: ((Event) -> dynamic)?
-    override var oncopy: ((ClipboardEvent) -> dynamic)?
-    override var oncut: ((ClipboardEvent) -> dynamic)?
-    override var onpaste: ((ClipboardEvent) -> dynamic)?
-    override var contentEditable: String
-    override val isContentEditable: Boolean
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-    override fun before(vararg nodes: dynamic)
-    override fun after(vararg nodes: dynamic)
-    override fun replaceWith(vararg nodes: dynamic)
-    override fun remove()
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
 external abstract class HTMLTextAreaElement : HTMLElement {
@@ -1893,6 +1340,74 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
     return o
 }
 
+external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
+    override val performance: Performance
+    open val window: Window
+    open val self: Window
+    open val document: Document
+    open var name: String
+    open val location: Location
+    open val history: History
+    open val customElements: CustomElementRegistry
+    open val locationbar: BarProp
+    open val menubar: BarProp
+    open val personalbar: BarProp
+    open val scrollbars: BarProp
+    open val statusbar: BarProp
+    open val toolbar: BarProp
+    open var status: String
+    open val closed: Boolean
+    open val frames: Window
+    open val length: Int
+    open val top: Window
+    open var opener: Any?
+    open val parent: Window
+    open val frameElement: Element?
+    open val navigator: Navigator
+    open val applicationCache: ApplicationCache
+    open val external: External
+    open val screen: Screen
+    open val innerWidth: Int
+    open val innerHeight: Int
+    open val scrollX: Double
+    open val pageXOffset: Double
+    open val scrollY: Double
+    open val pageYOffset: Double
+    open val screenX: Int
+    open val screenY: Int
+    open val outerWidth: Int
+    open val outerHeight: Int
+    open val devicePixelRatio: Double
+    fun close()
+    fun stop()
+    fun focus()
+    fun blur()
+    fun open(url: String = definedExternally, target: String = definedExternally, features: String = definedExternally): Window?
+    fun alert()
+    fun alert(message: String)
+    fun confirm(message: String = definedExternally): Boolean
+    fun prompt(message: String = definedExternally, default: String = definedExternally): String?
+    fun print()
+    fun requestAnimationFrame(callback: (Double) -> Unit): Int
+    fun cancelAnimationFrame(handle: Int)
+    fun postMessage(message: Any?, targetOrigin: String, transfer: Array<dynamic> = definedExternally)
+    fun captureEvents()
+    fun releaseEvents()
+    fun matchMedia(query: String): MediaQueryList
+    fun moveTo(x: Int, y: Int)
+    fun moveBy(x: Int, y: Int)
+    fun resizeTo(x: Int, y: Int)
+    fun resizeBy(x: Int, y: Int)
+    fun scroll(options: ScrollToOptions = definedExternally)
+    fun scroll(x: Double, y: Double)
+    fun scrollTo(options: ScrollToOptions = definedExternally)
+    fun scrollTo(x: Double, y: Double)
+    fun scrollBy(options: ScrollToOptions = definedExternally)
+    fun scrollBy(x: Double, y: Double)
+    fun getComputedStyle(elt: Element, pseudoElt: String? = definedExternally): CSSStyleDeclaration
+}
+@kotlin.internal.InlineOnly inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
+
 external abstract class BarProp {
     open val visible: Boolean
 }
@@ -2196,6 +1711,15 @@ external interface WindowOrWorkerGlobalScope {
     fun clearInterval(handle: Int = definedExternally)
     fun createImageBitmap(image: dynamic, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
     fun createImageBitmap(image: dynamic, sx: Int, sy: Int, sw: Int, sh: Int, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
+}
+
+external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
+    open val serviceWorker: ServiceWorkerContainer
+    open val maxTouchPoints: Int
+    open val mediaDevices: MediaDevices
+    open val clipboard: Clipboard
+    fun vibrate(pattern: dynamic): Boolean
+    fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
 }
 
 external interface NavigatorID {
@@ -2901,6 +2425,185 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
     return o
 }
 
+external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
+    open val fullscreenEnabled: Boolean
+    open val fullscreen: Boolean
+    var onfullscreenchange: ((Event) -> dynamic)?
+    var onfullscreenerror: ((Event) -> dynamic)?
+    open val rootElement: SVGSVGElement?
+    var title: String
+    open val referrer: String
+    var domain: String
+    open val activeElement: Element?
+    open val location: Location?
+    var cookie: String
+    open val lastModified: String
+    open val readyState: DocumentReadyState
+    var dir: String
+    var body: HTMLElement?
+    open val head: HTMLHeadElement?
+    open val images: HTMLCollection
+    open val embeds: HTMLCollection
+    open val plugins: HTMLCollection
+    open val links: HTMLCollection
+    open val forms: HTMLCollection
+    open val scripts: HTMLCollection
+    open val currentScript: HTMLOrSVGScriptElement?
+    open val defaultView: Window?
+    var designMode: String
+    var onreadystatechange: ((Event) -> dynamic)?
+    var fgColor: String
+    var linkColor: String
+    var vlinkColor: String
+    var alinkColor: String
+    var bgColor: String
+    open val anchors: HTMLCollection
+    open val applets: HTMLCollection
+    open val all: HTMLAllCollection
+    open val implementation: DOMImplementation
+    open val URL: String
+    open val documentURI: String
+    open val origin: String
+    open val compatMode: String
+    open val characterSet: String
+    open val charset: String
+    open val inputEncoding: String
+    open val contentType: String
+    open val doctype: DocumentType?
+    open val documentElement: Element?
+    open val scrollingElement: Element?
+    open val styleSheets: StyleSheetList
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
+    override var onabort: ((Event) -> dynamic)?
+    override var onblur: ((FocusEvent) -> dynamic)?
+    override var oncancel: ((Event) -> dynamic)?
+    override var oncanplay: ((Event) -> dynamic)?
+    override var oncanplaythrough: ((Event) -> dynamic)?
+    override var onchange: ((Event) -> dynamic)?
+    override var onclick: ((MouseEvent) -> dynamic)?
+    override var onclose: ((Event) -> dynamic)?
+    override var oncontextmenu: ((MouseEvent) -> dynamic)?
+    override var oncuechange: ((Event) -> dynamic)?
+    override var ondblclick: ((MouseEvent) -> dynamic)?
+    override var ondrag: ((DragEvent) -> dynamic)?
+    override var ondragend: ((DragEvent) -> dynamic)?
+    override var ondragenter: ((DragEvent) -> dynamic)?
+    override var ondragexit: ((DragEvent) -> dynamic)?
+    override var ondragleave: ((DragEvent) -> dynamic)?
+    override var ondragover: ((DragEvent) -> dynamic)?
+    override var ondragstart: ((DragEvent) -> dynamic)?
+    override var ondrop: ((DragEvent) -> dynamic)?
+    override var ondurationchange: ((Event) -> dynamic)?
+    override var onemptied: ((Event) -> dynamic)?
+    override var onended: ((Event) -> dynamic)?
+    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+    override var onfocus: ((FocusEvent) -> dynamic)?
+    override var oninput: ((InputEvent) -> dynamic)?
+    override var oninvalid: ((Event) -> dynamic)?
+    override var onkeydown: ((KeyboardEvent) -> dynamic)?
+    override var onkeypress: ((KeyboardEvent) -> dynamic)?
+    override var onkeyup: ((KeyboardEvent) -> dynamic)?
+    override var onload: ((Event) -> dynamic)?
+    override var onloadeddata: ((Event) -> dynamic)?
+    override var onloadedmetadata: ((Event) -> dynamic)?
+    override var onloadend: ((Event) -> dynamic)?
+    override var onloadstart: ((ProgressEvent) -> dynamic)?
+    override var onmousedown: ((MouseEvent) -> dynamic)?
+    override var onmouseenter: ((MouseEvent) -> dynamic)?
+    override var onmouseleave: ((MouseEvent) -> dynamic)?
+    override var onmousemove: ((MouseEvent) -> dynamic)?
+    override var onmouseout: ((MouseEvent) -> dynamic)?
+    override var onmouseover: ((MouseEvent) -> dynamic)?
+    override var onmouseup: ((MouseEvent) -> dynamic)?
+    override var onwheel: ((WheelEvent) -> dynamic)?
+    override var onpause: ((Event) -> dynamic)?
+    override var onplay: ((Event) -> dynamic)?
+    override var onplaying: ((Event) -> dynamic)?
+    override var onprogress: ((ProgressEvent) -> dynamic)?
+    override var onratechange: ((Event) -> dynamic)?
+    override var onreset: ((Event) -> dynamic)?
+    override var onresize: ((Event) -> dynamic)?
+    override var onscroll: ((Event) -> dynamic)?
+    override var onseeked: ((Event) -> dynamic)?
+    override var onseeking: ((Event) -> dynamic)?
+    override var onselect: ((Event) -> dynamic)?
+    override var onshow: ((Event) -> dynamic)?
+    override var onstalled: ((Event) -> dynamic)?
+    override var onsubmit: ((Event) -> dynamic)?
+    override var onsuspend: ((Event) -> dynamic)?
+    override var ontimeupdate: ((Event) -> dynamic)?
+    override var ontoggle: ((Event) -> dynamic)?
+    override var onvolumechange: ((Event) -> dynamic)?
+    override var onwaiting: ((Event) -> dynamic)?
+    override var oncopy: ((ClipboardEvent) -> dynamic)?
+    override var oncut: ((ClipboardEvent) -> dynamic)?
+    override var onpaste: ((ClipboardEvent) -> dynamic)?
+    override val fullscreenElement: Element?
+    override val children: HTMLCollection
+    override val firstElementChild: Element?
+    override val lastElementChild: Element?
+    override val childElementCount: Int
+    fun exitFullscreen(): Promise<Unit>
+    fun getElementsByName(elementName: String): NodeList
+    fun open(type: String = definedExternally, replace: String = definedExternally): Document
+    fun open(url: String, name: String, features: String): Window
+    fun close()
+    fun write(vararg text: String)
+    fun writeln(vararg text: String)
+    fun hasFocus(): Boolean
+    fun execCommand(commandId: String, showUI: Boolean = definedExternally, value: String = definedExternally): Boolean
+    fun queryCommandEnabled(commandId: String): Boolean
+    fun queryCommandIndeterm(commandId: String): Boolean
+    fun queryCommandState(commandId: String): Boolean
+    fun queryCommandSupported(commandId: String): Boolean
+    fun queryCommandValue(commandId: String): String
+    fun clear()
+    fun captureEvents()
+    fun releaseEvents()
+    fun getElementsByTagName(qualifiedName: String): HTMLCollection
+    fun getElementsByTagNameNS(namespace: String?, localName: String): HTMLCollection
+    fun getElementsByClassName(classNames: String): HTMLCollection
+    fun createElement(localName: String, options: ElementCreationOptions = definedExternally): Element
+    fun createElementNS(namespace: String?, qualifiedName: String, options: ElementCreationOptions = definedExternally): Element
+    fun createDocumentFragment(): DocumentFragment
+    fun createTextNode(data: String): Text
+    fun createCDATASection(data: String): CDATASection
+    fun createComment(data: String): Comment
+    fun createProcessingInstruction(target: String, data: String): ProcessingInstruction
+    fun importNode(node: Node, deep: Boolean = definedExternally): Node
+    fun adoptNode(node: Node): Node
+    fun createAttribute(localName: String): Attr
+    fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
+    fun createEvent(interface_: String): Event
+    fun createRange(): Range
+    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
+    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
+    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): TreeWalker
+    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): TreeWalker
+    fun elementFromPoint(x: Double, y: Double): Element?
+    fun elementsFromPoint(x: Double, y: Double): Array<Element>
+    fun caretPositionFromPoint(x: Double, y: Double): CaretPosition?
+    override fun getElementById(elementId: String): Element?
+    override fun prepend(vararg nodes: dynamic)
+    override fun append(vararg nodes: dynamic)
+    override fun querySelector(selectors: String): Element?
+    override fun querySelectorAll(selectors: String): NodeList
+    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
+    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+}
+@kotlin.internal.InlineOnly inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
+
 external open class XMLDocument : Document {
     override fun getElementById(elementId: String): Element?
     override fun prepend(vararg nodes: dynamic)
@@ -3535,6 +3238,303 @@ external interface GeometryUtils {
     fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad
     fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad
     fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMPoint
+}
+
+external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
+    override val children: HTMLCollection
+    override val firstElementChild: Element?
+    override val lastElementChild: Element?
+    override val childElementCount: Int
+    override val previousElementSibling: Element?
+    override val nextElementSibling: Element?
+    override val assignedSlot: HTMLSlotElement?
+    override val style: CSSStyleDeclaration
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
+    override var onabort: ((Event) -> dynamic)?
+    override var onblur: ((FocusEvent) -> dynamic)?
+    override var oncancel: ((Event) -> dynamic)?
+    override var oncanplay: ((Event) -> dynamic)?
+    override var oncanplaythrough: ((Event) -> dynamic)?
+    override var onchange: ((Event) -> dynamic)?
+    override var onclick: ((MouseEvent) -> dynamic)?
+    override var onclose: ((Event) -> dynamic)?
+    override var oncontextmenu: ((MouseEvent) -> dynamic)?
+    override var oncuechange: ((Event) -> dynamic)?
+    override var ondblclick: ((MouseEvent) -> dynamic)?
+    override var ondrag: ((DragEvent) -> dynamic)?
+    override var ondragend: ((DragEvent) -> dynamic)?
+    override var ondragenter: ((DragEvent) -> dynamic)?
+    override var ondragexit: ((DragEvent) -> dynamic)?
+    override var ondragleave: ((DragEvent) -> dynamic)?
+    override var ondragover: ((DragEvent) -> dynamic)?
+    override var ondragstart: ((DragEvent) -> dynamic)?
+    override var ondrop: ((DragEvent) -> dynamic)?
+    override var ondurationchange: ((Event) -> dynamic)?
+    override var onemptied: ((Event) -> dynamic)?
+    override var onended: ((Event) -> dynamic)?
+    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+    override var onfocus: ((FocusEvent) -> dynamic)?
+    override var oninput: ((InputEvent) -> dynamic)?
+    override var oninvalid: ((Event) -> dynamic)?
+    override var onkeydown: ((KeyboardEvent) -> dynamic)?
+    override var onkeypress: ((KeyboardEvent) -> dynamic)?
+    override var onkeyup: ((KeyboardEvent) -> dynamic)?
+    override var onload: ((Event) -> dynamic)?
+    override var onloadeddata: ((Event) -> dynamic)?
+    override var onloadedmetadata: ((Event) -> dynamic)?
+    override var onloadend: ((Event) -> dynamic)?
+    override var onloadstart: ((ProgressEvent) -> dynamic)?
+    override var onmousedown: ((MouseEvent) -> dynamic)?
+    override var onmouseenter: ((MouseEvent) -> dynamic)?
+    override var onmouseleave: ((MouseEvent) -> dynamic)?
+    override var onmousemove: ((MouseEvent) -> dynamic)?
+    override var onmouseout: ((MouseEvent) -> dynamic)?
+    override var onmouseover: ((MouseEvent) -> dynamic)?
+    override var onmouseup: ((MouseEvent) -> dynamic)?
+    override var onwheel: ((WheelEvent) -> dynamic)?
+    override var onpause: ((Event) -> dynamic)?
+    override var onplay: ((Event) -> dynamic)?
+    override var onplaying: ((Event) -> dynamic)?
+    override var onprogress: ((ProgressEvent) -> dynamic)?
+    override var onratechange: ((Event) -> dynamic)?
+    override var onreset: ((Event) -> dynamic)?
+    override var onresize: ((Event) -> dynamic)?
+    override var onscroll: ((Event) -> dynamic)?
+    override var onseeked: ((Event) -> dynamic)?
+    override var onseeking: ((Event) -> dynamic)?
+    override var onselect: ((Event) -> dynamic)?
+    override var onshow: ((Event) -> dynamic)?
+    override var onstalled: ((Event) -> dynamic)?
+    override var onsubmit: ((Event) -> dynamic)?
+    override var onsuspend: ((Event) -> dynamic)?
+    override var ontimeupdate: ((Event) -> dynamic)?
+    override var ontoggle: ((Event) -> dynamic)?
+    override var onvolumechange: ((Event) -> dynamic)?
+    override var onwaiting: ((Event) -> dynamic)?
+    override var oncopy: ((ClipboardEvent) -> dynamic)?
+    override var oncut: ((ClipboardEvent) -> dynamic)?
+    override var onpaste: ((ClipboardEvent) -> dynamic)?
+    override var contentEditable: String
+    override val isContentEditable: Boolean
+    override fun prepend(vararg nodes: dynamic)
+    override fun append(vararg nodes: dynamic)
+    override fun querySelector(selectors: String): Element?
+    override fun querySelectorAll(selectors: String): NodeList
+    override fun before(vararg nodes: dynamic)
+    override fun after(vararg nodes: dynamic)
+    override fun replaceWith(vararg nodes: dynamic)
+    override fun remove()
+    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
+    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+}
+
+external open class Audio(src: String = definedExternally) : HTMLAudioElement {
+    override val children: HTMLCollection
+    override val firstElementChild: Element?
+    override val lastElementChild: Element?
+    override val childElementCount: Int
+    override val previousElementSibling: Element?
+    override val nextElementSibling: Element?
+    override val assignedSlot: HTMLSlotElement?
+    override val style: CSSStyleDeclaration
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
+    override var onabort: ((Event) -> dynamic)?
+    override var onblur: ((FocusEvent) -> dynamic)?
+    override var oncancel: ((Event) -> dynamic)?
+    override var oncanplay: ((Event) -> dynamic)?
+    override var oncanplaythrough: ((Event) -> dynamic)?
+    override var onchange: ((Event) -> dynamic)?
+    override var onclick: ((MouseEvent) -> dynamic)?
+    override var onclose: ((Event) -> dynamic)?
+    override var oncontextmenu: ((MouseEvent) -> dynamic)?
+    override var oncuechange: ((Event) -> dynamic)?
+    override var ondblclick: ((MouseEvent) -> dynamic)?
+    override var ondrag: ((DragEvent) -> dynamic)?
+    override var ondragend: ((DragEvent) -> dynamic)?
+    override var ondragenter: ((DragEvent) -> dynamic)?
+    override var ondragexit: ((DragEvent) -> dynamic)?
+    override var ondragleave: ((DragEvent) -> dynamic)?
+    override var ondragover: ((DragEvent) -> dynamic)?
+    override var ondragstart: ((DragEvent) -> dynamic)?
+    override var ondrop: ((DragEvent) -> dynamic)?
+    override var ondurationchange: ((Event) -> dynamic)?
+    override var onemptied: ((Event) -> dynamic)?
+    override var onended: ((Event) -> dynamic)?
+    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+    override var onfocus: ((FocusEvent) -> dynamic)?
+    override var oninput: ((InputEvent) -> dynamic)?
+    override var oninvalid: ((Event) -> dynamic)?
+    override var onkeydown: ((KeyboardEvent) -> dynamic)?
+    override var onkeypress: ((KeyboardEvent) -> dynamic)?
+    override var onkeyup: ((KeyboardEvent) -> dynamic)?
+    override var onload: ((Event) -> dynamic)?
+    override var onloadeddata: ((Event) -> dynamic)?
+    override var onloadedmetadata: ((Event) -> dynamic)?
+    override var onloadend: ((Event) -> dynamic)?
+    override var onloadstart: ((ProgressEvent) -> dynamic)?
+    override var onmousedown: ((MouseEvent) -> dynamic)?
+    override var onmouseenter: ((MouseEvent) -> dynamic)?
+    override var onmouseleave: ((MouseEvent) -> dynamic)?
+    override var onmousemove: ((MouseEvent) -> dynamic)?
+    override var onmouseout: ((MouseEvent) -> dynamic)?
+    override var onmouseover: ((MouseEvent) -> dynamic)?
+    override var onmouseup: ((MouseEvent) -> dynamic)?
+    override var onwheel: ((WheelEvent) -> dynamic)?
+    override var onpause: ((Event) -> dynamic)?
+    override var onplay: ((Event) -> dynamic)?
+    override var onplaying: ((Event) -> dynamic)?
+    override var onprogress: ((ProgressEvent) -> dynamic)?
+    override var onratechange: ((Event) -> dynamic)?
+    override var onreset: ((Event) -> dynamic)?
+    override var onresize: ((Event) -> dynamic)?
+    override var onscroll: ((Event) -> dynamic)?
+    override var onseeked: ((Event) -> dynamic)?
+    override var onseeking: ((Event) -> dynamic)?
+    override var onselect: ((Event) -> dynamic)?
+    override var onshow: ((Event) -> dynamic)?
+    override var onstalled: ((Event) -> dynamic)?
+    override var onsubmit: ((Event) -> dynamic)?
+    override var onsuspend: ((Event) -> dynamic)?
+    override var ontimeupdate: ((Event) -> dynamic)?
+    override var ontoggle: ((Event) -> dynamic)?
+    override var onvolumechange: ((Event) -> dynamic)?
+    override var onwaiting: ((Event) -> dynamic)?
+    override var oncopy: ((ClipboardEvent) -> dynamic)?
+    override var oncut: ((ClipboardEvent) -> dynamic)?
+    override var onpaste: ((ClipboardEvent) -> dynamic)?
+    override var contentEditable: String
+    override val isContentEditable: Boolean
+    override fun prepend(vararg nodes: dynamic)
+    override fun append(vararg nodes: dynamic)
+    override fun querySelector(selectors: String): Element?
+    override fun querySelectorAll(selectors: String): NodeList
+    override fun before(vararg nodes: dynamic)
+    override fun after(vararg nodes: dynamic)
+    override fun replaceWith(vararg nodes: dynamic)
+    override fun remove()
+    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
+    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+}
+
+external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
+    override val children: HTMLCollection
+    override val firstElementChild: Element?
+    override val lastElementChild: Element?
+    override val childElementCount: Int
+    override val previousElementSibling: Element?
+    override val nextElementSibling: Element?
+    override val assignedSlot: HTMLSlotElement?
+    override val style: CSSStyleDeclaration
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
+    override var onabort: ((Event) -> dynamic)?
+    override var onblur: ((FocusEvent) -> dynamic)?
+    override var oncancel: ((Event) -> dynamic)?
+    override var oncanplay: ((Event) -> dynamic)?
+    override var oncanplaythrough: ((Event) -> dynamic)?
+    override var onchange: ((Event) -> dynamic)?
+    override var onclick: ((MouseEvent) -> dynamic)?
+    override var onclose: ((Event) -> dynamic)?
+    override var oncontextmenu: ((MouseEvent) -> dynamic)?
+    override var oncuechange: ((Event) -> dynamic)?
+    override var ondblclick: ((MouseEvent) -> dynamic)?
+    override var ondrag: ((DragEvent) -> dynamic)?
+    override var ondragend: ((DragEvent) -> dynamic)?
+    override var ondragenter: ((DragEvent) -> dynamic)?
+    override var ondragexit: ((DragEvent) -> dynamic)?
+    override var ondragleave: ((DragEvent) -> dynamic)?
+    override var ondragover: ((DragEvent) -> dynamic)?
+    override var ondragstart: ((DragEvent) -> dynamic)?
+    override var ondrop: ((DragEvent) -> dynamic)?
+    override var ondurationchange: ((Event) -> dynamic)?
+    override var onemptied: ((Event) -> dynamic)?
+    override var onended: ((Event) -> dynamic)?
+    override var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+    override var onfocus: ((FocusEvent) -> dynamic)?
+    override var oninput: ((InputEvent) -> dynamic)?
+    override var oninvalid: ((Event) -> dynamic)?
+    override var onkeydown: ((KeyboardEvent) -> dynamic)?
+    override var onkeypress: ((KeyboardEvent) -> dynamic)?
+    override var onkeyup: ((KeyboardEvent) -> dynamic)?
+    override var onload: ((Event) -> dynamic)?
+    override var onloadeddata: ((Event) -> dynamic)?
+    override var onloadedmetadata: ((Event) -> dynamic)?
+    override var onloadend: ((Event) -> dynamic)?
+    override var onloadstart: ((ProgressEvent) -> dynamic)?
+    override var onmousedown: ((MouseEvent) -> dynamic)?
+    override var onmouseenter: ((MouseEvent) -> dynamic)?
+    override var onmouseleave: ((MouseEvent) -> dynamic)?
+    override var onmousemove: ((MouseEvent) -> dynamic)?
+    override var onmouseout: ((MouseEvent) -> dynamic)?
+    override var onmouseover: ((MouseEvent) -> dynamic)?
+    override var onmouseup: ((MouseEvent) -> dynamic)?
+    override var onwheel: ((WheelEvent) -> dynamic)?
+    override var onpause: ((Event) -> dynamic)?
+    override var onplay: ((Event) -> dynamic)?
+    override var onplaying: ((Event) -> dynamic)?
+    override var onprogress: ((ProgressEvent) -> dynamic)?
+    override var onratechange: ((Event) -> dynamic)?
+    override var onreset: ((Event) -> dynamic)?
+    override var onresize: ((Event) -> dynamic)?
+    override var onscroll: ((Event) -> dynamic)?
+    override var onseeked: ((Event) -> dynamic)?
+    override var onseeking: ((Event) -> dynamic)?
+    override var onselect: ((Event) -> dynamic)?
+    override var onshow: ((Event) -> dynamic)?
+    override var onstalled: ((Event) -> dynamic)?
+    override var onsubmit: ((Event) -> dynamic)?
+    override var onsuspend: ((Event) -> dynamic)?
+    override var ontimeupdate: ((Event) -> dynamic)?
+    override var ontoggle: ((Event) -> dynamic)?
+    override var onvolumechange: ((Event) -> dynamic)?
+    override var onwaiting: ((Event) -> dynamic)?
+    override var oncopy: ((ClipboardEvent) -> dynamic)?
+    override var oncut: ((ClipboardEvent) -> dynamic)?
+    override var onpaste: ((ClipboardEvent) -> dynamic)?
+    override var contentEditable: String
+    override val isContentEditable: Boolean
+    override fun prepend(vararg nodes: dynamic)
+    override fun append(vararg nodes: dynamic)
+    override fun querySelector(selectors: String): Element?
+    override fun querySelectorAll(selectors: String): NodeList
+    override fun before(vararg nodes: dynamic)
+    override fun after(vararg nodes: dynamic)
+    override fun replaceWith(vararg nodes: dynamic)
+    override fun remove()
+    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
+    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
+    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
 external @marker interface UnionElementOrProcessingInstruction
