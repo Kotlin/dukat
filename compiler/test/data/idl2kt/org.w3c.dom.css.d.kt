@@ -366,5 +366,5 @@ external abstract class CSS {
     }
 }
 
-external @marker interface UnionElementOrProcessingInstruction
+external interface UnionElementOrProcessingInstruction
 

@@ -3537,25 +3537,25 @@ external open class Option(text: String = definedExternally, value: String = def
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
-external @marker interface UnionElementOrHTMLCollection
+external interface UnionElementOrHTMLCollection
 
-external @marker interface UnionElementOrRadioNodeList
+external interface UnionElementOrRadioNodeList
 
-external @marker interface UnionHTMLOptGroupElementOrHTMLOptionElement
+external interface UnionHTMLOptGroupElementOrHTMLOptionElement
 
-external @marker interface UnionAudioTrackOrTextTrackOrVideoTrack
+external interface UnionAudioTrackOrTextTrackOrVideoTrack
 
-external @marker interface UnionElementOrMouseEvent
+external interface UnionElementOrMouseEvent
 
-external @marker interface RenderingContext
+external interface RenderingContext
 
-external @marker interface HTMLOrSVGImageElement : CanvasImageSource
+external interface HTMLOrSVGImageElement : CanvasImageSource
 
-external @marker interface CanvasImageSource : ImageBitmapSource
+external interface CanvasImageSource : ImageBitmapSource
 
-external @marker interface ImageBitmapSource
+external interface ImageBitmapSource
 
-external @marker interface HTMLOrSVGScriptElement
+external interface HTMLOrSVGScriptElement
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

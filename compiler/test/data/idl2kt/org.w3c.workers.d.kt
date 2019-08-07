@@ -383,9 +383,9 @@ external abstract class CacheStorage {
 
 external open class FunctionalEvent : ExtendableEvent
 
-external @marker interface UnionMessagePortOrServiceWorker
+external interface UnionMessagePortOrServiceWorker
 
-external @marker interface UnionClientOrMessagePortOrServiceWorker
+external interface UnionClientOrMessagePortOrServiceWorker
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

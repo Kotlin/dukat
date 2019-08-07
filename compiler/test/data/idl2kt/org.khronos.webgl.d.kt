@@ -1084,7 +1084,7 @@ external open class DataView(buffer: ArrayBuffer, byteOffset: Int = definedExter
     fun setFloat64(byteOffset: Int, value: Double, littleEndian: Boolean = definedExternally)
 }
 
-external @marker interface BufferDataSource
+external interface BufferDataSource
 
-external @marker interface TexImageSource
+external interface TexImageSource
 
