@@ -2560,7 +2560,7 @@ external abstract class WorkerNavigator : NavigatorID, NavigatorLanguage, Naviga
 }
 
 external abstract class WorkerLocation {
-    open var href: String
+    open val href: String
     open val origin: String
     open val protocol: String
     open val host: String
