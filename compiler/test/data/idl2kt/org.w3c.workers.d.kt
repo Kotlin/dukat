@@ -383,6 +383,8 @@ external abstract class CacheStorage {
 
 external open class FunctionalEvent : ExtendableEvent
 
+external @marker interface UnionMessagePortOrServiceWorker
+
 external @marker interface UnionClientOrMessagePortOrServiceWorker
 
 /* please, don't implement this interface! */
