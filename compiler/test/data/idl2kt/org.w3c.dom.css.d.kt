@@ -21,9 +21,9 @@ import org.w3c.xhr.*
 external abstract class MediaList : ItemArrayLike<String> {
     open var mediaText: String
     override val length: Int
-    override fun item(index: Int): String?
     fun appendMedium(medium: String)
     fun deleteMedium(medium: String)
+    override fun item(index: Int): String?
 }
 @kotlin.internal.InlineOnly inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
 
@@ -345,13 +345,13 @@ external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     open var wordWrap: String
     open var writingMode: String
     open var zIndex: String
-    override fun item(index: Int): String
     fun getPropertyValue(property: String): String
     fun getPropertyPriority(property: String): String
     fun setProperty(property: String, value: String, priority: String = definedExternally)
     fun setPropertyValue(property: String, value: String)
     fun setPropertyPriority(property: String, priority: String)
     fun removeProperty(property: String): String
+    override fun item(index: Int): String
 }
 @kotlin.internal.InlineOnly inline operator fun CSSStyleDeclaration.get(index: Int): String? = asDynamic()[index]
 
