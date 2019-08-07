@@ -29,7 +29,7 @@ external abstract class ServiceWorkerRegistration : EventTarget {
     fun unregister(): Promise<Boolean>
     fun methodName(): Promise<dynamic>
     fun showNotification(title: String, options: NotificationOptions = definedExternally): Promise<Unit>
-    fun getNotifications(filter: GetNotificationOptions = definedExternally): Promise<dynamic>
+    fun getNotifications(filter: GetNotificationOptions = definedExternally): Promise<Array<Notification>>
 }
 
 external abstract class ServiceWorkerGlobalScope : WorkerGlobalScope {
@@ -60,7 +60,7 @@ external abstract class ServiceWorkerContainer : EventTarget {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun register(scriptURL: String, options: RegistrationOptions = definedExternally): Promise<ServiceWorkerRegistration>
     fun getRegistration(clientURL: String = definedExternally): Promise<Any?>
-    fun getRegistrations(): Promise<dynamic>
+    fun getRegistrations(): Promise<Array<ServiceWorkerRegistration>>
     fun startMessages()
 }
 
@@ -141,7 +141,7 @@ external abstract class WindowClient : Client {
 
 external abstract class Clients {
     fun get(id: String): Promise<Any?>
-    fun matchAll(options: ClientQueryOptions = definedExternally): Promise<dynamic>
+    fun matchAll(options: ClientQueryOptions = definedExternally): Promise<Array<Client>>
     fun openWindow(url: String): Promise<WindowClient?>
     fun claim(): Promise<Unit>
 }
@@ -334,12 +334,12 @@ inline fun ExtendableMessageEventInit(data: Any? = undefined, origin: String? = 
 
 external abstract class Cache {
     fun match(request: dynamic, options: CacheQueryOptions = definedExternally): Promise<Any?>
-    fun matchAll(request: dynamic = definedExternally, options: CacheQueryOptions = definedExternally): Promise<dynamic>
+    fun matchAll(request: dynamic = definedExternally, options: CacheQueryOptions = definedExternally): Promise<Array<Response>>
     fun add(request: dynamic): Promise<Unit>
     fun addAll(requests: Array<dynamic>): Promise<Unit>
     fun put(request: dynamic, response: Response): Promise<Unit>
     fun delete(request: dynamic, options: CacheQueryOptions = definedExternally): Promise<Boolean>
-    fun keys(request: dynamic = definedExternally, options: CacheQueryOptions = definedExternally): Promise<dynamic>
+    fun keys(request: dynamic = definedExternally, options: CacheQueryOptions = definedExternally): Promise<Array<Request>>
 }
 
 external interface CacheQueryOptions {
@@ -401,7 +401,7 @@ external abstract class CacheStorage {
     fun has(cacheName: String): Promise<Boolean>
     fun open(cacheName: String): Promise<Cache>
     fun delete(cacheName: String): Promise<Boolean>
-    fun keys(): Promise<dynamic>
+    fun keys(): Promise<Array<String>>
 }
 
 external open class FunctionalEvent : ExtendableEvent {

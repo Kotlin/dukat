@@ -430,7 +430,7 @@ inline fun OverconstrainedErrorEventInit(error: dynamic = null, bubbles: Boolean
 
 external abstract class MediaDevices : EventTarget {
     open var ondevicechange: ((Event) -> dynamic)?
-    fun enumerateDevices(): Promise<dynamic>
+    fun enumerateDevices(): Promise<Array<MediaDeviceInfo>>
     fun getSupportedConstraints(): MediaTrackSupportedConstraints
     fun getUserMedia(constraints: MediaStreamConstraints = definedExternally): Promise<MediaStream>
 }
