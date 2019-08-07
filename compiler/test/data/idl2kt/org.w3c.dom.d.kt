@@ -390,6 +390,8 @@ external abstract class HTMLUnknownElement : HTMLElement {
         val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
+
+external abstract class DOMStringMap
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
 @kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value; }
 
