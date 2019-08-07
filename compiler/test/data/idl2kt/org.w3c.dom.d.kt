@@ -694,7 +694,7 @@ external abstract class HTMLParamElement : HTMLElement {
     open var valueType: String
 }
 
-external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
+external abstract class HTMLVideoElement : HTMLMediaElement, CanvasImageSource, TexImageSource {
     open var width: Int
     open var height: Int
     open val videoWidth: Int
@@ -1544,7 +1544,7 @@ inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions
     return o
 }
 
-external abstract class HTMLCanvasElement : HTMLElement, TexImageSource {
+external abstract class HTMLCanvasElement : HTMLElement, CanvasImageSource, TexImageSource {
     open var width: Int
     open var height: Int
     fun getContext(contextId: String, vararg arguments: Any?): RenderingContext?
@@ -1602,7 +1602,7 @@ external interface CanvasFillStrokeStyles {
     var fillStyle: dynamic
     fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): CanvasGradient
     fun createRadialGradient(x0: Double, y0: Double, r0: Double, x1: Double, y1: Double, r1: Double): CanvasGradient
-    fun createPattern(image: dynamic, repetition: String): CanvasPattern?
+    fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
 }
 
 external interface CanvasShadowStyles {
@@ -1651,9 +1651,9 @@ external interface CanvasText {
 }
 
 external interface CanvasDrawImage {
-    fun drawImage(image: dynamic, dx: Double, dy: Double)
-    fun drawImage(image: dynamic, dx: Double, dy: Double, dw: Double, dh: Double)
-    fun drawImage(image: dynamic, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double)
+    fun drawImage(image: CanvasImageSource, dx: Double, dy: Double)
+    fun drawImage(image: CanvasImageSource, dx: Double, dy: Double, dw: Double, dh: Double)
+    fun drawImage(image: CanvasImageSource, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double)
 }
 
 external interface CanvasHitRegion {
@@ -1766,7 +1766,7 @@ inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = Ca
     return o
 }
 
-external open class ImageData : TexImageSource {
+external open class ImageData : ImageBitmapSource, TexImageSource {
     constructor(sw: Int, sh: Int)
     constructor(data: Uint8ClampedArray, sw: Int, sh: Int = definedExternally)
     open val width: Int
@@ -2222,8 +2222,8 @@ external interface WindowOrWorkerGlobalScope {
     fun clearTimeout(handle: Int = definedExternally)
     fun setInterval(handler: dynamic, timeout: Int = definedExternally, vararg arguments: Any?): Int
     fun clearInterval(handle: Int = definedExternally)
-    fun createImageBitmap(image: dynamic, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
-    fun createImageBitmap(image: dynamic, sx: Int, sy: Int, sw: Int, sh: Int, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
+    fun createImageBitmap(image: ImageBitmapSource, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
+    fun createImageBitmap(image: ImageBitmapSource, sx: Int, sy: Int, sw: Int, sh: Int, options: ImageBitmapOptions = definedExternally): Promise<ImageBitmap>
 }
 
 external interface NavigatorID {
@@ -2299,7 +2299,7 @@ external abstract class MimeType {
     open val enabledPlugin: Plugin
 }
 
-external abstract class ImageBitmap : TexImageSource {
+external abstract class ImageBitmap : CanvasImageSource, TexImageSource {
     open val width: Int
     open val height: Int
     fun close()
@@ -3641,6 +3641,10 @@ external @marker interface RenderingContext {
 
 external @marker interface HTMLOrSVGImageElement {
 }
+
+external @marker interface CanvasImageSource : ImageBitmapSource
+
+external @marker interface ImageBitmapSource
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
