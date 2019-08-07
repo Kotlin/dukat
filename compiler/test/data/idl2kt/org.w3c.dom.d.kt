@@ -1791,10 +1791,6 @@ external open class Path2D() : CanvasPath {
     override fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean /* = definedExternally */)
 }
 
-external abstract class Touch {
-    open val region: String?
-}
-
 external abstract class ImageBitmapRenderingContext {
     open val canvas: HTMLCanvasElement
     fun transferFromImageBitmap(bitmap: ImageBitmap?)
