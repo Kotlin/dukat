@@ -27,6 +27,7 @@ external interface WebGLContextAttributes {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 @kotlin.internal.InlineOnly
 inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true, stencil: Boolean? = false, antialias: Boolean? = true, premultipliedAlpha: Boolean? = true, preserveDrawingBuffer: Boolean? = false, preferLowPowerToHighPerformance: Boolean? = false, failIfMajorPerformanceCaveat: Boolean? = false): WebGLContextAttributes {
     val o = js("({})")
@@ -40,6 +41,7 @@ inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true
     o["failIfMajorPerformanceCaveat"] = failIfMajorPerformanceCaveat
     return o
 }
+
 external interface PointerEventInit : dynamic {
     var pointerId: Int? /* = 0 */
         get() = definedExternally
@@ -72,6 +74,7 @@ external interface PointerEventInit : dynamic {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 @kotlin.internal.InlineOnly
 inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: Double? = 1.0, pressure: Float? = 0f, tangentialPressure: Float? = 0f, tiltX: Int? = 0, tiltY: Int? = 0, twist: Int? = 0, pointerType: String? = "", isPrimary: Boolean? = false): PointerEventInit {
     val o = js("({})")
@@ -87,14 +90,17 @@ inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: D
     o["isPrimary"] = isPrimary
     return o
 }
+
 external abstract class A {
     var attributes: WebGLContextAttributes
 }
+
 external interface UndefinedMemberDictionary {
     var str: String?
         get() = definedExternally
         set(value) = definedExternally
 }
+
 @kotlin.internal.InlineOnly
 inline fun UndefinedMemberDictionary(str: String? = undefined): UndefinedMemberDictionary {
     val o = js("({})")

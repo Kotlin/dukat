@@ -6,10 +6,15 @@ external abstract class UnresolvedUnions {
     var y: dynamic
     fun f(x: dynamic): dynamic
 }
+
 external abstract class A : ABC
+
 external abstract class B : ABC
+
 external abstract class C : ABC, UnionCOrD
+
 external abstract class D : ABCD, UnionCOrD
+
 external abstract class ResolvedUnions {
     var x: ABC?
     var y: Array<ABCD>
@@ -17,6 +22,9 @@ external abstract class ResolvedUnions {
     var w: dynamic
     fun f(x: ABC?): ABC
 }
+
 external interface ABC : ABCD
+
 external interface ABCD
+
 external interface UnionCOrD

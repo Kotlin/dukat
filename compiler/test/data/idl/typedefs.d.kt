@@ -7,10 +7,12 @@ external abstract class A {
     var z: A<Int>?
     var intArray: Array<Int>
     fun f(x: Int): Int
+
     companion object {
         val y: Int
     }
 }
+
 external abstract class B : A {
     var x: A<Int>
 }
