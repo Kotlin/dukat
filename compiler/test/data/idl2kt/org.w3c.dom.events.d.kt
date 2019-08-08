@@ -66,15 +66,10 @@ inline fun FocusEventInit(relatedTarget: EventTarget? = null, view: Window? = nu
 }
 
 external open class MouseEvent(type: String, eventInitDict: MouseEventInit = definedExternally) : UIEvent, UnionElementOrMouseEvent {
-    open val region: String?
     open val screenX: Int
     open val screenY: Int
-    open val pageX: Double
-    open val pageY: Double
     open val clientX: Int
     open val clientY: Int
-    open val offsetX: Double
-    open val offsetY: Double
     open val ctrlKey: Boolean
     open val shiftKey: Boolean
     open val altKey: Boolean
@@ -82,6 +77,11 @@ external open class MouseEvent(type: String, eventInitDict: MouseEventInit = def
     open val button: Short
     open val buttons: Short
     open val relatedTarget: EventTarget?
+    open val region: String?
+    open val pageX: Double
+    open val pageY: Double
+    open val offsetX: Double
+    open val offsetY: Double
     fun getModifierState(keyArg: String): Boolean
 }
 
