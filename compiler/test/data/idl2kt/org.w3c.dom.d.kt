@@ -368,7 +368,6 @@ external abstract class HTMLElement : Element, ElementCSSInlineStyle, GlobalEven
 }
 
 external abstract class HTMLUnknownElement : HTMLElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -421,7 +420,6 @@ external abstract class HTMLHtmlElement : HTMLElement {
 }
 
 external abstract class HTMLHeadElement : HTMLElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -968,7 +966,6 @@ external abstract class HTMLTimeElement : HTMLElement {
 }
 
 external abstract class HTMLSpanElement : HTMLElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1057,7 +1054,6 @@ external abstract class HTMLModElement : HTMLElement {
 }
 
 external abstract class HTMLPictureElement : HTMLElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1468,7 +1464,6 @@ external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
 }
 
 external abstract class HTMLAudioElement : HTMLMediaElement {
-
     companion object {
         val NETWORK_EMPTY: Short
         val NETWORK_IDLE: Short

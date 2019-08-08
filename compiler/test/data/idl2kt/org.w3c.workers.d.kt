@@ -447,7 +447,6 @@ external abstract class CacheStorage {
 }
 
 external open class FunctionalEvent : ExtendableEvent {
-
     companion object {
         val NONE: Short
         val CAPTURING_PHASE: Short

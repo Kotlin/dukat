@@ -284,7 +284,6 @@ external abstract class SVGStringList {
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGUnitTypes {
-
     companion object {
         val SVG_UNIT_TYPE_UNKNOWN: Short
         val SVG_UNIT_TYPE_USERSPACEONUSE: Short
@@ -369,7 +368,6 @@ external abstract class SVGSVGElement : SVGGraphicsElement, SVGFitToViewBox, SVG
 }
 
 external abstract class SVGGElement : SVGGraphicsElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -393,7 +391,6 @@ external abstract class SVGGElement : SVGGraphicsElement {
 }
 
 external abstract class SVGUnknownElement : SVGGraphicsElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -417,7 +414,6 @@ external abstract class SVGUnknownElement : SVGGraphicsElement {
 }
 
 external abstract class SVGDefsElement : SVGGraphicsElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -441,7 +437,6 @@ external abstract class SVGDefsElement : SVGGraphicsElement {
 }
 
 external abstract class SVGDescElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -465,7 +460,6 @@ external abstract class SVGDescElement : SVGElement {
 }
 
 external abstract class SVGMetadataElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -489,7 +483,6 @@ external abstract class SVGMetadataElement : SVGElement {
 }
 
 external abstract class SVGTitleElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -513,7 +506,6 @@ external abstract class SVGTitleElement : SVGElement {
 }
 
 external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -605,7 +597,6 @@ external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
 }
 
 external abstract class SVGSwitchElement : SVGGraphicsElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -730,7 +721,6 @@ external abstract class SVGAnimatedPreserveAspectRatio {
 }
 
 external abstract class SVGPathElement : SVGGeometryElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -867,7 +857,6 @@ external abstract class SVGLineElement : SVGGeometryElement {
 }
 
 external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -910,7 +899,6 @@ external abstract class SVGPointList {
 @kotlin.internal.InlineOnly inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem; }
 
 external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -934,7 +922,6 @@ external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoin
 }
 
 external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1028,7 +1015,6 @@ external abstract class SVGTextPositioningElement : SVGTextContentElement {
 }
 
 external abstract class SVGTextElement : SVGTextPositioningElement {
-
     companion object {
         val LENGTHADJUST_UNKNOWN: Short
         val LENGTHADJUST_SPACING: Short
@@ -1055,7 +1041,6 @@ external abstract class SVGTextElement : SVGTextPositioningElement {
 }
 
 external abstract class SVGTSpanElement : SVGTextPositioningElement {
-
     companion object {
         val LENGTHADJUST_UNKNOWN: Short
         val LENGTHADJUST_SPACING: Short
@@ -1216,7 +1201,6 @@ external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
 }
 
 external abstract class SVGSolidcolorElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1346,7 +1330,6 @@ external abstract class SVGRadialGradientElement : SVGGradientElement {
 }
 
 external abstract class SVGMeshGradientElement : SVGGradientElement {
-
     companion object {
         val SVG_SPREADMETHOD_UNKNOWN: Short
         val SVG_SPREADMETHOD_PAD: Short
@@ -1377,7 +1360,6 @@ external abstract class SVGMeshGradientElement : SVGGradientElement {
 }
 
 external abstract class SVGMeshrowElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1401,7 +1383,6 @@ external abstract class SVGMeshrowElement : SVGElement {
 }
 
 external abstract class SVGMeshpatchElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1484,7 +1465,6 @@ external abstract class SVGPatternElement : SVGElement, SVGFitToViewBox, SVGURIR
 }
 
 external abstract class SVGHatchElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1508,7 +1488,6 @@ external abstract class SVGHatchElement : SVGElement {
 }
 
 external abstract class SVGHatchpathElement : SVGElement {
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1614,7 +1593,6 @@ external abstract class SVGAElement : SVGGraphicsElement, SVGURIReference {
 }
 
 external abstract class SVGViewElement : SVGElement, SVGFitToViewBox, SVGZoomAndPan {
-
     companion object {
         val SVG_ZOOMANDPAN_UNKNOWN: Short
         val SVG_ZOOMANDPAN_DISABLE: Short
