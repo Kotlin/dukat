@@ -62,7 +62,9 @@ external abstract class FileList : ItemArrayLike<File> {
     override val length: Int
     override fun item(index: Int): File?
 }
-@kotlin.internal.InlineOnly inline operator fun FileList.get(index: Int): File? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun FileList.get(index: Int): File? = asDynamic()[index]
 
 external open class FileReader : EventTarget {
     open val readyState: Short

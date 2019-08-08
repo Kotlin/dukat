@@ -41,7 +41,9 @@ external abstract class HTMLOptionsCollection : HTMLCollection {
     fun add(element: UnionHTMLOptGroupElementOrHTMLOptionElement, before: dynamic = definedExternally)
     fun remove(index: Int)
 }
-@kotlin.internal.InlineOnly inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable, ElementCSSInlineStyle {
     open var title: String
@@ -72,8 +74,12 @@ external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndE
 external abstract class HTMLUnknownElement : HTMLElement
 
 external abstract class DOMStringMap
-@kotlin.internal.InlineOnly inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
-@kotlin.internal.InlineOnly inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value }
+
+@kotlin.internal.InlineOnly
+inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value }
 
 external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
@@ -429,7 +435,9 @@ external abstract class AudioTrackList : EventTarget {
     open var onremovetrack: ((TrackEvent) -> dynamic)?
     fun getTrackById(id: String): AudioTrack?
 }
-@kotlin.internal.InlineOnly inline operator fun AudioTrackList.get(index: Int): AudioTrack? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun AudioTrackList.get(index: Int): AudioTrack? = asDynamic()[index]
 
 external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
@@ -447,7 +455,9 @@ external abstract class VideoTrackList : EventTarget {
     open var onremovetrack: ((TrackEvent) -> dynamic)?
     fun getTrackById(id: String): VideoTrack?
 }
-@kotlin.internal.InlineOnly inline operator fun VideoTrackList.get(index: Int): VideoTrack? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun VideoTrackList.get(index: Int): VideoTrack? = asDynamic()[index]
 
 external abstract class VideoTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
@@ -464,7 +474,9 @@ external abstract class TextTrackList : EventTarget {
     open var onremovetrack: ((TrackEvent) -> dynamic)?
     fun getTrackById(id: String): TextTrack?
 }
-@kotlin.internal.InlineOnly inline operator fun TextTrackList.get(index: Int): TextTrack? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun TextTrackList.get(index: Int): TextTrack? = asDynamic()[index]
 
 external abstract class TextTrack : EventTarget, UnionAudioTrackOrTextTrackOrVideoTrack {
     open val kind: TextTrackKind
@@ -484,7 +496,9 @@ external abstract class TextTrackCueList {
     open val length: Int
     fun getCueById(id: String): TextTrackCue?
 }
-@kotlin.internal.InlineOnly inline operator fun TextTrackCueList.get(index: Int): TextTrackCue? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun TextTrackCueList.get(index: Int): TextTrackCue? = asDynamic()[index]
 
 external abstract class TextTrackCue : EventTarget {
     open val track: TextTrack?
@@ -637,8 +651,12 @@ external abstract class HTMLFormElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
 }
-@kotlin.internal.InlineOnly inline operator fun HTMLFormElement.get(index: Int): Element? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun HTMLFormElement.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLFormElement.get(index: Int): Element? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLFormElement.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
 
 external abstract class HTMLLabelElement : HTMLElement {
     open val form: HTMLFormElement?
@@ -754,8 +772,12 @@ external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> 
     fun setCustomValidity(error: String)
     override fun item(index: Int): Element?
 }
-@kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 external abstract class HTMLDataListElement : HTMLElement {
     open val options: HTMLCollection
@@ -1287,7 +1309,9 @@ external abstract class DataTransferItemList {
     fun remove(index: Int)
     fun clear()
 }
-@kotlin.internal.InlineOnly inline operator fun DataTransferItemList.get(index: Int): DataTransferItem? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun DataTransferItemList.get(index: Int): DataTransferItem? = asDynamic()[index]
 
 external abstract class DataTransferItem {
     open val kind: String
@@ -1406,7 +1430,9 @@ external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHa
     fun scrollBy(x: Double, y: Double)
     fun getComputedStyle(elt: Element, pseudoElt: String? = definedExternally): CSSStyleDeclaration
 }
-@kotlin.internal.InlineOnly inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
 
 external abstract class BarProp {
     open val visible: Boolean
@@ -1766,16 +1792,24 @@ external abstract class PluginArray : ItemArrayLike<Plugin> {
     override fun item(index: Int): Plugin?
     fun namedItem(name: String): Plugin?
 }
-@kotlin.internal.InlineOnly inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
 
 external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
     override val length: Int
     override fun item(index: Int): MimeType?
     fun namedItem(name: String): MimeType?
 }
-@kotlin.internal.InlineOnly inline operator fun MimeTypeArray.get(index: Int): MimeType? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun MimeTypeArray.get(name: String): MimeType? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun MimeTypeArray.get(index: Int): MimeType? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun MimeTypeArray.get(name: String): MimeType? = asDynamic()[name]
 
 external abstract class Plugin : ItemArrayLike<MimeType> {
     open val name: String
@@ -1785,8 +1819,12 @@ external abstract class Plugin : ItemArrayLike<MimeType> {
     override fun item(index: Int): MimeType?
     fun namedItem(name: String): MimeType?
 }
-@kotlin.internal.InlineOnly inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
 
 external abstract class MimeType {
     open val type: String
@@ -2065,8 +2103,12 @@ external abstract class Storage {
     fun getItem(key: String): String?
     fun setItem(key: String, value: String)
 }
-@kotlin.internal.InlineOnly inline operator fun Storage.get(key: String): String? = asDynamic()[key]
-@kotlin.internal.InlineOnly inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value }
+
+@kotlin.internal.InlineOnly
+inline operator fun Storage.get(key: String): String? = asDynamic()[key]
+
+@kotlin.internal.InlineOnly
+inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value }
 
 external interface WindowSessionStorage {
     val sessionStorage: Storage
@@ -2294,15 +2336,21 @@ external abstract class NodeList : ItemArrayLike<Node> {
     override val length: Int
     override fun item(index: Int): Node?
 }
-@kotlin.internal.InlineOnly inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
 
 external abstract class HTMLCollection : ItemArrayLike<Element>, UnionElementOrHTMLCollection {
     override val length: Int
     override fun item(index: Int): Element?
     fun namedItem(name: String): Element?
 }
-@kotlin.internal.InlineOnly inline operator fun HTMLCollection.get(index: Int): Element? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun HTMLCollection.get(name: String): Element? = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLCollection.get(index: Int): Element? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLCollection.get(name: String): Element? = asDynamic()[name]
 
 external open class MutationObserver(callback: (Array<MutationRecord>, MutationObserver) -> Unit) {
     fun observe(target: Node, options: MutationObserverInit = definedExternally)
@@ -2602,7 +2650,9 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
-@kotlin.internal.InlineOnly inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
+
+@kotlin.internal.InlineOnly
+inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
 
 external open class XMLDocument : Document {
     override fun getElementById(elementId: String): Element?
@@ -2750,8 +2800,12 @@ external abstract class NamedNodeMap : ItemArrayLike<Attr> {
     override fun item(index: Int): Attr?
     fun getNamedItem(qualifiedName: String): Attr?
 }
-@kotlin.internal.InlineOnly inline operator fun NamedNodeMap.get(index: Int): Attr? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun NamedNodeMap.get(qualifiedName: String): Attr? = asDynamic()[qualifiedName]
+
+@kotlin.internal.InlineOnly
+inline operator fun NamedNodeMap.get(index: Int): Attr? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun NamedNodeMap.get(qualifiedName: String): Attr? = asDynamic()[qualifiedName]
 
 external abstract class Attr : Node {
     open val namespaceURI: String?
@@ -2912,7 +2966,9 @@ external abstract class DOMTokenList : ItemArrayLike<String> {
     fun supports(token: String): Boolean
     override fun item(index: Int): String?
 }
-@kotlin.internal.InlineOnly inline operator fun DOMTokenList.get(index: Int): String? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun DOMTokenList.get(index: Int): String? = asDynamic()[index]
 
 external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double) {
     open val x: Double
@@ -3002,7 +3058,9 @@ inline fun DOMRectInit(x: Double? = 0.0, y: Double? = 0.0, width: Double? = 0.0,
 external interface DOMRectList : ItemArrayLike<DOMRect> {
     override fun item(index: Int): DOMRect?
 }
-@kotlin.internal.InlineOnly inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
 
 external open class DOMQuad {
     constructor(p1: DOMPointInit = definedExternally, p2: DOMPointInit = definedExternally, p3: DOMPointInit = definedExternally, p4: DOMPointInit = definedExternally)

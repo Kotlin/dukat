@@ -122,8 +122,12 @@ external abstract class SVGNameList {
     fun appendItem(newItem: dynamic): dynamic
     fun getItem(index: Int): dynamic
 }
-@kotlin.internal.InlineOnly inline operator fun SVGNameList.get(index: Int): dynamic = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGNameList.set(index: Int, newItem: dynamic) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGNameList.get(index: Int): dynamic = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGNameList.set(index: Int, newItem: dynamic) { asDynamic()[index] = newItem }
 
 external abstract class SVGNumberList {
     open val length: Int
@@ -136,8 +140,12 @@ external abstract class SVGNumberList {
     fun appendItem(newItem: SVGNumber): SVGNumber
     fun getItem(index: Int): SVGNumber
 }
-@kotlin.internal.InlineOnly inline operator fun SVGNumberList.get(index: Int): SVGNumber? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGNumberList.set(index: Int, newItem: SVGNumber) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGNumberList.get(index: Int): SVGNumber? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGNumberList.set(index: Int, newItem: SVGNumber) { asDynamic()[index] = newItem }
 
 external abstract class SVGLengthList {
     open val length: Int
@@ -150,8 +158,12 @@ external abstract class SVGLengthList {
     fun appendItem(newItem: SVGLength): SVGLength
     fun getItem(index: Int): SVGLength
 }
-@kotlin.internal.InlineOnly inline operator fun SVGLengthList.get(index: Int): SVGLength? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGLengthList.set(index: Int, newItem: SVGLength) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGLengthList.get(index: Int): SVGLength? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGLengthList.set(index: Int, newItem: SVGLength) { asDynamic()[index] = newItem }
 
 external abstract class SVGAnimatedBoolean {
     open var baseVal: Boolean
@@ -214,8 +226,12 @@ external abstract class SVGStringList {
     fun appendItem(newItem: String): String
     fun getItem(index: Int): String
 }
-@kotlin.internal.InlineOnly inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem }
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGUnitTypes {
@@ -372,8 +388,12 @@ external abstract class SVGTransformList {
     fun consolidate(): SVGTransform?
     fun getItem(index: Int): SVGTransform
 }
-@kotlin.internal.InlineOnly inline operator fun SVGTransformList.get(index: Int): SVGTransform? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGTransformList.set(index: Int, newItem: SVGTransform) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGTransformList.get(index: Int): SVGTransform? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGTransformList.set(index: Int, newItem: SVGTransform) { asDynamic()[index] = newItem }
 
 external abstract class SVGAnimatedTransformList {
     open val baseVal: SVGTransformList
@@ -456,8 +476,12 @@ external abstract class SVGPointList {
     fun appendItem(newItem: DOMPoint): DOMPoint
     fun getItem(index: Int): DOMPoint
 }
-@kotlin.internal.InlineOnly inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
-@kotlin.internal.InlineOnly inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
 
 external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints
 

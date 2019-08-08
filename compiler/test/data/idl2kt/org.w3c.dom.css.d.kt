@@ -25,7 +25,9 @@ external abstract class MediaList : ItemArrayLike<String> {
     fun deleteMedium(medium: String)
     override fun item(index: Int): String?
 }
-@kotlin.internal.InlineOnly inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
 
 external abstract class StyleSheet {
     open val type: String
@@ -48,7 +50,9 @@ external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
     override val length: Int
     override fun item(index: Int): StyleSheet?
 }
-@kotlin.internal.InlineOnly inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[index]
 
 external interface LinkStyle {
     val sheet: StyleSheet?
@@ -58,7 +62,9 @@ external abstract class CSSRuleList : ItemArrayLike<CSSRule> {
     override val length: Int
     override fun item(index: Int): CSSRule?
 }
-@kotlin.internal.InlineOnly inline operator fun CSSRuleList.get(index: Int): CSSRule? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun CSSRuleList.get(index: Int): CSSRule? = asDynamic()[index]
 
 external abstract class CSSRule {
     open val type: Short
@@ -353,7 +359,9 @@ external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     fun removeProperty(property: String): String
     override fun item(index: Int): String
 }
-@kotlin.internal.InlineOnly inline operator fun CSSStyleDeclaration.get(index: Int): String? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun CSSStyleDeclaration.get(index: Int): String? = asDynamic()[index]
 
 external interface ElementCSSInlineStyle {
     val style: CSSStyleDeclaration
