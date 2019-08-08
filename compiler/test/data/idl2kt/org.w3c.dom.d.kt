@@ -206,7 +206,7 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
 }
 @kotlin.internal.InlineOnly inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
 
-external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
+external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindowProxy {
     override val performance: Performance
     open val window: Window
     open val self: Window
@@ -2344,9 +2344,9 @@ external open class MessageEvent(type: String, eventInitDict: MessageEventInit =
     open val data: Any?
     open val origin: String
     open val lastEventId: String
-    open val source: UnionMessagePortOrWindow?
+    open val source: UnionMessagePortOrWindowProxy?
     open val ports: Array<out MessagePort>
-    fun initMessageEvent(type: String, bubbles: Boolean, cancelable: Boolean, data: Any?, origin: String, lastEventId: String, source: UnionMessagePortOrWindow?, ports: Array<MessagePort>)
+    fun initMessageEvent(type: String, bubbles: Boolean, cancelable: Boolean, data: Any?, origin: String, lastEventId: String, source: UnionMessagePortOrWindowProxy?, ports: Array<MessagePort>)
 }
 
 external interface MessageEventInit : EventInit {
@@ -2359,7 +2359,7 @@ external interface MessageEventInit : EventInit {
     var lastEventId: String? /* = "" */
         get() = definedExternally
         set(value) = definedExternally
-    var source: UnionMessagePortOrWindow? /* = null */
+    var source: UnionMessagePortOrWindowProxy? /* = null */
         get() = definedExternally
         set(value) = definedExternally
     var ports: Array<MessagePort>? /* = arrayOf() */
@@ -2368,7 +2368,7 @@ external interface MessageEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId: String? = "", source: UnionMessagePortOrWindow? = null, ports: Array<MessagePort>? = arrayOf(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MessageEventInit {
+inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId: String? = "", source: UnionMessagePortOrWindowProxy? = null, ports: Array<MessagePort>? = arrayOf(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MessageEventInit {
     val o = js("({})")
 
     o["data"] = data
@@ -2476,7 +2476,7 @@ external open class MessageChannel {
     open val port2: MessagePort
 }
 
-external abstract class MessagePort : EventTarget, UnionMessagePortOrWindow, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
+external abstract class MessagePort : EventTarget, UnionMessagePortOrWindowProxy, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
     fun start()
@@ -3627,7 +3627,7 @@ external @marker interface UnionAudioTrackOrTextTrackOrVideoTrack {
 external @marker interface UnionElementOrMouseEvent {
 }
 
-external @marker interface UnionMessagePortOrWindow {
+external @marker interface UnionMessagePortOrWindowProxy {
 }
 
 external @marker interface UnionMessagePortOrServiceWorker {
