@@ -78,7 +78,8 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                     partial = true
             )
         }
-        val partials = context.getDictionaries(declaration.name)
+        var partials = context.getDictionaries(declaration.name)
+        partials = partials.filterNot { it.partial } + partials.filter { it.partial }
         context.addResolvedPartial(declaration.name)
         return IDLDictionaryDeclaration(
                 name = declaration.name,
