@@ -446,10 +446,6 @@ private fun InterfaceModel.translate(padding: Int): String {
 }
 
 fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
-    if (fromStdlib) {
-        return
-    }
-
     val hasMembers = members.isNotEmpty()
     val staticMembers = companionObject?.members.orEmpty()
 
@@ -528,7 +524,9 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
-        interfaceModel.translate(0, ::addOutput)
+        if (!interfaceModel.fromStdlib) {
+            interfaceModel.translate(0, ::addOutput)
+        }
     }
 
     override fun visitClass(classModel: ClassModel) {
