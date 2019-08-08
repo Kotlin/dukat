@@ -44,7 +44,6 @@ external abstract class SVGClipPathElement : SVGElement, SVGUnitTypes {
         val DOCUMENT_POSITION_CONTAINS: Short
         val DOCUMENT_POSITION_CONTAINED_BY: Short
         val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
-
     }
 }
 
@@ -78,7 +77,6 @@ external abstract class SVGMaskElement : SVGElement, SVGUnitTypes {
         val DOCUMENT_POSITION_CONTAINS: Short
         val DOCUMENT_POSITION_CONTAINED_BY: Short
         val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
-
     }
 }
 
