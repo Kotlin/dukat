@@ -66,6 +66,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val allParents = getAllInterfaceParents(declaration)
         val newAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val newOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
+        val duplicatedAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
+        val duplicatedOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         for (parent in allParents) {
             for (parentOperation in parent.operations) {
                 if (parentOperation.static || parent.isInterface()) {
@@ -82,12 +84,18 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                                 }
                         )
                     }
+                    if (declaration.operations.any { it == parentOperation }) {
+                        duplicatedOperations += parentOperation
+                    }
                 }
             }
             for (parentAttribute in parent.attributes) {
                 if (parentAttribute.static || parent.isInterface()) {
                     if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
                         newAttributes += parentAttribute
+                    }
+                    if (declaration.attributes.any { it == parentAttribute }) {
+                        duplicatedAttributes += parentAttribute
                     }
                 }
             }
@@ -98,8 +106,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
             newOperations.removeIf { !it.static }
         }
         return declaration.copy(
-                attributes = declaration.attributes + newAttributes,
-                operations = declaration.operations + newOperations
+                attributes = declaration.attributes + newAttributes - duplicatedAttributes,
+                operations = declaration.operations + newOperations - duplicatedOperations
         )
     }
 
