@@ -24,8 +24,11 @@ external interface IAbstractComponent : Ext.IBase, Ext.util.IPositionable, Ext.u
         set(value) = definedExternally
     var autoRender: Any
 }
+
 external var num: Number
+
 external fun foo()
+
 external interface IAbstractPlugin : Ext.IBase {
     var pluginId: String?
         get() = definedExternally
@@ -34,5 +37,7 @@ external interface IAbstractPlugin : Ext.IBase {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 external var str: String
+
 external fun bar()

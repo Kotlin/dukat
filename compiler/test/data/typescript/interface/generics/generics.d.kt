@@ -16,6 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface ComponentSpec<P, S>
+
 external interface Foo<T> {
     var varT: T
     fun withoutArgumentsReturnsT(): T

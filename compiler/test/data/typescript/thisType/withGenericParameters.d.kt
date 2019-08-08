@@ -19,6 +19,7 @@ external interface Interface<T> {
     var foo: Interface<T> /* this */
     fun bar(): Interface<T> /* this */
 }
+
 external open class Class<T, U> {
     open var baz: Class<T, U> /* this */
     open fun boo(): Class<T, U> /* this */

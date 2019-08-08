@@ -16,11 +16,14 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun foo(a: Nothing?): Nothing?
+
 external fun bar(a: Nothing?): Nothing?
+
 external interface I {
     fun foo(a: Nothing?): Nothing?
     fun bar(a: Nothing?): Nothing?
 }
+
 external open class C {
     open fun foo(a: Nothing?): Nothing?
     open fun bar(a: Nothing?): Nothing?

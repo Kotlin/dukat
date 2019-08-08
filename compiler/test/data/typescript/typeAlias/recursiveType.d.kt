@@ -16,9 +16,11 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface AnimatedValue
+
 external interface Rec {
     var foo: Rec
 }
+
 external interface `T$0` {
     @nativeGetter
     operator fun get(key: String): dynamic /* `T$0` | AnimatedValue */
@@ -27,8 +29,13 @@ external interface `T$0` {
     @nativeSetter
     operator fun set(key: String, value: AnimatedValue)
 }
+
 external fun foo(): dynamic /* `T$0` | AnimatedValue */
+
 external fun bar(d: `T$0`)
+
 external fun bar(d: AnimatedValue)
+
 external fun boo(): Rec
+
 external fun baz(d: Rec)

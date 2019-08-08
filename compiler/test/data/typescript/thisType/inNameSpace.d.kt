@@ -44,6 +44,7 @@ external interface Status {
     var type: dynamic /* "begin" | "end" | "unknown" */
     var status: dynamic /* "ok" | "fail" */
 }
+
 external interface EventEmitter {
     fun on(event: String /* "customevent" */, listener: (info: Status) -> Unit): EventEmitter /* this */
 }

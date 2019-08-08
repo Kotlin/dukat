@@ -16,4 +16,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 typealias Array2D<T> = Array<Array<T>>
+
 external fun <T> shape(arr: Array2D<T>): Array2D<Number>

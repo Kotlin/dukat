@@ -26,6 +26,7 @@ external interface CustomOptions {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 external interface Options : CustomOptions {
     var insertGlobalVars: insertGlobals.VarsOption?
         get() = definedExternally

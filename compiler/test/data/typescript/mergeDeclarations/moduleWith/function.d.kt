@@ -64,4 +64,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var current: Fiber
+
 external fun yield(value: Any? = definedExternally /* null */): Any

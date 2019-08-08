@@ -23,5 +23,6 @@ external interface `T$0` {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 @JsModule("<RESOLVED_MODULE_NAME>")
 external open class App(opts: `T$0` = definedExternally /* null */)

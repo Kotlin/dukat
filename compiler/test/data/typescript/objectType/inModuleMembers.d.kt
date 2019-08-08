@@ -27,14 +27,18 @@ external interface `T$0` {
         set(value) = definedExternally
     var show: (overrideChecks: Boolean) -> Unit
 }
+
 external fun withObjectTypeParam(opt: `T$0`)
+
 external interface `T$1` {
     var value: Any?
         get() = definedExternally
         set(value) = definedExternally
     var done: Boolean
 }
+
 external fun returnsObjectType(): `T$1`
+
 external object foo {
     fun bar(a: Any): Number
     fun baz(a: Any, b: Any, c: String): Boolean

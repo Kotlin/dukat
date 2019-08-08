@@ -21,6 +21,7 @@ external interface StructureType {
         get() = definedExternally
         set(value) = definedExternally
 }
+
 external interface Registry {
     fun register(type: StructureType)
 }

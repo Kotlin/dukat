@@ -23,6 +23,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getSortOfEventTarget(): SortOfElement
     override var prop: String
 }
+
 external interface NumberEvent : BaseEvent {
     override var data: Number
     var otherProp: Any

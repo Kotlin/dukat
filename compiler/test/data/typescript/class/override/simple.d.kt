@@ -20,6 +20,7 @@ external open class Foo {
     open fun bar(a: Number)
     open var baz: Any
 }
+
 external open class Boo : Foo {
     override fun bar()
     override fun bar(a: Number)

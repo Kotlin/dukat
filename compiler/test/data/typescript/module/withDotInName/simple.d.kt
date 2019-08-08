@@ -18,5 +18,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var variable: Number
+
 external fun func()
+
 external open class A

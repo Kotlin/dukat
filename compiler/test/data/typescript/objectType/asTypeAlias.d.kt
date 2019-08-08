@@ -18,17 +18,27 @@ import org.w3c.xhr.*
 external interface I {
     fun foo(): String
 }
+
 external interface J {
     fun foo(): String
 }
+
 external interface K {
     fun bar(): Number
 }
+
 external interface Q
+
 external interface W
+
 external fun f(a: I, b: J, c: I, q: Q, w: W): K
+
 external var x: I
+
 external var y: I
+
 external var z: J
+
 external var q: Q
+
 external var w: W
