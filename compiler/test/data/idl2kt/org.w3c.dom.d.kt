@@ -2438,9 +2438,12 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     open val doctype: DocumentType?
     open val documentElement: Element?
     open val location: Location?
+    var domain: String
+    open val referrer: String
     var cookie: String
     open val lastModified: String
     open val readyState: DocumentReadyState
+    var title: String
     var dir: String
     var body: HTMLElement?
     open val head: HTMLHeadElement?
@@ -2466,9 +2469,6 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     open val scrollingElement: Element?
     open val styleSheets: StyleSheetList
     open val rootElement: SVGSVGElement?
-    var title: String
-    open val referrer: String
-    var domain: String
     open val fullscreenEnabled: Boolean
     open val fullscreen: Boolean
     var onfullscreenchange: ((Event) -> dynamic)?
