@@ -1320,7 +1320,6 @@ external abstract class DataTransferItem {
     fun getAsFile(): File?
 }
 
-
 external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
     open val dataTransfer: DataTransfer?
 }

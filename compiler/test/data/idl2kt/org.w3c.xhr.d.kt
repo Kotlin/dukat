@@ -93,14 +93,12 @@ external interface ProgressEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ProgressEventInit(lengthComputable: Boolean? = false, loaded: Int? = 0, total: Int? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ProgressEventInit {
     val o = js("({})")
-
     o["lengthComputable"] = lengthComputable
     o["loaded"] = loaded
     o["total"] = total
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 

@@ -235,7 +235,6 @@ inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGUnitTypes {
-
     companion object {
         val SVG_UNIT_TYPE_UNKNOWN: Short
         val SVG_UNIT_TYPE_USERSPACEONUSE: Short

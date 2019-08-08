@@ -368,7 +368,6 @@ external interface ElementCSSInlineStyle {
 }
 
 external abstract class CSS {
-
     companion object {
         fun escape(ident: String): String
     }

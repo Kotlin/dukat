@@ -545,7 +545,6 @@ external interface WebGLRenderingContextBase {
 }
 
 external abstract class WebGLRenderingContext : WebGLRenderingContextBase, RenderingContext {
-
     companion object {
         val DEPTH_BUFFER_BIT: Int
         val STENCIL_BUFFER_BIT: Int
