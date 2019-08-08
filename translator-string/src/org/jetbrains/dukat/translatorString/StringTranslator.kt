@@ -440,6 +440,9 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     }
 
     if (companionObject != null) {
+        if (hasMembers) {
+            output("")
+        }
         output(FORMAT_TAB.repeat(padding + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
     }
     if (hasStaticMembers) {
@@ -483,6 +486,9 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
                 " : ${companionObject!!.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
             }
 
+            if (hasMembers) {
+                output("")
+            }
             output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents}${if (staticMembers.isEmpty()) "" else " {"}")
 
             if (staticMembers.isNotEmpty()) {
@@ -508,18 +514,22 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitTypeAlias(typeAlias: TypeAliasModel) {
+        addOutput("")
         addOutput(typeAlias.translate())
     }
 
     override fun visitVariable(variable: VariableModel) {
+        addOutput("")
         addOutput(variable.translate())
     }
 
     override fun visitFunction(function: FunctionModel) {
+        addOutput("")
         function.translate(0, ::addOutput)
     }
 
     override fun visitObject(objectNode: ObjectModel) {
+        addOutput("")
         val objectModel = "${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
@@ -539,14 +549,17 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitEnum(enumNode: EnumModel) {
+        addOutput("")
         addOutput(enumNode.translate())
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
+        addOutput("")
         interfaceModel.translate(0, ::addOutput)
     }
 
     override fun visitClass(classModel: ClassModel) {
+        addOutput("")
         classModel.translate(0, ::addOutput)
     }
 
@@ -574,9 +587,6 @@ class StringTranslator : ModelVisitor {
 
         moduleModel.imports.forEachIndexed { index, importNode ->
             visitImport(importNode)
-            if (index == (moduleModel.imports.size - 1)) {
-                addOutput("")
-            }
         }
     }
 
