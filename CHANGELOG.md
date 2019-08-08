@@ -1,5 +1,11 @@
 # Changelog
 
+#### [0.0.14] - 8'August, 2019
+ - Add global module annotation in case we have default export but don't have module annotation so far
+ - [idl] Allow translation of several files (dependent on each other)
+ - [idl] Introduce getters/setters and enums
+ - [idl] Support for union types and function (callback) types
+
 #### [0.0.13] - 24'July, 2019
  - [idl] support for translating dictionaries, nullable types, array types and parameter types
  - [idl] support "implements" statement
