@@ -606,7 +606,9 @@ inline fun Constraints(advanced: Array<ConstraintSet>? = undefined): Constraints
 external interface MediaStreamTrackState {
     companion object
 }
+
 inline val MediaStreamTrackState.Companion.LIVE: MediaStreamTrackState get() = "live".asDynamic().unsafeCast<MediaStreamTrackState>()
+
 inline val MediaStreamTrackState.Companion.ENDED: MediaStreamTrackState get() = "ended".asDynamic().unsafeCast<MediaStreamTrackState>()
 
 /* please, don't implement this interface! */
@@ -614,9 +616,13 @@ inline val MediaStreamTrackState.Companion.ENDED: MediaStreamTrackState get() = 
 external interface VideoFacingModeEnum {
     companion object
 }
+
 inline val VideoFacingModeEnum.Companion.USER: VideoFacingModeEnum get() = "user".asDynamic().unsafeCast<VideoFacingModeEnum>()
+
 inline val VideoFacingModeEnum.Companion.ENVIRONMENT: VideoFacingModeEnum get() = "environment".asDynamic().unsafeCast<VideoFacingModeEnum>()
+
 inline val VideoFacingModeEnum.Companion.LEFT: VideoFacingModeEnum get() = "left".asDynamic().unsafeCast<VideoFacingModeEnum>()
+
 inline val VideoFacingModeEnum.Companion.RIGHT: VideoFacingModeEnum get() = "right".asDynamic().unsafeCast<VideoFacingModeEnum>()
 
 /* please, don't implement this interface! */
@@ -624,7 +630,9 @@ inline val VideoFacingModeEnum.Companion.RIGHT: VideoFacingModeEnum get() = "rig
 external interface VideoResizeModeEnum {
     companion object
 }
+
 inline val VideoResizeModeEnum.Companion.NONE: VideoResizeModeEnum get() = "none".asDynamic().unsafeCast<VideoResizeModeEnum>()
+
 inline val VideoResizeModeEnum.Companion.CROP_AND_SCALE: VideoResizeModeEnum get() = "crop-and-scale".asDynamic().unsafeCast<VideoResizeModeEnum>()
 
 /* please, don't implement this interface! */
@@ -632,7 +640,10 @@ inline val VideoResizeModeEnum.Companion.CROP_AND_SCALE: VideoResizeModeEnum get
 external interface MediaDeviceKind {
     companion object
 }
+
 inline val MediaDeviceKind.Companion.AUDIOINPUT: MediaDeviceKind get() = "audioinput".asDynamic().unsafeCast<MediaDeviceKind>()
+
 inline val MediaDeviceKind.Companion.AUDIOOUTPUT: MediaDeviceKind get() = "audiooutput".asDynamic().unsafeCast<MediaDeviceKind>()
+
 inline val MediaDeviceKind.Companion.VIDEOINPUT: MediaDeviceKind get() = "videoinput".asDynamic().unsafeCast<MediaDeviceKind>()
 

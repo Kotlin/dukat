@@ -189,8 +189,11 @@ inline fun NotificationEventInit(notification: Notification?, action: String? = 
 external interface NotificationPermission {
     companion object
 }
+
 inline val NotificationPermission.Companion.DEFAULT: NotificationPermission get() = "default".asDynamic().unsafeCast<NotificationPermission>()
+
 inline val NotificationPermission.Companion.DENIED: NotificationPermission get() = "denied".asDynamic().unsafeCast<NotificationPermission>()
+
 inline val NotificationPermission.Companion.GRANTED: NotificationPermission get() = "granted".asDynamic().unsafeCast<NotificationPermission>()
 
 /* please, don't implement this interface! */
@@ -198,7 +201,10 @@ inline val NotificationPermission.Companion.GRANTED: NotificationPermission get(
 external interface NotificationDirection {
     companion object
 }
+
 inline val NotificationDirection.Companion.AUTO: NotificationDirection get() = "auto".asDynamic().unsafeCast<NotificationDirection>()
+
 inline val NotificationDirection.Companion.LTR: NotificationDirection get() = "ltr".asDynamic().unsafeCast<NotificationDirection>()
+
 inline val NotificationDirection.Companion.RTL: NotificationDirection get() = "rtl".asDynamic().unsafeCast<NotificationDirection>()
 
