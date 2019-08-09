@@ -69,7 +69,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "long" -> "Int"
                 "unsignedlong" -> "Int"
                 "longlong" -> "Int"
-                "unsignedlonglong" -> "Int"
+                "unsignedlonglong" -> "Number"
                 "octet" -> "Byte"
                 "byte" -> "Byte"
                 "short" -> "Short"

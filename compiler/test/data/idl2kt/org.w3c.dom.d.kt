@@ -2421,7 +2421,7 @@ inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
 external open class WebSocket(url: String, protocols: dynamic = definedExternally) : EventTarget {
     open val url: String
     open val readyState: Short
-    open val bufferedAmount: Int
+    open val bufferedAmount: Number
     var onopen: ((Event) -> dynamic)?
     var onerror: ((Event) -> dynamic)?
     var onclose: ((Event) -> dynamic)?
@@ -2556,7 +2556,7 @@ external open class SharedWorker(scriptURL: String, name: String = definedExtern
 }
 
 external interface NavigatorConcurrentHardware {
-    val hardwareConcurrency: Int
+    val hardwareConcurrency: Number
 }
 
 external abstract class WorkerNavigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorConcurrentHardware {

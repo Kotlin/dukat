@@ -29,27 +29,27 @@ external interface GlobalPerformance {
 }
 
 external abstract class PerformanceTiming {
-    open val navigationStart: Int
-    open val unloadEventStart: Int
-    open val unloadEventEnd: Int
-    open val redirectStart: Int
-    open val redirectEnd: Int
-    open val fetchStart: Int
-    open val domainLookupStart: Int
-    open val domainLookupEnd: Int
-    open val connectStart: Int
-    open val connectEnd: Int
-    open val secureConnectionStart: Int
-    open val requestStart: Int
-    open val responseStart: Int
-    open val responseEnd: Int
-    open val domLoading: Int
-    open val domInteractive: Int
-    open val domContentLoadedEventStart: Int
-    open val domContentLoadedEventEnd: Int
-    open val domComplete: Int
-    open val loadEventStart: Int
-    open val loadEventEnd: Int
+    open val navigationStart: Number
+    open val unloadEventStart: Number
+    open val unloadEventEnd: Number
+    open val redirectStart: Number
+    open val redirectEnd: Number
+    open val fetchStart: Number
+    open val domainLookupStart: Number
+    open val domainLookupEnd: Number
+    open val connectStart: Number
+    open val connectEnd: Number
+    open val secureConnectionStart: Number
+    open val requestStart: Number
+    open val responseStart: Number
+    open val responseEnd: Number
+    open val domLoading: Number
+    open val domInteractive: Number
+    open val domContentLoadedEventStart: Number
+    open val domContentLoadedEventEnd: Number
+    open val domComplete: Number
+    open val loadEventStart: Number
+    open val loadEventEnd: Number
 }
 
 external abstract class PerformanceNavigation {

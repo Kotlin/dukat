@@ -75,24 +75,24 @@ external open class FormData(form: HTMLFormElement = definedExternally) {
 
 external open class ProgressEvent(type: String, eventInitDict: ProgressEventInit = definedExternally) : Event {
     open val lengthComputable: Boolean
-    open val loaded: Int
-    open val total: Int
+    open val loaded: Number
+    open val total: Number
 }
 
 external interface ProgressEventInit : EventInit {
     var lengthComputable: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
-    var loaded: Int? /* = 0 */
+    var loaded: Number? /* = 0 */
         get() = definedExternally
         set(value) = definedExternally
-    var total: Int? /* = 0 */
+    var total: Number? /* = 0 */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ProgressEventInit(lengthComputable: Boolean? = false, loaded: Int? = 0, total: Int? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ProgressEventInit {
+inline fun ProgressEventInit(lengthComputable: Boolean? = false, loaded: Number? = 0, total: Number? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ProgressEventInit {
     val o = js("({})")
 
     o["lengthComputable"] = lengthComputable
