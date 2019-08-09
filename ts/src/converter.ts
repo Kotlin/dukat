@@ -1,6 +1,4 @@
 /// <reference path="../build/package/node_modules/typescript/lib/typescriptServices.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/typescript.d.ts"/>
 
 declare function require(path: string): any;
 
