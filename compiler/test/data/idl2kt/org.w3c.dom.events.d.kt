@@ -75,6 +75,8 @@ external open class MouseEvent(type: String, eventInitDict: MouseEventInit = def
     open val screenY: Int
     open val pageX: Double
     open val pageY: Double
+    open val x: Double
+    open val y: Double
     open val clientX: Int
     open val clientY: Int
     open val offsetX: Double
