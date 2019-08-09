@@ -18,7 +18,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external abstract class SVGElement : Element, ElementCSSInlineStyle, GlobalEventHandlers, SVGElementInstance {
+external abstract class SVGElement : Element, GlobalEventHandlers, SVGElementInstance, ElementCSSInlineStyle {
     open val dataset: DOMStringMap
     open val ownerSVGElement: SVGSVGElement?
     open val viewportElement: SVGElement?
