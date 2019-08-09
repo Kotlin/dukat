@@ -48,7 +48,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
 
     fun IDLAttributeDeclaration.isOverriding(parentMember: IDLAttributeDeclaration): Boolean {
         return name == parentMember.name &&
-                static == parentMember.static
+                static == parentMember.static &&
+                type.isOverriding(parentMember.type)
     }
 
     fun IDLOperationDeclaration.isOverriding(parentMember: IDLOperationDeclaration): Boolean {
@@ -68,6 +69,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val newOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         val duplicatedAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val duplicatedOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
+        val conflictingAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         for (parent in allParents) {
             for (parentOperation in parent.operations) {
                 if (parentOperation.static || parent.isInterface()) {
@@ -90,13 +92,17 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                 }
             }
             for (parentAttribute in parent.attributes) {
-                if (parentAttribute.static || parent.isInterface()) {
-                    if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
-                        newAttributes += parentAttribute
+                if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
+                    if (declaration.attributes.none { it.name == parentAttribute.name }) {
+                        if (parentAttribute.static || parent.isInterface()) {
+                            newAttributes += parentAttribute
+                        }
+                    } else {
+                        conflictingAttributes.addAll(declaration.attributes.filter { it.name == parentAttribute.name })
                     }
-                    if (declaration.attributes.any { it == parentAttribute }) {
-                        duplicatedAttributes += parentAttribute
-                    }
+                }
+                if (declaration.attributes.any { it == parentAttribute }) {
+                    duplicatedAttributes += parentAttribute
                 }
             }
         }
@@ -106,7 +112,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
             newOperations.removeIf { !it.static }
         }
         return declaration.copy(
-                attributes = declaration.attributes + newAttributes - duplicatedAttributes,
+                attributes = declaration.attributes + newAttributes - duplicatedAttributes - conflictingAttributes,
                 operations = declaration.operations + newOperations - duplicatedOperations
         )
     }
