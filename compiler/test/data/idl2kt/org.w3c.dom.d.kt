@@ -1599,7 +1599,11 @@ external interface CanvasImageSmoothing {
 
 external interface CanvasFillStrokeStyles {
     var strokeStyle: dynamic
+        get() = definedExternally
+        set(value) = definedExternally
     var fillStyle: dynamic
+        get() = definedExternally
+        set(value) = definedExternally
     fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): CanvasGradient
     fun createRadialGradient(x0: Double, y0: Double, r0: Double, x1: Double, y1: Double, r1: Double): CanvasGradient
     fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
@@ -2117,100 +2121,278 @@ inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = und
 
 external interface GlobalEventHandlers {
     var ongotpointercapture: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onlostpointercapture: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerdown: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointermove: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerup: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointercancel: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerover: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerout: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerenter: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerleave: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onabort: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onblur: ((FocusEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncancel: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncanplay: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncanplaythrough: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onchange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onclick: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onclose: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncontextmenu: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncuechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondblclick: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondrag: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragend: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragenter: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragexit: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragleave: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragover: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragstart: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondrop: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondurationchange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onemptied: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onended: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onfocus: ((FocusEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oninput: ((InputEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oninvalid: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeydown: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeypress: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeyup: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onload: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadeddata: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadedmetadata: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadend: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadstart: ((ProgressEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmousedown: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseenter: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseleave: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmousemove: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseout: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseover: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseup: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onwheel: ((WheelEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpause: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onplay: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onplaying: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onprogress: ((ProgressEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onratechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onreset: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onresize: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onscroll: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onseeked: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onseeking: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onselect: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onshow: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onstalled: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onsubmit: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onsuspend: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ontimeupdate: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ontoggle: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onvolumechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onwaiting: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface WindowEventHandlers {
     var onafterprint: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onbeforeprint: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onbeforeunload: ((BeforeUnloadEvent) -> String?)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onhashchange: ((HashChangeEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onlanguagechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmessage: ((MessageEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onoffline: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ononline: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpagehide: ((PageTransitionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpageshow: ((PageTransitionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpopstate: ((PopStateEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onrejectionhandled: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onstorage: ((StorageEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onunhandledrejection: ((PromiseRejectionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onunload: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface DocumentAndElementEventHandlers {
     var oncopy: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncut: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpaste: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface WindowOrWorkerGlobalScope {
@@ -2519,6 +2701,8 @@ external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
 
 external interface AbstractWorker {
     var onerror: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external open class Worker(scriptURL: String, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
@@ -2786,12 +2970,15 @@ external interface NonElementParentNode {
 
 external interface DocumentOrShadowRoot {
     val fullscreenElement: Element?
+        get() = definedExternally
 }
 
 external interface ParentNode {
     val children: HTMLCollection
     val firstElementChild: Element?
+        get() = definedExternally
     val lastElementChild: Element?
+        get() = definedExternally
     val childElementCount: Int
     fun prepend(vararg nodes: dynamic)
     fun append(vararg nodes: dynamic)
@@ -2801,7 +2988,9 @@ external interface ParentNode {
 
 external interface NonDocumentTypeChildNode {
     val previousElementSibling: Element?
+        get() = definedExternally
     val nextElementSibling: Element?
+        get() = definedExternally
 }
 
 external interface ChildNode {
@@ -2813,6 +3002,7 @@ external interface ChildNode {
 
 external interface Slotable {
     val assignedSlot: HTMLSlotElement?
+        get() = definedExternally
 }
 
 external abstract class NodeList : ItemArrayLike<Node> {

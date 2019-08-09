@@ -468,6 +468,8 @@ inline fun MediaStreamConstraints(video: dynamic = false, audio: dynamic = false
 
 external interface ConstrainablePattern {
     var onoverconstrained: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     fun getCapabilities(): Capabilities
     fun getConstraints(): Constraints
     fun getSettings(): Settings

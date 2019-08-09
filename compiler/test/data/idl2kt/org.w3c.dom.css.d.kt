@@ -293,6 +293,7 @@ external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
 
 external interface LinkStyle {
     val sheet: StyleSheet?
+        get() = definedExternally
 }
 
 external abstract class CSSRuleList : ItemArrayLike<CSSRule> {

@@ -327,7 +327,9 @@ external open class SVGUseElementShadowRoot : ShadowRoot {
 
 external interface SVGElementInstance {
     val correspondingElement: SVGElement?
+        get() = definedExternally
     val correspondingUseElement: SVGUseElement?
+        get() = definedExternally
 }
 
 external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
