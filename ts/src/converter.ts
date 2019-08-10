@@ -2,24 +2,30 @@
 
 declare function require(path: string): any;
 
-let declarations = require("declarations");
-
 interface FileResolver {
     resolve(fileName: string): string;
 }
 
-declare interface DocumentCache {
-    setDocument(key: string, path: string, sourceFile: ts.SourceFile): void;
-    getDocument(key: string, path: string): ts.SourceFile | undefined;
+class DocumentCache {
+    private myDocumentMap: Map<string, any> = new Map();
+
+    setDocument(key: string, path: string, sourceFile: any) {
+        this.myDocumentMap.set(path, sourceFile);
+    }
+
+    getDocument(key: string, path: string): any | undefined {
+        return this.myDocumentMap.get(path);
+    }
 }
 
-function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) {
+let cache = new DocumentCache();
+
+function main(fileName: string, packageName: NameEntity) {
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 
     let logger = createLogger("converter");
 
-    logger.debug(`using document cache: ${!!cache}`);
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
 
     const program = languageService.getProgram();
