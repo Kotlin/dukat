@@ -8,7 +8,6 @@ import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsinterop.ExportContent
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.factory.AstFactory
-import java.util.*
 import java.util.function.Supplier
 
 private fun InteropEngine.loadAstBuilder() {
@@ -23,7 +22,6 @@ private fun createGraalInterop(): InteropGraal {
     engine.put("createExportContent", Supplier { ExportContent<Any>() })
     engine.put("createFileResolver", Supplier { FileResolver() })
     engine.put("createLogger", java.util.function.Function<String, Logging> { name -> Logging.logger(name) })
-    engine.put("uid", Supplier { UUID.randomUUID().toString() })
 
     engine.loadAstBuilder()
 
