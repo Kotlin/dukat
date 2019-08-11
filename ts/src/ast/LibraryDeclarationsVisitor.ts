@@ -1,4 +1,8 @@
-class LibraryDeclarationsVisitor {
+import {AstConverter} from "../AstConverter";
+
+import * as ts from "typescript-services-api";
+
+export class LibraryDeclarationsVisitor {
 
   private log = createLogger("LibraryDeclarationsVisitor");
   private libDeclarations = new Map<string, Array<Declaration>>();

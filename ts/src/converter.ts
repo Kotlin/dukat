@@ -1,10 +1,10 @@
-/// <reference path="../build/package/node_modules/typescript/lib/typescriptServices.d.ts"/>
+import {DukatLanguageServiceHost, FileResolver} from "./DukatLanguageServiceHost";
+import {AstConverter} from "./AstConverter";
+import * as ts from "typescript-services-api";
 
-declare function require(path: string): any;
+declare function createAstFactory(): AstFactory;
+declare function createFileResolver(): FileResolver;
 
-interface FileResolver {
-    resolve(fileName: string): string;
-}
 
 class DocumentCache {
     private myDocumentMap: Map<string, any> = new Map();

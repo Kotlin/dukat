@@ -1,6 +1,16 @@
+/// <reference path="../../build/package/node_modules/typescript/lib/typescriptServices.d.ts"/>
+
+import * as ts from "typescript-services-api";
+
+//Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
+interface TsInternals {
+    normalizePath(path: string): string;
+    getDirectoryPath(path: string): string;
+    libMap : { get(path: string) : string };
+}
 
 
-class ResourceFetcher {
+export class ResourceFetcher {
     private resourceSet = new Set<string>();
 
   constructor(
@@ -15,15 +25,15 @@ class ResourceFetcher {
       return this.resourceSet;
     }
 
-    let curDir = ts.getDirectoryPath(fileName) +  "/";
+    let curDir = ((ts as any) as TsInternals).getDirectoryPath(fileName) +  "/";
 
     let referencedFiles = sourceFile.referencedFiles.map(
-      referencedFile => ts.normalizePath(curDir + referencedFile.fileName)
+      referencedFile => ((ts as any) as TsInternals).normalizePath(curDir + referencedFile.fileName)
     );
 
     let libReferences = sourceFile.libReferenceDirectives.map(libReference => {
       let libName = libReference.fileName.toLocaleLowerCase();
-      return ts.libMap.get(libName);
+      return ((ts as any) as TsInternals).libMap.get(libName);
     });
 
     referencedFiles.concat(libReferences).forEach(reference => this.build(reference));
