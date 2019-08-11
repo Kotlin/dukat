@@ -2,16 +2,8 @@ import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
-
-declare function createExportContent(): ExportContext;
-
-//TODO: thoroughly revisit and decide whether we need something stricter
-function uid(): string {
-    return (`1111-1111-1111-1111`).replace(/[1]/g, (v) => {
-        let a = parseInt(v, 16);
-        return (a ^ Math.random() * 16 >> a / 4).toString(16);
-    });
-}
+import {uid} from "./uid";
+import {createExportContent} from "./ExportContent";
 
 export class AstConverter {
     private exportContext = createExportContent();
