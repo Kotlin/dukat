@@ -1,6 +1,7 @@
 import {AstConverter} from "../AstConverter";
 
 import * as ts from "typescript-services-api";
+import {createLogger} from "../Logger";
 
 export class LibraryDeclarationsVisitor {
 

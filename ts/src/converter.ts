@@ -1,6 +1,7 @@
 import {DukatLanguageServiceHost, FileResolver} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
 import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
 
 declare function createAstFactory(): AstFactory;
 declare function createFileResolver(): FileResolver;

@@ -1,6 +1,7 @@
 import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
 
 declare function createExportContent(): ExportContext;
 

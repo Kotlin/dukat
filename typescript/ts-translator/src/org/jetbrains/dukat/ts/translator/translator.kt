@@ -3,7 +3,6 @@ package org.jetbrains.dukat.ts.translator
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.interop.InteropEngine
 import org.jetbrains.dukat.interop.graal.InteropGraal
-import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsinterop.ExportContent
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -21,8 +20,6 @@ private fun createGraalInterop(): InteropGraal {
     engine.put("createAstFactory", Supplier { AstFactory() })
     engine.put("createExportContent", Supplier { ExportContent<Any>() })
     engine.put("createFileResolver", Supplier { FileResolver() })
-    engine.put("createLogger", java.util.function.Function<String, Logging> { name -> Logging.logger(name) })
-
     engine.loadAstBuilder()
 
     return engine
