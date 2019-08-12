@@ -276,16 +276,17 @@ external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHa
 
 external abstract class HTMLAllCollection {
     open val length: Int
-//    fun namedItem(name: String): UnionElementOrHTMLCollection?
+    fun namedItem(name: String): UnionElementOrHTMLCollection?
     fun item(nameOrIndex: String = definedExternally): UnionElementOrHTMLCollection?
 }
-//@kotlin.internal.InlineOnly inline operator fun HTMLAllCollection.get(index: Int): Element? = asDynamic()[index]
-//@kotlin.internal.InlineOnly inline operator fun HTMLAllCollection.get(name: String): UnionElementOrHTMLCollection? = asDynamic()[name]
 
-external abstract class HTMLFormControlsCollection : HTMLCollection {
-//    override fun namedItem(name: String): UnionElementOrRadioNodeList?
-}
-//@kotlin.internal.InlineOnly override inline operator fun HTMLFormControlsCollection.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
+@kotlin.internal.InlineOnly
+inline operator fun HTMLAllCollection.get(index: Int): Element? = asDynamic()[index]
+
+@kotlin.internal.InlineOnly
+inline operator fun HTMLAllCollection.get(name: String): UnionElementOrHTMLCollection? = asDynamic()[name]
+
+external abstract class HTMLFormControlsCollection : HTMLCollection
 
 external abstract class RadioNodeList : NodeList, UnionElementOrRadioNodeList {
     open var value: String
