@@ -1,6 +1,7 @@
 plugins {
   id("kotlin")
   id("kotlinx-serialization")
+  id("maven-publish")
 }
 
 configurations {
@@ -38,4 +39,15 @@ jar {
     configurations.cliRuntime.collect { it.isDirectory() ? it : zipTree(it) }
   }
 
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      groupId "org.jetbrains"
+      artifactId "dukat"
+      version "0.0.14"
+      artifact jar
+    }
+  }
 }
