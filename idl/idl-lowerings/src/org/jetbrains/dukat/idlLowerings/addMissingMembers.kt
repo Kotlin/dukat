@@ -56,17 +56,16 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         return name == parentMember.name &&
                 static == parentMember.static &&
                 arguments.size == parentMember.arguments.size &&
-                returnType.isOverriding(parentMember.returnType) &&
                 !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
     }
 
-    fun IDLGetterDeclaration.isOverriding(parentMember: IDLGetterDeclaration) : Boolean {
+    fun IDLGetterDeclaration.isOverriding(parentMember: IDLGetterDeclaration): Boolean {
         return name == parentMember.name &&
                 valueType.isOverriding(parentMember.valueType) &&
                 key.type.isOverriding(parentMember.key.type)
     }
 
-    fun IDLSetterDeclaration.isOverriding(parentMember: IDLSetterDeclaration) : Boolean {
+    fun IDLSetterDeclaration.isOverriding(parentMember: IDLSetterDeclaration): Boolean {
         return name == parentMember.name &&
                 key.type.isOverriding(parentMember.key.type) &&
                 value.type.isOverriding(parentMember.value.type)
@@ -105,9 +104,10 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                     if (declaration.operations.any { it == parentOperation }) {
                         duplicatedOperations += parentOperation
                     }
-                }
-                conflictingOperations += declaration.operations.filter {
-                    it.name == parentOperation.name && !it.isOverriding(parentOperation)
+                } else {
+                    conflictingOperations += declaration.operations.filter {
+                        it.isOverriding(parentOperation) && !it.returnType.isOverriding(parentOperation.returnType)
+                    }
                 }
             }
             for (parentAttribute in parent.attributes) {
