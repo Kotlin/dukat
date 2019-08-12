@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.commonLowerings.omitStdLib
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.addItemArrayLike
@@ -29,6 +30,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .process()
                 .lowerOverrides()
                 .addImportsForReferencedFiles()
+                .omitStdLib()
     }
 
 }

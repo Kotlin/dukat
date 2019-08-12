@@ -524,9 +524,7 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
-        if (!interfaceModel.fromStdlib) {
-            interfaceModel.translate(0, ::addOutput)
-        }
+        interfaceModel.translate(0, ::addOutput)
     }
 
     override fun visitClass(classModel: ClassModel) {

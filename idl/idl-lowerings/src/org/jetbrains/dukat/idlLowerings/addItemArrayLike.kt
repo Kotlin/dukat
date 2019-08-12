@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
@@ -32,11 +33,9 @@ private class ItemArrayLikeLowering : IDLLowering {
         return declaration
     }
 
-    override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
-        if (alreadyAddedClassesFromStdlib) {
-            return super.lowerFileDeclaration(fileDeclaration)
-        }
-        alreadyAddedClassesFromStdlib = true
+    override fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
+        val newSourceSet = super.lowerSourceSetDeclaration(sourceSet)
+        val newFiles = newSourceSet.files.toMutableList()
         val itemArrayLikeDeclaration = IDLInterfaceDeclaration(
                 name = "ItemArrayLike",
                 attributes = listOf(IDLAttributeDeclaration(
@@ -65,12 +64,24 @@ private class ItemArrayLikeLowering : IDLLowering {
                 setters = listOf(),
                 callback = false,
                 generated = true,
-                partial = false,
-                fromStdlib = true
+                partial = false
         )
-        val newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
-        return newFileDeclaration.copy(
-                declarations = newFileDeclaration.declarations + itemArrayLikeDeclaration
+        if (newFiles.none { it.packageName == "<LIBROOT>".toNameEntity() }) {
+            newFiles += IDLFileDeclaration(
+                    fileName = "<LIBROOT>",
+                    declarations = listOf(),
+                    referencedFiles = listOf(),
+                    packageName = "<LIBROOT>".toNameEntity()
+            )
+        }
+        return newSourceSet.copy(
+                files = newFiles.map {
+                    if (it.packageName == "<LIBROOT>".toNameEntity()) {
+                        it.copy(declarations = it.declarations + itemArrayLikeDeclaration)
+                    } else {
+                        it
+                    }
+                }
         )
     }
 }

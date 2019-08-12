@@ -13,5 +13,5 @@ data class ModuleModel(
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {
     return (listOf(this.copy(submodules = emptyList())) + submodules.flatMap { submodule -> submodule.flattenDeclarations() })
-            .filter { module -> module.declarations.isNotEmpty() && !module.declarations.all { it is InterfaceModel && it.fromStdlib }}
+            .filter { module -> module.declarations.isNotEmpty() }
 }
