@@ -56,6 +56,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         return name == parentMember.name &&
                 static == parentMember.static &&
                 arguments.size == parentMember.arguments.size &&
+                returnType.isOverriding(parentMember.returnType) &&
                 !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
     }
 
@@ -70,10 +71,11 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val duplicatedAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val duplicatedOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         val conflictingAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
+        val conflictingOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         for (parent in allParents) {
             for (parentOperation in parent.operations) {
-                if (parentOperation.static || parent.isInterface()) {
-                    if (declaration.operations.none { it.isOverriding(parentOperation) }) {
+                if (declaration.operations.none { it.isOverriding(parentOperation) }) {
+                    if (parentOperation.static || parent.isInterface()) {
                         newOperations += parentOperation.copy(
                                 arguments = parentOperation.arguments.map {
                                     it.copy(
@@ -89,6 +91,9 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                     if (declaration.operations.any { it == parentOperation }) {
                         duplicatedOperations += parentOperation
                     }
+                }
+                conflictingOperations += declaration.operations.filter {
+                    it.name == parentOperation.name && !it.isOverriding(parentOperation)
                 }
             }
             for (parentAttribute in parent.attributes) {
@@ -113,7 +118,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         }
         return declaration.copy(
                 attributes = declaration.attributes + newAttributes - duplicatedAttributes - conflictingAttributes,
-                operations = declaration.operations + newOperations - duplicatedOperations
+                operations = declaration.operations + newOperations - duplicatedOperations - conflictingOperations
         )
     }
 
