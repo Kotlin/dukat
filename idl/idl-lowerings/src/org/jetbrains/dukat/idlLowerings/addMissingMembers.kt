@@ -60,6 +60,18 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                 !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
     }
 
+    fun IDLGetterDeclaration.isOverriding(parentMember: IDLGetterDeclaration) : Boolean {
+        return name == parentMember.name &&
+                valueType.isOverriding(parentMember.valueType) &&
+                key.type.isOverriding(parentMember.key.type)
+    }
+
+    fun IDLSetterDeclaration.isOverriding(parentMember: IDLSetterDeclaration) : Boolean {
+        return name == parentMember.name &&
+                key.type.isOverriding(parentMember.key.type) &&
+                value.type.isOverriding(parentMember.value.type)
+    }
+
     private fun IDLInterfaceDeclaration.isInterface(): Boolean {
         return IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject") in extendedAttributes
     }
@@ -72,6 +84,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val duplicatedOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         val conflictingAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val conflictingOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
+        val conflictingGetters: MutableList<IDLGetterDeclaration> = mutableListOf()
+        val conflictingSetters: MutableList<IDLSetterDeclaration> = mutableListOf()
         for (parent in allParents) {
             for (parentOperation in parent.operations) {
                 if (declaration.operations.none { it.isOverriding(parentOperation) }) {
@@ -110,6 +124,16 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                     duplicatedAttributes += parentAttribute
                 }
             }
+            for (parentGetter in parent.getters) {
+                conflictingGetters += declaration.getters.filter {
+                    it.name == parentGetter.name && !it.isOverriding(parentGetter)
+                }
+            }
+            for (parentSetter in parent.setters) {
+                conflictingSetters += declaration.setters.filter {
+                    it.name == parentSetter.name && !it.isOverriding(parentSetter)
+                }
+            }
         }
         if (declaration.isInterface() ||
                 (declaration.constructors.isEmpty() && declaration.primaryConstructor == null)) {
@@ -118,7 +142,9 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         }
         return declaration.copy(
                 attributes = declaration.attributes + newAttributes - duplicatedAttributes - conflictingAttributes,
-                operations = declaration.operations + newOperations - duplicatedOperations - conflictingOperations
+                operations = declaration.operations + newOperations - duplicatedOperations - conflictingOperations,
+                getters = declaration.getters - conflictingGetters,
+                setters = declaration.setters - conflictingSetters
         )
     }
 
