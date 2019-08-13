@@ -62,11 +62,12 @@ definitions
 ;
 
 definition
-	: callbackOrInterface
+	: callbackOrInterfaceOrMixin
 	| partial
 	| dictionary
 	| enum_
 	| typedef
+	| includesStatement
 	| exception_
 	| const_
 	| module
@@ -77,9 +78,9 @@ module
 	: 'module' IDENTIFIER_WEBIDL '{' definitions '}' ';'
 	;
 
-callbackOrInterface
+callbackOrInterfaceOrMixin
 	: 'callback' callbackRestOrInterface
-	| interface_
+	| 'interface' interfaceOrMixin
 ;
 
 exception_
@@ -88,11 +89,26 @@ exception_
 
 callbackRestOrInterface
 	: callbackRest
-	| interface_
+	| 'interface' IDENTIFIER_WEBIDL '{' callbackInterfaceMembers '}' ';'
 ;
 
-interface_
-	: 'interface' IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
+callbackInterfaceMembers
+    : extendedAttributeList callbackInterfaceMember callbackInterfaceMembers
+    | /* empty */
+;
+
+callbackInterfaceMember
+    : const_
+    | regularOperation
+;
+
+interfaceOrMixin
+	: interfaceRest
+	| mixinRest
+;
+
+interfaceRest
+    : IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
 ;
 
 partial
@@ -100,12 +116,17 @@ partial
 ;
 
 partialDefinition
-	: partialInterface
+	: 'interface' partialInterfaceOrPartialMixin
 	| partialDictionary
 ;
 
-partialInterface
-	: 'interface' IDENTIFIER_WEBIDL '{' interfaceMembers '}' ';'
+partialInterfaceOrPartialMixin
+	: partialInterfaceRest
+	| mixinRest
+;
+
+partialInterfaceRest
+    : IDENTIFIER_WEBIDL '{' interfaceMembers '}' ';'
 ;
 
 interfaceMembers
@@ -125,6 +146,26 @@ interfaceMember
 	| readWriteMaplike
 	| readWriteSetlike
 	| typedef
+;
+
+mixinRest
+    : 'mixin' IDENTIFIER_WEBIDL '{' mixinMembers '}'
+;
+
+mixinMembers
+    : extendedAttributeList mixinMember mixinMembers
+    | /* empty */
+;
+
+mixinMember
+    : const_
+    | regularOperation
+    | stringifier
+    | readOnly attributeRest
+;
+
+includesStatement
+    : IDENTIFIER_WEBIDL 'includes' IDENTIFIER_WEBIDL ';'
 ;
 
 dictionary
@@ -300,8 +341,12 @@ readOnly
 ;
 
 operation
-	: returnType operationRest
+	: regularOperation
 	| specialOperation
+;
+
+regularOperation
+    : returnType operationRest
 ;
 
 specialOperation
@@ -415,6 +460,7 @@ argumentNameKeyword
 	| 'enum'
 	| 'getter'
 	| 'implements'
+	| 'includes'
 	| 'inherit'
 	| 'interface'
 	| 'iterable'

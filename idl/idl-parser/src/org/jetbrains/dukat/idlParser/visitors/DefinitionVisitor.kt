@@ -20,6 +20,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlParser.filterIdentifiers
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 
 internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtendedAttributeDeclaration>) :
@@ -97,14 +98,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
-    override fun visitInterface_(ctx: WebIDLParser.Interface_Context): IDLTopLevelDeclaration {
+    override fun visitInterfaceRest(ctx: WebIDLParser.InterfaceRestContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
         name = ctx.getName()
         visitChildren(ctx)
         return defaultResult()
     }
 
-    override fun visitPartialInterface(ctx: WebIDLParser.PartialInterfaceContext): IDLTopLevelDeclaration {
+    override fun visitPartialInterfaceRest(ctx: WebIDLParser.PartialInterfaceRestContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
         name = ctx.getName()
         visitChildren(ctx)
@@ -116,6 +117,11 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             is IDLOperationDeclaration -> operations.add(staticMember)
             is IDLAttributeDeclaration -> myAttributes.add(staticMember)
         }
+        return defaultResult()
+    }
+
+    override fun visitRegularOperation(ctx: WebIDLParser.RegularOperationContext): IDLTopLevelDeclaration {
+        operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
         return defaultResult()
     }
 
@@ -147,6 +153,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitCallbackRestOrInterface(ctx: WebIDLParser.CallbackRestOrInterfaceContext): IDLTopLevelDeclaration {
         isCallback = true
+        if (ctx.getFirstValueOrNull() == "interface") {
+            kind = DefinitionKind.INTERFACE
+            name = ctx.getName()
+        }
         visitChildren(ctx)
         return defaultResult()
     }
