@@ -54,6 +54,9 @@ external abstract class HTMLOptionsCollection : HTMLCollection {
 @kotlin.internal.InlineOnly
 inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
+/**
+ * Exposes the JavaScript [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) to Kotlin
+ */
 external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable, ElementCSSInlineStyle {
     open var title: String
     open var lang: String
@@ -85,6 +88,9 @@ external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndE
  */
 external abstract class HTMLUnknownElement : HTMLElement
 
+/**
+ * Exposes the JavaScript [DOMStringMap](https://developer.mozilla.org/en/docs/Web/API/DOMStringMap) to Kotlin
+ */
 external abstract class DOMStringMap
 
 @kotlin.internal.InlineOnly
@@ -368,6 +374,9 @@ external abstract class HTMLImageElement : HTMLElement, HTMLOrSVGImageElement, T
     open val y: Int
 }
 
+/**
+ * Exposes the JavaScript [HTMLIFrameElement](https://developer.mozilla.org/en/docs/Web/API/HTMLIFrameElement) to Kotlin
+ */
 external abstract class HTMLIFrameElement : HTMLElement {
     open var src: String
     open var srcdoc: String
@@ -991,6 +1000,9 @@ external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElemen
     open val index: Int
 }
 
+/**
+ * Exposes the JavaScript [HTMLTextAreaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTextAreaElement) to Kotlin
+ */
 external abstract class HTMLTextAreaElement : HTMLElement {
     open var autocomplete: String
     open var autofocus: Boolean
@@ -1587,6 +1599,9 @@ external abstract class DataTransferItem {
     fun getAsFile(): File?
 }
 
+/**
+ * Exposes the JavaScript [DragEvent](https://developer.mozilla.org/en/docs/Web/API/DragEvent) to Kotlin
+ */
 external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
     open val dataTransfer: DataTransfer?
 }
@@ -1630,6 +1645,9 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
     return o
 }
 
+/**
+ * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
+ */
 external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
     open val window: Window
     open val self: Window
@@ -2041,6 +2059,9 @@ external interface WindowOrWorkerGlobalScope {
     fun fetch(input: dynamic, init: RequestInit = definedExternally): Promise<Response>
 }
 
+/**
+ * Exposes the JavaScript [Navigator](https://developer.mozilla.org/en/docs/Web/API/Navigator) to Kotlin
+ */
 external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
     open val clipboard: Clipboard
     open val mediaDevices: MediaDevices
@@ -2756,6 +2777,9 @@ external abstract class NodeList : ItemArrayLike<Node> {
 @kotlin.internal.InlineOnly
 inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
 
+/**
+ * Exposes the JavaScript [HTMLCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLCollection) to Kotlin
+ */
 external abstract class HTMLCollection : ItemArrayLike<Element>, UnionElementOrHTMLCollection {
     override val length: Int
     override fun item(index: Int): Element?
@@ -2901,6 +2925,9 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
     return o
 }
 
+/**
+ * Exposes the JavaScript [Document](https://developer.mozilla.org/en/docs/Web/API/Document) to Kotlin
+ */
 external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
     open val implementation: DOMImplementation
     open val URL: String
@@ -3082,6 +3109,9 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
 @kotlin.internal.InlineOnly
 inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
 
+/**
+ * Exposes the JavaScript [XMLDocument](https://developer.mozilla.org/en/docs/Web/API/XMLDocument) to Kotlin
+ */
 external open class XMLDocument : Document {
     override fun getElementById(elementId: String): Element?
     override fun prepend(vararg nodes: dynamic)
@@ -3404,6 +3434,9 @@ external abstract class TreeWalker {
     fun nextNode(): Node?
 }
 
+/**
+ * Exposes the JavaScript [NodeFilter](https://developer.mozilla.org/en/docs/Web/API/NodeFilter) to Kotlin
+ */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface NodeFilter {
     fun acceptNode(node: Node): Short
@@ -3816,6 +3849,9 @@ external interface GeometryUtils {
     fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMPoint
 }
 
+/**
+ * Exposes the JavaScript [Image](https://developer.mozilla.org/en/docs/Web/API/Image) to Kotlin
+ */
 external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
@@ -4014,6 +4050,9 @@ external open class Audio(src: String = definedExternally) : HTMLAudioElement {
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
 }
 
+/**
+ * Exposes the JavaScript [Option](https://developer.mozilla.org/en/docs/Web/API/Option) to Kotlin
+ */
 external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?

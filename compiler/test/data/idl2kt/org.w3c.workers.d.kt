@@ -18,6 +18,9 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [ServiceWorker](https://developer.mozilla.org/en/docs/Web/API/ServiceWorker) to Kotlin
+ */
 external abstract class ServiceWorker : EventTarget, AbstractWorker, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
     open val scriptURL: String
     open val state: ServiceWorkerState
@@ -25,6 +28,9 @@ external abstract class ServiceWorker : EventTarget, AbstractWorker, UnionMessag
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
 }
 
+/**
+ * Exposes the JavaScript [ServiceWorkerRegistration](https://developer.mozilla.org/en/docs/Web/API/ServiceWorkerRegistration) to Kotlin
+ */
 external abstract class ServiceWorkerRegistration : EventTarget {
     open val installing: ServiceWorker?
     open val waiting: ServiceWorker?
@@ -39,6 +45,9 @@ external abstract class ServiceWorkerRegistration : EventTarget {
     fun getNotifications(filter: GetNotificationOptions = definedExternally): Promise<dynamic>
 }
 
+/**
+ * Exposes the JavaScript [ServiceWorkerContainer](https://developer.mozilla.org/en/docs/Web/API/ServiceWorkerContainer) to Kotlin
+ */
 external abstract class ServiceWorkerContainer : EventTarget {
     open val controller: ServiceWorker?
     open val ready: Promise<ServiceWorkerRegistration>
@@ -110,6 +119,9 @@ inline fun ServiceWorkerMessageEventInit(data: Any? = undefined, origin: String?
     return o
 }
 
+/**
+ * Exposes the JavaScript [ServiceWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/ServiceWorkerGlobalScope) to Kotlin
+ */
 external abstract class ServiceWorkerGlobalScope : WorkerGlobalScope {
     open val clients: Clients
     open val registration: ServiceWorkerRegistration
@@ -124,6 +136,9 @@ external abstract class ServiceWorkerGlobalScope : WorkerGlobalScope {
     fun skipWaiting(): Promise<Unit>
 }
 
+/**
+ * Exposes the JavaScript [Client](https://developer.mozilla.org/en/docs/Web/API/Client) to Kotlin
+ */
 external abstract class Client : UnionClientOrMessagePortOrServiceWorker {
     open val url: String
     open val frameType: FrameType

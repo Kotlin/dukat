@@ -290,6 +290,9 @@ inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
 @kotlin.internal.InlineOnly
 inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem }
 
+/**
+ * Exposes the JavaScript [SVGUnitTypes](https://developer.mozilla.org/en/docs/Web/API/SVGUnitTypes) to Kotlin
+ */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGUnitTypes {
     companion object {
@@ -312,6 +315,9 @@ external interface SVGFitToViewBox {
     val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
 }
 
+/**
+ * Exposes the JavaScript [SVGZoomAndPan](https://developer.mozilla.org/en/docs/Web/API/SVGZoomAndPan) to Kotlin
+ */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SVGZoomAndPan {
     var zoomAndPan: Short
@@ -611,8 +617,14 @@ inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
 @kotlin.internal.InlineOnly
 inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
 
+/**
+ * Exposes the JavaScript [SVGPolylineElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolylineElement) to Kotlin
+ */
 external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints
 
+/**
+ * Exposes the JavaScript [SVGPolygonElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolygonElement) to Kotlin
+ */
 external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints
 
 /**
