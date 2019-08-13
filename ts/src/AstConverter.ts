@@ -1,17 +1,11 @@
-declare function uid(): string;
-declare function createExportContent(): ExportContext;
-declare function createAstFactory(): AstFactory;
-declare function createFileResolver(): FileResolver;
+import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
+import {ResourceFetcher} from "./ast/ResourceFetcher";
+import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
+import {uid} from "./uid";
+import {createExportContent} from "./ExportContent";
 
-// Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
-declare namespace ts {
-    function normalizePath(path: string): string;
-    function getDirectoryPath(path: string): string;
-    var libMap : { get(path: string) : string };
-}
-
-
-class AstConverter {
+export class AstConverter {
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
 
@@ -395,7 +389,7 @@ class AstConverter {
     }
 
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number) : ParameterDeclaration {
-        let initializer = null;
+        let initializer: Expression | null = null;
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
             initializer = this.astFactory.createExpression(

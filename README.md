@@ -46,15 +46,16 @@ where possible options include:
 
 # Recent Changes
 
+#### [0.0.14] - 8'August, 2019
+ - Add global module annotation in case we have default export but don't have module annotation so far
+ - [idl] Allow translation of several files (dependent on each other)
+ - [idl] Introduce getters/setters and enums
+ - [idl] Support for union types and function (callback) types
+
 #### [0.0.13] - 24'July, 2019
  - [idl] support for translating dictionaries, nullable types, array types and parameter types
  - [idl] support "implements" statement
  - redundant Unit return type in not printed anymore
-
-#### [0.0.12] - 19'July, 2019
- - package name (if found) is added as a prefix to the name of the translated entity
- - [#73 - Union type unrolling is broken when it's aliased in a referenced file](https://github.com/Kotlin/dukat/issues/73)
- - [idl] Support typedefs in inheritance declarations
 
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 

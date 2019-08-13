@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.lowerings
+package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
