@@ -18,6 +18,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [UIEvent](https://developer.mozilla.org/en/docs/Web/API/UIEvent) to Kotlin
+ */
 external open class UIEvent(type: String, eventInitDict: UIEventInit = definedExternally) : Event {
     open val view: Window?
     open val detail: Int
@@ -43,6 +46,9 @@ inline fun UIEventInit(view: Window? = null, detail: Int? = 0, bubbles: Boolean?
     return o
 }
 
+/**
+ * Exposes the JavaScript [FocusEvent](https://developer.mozilla.org/en/docs/Web/API/FocusEvent) to Kotlin
+ */
 external open class FocusEvent(type: String, eventInitDict: FocusEventInit = definedExternally) : UIEvent {
     open val relatedTarget: EventTarget?
 }
@@ -65,6 +71,9 @@ inline fun FocusEventInit(relatedTarget: EventTarget? = null, view: Window? = nu
     return o
 }
 
+/**
+ * Exposes the JavaScript [MouseEvent](https://developer.mozilla.org/en/docs/Web/API/MouseEvent) to Kotlin
+ */
 external open class MouseEvent(type: String, eventInitDict: MouseEventInit = definedExternally) : UIEvent, UnionElementOrMouseEvent {
     open val screenX: Int
     open val screenY: Int
@@ -211,6 +220,9 @@ inline fun EventModifierInit(ctrlKey: Boolean? = false, shiftKey: Boolean? = fal
     return o
 }
 
+/**
+ * Exposes the JavaScript [WheelEvent](https://developer.mozilla.org/en/docs/Web/API/WheelEvent) to Kotlin
+ */
 external open class WheelEvent(type: String, eventInitDict: WheelEventInit = definedExternally) : MouseEvent {
     open val deltaX: Double
     open val deltaY: Double
@@ -275,6 +287,9 @@ inline fun WheelEventInit(deltaX: Double? = 0.0, deltaY: Double? = 0.0, deltaZ: 
     return o
 }
 
+/**
+ * Exposes the JavaScript [InputEvent](https://developer.mozilla.org/en/docs/Web/API/InputEvent) to Kotlin
+ */
 external open class InputEvent(type: String, eventInitDict: InputEventInit = definedExternally) : UIEvent {
     open val data: String
     open val isComposing: Boolean
@@ -302,6 +317,9 @@ inline fun InputEventInit(data: String? = "", isComposing: Boolean? = false, vie
     return o
 }
 
+/**
+ * Exposes the JavaScript [KeyboardEvent](https://developer.mozilla.org/en/docs/Web/API/KeyboardEvent) to Kotlin
+ */
 external open class KeyboardEvent(type: String, eventInitDict: KeyboardEventInit = definedExternally) : UIEvent {
     open val key: String
     open val code: String
@@ -373,6 +391,9 @@ inline fun KeyboardEventInit(key: String? = "", code: String? = "", location: In
     return o
 }
 
+/**
+ * Exposes the JavaScript [CompositionEvent](https://developer.mozilla.org/en/docs/Web/API/CompositionEvent) to Kotlin
+ */
 external open class CompositionEvent(type: String, eventInitDict: CompositionEventInit = definedExternally) : UIEvent {
     open val data: String
 }
@@ -395,6 +416,9 @@ inline fun CompositionEventInit(data: String? = "", view: Window? = null, detail
     return o
 }
 
+/**
+ * Exposes the JavaScript [Event](https://developer.mozilla.org/en/docs/Web/API/Event) to Kotlin
+ */
 external open class Event(type: String, eventInitDict: EventInit = definedExternally) {
     open val type: String
     open val target: EventTarget?
@@ -420,6 +444,9 @@ external open class Event(type: String, eventInitDict: EventInit = definedExtern
     }
 }
 
+/**
+ * Exposes the JavaScript [EventTarget](https://developer.mozilla.org/en/docs/Web/API/EventTarget) to Kotlin
+ */
 external abstract class EventTarget {
     fun addEventListener(type: String, callback: EventListener?, options: dynamic = definedExternally)
     fun addEventListener(type: String, callback: ((Event) -> Unit)?, options: dynamic = definedExternally)
@@ -428,6 +455,9 @@ external abstract class EventTarget {
     fun dispatchEvent(event: Event): Boolean
 }
 
+/**
+ * Exposes the JavaScript [EventListener](https://developer.mozilla.org/en/docs/Web/API/EventListener) to Kotlin
+ */
 external interface EventListener {
     fun handleEvent(event: Event)
 }

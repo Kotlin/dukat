@@ -18,6 +18,9 @@ import org.w3c.notifications.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [Performance](https://developer.mozilla.org/en/docs/Web/API/Performance) to Kotlin
+ */
 external abstract class Performance : EventTarget {
     open val timing: PerformanceTiming
     open val navigation: PerformanceNavigation
@@ -28,6 +31,9 @@ external interface GlobalPerformance {
     val performance: Performance
 }
 
+/**
+ * Exposes the JavaScript [PerformanceTiming](https://developer.mozilla.org/en/docs/Web/API/PerformanceTiming) to Kotlin
+ */
 external abstract class PerformanceTiming {
     open val navigationStart: Int
     open val unloadEventStart: Int
@@ -52,6 +58,9 @@ external abstract class PerformanceTiming {
     open val loadEventEnd: Int
 }
 
+/**
+ * Exposes the JavaScript [PerformanceNavigation](https://developer.mozilla.org/en/docs/Web/API/PerformanceNavigation) to Kotlin
+ */
 external abstract class PerformanceNavigation {
     open val type: Short
     open val redirectCount: Short

@@ -34,10 +34,16 @@ inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Bool
     return o
 }
 
+/**
+ * Exposes the JavaScript [ClipboardEvent](https://developer.mozilla.org/en/docs/Web/API/ClipboardEvent) to Kotlin
+ */
 external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventInit = definedExternally) : Event {
     open val clipboardData: DataTransfer?
 }
 
+/**
+ * Exposes the JavaScript [Clipboard](https://developer.mozilla.org/en/docs/Web/API/Clipboard) to Kotlin
+ */
 external abstract class Clipboard : EventTarget {
     fun read(): Promise<DataTransfer>
     fun readText(): Promise<String>

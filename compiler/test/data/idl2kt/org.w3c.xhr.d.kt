@@ -18,6 +18,9 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 
+/**
+ * Exposes the JavaScript [XMLHttpRequestEventTarget](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequestEventTarget) to Kotlin
+ */
 external abstract class XMLHttpRequestEventTarget : EventTarget {
     open var onloadstart: ((ProgressEvent) -> dynamic)?
     open var onprogress: ((ProgressEvent) -> dynamic)?
@@ -30,6 +33,9 @@ external abstract class XMLHttpRequestEventTarget : EventTarget {
 
 external abstract class XMLHttpRequestUpload : XMLHttpRequestEventTarget
 
+/**
+ * Exposes the JavaScript [XMLHttpRequest](https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest) to Kotlin
+ */
 external open class XMLHttpRequest : XMLHttpRequestEventTarget {
     var onreadystatechange: ((Event) -> dynamic)?
     open val readyState: Short
@@ -61,6 +67,9 @@ external open class XMLHttpRequest : XMLHttpRequestEventTarget {
     }
 }
 
+/**
+ * Exposes the JavaScript [FormData](https://developer.mozilla.org/en/docs/Web/API/FormData) to Kotlin
+ */
 external open class FormData(form: HTMLFormElement = definedExternally) {
     fun append(name: String, value: String)
     fun append(name: String, value: Blob, filename: String = definedExternally)
@@ -72,6 +81,9 @@ external open class FormData(form: HTMLFormElement = definedExternally) {
     fun set(name: String, value: Blob, filename: String = definedExternally)
 }
 
+/**
+ * Exposes the JavaScript [ProgressEvent](https://developer.mozilla.org/en/docs/Web/API/ProgressEvent) to Kotlin
+ */
 external open class ProgressEvent(type: String, eventInitDict: ProgressEventInit = definedExternally) : Event {
     open val lengthComputable: Boolean
     open val loaded: Int

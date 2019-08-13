@@ -93,6 +93,9 @@ inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: D
     return o
 }
 
+/**
+ * Exposes the JavaScript [PointerEvent](https://developer.mozilla.org/en/docs/Web/API/PointerEvent) to Kotlin
+ */
 external open class PointerEvent(type: String, eventInitDict: PointerEventInit = definedExternally) : MouseEvent {
     open val pointerId: Int
     open val width: Double

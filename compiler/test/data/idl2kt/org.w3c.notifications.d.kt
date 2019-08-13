@@ -18,6 +18,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [Notification](https://developer.mozilla.org/en/docs/Web/API/Notification) to Kotlin
+ */
 external open class Notification(title: String, options: NotificationOptions = definedExternally) : EventTarget {
     var onclick: ((MouseEvent) -> dynamic)?
     var onerror: ((Event) -> dynamic)?
@@ -159,6 +162,9 @@ inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
     return o
 }
 
+/**
+ * Exposes the JavaScript [NotificationEvent](https://developer.mozilla.org/en/docs/Web/API/NotificationEvent) to Kotlin
+ */
 external open class NotificationEvent(type: String, eventInitDict: NotificationEventInit) : ExtendableEvent {
     open val notification: Notification
     open val action: String

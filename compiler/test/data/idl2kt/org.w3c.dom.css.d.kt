@@ -367,6 +367,9 @@ external interface ElementCSSInlineStyle {
     val style: CSSStyleDeclaration
 }
 
+/**
+ * Exposes the JavaScript [CSS](https://developer.mozilla.org/en/docs/Web/API/CSS) to Kotlin
+ */
 external abstract class CSS {
     companion object {
         fun escape(ident: String): String
