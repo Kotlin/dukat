@@ -1,7 +1,7 @@
 
 import kotlin.js.*
 
-external interface EventListener {
-    fun handleEvent(event: Event)
+external interface EventListenerX {
+    fun handleEvent(event: EventX)
 }
-external abstract class Event
+external abstract class EventX

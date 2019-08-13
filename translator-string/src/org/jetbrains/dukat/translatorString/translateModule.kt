@@ -25,7 +25,7 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-internal fun NameEntity.translate(): String = when (this) {
+fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
         if (leftMost() == ROOT_PACKAGENAME) {

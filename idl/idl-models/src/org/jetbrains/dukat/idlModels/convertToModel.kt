@@ -235,6 +235,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
+                documentation = null,
                 annotations = mutableListOf(),
                 external = true
         )
@@ -257,6 +258,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                     null
                 },
                 annotations = mutableListOf(),
+                documentation = null,
                 external = true,
                 abstract = constructors.isEmpty() && primaryConstructor == null
         )
@@ -333,6 +335,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
                         null
                 )
             },
+            documentation = null,
             annotations = mutableListOf(),
             external = true
     )
@@ -373,6 +376,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
+            documentation = null,
             annotations = mutableListOf(),
             external = true
     )

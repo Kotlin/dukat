@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
+import addKDocs
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
@@ -26,6 +27,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .resolveTypes()
                 .process()
                 .lowerOverrides()
+                .addKDocs()
                 .addImportsForReferencedFiles()
     }
 
