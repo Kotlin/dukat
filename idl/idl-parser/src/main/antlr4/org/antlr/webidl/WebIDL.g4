@@ -151,7 +151,7 @@ interfaceMember
 ;
 
 mixinRest
-    : 'mixin' IDENTIFIER_WEBIDL '{' mixinMembers '}'
+    : 'mixin' IDENTIFIER_WEBIDL '{' mixinMembers '}' ';'
 ;
 
 mixinMembers

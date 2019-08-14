@@ -12,6 +12,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
@@ -40,6 +41,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val enumMembers: MutableList<String> = mutableListOf()
     private var isCallback: Boolean = false
     private var partial = false
+    private var mixin = false
 
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
@@ -58,7 +60,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     setters = setters,
                     callback = isCallback,
                     generated = false,
-                    partial = partial
+                    partial = partial,
+                    mixin = mixin
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -74,6 +77,10 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     child = childType,
                     parent = parentType
             )
+            DefinitionKind.INCLUDES_STATEMENT -> IDLIncludesStatementDeclaration(
+                    child = childType,
+                    parent = parentType
+            )
             DefinitionKind.ENUM -> IDLEnumDeclaration(
                     name = name,
                     members = enumMembers
@@ -81,7 +88,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         }
     }
 
-    override fun visitReadWriteAttribute(ctx: WebIDLParser.ReadWriteAttributeContext): IDLTopLevelDeclaration {
+    override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
         myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
         return defaultResult()
     }
@@ -100,6 +107,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitInterfaceRest(ctx: WebIDLParser.InterfaceRestContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitMixinRest(ctx: WebIDLParser.MixinRestContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.INTERFACE
+        mixin = true
         name = ctx.getName()
         visitChildren(ctx)
         return defaultResult()
@@ -169,6 +184,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitIncludesStatement(ctx: WebIDLParser.IncludesStatementContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.INCLUDES_STATEMENT
+        val identifiers = ctx.filterIdentifiers()
+        childType = IDLSingleTypeDeclaration(identifiers[0].text, null, false)
+        parentType = IDLSingleTypeDeclaration(identifiers[1].text, null, false)
+        return defaultResult()
+    }
+
     override fun visitDictionary(ctx: WebIDLParser.DictionaryContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.DICTIONARY
         name = ctx.getName()
@@ -221,5 +244,5 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, DICTIONARY, ENUM
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, INCLUDES_STATEMENT, DICTIONARY, ENUM
 }

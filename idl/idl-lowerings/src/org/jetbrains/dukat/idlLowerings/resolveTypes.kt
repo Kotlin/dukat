@@ -118,7 +118,8 @@ private class TypeResolver : IDLLowering {
                             setters = listOf(),
                             callback = false,
                             generated = true,
-                            partial = false
+                            partial = false,
+                            mixin = false
                     )
                 }
         )

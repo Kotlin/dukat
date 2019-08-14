@@ -42,6 +42,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
@@ -423,6 +424,7 @@ fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
         is IDLEnumDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
+        is IDLIncludesStatementDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
