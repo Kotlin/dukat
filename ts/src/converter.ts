@@ -1,27 +1,32 @@
-/// <reference path="../build/package/node_modules/typescript/lib/typescriptServices.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/typescript.d.ts"/>
+import {DukatLanguageServiceHost, FileResolver} from "./DukatLanguageServiceHost";
+import {AstConverter} from "./AstConverter";
+import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
 
-declare function require(path: string): any;
+declare function createAstFactory(): AstFactory;
+declare function createFileResolver(): FileResolver;
 
-let declarations = require("declarations");
 
-interface FileResolver {
-    resolve(fileName: string): string;
+class DocumentCache {
+    private myDocumentMap: Map<string, any> = new Map();
+
+    setDocument(key: string, path: string, sourceFile: any) {
+        this.myDocumentMap.set(path, sourceFile);
+    }
+
+    getDocument(key: string, path: string): any | undefined {
+        return this.myDocumentMap.get(path);
+    }
 }
 
-declare interface DocumentCache {
-    setDocument(key: string, path: string, sourceFile: ts.SourceFile): void;
-    getDocument(key: string, path: string): ts.SourceFile | undefined;
-}
+let cache = new DocumentCache();
 
-function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) {
+function main(fileName: string, packageName: NameEntity) {
     let host = new DukatLanguageServiceHost(createFileResolver());
     host.register(fileName);
 
     let logger = createLogger("converter");
 
-    logger.debug(`using document cache: ${!!cache}`);
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
 
     const program = languageService.getProgram();

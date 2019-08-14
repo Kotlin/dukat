@@ -14,6 +14,5 @@ dependencies {
     implementation(project(":node-lowering"))
     implementation(project(":translator"))
     implementation(project(":ts-lowerings"))
-    implementation(project(":tsinterop"))
     implementation(project(":tsmodel"))
 }

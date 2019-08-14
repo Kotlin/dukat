@@ -30,7 +30,6 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -267,7 +266,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
                     name,
-                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name.toNode(), emptyList(), null) },
+                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
             )

@@ -1,6 +1,10 @@
-/// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
+import * as ts from "typescript-services-api";
 
-class DukatLanguageServiceHost implements ts.LanguageServiceHost {
+export interface FileResolver {
+    resolve(fileName: string): string;
+}
+
+export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     constructor(
         public fileResolver: FileResolver,
