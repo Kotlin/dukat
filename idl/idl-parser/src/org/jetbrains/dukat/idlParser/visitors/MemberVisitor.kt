@@ -56,8 +56,12 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLMemberDeclaration {
         kind = MemberKind.ATTRIBUTE
-        name = ctx.getNameOrNull() ?: ctx.children.filterIsInstance<TerminalNode>().last { it.text != ";" }.text
         visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitAttributeName(ctx: WebIDLParser.AttributeNameContext): IDLMemberDeclaration? {
+        name = ctx.getNameOrNull() ?: "required"
         return defaultResult()
     }
 
@@ -68,7 +72,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
-    override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLMemberDeclaration {
+    override fun visitDictionaryMemberRest(ctx: WebIDLParser.DictionaryMemberRestContext): IDLMemberDeclaration {
         kind = MemberKind.DICTIONARY_MEMBER
         name = ctx.getName()
         visitChildren(ctx)
@@ -85,7 +89,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
-    override fun visitOptionalOrRequiredArgument(ctx: WebIDLParser.OptionalOrRequiredArgumentContext?): IDLMemberDeclaration {
+    override fun visitArgumentRest(ctx: WebIDLParser.ArgumentRestContext?): IDLMemberDeclaration {
         arguments.add(ArgumentVisitor().visit(ctx))
         return defaultResult()
     }

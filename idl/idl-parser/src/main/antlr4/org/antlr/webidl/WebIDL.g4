@@ -42,19 +42,19 @@ grammar WebIDL;
 // Note: Added "wrapper" rule webIDL with EOF token.
 
 webIDL
-	: namespace? definitions EOF
+	: package_? definitions EOF
 ;
 
-namespaceScope
+packageScope
   	: '*' | 'cpp' | 'java' | 'py' | 'perl' | 'rb' | 'cocoa' | 'csharp'
 ;
 
-namespaceRest
+packageRest
     : IDENTIFIER_WEBIDL ( '.' IDENTIFIER_WEBIDL )*
     ;
 
-namespace
-	: 'namespace' namespaceScope? namespaceRest ';';
+package_
+	: 'namespace' packageScope? packageRest ';';
 
 definitions
 	: extendedAttributeList definition definitions
@@ -63,6 +63,7 @@ definitions
 
 definition
 	: callbackOrInterfaceOrMixin
+    | namespace
 	| partial
 	| dictionary
 	| enum_
@@ -118,6 +119,7 @@ partial
 partialDefinition
 	: 'interface' partialInterfaceOrPartialMixin
 	| partialDictionary
+	| namespace
 ;
 
 partialInterfaceOrPartialMixin
@@ -173,17 +175,17 @@ dictionary
 ;
 
 dictionaryMembers
-	: extendedAttributeList dictionaryMember dictionaryMembers
+	: dictionaryMember dictionaryMembers
 	| /* empty */
 ;
 
 dictionaryMember
-	: required type IDENTIFIER_WEBIDL default_ ';'
+    : extendedAttributeList dictionaryMemberRest
 ;
 
-required
-	: 'required'
-	| /* empty */
+dictionaryMemberRest
+	: 'required' typeWithExtendedAttributes IDENTIFIER_WEBIDL ';'
+	| type IDENTIFIER_WEBIDL default_ ';'
 ;
 
 partialDictionary
@@ -199,10 +201,12 @@ defaultValue
 	: constValue
 	| STRING_WEBIDL
 	| '[' ']'
+	| '{' '}'
+	| 'null'
 ;
 
 inheritance
-	: ':' IDENTIFIER_WEBIDL ( ',' IDENTIFIER_WEBIDL )*
+	: ':' IDENTIFIER_WEBIDL
 	| /* empty */
 ;
 
@@ -229,7 +233,7 @@ callbackRest
 ;
 
 typedef
-	: 'typedef' type IDENTIFIER_WEBIDL ';'
+	: 'typedef' typeWithExtendedAttributes IDENTIFIER_WEBIDL ';'
 ;
 
 implementsStatement
@@ -294,7 +298,7 @@ stringifier
 
 stringifierRest
 	: readOnly attributeRest
-	| returnType operationRest
+	| regularOperation
 	| ';'
 ;
 
@@ -304,7 +308,7 @@ staticMember
 
 staticMemberRest
 	: readOnly attributeRest
-	| returnType operationRest
+	| regularOperation
 ;
 
 readonlyMember
@@ -318,21 +322,21 @@ readonlyMemberRest
 ;
 
 readWriteAttribute
-	: 'inherit' readOnly attributeRest
+	: 'inherit' attributeRest
 	| attributeRest
 ;
 
 attributeRest
-	: 'attribute' type (IDENTIFIER_WEBIDL | 'required') attributeAnnotations* ';'
+	: 'attribute' typeWithExtendedAttributes attributeName ';'
 ;
 
-attributeAnnotations
-	: IDENTIFIER_WEBIDL ( '(' type (',' type)* ')' )?
+attributeName
+    : attributeNameKeyword
+    | IDENTIFIER_WEBIDL
 ;
 
-inherit
-	: 'inherit'
-	| /* empty */
+attributeNameKeyword
+    : 'required'
 ;
 
 readOnly
@@ -350,7 +354,7 @@ regularOperation
 ;
 
 specialOperation
-	: special specials returnType operationRest
+	: special regularOperation
 ;
 
 specials
@@ -367,7 +371,7 @@ special
 ;
 
 operationRest
-	: optionalIdentifier '(' argumentList ')' attributeAnnotations* ';'
+	: optionalIdentifier '(' argumentList ')' ';'
 ;
 
 optionalIdentifier
@@ -386,11 +390,12 @@ arguments
 ;
 
 argument
-	: extendedAttributeList optionalOrRequiredArgument
+	: extendedAttributeList argumentRest
 ;
 
-optionalOrRequiredArgument
-	: 'optional'? ('in'|'out')? type ellipsis argumentName default_
+argumentRest
+	: 'optional' typeWithExtendedAttributes argumentName default_
+	| type ellipsis argumentName default_
 ;
 
 argumentName
@@ -404,12 +409,12 @@ ellipsis
 ;
 
 iterable
-	: 'iterable' '<' type optionalType '>' ';'
+	: 'iterable' '<' typeWithExtendedAttributes optionalType '>' ';'
 	| 'legacyiterable' '<' type '>' ';'
 ;
 
 optionalType
-	: ',' type
+	: ',' typeWithExtendedAttributes
 	| /* empty */
 ;
 
@@ -422,11 +427,25 @@ readWriteSetlike
 ;
 
 maplikeRest
-	: 'maplike' '<' type ',' type '>' ';'
+	: 'maplike' '<' typeWithExtendedAttributes ',' typeWithExtendedAttributes '>' ';'
 ;
 
 setlikeRest
-	: 'setlike' '<' type '>' ';'
+	: 'setlike' '<' typeWithExtendedAttributes '>' ';'
+;
+
+namespace
+    : 'namespace' IDENTIFIER_WEBIDL '{' namespaceMembers '}' ';'
+;
+
+namespaceMembers
+    : extendedAttributeList namespaceMember namespaceMembers
+    | /* empty */
+;
+
+namespaceMember
+    : regularOperation
+    | 'readonly' attributeRest
 ;
 
 extendedAttributeList
@@ -484,17 +503,22 @@ type
 	| unionType typeSuffix
 ;
 
+typeWithExtendedAttributes
+    : extendedAttributeList type
+;
+
 singleType
-	: nonAnyType
+	: distinguishableType
 	| 'any' typeSuffixStartingWithArray
+	| promiseType
 ;
 
 unionType
-	: '(' unionMemberType ( 'or' unionMemberType )* ')'
+	: '(' unionMemberType 'or' unionMemberType unionMemberTypes ')'
 ;
 
 unionMemberType
-	: nonAnyType
+	: extendedAttributeList distinguishableType
 	| unionType typeSuffix
 	| 'any' '[' ']' typeSuffix
 ;
@@ -504,18 +528,18 @@ unionMemberTypes
 	| /* empty */
 ;
 
-nonAnyType
+distinguishableType
 	: primitiveType typeSuffix
-	| promiseType null_
-	| 'ByteString' typeSuffix
-	| 'DOMString' typeSuffix
-	| 'USVString' typeSuffix
+	| stringType typeSuffix
 	| IDENTIFIER_WEBIDL typeSuffix
-	| sequenceType null_
+	| 'sequence' '<' typeWithExtendedAttributes '>' null_
+	| 'FrozenArray' '<' typeWithExtendedAttributes '>' null_
 	| 'object' typeSuffix
+	| 'symbol' typeSuffix
 	| 'Date' typeSuffix
 	| 'RegExp' typeSuffix
 	| 'DOMException' typeSuffix
+	| recordType typeSuffix
 	| IDENTIFIER_WEBIDL '<' type '>' null_
 ;
 
@@ -549,16 +573,26 @@ unsignedIntegerType
 
 integerType
 	: 'short'
-	| 'long'+
+	| 'long' optionalLong
 ;
 
-sequenceType
-    : 'sequence' '<' type '>'
-    | 'FrozenArray' '<' type '>'
+optionalLong
+    : 'long'
+    | /* empty */
+;
+
+stringType
+    : 'ByteString'
+    | 'DOMString'
+    | 'USVString'
 ;
 
 promiseType
 	: 'Promise' '<' returnType '>'
+;
+
+recordType
+    : 'record' '<' stringType ',' typeWithExtendedAttributes '>'
 ;
 
 typeSuffix

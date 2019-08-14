@@ -34,7 +34,7 @@ internal class ModuleVisitor(private val fileName: String) : WebIDLBaseVisitor<I
         return defaultResult()
     }
 
-    override fun visitNamespaceRest(ctx: WebIDLParser.NamespaceRestContext): IDLFileDeclaration {
+    override fun visitPackageRest(ctx: WebIDLParser.PackageRestContext): IDLFileDeclaration {
         packageName = ctx.text.toNameEntity()
         return defaultResult()
     }
