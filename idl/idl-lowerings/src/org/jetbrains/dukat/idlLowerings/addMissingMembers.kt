@@ -4,8 +4,12 @@ import org.jetbrains.dukat.idlDeclarations.*
 
 private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowering {
 
+    fun getFirstLevelParents(declaration: IDLInterfaceDeclaration): List<IDLInterfaceDeclaration> {
+        return declaration.parents.mapNotNull { context.resolveInterface(it.name) }
+    }
+
     fun getAllInterfaceParents(declaration: IDLInterfaceDeclaration): List<IDLInterfaceDeclaration> {
-        val firstLevelParents = declaration.parents.mapNotNull { context.resolveInterface(it.name) }
+        val firstLevelParents = getFirstLevelParents(declaration)
         return firstLevelParents + firstLevelParents.flatMap { getAllInterfaceParents(it) }
     }
 
@@ -52,11 +56,19 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                 type.isOverriding(parentMember.type)
     }
 
+    fun IDLAttributeDeclaration.isConflicting(parentMember: IDLAttributeDeclaration): Boolean {
+        return name == parentMember.name && !isOverriding(parentMember)
+    }
+
     fun IDLOperationDeclaration.isOverriding(parentMember: IDLOperationDeclaration): Boolean {
         return name == parentMember.name &&
                 static == parentMember.static &&
                 arguments.size == parentMember.arguments.size &&
                 !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
+    }
+
+    fun IDLOperationDeclaration.isConflicting(parentMember: IDLOperationDeclaration): Boolean {
+        return isOverriding(parentMember) && !returnType.isOverriding(parentMember.returnType)
     }
 
     fun IDLGetterDeclaration.isOverriding(parentMember: IDLGetterDeclaration): Boolean {
@@ -85,6 +97,34 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val conflictingOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         val conflictingGetters: MutableList<IDLGetterDeclaration> = mutableListOf()
         val conflictingSetters: MutableList<IDLSetterDeclaration> = mutableListOf()
+
+        val conflictingParents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
+        val allParentOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
+        val allParentAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
+        for (parent in declaration.parents) {
+            val resolvedParent = context.resolveInterface(parent.name) ?: continue
+            var isConflicting = false
+            val currentParentAttributes = (getAllInterfaceParents(resolvedParent) + resolvedParent).flatMap { it.attributes }
+            val currentParentOperations = (getAllInterfaceParents(resolvedParent) + resolvedParent).flatMap { it.operations }
+            for (attribute in allParentAttributes) {
+                if (currentParentAttributes.any { it.isConflicting(attribute) }) {
+                    isConflicting = true
+                }
+            }
+            for (operation in allParentOperations) {
+                if (currentParentOperations.any { it.isConflicting(operation) }) {
+                    isConflicting = true
+                }
+            }
+            if (isConflicting) {
+                conflictingParents += parent
+            } else {
+                allParentAttributes += currentParentAttributes
+                allParentOperations += currentParentOperations
+            }
+        }
+
+
         for (parent in allParents) {
             for (parentOperation in parent.operations) {
                 if (declaration.operations.none { it.isOverriding(parentOperation) }) {
@@ -105,9 +145,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                         duplicatedOperations += parentOperation
                     }
                 } else {
-                    conflictingOperations += declaration.operations.filter {
-                        it.isOverriding(parentOperation) && !it.returnType.isOverriding(parentOperation.returnType)
-                    }
+                    conflictingOperations += declaration.operations.filter { it.isConflicting(parentOperation) }
                 }
             }
             for (parentAttribute in parent.attributes) {
@@ -117,7 +155,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                             newAttributes += parentAttribute
                         }
                     } else {
-                        conflictingAttributes.addAll(declaration.attributes.filter { it.name == parentAttribute.name })
+                        conflictingAttributes.addAll(declaration.attributes.filter { it.isConflicting(parentAttribute) })
                     }
                 }
                 if (declaration.attributes.any { it == parentAttribute }) {
@@ -144,7 +182,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                 attributes = declaration.attributes + newAttributes - duplicatedAttributes - conflictingAttributes,
                 operations = declaration.operations + newOperations - duplicatedOperations - conflictingOperations,
                 getters = declaration.getters - conflictingGetters,
-                setters = declaration.setters - conflictingSetters
+                setters = declaration.setters - conflictingSetters,
+                parents = declaration.parents - conflictingParents
         )
     }
 
