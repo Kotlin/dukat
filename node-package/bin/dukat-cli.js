@@ -94,6 +94,11 @@ function processArgs(args) {
     return [];
 }
 
+function endsWith(str, postfix) {
+    return str.lastIndexOf(postfix) == (str.length - postfix.length);
+}
+
+
 var main = function () {
     var args = process.argv.slice(2);
 
@@ -108,20 +113,34 @@ var main = function () {
     guardJavaExists();
 
     var files = processArgs(args);
-    var bundle = createBundle(path.resolve(packageDir, "d.ts.libs/lib.d.ts"), files);
+    var is_ts = files.every(function(file) { return endsWith(file, ".d.ts")});
+    var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
-    var inputStream = createReadable();
-    inputStream.push(bundle.serializeBinary());
-    inputStream.push(null);
+    if (is_ts) {
+        var bundle = createBundle(path.resolve(packageDir, "d.ts.libs/lib.d.ts"), files);
 
-    var commandArgs = [
-        "-Ddukat.cli.internal.nodepath=" + process.execPath,
-        "-Ddukat.cli.internal.packagedir=" + packageDir,
-        "-Ddukat.cli.internal.version=" + getVersion(),
-        "-cp", classPath, "org.jetbrains.dukat.cli.CliKt", "-"];
+        var inputStream = createReadable();
+        inputStream.push(bundle.serializeBinary());
+        inputStream.push(null);
 
-    var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
-    inputStream.pipe(dukatProcess.stdin);
+        var commandArgs = [
+            "-Ddukat.cli.internal.nodepath=" + process.execPath,
+            "-Ddukat.cli.internal.packagedir=" + packageDir,
+            "-Ddukat.cli.internal.version=" + getVersion(),
+            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt", "-"];
+
+        var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
+        inputStream.pipe(dukatProcess.stdin);
+    } else if (is_idl) {
+        var commandArgs = [
+            "-Ddukat.cli.internal.nodepath=" + process.execPath,
+            "-Ddukat.cli.internal.packagedir=" + packageDir,
+            "-Ddukat.cli.internal.version=" + getVersion(),
+            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+
+        var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
+    }
+
 };
 
 main();
