@@ -17,6 +17,7 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
@@ -418,9 +419,13 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration) + generatedVariables
 }
 
-fun IDLNamespaceDeclaration.convertToModel() : List<TopLevelModel> {
-    //TODO
-    return listOf()
+fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
+    return ObjectModel(
+            name = IdentifierEntity(name),
+            members = attributes.mapNotNull { it.process() } +
+                    operations.mapNotNull { it.process() },
+            parentEntities = listOf()
+    )
 }
 
 fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
@@ -428,7 +433,7 @@ fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
         is IDLInterfaceDeclaration -> convertToModel()
         is IDLDictionaryDeclaration -> convertToModel()
         is IDLEnumDeclaration -> convertToModel()
-        is IDLNamespaceDeclaration -> convertToModel()
+        is IDLNamespaceDeclaration -> listOf(convertToModel())
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
         is IDLIncludesStatementDeclaration -> null

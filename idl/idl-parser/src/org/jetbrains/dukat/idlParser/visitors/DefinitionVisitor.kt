@@ -249,6 +249,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitNamespaceMember(ctx: WebIDLParser.NamespaceMemberContext): IDLTopLevelDeclaration {
+        when (val member = MemberVisitor().visit(ctx)) {
+            is IDLAttributeDeclaration -> myAttributes.add(member)
+            is IDLOperationDeclaration -> operations.add(member)
+        }
+        return defaultResult()
+    }
+
     override fun visitPartial(ctx: WebIDLParser.PartialContext): IDLTopLevelDeclaration {
         partial = true
         visitChildren(ctx)

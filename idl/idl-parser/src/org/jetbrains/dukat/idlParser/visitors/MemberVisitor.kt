@@ -134,6 +134,14 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration>() {
         return defaultResult()
     }
 
+    override fun visitNamespaceMember(ctx: WebIDLParser.NamespaceMemberContext): IDLMemberDeclaration {
+        if (ctx.getFirstValueOrNull() == "readonly") {
+            readOnly = true
+        }
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitReadOnly(ctx: WebIDLParser.ReadOnlyContext): IDLMemberDeclaration {
         if (ctx.text.isNotEmpty()) {
             readOnly = true
