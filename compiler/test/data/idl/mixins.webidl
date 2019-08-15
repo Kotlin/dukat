@@ -3,8 +3,17 @@ interface mixin mixinA {
     void f();
 };
 
+partial interface mixin mixinA {
+    void g();
+};
+
 interface A {
 
 };
 
+interface B {
+
+};
+
 A includes mixinA;
+B includes mixinA;

@@ -202,6 +202,10 @@ fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
+    if (mixin) {
+        return listOf()
+    }
+
     val dynamicMemberModels = (constructors +
             attributes.filterNot { it.static } +
             operations.filterNot { it.static }).mapNotNull { it.process() }

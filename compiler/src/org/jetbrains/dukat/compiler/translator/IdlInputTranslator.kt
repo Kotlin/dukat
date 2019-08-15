@@ -5,6 +5,7 @@ import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatements
+import org.jetbrains.dukat.idlLowerings.resolveMixins
 import org.jetbrains.dukat.idlLowerings.resolvePartials
 import org.jetbrains.dukat.idlLowerings.resolveTypedefs
 import org.jetbrains.dukat.idlLowerings.resolveTypes
@@ -23,6 +24,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .resolveTypedefs()
                 .specifyDefaultValues()
                 .resolveImplementsStatements()
+                .resolveMixins()
                 .resolveTypes()
                 .process()
                 .lowerOverrides()
