@@ -54,7 +54,7 @@ packageRest
     ;
 
 package_
-	: 'namespace' packageScope? packageRest ';';
+	: 'package' packageScope? packageRest ';';
 
 definitions
 	: extendedAttributeList definition definitions
