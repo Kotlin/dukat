@@ -14,6 +14,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
@@ -84,6 +85,11 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.ENUM -> IDLEnumDeclaration(
                     name = name,
                     members = enumMembers
+            )
+            DefinitionKind.NAMESPACE -> IDLNamespaceDeclaration(
+                    name = name,
+                    attributes = myAttributes,
+                    operations = operations
             )
         }
     }
@@ -236,6 +242,13 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitNamespace(ctx: WebIDLParser.NamespaceContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.NAMESPACE
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitPartial(ctx: WebIDLParser.PartialContext): IDLTopLevelDeclaration {
         partial = true
         visitChildren(ctx)
@@ -244,5 +257,5 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, INCLUDES_STATEMENT, DICTIONARY, ENUM
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, INCLUDES_STATEMENT, DICTIONARY, ENUM, NAMESPACE
 }

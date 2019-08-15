@@ -45,6 +45,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
@@ -417,11 +418,17 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration) + generatedVariables
 }
 
+fun IDLNamespaceDeclaration.convertToModel() : List<TopLevelModel> {
+    //TODO
+    return listOf()
+}
+
 fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
     return when (this) {
         is IDLInterfaceDeclaration -> convertToModel()
         is IDLDictionaryDeclaration -> convertToModel()
         is IDLEnumDeclaration -> convertToModel()
+        is IDLNamespaceDeclaration -> convertToModel()
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
         is IDLIncludesStatementDeclaration -> null
