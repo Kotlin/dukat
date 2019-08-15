@@ -7,7 +7,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import org.jetbrains.dukat.ts.translator.createGraalTranslator
+import org.jetbrains.dukat.ts.translator.createJsFileTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -22,7 +22,7 @@ import kotlin.test.assertEquals
 
 class CompilationTests : OutputTests() {
 
-    override fun getTranslator(): InputTranslator = translator
+    override fun getTranslator(): InputTranslator<String> = translator
 
     @DisplayName("core test set compile")
     @ParameterizedTest(name = "{0}")
@@ -94,7 +94,7 @@ class CompilationTests : OutputTests() {
 
         override val postfix = ".d.ts"
 
-        val translator: InputTranslator = createGraalTranslator(ROOT_PACKAGENAME, ConstNameResolver())
+        val translator: InputTranslator<String> = createJsFileTranslator(ROOT_PACKAGENAME, ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
         val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
 
         @JvmStatic

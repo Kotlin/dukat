@@ -8,6 +8,8 @@
   "files": [
     "build/runtime/*.jar",
     "bin/dukat-cli.js",
+    "lib/converter.js",
+    "d.ts.libs/*",
     "README.md"
   ],
   "scripts": {

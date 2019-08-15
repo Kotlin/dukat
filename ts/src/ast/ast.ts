@@ -1,123 +1,158 @@
+export declare interface ProtoMessage {
+    serializeBinary(): Int8Array;
+}
+
+export declare interface NameEntityProto extends ProtoMessage {}
+export declare interface IdentifierEntityProto extends NameEntityProto {
+    setValue(value: string): void;
+}
+export declare interface QualifierEntityProto extends NameEntityProto {
+    setRight(right: IdentifierEntityProto): void;
+    setLeft(left: NameEntityProto): void;
+}
 
 declare interface AstNode {
 }
 
 
-declare interface Declaration extends AstNode {}
+export declare class Declaration implements AstNode, ProtoMessage {
+    serializeBinary(): Int8Array
+}
 
-declare interface ReferenceEntity<T extends Declaration> {
+export declare interface ReferenceEntity {
     uid: String;
 }
 
-declare interface DefinitionInfoDeclaration extends AstNode {
+export declare interface DefinitionInfoDeclaration extends AstNode {
     fileName: string;
 }
 
-declare interface TupleDeclaration extends ParameterValue {}
+export declare interface TupleDeclaration extends ParameterValue {}
 
-declare interface NameEntity extends Declaration {}
+export declare interface NameEntity extends Declaration {}
 
-declare interface IdentifierEntity extends ParameterValue, ModuleReferenceDeclaration, NameEntity {}
-declare interface QualifierEntity extends ModuleReferenceDeclaration, ParameterValue, NameEntity {
+export declare interface IdentifierEntity extends ParameterValue, ModuleReferenceDeclaration, NameEntity {}
+export declare interface QualifierEntity extends ModuleReferenceDeclaration, ParameterValue, NameEntity {
     left: ParameterValue,
     right: ParameterValue
 }
 
-declare interface ThisTypeDeclaration extends Declaration {}
-declare interface ModuleReferenceDeclaration extends Declaration {}
+export declare interface ThisTypeDeclaration extends Declaration {}
+export declare interface ModuleReferenceDeclaration extends Declaration {}
 
-declare interface ImportEqualsDeclaration extends Declaration {
+export declare interface ImportEqualsDeclaration extends Declaration {
     name: string
 }
 
-declare interface EnumDeclaration extends ParameterValue {
+export declare interface EnumDeclaration extends ParameterValue {
     values: Array<EnumTokenDeclaration>
 }
 
-declare interface EnumTokenDeclaration extends Declaration {
+export declare interface EnumTokenDeclaration extends Declaration {
     value: string;
     meta: string;
 }
 
-declare interface ExportAssignmentDeclaration extends Declaration {
+export declare interface ExportAssignmentDeclaration extends Declaration {
     name: string;
 }
 
-declare interface IntersectionTypeDeclaration extends Declaration {}
-declare interface UnionTypeDeclatation extends Declaration {}
-declare interface HeritageClauseDeclaration extends Declaration {
+export declare interface IntersectionTypeDeclaration extends Declaration {}
+export declare interface UnionTypeDeclatation extends Declaration {}
+export declare interface HeritageClauseDeclaration extends Declaration {
     name: NameEntity,
     typeArguments: Array<ParameterValue>,
     extending: boolean,
-    typeReference: ReferenceEntity<ClassLikeDeclaration> | null
+    typeReference: ReferenceEntity | null
 }
-declare interface TypeAliasDeclaration extends Declaration {}
-declare interface IndexSignatureDeclaration extends ParameterValue {}
-declare interface StringLiteralDeclaration
+export declare interface TypeAliasDeclaration extends Declaration {}
+export declare interface IndexSignatureDeclaration extends ParameterValue {}
+export declare interface StringLiteralDeclaration
     extends ParameterValue {}
 
-declare interface CallSignatureDeclaration extends MemberDeclaration {}
-declare interface ConstructorDeclaration extends MemberDeclaration {}
+export declare interface CallSignatureDeclaration extends MemberDeclaration {}
+export declare interface ConstructorDeclaration extends MemberDeclaration {}
 
-declare interface ModifierDeclaration extends Declaration {
+export declare interface ModifierDeclaration extends Declaration {
     token: string;
 }
 
-declare interface MemberDeclaration extends Declaration {
+export declare interface MemberDeclaration extends Declaration {
 }
 
-declare class ClassDeclaration implements Declaration {
+export declare class ClassDeclaration implements Declaration {
     name: String;
+    serializeBinary(): Int8Array;
 }
 
-declare class InterfaceDeclaration implements Declaration {}
-declare class MethodSignatureDeclaration implements Declaration {}
+export declare class InterfaceDeclaration implements Declaration {
+    serializeBinary(): Int8Array;
+}
+export declare class MethodSignatureDeclaration implements Declaration {
+    serializeBinary(): Int8Array;
+}
 
-declare class ObjectLiteral implements ParameterValue {}
+export declare class ObjectLiteral implements ParameterValue {
+    serializeBinary(): Int8Array;
+}
 
-declare class VariableDeclaration implements Declaration {
+export declare class VariableDeclaration implements Declaration {
     name: String;
     type: TypeDeclaration;
+    serializeBinary(): Int8Array;
 }
 
-declare class PropertyDeclaration implements MemberDeclaration {
+export declare class PropertyDeclaration implements MemberDeclaration {
     name: string;
     type: TypeDeclaration;
     immmutable: boolean;
+    serializeBinary(): Int8Array;
 }
 
-declare class Expression implements Declaration {
+export declare class Expression implements Declaration {
     kind: TypeDeclaration;
     meta: String;
+    serializeBinary(): Int8Array;
 }
 
-declare interface ParameterValue extends Declaration {}
+export declare interface ParameterValue extends Declaration {}
 
-declare class ParameterDeclaration {
+export declare class ParameterDeclaration extends Declaration {
   name: String;
   type: ParameterValue;
 }
 
-declare class PackageDeclaration implements AstNode {
+export declare class ModuleDeclaration implements Declaration {
+    declarations: Declaration[];
+    serializeBinary(): Int8Array;
+}
+
+export declare class SourceFileDeclaration implements AstNode {
     declarations: Declaration[]
 }
 
-declare class SourceFileDeclaration implements AstNode {
-    declarations: Declaration[]
+export declare class SourceSet implements Declaration {
+  serializeBinary(): Int8Array;
 }
 
-declare class SourceSet implements AstNode {}
+export declare class SourceBundle implements Declaration {
+    serializeBinary(): Int8Array;
+}
 
-declare class TypeParameter {
+export declare class TypeParameter {
     name: String;
 }
 
-type ClassLikeDeclaration = ClassDeclaration | InterfaceDeclaration
+export type ClassLikeDeclaration = ClassDeclaration | InterfaceDeclaration
 
-declare class TypeDeclaration implements ParameterValue {
-    constructor(value: string, params: Array<ParameterValue>);
+export declare class TypeDeclaration implements ParameterValue {
+    serializeBinary(): Int8Array;
 }
 
-declare class FunctionDeclaration implements MemberDeclaration {}
+export declare class FunctionDeclaration implements MemberDeclaration {
+    serializeBinary(): Int8Array;
+}
 
-declare class FunctionTypeDeclaration implements ParameterValue {}
+export declare class FunctionTypeDeclaration implements ParameterValue {
+    serializeBinary(): Int8Array;
+}

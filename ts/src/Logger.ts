@@ -14,29 +14,37 @@ declare var console: ConsoleLogger;
 class SimpleLogger implements Logger {
     private commonPrefix = "[ts]";
 
-    constructor(private prefix: string) {}
+    static dummy_logger = (message: string) => {};
+
+    constructor(private prefix: string, private output: (message: string) => void = SimpleLogger.dummy_logger) {}
 
     private logMessage(message: string): string {
         return `${this.commonPrefix} [${this.prefix}] ${message}`;
     }
 
+    private log(message: string): void {
+        if (this.output !== SimpleLogger.dummy_logger) {
+            this.output(message);
+        }
+    }
+
     debug(message: string): void {
-        console.log(this.logMessage(message));
+        this.log(this.logMessage(message));
     }
 
     info(message: string): void {
-        console.log(this.logMessage(message));
+        this.log(this.logMessage(message));
     }
 
     trace(message: string): void {
-        console.log(this.logMessage(message));
+        this.log(this.logMessage(message));
     }
 
     warn(message: string): void {
-        console.log(this.logMessage(message));
+        this.log(this.logMessage(message));
     }
 }
 
-export function createLogger(name: string): Logger {
-    return new SimpleLogger(name);
+export function createLogger(name: string, output: (message: string) => void = SimpleLogger.dummy_logger): Logger {
+    return new SimpleLogger(name, output);
 }

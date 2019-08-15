@@ -547,6 +547,7 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
 }
 
 fun SourceSetNode.introduceModels() = SourceSetModel(
+        sourceName = sourceName,
         sources = sources.flatMap { source ->
             val rootFile = File(source.fileName)
             val fileName = rootFile.normalize().absolutePath

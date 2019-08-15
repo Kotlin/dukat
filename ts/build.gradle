@@ -30,7 +30,7 @@ task prepareNpmPackage(type: Copy) {
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
 task compileTs(type: NodeTask) {
-  dependsOn = [yarn]
+  dependsOn = [yarn, ":tsmodel-proto:build"]
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   inputs.dir(packagePath)
@@ -43,7 +43,16 @@ task compileTs(type: NodeTask) {
 
 task webpack(type: NodeTask) {
   dependsOn = ["compileTs", ":tsmodel-proto:build"]
-  script = file("${project.buildDir}/package/node_modules/webpack/bin/webpack.js")
+  def scriptName = "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
+
+  inputs.file(scriptName)
+  inputs.file("${project.buildDir}/ts/converter.js")
+  inputs.file("${project(":tsmodel-proto").buildDir}/generated/source/proto/main/js/Declarations_pb.js")
+  inputs.dir("${project.buildDir}/package/node_modules")
+
+  outputs.file("${project.buildDir}/bundle/converter.js")
+
+  script = file(scriptName)
 }
 
 task createJar(type: Zip) {

@@ -1,11 +1,19 @@
-import {DukatLanguageServiceHost, FileResolver} from "./DukatLanguageServiceHost";
+import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
+import {FileResolver} from "./FileResolver";
+import {AstFactory} from "./ast/AstFactory";
+import {SourceBundle, SourceSet} from "./ast/ast";
+import * as declarations from "declarations";
 
-declare function createAstFactory(): AstFactory;
-declare function createFileResolver(): FileResolver;
+function createAstFactory(): AstFactory {
+    return new AstFactory();
+}
 
+function createFileResolver(): FileResolver {
+    return new FileResolver();
+}
 
 class DocumentCache {
     private myDocumentMap: Map<string, any> = new Map();
@@ -21,8 +29,8 @@ class DocumentCache {
 
 let cache = new DocumentCache();
 
-function main(fileName: string, packageName: NameEntity) {
-    let host = new DukatLanguageServiceHost(createFileResolver());
+function translateFile(fileName: string, stdlib: string): SourceSet {
+    let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
     host.register(fileName);
 
     let logger = createLogger("converter");
@@ -40,18 +48,32 @@ function main(fileName: string, packageName: NameEntity) {
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)
     } else {
+        let astFactory = createAstFactory();
+        let packageName = astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>");
         let astConverter: AstConverter = new AstConverter(
-            fileName,
-            packageName,
-            program.getTypeChecker(),
-            (fileName: string) => program.getSourceFile(fileName),
-            (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
-            createAstFactory()
+          fileName,
+          packageName,
+          program.getTypeChecker(),
+          (fileName: string) => program.getSourceFile(fileName),
+          (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
+          astFactory
         );
 
-        return astConverter.createSourceSet();
+        return astConverter.createSourceSet(fileName);
     }
 }
 
-declare var global: any;
-global.main = main;
+export function translate(stdlib: string, files: Array<string>): SourceBundle {
+    let sourceSets = files.map(fileName => translateFile(fileName, stdlib));
+    let sourceSetBundle = new declarations.SourceSetBundleProto();
+    sourceSetBundle.setSourcesList(sourceSets);
+    return sourceSetBundle;
+}
+
+
+function createBundle(lib, files) {
+    let sourceSetBundle = translate(lib, files);
+    return sourceSetBundle;
+}
+
+(global as any).createBundle = createBundle;
