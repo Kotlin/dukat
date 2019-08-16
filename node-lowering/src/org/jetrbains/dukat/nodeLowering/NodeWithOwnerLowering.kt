@@ -11,17 +11,14 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.TypeEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-interface NodeWithOwnerLowering<T:TypeEntity> {
+interface NodeWithOwnerLowering<T : TypeEntity> {
     fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode
     fun lowerFunctionNode(owner: NodeOwner<FunctionNode>): FunctionNode
     fun lowerClassNode(owner: NodeOwner<ClassNode>): ClassNode
@@ -35,10 +32,7 @@ interface NodeWithOwnerLowering<T:TypeEntity> {
 
     fun lowerTypeNode(owner: NodeOwner<TypeValueNode>): T
     fun lowerFunctionTypeNode(owner: NodeOwner<FunctionTypeNode>): T
-    fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): T
     fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): T
-    fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): T
-    fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): T
 
     fun lowerClassLikeNode(owner: NodeOwner<ClassLikeNode>): ClassLikeNode {
         val declaration = owner.node

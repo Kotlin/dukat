@@ -29,8 +29,7 @@ pluginManagement {
 gradle.ext {
   kotlinVersion = "1.3.41"
   jupiterVersion = "5.4.1"
-  graalVersion = "19.1.0"
-  nodeVersion = "10.15.3"
+  nodeVersion = "10.16.2"
   npmVersion = "6.9.0"
   nodePluginVersion = "1.3.1"
   kotlinSerializationRuntimeVersion = "0.11.0"
@@ -53,7 +52,6 @@ include 'idl-parser'
 include 'idl-reference-resolver'
 include 'itertools'
 include 'interop'
-include 'interop-graal'
 include 'logging'
 include 'module-name-resolver'
 include 'node-introduction'
@@ -65,9 +63,9 @@ include 'translator-string'
 include 'ts'
 include 'tsmodel'
 include 'tsmodel-proto'
-include 'tsinterop'
 include 'translator'
 include 'ts-lowerings'
+include 'ts-translator'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
@@ -75,6 +73,8 @@ project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
 project(':tsmodel-proto').projectDir = file("$rootDir/typescript/tsmodel-proto")
+
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
+project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
 project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
 

@@ -1,27 +1,41 @@
-/// <reference path="../build/package/node_modules/typescript/lib/typescriptServices.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/tsserverlibrary.d.ts"/>
-/// <reference path="../build/package/node_modules/typescript/lib/typescript.d.ts"/>
+import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
+import {AstConverter} from "./AstConverter";
+import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
+import {FileResolver} from "./FileResolver";
+import {AstFactory} from "./ast/AstFactory";
+import {SourceBundle, SourceSet} from "./ast/ast";
+import * as declarations from "declarations";
+import {toNameEntity} from "./toNameEntity";
 
-declare function require(path: string): any;
-
-let declarations = require("declarations");
-
-interface FileResolver {
-    resolve(fileName: string): string;
+function createAstFactory(): AstFactory {
+    return new AstFactory();
 }
 
-declare interface DocumentCache {
-    setDocument(key: string, path: string, sourceFile: ts.SourceFile): void;
-    getDocument(key: string, path: string): ts.SourceFile | undefined;
+function createFileResolver(): FileResolver {
+    return new FileResolver();
 }
 
-function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) {
-    let host = new DukatLanguageServiceHost(createFileResolver());
+class DocumentCache {
+    private myDocumentMap: Map<string, any> = new Map();
+
+    setDocument(key: string, path: string, sourceFile: any) {
+        this.myDocumentMap.set(path, sourceFile);
+    }
+
+    getDocument(key: string, path: string): any | undefined {
+        return this.myDocumentMap.get(path);
+    }
+}
+
+let cache = new DocumentCache();
+
+function translateFile(fileName: string, stdlib: string, packageNameString: string): SourceSet {
+    let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
     host.register(fileName);
 
     let logger = createLogger("converter");
 
-    logger.debug(`using document cache: ${!!cache}`);
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
 
     const program = languageService.getProgram();
@@ -35,18 +49,32 @@ function main(fileName: string, packageName: NameEntity, cache?: DocumentCache) 
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)
     } else {
+        let astFactory = createAstFactory();
+        let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
         let astConverter: AstConverter = new AstConverter(
-            fileName,
-            packageName,
-            program.getTypeChecker(),
-            (fileName: string) => program.getSourceFile(fileName),
-            (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
-            createAstFactory()
+          fileName,
+          packageName,
+          program.getTypeChecker(),
+          (fileName: string) => program.getSourceFile(fileName),
+          (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
+          astFactory
         );
 
-        return astConverter.createSourceSet();
+        return astConverter.createSourceSet(fileName);
     }
 }
 
-declare var global: any;
-global.main = main;
+export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
+    let sourceSets = files.map(fileName => translateFile(fileName, stdlib, packageName));
+    let sourceSetBundle = new declarations.SourceSetBundleProto();
+    sourceSetBundle.setSourcesList(sourceSets);
+    return sourceSetBundle;
+}
+
+
+function createBundle(lib, packageName, files) {
+    let sourceSetBundle = translate(lib, packageName, files);
+    return sourceSetBundle;
+}
+
+(global as any).createBundle = createBundle;

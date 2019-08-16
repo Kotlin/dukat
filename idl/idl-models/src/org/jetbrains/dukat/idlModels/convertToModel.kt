@@ -491,6 +491,7 @@ fun IDLFileDeclaration.process(): SourceFileModel {
 
 fun IDLSourceSetDeclaration.process(): SourceSetModel {
     return SourceSetModel(
+            "<IRRELEVANT>",
             sources = files.map { it.process() }
     )
 }
