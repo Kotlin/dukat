@@ -1,6 +1,6 @@
 # Changelog
 
-#### [0.0.15.1] - 16'August, 2019 
+#### [0.0.16] - 16'August, 2019 
  - Compiling protobuf-generated java code to 1.6 (which is currently the target version for dukat)
 #### [0.0.15] - 16'August, 2019
  - The only change is speed, however, this change is big. Since this release ts is parsed on nodejs side and
