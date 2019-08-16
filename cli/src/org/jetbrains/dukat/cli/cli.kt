@@ -262,12 +262,11 @@ fun main(vararg args: String) {
             exitProcess(1)
         }
 
-        val isTsPipeTranslation = options.sources.first() == "-"
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
         val isIdlTranslation = options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
         when {
-            isTsPipeTranslation -> {
+            isTsTranslation -> {
                 compile(
                         options.outDir,
                         createJsByteArrayTranslator(
@@ -278,19 +277,6 @@ fun main(vararg args: String) {
                 )
 
             }
-
-            isTsTranslation -> compile(
-                    options.sources,
-                    options.outDir,
-                    createJsFileTranslator(
-                            options.basePackageName,
-                            moduleResolver,
-                            File(PACKAGE_DIR, "lib/converter.js").absolutePath,
-                            options.tsDefaultLib,
-                            System.getProperty("dukat.cli.internal.nodepath")
-                    ),
-                    options.reportPath
-            )
 
             isIdlTranslation-> {
                 compile(

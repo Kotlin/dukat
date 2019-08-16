@@ -82,13 +82,15 @@ function processArgs(args) {
     while (count < args.length) {
         var arg = args[count];
         if (skip_2args.has(arg)) {
-            count++
+            count += 2;
+        } else {
+            break;
         }
-        count++
     }
-    count = count - 1;
     if (count < args.length) {
-        return args.slice(count);
+        return args.slice(count).map(function(arg) {
+            return path.resolve(arg);
+        })
     }
 
     return [];
@@ -124,16 +126,14 @@ var main = function () {
         inputStream.push(null);
 
         var commandArgs = [
-            "-Ddukat.cli.internal.nodepath=" + process.execPath,
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-Ddukat.cli.internal.version=" + getVersion(),
-            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt", "-"];
+            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
         var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
         inputStream.pipe(dukatProcess.stdin);
     } else if (is_idl) {
         var commandArgs = [
-            "-Ddukat.cli.internal.nodepath=" + process.execPath,
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-Ddukat.cli.internal.version=" + getVersion(),
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
