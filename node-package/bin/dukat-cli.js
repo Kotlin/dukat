@@ -64,10 +64,6 @@ function guardJavaExists() {
     });
 }
 
-function getVersion() {
-    return require(path.resolve(__dirname, "..", "package.json")).version;
-}
-
 function createReadable() {
     var readable = new Readable();
     readable._read = function(chunk) {};
@@ -85,7 +81,7 @@ function processArgs(args) {
     while (count < args.length) {
         var arg = args[count];
         if (arg == "-p") {
-            packageName = args[count + 1]
+            packageName = args[count + 1];
             count += 2;
         } else if (skip_2args.has(arg)) {
             count += 2;
@@ -116,7 +112,12 @@ var main = function () {
     var args = process.argv.slice(2);
 
     var packageDir = path.resolve(__dirname, "..");
-    var version = require(path.resolve(packageDir, "package.json")).version;
+
+    if (args[0] == "-v" || args[0] == "version") {
+        var version = require(path.resolve(packageDir, "package.json")).version;
+        console.log("dukat version " + version);
+        return;
+    }
 
     var runtimePath = path.resolve(packageDir, "build/runtime");
     var jsPath = path.resolve(runtimePath, "js.jar");
@@ -140,7 +141,6 @@ var main = function () {
 
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
-            "-Ddukat.cli.internal.version=" + getVersion(),
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
         var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
@@ -148,7 +148,6 @@ var main = function () {
     } else if (is_idl) {
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
-            "-Ddukat.cli.internal.version=" + getVersion(),
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
         var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});

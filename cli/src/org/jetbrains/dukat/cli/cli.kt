@@ -119,12 +119,6 @@ fun Iterator<String>.readArg(): String? {
     } else null
 }
 
-private fun printVersion() {
-    println("""
-dukat version ${System.getProperty("dukat.cli.internal.version")}
-""".trimIndent())
-}
-
 private fun printUsage(program: String) {
     println("""
 Usage: $program [<options>] <d.ts files>
@@ -168,7 +162,6 @@ private fun process(args: List<String>): CliOptions? {
         val arg = argsIterator.next()
 
         when (arg) {
-            "-v", "-version" -> printVersion()
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)
             }
