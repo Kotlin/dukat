@@ -5,7 +5,7 @@ import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import translateModule
+import org.jetbrains.dukat.translatorString.translateModule
 import java.io.File
 import kotlin.test.assertEquals
 
