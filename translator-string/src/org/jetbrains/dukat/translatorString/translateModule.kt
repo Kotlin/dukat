@@ -1,3 +1,5 @@
+package org.jetbrains.dukat.translatorString
+
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -27,7 +29,7 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-internal fun NameEntity.translate(): String = when (this) {
+fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
         if (leftMost() == ROOT_PACKAGENAME) {

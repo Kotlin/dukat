@@ -19,9 +19,8 @@ import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
-import org.jetbrains.dukat.ts.translator.createJsFileTranslator
-import translateModule
 import java.io.File
 import kotlin.system.exitProcess
 
