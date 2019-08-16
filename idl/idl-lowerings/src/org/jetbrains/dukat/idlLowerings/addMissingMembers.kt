@@ -64,7 +64,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         return name == parentMember.name &&
                 static == parentMember.static &&
                 arguments.size == parentMember.arguments.size &&
-                !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it }
+                (arguments.isEmpty() ||
+                        !arguments.zip(parentMember.arguments) { a, b -> a.type.isOverriding(b.type) }.all { it })
     }
 
     fun IDLOperationDeclaration.isConflicting(parentMember: IDLOperationDeclaration): Boolean {
@@ -141,11 +142,11 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                                 }
                         )
                     }
-                    if (declaration.operations.any { it == parentOperation }) {
-                        duplicatedOperations += parentOperation
-                    }
                 } else {
                     conflictingOperations += declaration.operations.filter { it.isConflicting(parentOperation) }
+                }
+                if (declaration.operations.any { it == parentOperation }) {
+                    duplicatedOperations += parentOperation
                 }
             }
             for (parentAttribute in parent.attributes) {

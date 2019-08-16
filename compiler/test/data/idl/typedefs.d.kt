@@ -8,12 +8,12 @@ external abstract class A {
     var intArray: Array<Int>
     fun f(x: Int): Int
     companion object {
-        val y: Int
+        val yy: Int
     }
 }
 external abstract class B : A {
-    var x: A<Int>
+    var xx: A<Int>
     companion object {
-        val y: Int
+        val yy: Int
     }
 }
