@@ -79,21 +79,32 @@ function createReadable() {
 function processArgs(args) {
     var skip_2args = new Set(["-d", "-p", "-m", "r"]);
     var count = 0;
+
+    var packageName = "<ROOT>";
+
     while (count < args.length) {
         var arg = args[count];
-        if (skip_2args.has(arg)) {
+        if (arg == "-p") {
+            packageName = args[count + 1]
+            count += 2;
+        } else if (skip_2args.has(arg)) {
             count += 2;
         } else {
             break;
         }
     }
+
+    var files = [];
     if (count < args.length) {
-        return args.slice(count).map(function(arg) {
+        files = args.slice(count).map(function(arg) {
             return path.resolve(arg);
-        })
+        });
     }
 
-    return [];
+    return {
+        packageName: packageName,
+        files: files
+    }
 }
 
 function endsWith(str, postfix) {
@@ -114,12 +125,14 @@ var main = function () {
 
     guardJavaExists();
 
-    var files = processArgs(args);
+    var argsProcessed = processArgs(args);
+
+    var files = argsProcessed.files;
     var is_ts = files.every(function(file) { return endsWith(file, ".d.ts")});
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var bundle = createBundle(path.resolve(packageDir, "d.ts.libs/lib.d.ts"), files);
+        var bundle = createBundle(path.resolve(packageDir, "d.ts.libs/lib.d.ts"), argsProcessed.packageName, files);
 
         var inputStream = createReadable();
         inputStream.push(bundle.serializeBinary());

@@ -29,12 +29,17 @@ export declare interface DefinitionInfoDeclaration extends AstNode {
 
 export declare interface TupleDeclaration extends ParameterValue {}
 
-export declare interface NameEntity extends Declaration {}
+export declare interface NameEntity extends Declaration {
+    hasIdentifier(): boolean;
+    hasQualifier(): boolean;
+    getQualifier(): QualifierEntity;
+    getIdentifier(): IdentifierEntity;
+}
 
 export declare interface IdentifierEntity extends ParameterValue, ModuleReferenceDeclaration, NameEntity {}
-export declare interface QualifierEntity extends ModuleReferenceDeclaration, ParameterValue, NameEntity {
-    left: ParameterValue,
-    right: ParameterValue
+export declare interface QualifierEntity extends NameEntity {
+    getLeft(): NameEntity,
+    getRight(): IdentifierEntity
 }
 
 export declare interface ThisTypeDeclaration extends Declaration {}

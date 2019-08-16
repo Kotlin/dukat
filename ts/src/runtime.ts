@@ -11,7 +11,7 @@ function runtime() {
 
     let outputName = args.shift();
 
-    let sourceSetBundle = translate(libName || "", args);
+    let sourceSetBundle = translate(libName || "", "<ROOT>", args);
 
     let writeStream = (outputName == "--std-out") ? process.stdout : fs.createWriteStream(outputName!!);
     writeStream.write(sourceSetBundle.serializeBinary() as any)

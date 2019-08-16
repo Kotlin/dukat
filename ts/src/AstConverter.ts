@@ -624,7 +624,7 @@ export class AstConverter {
     private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): TypeAliasDeclaration {
 
         return this.astFactory.createTypeAliasDeclaration(
-          this.convertType(declaration.name),
+          this.convertType(declaration.name) as NameEntity,
           this.convertTypeParamsToTokens(declaration.typeParameters),
           this.convertType(declaration.type),
           declaration.name.getText() + "_TYPE"

@@ -6,6 +6,7 @@ import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
+import {toNameEntity} from "./toNameEntity";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -29,7 +30,7 @@ class DocumentCache {
 
 let cache = new DocumentCache();
 
-function translateFile(fileName: string, stdlib: string): SourceSet {
+function translateFile(fileName: string, stdlib: string, packageNameString: string): SourceSet {
     let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
     host.register(fileName);
 
@@ -49,7 +50,7 @@ function translateFile(fileName: string, stdlib: string): SourceSet {
         throw new Error(`failed to resolve ${fileName}`)
     } else {
         let astFactory = createAstFactory();
-        let packageName = astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>");
+        let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
         let astConverter: AstConverter = new AstConverter(
           fileName,
           packageName,
@@ -63,16 +64,16 @@ function translateFile(fileName: string, stdlib: string): SourceSet {
     }
 }
 
-export function translate(stdlib: string, files: Array<string>): SourceBundle {
-    let sourceSets = files.map(fileName => translateFile(fileName, stdlib));
+export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
+    let sourceSets = files.map(fileName => translateFile(fileName, stdlib, packageName));
     let sourceSetBundle = new declarations.SourceSetBundleProto();
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
 }
 
 
-function createBundle(lib, files) {
-    let sourceSetBundle = translate(lib, files);
+function createBundle(lib, packageName, files) {
+    let sourceSetBundle = translate(lib, packageName, files);
     return sourceSetBundle;
 }
 
