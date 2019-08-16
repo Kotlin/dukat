@@ -1,7 +1,15 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ExternalDelegationModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.transform
 
 
 fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {

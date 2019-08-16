@@ -3,7 +3,20 @@ package org.jetbrains.dukat.commonLowerings.merge
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.unquote
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MergeableModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.mergeWith
+import org.jetbrains.dukat.astModel.transform
 
 
 private fun ModuleModel.canBeMerged(): Boolean {

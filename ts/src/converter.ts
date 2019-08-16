@@ -6,7 +6,6 @@ import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
-import {toNameEntity} from "./toNameEntity";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
