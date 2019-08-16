@@ -1,9 +1,12 @@
+package org.jetbrains.dukat.idlLowerings
+
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import translate
 
 fun TopLevelModel.addKDocs(): TopLevelModel {
     val documentation =

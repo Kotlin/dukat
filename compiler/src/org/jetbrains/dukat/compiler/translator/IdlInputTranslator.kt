@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
-import addKDocs
+import org.jetbrains.dukat.idlLowerings.addKDocs
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
