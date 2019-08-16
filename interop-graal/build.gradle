@@ -1,9 +1,0 @@
-plugins {
-  id("kotlin")
-}
-
-dependencies {
-  compile(project(":interop"))
-  compile "org.graalvm.sdk:graal-sdk:${gradle.graalVersion}"
-  compile "org.graalvm.js:js:${gradle.graalVersion}"
-}
