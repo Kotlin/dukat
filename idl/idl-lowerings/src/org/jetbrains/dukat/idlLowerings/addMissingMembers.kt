@@ -102,17 +102,17 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         val conflictingParents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
         val allParentOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
         val allParentAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
-        for (parent in declaration.parents) {
-            val resolvedParent = context.resolveInterface(parent.name) ?: continue
+        declaration.parents.forEach { parent ->
+            val resolvedParent = context.resolveInterface(parent.name) ?: return@forEach
             var isConflicting = false
             val currentParentAttributes = (getAllInterfaceParents(resolvedParent) + resolvedParent).flatMap { it.attributes }
             val currentParentOperations = (getAllInterfaceParents(resolvedParent) + resolvedParent).flatMap { it.operations }
-            for (attribute in allParentAttributes) {
+            allParentAttributes.forEach { attribute ->
                 if (currentParentAttributes.any { it.isConflicting(attribute) }) {
                     isConflicting = true
                 }
             }
-            for (operation in allParentOperations) {
+            allParentOperations.forEach { operation ->
                 if (currentParentOperations.any { it.isConflicting(operation) }) {
                     isConflicting = true
                 }
@@ -126,8 +126,8 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         }
 
 
-        for (parent in allParents) {
-            for (parentOperation in parent.operations) {
+        allParents.forEach { parent ->
+            parent.operations.forEach { parentOperation ->
                 if (declaration.operations.none { it.isOverriding(parentOperation) }) {
                     if (parentOperation.static || parent.isInterface()) {
                         newOperations += parentOperation.copy(
@@ -149,7 +149,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                     duplicatedOperations += parentOperation
                 }
             }
-            for (parentAttribute in parent.attributes) {
+            parent.attributes.forEach { parentAttribute ->
                 if (declaration.attributes.none { it.isOverriding(parentAttribute) }) {
                     if (declaration.attributes.none { it.name == parentAttribute.name }) {
                         if (parentAttribute.static || parent.isInterface()) {
@@ -163,12 +163,12 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                     duplicatedAttributes += parentAttribute
                 }
             }
-            for (parentGetter in parent.getters) {
+            parent.getters.forEach { parentGetter ->
                 conflictingGetters += declaration.getters.filter {
                     it.name == parentGetter.name && !it.isOverriding(parentGetter)
                 }
             }
-            for (parentSetter in parent.setters) {
+            parent.setters.forEach { parentSetter ->
                 conflictingSetters += declaration.setters.filter {
                     it.name == parentSetter.name && !it.isOverriding(parentSetter)
                 }
@@ -189,18 +189,11 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
-        val allParents = getAllDictionaryParents(declaration)
-        val newMembers: MutableList<IDLDictionaryMemberDeclaration> = mutableListOf()
-        for (parent in allParents) {
-            for (parentMember in parent.members) {
-                if (declaration.members.none { it.isOverriding(parentMember) }) {
-                    newMembers += parentMember
-                }
-            }
-        }
-        return declaration.copy(
-                members = declaration.members + newMembers.map { it.copy(inherited = true) }
-        )
+        val newMembers = getAllDictionaryParents(declaration)
+                .flatMap { it.members }.filter { parentMember ->
+                    declaration.members.none { it.isOverriding(parentMember) }
+                }.map { it.copy(inherited = true) }
+        return declaration.copy(members = declaration.members + newMembers)
     }
 }
 
