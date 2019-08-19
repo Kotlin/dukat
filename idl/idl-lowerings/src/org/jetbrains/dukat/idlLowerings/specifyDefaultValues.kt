@@ -5,6 +5,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.changeComment
+import org.jetbrains.dukat.idlDeclarations.processEnumMember
 import java.math.BigInteger
 
 private fun String.toBigInteger(): BigInteger {
@@ -15,7 +16,7 @@ private fun String.toBigInteger(): BigInteger {
     }
 }
 
-private class DefaultValueSpecifier : IDLLowering {
+private class DefaultValueSpecifier(val sourceSet: IDLSourceSetDeclaration) : IDLLowering {
 
     private fun IDLDictionaryMemberDeclaration.specifyDefaultValue(): String? {
         if (defaultValue == null) {
@@ -23,6 +24,9 @@ private class DefaultValueSpecifier : IDLLowering {
         }
         if (this.type !is IDLSingleTypeDeclaration) {
             return defaultValue
+        }
+        if (sourceSet.containsEnum(this.type.name)) {
+            return "${this.type.name}.${processEnumMember(defaultValue!!)}"
         }
         return when (this.type.name) {
             "float", "unrestrictedfloat" -> "${defaultValue}f"
@@ -38,6 +42,7 @@ private class DefaultValueSpecifier : IDLLowering {
             } else {
                 defaultValue
             }
+            "\$Array", "sequence", "FrozenArray" -> "arrayOf()"
             else -> defaultValue
         }
     }
@@ -56,5 +61,5 @@ private class DefaultValueSpecifier : IDLLowering {
 }
 
 fun IDLSourceSetDeclaration.specifyDefaultValues(): IDLSourceSetDeclaration {
-    return DefaultValueSpecifier().lowerSourceSetDeclaration(this)
+    return DefaultValueSpecifier(this).lowerSourceSetDeclaration(this)
 }

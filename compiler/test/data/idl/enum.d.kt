@@ -1,6 +1,9 @@
 
 import kotlin.js.*
 
+external abstract class A {
+    open var behavior: ScrollBehavior
+}
 external interface ScrollBehavior {
     companion object
 }
