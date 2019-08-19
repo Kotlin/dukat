@@ -9,5 +9,12 @@ interface ParameterValueDeclaration : TypeEntity {
 }
 
 fun ParameterValueDeclaration.isSimpleType(str: String): Boolean {
-    return this == TypeDeclaration(value = IdentifierEntity(str), params = emptyList(), nullable = false, meta = null)
+    if (this !is TypeDeclaration) {
+        return false
+    }
+
+    val referenceTypeDeclaration = TypeDeclaration(value = IdentifierEntity(str), params = emptyList(), nullable = false, meta = null)
+    return (value == referenceTypeDeclaration.value)
+            && (params == referenceTypeDeclaration.params)
+            && (nullable == referenceTypeDeclaration.nullable)
 }

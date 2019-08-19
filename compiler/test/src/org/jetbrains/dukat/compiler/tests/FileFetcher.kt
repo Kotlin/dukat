@@ -19,7 +19,7 @@ abstract class FileFetcher {
         val rootFolder = File(path)
         return fileSet(path, postfix, recursive).mapNotNull { file ->
 
-            val tsPath = file.absolutePath
+            val tsPath = file.normalize().absolutePath
             val ktPath = tsPath.replace(postfix, ".d.kt")
             val descriptor = file.relativeTo(rootFolder).path.replace(path, "").replace(postfix, "")
 
