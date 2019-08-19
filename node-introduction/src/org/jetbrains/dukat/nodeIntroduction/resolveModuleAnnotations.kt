@@ -174,6 +174,20 @@ private class ExportAssignmentLowering(
             }
         }
 
+        val hasDefaults = docRoot.declarations.any { declaration ->
+            when (declaration) {
+                is ClassNode -> declaration.exportQualifier is JsDefault
+                is FunctionNode -> declaration.exportQualifier is JsDefault
+                is InterfaceNode -> declaration.exportQualifier is JsDefault
+                is VariableNode -> declaration.exportQualifier is JsDefault
+                else -> false
+            }
+        }
+
+        if (hasDefaults && (docRoot.jsModule == null)) {
+            docRoot.jsModule = docRoot.moduleName
+        }
+
         return docRoot.copy(declarations = declarationsResolved)
     }
 }
