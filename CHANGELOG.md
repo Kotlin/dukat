@@ -1,5 +1,11 @@
 # Changelog
 
+#### [0.0.16] - 16'August, 2019 
+ - Compiling protobuf-generated java code to 1.6 (which is currently the target version for dukat)
+#### [0.0.15] - 16'August, 2019
+ - The only change is speed, however, this change is big. Since this release ts is parsed on nodejs side and
+ passed in a binary form to the JVM side. 
+
 #### [0.0.14] - 8'August, 2019
  - Add global module annotation in case we have default export but don't have module annotation so far
  - [idl] Allow translation of several files (dependent on each other)

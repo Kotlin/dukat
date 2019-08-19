@@ -584,6 +584,6 @@ fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver)
 }
 
 fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver) =
-        SourceSetNode(sources = sources.map { source ->
+        SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
             source.introduceNodes(moduleNameResolver)
         })

@@ -42,7 +42,7 @@ inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true
     return o
 }
 
-external interface PointerEventInit : dynamic {
+external interface PointerEventInit {
     var pointerId: Int? /* = 0 */
         get() = definedExternally
         set(value) = definedExternally

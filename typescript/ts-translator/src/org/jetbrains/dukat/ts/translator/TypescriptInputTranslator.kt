@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
@@ -29,6 +30,7 @@ import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.resolvePartials
+import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
@@ -41,19 +43,12 @@ import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 
 
-interface TypescriptInputTranslator : InputTranslator {
-    fun translateFile(fileName: String, packageName: NameEntity): SourceSetDeclaration
-    fun release()
-
+interface TypescriptInputTranslator<T> : InputTranslator<T> {
     val packageName: NameEntity
     val moduleNameResolver: ModuleNameResolver
 
-    override fun translate(fileName: String): SourceSetModel {
-        return lower(translateFile(fileName, packageName))
-    }
-
-    private fun lower(documentRoot: SourceSetDeclaration): SourceSetModel {
-        return documentRoot
+    fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
+        return sourceSet
                 .filterOutNonDeclarations()
                 .resolvePartials()
                 .generateInterfaceReferences()
@@ -88,5 +83,9 @@ interface TypescriptInputTranslator : InputTranslator {
                 .specifyTypeNodesWithModuleData()
                 .addStandardImportsAndAnnotations()
                 .omitStdLib()
+    }
+
+    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+        return SourceBundleModel(sourceBundle.sources.map { source -> lower(source) })
     }
 }
