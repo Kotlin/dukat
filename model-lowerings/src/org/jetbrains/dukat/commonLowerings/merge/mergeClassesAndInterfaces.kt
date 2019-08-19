@@ -2,7 +2,19 @@ package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.mergeWith
+import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.panic.raiseConcern
 
 private data class ClassLikeKey(
