@@ -29,7 +29,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
-import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -103,7 +102,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
         return typeParams.map { typeParam ->
             TypeValueNode(
-                    value = typeParam.name.toNode(),
+                    value = typeParam.name,
                     params = typeParam.constraints
             )
         }
@@ -199,7 +198,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name.toNode(), typeParameter.constraints)
+                    TypeValueNode(typeParameter.name, typeParameter.constraints)
                 },
                 convertToHeritageNodes(parentEntities),
                 null,
@@ -263,7 +262,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
 
     private fun TypeAliasDeclaration.convert(): TypeAliasNode {
         return TypeAliasNode(
-                name = aliasName.toNode(),
+                name = aliasName,
                 typeReference = typeReference,
                 typeParameters = typeParameters.map { typeParameter -> IdentifierEntity(typeParameter.value) },
                 uid = uid,
@@ -585,6 +584,6 @@ fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver)
 }
 
 fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver) =
-        SourceSetNode(sources = sources.map { source ->
+        SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
             source.introduceNodes(moduleNameResolver)
         })

@@ -83,7 +83,7 @@ fun SourceSetNode.moveTypeAliasesOutside(): SourceSetNode {
                     referencedFiles = emptyList()
             )
         }
-        moduleWithoutAliases.copy(newSources + moduleWithoutAliases.sources)
+        moduleWithoutAliases.copy(sources = newSources + moduleWithoutAliases.sources)
     } else {
         moduleWithoutAliases
     }

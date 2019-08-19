@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.logger
 
 import mu.KotlinLogging
+import java.io.InputStream
 
 class Logging(private val name: String) {
 
