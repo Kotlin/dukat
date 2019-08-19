@@ -80,13 +80,6 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                         right = IdentifierEntity(value.right.value)
                 )
             }
-            is IdentifierEntity -> {
-                resolve(value.value, owner)
-            }
-            is QualifierEntity -> value.copy(
-                    left = resolve(value.left, owner),
-                    right = IdentifierEntity(value.right.value)
-            )
             else -> raiseConcern("unknown NameEntity subtype ${value::class.simpleName}") { value }
         }
     }

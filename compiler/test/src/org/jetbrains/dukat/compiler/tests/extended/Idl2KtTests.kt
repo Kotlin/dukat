@@ -36,7 +36,7 @@ class Idl2KtTests : OutputTests() {
                 content ?: "//NO DECLARATIONS"
     }
 
-    override fun getTranslator(): InputTranslator = translator
+    override fun getTranslator(): InputTranslator<String> = translator
 
     companion object : FileFetcher() {
         override val postfix = WEBIDL_DECLARATION_EXTENSION
@@ -46,7 +46,7 @@ class Idl2KtTests : OutputTests() {
             return fileSetWithDescriptors("./test/data/idl2kt")
         }
 
-        val translator: InputTranslator = IdlInputTranslator(DirectoryReferencesResolver())
+        val translator: InputTranslator<String> = IdlInputTranslator(DirectoryReferencesResolver())
     }
 
 }

@@ -19,7 +19,7 @@ class IdlTests : OutputTests() {
         assertContentEquals(name, tsPath, ktPath)
     }
 
-    override fun getTranslator(): InputTranslator = translator
+    override fun getTranslator(): InputTranslator<String> = translator
 
     companion object : FileFetcher() {
         override val postfix = WEBIDL_DECLARATION_EXTENSION
@@ -29,7 +29,7 @@ class IdlTests : OutputTests() {
             return fileSetWithDescriptors("./test/data/idl")
         }
 
-        val translator: InputTranslator = IdlInputTranslator(EmptyReferencesResolver())
+        val translator: InputTranslator<String> = IdlInputTranslator(EmptyReferencesResolver())
     }
 
 }
