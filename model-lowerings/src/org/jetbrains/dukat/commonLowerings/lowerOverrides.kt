@@ -216,16 +216,14 @@ private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
         if (declaration is ClassModel) {
             context.registerClass(declaration)
         }
-        if (declaration is ModuleModel) {
-            declaration.updateContext(context)
-        }
     }
+
+    submodules.forEach { declaration -> declaration.updateContext(context) }
 
     return this
 }
 
 private fun SourceSetModel.updateContext(astContext: ModelContext) = transform { it.updateContext(astContext) }
-
 
 fun SourceSetModel.lowerOverrides(): SourceSetModel {
     val astContext = ModelContext()

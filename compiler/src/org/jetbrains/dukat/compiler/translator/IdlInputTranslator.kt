@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.translator
 
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
@@ -13,11 +14,15 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.process
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
+import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
+import java.io.File
 
-class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): InputTranslator {
+class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): InputTranslator<String> {
 
-    override fun translate(fileName: String): SourceSetModel {
+    fun translateSet(fileName: String): SourceSetModel {
         return parseIDL(fileName, nameResolver)
                 .resolvePartials()
                 .addConstructors()
@@ -29,6 +34,10 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .process()
                 .lowerOverrides()
                 .addImportsForReferencedFiles()
+    }
+
+    override fun translate(fileName: String): SourceBundleModel {
+        return SourceBundleModel(listOf(translateSet(fileName)))
     }
 
 }
