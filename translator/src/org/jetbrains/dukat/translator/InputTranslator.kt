@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.translator
 
-import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.SourceBundleModel
 
-interface InputTranslator {
-    fun translate(fileName: String): SourceSetModel
+interface InputTranslator<T> {
+    fun translate(data: T): SourceBundleModel
 }
