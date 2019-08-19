@@ -1,10 +1,14 @@
+package org.jetbrains.dukat.translatorString
+
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
@@ -25,7 +29,7 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-internal fun NameEntity.translate(): String = when (this) {
+fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
         if (leftMost() == ROOT_PACKAGENAME) {
@@ -79,7 +83,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
     return res
 }
 
-private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
+fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
     val docRoot = sourceFile.root
     return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
@@ -88,7 +92,32 @@ private fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslation
     }
 }
 
-fun translateModule(fileName: String, translator: InputTranslator): List<TranslationUnitResult> {
+fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
+    val visited = mutableSetOf<SourceUnit>()
+
+    return sourceSet.sources.mapNotNull { sourceFile ->
+        // TODO: investigate whether it's safe to check just moduleName
+        val sourceKey = Pair(sourceFile.fileName, sourceFile.root.name)
+        if (!visited.contains(sourceKey)) {
+            visited.add(sourceKey)
+            translateModule(sourceFile)
+        } else {
+            null
+        }
+    }.flatten()
+}
+
+fun translateModule(sourceBundle: SourceBundleModel): List<TranslationUnitResult> {
+    return sourceBundle.sources.flatMap { sourceSet ->
+        translateModule(sourceSet)
+    }
+}
+
+fun translateModule(data: ByteArray, translator: InputTranslator<ByteArray>): List<TranslationUnitResult> {
+    return translateModule(translator.translate(data))
+}
+
+fun translateModule(fileName: String, translator: InputTranslator<String>): List<TranslationUnitResult> {
     if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
         !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
@@ -102,16 +131,5 @@ fun translateModule(fileName: String, translator: InputTranslator): List<Transla
     val sourceSet =
             translator.translate(fileName)
 
-    val visited = mutableSetOf<SourceUnit>()
-
-    return sourceSet.sources.mapNotNull { sourceFile ->
-        // TODO: investigate whether it's safe to check just moduleName
-        val sourceKey = Pair(sourceFile.fileName, sourceFile.root.name)
-        if (!visited.contains(sourceKey)) {
-            visited.add(sourceKey)
-            translateModule(sourceFile)
-        } else {
-            null
-        }
-    }.flatten()
+    return translateModule(sourceSet)
 }

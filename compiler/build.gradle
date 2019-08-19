@@ -11,6 +11,7 @@ buildscript {
 
 plugins {
     id("kotlin")
+    id("com.moowork.node")
 }
 
 configurations {
@@ -31,7 +32,6 @@ dependencies {
     implementation(project(":idl-models"))
     implementation(project(":idl-parser"))
     implementation(project(":idl-reference-resolver"))
-    implementation(project(":interop-graal"))
     implementation(project(":itertools"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
@@ -111,6 +111,38 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
 }
 
 test.dependsOn(download)
+
+task generateBinary(type: NodeTask) {
+    def scriptName = "${project(":ts").buildDir}/bundle/runtime.js"
+    script = file(scriptName)
+
+    def declarationsDir = "${project.projectDir}/test/data/typescript"
+    def libPath = "${project(":ts").buildDir}/package/node_modules/typescript/lib/lib.d.ts"
+
+    inputs.dir(declarationsDir)
+    inputs.file(scriptName)
+    inputs.file(libPath)
+
+    def outputFile = "${project.buildDir}/declarations.dukat"
+    outputs.file(outputFile)
+
+    def files = []
+    file(declarationsDir)
+            .eachFileRecurse() {
+                if (it.isFile() && it.name.endsWith(".d.ts")) {
+                    files << it
+                }
+            }
+
+    args = [
+            libPath,
+            outputFile
+    ] + files
+}
+
+generateBinary.dependsOn = [":ts:webpack"]
+
+test.dependsOn = [generateBinary]
 
 test {
     [
