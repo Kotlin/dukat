@@ -21,14 +21,15 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private val logger = Logging.logger("NodeWithOwnerLowering")
 
 interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclaration> {
+
+    fun lowerIdentificator(identificator: String): String {
+        return identificator;
+    }
 
     fun lowerIdentificator(identificator: NameEntity): NameEntity {
         return when (identificator) {
@@ -42,16 +43,9 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         return when (val declaration = owner.node) {
             is TypeValueNode -> lowerTypeNode(owner.wrap(declaration))
             is FunctionTypeNode -> lowerFunctionTypeNode(owner.wrap(declaration))
-            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner.wrap(declaration))
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner.wrap(declaration))
             is UnionTypeNode -> lowerUnionTypeNode(owner.wrap(declaration))
-            is TupleDeclaration -> lowerTupleDeclaration(owner.wrap(declaration))
             else -> declaration
         }
-    }
-
-    fun lowerIdentificator(identificator: String): String {
-        return identificator;
     }
 
     fun lowerMethodNode(owner: NodeOwner<MethodNode>): MethodNode {
@@ -110,28 +104,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         )
     }
 
-    override fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
-        val declaration = owner.node
-        return declaration.copy(params = declaration.params.map { param ->
-            lowerParameterValue(owner.wrap(param))
-        })
-    }
-
-    override fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): ParameterValueDeclaration {
-        val declaration = owner.node
-        return declaration.copy(params = declaration.params.map { param ->
-            lowerParameterValue(owner.wrap(param))
-        })
-    }
-
     override fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): UnionTypeNode {
-        val declaration = owner.node
-        return declaration.copy(params = declaration.params.map { param ->
-            lowerParameterValue(owner.wrap(param))
-        })
-    }
-
-    override fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param ->
             lowerParameterValue(owner.wrap(param))

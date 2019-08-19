@@ -3,11 +3,15 @@ package org.jetbrains.dukat.translatorString
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
-import org.jetbrains.dukat.astModel.statements.*
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import translate
 
 const val FORMAT_TAB = "    "
 

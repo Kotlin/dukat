@@ -204,7 +204,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         object : WebIDLBaseVisitor<Unit>() {
             override fun visitTerminal(node: TerminalNode) {
                 if (node.symbol.type == WebIDLLexer.STRING_WEBIDL) {
-                    enumMembers.add(node.text.removeSurrounding("\""))
+                    enumMembers.add(node.text)
                 }
             }
         }.visit(ctx)

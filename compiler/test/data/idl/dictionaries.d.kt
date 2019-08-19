@@ -13,7 +13,7 @@ external interface WebGLContextAttributes {
 }
 @kotlin.internal.InlineOnly
 inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true, stencil: Boolean? = false, antialias: Boolean? = true, premultipliedAlpha: Boolean? = true, preserveDrawingBuffer: Boolean? = false, preferLowPowerToHighPerformance: Boolean? = false, failIfMajorPerformanceCaveat: Boolean? = false): WebGLContextAttributes { val o = js("({})"); o["alpha"] = alpha; o["depth"] = depth; o["stencil"] = stencil; o["antialias"] = antialias; o["premultipliedAlpha"] = premultipliedAlpha; o["preserveDrawingBuffer"] = preserveDrawingBuffer; o["preferLowPowerToHighPerformance"] = preferLowPowerToHighPerformance; o["failIfMajorPerformanceCaveat"] = failIfMajorPerformanceCaveat; return o }
-external interface PointerEventInit : dynamic {
+external interface PointerEventInit {
     var pointerId: Int? /* = 0 */ get() = definedExternally; set(value) = definedExternally
     var width: Double? /* = 1.0 */ get() = definedExternally; set(value) = definedExternally
     var height: Double? /* = 1.0 */ get() = definedExternally; set(value) = definedExternally
