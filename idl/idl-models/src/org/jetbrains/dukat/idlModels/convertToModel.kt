@@ -53,6 +53,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.changeComment
+import org.jetbrains.dukat.idlDeclarations.processEnumMember
 import org.jetbrains.dukat.idlDeclarations.toNullable
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -361,10 +362,6 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration, generatedFunction)
 }
 
-fun processEnumMember(memberName: String): String {
-    return memberName.toUpperCase().replace('-', '_').ifEmpty { "EMPTY" }
-}
-
 fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
@@ -395,7 +392,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                 get = ChainCallModel(
                         StatementCallModel(
                                 value = QualifierEntity(
-                                        left = IdentifierEntity("\"$memberName\""),
+                                        left = IdentifierEntity(memberName),
                                         right = IdentifierEntity("asDynamic")
                                 ),
                                 params = listOf()
@@ -505,6 +502,7 @@ fun IDLFileDeclaration.process(): SourceFileModel {
 
 fun IDLSourceSetDeclaration.process(): SourceSetModel {
     return SourceSetModel(
+            "<IRRELEVANT>",
             sources = files.map { it.process() }
     )
 }

@@ -10,8 +10,12 @@
     "listEmittedFiles": true,
     "baseUrl": "./",
     "noImplicitAny": false,
+    "typeRoots": [
+      "./build/package/node_modules/@types"
+    ],
     "paths": {
-      "typescript-services-api": ["./build/package/node_modules/typescript/lib/typescriptServices.js"]
+      "typescript-services-api": ["./build/package/node_modules/typescript/lib/typescriptServices.js"],
+      "declarations": ["../typescript/tsmodel-proto/build/generated/source/proto/main/js/Declarations_pb.js"]
     }
   },  
   "include": [

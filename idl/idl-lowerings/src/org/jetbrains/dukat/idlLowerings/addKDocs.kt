@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
-import translate
+import org.jetbrains.dukat.translatorString.translate
 
 fun TopLevelModel.addKDocs(): TopLevelModel {
     val documentation =

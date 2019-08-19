@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
@@ -9,9 +10,12 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 
 private class TypeResolver : IDLLowering {
+
+    private val logger: Logging = Logging("resolveTypes")
 
     private val resolvedUnionTypes: MutableSet<String> = mutableSetOf()
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
@@ -43,7 +47,7 @@ private class TypeResolver : IDLLowering {
                     ))
                 }
                 is IDLSingleTypeDeclaration -> {
-                    if (member.typeParameter != null || !sourceSet.containsInterface(member.name)) {
+                    if (member.typeParameter != null || !sourceSet.containsType(member.name)) {
                         failedToResolveUnionTypes += unionType.name
                         return
                     }
@@ -84,7 +88,7 @@ private class TypeResolver : IDLLowering {
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
+            return if (!declaration.isPrimitive() && !sourceSet.containsType(declaration.name)) {
                 IDLSingleTypeDeclaration("\$dynamic", null, false)
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
@@ -97,6 +101,28 @@ private class TypeResolver : IDLLowering {
             )
         }
         return declaration
+    }
+
+    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration, ownerName: String): IDLSingleTypeDeclaration? {
+        return if (sourceSet.containsType(inheritance.name)) {
+            inheritance
+        } else {
+            logger.warn("Failed to find parent of ${ownerName}: ${inheritance.name}").let { null }
+        }
+    }
+
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+        val newDeclaration = super.lowerInterfaceDeclaration(declaration)
+        return newDeclaration.copy(
+                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+        )
+    }
+
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+        val newDeclaration = super.lowerDictionaryDeclaration(declaration)
+        return newDeclaration.copy(
+                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+        )
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {

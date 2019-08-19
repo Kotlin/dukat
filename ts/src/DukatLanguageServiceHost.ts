@@ -1,15 +1,16 @@
 import * as ts from "typescript-services-api";
-
-export interface FileResolver {
-    resolve(fileName: string): string;
-}
+import {FileResolver} from "./FileResolver";
+import {createLogger} from "./Logger";
 
 export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
+    private static log = createLogger("DukatLanguageServiceHost");
+
     constructor(
         public fileResolver: FileResolver,
+        private defaultLib: string,
         private knownFiles = new Set<string>(),
-        private currentDirectory: string = ""
+        private currentDirectory: string = "",
     ) {
     }
 
@@ -33,7 +34,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getDefaultLibFileName(options: ts.CompilerOptions): string {
-        return "lib.d.ts";
+        return this.defaultLib;
     }
 
     getCurrentDirectory(): string {
@@ -41,15 +42,12 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
-        try {
-            var contents = this.fileResolver.resolve(fileName);
-            return ts.ScriptSnapshot.fromString(contents);
-        } catch (e) {
-            // TODO: need to pass error logger from frontend here
-        }
+        var contents = this.fileResolver.resolve(fileName);
+        return ts.ScriptSnapshot.fromString(contents);
     }
 
     log(message: string): void {
+        DukatLanguageServiceHost.log.debug(message);
     }
 
     register(knownFile: string) {
