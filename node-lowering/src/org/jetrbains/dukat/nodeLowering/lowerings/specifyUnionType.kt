@@ -12,13 +12,10 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.IdentityLowering
 
 private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: Int): List<List<ParameterNode>> {
@@ -44,20 +41,6 @@ private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: I
         }
     }
 }
-
-private fun ParameterValueDeclaration.description(): String {
-    return when (this) {
-        is TypeValueNode -> {
-            val typeNodeValue = value
-            when (typeNodeValue) {
-                is IdentifierEntity -> typeNodeValue.value
-                else -> typeNodeValue.toString()
-            }
-        }
-        else -> "${this::class.simpleName}"
-    }
-}
-
 
 private class SpecifyUnionTypeLowering : IdentityLowering {
 
