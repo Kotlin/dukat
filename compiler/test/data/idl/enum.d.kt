@@ -6,6 +6,7 @@ external abstract class A {
 }
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ScrollBehavior {
     companion object
 }
@@ -17,6 +18,7 @@ inline val ScrollBehavior.Companion.INSTANT: ScrollBehavior get() = "instant".as
 inline val ScrollBehavior.Companion.SMOOTH: ScrollBehavior get() = "smooth".asDynamic().unsafeCast<ScrollBehavior>()
 
 /* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface StyleEnum {
     companion object
 }
