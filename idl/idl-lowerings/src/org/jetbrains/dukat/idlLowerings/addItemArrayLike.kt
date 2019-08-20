@@ -9,6 +9,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.toNotNullable
 
 private class ItemArrayLikeLowering : IDLLowering {
@@ -64,7 +65,8 @@ private class ItemArrayLikeLowering : IDLLowering {
                 setters = listOf(),
                 callback = false,
                 generated = true,
-                partial = false
+                partial = false,
+                kind = InterfaceKind.INTERFACE
         )
         if (newFiles.none { it.packageName == "<LIBROOT>".toNameEntity() }) {
             newFiles += IDLFileDeclaration(
