@@ -34,12 +34,12 @@ private class TypeResolver : IDLLowering {
         for (member in unionType.unionMembers) {
             when (member) {
                 is IDLUnionTypeDeclaration -> {
+                    if (member.name !in resolvedUnionTypes && member.name !in failedToResolveUnionTypes) {
+                        processUnionType(member)
+                    }
                     if (member.name in failedToResolveUnionTypes) {
                         failedToResolveUnionTypes += unionType.name
                         return
-                    }
-                    if (member.name !in resolvedUnionTypes) {
-                        processUnionType(member)
                     }
                     newDependenciesToAdd.putIfAbsent(member.name, mutableSetOf())
                     newDependenciesToAdd[member.name]!!.add(IDLSingleTypeDeclaration(
@@ -84,14 +84,20 @@ private class TypeResolver : IDLLowering {
                 in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
-                        nullable = false
+                        nullable = false,
+                        comment = declaration.comment
                 )
                 else -> raiseConcern("unprocessed UnionTypeDeclaration: $this") { declaration }
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
             return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
-                IDLSingleTypeDeclaration("\$dynamic", null, false)
+                IDLSingleTypeDeclaration(
+                        name = "\$dynamic",
+                        typeParameter = null,
+                        nullable = false,
+                        comment = declaration.comment
+                )
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
             }

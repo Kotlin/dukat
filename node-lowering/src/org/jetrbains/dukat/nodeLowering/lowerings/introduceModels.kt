@@ -133,7 +133,7 @@ private fun MemberNode.process(): MemberModel? {
                 parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.value,
+                            type = TypeValueModel(typeParam.value, listOf(), null),
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
@@ -145,7 +145,7 @@ private fun MemberNode.process(): MemberModel? {
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.value,
+                            type = TypeValueModel(typeParam.value, listOf(), null),
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
@@ -163,7 +163,7 @@ private fun MemberNode.process(): MemberModel? {
                 type = type.process(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.value,
+                            type = TypeValueModel(typeParam.value, listOf(), null),
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
@@ -247,7 +247,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
             } else {
                 TypeValueModel(
                         value,
-                        params.map { param -> param.process() },
+                        params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
                         meta.processMeta(nullable, context.resolveAsMetaOptions()),
                         nullable
                 )
@@ -266,7 +266,8 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         is GeneratedInterfaceReferenceDeclaration -> {
             TypeValueModel(
                     name,
-                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) },
+                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) }
+                            .map { TypeParameterModel(it, listOf()) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                     nullable
             )
@@ -303,7 +304,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
                         parameters = primaryConstructor!!.parameters.map { param -> param.process() },
                         typeParameters = primaryConstructor!!.typeParameters.map { typeParam ->
                             TypeParameterModel(
-                                    name = typeParam.value,
+                                    type = TypeValueModel(typeParam.value, listOf(), null),
                                     constraints = typeParam.params.map { param -> param.process() }
                             )
                         },
@@ -312,7 +313,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             } else null,
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        name = typeParam.value,
+                        type = TypeValueModel(typeParam.value, listOf(), null),
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
@@ -352,7 +353,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        name = typeParam.value,
+                        type = TypeValueModel(typeParam.value, listOf(), null),
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
@@ -464,7 +465,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
 
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.value,
+                            type = TypeValueModel(typeParam.value, listOf(), null),
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
@@ -486,7 +487,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 set = resolveSetter(),
                 typeParameters = typeParameters.map { typeParam ->
                     TypeParameterModel(
-                            name = typeParam.value,
+                            type = TypeValueModel(typeParam.value, listOf(), null),
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
@@ -501,7 +502,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
             TypeAliasModel(
                     name = name,
                     typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(typeParameter, emptyList()) })
+                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) })
         } else null
         else -> {
             logger.debug("skipping ${this::class.simpleName}")
