@@ -2,29 +2,7 @@ package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.AnnotationModel
-import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.ConstructorModel
-import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.EnumModel
-import org.jetbrains.dukat.astModel.ExternalDelegationModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.FunctionTypeModel
-import org.jetbrains.dukat.astModel.HeritageModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
-import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TypeAliasModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -66,7 +44,7 @@ fun TypeModel.translate(): String {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
             if (isGeneric()) {
-                res.add(translateTypeParams(params))
+                res.add(translateTypeParameters(params))
             }
             if (nullable) {
                 res.add("?")
@@ -122,12 +100,18 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
         ""
     } else {
         "<" + typeParameters.map { typeParameter ->
+            val varianceDescription = when (typeParameter.variance) {
+                Variance.INVARIANT -> ""
+                Variance.COVARIANT -> "out "
+                Variance.CONTRAVARIANT -> "in "
+            }
             val constraintDescription = if (typeParameter.constraints.isEmpty()) {
                 ""
             } else {
                 " : ${typeParameter.constraints[0].translate()}"
             }
-            typeParameter.name.translate() + constraintDescription
+            varianceDescription + typeParameter.type.translate() +
+                    typeParameter.type.translateMeta() + constraintDescription
         }.joinToString(", ") + ">"
     }
 }
@@ -315,7 +299,7 @@ private fun PropertyModel.translateSignature(): String {
     }
     val metaClause = type.translateMeta()
     var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
-    if (type.nullable) {
+    if (type.nullable || (type is TypeValueModel && (type as TypeValueModel).value == IdentifierEntity("dynamic"))) {
         if (getter) {
             res += " get() = definedExternally"
         }
@@ -371,7 +355,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
             val typeParams = if (params.isEmpty()) {
                 ""
             } else {
-                "<${params.joinToString("::") { it.translateAsHeritageClause() }}>"
+                "<${params.joinToString("::") { it.type.translateAsHeritageClause() }}>"
             }
 
             when (value) {
@@ -404,6 +388,7 @@ private fun ClassModel.translate(padding: Int): String {
 
 private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
+    val hasSecondaryConstructors = members.any { it is ConstructorModel }
 
     if (documentation != null) {
         output("/**")
@@ -414,7 +399,7 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
+        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
     val openClause = if (abstract) "abstract" else "open"
     val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
