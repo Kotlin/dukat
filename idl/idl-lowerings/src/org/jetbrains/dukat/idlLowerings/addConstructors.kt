@@ -67,10 +67,22 @@ private class ConstructorLowering : IDLLowering {
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val ordinaryConstructors = declaration.extendedAttributes.mapNotNull { it.convertToOrdinaryConstructor() }
         addNamedConstructors(declaration)
-        return if (ordinaryConstructors.size == 1) {
-            declaration.copy(primaryConstructor = ordinaryConstructors[0])
-        } else {
-            declaration.copy(constructors = ordinaryConstructors)
+        return when {
+            ordinaryConstructors.size == 1 -> declaration.copy(
+                    primaryConstructor = ordinaryConstructors[0]
+            )
+            else -> {
+                val (emptyConstructors, nonEmptyConstructors) = ordinaryConstructors.partition { it.arguments.isEmpty() }
+                when {
+                    emptyConstructors.isNotEmpty() -> declaration.copy(
+                            primaryConstructor = emptyConstructors.first(),
+                            constructors = nonEmptyConstructors
+                    )
+                    else -> declaration.copy(
+                            constructors = ordinaryConstructors
+                    )
+                }
+            }
         }
     }
 

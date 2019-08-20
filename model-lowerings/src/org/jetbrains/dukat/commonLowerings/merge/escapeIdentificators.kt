@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -139,11 +140,23 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = escapeIdentificator(declaration.name))))
     }
 
+    private fun TypeParameterModel.escape(): TypeParameterModel {
+        return copy(
+                type = if (type is TypeValueModel) {
+                    (type as TypeValueModel).copy(
+                            value = (type as TypeValueModel).value.escape()
+                    )
+                } else {
+                    type
+                }
+        )
+    }
+
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape(),
-                typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.copy(name = typeParameter.name.escape()) }
+                typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape()}
         )))
     }
 
@@ -152,7 +165,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerClassModel(
                 ownerContext.copy(node = declaration.copy(
                         name = declaration.name.escape(),
-                        typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.copy(name = typeParameter.name.escape()) }
+                        typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape() }
                 )))
     }
 
