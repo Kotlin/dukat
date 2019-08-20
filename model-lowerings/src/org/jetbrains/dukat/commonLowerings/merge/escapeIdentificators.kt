@@ -3,7 +3,27 @@ package org.jetbrains.dukat.commonLowerings.merge
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.EnumModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -56,6 +76,25 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         }
     }
 
+    private fun StatementCallModel.escape(): StatementCallModel {
+        return copy(
+                value = value.escape(),
+                params = params?.map { it.escape() },
+                typeParameters = typeParameters.map { it.escape() }
+        )
+    }
+
+    private fun StatementModel.escape(): StatementModel {
+        return when (this) {
+            is StatementCallModel -> escape()
+            is ReturnStatementModel -> copy(statement = statement.escape())
+            is ChainCallModel -> copy(left = left.escape(), right = right.escape())
+            is AssignmentStatementModel -> copy(left = left.escape(), right = right.escape())
+            is IndexStatementModel -> copy(array = array.escape(), index = index.escape())
+            else -> this
+        }
+    }
+
     private fun NameEntity.escape(): NameEntity {
         return when (this) {
             is IdentifierEntity -> escape()
@@ -85,7 +124,10 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
         val declaration = ownerContext.node
-        return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())))
+        return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
+                name = declaration.name.escape(),
+                body = declaration.body.map { it.escape() }
+        )))
     }
 
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {

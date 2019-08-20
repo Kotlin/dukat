@@ -2,7 +2,7 @@
 import kotlin.js.*
 
 external abstract class A {
-    var intVar: Int
+    open var intVar: Int
     fun f1(): Double
     fun f1(x: Int): Double
     fun f2(other: A): Double

@@ -2,6 +2,6 @@
 import kotlin.js.*
 
 external abstract class A {
-    var name: String
+    open var name: String
     fun toStr(): String
 }

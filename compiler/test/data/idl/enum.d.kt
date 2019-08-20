@@ -2,7 +2,7 @@
 import kotlin.js.*
 
 external abstract class A {
-    var behavior: ScrollBehavior
+    open var behavior: ScrollBehavior
 }
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ScrollBehavior {
