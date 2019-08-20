@@ -2,13 +2,13 @@
 import kotlin.js.*
 
 external abstract class A {
-    var a: Int
+    open var a: Int
 }
 
 external abstract class B : A {
-    var b: Int
+    open var b: Int
 }
 
 external abstract class C : B {
-    var c: Int
+    open var c: Int
 }

@@ -92,7 +92,7 @@ inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: D
 }
 
 external abstract class A {
-    var attributes: WebGLContextAttributes
+    open var attributes: WebGLContextAttributes
 }
 
 external interface UndefinedMemberDictionary {

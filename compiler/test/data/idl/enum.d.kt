@@ -2,7 +2,7 @@
 import kotlin.js.*
 
 external abstract class A {
-    var behavior: ScrollBehavior
+    open var behavior: ScrollBehavior
 }
 
 /* please, don't implement this interface! */

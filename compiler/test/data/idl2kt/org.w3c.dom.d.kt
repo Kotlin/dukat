@@ -133,7 +133,7 @@ external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var href: String
     open var crossOrigin: String?
     open var rel: String
-    @JsName("as") open var as_: RequestDestination
+    open var `as`: RequestDestination
     open val relList: DOMTokenList
     open var media: String
     open var nonce: String
@@ -1649,6 +1649,7 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
  * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
  */
 external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
+    override val performance: Performance
     open val window: Window
     open val self: Window
     open val document: Document
@@ -1685,7 +1686,6 @@ external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHa
     open val outerWidth: Int
     open val outerHeight: Int
     open val devicePixelRatio: Double
-    override val performance: Performance
     fun close()
     fun stop()
     fun focus()
@@ -2063,12 +2063,12 @@ external interface WindowOrWorkerGlobalScope {
  * Exposes the JavaScript [Navigator](https://developer.mozilla.org/en/docs/Web/API/Navigator) to Kotlin
  */
 external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
-    open val clipboard: Clipboard
-    open val mediaDevices: MediaDevices
-    open val maxTouchPoints: Int
     open val serviceWorker: ServiceWorkerContainer
-    fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
+    open val maxTouchPoints: Int
+    open val mediaDevices: MediaDevices
+    open val clipboard: Clipboard
     fun vibrate(pattern: dynamic): Boolean
+    fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
 }
 
 /**
@@ -2929,24 +2929,19 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
  * Exposes the JavaScript [Document](https://developer.mozilla.org/en/docs/Web/API/Document) to Kotlin
  */
 external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
-    open val implementation: DOMImplementation
-    open val URL: String
-    open val documentURI: String
-    open val origin: String
-    open val compatMode: String
-    open val characterSet: String
-    open val charset: String
-    open val inputEncoding: String
-    open val contentType: String
-    open val doctype: DocumentType?
-    open val documentElement: Element?
-    open val location: Location?
-    var domain: String
+    open val fullscreenEnabled: Boolean
+    open val fullscreen: Boolean
+    var onfullscreenchange: ((Event) -> dynamic)?
+    var onfullscreenerror: ((Event) -> dynamic)?
+    open val rootElement: SVGSVGElement?
+    var title: String
     open val referrer: String
+    var domain: String
+    open val activeElement: Element?
+    open val location: Location?
     var cookie: String
     open val lastModified: String
     open val readyState: DocumentReadyState
-    var title: String
     var dir: String
     var body: HTMLElement?
     open val head: HTMLHeadElement?
@@ -2958,7 +2953,6 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     open val scripts: HTMLCollection
     open val currentScript: HTMLOrSVGScriptElement?
     open val defaultView: Window?
-    open val activeElement: Element?
     var designMode: String
     var onreadystatechange: ((Event) -> dynamic)?
     var fgColor: String
@@ -2969,13 +2963,29 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     open val anchors: HTMLCollection
     open val applets: HTMLCollection
     open val all: HTMLAllCollection
+    open val implementation: DOMImplementation
+    open val URL: String
+    open val documentURI: String
+    open val origin: String
+    open val compatMode: String
+    open val characterSet: String
+    open val charset: String
+    open val inputEncoding: String
+    open val contentType: String
+    open val doctype: DocumentType?
+    open val documentElement: Element?
     open val scrollingElement: Element?
     open val styleSheets: StyleSheetList
-    open val rootElement: SVGSVGElement?
-    open val fullscreenEnabled: Boolean
-    open val fullscreen: Boolean
-    var onfullscreenchange: ((Event) -> dynamic)?
-    var onfullscreenerror: ((Event) -> dynamic)?
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
     override var oncancel: ((Event) -> dynamic)?
@@ -3037,16 +3047,6 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override var ontoggle: ((Event) -> dynamic)?
     override var onvolumechange: ((Event) -> dynamic)?
     override var onwaiting: ((Event) -> dynamic)?
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
     override var oncopy: ((ClipboardEvent) -> dynamic)?
     override var oncut: ((ClipboardEvent) -> dynamic)?
     override var onpaste: ((ClipboardEvent) -> dynamic)?
@@ -3055,26 +3055,7 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override val firstElementChild: Element?
     override val lastElementChild: Element?
     override val childElementCount: Int
-    fun getElementsByTagName(qualifiedName: String): HTMLCollection
-    fun getElementsByTagNameNS(namespace: String?, localName: String): HTMLCollection
-    fun getElementsByClassName(classNames: String): HTMLCollection
-    fun createElement(localName: String, options: ElementCreationOptions = definedExternally): Element
-    fun createElementNS(namespace: String?, qualifiedName: String, options: ElementCreationOptions = definedExternally): Element
-    fun createDocumentFragment(): DocumentFragment
-    fun createTextNode(data: String): Text
-    fun createCDATASection(data: String): CDATASection
-    fun createComment(data: String): Comment
-    fun createProcessingInstruction(target: String, data: String): ProcessingInstruction
-    fun importNode(node: Node, deep: Boolean = definedExternally): Node
-    fun adoptNode(node: Node): Node
-    fun createAttribute(localName: String): Attr
-    fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
-    fun createEvent(interface_: String): Event
-    fun createRange(): Range
-    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
-    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
-    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): TreeWalker
-    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): TreeWalker
+    fun exitFullscreen(): Promise<Unit>
     fun getElementsByName(elementName: String): NodeList
     fun open(type: String = definedExternally, replace: String = definedExternally): Document
     fun open(url: String, name: String, features: String): Window
@@ -3091,10 +3072,29 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     fun clear()
     fun captureEvents()
     fun releaseEvents()
+    fun getElementsByTagName(qualifiedName: String): HTMLCollection
+    fun getElementsByTagNameNS(namespace: String?, localName: String): HTMLCollection
+    fun getElementsByClassName(classNames: String): HTMLCollection
+    fun createElement(localName: String, options: ElementCreationOptions = definedExternally): Element
+    fun createElementNS(namespace: String?, qualifiedName: String, options: ElementCreationOptions = definedExternally): Element
+    fun createDocumentFragment(): DocumentFragment
+    fun createTextNode(data: String): Text
+    fun createCDATASection(data: String): CDATASection
+    fun createComment(data: String): Comment
+    fun createProcessingInstruction(target: String, data: String): ProcessingInstruction
+    fun importNode(node: Node, deep: Boolean = definedExternally): Node
+    fun adoptNode(node: Node): Node
+    fun createAttribute(localName: String): Attr
+    fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
+    fun createEvent(`interface`: String): Event
+    fun createRange(): Range
+    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
+    fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
+    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): TreeWalker
+    fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): TreeWalker
     fun elementFromPoint(x: Double, y: Double): Element?
     fun elementsFromPoint(x: Double, y: Double): Array<Element>
     fun caretPositionFromPoint(x: Double, y: Double): CaretPosition?
-    fun exitFullscreen(): Promise<Unit>
     override fun getElementById(elementId: String): Element?
     override fun prepend(vararg nodes: dynamic)
     override fun append(vararg nodes: dynamic)
@@ -3125,15 +3125,15 @@ external open class XMLDocument : Document {
 }
 
 external interface ElementCreationOptions {
-    @JsName("is") var is_: String?
+    var `is`: String?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ElementCreationOptions(is_: String? = undefined): ElementCreationOptions {
+inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOptions {
     val o = js("({})")
-    o["is"] = is_
+    o["is"] = `is`
     return o
 }
 
