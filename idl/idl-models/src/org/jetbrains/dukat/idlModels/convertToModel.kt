@@ -52,6 +52,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.processEnumMember
 import org.jetbrains.dukat.idlDeclarations.toNullable
@@ -225,11 +226,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         )
     }
 
-    val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
-        )
-    ) {
+    val declaration = if (kind == InterfaceKind.INTERFACE) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = dynamicMemberModels,
@@ -243,13 +240,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = dynamicMemberModels.map {
-                    if (it is PropertyModel && !it.setter) {
-                        it.copy(open = true)
-                    } else {
-                        it
-                    }
-                },
+                members = dynamicMemberModels,
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
@@ -261,7 +252,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 annotations = mutableListOf(),
                 documentation = null,
                 external = true,
-                abstract = constructors.isEmpty() && primaryConstructor == null
+                abstract = kind == InterfaceKind.ABSTRACT_CLASS
         )
     }
     val getterModels = getters.map { it.process(declaration.name) }
@@ -438,7 +429,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 override = false,
                 getter = true,
                 setter = !readOnly,
-                open = false
+                open = open
         )
         is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
