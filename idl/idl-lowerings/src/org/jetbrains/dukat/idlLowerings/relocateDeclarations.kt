@@ -17,20 +17,21 @@ private val relocations: Set<Relocation> = setOf(
 )
 
 fun SourceSetModel.relocateDeclarations(): SourceSetModel {
-    val newSources = sources.toMutableList()
+    val newSources = sources.toMutableSet()
     for (relocation in relocations) {
         val fileFrom = newSources.find { it.root.name == relocation.from }
         val fileTo = newSources.find { it.root.name == relocation.to }
         val declarationToMove = fileFrom?.root?.declarations?.find { it.name == relocation.name }
         if (fileTo != null && fileFrom != null && declarationToMove != null) {
-            newSources.replaceAll {
-                it.copy(root = it.root.copy(declarations = when (it) {
-                    fileFrom -> it.root.declarations - declarationToMove
-                    fileTo -> it.root.declarations + declarationToMove
-                    else -> it.root.declarations
-                }))
-            }
+            newSources.remove(fileFrom)
+            newSources.add(fileFrom.copy(root = fileFrom.root.copy(
+                    declarations = fileFrom.root.declarations - declarationToMove)
+            ))
+            newSources.remove(fileTo)
+            newSources.add(fileTo.copy(root = fileTo.root.copy(
+                    declarations = fileTo.root.declarations + declarationToMove)
+            ))
         }
     }
-    return copy(sources = newSources)
+    return copy(sources = newSources.toList())
 }
