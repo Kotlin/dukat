@@ -19,7 +19,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) {
-    open val size: Int
+    open val size: Number
     open val type: String
     open val isClosed: Boolean
     fun slice(start: Int = definedExternally, end: Int = definedExternally, contentType: String = definedExternally): Blob
