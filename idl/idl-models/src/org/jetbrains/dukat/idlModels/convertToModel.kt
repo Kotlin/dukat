@@ -23,8 +23,10 @@ import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -84,13 +86,23 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "USVString" -> "String"
                 "\$Array" -> "Array"
                 "sequence" -> "Array"
+                "FrozenArray" -> "Array"
+                "Promise" -> "Promise"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
                 "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name
             }),
-            params = listOfNotNull(typeParameter?.process()),
+            params = listOfNotNull(typeParameter?.process())
+                    .map { TypeParameterModel(it, listOf()) }
+                    .map {
+                        if (name == "FrozenArray") {
+                            it.copy(variance = Variance.COVARIANT)
+                        } else {
+                            it
+                        }
+                    },
             metaDescription = comment
     )
     return typeModel.copy(
@@ -104,7 +116,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
     return FunctionTypeModel(
-            parameters = arguments.map { it.process() },
+            parameters = arguments.filterNot { it.variadic }.map { it.process() },
             type = returnType.process(),
             metaDescription = comment,
             nullable = nullable
@@ -124,8 +136,15 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process(),
-            initializer = null,
-            vararg = false,
+            initializer = if (optional) {
+                StatementCallModel(
+                        IdentifierEntity("definedExternally"),
+                        null
+                )
+            } else {
+                null
+            },
+            vararg = variadic,
             optional = false
     )
 }
@@ -230,6 +249,15 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         )
     }
 
+    val annotationModels = listOfNotNull(if (companionObjectModel != null) {
+        AnnotationModel(
+                "Suppress",
+                listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+        )
+    } else {
+        null
+    }).toMutableList()
+
     val declaration = if (
             kind == InterfaceKind.INTERFACE) {
         InterfaceModel(
@@ -238,7 +266,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
-                annotations = mutableListOf(),
+                annotations = annotationModels,
                 external = true
         )
     } else {
@@ -267,7 +295,7 @@ fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.toNullable().changeComment(null).process(),
-            initializer = if (defaultValue != null) {
+            initializer = if (defaultValue != null && !required) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
                         null
@@ -366,7 +394,12 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            annotations = mutableListOf(),
+            annotations = mutableListOf(
+                    AnnotationModel(
+                            "Suppress",
+                            listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                    )
+            ),
             external = true
     )
     val generatedVariables = members.map { memberName ->

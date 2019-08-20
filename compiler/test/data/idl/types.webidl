@@ -14,6 +14,9 @@ interface A {
     attribute long[][] intArray2D;
     attribute sequence<long> intSequence;
 
+    attribute Promise<void> promise;
+    attribute FrozenArray<long> readArray;
+
     sequence<long> f(sequence<long> x);
     A<long> g(A<long> x);
     any h();
