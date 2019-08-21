@@ -11,6 +11,7 @@ import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.addItemArrayLike
 import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
 import org.jetbrains.dukat.idlLowerings.markAbstractOrOpen
+import org.jetbrains.dukat.idlLowerings.relocateDeclarations
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatements
 import org.jetbrains.dukat.idlLowerings.resolvePartials
 import org.jetbrains.dukat.idlLowerings.resolveTypedefs
@@ -44,6 +45,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .lowerOverrides()
                 .escapeIdentificators()
                 .addKDocs()
+                .relocateDeclarations()
                 .addImportsForReferencedFiles()
                 .omitStdLib()
     }

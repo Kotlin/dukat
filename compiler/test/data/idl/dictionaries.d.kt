@@ -97,10 +97,10 @@ external abstract class A {
 
 external interface UndefinedMemberDictionary {
     var str: String?
-        get() = definedExternally;
+        get() = definedExternally
         set(value) = definedExternally
     var str2: String?
-        get() = definedExternally;
+        get() = definedExternally
         set(value) = definedExternally
 }
 
