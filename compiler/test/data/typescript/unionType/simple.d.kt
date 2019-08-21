@@ -16,15 +16,25 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var foo: dynamic /* String | Number */
+
 external fun bar(a: String)
+
 external fun bar(a: Number)
+
 external fun bar(a: Foo)
+
 external fun baz(a: String, b: Number)
+
 external fun baz(a: String, b: Foo)
+
 external fun baz(a: Number, b: Number)
+
 external fun baz(a: Number, b: Foo)
+
 external fun baz(a: Foo, b: Number)
+
 external fun baz(a: Foo, b: Foo)
+
 external interface `T$0` {
     @nativeGetter
     operator fun get(key: String): dynamic /* String | Number */
@@ -33,6 +43,7 @@ external interface `T$0` {
     @nativeSetter
     operator fun set(key: String, value: Number)
 }
+
 external open class Foo {
     constructor(a: String)
     constructor(a: Number)

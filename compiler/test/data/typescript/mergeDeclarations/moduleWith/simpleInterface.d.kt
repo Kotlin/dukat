@@ -18,6 +18,7 @@ import org.w3c.xhr.*
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface Foo {
     fun bar(): Number
+
     companion object {
         fun baz(a: Any)
         fun bar(): Number

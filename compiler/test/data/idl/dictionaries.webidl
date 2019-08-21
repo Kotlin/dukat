@@ -27,5 +27,6 @@ interface A {
 };
 
 dictionary UndefinedMemberDictionary {
-    DOMString str;
+    required DOMString str;
+    DOMString str2;
 };

@@ -16,15 +16,20 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var foo: String?
+
 external var bar: String?
+
 external fun bar(a: String?): Foo?
+
 external fun baz(a: Foo?, b: Number? = definedExternally /* null */): Any?
+
 external interface `T$0` {
     @nativeGetter
     operator fun get(key: String?): String?
     @nativeSetter
     operator fun set(key: String?, value: String?)
 }
+
 external open class Foo(a: String?) {
     open fun someMethod(): dynamic /* String | Number | Nothing? */
     open var foo: Foo?
@@ -33,10 +38,17 @@ external open class Foo(a: String?) {
     open var optionalFoo3: String?
     open var refs: `T$0`
 }
+
 external interface IBar {
     fun someMethod(): dynamic /* String | Number | Nothing? */
     var foo: Foo?
-    var optionalFoo: String? get() = definedExternally; set(value) = definedExternally
-    var optionalFoo2: String? get() = definedExternally; set(value) = definedExternally
-    var optionalFoo3: String? get() = definedExternally; set(value) = definedExternally
+    var optionalFoo: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var optionalFoo2: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var optionalFoo3: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }

@@ -32,11 +32,17 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
                             nullable = declaration.nullable
                     )
                     is IDLFunctionTypeDeclaration -> newType.copy(
-                            nullable = declaration.nullable || newType.nullable
+                            nullable = declaration.nullable || newType.nullable,
+                            returnType = lowerTypeDeclaration(newType.returnType),
+                            arguments = newType.arguments.map { lowerArgumentDeclaration(it) }
                     )
                     else -> declaration
                 }
             }
+            is IDLFunctionTypeDeclaration -> declaration.copy(
+                    returnType = lowerTypeDeclaration(declaration.returnType),
+                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it) }
+            )
             else -> declaration
         }
     }

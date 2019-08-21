@@ -16,5 +16,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Foo {
-    val foo: ((f: ((n: Number, s: String) -> String)? /* = null */) -> Boolean)? get() = definedExternally
+    val foo: ((f: ((n: Number, s: String) -> String)? /* = null */) -> Boolean)?
+        get() = definedExternally
 }

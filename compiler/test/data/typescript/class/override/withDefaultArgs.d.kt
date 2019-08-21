@@ -19,6 +19,7 @@ external open class Foo {
     open fun bar(a: Number = definedExternally /* 1 */)
     open fun baz(a: Any? = definedExternally /* null */)
 }
+
 external open class Boo : Foo {
     override fun bar(a: Number)
     override fun baz(a: Any?)

@@ -16,4 +16,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 typealias A<T> = (x: T) -> T
+
 external var foo: A<String>

@@ -19,6 +19,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlParser.filterIdentifiers
 import org.jetbrains.dukat.idlParser.getName
 
@@ -57,7 +58,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     setters = setters,
                     callback = isCallback,
                     generated = false,
-                    partial = partial
+                    partial = partial,
+                    kind = InterfaceKind.INTERFACE
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -115,6 +117,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         when (val staticMember = MemberVisitor().visit(ctx)) {
             is IDLOperationDeclaration -> operations.add(staticMember)
             is IDLAttributeDeclaration -> myAttributes.add(staticMember)
+        }
+        return defaultResult()
+    }
+
+    override fun visitStringifier(ctx: WebIDLParser.StringifierContext): IDLTopLevelDeclaration {
+        when (val stringifier = MemberVisitor().visit(ctx)) {
+            is IDLOperationDeclaration -> operations.add(stringifier)
+            is IDLAttributeDeclaration -> myAttributes.add(stringifier)
         }
         return defaultResult()
     }

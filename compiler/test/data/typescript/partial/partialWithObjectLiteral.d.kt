@@ -16,8 +16,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface `T$0` {
-    var min: Number? get() = definedExternally; set(value) = definedExternally
-    var max: Number? get() = definedExternally; set(value) = definedExternally
+    var min: Number?
+        get() = definedExternally
+        set(value) = definedExternally
+    var max: Number?
+        get() = definedExternally
+        set(value) = definedExternally
 }
+
 @JsModule("<RESOLVED_MODULE_NAME>")
 external open class App(opts: `T$0` = definedExternally /* null */)

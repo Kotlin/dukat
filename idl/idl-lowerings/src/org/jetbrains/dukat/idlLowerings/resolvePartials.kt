@@ -5,6 +5,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 
 private class PartialContext : IDLLowering {
     private val interfaces: MutableMap<String, MutableList<IDLInterfaceDeclaration>> = mutableMapOf()
@@ -63,7 +64,8 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                     partial = true
             )
         }
-        val partials = context.getInterfaces(declaration.name)
+        var partials = context.getInterfaces(declaration.name)
+        partials = partials.filterNot { it.partial } + partials.filter { it.partial }
         context.addResolvedPartial(declaration.name)
         return IDLInterfaceDeclaration(
                 name = declaration.name,
@@ -79,7 +81,8 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                 setters = partials.flatMap { it.setters }.distinct(),
                 callback = partials.any { it.callback },
                 generated = partials.any { it.generated },
-                partial = false
+                partial = false,
+                kind = InterfaceKind.INTERFACE
         )
     }
 
@@ -89,7 +92,8 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                     partial = true
             )
         }
-        val partials = context.getDictionaries(declaration.name)
+        var partials = context.getDictionaries(declaration.name)
+        partials = partials.filterNot { it.partial } + partials.filter { it.partial }
         context.addResolvedPartial(declaration.name)
         return IDLDictionaryDeclaration(
                 name = declaration.name,

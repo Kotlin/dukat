@@ -39,4 +39,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface J : A
+
 external interface I

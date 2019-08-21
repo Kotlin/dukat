@@ -23,6 +23,7 @@ external enum class SomeEnum {
     UnaryExpressionValue /* = -123 */,
     ExpressionValue /* = -123 + 23 */
 }
+
 external enum class AnotherEnum {
     StringValue /* = "my string value" */,
     UnaryExpressionValue /* = -123 */
