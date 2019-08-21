@@ -20,6 +20,7 @@ import org.w3c.xhr.*
 external interface A {
     fun baz()
 }
+
 external fun d(a: A, b: Any, c: Foo.Foo.B)
 
 // ------------------------------------------------------------------------------------------
@@ -45,4 +46,5 @@ import org.w3c.xhr.*
 external open class B {
     open fun boo(): Foo.A
 }
+
 external var c: Number

@@ -16,24 +16,43 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Map<K, V>
+
 external interface List<T>
+
 typealias Values<V> = List<V>
+
 typealias MultiMap<K, V> = Map<K, Values<V>>
+
 typealias MyHeaders = MultiMap<String, String>
+
 external interface `T$0`<T> {
     var ip: T
 }
+
 typealias Ping<T> = (packet: `T$0`<T>) -> Boolean
+
 external var fooMap: MultiMap<String, Number>
+
 external fun mapKey(a: MultiMap<Number, String>)
+
 external var fooStringOrMap: dynamic /* String | MultiMap<String, Number> */
+
 external fun stringOrMapKey(a: String)
+
 external fun stringOrMapKey(a: MultiMap<Number, String>)
+
 external var listOfStringOrNumber: dynamic /* String | List<dynamic /* String | Number */> */
+
 external fun listOfNumberOrString(a: List<dynamic /* Number | String */>)
+
 external var headers: MyHeaders
+
 external fun getHeaders(): MyHeaders
+
 external fun addHeaders(headers: MyHeaders)
+
 external var someRef: dynamic /* String | (instance: Number) -> Any */
+
 external fun addRef(ref: String)
+
 external fun addRef(ref: (instance: Number) -> Any)

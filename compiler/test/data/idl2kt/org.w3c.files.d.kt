@@ -18,6 +18,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) to Kotlin
+ */
 external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) {
     open val size: Number
     open val type: String
@@ -35,12 +38,13 @@ external interface BlobPropertyBag {
 @kotlin.internal.InlineOnly
 inline fun BlobPropertyBag(type: String? = ""): BlobPropertyBag {
     val o = js("({})")
-
     o["type"] = type
-
     return o
 }
 
+/**
+ * Exposes the JavaScript [File](https://developer.mozilla.org/en/docs/Web/API/File) to Kotlin
+ */
 external open class File(fileBits: Array<dynamic>, fileName: String, options: FilePropertyBag = definedExternally) : Blob {
     open val name: String
     open val lastModified: Int
@@ -55,19 +59,25 @@ external interface FilePropertyBag : BlobPropertyBag {
 @kotlin.internal.InlineOnly
 inline fun FilePropertyBag(lastModified: Int? = undefined, type: String? = ""): FilePropertyBag {
     val o = js("({})")
-
     o["lastModified"] = lastModified
     o["type"] = type
-
     return o
 }
 
+/**
+ * Exposes the JavaScript [FileList](https://developer.mozilla.org/en/docs/Web/API/FileList) to Kotlin
+ */
 external abstract class FileList : ItemArrayLike<File> {
     override val length: Int
     override fun item(index: Int): File?
 }
-@kotlin.internal.InlineOnly inline operator fun FileList.get(index: Int): File? = asDynamic()[index]
 
+@kotlin.internal.InlineOnly
+inline operator fun FileList.get(index: Int): File? = asDynamic()[index]
+
+/**
+ * Exposes the JavaScript [FileReader](https://developer.mozilla.org/en/docs/Web/API/FileReader) to Kotlin
+ */
 external open class FileReader : EventTarget {
     open val readyState: Short
     open val result: dynamic
@@ -91,6 +101,9 @@ external open class FileReader : EventTarget {
     }
 }
 
+/**
+ * Exposes the JavaScript [FileReaderSync](https://developer.mozilla.org/en/docs/Web/API/FileReaderSync) to Kotlin
+ */
 external open class FileReaderSync {
     fun readAsArrayBuffer(blob: Blob): ArrayBuffer
     fun readAsBinaryString(blob: Blob): String

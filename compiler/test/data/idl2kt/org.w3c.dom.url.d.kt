@@ -18,6 +18,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [URL](https://developer.mozilla.org/en/docs/Web/API/URL) to Kotlin
+ */
 external open class URL(url: String, base: String = definedExternally) {
     var href: String
     open val origin: String
@@ -33,14 +36,17 @@ external open class URL(url: String, base: String = definedExternally) {
     var hash: String
 
     companion object {
+        fun domainToASCII(domain: String): String
+        fun domainToUnicode(domain: String): String
         fun createObjectURL(blob: Blob): String
         fun createFor(blob: Blob): String
         fun revokeObjectURL(url: String)
-        fun domainToASCII(domain: String): String
-        fun domainToUnicode(domain: String): String
     }
 }
 
+/**
+ * Exposes the JavaScript [URLSearchParams](https://developer.mozilla.org/en/docs/Web/API/URLSearchParams) to Kotlin
+ */
 external open class URLSearchParams(init: dynamic = definedExternally) {
     fun append(name: String, value: String)
     fun delete(name: String)

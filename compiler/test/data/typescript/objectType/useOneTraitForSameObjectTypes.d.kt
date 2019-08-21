@@ -25,8 +25,11 @@ external interface `T$0` {
     @nativeSetter
     operator fun set(s: String, value: Any)
 }
+
 external fun foo(): `T$0`
+
 external fun bar(): `T$0`
+
 external interface `T$1` {
     fun bar(a: Any): Number
     var baz: Any
@@ -37,7 +40,9 @@ external interface `T$1` {
     @nativeSetter
     operator fun set(s: String, value: Number)
 }
+
 external fun baz(): `T$1`
+
 external interface Interface {
     var bar: `T$0`
     var baz: `T$1`

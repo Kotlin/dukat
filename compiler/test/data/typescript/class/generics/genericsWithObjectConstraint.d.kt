@@ -16,24 +16,33 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface `T$0` {
-    var target: Any? get() = definedExternally; set(value) = definedExternally
+    var target: Any?
+        get() = definedExternally
+        set(value) = definedExternally
 }
+
 external open class SomeClass {
     open fun <T : `T$0`> ping(source: T)
+
     companion object {
         fun <T : `T$0`> foo(array: Array<T>, classes: Array<Any>? = definedExternally /* null */): Array<T>
     }
 }
+
 external interface `T$1` {
     var target: Any
 }
+
 external open class SomeOtherClass<T : `T$1`> {
     open fun ping(obj: T): Boolean
 }
+
 external interface OtherClassLikeInterface<T : `T$1`> {
     fun ping(obj: T): SomeOtherClass<T>
 }
+
 external interface `T$2` {
     var onTransformEnd: () -> Unit
 }
+
 external fun <T : `T$2`> transform(a: T): T

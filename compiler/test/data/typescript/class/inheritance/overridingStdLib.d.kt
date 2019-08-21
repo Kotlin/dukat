@@ -20,6 +20,7 @@ external interface AppEvent : Event {
     override var target: Element
     override fun preventDefault(): Any
 }
+
 external open class NativeEvent : Event {
     override fun preventDefault(): Any
 }

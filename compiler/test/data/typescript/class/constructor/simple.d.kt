@@ -16,4 +16,5 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Foo
+
 external open class Bar(a: Number)

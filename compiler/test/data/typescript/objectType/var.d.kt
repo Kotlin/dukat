@@ -18,6 +18,7 @@ import org.w3c.xhr.*
 external interface `T$0` {
     var bar: Number
 }
+
 external object foo {
     fun bar(a: Any): Number
     var baz: Any

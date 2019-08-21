@@ -44,10 +44,12 @@ external interface LoDashStatic {
     var VERSION: String
     var support: Support
 }
+
 external interface Support {
     var argsClass: Boolean
     var argsObject: Boolean
 }
+
 external interface LoDashArrayWrapper<T> {
     fun difference(vararg others: Array<T>): LoDashArrayWrapper<T>
     fun difference(vararg others: List<T>): LoDashArrayWrapper<T>

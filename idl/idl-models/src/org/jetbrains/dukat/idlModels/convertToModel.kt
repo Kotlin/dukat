@@ -231,8 +231,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             attributes.filterNot { it.static } +
             operations.filterNot { it.static }).mapNotNull { it.process() }
     val staticMemberModels = (constants +
-            operations.filter { it.static } +
-            attributes.filter { it.static }).mapNotNull { it.process() }
+            attributes.filter { it.static } +
+            operations.filter { it.static }).mapNotNull { it.process() }
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
         CompanionObjectModel(
@@ -403,7 +403,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                             listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                     )
             ),
-            external = true
+            external = true,
+            metaDescription = "please, don't implement this interface!"
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(
@@ -509,12 +510,20 @@ fun IDLMemberDeclaration.process(): MemberModel? {
 }
 
 fun IDLFileDeclaration.process(): SourceFileModel {
-    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
+    val modelsExceptEnumsAndGenerated = declarations.filterNot {
+        it is IDLEnumDeclaration || (it is IDLInterfaceDeclaration && it.generated)
+    }.mapNotNull { it.convertToModel() }.flatten()
+
+    val enumModels = declarations.filterIsInstance<IDLEnumDeclaration>().map { it.convertToModel() }.flatten()
+
+    val generatedModels = declarations.filter {
+        it is IDLInterfaceDeclaration && it.generated
+    }.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
             name = packageName ?: ROOT_PACKAGENAME,
             shortName = packageName?.rightMost() ?: ROOT_PACKAGENAME,
-            declarations = modelDeclarations,
+            declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
             imports = mutableListOf("kotlin.js.*".toNameEntity())

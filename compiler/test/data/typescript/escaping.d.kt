@@ -16,9 +16,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var `val`: Any
+
 external var `$foo`: Boolean
+
 external fun `bar$`(`ba$z`: Number)
+
 external fun `fun`()
+
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
     var `string-literal`: Boolean
@@ -27,6 +31,7 @@ external interface This {
     var `typealias`: Number
     var `typeof`: Number
     fun `in`(`object`: Foo)
+
     companion object {
         var `$foo`: Boolean
         fun `bar$`(`ba$z`: Number)
@@ -34,11 +39,14 @@ external interface This {
         var bbb: `when`.`$foo`
     }
 }
+
 external open class `is`<`interface`> {
     open var `as`: Number
     open fun `package`(a: Any): Boolean
 }
+
 external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>
+
 external var `_`: `__`.`___`
 
 // ------------------------------------------------------------------------------------------
@@ -62,7 +70,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var `$`: Boolean
+
 external fun `package`(`as`: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
+
 external interface Promise<T>
 
 // ------------------------------------------------------------------------------------------
@@ -86,6 +96,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface `___`
+
 external interface _OK_
 
 // ------------------------------------------------------------------------------------------

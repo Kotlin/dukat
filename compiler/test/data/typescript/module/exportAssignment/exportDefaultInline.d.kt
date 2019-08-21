@@ -18,5 +18,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun baz()
+
 @JsName("default")
 external fun bar(): String
