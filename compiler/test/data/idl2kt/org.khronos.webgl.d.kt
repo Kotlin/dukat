@@ -881,6 +881,13 @@ external abstract class WebGLRenderingContext : WebGLRenderingContextBase, Rende
  */
 external open class WebGLContextEvent(type: String, eventInit: WebGLContextEventInit = definedExternally) : Event {
     open val statusMessage: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface WebGLContextEventInit : EventInit {

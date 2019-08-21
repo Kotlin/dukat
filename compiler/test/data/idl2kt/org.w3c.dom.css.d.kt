@@ -108,12 +108,34 @@ external abstract class CSSRule {
 external abstract class CSSStyleRule : CSSRule {
     open var selectorText: String
     open val style: CSSStyleDeclaration
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 external abstract class CSSImportRule : CSSRule {
     open val href: String
     open val media: MediaList
     open val styleSheet: CSSStyleSheet
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 /**
@@ -123,6 +145,17 @@ external abstract class CSSGroupingRule : CSSRule {
     open val cssRules: CSSRuleList
     fun insertRule(rule: String, index: Int): Int
     fun deleteRule(index: Int)
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 /**
@@ -130,6 +163,17 @@ external abstract class CSSGroupingRule : CSSRule {
  */
 external abstract class CSSMediaRule : CSSGroupingRule {
     open val media: MediaList
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 /**
@@ -138,11 +182,33 @@ external abstract class CSSMediaRule : CSSGroupingRule {
 external abstract class CSSPageRule : CSSGroupingRule {
     open var selectorText: String
     open val style: CSSStyleDeclaration
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 external abstract class CSSMarginRule : CSSRule {
     open val name: String
     open val style: CSSStyleDeclaration
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 /**
@@ -151,6 +217,17 @@ external abstract class CSSMarginRule : CSSRule {
 external abstract class CSSNamespaceRule : CSSRule {
     open val namespaceURI: String
     open val prefix: String
+
+    companion object {
+        val STYLE_RULE: Short
+        val CHARSET_RULE: Short
+        val IMPORT_RULE: Short
+        val MEDIA_RULE: Short
+        val FONT_FACE_RULE: Short
+        val PAGE_RULE: Short
+        val MARGIN_RULE: Short
+        val NAMESPACE_RULE: Short
+    }
 }
 
 /**

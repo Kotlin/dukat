@@ -3,12 +3,12 @@ interface A {
     attribute alias2 y;
     attribute arr3 z;
     attribute sequence<alias> intArray;
-    const alias y = 5;
+    const alias yy = 5;
     alias f(alias x);
 };
 
 interface B : myAClass {
-    attribute myAClass<alias> x;
+    attribute myAClass<alias> xx;
 };
 
 typedef long alias;

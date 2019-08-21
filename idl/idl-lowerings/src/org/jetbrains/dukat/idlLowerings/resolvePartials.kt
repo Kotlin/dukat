@@ -69,8 +69,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         context.addResolvedPartial(declaration.name)
         return IDLInterfaceDeclaration(
                 name = declaration.name,
-                attributes = partials.flatMap { it.attributes }.distinct(),
-                constants = partials.flatMap { it.constants }.distinct(),
+                attributes = partials.flatMap { it.attributes }.distinctBy { it.name },
                 operations = partials.flatMap { it.operations }.distinct(),
                 //at this stage there are no constructors
                 primaryConstructor = null,
@@ -97,7 +96,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         context.addResolvedPartial(declaration.name)
         return IDLDictionaryDeclaration(
                 name = declaration.name,
-                members = partials.flatMap { it.members }.distinct(),
+                members = partials.flatMap { it.members }.distinctBy { it.name },
                 parents = partials.flatMap { it.parents }.distinct(),
                 partial = false
         )

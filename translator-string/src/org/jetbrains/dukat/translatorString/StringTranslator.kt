@@ -231,7 +231,7 @@ private fun MethodModel.translate(): List<String> {
     val overrideClause = if (override) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters, !override)})${returnClause}$metaClause")
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause")
 }
 
 private fun ConstructorModel.translate(): List<String> {

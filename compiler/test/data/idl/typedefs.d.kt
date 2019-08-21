@@ -9,10 +9,14 @@ external abstract class A {
     fun f(x: Int): Int
 
     companion object {
-        val y: Int
+        val yy: Int
     }
 }
 
 external abstract class B : A {
-    open var x: A<Int>
+    open var xx: A<Int>
+
+    companion object {
+        val yy: Int
+    }
 }

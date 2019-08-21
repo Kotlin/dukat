@@ -5,7 +5,6 @@ import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
@@ -36,17 +35,17 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
                 null
             }
             MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
-            MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
+            MemberKind.CONSTANT -> IDLAttributeDeclaration(name, type, static = true, readOnly = true)
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue, required)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name.ifEmpty { "get" },
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) },
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), null, false, false) },
                     type
             )
             MemberKind.SETTER -> IDLSetterDeclaration(
                     name.ifEmpty { "set" },
-                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) },
-                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) }
+                    arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), null, false, false) },
+                    arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), null, false, false) }
             )
             MemberKind.EMPTY -> null
         }

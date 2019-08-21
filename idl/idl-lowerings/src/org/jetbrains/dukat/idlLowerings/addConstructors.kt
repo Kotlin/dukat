@@ -93,7 +93,6 @@ private class ConstructorLowering : IDLLowering {
                     IDLInterfaceDeclaration(
                             name = it.constructorName,
                             attributes = listOf(),
-                            constants = listOf(),
                             operations = listOf(),
                             primaryConstructor = it.constructor,
                             constructors = listOf(),

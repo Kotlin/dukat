@@ -394,6 +394,13 @@ inline fun MediaTrackSettings(width: Int? = undefined, height: Int? = undefined,
  */
 external open class MediaStreamTrackEvent(type: String, eventInitDict: MediaStreamTrackEventInit) : Event {
     open val track: MediaStreamTrack
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface MediaStreamTrackEventInit : EventInit {
@@ -414,6 +421,13 @@ inline fun MediaStreamTrackEventInit(track: MediaStreamTrack?, bubbles: Boolean?
 
 external open class OverconstrainedErrorEvent(type: String, eventInitDict: OverconstrainedErrorEventInit) : Event {
     open val error: dynamic
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface OverconstrainedErrorEventInit : EventInit {

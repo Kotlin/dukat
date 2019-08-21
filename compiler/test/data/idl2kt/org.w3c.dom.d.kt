@@ -81,12 +81,54 @@ external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndE
     fun focus()
     fun blur()
     fun forceSpellCheck()
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [HTMLUnknownElement](https://developer.mozilla.org/en/docs/Web/API/HTMLUnknownElement) to Kotlin
  */
-external abstract class HTMLUnknownElement : HTMLElement
+external abstract class HTMLUnknownElement : HTMLElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [DOMStringMap](https://developer.mozilla.org/en/docs/Web/API/DOMStringMap) to Kotlin
@@ -104,18 +146,81 @@ inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[
  */
 external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [HTMLHeadElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHeadElement) to Kotlin
  */
-external abstract class HTMLHeadElement : HTMLElement
+external abstract class HTMLHeadElement : HTMLElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [HTMLTitleElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTitleElement) to Kotlin
  */
 external abstract class HTMLTitleElement : HTMLElement {
     open var text: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -124,6 +229,27 @@ external abstract class HTMLTitleElement : HTMLElement {
 external abstract class HTMLBaseElement : HTMLElement {
     open var href: String
     open var target: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -146,6 +272,27 @@ external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var target: String
     open var scope: String
     open var workerType: WorkerType
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -156,6 +303,27 @@ external abstract class HTMLMetaElement : HTMLElement {
     open var httpEquiv: String
     open var content: String
     open var scheme: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -165,6 +333,27 @@ external abstract class HTMLStyleElement : HTMLElement, LinkStyle {
     open var media: String
     open var nonce: String
     open var type: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -177,6 +366,27 @@ external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
     open var aLink: String
     open var bgColor: String
     open var background: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -184,6 +394,27 @@ external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
  */
 external abstract class HTMLHeadingElement : HTMLElement {
     open var align: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -191,6 +422,27 @@ external abstract class HTMLHeadingElement : HTMLElement {
  */
 external abstract class HTMLParagraphElement : HTMLElement {
     open var align: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -202,6 +454,27 @@ external abstract class HTMLHRElement : HTMLElement {
     open var noShade: Boolean
     open var size: String
     open var width: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -209,6 +482,27 @@ external abstract class HTMLHRElement : HTMLElement {
  */
 external abstract class HTMLPreElement : HTMLElement {
     open var width: Int
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -216,6 +510,27 @@ external abstract class HTMLPreElement : HTMLElement {
  */
 external abstract class HTMLQuoteElement : HTMLElement {
     open var cite: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -226,6 +541,27 @@ external abstract class HTMLOListElement : HTMLElement {
     open var start: Int
     open var type: String
     open var compact: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -234,6 +570,27 @@ external abstract class HTMLOListElement : HTMLElement {
 external abstract class HTMLUListElement : HTMLElement {
     open var compact: Boolean
     open var type: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -242,6 +599,27 @@ external abstract class HTMLUListElement : HTMLElement {
 external abstract class HTMLLIElement : HTMLElement {
     open var value: Int
     open var type: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -249,6 +627,27 @@ external abstract class HTMLLIElement : HTMLElement {
  */
 external abstract class HTMLDListElement : HTMLElement {
     open var compact: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -256,6 +655,27 @@ external abstract class HTMLDListElement : HTMLElement {
  */
 external abstract class HTMLDivElement : HTMLElement {
     open var align: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -276,6 +696,27 @@ external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUti
     open var name: String
     open var rev: String
     open var shape: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -283,6 +724,27 @@ external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUti
  */
 external abstract class HTMLDataElement : HTMLElement {
     open var value: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -290,18 +752,81 @@ external abstract class HTMLDataElement : HTMLElement {
  */
 external abstract class HTMLTimeElement : HTMLElement {
     open var dateTime: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [HTMLSpanElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSpanElement) to Kotlin
  */
-external abstract class HTMLSpanElement : HTMLElement
+external abstract class HTMLSpanElement : HTMLElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [HTMLBRElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBRElement) to Kotlin
  */
 external abstract class HTMLBRElement : HTMLElement {
     open var clear: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -327,12 +852,54 @@ external interface HTMLHyperlinkElementUtils {
 external abstract class HTMLModElement : HTMLElement {
     open var cite: String
     open var dateTime: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [HTMLPictureElement](https://developer.mozilla.org/en/docs/Web/API/HTMLPictureElement) to Kotlin
  */
-external abstract class HTMLPictureElement : HTMLElement
+external abstract class HTMLPictureElement : HTMLElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [HTMLSourceElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSourceElement) to Kotlin
@@ -343,6 +910,27 @@ external abstract class HTMLSourceElement : HTMLElement {
     open var srcset: String
     open var sizes: String
     open var media: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -372,6 +960,27 @@ external abstract class HTMLImageElement : HTMLElement, HTMLOrSVGImageElement, T
     open var border: String
     open val x: Int
     open val y: Int
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -396,6 +1005,27 @@ external abstract class HTMLIFrameElement : HTMLElement {
     open var marginHeight: String
     open var marginWidth: String
     fun getSVGDocument(): Document?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -409,6 +1039,27 @@ external abstract class HTMLEmbedElement : HTMLElement {
     open var align: String
     open var name: String
     fun getSVGDocument(): Document?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -442,6 +1093,27 @@ external abstract class HTMLObjectElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -452,6 +1124,27 @@ external abstract class HTMLParamElement : HTMLElement {
     open var value: String
     open var type: String
     open var valueType: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -464,12 +1157,72 @@ external abstract class HTMLVideoElement : HTMLMediaElement, TexImageSource {
     open val videoHeight: Int
     open var poster: String
     open var playsInline: Boolean
+
+    companion object {
+        val NETWORK_EMPTY: Short
+        val NETWORK_IDLE: Short
+        val NETWORK_LOADING: Short
+        val NETWORK_NO_SOURCE: Short
+        val HAVE_NOTHING: Short
+        val HAVE_METADATA: Short
+        val HAVE_CURRENT_DATA: Short
+        val HAVE_FUTURE_DATA: Short
+        val HAVE_ENOUGH_DATA: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [HTMLAudioElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAudioElement) to Kotlin
  */
-external abstract class HTMLAudioElement : HTMLMediaElement
+external abstract class HTMLAudioElement : HTMLMediaElement {
+    companion object {
+        val NETWORK_EMPTY: Short
+        val NETWORK_IDLE: Short
+        val NETWORK_LOADING: Short
+        val NETWORK_NO_SOURCE: Short
+        val HAVE_NOTHING: Short
+        val HAVE_METADATA: Short
+        val HAVE_CURRENT_DATA: Short
+        val HAVE_FUTURE_DATA: Short
+        val HAVE_ENOUGH_DATA: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [HTMLTrackElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTrackElement) to Kotlin
@@ -488,6 +1241,24 @@ external abstract class HTMLTrackElement : HTMLElement {
         val LOADING: Short
         val LOADED: Short
         val ERROR: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
@@ -540,6 +1311,24 @@ external abstract class HTMLMediaElement : HTMLElement {
         val HAVE_CURRENT_DATA: Short
         val HAVE_FUTURE_DATA: Short
         val HAVE_ENOUGH_DATA: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
@@ -671,6 +1460,13 @@ external abstract class TimeRanges {
  */
 external open class TrackEvent(type: String, eventInitDict: TrackEventInit = definedExternally) : Event {
     open val track: UnionAudioTrackOrTextTrackOrVideoTrack?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface TrackEventInit : EventInit {
@@ -695,6 +1491,27 @@ inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null,
 external abstract class HTMLMapElement : HTMLElement {
     open var name: String
     open val areas: HTMLCollection
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -711,6 +1528,27 @@ external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils
     open val relList: DOMTokenList
     open var referrerPolicy: String
     open var noHref: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -740,6 +1578,27 @@ external abstract class HTMLTableElement : HTMLElement {
     fun createTBody(): HTMLTableSectionElement
     fun insertRow(index: Int = definedExternally): HTMLTableRowElement
     fun deleteRow(index: Int)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -747,6 +1606,27 @@ external abstract class HTMLTableElement : HTMLElement {
  */
 external abstract class HTMLTableCaptionElement : HTMLElement {
     open var align: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -759,6 +1639,27 @@ external abstract class HTMLTableColElement : HTMLElement {
     open var chOff: String
     open var vAlign: String
     open var width: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -772,6 +1673,27 @@ external abstract class HTMLTableSectionElement : HTMLElement {
     open var vAlign: String
     fun insertRow(index: Int = definedExternally): HTMLElement
     fun deleteRow(index: Int)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -788,6 +1710,27 @@ external abstract class HTMLTableRowElement : HTMLElement {
     open var bgColor: String
     fun insertCell(index: Int = definedExternally): HTMLElement
     fun deleteCell(index: Int)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -809,6 +1752,27 @@ external abstract class HTMLTableCellElement : HTMLElement {
     open var noWrap: Boolean
     open var vAlign: String
     open var bgColor: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -830,6 +1794,27 @@ external abstract class HTMLFormElement : HTMLElement {
     fun reset()
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 @kotlin.internal.InlineOnly
@@ -845,6 +1830,27 @@ external abstract class HTMLLabelElement : HTMLElement {
     open val form: HTMLFormElement?
     open var htmlFor: String
     open val control: HTMLElement?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -907,6 +1913,27 @@ external abstract class HTMLInputElement : HTMLElement {
     fun setRangeText(replacement: String)
     fun setRangeText(replacement: String, start: Int, end: Int, selectionMode: SelectionMode = definedExternally)
     fun setSelectionRange(start: Int, end: Int, direction: String = definedExternally)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -932,6 +1959,27 @@ external abstract class HTMLButtonElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -963,6 +2011,27 @@ external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> 
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
     override fun item(index: Int): Element?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 @kotlin.internal.InlineOnly
@@ -976,6 +2045,27 @@ inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?
  */
 external abstract class HTMLDataListElement : HTMLElement {
     open val options: HTMLCollection
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -984,6 +2074,27 @@ external abstract class HTMLDataListElement : HTMLElement {
 external abstract class HTMLOptGroupElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
     open var disabled: Boolean
     open var label: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -998,6 +2109,27 @@ external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElemen
     open var value: String
     open var text: String
     open val index: Int
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1037,6 +2169,27 @@ external abstract class HTMLTextAreaElement : HTMLElement {
     fun setRangeText(replacement: String)
     fun setRangeText(replacement: String, start: Int, end: Int, selectionMode: SelectionMode = definedExternally)
     fun setSelectionRange(start: Int, end: Int, direction: String = definedExternally)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1057,6 +2210,27 @@ external abstract class HTMLKeygenElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1076,6 +2250,27 @@ external abstract class HTMLOutputElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1086,6 +2281,27 @@ external abstract class HTMLProgressElement : HTMLElement {
     open var max: Double
     open val position: Double
     open val labels: NodeList
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1099,6 +2315,27 @@ external abstract class HTMLMeterElement : HTMLElement {
     open var high: Double
     open var optimum: Double
     open val labels: NodeList
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1116,6 +2353,27 @@ external abstract class HTMLFieldSetElement : HTMLElement {
     fun checkValidity(): Boolean
     fun reportValidity(): Boolean
     fun setCustomValidity(error: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1124,6 +2382,27 @@ external abstract class HTMLFieldSetElement : HTMLElement {
 external abstract class HTMLLegendElement : HTMLElement {
     open val form: HTMLFormElement?
     open var align: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1148,12 +2427,54 @@ external abstract class ValidityState {
  */
 external abstract class HTMLDetailsElement : HTMLElement {
     open var open: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external abstract class HTMLMenuElement : HTMLElement {
     open var type: String
     open var label: String
     open var compact: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external abstract class HTMLMenuItemElement : HTMLElement {
@@ -1164,10 +2485,38 @@ external abstract class HTMLMenuItemElement : HTMLElement {
     open var checked: Boolean
     open var radiogroup: String
     open var default: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external open class RelatedEvent(type: String, eventInitDict: RelatedEventInit = definedExternally) : Event {
     open val relatedTarget: EventTarget?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface RelatedEventInit : EventInit {
@@ -1195,6 +2544,27 @@ external abstract class HTMLDialogElement : HTMLElement {
     fun show(anchor: UnionElementOrMouseEvent = definedExternally)
     fun showModal(anchor: UnionElementOrMouseEvent = definedExternally)
     fun close(returnValue: String = definedExternally)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1211,6 +2581,27 @@ external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement 
     open var nonce: String
     open var event: String
     open var htmlFor: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1218,6 +2609,27 @@ external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement 
  */
 external abstract class HTMLTemplateElement : HTMLElement {
     open val content: DocumentFragment
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -1226,6 +2638,27 @@ external abstract class HTMLTemplateElement : HTMLElement {
 external abstract class HTMLSlotElement : HTMLElement {
     open var name: String
     fun assignedNodes(options: AssignedNodesOptions = definedExternally): Array<Node>
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface AssignedNodesOptions {
@@ -1250,6 +2683,27 @@ external abstract class HTMLCanvasElement : HTMLElement, TexImageSource {
     fun getContext(contextId: String, vararg arguments: Any?): RenderingContext?
     fun toDataURL(type: String = definedExternally, quality: Any? = definedExternally): String
     fun toBlob(_callback: (Blob?) -> Unit, type: String = definedExternally, quality: Any? = definedExternally)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface CanvasRenderingContext2DSettings {
@@ -1604,6 +3058,13 @@ external abstract class DataTransferItem {
  */
 external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
     open val dataTransfer: DataTransfer?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface DragEventInit : MouseEventInit {
@@ -1760,6 +3221,13 @@ external abstract class Location {
  */
 external open class PopStateEvent(type: String, eventInitDict: PopStateEventInit = definedExternally) : Event {
     open val state: Any?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface PopStateEventInit : EventInit {
@@ -1784,6 +3252,13 @@ inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, canc
 external open class HashChangeEvent(type: String, eventInitDict: HashChangeEventInit = definedExternally) : Event {
     open val oldURL: String
     open val newURL: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface HashChangeEventInit : EventInit {
@@ -1811,6 +3286,13 @@ inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbl
  */
 external open class PageTransitionEvent(type: String, eventInitDict: PageTransitionEventInit = definedExternally) : Event {
     open val persisted: Boolean
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface PageTransitionEventInit : EventInit {
@@ -1834,6 +3316,13 @@ inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean
  */
 external open class BeforeUnloadEvent : Event {
     var returnValue: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external abstract class ApplicationCache : EventTarget {
@@ -1876,6 +3365,13 @@ external open class ErrorEvent(type: String, eventInitDict: ErrorEventInit = def
     open val lineno: Int
     open val colno: Int
     open val error: Any?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface ErrorEventInit : EventInit {
@@ -1916,6 +3412,13 @@ inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno:
 external open class PromiseRejectionEvent(type: String, eventInitDict: PromiseRejectionEventInit) : Event {
     open val promise: Promise<Any?>
     open val reason: Any?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface PromiseRejectionEventInit : EventInit {
@@ -2229,6 +3732,13 @@ external open class MessageEvent(type: String, eventInitDict: MessageEventInit =
     open val source: UnionMessagePortOrWindow?
     open val ports: Array<out MessagePort>
     fun initMessageEvent(type: String, bubbles: Boolean, cancelable: Boolean, data: Any?, origin: String, lastEventId: String, source: UnionMessagePortOrWindow?, ports: Array<MessagePort>)
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface MessageEventInit : EventInit {
@@ -2330,6 +3840,13 @@ external open class CloseEvent(type: String, eventInitDict: CloseEventInit = def
     open val wasClean: Boolean
     open val code: Short
     open val reason: String
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface CloseEventInit : EventInit {
@@ -2531,6 +4048,13 @@ external open class StorageEvent(type: String, eventInitDict: StorageEventInit =
     open val newValue: String?
     open val url: String
     open val storageArea: Storage?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface StorageEventInit : EventInit {
@@ -2577,6 +4101,27 @@ external abstract class HTMLAppletElement : HTMLElement {
     open var _object: String
     open var vspace: Int
     open var width: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -2599,6 +4144,27 @@ external abstract class HTMLMarqueeElement : HTMLElement {
     open var onstart: ((Event) -> dynamic)?
     fun start()
     fun stop()
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -2607,6 +4173,27 @@ external abstract class HTMLMarqueeElement : HTMLElement {
 external abstract class HTMLFrameSetElement : HTMLElement, WindowEventHandlers {
     open var cols: String
     open var rows: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external abstract class HTMLFrameElement : HTMLElement {
@@ -2620,10 +4207,52 @@ external abstract class HTMLFrameElement : HTMLElement {
     open val contentWindow: Window?
     open var marginHeight: String
     open var marginWidth: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external abstract class HTMLDirectoryElement : HTMLElement {
     open var compact: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -2633,6 +4262,27 @@ external abstract class HTMLFontElement : HTMLElement {
     open var color: String
     open var face: String
     open var size: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface External {
@@ -2667,6 +4317,13 @@ inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, co
 external open class CustomEvent(type: String, eventInitDict: CustomEventInit = definedExternally) : Event {
     open val detail: Any?
     fun initCustomEvent(type: String, bubbles: Boolean, cancelable: Boolean, detail: Any?)
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface CustomEventInit : EventInit {
@@ -3104,6 +4761,27 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 @kotlin.internal.InlineOnly
@@ -3122,6 +4800,27 @@ external open class XMLDocument : Document {
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface ElementCreationOptions {
@@ -3154,6 +4853,27 @@ external abstract class DocumentType : Node, ChildNode {
     open val name: String
     open val publicId: String
     open val systemId: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3169,6 +4889,27 @@ external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
     override fun append(vararg nodes: dynamic)
     override fun querySelector(selectors: String): Element?
     override fun querySelectorAll(selectors: String): NodeList
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3183,6 +4924,27 @@ external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
     override fun append(vararg nodes: dynamic)
     override fun querySelector(selectors: String): Element?
     override fun querySelectorAll(selectors: String): NodeList
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3248,6 +5010,27 @@ external abstract class Element : Node, ParentNode, NonDocumentTypeChildNode, Ch
     fun releasePointerCapture(pointerId: Int)
     fun hasPointerCapture(pointerId: Int): Boolean
     fun requestFullscreen(): Promise<Unit>
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface ShadowRootInit {
@@ -3294,6 +5077,27 @@ external abstract class Attr : Node {
     open var value: String
     open val ownerElement: Element?
     open val specified: Boolean
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3307,6 +5111,27 @@ external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNod
     fun insertData(offset: Int, data: String)
     fun deleteData(offset: Int, count: Int)
     fun replaceData(offset: Int, count: Int, data: String)
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3326,6 +5151,27 @@ external open class Text(data: String = definedExternally) : CharacterData, Slot
     override fun after(vararg nodes: dynamic)
     override fun replaceWith(vararg nodes: dynamic)
     override fun remove()
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3340,6 +5186,27 @@ external open class CDATASection : Text {
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3347,6 +5214,27 @@ external open class CDATASection : Text {
  */
 external abstract class ProcessingInstruction : CharacterData, LinkStyle, UnionElementOrProcessingInstruction {
     open val target: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3359,6 +5247,27 @@ external open class Comment(data: String = definedExternally) : CharacterData {
     override fun after(vararg nodes: dynamic)
     override fun replaceWith(vararg nodes: dynamic)
     override fun remove()
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -3744,6 +5653,13 @@ external abstract class MediaQueryList : EventTarget {
 external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryListEventInit = definedExternally) : Event {
     open val media: String
     open val matches: Boolean
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
 external interface MediaQueryListEventInit : EventInit {
@@ -3949,6 +5865,27 @@ external open class Image(width: Int = definedExternally, height: Int = definedE
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external open class Audio(src: String = definedExternally) : HTMLAudioElement {
@@ -4048,6 +5985,36 @@ external open class Audio(src: String = definedExternally) : HTMLAudioElement {
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val NETWORK_EMPTY: Short
+        val NETWORK_IDLE: Short
+        val NETWORK_LOADING: Short
+        val NETWORK_NO_SOURCE: Short
+        val HAVE_NOTHING: Short
+        val HAVE_METADATA: Short
+        val HAVE_CURRENT_DATA: Short
+        val HAVE_FUTURE_DATA: Short
+        val HAVE_ENOUGH_DATA: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -4150,6 +6117,28 @@ external open class Option(text: String = definedExternally, value: String = def
     override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
     override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+
 }
 
 external interface UnionElementOrHTMLCollection

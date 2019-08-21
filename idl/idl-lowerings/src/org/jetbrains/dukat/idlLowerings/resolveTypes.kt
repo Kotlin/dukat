@@ -83,7 +83,8 @@ private class TypeResolver : IDLLowering {
                 in resolvedUnionTypes -> IDLSingleTypeDeclaration(
                         name = declaration.name,
                         typeParameter = null,
-                        nullable = declaration.nullable
+                        nullable = declaration.nullable,
+                        comment = declaration.comment
                 )
                 in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
                         name = "\$dynamic",
@@ -144,7 +145,6 @@ private class TypeResolver : IDLLowering {
                     IDLInterfaceDeclaration(
                             name = it,
                             attributes = listOf(),
-                            constants = listOf(),
                             operations = listOf(),
                             primaryConstructor = null,
                             constructors = listOf(),
