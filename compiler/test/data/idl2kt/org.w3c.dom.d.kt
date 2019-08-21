@@ -3802,7 +3802,6 @@ external interface NavigatorPlugins {
  * Exposes the JavaScript [PluginArray](https://developer.mozilla.org/en/docs/Web/API/PluginArray) to Kotlin
  */
 external abstract class PluginArray : ItemArrayLike<Plugin> {
-    override val length: Int
     fun refresh(reload: Boolean = definedExternally)
     override fun item(index: Int): Plugin?
     fun namedItem(name: String): Plugin?
@@ -3818,7 +3817,6 @@ inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
  * Exposes the JavaScript [MimeTypeArray](https://developer.mozilla.org/en/docs/Web/API/MimeTypeArray) to Kotlin
  */
 external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
-    override val length: Int
     override fun item(index: Int): MimeType?
     fun namedItem(name: String): MimeType?
 }
@@ -3836,7 +3834,6 @@ external abstract class Plugin : ItemArrayLike<MimeType> {
     open val name: String
     open val description: String
     open val filename: String
-    override val length: Int
     override fun item(index: Int): MimeType?
     fun namedItem(name: String): MimeType?
 }
@@ -4612,7 +4609,6 @@ external interface Slotable {
  * Exposes the JavaScript [NodeList](https://developer.mozilla.org/en/docs/Web/API/NodeList) to Kotlin
  */
 external abstract class NodeList : ItemArrayLike<Node> {
-    override val length: Int
     override fun item(index: Int): Node?
 }
 
@@ -4623,7 +4619,6 @@ inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
  * Exposes the JavaScript [HTMLCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLCollection) to Kotlin
  */
 external abstract class HTMLCollection : ItemArrayLike<Element>, UnionElementOrHTMLCollection {
-    override val length: Int
     override fun item(index: Int): Element?
     fun namedItem(name: String): Element?
 }
@@ -5235,7 +5230,6 @@ inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
  * Exposes the JavaScript [NamedNodeMap](https://developer.mozilla.org/en/docs/Web/API/NamedNodeMap) to Kotlin
  */
 external abstract class NamedNodeMap : ItemArrayLike<Attr> {
-    override val length: Int
     fun getNamedItemNS(namespace: String?, localName: String): Attr?
     fun setNamedItem(attr: Attr): Attr?
     fun setNamedItemNS(attr: Attr): Attr?
@@ -5559,7 +5553,6 @@ external interface NodeFilter {
  * Exposes the JavaScript [DOMTokenList](https://developer.mozilla.org/en/docs/Web/API/DOMTokenList) to Kotlin
  */
 external abstract class DOMTokenList : ItemArrayLike<String> {
-    override val length: Int
     open var value: String
     fun contains(token: String): Boolean
     fun add(vararg tokens: String)

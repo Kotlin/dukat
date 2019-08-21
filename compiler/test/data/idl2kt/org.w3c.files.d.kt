@@ -68,7 +68,6 @@ inline fun FilePropertyBag(lastModified: Int? = undefined, type: String? = ""): 
  * Exposes the JavaScript [FileList](https://developer.mozilla.org/en/docs/Web/API/FileList) to Kotlin
  */
 external abstract class FileList : ItemArrayLike<File> {
-    override val length: Int
     override fun item(index: Int): File?
 }
 
