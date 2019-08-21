@@ -28,9 +28,6 @@ interface ModelVisitor {
         visitFunction(declaration)
     }
 
-    private fun processParameterModel(ownerContext: ParameterModel) {}
-    private fun processMemberNode(declaration: MemberModel) {}
-
     fun visitObject(objectNode: ObjectModel)
     private fun processObjectModel(declaration: ObjectModel) {
         visitObject(declaration)
@@ -49,34 +46,12 @@ interface ModelVisitor {
     fun visitInterface(interfaceModel: InterfaceModel)
     private fun processInterfaceModel(declaration: InterfaceModel) {
         visitInterface(declaration)
-
-        declaration.members.forEach { member ->
-            processMemberNode(member)
-        }
-
-        declaration.parentEntities.forEach { heritageClause ->
-            processHeritageNode(heritageClause)
-        }
     }
-
 
     fun visitClass(classModel: ClassModel)
     private fun processClassModel(declaration: ClassModel) {
         visitClass(declaration)
-
-        declaration.members.forEach { member ->
-            processMemberNode(member)
-        }
-
-        declaration.parentEntities.forEach { heritageClause ->
-            processHeritageNode(heritageClause)
-        }
     }
-
-    private fun processHeritageNode(declaration: HeritageModel) {
-        val heritageClause = declaration
-    }
-
 
     private fun processClassLikeModel(declaration: ClassLikeModel) {
         when (declaration) {
@@ -93,7 +68,7 @@ interface ModelVisitor {
             is ObjectModel -> processObjectModel(declaration)
             is EnumModel -> processEnumNode(declaration)
             is TypeAliasModel -> processTypeAliasModel(declaration)
-            else -> raiseConcern("unable to process TopeLevelDeclaration ${declaration::class.simpleName}") {  }
+            else -> raiseConcern("unable to process TopLevelDeclaration ${declaration}") {  }
         }
     }
 

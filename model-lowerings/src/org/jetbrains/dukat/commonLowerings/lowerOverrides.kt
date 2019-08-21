@@ -20,7 +20,7 @@ private class OverrideResolver(val context: ModelContext) {
         return when (this) {
             is InterfaceModel -> getKnownParents()
             is ClassModel -> getKnownParents()
-            else -> raiseConcern("unknown ClassLikeDeclaration ${this::class.simpleName}") { emptyList<ClassLikeModel>() }
+            else -> raiseConcern("unknown ClassLikeDeclaration ${this}") { emptyList<ClassLikeModel>() }
         }
     }
 

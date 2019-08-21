@@ -134,7 +134,7 @@ private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boo
 }
 
 private fun translateAnnotations(annotations: List<AnnotationModel>): String {
-    val annotations = annotations.map { annotationNode ->
+    val annotationsResolved = annotations.map { annotationNode ->
         var res = "@" + annotationNode.name
         if (annotationNode.params.isNotEmpty()) {
             res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
@@ -142,7 +142,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
         res
     }
 
-    val annotationTranslated = if (annotations.isEmpty()) "" else annotations.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
+    val annotationTranslated = if (annotationsResolved.isEmpty()) "" else annotationsResolved.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
 
     return annotationTranslated
 }
@@ -297,7 +297,7 @@ private fun MemberModel.translate(): List<String> {
         is ConstructorModel -> translate()
         is ClassModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
-        else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
+        else -> raiseConcern("can not translate MemberModel ${this}") { listOf("") }
     }
 }
 
@@ -482,7 +482,7 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
         if (companionObject != null) {
-            val parents = if (companionObject!!.parentEntities.isEmpty()) {
+            val parentsResolved = if (companionObject!!.parentEntities.isEmpty()) {
                 ""
             } else {
                 " : ${companionObject!!.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
@@ -491,7 +491,7 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
             if (hasMembers) {
                 output("")
             }
-            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents}${if (staticMembers.isEmpty()) "" else " {"}")
+            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parentsResolved}${if (staticMembers.isEmpty()) "" else " {"}")
 
             if (staticMembers.isNotEmpty()) {
                 staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }.forEach { output(it) }
@@ -587,7 +587,7 @@ class StringTranslator : ModelVisitor {
             }
         }
 
-        moduleModel.imports.forEachIndexed { index, importNode ->
+        moduleModel.imports.forEachIndexed { _, importNode ->
             visitImport(importNode)
         }
     }

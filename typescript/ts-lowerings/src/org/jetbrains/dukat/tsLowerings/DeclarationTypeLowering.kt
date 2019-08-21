@@ -68,7 +68,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
             is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration)
             else -> {
-                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this}] skipping ${declaration}")
                 declaration
             }
         }

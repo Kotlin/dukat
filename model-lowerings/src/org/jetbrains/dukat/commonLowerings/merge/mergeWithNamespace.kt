@@ -28,7 +28,7 @@ private fun ModuleModel.visitTopLevelNode(visitor: (TopLevelModel, ModuleModel) 
 private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelModel) -> TopLevelModel?): TopLevelModel? {
     val moduleResolved = visitor(this)
     return if (moduleResolved is ModuleModel) {
-        return (moduleResolved as ModuleModel).copy(
+        return moduleResolved.copy(
                 declarations = declarations.mapNotNull { declaration -> visitor(declaration) },
                 submodules = submodules.mapNotNull { submodule -> (submodule.transformTopLevelNode(visitor) as ModuleModel?) }
         )

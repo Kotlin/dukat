@@ -10,5 +10,5 @@ interface MetaData : ParameterValueDeclaration {
         get() = raiseConcern("MetaData has nullable only for historical reasons and will be removed") { false }
     override var meta: ParameterValueDeclaration?
         get() = raiseConcern("MetaData has nullable only for historical reasons and will be removed") { null }
-        set(value) {}
+        set(value) { raiseConcern("Cannot set ${value} to MetaData") { null }}
 }

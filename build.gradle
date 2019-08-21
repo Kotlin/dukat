@@ -26,6 +26,8 @@ allprojects {
       compileKotlin {
         kotlinOptions {
           jvmTarget = '1.6'
+          allWarningsAsErrors = true
+          freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
         }
       }
 

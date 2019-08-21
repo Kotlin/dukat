@@ -22,11 +22,7 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.process
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
-import java.io.File
 
 class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): InputTranslator<String> {
 
@@ -52,8 +48,8 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .omitStdLib()
     }
 
-    override fun translate(fileName: String): SourceBundleModel {
-        return SourceBundleModel(listOf(translateSet(fileName)))
+    override fun translate(data: String): SourceBundleModel {
+        return SourceBundleModel(listOf(translateSet(data)))
     }
 
 }

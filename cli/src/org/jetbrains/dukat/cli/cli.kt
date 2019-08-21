@@ -58,17 +58,15 @@ private fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: S
         if (translationUnitResult is ModuleTranslationUnit) {
             val targetName = "${translationUnitResult.name}.kt"
 
-            if (targetName != null) {
-                val resolvedTarget = dirFile.resolve(targetName)
+            val resolvedTarget = dirFile.resolve(targetName)
 
-                println(resolvedTarget.name)
+            println(resolvedTarget.name)
 
-                if (buildReport) {
-                    output.add(resolvedTarget.name)
-                }
-
-                resolvedTarget.writeText(translationUnitResult.content)
+            if (buildReport) {
+                output.add(resolvedTarget.name)
             }
+
+            resolvedTarget.writeText(translationUnitResult.content)
         } else {
             val fileName = when (translationUnitResult) {
                 is TranslationErrorInvalidFile -> translationUnitResult.fileName
@@ -94,6 +92,7 @@ private fun compile(filenames: List<String>, outDir: String?, translator: InputT
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
+@UseExperimental(kotlinx.serialization.UnstableDefault::class)
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
 

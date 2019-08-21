@@ -507,7 +507,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                     typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) })
         } else null
         else -> {
-            logger.debug("skipping ${this::class.simpleName}")
+            logger.debug("skipping ${this}")
             null
         }
     }

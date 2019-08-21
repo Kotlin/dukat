@@ -28,9 +28,8 @@ fun ModuleModel.mergeModules(): ModuleModel {
 
     val submodulesResolved = mutableListOf<ModuleModel>()
     submodules.forEach { submodule ->
-        val submodule = modulesInBucketsMerged.remove(submodule.shortName)
-        if (submodule != null) {
-            submodulesResolved.add(submodule.mergeModules())
+        modulesInBucketsMerged.remove(submodule.shortName)?.let {
+            submodulesResolved.add(it.mergeModules())
         }
     }
 

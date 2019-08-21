@@ -103,7 +103,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         val heritageClause = ownerContext.node
         val heritageClauseValue = heritageClause.value
 
-        if ((heritageClauseValue is TypeValueModel) && (heritageClauseValue.value is IdentifierEntity)) {
+        if (heritageClauseValue.value is IdentifierEntity) {
             val name = heritageClauseValue.value
             declarationResolver.resolve(name, ownerContext.getQualifiedName())?.let { declarationOwnerContext ->
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()

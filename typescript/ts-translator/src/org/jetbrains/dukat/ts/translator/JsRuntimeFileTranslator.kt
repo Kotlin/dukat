@@ -3,11 +3,9 @@ package org.jetbrains.dukat.ts.translator
 import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
@@ -40,7 +38,7 @@ class JsRuntimeFileTranslator(
         return proto.convert()
     }
 
-    override fun translate(fileName: String): SourceBundleModel {
-        return lower(translateFile(fileName, packageName))
+    override fun translate(data: String): SourceBundleModel {
+        return lower(translateFile(data, packageName))
     }
 }

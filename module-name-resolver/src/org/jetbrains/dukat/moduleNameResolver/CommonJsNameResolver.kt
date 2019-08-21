@@ -4,6 +4,8 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
+
+    @UseExperimental(kotlinx.serialization.UnstableDefault::class)
     fun resolveName(sourceFile: File): String? {
         val parentDirs = generateSequence(sourceFile.parentFile) { it.parentFile }
 

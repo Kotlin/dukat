@@ -30,7 +30,7 @@ private fun Entity.getKey(): String {
         is TypeAliasNode -> uid
         is EnumNode -> ""
         is DocumentRootNode -> ""
-        else -> raiseConcern("unknown TopLevelNode ${this::class.simpleName}") { "" }
+        else -> raiseConcern("unknown TopLevelNode ${this}") { "" }
     }
 }
 
@@ -41,6 +41,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
         return myReferences
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun findTopLevelOwner(ownerContext: NodeOwner<*>): NodeOwner<out Entity>? {
         ownerContext.getOwners().forEach { owner ->
             if (owner is NodeOwner<*>) {
@@ -53,7 +54,7 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
                     is VariableNode -> return owner as NodeOwner<VariableNode>
                     is TypeAliasNode -> if (node.canBeTranslated) {
                         return owner as NodeOwner<TypeAliasNode>
-                    } else null
+                    }
                 }
             }
         }
@@ -61,17 +62,17 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
         return null
     }
 
-    override fun lowerParameterValue(ownerContext: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+    override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
 
-        val declaration = ownerContext.node
+        val declaration = owner.node
 
         if (declaration is GeneratedInterfaceReferenceDeclaration) {
-            findTopLevelOwner(ownerContext)?.let {
+            findTopLevelOwner(owner)?.let {
                 myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(declaration.name)
             }
         }
 
-        return super.lowerParameterValue(ownerContext)
+        return super.lowerParameterValue(owner)
     }
 
 }
