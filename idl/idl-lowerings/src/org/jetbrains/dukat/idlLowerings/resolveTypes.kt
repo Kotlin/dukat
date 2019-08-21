@@ -9,6 +9,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.isKnown
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
 import org.jetbrains.dukat.logger.Logging
@@ -94,7 +95,7 @@ private class TypeResolver : IDLLowering {
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsType(declaration.name)) {
+            return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
                 IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,

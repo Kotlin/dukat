@@ -3,9 +3,11 @@ package org.jetbrains.dukat.compiler.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.commonLowerings.omitStdLib
 import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
+import org.jetbrains.dukat.idlLowerings.addItemArrayLike
 import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
 import org.jetbrains.dukat.idlLowerings.markAbstractOrOpen
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatements
@@ -33,6 +35,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .specifyEventHandlerTypes()
                 .specifyDefaultValues()
                 .resolveImplementsStatements()
+                .addItemArrayLike()
                 .resolveTypes()
                 .addOverloadsForCallbacks()
                 .markAbstractOrOpen()
@@ -40,6 +43,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .lowerOverrides()
                 .escapeIdentificators()
                 .addImportsForReferencedFiles()
+                .omitStdLib()
     }
 
     override fun translate(fileName: String): SourceBundleModel {

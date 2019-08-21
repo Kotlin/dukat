@@ -39,12 +39,12 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
             MemberKind.CONSTANT -> IDLConstantDeclaration(name, type)
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue, required)
             MemberKind.GETTER -> IDLGetterDeclaration(
-                    name,
+                    name.ifEmpty { "get" },
                     arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) },
                     type
             )
             MemberKind.SETTER -> IDLSetterDeclaration(
-                    name,
+                    name.ifEmpty { "set" },
                     arguments.getOrElse(0) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) },
                     arguments.getOrElse(1) { IDLArgumentDeclaration("", IDLSingleTypeDeclaration("", null, false), false, false) }
             )
