@@ -21,7 +21,7 @@ import org.w3c.xhr.*
 /**
  * Exposes the JavaScript [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) to Kotlin
  */
-external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) {
+external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) : ImageBitmapSource {
     open val size: Number
     open val type: String
     open val isClosed: Boolean
@@ -68,7 +68,6 @@ inline fun FilePropertyBag(lastModified: Int? = undefined, type: String? = ""): 
  * Exposes the JavaScript [FileList](https://developer.mozilla.org/en/docs/Web/API/FileList) to Kotlin
  */
 external abstract class FileList : ItemArrayLike<File> {
-    override val length: Int
     override fun item(index: Int): File?
 }
 

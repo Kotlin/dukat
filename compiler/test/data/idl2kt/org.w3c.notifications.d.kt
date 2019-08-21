@@ -45,8 +45,8 @@ external open class Notification(title: String, options: NotificationOptions = d
     fun close()
 
     companion object {
-        var permission: NotificationPermission
-        var maxActions: Int
+        val permission: NotificationPermission
+        val maxActions: Int
         fun requestPermission(deprecatedCallback: (NotificationPermission) -> Unit = definedExternally): Promise<NotificationPermission>
     }
 }

@@ -20,7 +20,6 @@ import org.w3c.xhr.*
 
 external abstract class MediaList : ItemArrayLike<String> {
     open var mediaText: String
-    override val length: Int
     fun appendMedium(medium: String)
     fun deleteMedium(medium: String)
     override fun item(index: Int): String?
@@ -56,7 +55,6 @@ external abstract class CSSStyleSheet : StyleSheet {
  * Exposes the JavaScript [StyleSheetList](https://developer.mozilla.org/en/docs/Web/API/StyleSheetList) to Kotlin
  */
 external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
-    override val length: Int
     override fun item(index: Int): StyleSheet?
 }
 
@@ -68,13 +66,13 @@ inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[in
  */
 external interface LinkStyle {
     val sheet: StyleSheet?
+        get() = definedExternally
 }
 
 /**
  * Exposes the JavaScript [CSSRuleList](https://developer.mozilla.org/en/docs/Web/API/CSSRuleList) to Kotlin
  */
 external abstract class CSSRuleList : ItemArrayLike<CSSRule> {
-    override val length: Int
     override fun item(index: Int): CSSRule?
 }
 
@@ -235,7 +233,6 @@ external abstract class CSSNamespaceRule : CSSRule {
  */
 external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     open var cssText: String
-    override val length: Int
     open val parentRule: CSSRule?
     open var cssFloat: String
     open var _dashed_attribute: String

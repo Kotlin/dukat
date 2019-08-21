@@ -696,7 +696,9 @@ external open class SVGUseElementShadowRoot : ShadowRoot {
 
 external interface SVGElementInstance {
     val correspondingElement: SVGElement?
+        get() = definedExternally
     val correspondingUseElement: SVGUseElement?
+        get() = definedExternally
 }
 
 external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
@@ -1053,7 +1055,7 @@ external abstract class SVGPointList {
 inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem; }
+inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGPolylineElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolylineElement) to Kotlin

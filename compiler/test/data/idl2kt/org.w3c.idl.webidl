@@ -5,3 +5,5 @@ namespace org.w3c.webidl;
 typedef unsigned long long DOMTimeStamp;
 callback Function = any (any... arguments);
 callback VoidFunction = void ();
+
+typedef Window WindowProxy;
