@@ -59,6 +59,10 @@ private class TypeResolver : IDLLowering {
                             nullable = false
                     ))
                 }
+                is IDLFunctionTypeDeclaration -> {
+                    failedToResolveUnionTypes += unionType.name
+                    return
+                }
             }
         }
         resolvedUnionTypes += unionType.name

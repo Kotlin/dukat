@@ -113,9 +113,16 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 }
 
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
+
+    val returnTypeModel = if (returnType.name == "any") {
+        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null)
+    } else {
+        returnType.process()
+    }
+
     return FunctionTypeModel(
-            parameters = arguments.filterNot { it.variadic }.map { it.process() },
-            type = returnType.process(),
+            parameters = arguments.map { it.process() },
+            type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
     )
