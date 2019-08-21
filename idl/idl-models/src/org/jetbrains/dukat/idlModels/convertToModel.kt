@@ -35,7 +35,6 @@ import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
@@ -143,7 +142,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process(),
-            initializer = if (optional) {
+            initializer = if (optional || defaultValue != null) {
                 StatementCallModel(
                         IdentifierEntity("definedExternally"),
                         null
@@ -234,8 +233,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             operations.filterNot { it.static } +
             getters.filterNot { it.name == "get" } +
             setters.filterNot { it.name == "set" }).mapNotNull { it.process() }
-    val staticMemberModels = (constants +
-            attributes.filter { it.static } +
+    val staticMemberModels = (attributes.filter { it.static } +
             operations.filter { it.static }).mapNotNull { it.process() }
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
@@ -357,7 +355,7 @@ fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
 fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
-            members = members.mapNotNull { it.process() },
+            members = members.filterNot { it.inherited }.mapNotNull { it.process() },
             companionObject = null,
             typeParameters = listOf(),
             parentEntities = parents.map {
@@ -492,16 +490,6 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 parameters = arguments.map { it.process() },
                 typeParameters = listOf(),
                 generated = false
-        )
-        is IDLConstantDeclaration -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.process(),
-                typeParameters = listOf(),
-                static = false,
-                override = false,
-                getter = true,
-                setter = false,
-                open = false
         )
         is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),

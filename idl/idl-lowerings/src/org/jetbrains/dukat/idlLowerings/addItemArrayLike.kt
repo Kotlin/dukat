@@ -45,13 +45,13 @@ private class ItemArrayLikeLowering : IDLLowering {
                         static = false,
                         readOnly = true
                 )),
-                constants = listOf(),
                 operations = listOf(IDLOperationDeclaration(
                         name = "item",
                         returnType = IDLSingleTypeDeclaration("any", null, false),
                         arguments = listOf(IDLArgumentDeclaration(
                                 name = "index",
                                 type = IDLSingleTypeDeclaration("unsignedlong", null, false),
+                                defaultValue = null,
                                 optional = false,
                                 variadic = false
                         )),

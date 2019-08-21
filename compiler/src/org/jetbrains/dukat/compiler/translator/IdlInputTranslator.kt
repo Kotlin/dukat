@@ -8,6 +8,7 @@ import org.jetbrains.dukat.commonLowerings.omitStdLib
 import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
+import org.jetbrains.dukat.idlLowerings.addMissingMembers
 import org.jetbrains.dukat.idlLowerings.addItemArrayLike
 import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
 import org.jetbrains.dukat.idlLowerings.markAbstractOrOpen
@@ -39,6 +40,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .resolveImplementsStatements()
                 .addItemArrayLike()
                 .resolveTypes()
+                .addMissingMembers()
                 .addOverloadsForCallbacks()
                 .markAbstractOrOpen()
                 .process()

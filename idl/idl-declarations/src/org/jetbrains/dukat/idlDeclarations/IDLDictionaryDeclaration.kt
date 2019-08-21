@@ -5,4 +5,4 @@ data class IDLDictionaryDeclaration(
         val members: List<IDLDictionaryMemberDeclaration>,
         val parents: List<IDLSingleTypeDeclaration>,
         val partial: Boolean
-) : IDLTopLevelDeclaration
+) : IDLClassLikeDeclaration

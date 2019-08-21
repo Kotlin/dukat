@@ -3,7 +3,6 @@ package org.jetbrains.dukat.idlDeclarations
 data class IDLInterfaceDeclaration(
         val name: String,
         val attributes: List<IDLAttributeDeclaration>,
-        val constants: List<IDLConstantDeclaration>,
         val operations: List<IDLOperationDeclaration>,
         val primaryConstructor: IDLConstructorDeclaration?,
         val constructors: List<IDLConstructorDeclaration>,
@@ -15,7 +14,7 @@ data class IDLInterfaceDeclaration(
         val callback: Boolean,
         val generated: Boolean,
         val partial: Boolean
-) : IDLTopLevelDeclaration
+) : IDLClassLikeDeclaration
 
 enum class InterfaceKind {
     INTERFACE, ABSTRACT_CLASS, OPEN_CLASS

@@ -28,6 +28,27 @@ external abstract class SVGElement : Element, GlobalEventHandlers, SVGElementIns
     open var tabIndex: Int
     fun focus()
     fun blur()
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface SVGBoundingBoxOptions {
@@ -63,6 +84,27 @@ external abstract class SVGGraphicsElement : SVGElement, SVGTests {
     fun getBBox(options: SVGBoundingBoxOptions = definedExternally): DOMRect
     fun getCTM(): DOMMatrix?
     fun getScreenCTM(): DOMMatrix?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -74,6 +116,27 @@ external abstract class SVGGeometryElement : SVGGraphicsElement {
     fun isPointInStroke(point: DOMPoint): Boolean
     fun getTotalLength(): Float
     fun getPointAtLength(distance: Float): DOMPoint
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -369,40 +432,205 @@ external abstract class SVGSVGElement : SVGGraphicsElement, SVGFitToViewBox, SVG
         val SVG_ZOOMANDPAN_UNKNOWN: Short
         val SVG_ZOOMANDPAN_DISABLE: Short
         val SVG_ZOOMANDPAN_MAGNIFY: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
 /**
  * Exposes the JavaScript [SVGGElement](https://developer.mozilla.org/en/docs/Web/API/SVGGElement) to Kotlin
  */
-external abstract class SVGGElement : SVGGraphicsElement
+external abstract class SVGGElement : SVGGraphicsElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
-external abstract class SVGUnknownElement : SVGGraphicsElement
+external abstract class SVGUnknownElement : SVGGraphicsElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGDefsElement](https://developer.mozilla.org/en/docs/Web/API/SVGDefsElement) to Kotlin
  */
-external abstract class SVGDefsElement : SVGGraphicsElement
+external abstract class SVGDefsElement : SVGGraphicsElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGDescElement](https://developer.mozilla.org/en/docs/Web/API/SVGDescElement) to Kotlin
  */
-external abstract class SVGDescElement : SVGElement
+external abstract class SVGDescElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGMetadataElement](https://developer.mozilla.org/en/docs/Web/API/SVGMetadataElement) to Kotlin
  */
-external abstract class SVGMetadataElement : SVGElement
+external abstract class SVGMetadataElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGTitleElement](https://developer.mozilla.org/en/docs/Web/API/SVGTitleElement) to Kotlin
  */
-external abstract class SVGTitleElement : SVGElement
+external abstract class SVGTitleElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGSymbolElement](https://developer.mozilla.org/en/docs/Web/API/SVGSymbolElement) to Kotlin
  */
-external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox
+external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGUseElement](https://developer.mozilla.org/en/docs/Web/API/SVGUseElement) to Kotlin
@@ -414,6 +642,27 @@ external abstract class SVGUseElement : SVGGraphicsElement, SVGURIReference {
     open val height: SVGAnimatedLength
     open val instanceRoot: SVGElement?
     open val animatedInstanceRoot: SVGElement?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external open class SVGUseElementShadowRoot : ShadowRoot {
@@ -422,6 +671,27 @@ external open class SVGUseElementShadowRoot : ShadowRoot {
     override fun append(vararg nodes: dynamic)
     override fun querySelector(selectors: String): Element?
     override fun querySelectorAll(selectors: String): NodeList
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external interface SVGElementInstance {
@@ -438,7 +708,28 @@ external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
 /**
  * Exposes the JavaScript [SVGSwitchElement](https://developer.mozilla.org/en/docs/Web/API/SVGSwitchElement) to Kotlin
  */
-external abstract class SVGSwitchElement : SVGGraphicsElement
+external abstract class SVGSwitchElement : SVGGraphicsElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 external interface GetSVGDocument {
     fun getSVGDocument(): Document
@@ -451,6 +742,27 @@ external abstract class SVGStyleElement : SVGElement, LinkStyle {
     open var type: String
     open var media: String
     open var title: String
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -545,7 +857,28 @@ external abstract class SVGAnimatedPreserveAspectRatio {
 /**
  * Exposes the JavaScript [SVGPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGPathElement) to Kotlin
  */
-external abstract class SVGPathElement : SVGGeometryElement
+external abstract class SVGPathElement : SVGGeometryElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGRectElement](https://developer.mozilla.org/en/docs/Web/API/SVGRectElement) to Kotlin
@@ -557,6 +890,27 @@ external abstract class SVGRectElement : SVGGeometryElement {
     open val height: SVGAnimatedLength
     open val rx: SVGAnimatedLength
     open val ry: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -566,6 +920,27 @@ external abstract class SVGCircleElement : SVGGeometryElement {
     open val cx: SVGAnimatedLength
     open val cy: SVGAnimatedLength
     open val r: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -576,6 +951,27 @@ external abstract class SVGEllipseElement : SVGGeometryElement {
     open val cy: SVGAnimatedLength
     open val rx: SVGAnimatedLength
     open val ry: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -586,12 +982,54 @@ external abstract class SVGLineElement : SVGGeometryElement {
     open val y1: SVGAnimatedLength
     open val x2: SVGAnimatedLength
     open val y2: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [SVGMeshElement](https://developer.mozilla.org/en/docs/Web/API/SVGMeshElement) to Kotlin
  */
-external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference
+external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGAnimatedPoints](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedPoints) to Kotlin
@@ -617,17 +1055,59 @@ external abstract class SVGPointList {
 inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
+inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem; }
 
 /**
  * Exposes the JavaScript [SVGPolylineElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolylineElement) to Kotlin
  */
-external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints
+external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGPolygonElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolygonElement) to Kotlin
  */
-external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints
+external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGTextContentElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextContentElement) to Kotlin
@@ -649,6 +1129,24 @@ external abstract class SVGTextContentElement : SVGGraphicsElement {
         val LENGTHADJUST_UNKNOWN: Short
         val LENGTHADJUST_SPACING: Short
         val LENGTHADJUST_SPACINGANDGLYPHS: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
@@ -661,17 +1159,89 @@ external abstract class SVGTextPositioningElement : SVGTextContentElement {
     open val dx: SVGAnimatedLengthList
     open val dy: SVGAnimatedLengthList
     open val rotate: SVGAnimatedNumberList
+
+    companion object {
+        val LENGTHADJUST_UNKNOWN: Short
+        val LENGTHADJUST_SPACING: Short
+        val LENGTHADJUST_SPACINGANDGLYPHS: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [SVGTextElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextElement) to Kotlin
  */
-external abstract class SVGTextElement : SVGTextPositioningElement
+external abstract class SVGTextElement : SVGTextPositioningElement {
+    companion object {
+        val LENGTHADJUST_UNKNOWN: Short
+        val LENGTHADJUST_SPACING: Short
+        val LENGTHADJUST_SPACINGANDGLYPHS: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGTSpanElement](https://developer.mozilla.org/en/docs/Web/API/SVGTSpanElement) to Kotlin
  */
-external abstract class SVGTSpanElement : SVGTextPositioningElement
+external abstract class SVGTSpanElement : SVGTextPositioningElement {
+    companion object {
+        val LENGTHADJUST_UNKNOWN: Short
+        val LENGTHADJUST_SPACING: Short
+        val LENGTHADJUST_SPACINGANDGLYPHS: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGTextPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextPathElement) to Kotlin
@@ -688,6 +1258,27 @@ external abstract class SVGTextPathElement : SVGTextContentElement, SVGURIRefere
         val TEXTPATH_SPACINGTYPE_UNKNOWN: Short
         val TEXTPATH_SPACINGTYPE_AUTO: Short
         val TEXTPATH_SPACINGTYPE_EXACT: Short
+        val LENGTHADJUST_UNKNOWN: Short
+        val LENGTHADJUST_SPACING: Short
+        val LENGTHADJUST_SPACINGANDGLYPHS: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
@@ -701,6 +1292,27 @@ external abstract class SVGImageElement : SVGGraphicsElement, SVGURIReference, H
     open val height: SVGAnimatedLength
     open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
     open var crossOrigin: String?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -711,6 +1323,27 @@ external abstract class SVGForeignObjectElement : SVGGraphicsElement {
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
     open val height: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
@@ -732,13 +1365,52 @@ external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
         val SVG_MARKER_ORIENT_UNKNOWN: Short
         val SVG_MARKER_ORIENT_AUTO: Short
         val SVG_MARKER_ORIENT_ANGLE: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
 /**
  * Exposes the JavaScript [SVGSolidcolorElement](https://developer.mozilla.org/en/docs/Web/API/SVGSolidcolorElement) to Kotlin
  */
-external abstract class SVGSolidcolorElement : SVGElement
+external abstract class SVGSolidcolorElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGGradientElement](https://developer.mozilla.org/en/docs/Web/API/SVGGradientElement) to Kotlin
@@ -756,6 +1428,24 @@ external abstract class SVGGradientElement : SVGElement, SVGURIReference, SVGUni
         val SVG_UNIT_TYPE_UNKNOWN: Short
         val SVG_UNIT_TYPE_USERSPACEONUSE: Short
         val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
@@ -767,6 +1457,34 @@ external abstract class SVGLinearGradientElement : SVGGradientElement {
     open val y1: SVGAnimatedLength
     open val x2: SVGAnimatedLength
     open val y2: SVGAnimatedLength
+
+    companion object {
+        val SVG_SPREADMETHOD_UNKNOWN: Short
+        val SVG_SPREADMETHOD_PAD: Short
+        val SVG_SPREADMETHOD_REFLECT: Short
+        val SVG_SPREADMETHOD_REPEAT: Short
+        val SVG_UNIT_TYPE_UNKNOWN: Short
+        val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+        val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -779,19 +1497,138 @@ external abstract class SVGRadialGradientElement : SVGGradientElement {
     open val fx: SVGAnimatedLength
     open val fy: SVGAnimatedLength
     open val fr: SVGAnimatedLength
+
+    companion object {
+        val SVG_SPREADMETHOD_UNKNOWN: Short
+        val SVG_SPREADMETHOD_PAD: Short
+        val SVG_SPREADMETHOD_REFLECT: Short
+        val SVG_SPREADMETHOD_REPEAT: Short
+        val SVG_UNIT_TYPE_UNKNOWN: Short
+        val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+        val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
-external abstract class SVGMeshGradientElement : SVGGradientElement
+external abstract class SVGMeshGradientElement : SVGGradientElement {
+    companion object {
+        val SVG_SPREADMETHOD_UNKNOWN: Short
+        val SVG_SPREADMETHOD_PAD: Short
+        val SVG_SPREADMETHOD_REFLECT: Short
+        val SVG_SPREADMETHOD_REPEAT: Short
+        val SVG_UNIT_TYPE_UNKNOWN: Short
+        val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+        val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
-external abstract class SVGMeshrowElement : SVGElement
+external abstract class SVGMeshrowElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
-external abstract class SVGMeshpatchElement : SVGElement
+external abstract class SVGMeshpatchElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGStopElement](https://developer.mozilla.org/en/docs/Web/API/SVGStopElement) to Kotlin
  */
 external abstract class SVGStopElement : SVGElement {
     open val offset: SVGAnimatedNumber
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -810,12 +1647,72 @@ external abstract class SVGPatternElement : SVGElement, SVGFitToViewBox, SVGURIR
         val SVG_UNIT_TYPE_UNKNOWN: Short
         val SVG_UNIT_TYPE_USERSPACEONUSE: Short
         val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 
-external abstract class SVGHatchElement : SVGElement
+external abstract class SVGHatchElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
-external abstract class SVGHatchpathElement : SVGElement
+external abstract class SVGHatchpathElement : SVGElement {
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
+}
 
 /**
  * Exposes the JavaScript [SVGCursorElement](https://developer.mozilla.org/en/docs/Web/API/SVGCursorElement) to Kotlin
@@ -823,6 +1720,27 @@ external abstract class SVGHatchpathElement : SVGElement
 external abstract class SVGCursorElement : SVGElement, SVGURIReference {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -831,6 +1749,27 @@ external abstract class SVGCursorElement : SVGElement, SVGURIReference {
 external abstract class SVGScriptElement : SVGElement, SVGURIReference, HTMLOrSVGScriptElement {
     open var type: String
     open var crossOrigin: String?
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
@@ -843,17 +1782,55 @@ external abstract class SVGAElement : SVGGraphicsElement, SVGURIReference {
     open val relList: SVGAnimatedString
     open val hreflang: SVGAnimatedString
     open val type: SVGAnimatedString
+
+    companion object {
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+    }
 }
 
 /**
  * Exposes the JavaScript [SVGViewElement](https://developer.mozilla.org/en/docs/Web/API/SVGViewElement) to Kotlin
  */
 external abstract class SVGViewElement : SVGElement, SVGFitToViewBox, SVGZoomAndPan {
-
     companion object {
         val SVG_ZOOMANDPAN_UNKNOWN: Short
         val SVG_ZOOMANDPAN_DISABLE: Short
         val SVG_ZOOMANDPAN_MAGNIFY: Short
+        val ELEMENT_NODE: Short
+        val ATTRIBUTE_NODE: Short
+        val TEXT_NODE: Short
+        val CDATA_SECTION_NODE: Short
+        val ENTITY_REFERENCE_NODE: Short
+        val ENTITY_NODE: Short
+        val PROCESSING_INSTRUCTION_NODE: Short
+        val COMMENT_NODE: Short
+        val DOCUMENT_NODE: Short
+        val DOCUMENT_TYPE_NODE: Short
+        val DOCUMENT_FRAGMENT_NODE: Short
+        val NOTATION_NODE: Short
+        val DOCUMENT_POSITION_DISCONNECTED: Short
+        val DOCUMENT_POSITION_PRECEDING: Short
+        val DOCUMENT_POSITION_FOLLOWING: Short
+        val DOCUMENT_POSITION_CONTAINS: Short
+        val DOCUMENT_POSITION_CONTAINED_BY: Short
+        val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
 

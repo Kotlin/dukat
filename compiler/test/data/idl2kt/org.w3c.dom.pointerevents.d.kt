@@ -108,5 +108,12 @@ external open class PointerEvent(type: String, eventInitDict: PointerEventInit =
     open val twist: Int
     open val pointerType: String
     open val isPrimary: Boolean
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
