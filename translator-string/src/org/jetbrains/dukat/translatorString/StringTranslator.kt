@@ -326,7 +326,7 @@ private fun PropertyModel.translateSignature(): List<String> {
 }
 
 private fun MethodModel.translateSignature(): List<String> {
-    val typeParams = translateTypeParameters(typeParameters)
+    var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
         typeParams = " " + typeParams
     }
@@ -405,6 +405,12 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
     val hasSecondaryConstructors = members.any { it is ConstructorModel }
 
+    if (documentation != null) {
+        output("/**")
+        output(" * $documentation")
+        output(" */")
+    }
+
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     val params = if (primaryConstructor == null) "" else
@@ -453,6 +459,13 @@ private fun InterfaceModel.translate(padding: Int): String {
 }
 
 fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
+
+    if (documentation != null) {
+        output("/**")
+        output(" * $documentation")
+        output(" */")
+    }
+
     val hasMembers = members.isNotEmpty()
     val staticMembers = companionObject?.members.orEmpty()
 

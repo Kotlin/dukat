@@ -319,6 +319,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = exportQualifier.toAnnotation(),
+            documentation = null,
             external = true,
             abstract = false
     )
@@ -359,6 +360,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             },
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = exportQualifier.toAnnotation(),
+            documentation = null,
             external = true
     )
 }

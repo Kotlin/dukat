@@ -1,15 +1,15 @@
 interface A {
-    void f(EventListener eventListener, StringListener stringListener);
+    void f(EventListenerX eventListener, StringListenerX stringListener);
 };
 
-callback interface EventListener {
-    void handleEvent(Event event);
+callback interface EventListenerX {
+    void handleEvent(EventX event);
 };
 
-callback interface StringListener {
+callback interface StringListenerX {
     DOMString handleString(DOMString string);
 };
 
-interface Event {
+interface EventX {
 
 };
