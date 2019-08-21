@@ -20,8 +20,8 @@ import org.w3c.xhr.*
 
 external abstract class HTMLAllCollection {
     open val length: Int
-    fun namedItem(name: String): UnionElementOrHTMLCollection?
     fun item(nameOrIndex: String = definedExternally): UnionElementOrHTMLCollection?
+    fun namedItem(name: String): UnionElementOrHTMLCollection?
 }
 
 @kotlin.internal.InlineOnly
@@ -3108,7 +3108,7 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
 /**
  * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
  */
-external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindow {
+external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindowProxy {
     override val performance: Performance
     open val window: Window
     open val self: Window
@@ -3743,12 +3743,12 @@ external interface WindowOrWorkerGlobalScope {
  * Exposes the JavaScript [Navigator](https://developer.mozilla.org/en/docs/Web/API/Navigator) to Kotlin
  */
 external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
-    open val serviceWorker: ServiceWorkerContainer
-    open val maxTouchPoints: Int
-    open val mediaDevices: MediaDevices
     open val clipboard: Clipboard
-    fun vibrate(pattern: dynamic): Boolean
+    open val mediaDevices: MediaDevices
+    open val maxTouchPoints: Int
+    open val serviceWorker: ServiceWorkerContainer
     fun getUserMedia(constraints: MediaStreamConstraints, successCallback: (MediaStream) -> Unit, errorCallback: (dynamic) -> Unit)
+    fun vibrate(pattern: dynamic): Boolean
 }
 
 /**
@@ -4766,40 +4766,6 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
  * Exposes the JavaScript [Document](https://developer.mozilla.org/en/docs/Web/API/Document) to Kotlin
  */
 external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
-    open val fullscreenEnabled: Boolean
-    open val fullscreen: Boolean
-    var onfullscreenchange: ((Event) -> dynamic)?
-    var onfullscreenerror: ((Event) -> dynamic)?
-    open val rootElement: SVGSVGElement?
-    var title: String
-    open val referrer: String
-    var domain: String
-    open val activeElement: Element?
-    open val location: Location?
-    var cookie: String
-    open val lastModified: String
-    open val readyState: DocumentReadyState
-    var dir: String
-    var body: HTMLElement?
-    open val head: HTMLHeadElement?
-    open val images: HTMLCollection
-    open val embeds: HTMLCollection
-    open val plugins: HTMLCollection
-    open val links: HTMLCollection
-    open val forms: HTMLCollection
-    open val scripts: HTMLCollection
-    open val currentScript: HTMLOrSVGScriptElement?
-    open val defaultView: Window?
-    var designMode: String
-    var onreadystatechange: ((Event) -> dynamic)?
-    var fgColor: String
-    var linkColor: String
-    var vlinkColor: String
-    var alinkColor: String
-    var bgColor: String
-    open val anchors: HTMLCollection
-    open val applets: HTMLCollection
-    open val all: HTMLAllCollection
     open val implementation: DOMImplementation
     open val URL: String
     open val documentURI: String
@@ -4811,18 +4777,42 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     open val contentType: String
     open val doctype: DocumentType?
     open val documentElement: Element?
+    open val location: Location?
+    var domain: String
+    open val referrer: String
+    var cookie: String
+    open val lastModified: String
+    open val readyState: DocumentReadyState
+    var title: String
+    var dir: String
+    var body: HTMLElement?
+    open val head: HTMLHeadElement?
+    open val images: HTMLCollection
+    open val embeds: HTMLCollection
+    open val plugins: HTMLCollection
+    open val links: HTMLCollection
+    open val forms: HTMLCollection
+    open val scripts: HTMLCollection
+    open val currentScript: HTMLOrSVGScriptElement?
+    open val defaultView: Window?
+    open val activeElement: Element?
+    var designMode: String
+    var onreadystatechange: ((Event) -> dynamic)?
+    var fgColor: String
+    var linkColor: String
+    var vlinkColor: String
+    var alinkColor: String
+    var bgColor: String
+    open val anchors: HTMLCollection
+    open val applets: HTMLCollection
+    open val all: HTMLAllCollection
     open val scrollingElement: Element?
     open val styleSheets: StyleSheetList
-    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
-    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
-    override var onpointerdown: ((PointerEvent) -> dynamic)?
-    override var onpointermove: ((PointerEvent) -> dynamic)?
-    override var onpointerup: ((PointerEvent) -> dynamic)?
-    override var onpointercancel: ((PointerEvent) -> dynamic)?
-    override var onpointerover: ((PointerEvent) -> dynamic)?
-    override var onpointerout: ((PointerEvent) -> dynamic)?
-    override var onpointerenter: ((PointerEvent) -> dynamic)?
-    override var onpointerleave: ((PointerEvent) -> dynamic)?
+    open val rootElement: SVGSVGElement?
+    open val fullscreenEnabled: Boolean
+    open val fullscreen: Boolean
+    var onfullscreenchange: ((Event) -> dynamic)?
+    var onfullscreenerror: ((Event) -> dynamic)?
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
     override var oncancel: ((Event) -> dynamic)?
@@ -4884,6 +4874,16 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override var ontoggle: ((Event) -> dynamic)?
     override var onvolumechange: ((Event) -> dynamic)?
     override var onwaiting: ((Event) -> dynamic)?
+    override var ongotpointercapture: ((PointerEvent) -> dynamic)?
+    override var onlostpointercapture: ((PointerEvent) -> dynamic)?
+    override var onpointerdown: ((PointerEvent) -> dynamic)?
+    override var onpointermove: ((PointerEvent) -> dynamic)?
+    override var onpointerup: ((PointerEvent) -> dynamic)?
+    override var onpointercancel: ((PointerEvent) -> dynamic)?
+    override var onpointerover: ((PointerEvent) -> dynamic)?
+    override var onpointerout: ((PointerEvent) -> dynamic)?
+    override var onpointerenter: ((PointerEvent) -> dynamic)?
+    override var onpointerleave: ((PointerEvent) -> dynamic)?
     override var oncopy: ((ClipboardEvent) -> dynamic)?
     override var oncut: ((ClipboardEvent) -> dynamic)?
     override var onpaste: ((ClipboardEvent) -> dynamic)?
@@ -4892,23 +4892,6 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     override val firstElementChild: Element?
     override val lastElementChild: Element?
     override val childElementCount: Int
-    fun exitFullscreen(): Promise<Unit>
-    fun getElementsByName(elementName: String): NodeList
-    fun open(type: String = definedExternally, replace: String = definedExternally): Document
-    fun open(url: String, name: String, features: String): Window
-    fun close()
-    fun write(vararg text: String)
-    fun writeln(vararg text: String)
-    fun hasFocus(): Boolean
-    fun execCommand(commandId: String, showUI: Boolean = definedExternally, value: String = definedExternally): Boolean
-    fun queryCommandEnabled(commandId: String): Boolean
-    fun queryCommandIndeterm(commandId: String): Boolean
-    fun queryCommandState(commandId: String): Boolean
-    fun queryCommandSupported(commandId: String): Boolean
-    fun queryCommandValue(commandId: String): String
-    fun clear()
-    fun captureEvents()
-    fun releaseEvents()
     fun getElementsByTagName(qualifiedName: String): HTMLCollection
     fun getElementsByTagNameNS(namespace: String?, localName: String): HTMLCollection
     fun getElementsByClassName(classNames: String): HTMLCollection
@@ -4929,9 +4912,26 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
     fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
     fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): TreeWalker
     fun createTreeWalker(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): TreeWalker
+    fun getElementsByName(elementName: String): NodeList
+    fun open(type: String = definedExternally, replace: String = definedExternally): Document
+    fun open(url: String, name: String, features: String): Window
+    fun close()
+    fun write(vararg text: String)
+    fun writeln(vararg text: String)
+    fun hasFocus(): Boolean
+    fun execCommand(commandId: String, showUI: Boolean = definedExternally, value: String = definedExternally): Boolean
+    fun queryCommandEnabled(commandId: String): Boolean
+    fun queryCommandIndeterm(commandId: String): Boolean
+    fun queryCommandState(commandId: String): Boolean
+    fun queryCommandSupported(commandId: String): Boolean
+    fun queryCommandValue(commandId: String): String
+    fun clear()
+    fun captureEvents()
+    fun releaseEvents()
     fun elementFromPoint(x: Double, y: Double): Element?
     fun elementsFromPoint(x: Double, y: Double): Array<Element>
     fun caretPositionFromPoint(x: Double, y: Double): CaretPosition?
+    fun exitFullscreen(): Promise<Unit>
     override fun getElementById(elementId: String): Element?
     override fun prepend(vararg nodes: dynamic)
     override fun append(vararg nodes: dynamic)
@@ -6316,7 +6316,6 @@ external open class Option(text: String = definedExternally, value: String = def
         val DOCUMENT_POSITION_CONTAINED_BY: Short
         val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
-
 }
 
 external interface UnionElementOrHTMLCollection
@@ -6324,8 +6323,6 @@ external interface UnionElementOrHTMLCollection
 external interface UnionElementOrRadioNodeList
 
 external interface UnionHTMLOptGroupElementOrHTMLOptionElement
-
-external interface UnionMessagePortOrWindowProxy
 
 external interface UnionAudioTrackOrTextTrackOrVideoTrack
 
@@ -6339,11 +6336,9 @@ external interface CanvasImageSource : ImageBitmapSource
 
 external interface ImageBitmapSource
 
+external interface UnionMessagePortOrWindowProxy
+
 external interface HTMLOrSVGScriptElement
-
-external @marker interface CanvasImageSource : ImageBitmapSource
-
-external @marker interface ImageBitmapSource
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
