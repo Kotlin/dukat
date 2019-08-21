@@ -16,12 +16,21 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun <T> withoutArgumentsReturnsT(): T
+
 external fun <T> withOneT(a: T): Any
+
 external fun <T> returnsT(s: String): T
+
 external fun <A, B> withManyArguments(a: A, b: B): Boolean
+
 external var arrayOfAny: Array<Any>
+
 external var arrayOfArray: Array<Array<String>>
+
 external var arrayOfList: Array<List<String>>
+
 external var arrayOfListBySquare: Array<List<Boolean>>
+
 external var listOfArray: List<Array<Any>>
+
 external var listOfArrayBySquare: List<Array<Number>>

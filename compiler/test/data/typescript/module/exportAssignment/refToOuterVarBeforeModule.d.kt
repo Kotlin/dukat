@@ -21,5 +21,6 @@ external interface SinonStatic {
     var log: (message: String) -> Unit
     fun restore(`object`: Any)
 }
+
 @JsModule("sinon")
 external val sinon: SinonStatic

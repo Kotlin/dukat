@@ -16,10 +16,17 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var varAsArrayOfAny: Array<Any>
+
 external var varAsArrayOfNumber: Array<Number>
+
 external var varAsGenericArrayOfNumber: Array<Number>
+
 external var varAsArrayOfArrayOfNumber: Array<Array<Number>>
+
 external var varAsArrayOfBoolean: Array<Boolean>
+
 external var varAsArrayOfString: Array<String>
+
 external var varAsArrayOfFoo: Array<Foo>
+
 external var varAsGenericArrayOfFoo: Array<Foo>

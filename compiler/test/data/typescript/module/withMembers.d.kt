@@ -20,8 +20,11 @@ import org.w3c.xhr.*
 external interface A {
     fun baz()
 }
+
 external open class B {
     open fun boo()
 }
+
 external var c: Number
+
 external fun d(a: Boolean, b: Any, c: SomeType)

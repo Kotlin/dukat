@@ -16,10 +16,12 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface FooIntersectionPart
+
 external interface `T$0` {
     var foo: String
     var bar: Any
 }
+
 external open class FooIntersection {
     open fun bar(p: `T$0` /* `T$0` & FooIntersectionPart */)
 }

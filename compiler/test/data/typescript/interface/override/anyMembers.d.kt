@@ -20,9 +20,11 @@ external interface ExpectedOverrides {
     override fun hashCode(): Number
     override fun toString(): String
 }
+
 external interface ExpectedOverrides2 {
     override fun equals(a: Any)
 }
+
 external interface ExpectedNoOverrides {
     fun equals()
     fun equals(a: Number)

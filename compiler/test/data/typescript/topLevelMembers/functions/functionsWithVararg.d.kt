@@ -16,8 +16,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun withVarargWithoutTypeAnnotation(vararg a: Any)
+
 external fun withVarargAny(vararg a: Any): Any
+
 external fun withVarargNumber(vararg s: Number): String
+
 external fun withManyArguments(n: Number, vararg s: String): Boolean
+
 external fun withVarargWithGenericArrayOfNumber(vararg numbers: Number): String
+
 external fun withVarargWithGenericArrayOfFoo(vararg foos: Foo): String

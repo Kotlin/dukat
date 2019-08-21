@@ -20,6 +20,7 @@ import org.w3c.xhr.*
 external interface ISyntaxElement {
     fun childAt(index: Number): ISyntaxElement
 }
+
 external interface ISeparatedSyntaxList : ISyntaxElement {
     override fun childAt(index: Number): ISeparatedSyntaxList
 }

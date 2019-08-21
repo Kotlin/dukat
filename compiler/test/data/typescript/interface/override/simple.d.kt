@@ -20,6 +20,7 @@ external interface Foo {
     fun bar(a: Number)
     var baz: Any
 }
+
 external interface Boo : Foo {
     override fun bar()
     override fun bar(a: Number)

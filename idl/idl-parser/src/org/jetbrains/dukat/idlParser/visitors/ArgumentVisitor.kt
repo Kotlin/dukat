@@ -5,14 +5,16 @@ import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlParser.getNameOrNull
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 
 internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
     private var name: String = ""
     private var type: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
+    private var optional: Boolean = false
+    private var variadic: Boolean = false
     private var defaultValue: String? = null
 
-    override fun defaultResult() = IDLArgumentDeclaration(name, type, defaultValue)
+    override fun defaultResult() = IDLArgumentDeclaration(name, type, defaultValue, optional, variadic)
 
     override fun visitType(ctx: WebIDLParser.TypeContext): IDLArgumentDeclaration {
         type = TypeVisitor().visit(ctx)
@@ -26,6 +28,21 @@ internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
 
     override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLArgumentDeclaration {
         defaultValue = ctx.text
+        return defaultResult()
+    }
+
+    override fun visitOptionalOrRequiredArgument(ctx: WebIDLParser.OptionalOrRequiredArgumentContext): IDLArgumentDeclaration {
+        if (ctx.getFirstValueOrNull() == "optional") {
+            optional = true
+        }
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitEllipsis(ctx: WebIDLParser.EllipsisContext): IDLArgumentDeclaration {
+        if (ctx.text == "...") {
+            variadic = true
+        }
         return defaultResult()
     }
 }

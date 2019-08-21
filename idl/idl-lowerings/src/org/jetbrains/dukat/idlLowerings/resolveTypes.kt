@@ -9,6 +9,8 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.isKnown
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
@@ -32,12 +34,12 @@ private class TypeResolver : IDLLowering {
         for (member in unionType.unionMembers) {
             when (member) {
                 is IDLUnionTypeDeclaration -> {
+                    if (member.name !in resolvedUnionTypes && member.name !in failedToResolveUnionTypes) {
+                        processUnionType(member)
+                    }
                     if (member.name in failedToResolveUnionTypes) {
                         failedToResolveUnionTypes += unionType.name
                         return
-                    }
-                    if (member.name !in resolvedUnionTypes) {
-                        processUnionType(member)
                     }
                     newDependenciesToAdd.putIfAbsent(member.name, mutableSetOf())
                     newDependenciesToAdd[member.name]!!.add(IDLSingleTypeDeclaration(
@@ -57,6 +59,10 @@ private class TypeResolver : IDLLowering {
                             typeParameter = null,
                             nullable = false
                     ))
+                }
+                is IDLFunctionTypeDeclaration -> {
+                    failedToResolveUnionTypes += unionType.name
+                    return
                 }
             }
         }
@@ -83,14 +89,20 @@ private class TypeResolver : IDLLowering {
                 in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
-                        nullable = false
+                        nullable = false,
+                        comment = declaration.comment
                 )
                 else -> raiseConcern("unprocessed UnionTypeDeclaration: $this") { declaration }
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsType(declaration.name)) {
-                IDLSingleTypeDeclaration("\$dynamic", null, false)
+            return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
+                IDLSingleTypeDeclaration(
+                        name = "\$dynamic",
+                        typeParameter = null,
+                        nullable = false,
+                        comment = declaration.comment
+                )
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
             }
@@ -144,7 +156,8 @@ private class TypeResolver : IDLLowering {
                             setters = listOf(),
                             callback = false,
                             generated = true,
-                            partial = false
+                            partial = false,
+                            kind = InterfaceKind.INTERFACE
                     )
                 }
         )

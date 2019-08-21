@@ -9,5 +9,8 @@ data class InterfaceModel(
         val typeParameters: List<TypeParameterModel>,
         val parentEntities: List<HeritageModel>,
         val annotations: MutableList<AnnotationModel>,
-        val external: Boolean
+        // TODO: switch to CommentModel
+        val documentation: String?,
+        val external: Boolean,
+        val metaDescription: String? = null
 ) : ClassLikeModel

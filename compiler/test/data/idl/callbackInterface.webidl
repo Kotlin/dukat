@@ -1,6 +1,6 @@
-callback interface EventListener {
-    void handleEvent(Event event);
+callback interface EventListenerX {
+    void handleEvent(EventX event);
 };
-interface Event {
+interface EventX {
 
 };

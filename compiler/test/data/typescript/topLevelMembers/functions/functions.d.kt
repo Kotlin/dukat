@@ -16,8 +16,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun withoutArguments()
+
 external fun withOneAny(a: Any): Any
+
 external fun withOneString(s: String): String
+
 external fun withOneNumber(num: Number): Number
+
 external fun withOneBoolean(bool: Boolean): Boolean
+
 external fun withManyArguments(s: String, settings: JQueryAjaxSettings): Boolean

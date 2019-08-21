@@ -20,6 +20,7 @@ import org.w3c.xhr.*
 external interface IFactory {
     fun sourceUnit(moduleElements: ISyntaxList, endOfFileToken: ISyntaxToken): SourceUnitSyntax
 }
+
 external open class NormalModeFactory : IFactory {
     override fun sourceUnit(moduleElements: ISyntaxList, endOfFileToken: ISyntaxToken): SourceUnitSyntax
 }

@@ -18,6 +18,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [SVGClipPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGClipPathElement) to Kotlin
+ */
 external abstract class SVGClipPathElement : SVGElement, SVGUnitTypes {
     open val clipPathUnits: SVGAnimatedEnumeration
     open val transform: SVGAnimatedTransformList
@@ -47,6 +50,9 @@ external abstract class SVGClipPathElement : SVGElement, SVGUnitTypes {
     }
 }
 
+/**
+ * Exposes the JavaScript [SVGMaskElement](https://developer.mozilla.org/en/docs/Web/API/SVGMaskElement) to Kotlin
+ */
 external abstract class SVGMaskElement : SVGElement, SVGUnitTypes {
     open val maskUnits: SVGAnimatedEnumeration
     open val maskContentUnits: SVGAnimatedEnumeration

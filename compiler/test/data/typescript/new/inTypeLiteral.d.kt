@@ -16,5 +16,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Foo
+
 external object foo {
 }

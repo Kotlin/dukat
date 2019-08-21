@@ -16,7 +16,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Shape
+
 external interface Box : Shape
+
 external interface BaseEvent {
     var data: dynamic /* String | Number */
     fun getDelegateTarget(): Shape
@@ -25,6 +27,7 @@ external interface BaseEvent {
     var prop: Any
     fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally /* null */): Promise<Any>
 }
+
 external open class BoxStringEvent : BaseEvent {
     override var data: String
     override fun getDelegateTarget(): Box
@@ -33,13 +36,16 @@ external open class BoxStringEvent : BaseEvent {
     override var prop: String
     override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String>
 }
+
 external interface NumberEvent : BaseEvent {
     override var data: Number
     var otherProp: Any
 }
+
 external open class ParentClass {
     open var prop: Any
 }
+
 external open class ChildClass : ParentClass {
     override var prop: String
 }

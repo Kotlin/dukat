@@ -41,4 +41,5 @@ import org.w3c.xhr.*
 external interface LazyStatic {
     fun foo(a: Number)
 }
+
 external var a: Any

@@ -22,6 +22,7 @@ external interface MyFramework {
         fun ping()
     }
     open class MyClass
+
     companion object {
         var prop: String
     }

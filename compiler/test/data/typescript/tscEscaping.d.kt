@@ -16,19 +16,24 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Any
+
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
+
 external open class __A {
     open var __foo: Number
     open fun __express(filename: String, options: Any, callback: Function<*>): Any
 }
+
 external interface __B {
     var __foo: Number
     fun __express(filename: String, options: Any, callback: Function<*>): Any
 }
+
 external enum class __E {
     __A,
     __B
 }
+
 external fun <__T> foo(__a: __T, _b: __M.__N.__C)
 
 // ------------------------------------------------------------------------------------------
@@ -52,6 +57,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Any
+
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
@@ -75,6 +81,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Number
+
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
@@ -98,5 +105,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external var __foo: Number
+
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
+
 external open class __C
