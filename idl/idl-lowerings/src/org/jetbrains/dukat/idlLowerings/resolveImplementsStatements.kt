@@ -19,7 +19,7 @@ private class ImplementsStatementContext : IDLLowering {
         return missingInheritances[declaration.name] ?: listOf()
     }
 
-    override fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLTopLevelDeclaration {
+    override fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLImplementsStatementDeclaration {
         registerImplementsStatement(declaration)
         return declaration
     }

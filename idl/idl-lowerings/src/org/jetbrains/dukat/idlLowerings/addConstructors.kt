@@ -127,7 +127,8 @@ private class ConstructorLowering : IDLLowering {
                             kind = InterfaceKind.INTERFACE,
                             callback = false,
                             generated = false,
-                            partial = false
+                            partial = false,
+                            mixin = false
                     )
                 }
         ).also { namedConstructors.clear() }

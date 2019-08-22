@@ -63,7 +63,7 @@ internal class TypeVisitor(private var name: String = "",
         return defaultResult()
     }
 
-    override fun visitNonAnyType(ctx: WebIDLParser.NonAnyTypeContext): IDLTypeDeclaration {
+    override fun visitDistinguishableType(ctx: WebIDLParser.DistinguishableTypeContext): IDLTypeDeclaration {
         ctx.getFirstValueOrNull()?.let { name = it }
 
         //if this type is parametrized
@@ -80,14 +80,13 @@ internal class TypeVisitor(private var name: String = "",
         return defaultResult()
     }
 
-    override fun visitPrimitiveType(ctx: WebIDLParser.PrimitiveTypeContext): IDLTypeDeclaration {
-        name = ctx.text
+    override fun visitStringType(ctx: WebIDLParser.StringTypeContext): IDLTypeDeclaration {
+        ctx.getFirstValueOrNull()?.let { name = it }
         return defaultResult()
     }
 
-    override fun visitSequenceType(ctx: WebIDLParser.SequenceTypeContext): IDLTypeDeclaration {
-        name = ctx.getFirstValueOrNull()!!
-        typeParameter = TypeVisitor().visitChildren(ctx)
+    override fun visitPrimitiveType(ctx: WebIDLParser.PrimitiveTypeContext): IDLTypeDeclaration {
+        name = ctx.text
         return defaultResult()
     }
 

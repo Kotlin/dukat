@@ -1,4 +1,4 @@
-namespace org.w3c.webidl;
+package org.w3c.webidl;
 
 /** written by WebIDL spec */
 

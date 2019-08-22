@@ -9,6 +9,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
@@ -48,7 +49,14 @@ interface IDLLowering {
         return declaration
     }
 
-    fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLTopLevelDeclaration {
+    fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLImplementsStatementDeclaration {
+        return declaration.copy(
+                child = lowerTypeDeclaration(declaration.child),
+                parent = lowerTypeDeclaration(declaration.parent)
+        )
+    }
+
+    fun lowerIncludesStatementDeclaration(declaration: IDLIncludesStatementDeclaration): IDLIncludesStatementDeclaration {
         return declaration.copy(
                 child = lowerTypeDeclaration(declaration.child),
                 parent = lowerTypeDeclaration(declaration.parent)
@@ -107,6 +115,7 @@ interface IDLLowering {
             is IDLImplementsStatementDeclaration -> lowerImplementStatementDeclaration(declaration)
             is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
             is IDLEnumDeclaration -> lowerEnumDeclaration(declaration)
+            is IDLIncludesStatementDeclaration -> lowerIncludesStatementDeclaration(declaration)
             else -> declaration
         }
     }

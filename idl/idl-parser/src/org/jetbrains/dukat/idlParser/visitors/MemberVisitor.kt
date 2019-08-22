@@ -61,8 +61,12 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
 
     override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLMemberDeclaration? {
         kind = MemberKind.ATTRIBUTE
-        name = ctx.getNameOrNull() ?: ctx.children.filterIsInstance<TerminalNode>().last { it.text != ";" }.text
         visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitAttributeName(ctx: WebIDLParser.AttributeNameContext): IDLMemberDeclaration? {
+        name = ctx.getNameOrNull() ?: "required"
         return defaultResult()
     }
 
@@ -73,7 +77,10 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
         return defaultResult()
     }
 
-    override fun visitDictionaryMember(ctx: WebIDLParser.DictionaryMemberContext): IDLMemberDeclaration? {
+    override fun visitDictionaryMemberRest(ctx: WebIDLParser.DictionaryMemberRestContext): IDLMemberDeclaration? {
+        if (ctx.getFirstValueOrNull() == "required") {
+            required = true
+        }
         kind = MemberKind.DICTIONARY_MEMBER
         name = ctx.getName()
         visitChildren(ctx)
@@ -90,7 +97,7 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
         return defaultResult()
     }
 
-    override fun visitOptionalOrRequiredArgument(ctx: WebIDLParser.OptionalOrRequiredArgumentContext?): IDLMemberDeclaration? {
+    override fun visitArgumentRest(ctx: WebIDLParser.ArgumentRestContext?): IDLMemberDeclaration? {
         arguments.add(ArgumentVisitor().visit(ctx))
         return defaultResult()
     }
@@ -135,6 +142,14 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
         return defaultResult()
     }
 
+    override fun visitNamespaceMember(ctx: WebIDLParser.NamespaceMemberContext): IDLMemberDeclaration? {
+        if (ctx.getFirstValueOrNull() == "readonly") {
+            readOnly = true
+        }
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitReadOnly(ctx: WebIDLParser.ReadOnlyContext): IDLMemberDeclaration? {
         if (ctx.text.isNotEmpty()) {
             readOnly = true
@@ -149,14 +164,6 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
         }
         return defaultResult()
     }
-
-    override fun visitRequired(ctx: WebIDLParser.RequiredContext): IDLMemberDeclaration? {
-        if (ctx.text.isNotEmpty()) {
-            required = true
-        }
-        return defaultResult()
-    }
-
 }
 
 private enum class MemberKind {

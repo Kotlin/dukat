@@ -70,6 +70,7 @@ private class ItemArrayLikeLowering : IDLLowering {
                 callback = false,
                 generated = true,
                 partial = false,
+                mixin = false,
                 kind = InterfaceKind.INTERFACE
         )
         if (newFiles.none { it.packageName == "<LIBROOT>".toNameEntity() }) {

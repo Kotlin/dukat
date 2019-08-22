@@ -157,6 +157,7 @@ private class TypeResolver : IDLLowering {
                             callback = false,
                             generated = true,
                             partial = false,
+                            mixin = false,
                             kind = InterfaceKind.INTERFACE
                     )
                 }

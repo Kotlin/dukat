@@ -81,6 +81,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                 callback = partials.any { it.callback },
                 generated = partials.any { it.generated },
                 partial = false,
+                mixin = partials.any { it.mixin },
                 kind = InterfaceKind.INTERFACE
         )
     }

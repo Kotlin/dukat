@@ -14,6 +14,7 @@ import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
 import org.jetbrains.dukat.idlLowerings.markAbstractOrOpen
 import org.jetbrains.dukat.idlLowerings.relocateDeclarations
 import org.jetbrains.dukat.idlLowerings.resolveImplementsStatements
+import org.jetbrains.dukat.idlLowerings.resolveMixins
 import org.jetbrains.dukat.idlLowerings.resolvePartials
 import org.jetbrains.dukat.idlLowerings.resolveTypedefs
 import org.jetbrains.dukat.idlLowerings.resolveTypes
@@ -34,6 +35,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .specifyEventHandlerTypes()
                 .specifyDefaultValues()
                 .resolveImplementsStatements()
+                .resolveMixins()
                 .addItemArrayLike()
                 .resolveTypes()
                 .markAbstractOrOpen()

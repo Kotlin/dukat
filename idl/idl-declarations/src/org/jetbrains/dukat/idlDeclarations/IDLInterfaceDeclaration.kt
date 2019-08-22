@@ -13,7 +13,8 @@ data class IDLInterfaceDeclaration(
         val kind: InterfaceKind,
         val callback: Boolean,
         val generated: Boolean,
-        val partial: Boolean
+        val partial: Boolean,
+        val mixin: Boolean
 ) : IDLClassLikeDeclaration
 
 enum class InterfaceKind {

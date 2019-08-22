@@ -17,6 +17,7 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SimpleCommentModel
@@ -44,8 +45,10 @@ import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
@@ -229,6 +232,10 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
 }
 
 fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
+    if (mixin) {
+        return listOf()
+    }
+
     val dynamicMemberModels = (constructors +
             attributes.filterNot { it.static } +
             operations.filterNot { it.static } +
@@ -454,13 +461,24 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration) + generatedVariables
 }
 
+fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
+    return ObjectModel(
+            name = IdentifierEntity(name),
+            members = attributes.mapNotNull { it.process() } +
+                    operations.mapNotNull { it.process() },
+            parentEntities = listOf()
+    )
+}
+
 fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
     return when (this) {
         is IDLInterfaceDeclaration -> convertToModel()
         is IDLDictionaryDeclaration -> convertToModel()
         is IDLEnumDeclaration -> convertToModel()
+        is IDLNamespaceDeclaration -> listOf(convertToModel())
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
+        is IDLIncludesStatementDeclaration -> null
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }

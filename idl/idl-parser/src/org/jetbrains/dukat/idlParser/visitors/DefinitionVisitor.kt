@@ -11,7 +11,9 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
@@ -20,6 +22,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlParser.filterIdentifiers
+import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
 
 internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtendedAttributeDeclaration>) :
@@ -38,6 +41,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val enumMembers: MutableList<String> = mutableListOf()
     private var isCallback: Boolean = false
     private var partial = false
+    private var mixin = false
 
     private var kind: DefinitionKind = DefinitionKind.INTERFACE
 
@@ -56,6 +60,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     callback = isCallback,
                     generated = false,
                     partial = partial,
+                    mixin = mixin,
                     kind = InterfaceKind.INTERFACE
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
@@ -72,14 +77,23 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     child = childType,
                     parent = parentType
             )
+            DefinitionKind.INCLUDES_STATEMENT -> IDLIncludesStatementDeclaration(
+                    child = childType,
+                    parent = parentType
+            )
             DefinitionKind.ENUM -> IDLEnumDeclaration(
                     name = name,
                     members = enumMembers
             )
+            DefinitionKind.NAMESPACE -> IDLNamespaceDeclaration(
+                    name = name,
+                    attributes = myAttributes,
+                    operations = operations
+            )
         }
     }
 
-    override fun visitReadWriteAttribute(ctx: WebIDLParser.ReadWriteAttributeContext): IDLTopLevelDeclaration {
+    override fun visitAttributeRest(ctx: WebIDLParser.AttributeRestContext): IDLTopLevelDeclaration {
         myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
         return defaultResult()
     }
@@ -96,14 +110,22 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
-    override fun visitInterface_(ctx: WebIDLParser.Interface_Context): IDLTopLevelDeclaration {
+    override fun visitInterfaceRest(ctx: WebIDLParser.InterfaceRestContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
         name = ctx.getName()
         visitChildren(ctx)
         return defaultResult()
     }
 
-    override fun visitPartialInterface(ctx: WebIDLParser.PartialInterfaceContext): IDLTopLevelDeclaration {
+    override fun visitMixinRest(ctx: WebIDLParser.MixinRestContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.INTERFACE
+        mixin = true
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitPartialInterfaceRest(ctx: WebIDLParser.PartialInterfaceRestContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.INTERFACE
         name = ctx.getName()
         visitChildren(ctx)
@@ -115,6 +137,11 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             is IDLOperationDeclaration -> operations.add(staticMember)
             is IDLAttributeDeclaration -> myAttributes.add(staticMember)
         }
+        return defaultResult()
+    }
+
+    override fun visitRegularOperation(ctx: WebIDLParser.RegularOperationContext): IDLTopLevelDeclaration {
+        operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
         return defaultResult()
     }
 
@@ -154,12 +181,24 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitCallbackRestOrInterface(ctx: WebIDLParser.CallbackRestOrInterfaceContext): IDLTopLevelDeclaration {
         isCallback = true
+        if (ctx.getFirstValueOrNull() == "interface") {
+            kind = DefinitionKind.INTERFACE
+            name = ctx.getName()
+        }
         visitChildren(ctx)
         return defaultResult()
     }
 
     override fun visitImplementsStatement(ctx: WebIDLParser.ImplementsStatementContext): IDLTopLevelDeclaration {
         kind = DefinitionKind.IMPLEMENTS_STATEMENT
+        val identifiers = ctx.filterIdentifiers()
+        childType = IDLSingleTypeDeclaration(identifiers[0].text, null, false)
+        parentType = IDLSingleTypeDeclaration(identifiers[1].text, null, false)
+        return defaultResult()
+    }
+
+    override fun visitIncludesStatement(ctx: WebIDLParser.IncludesStatementContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.INCLUDES_STATEMENT
         val identifiers = ctx.filterIdentifiers()
         childType = IDLSingleTypeDeclaration(identifiers[0].text, null, false)
         parentType = IDLSingleTypeDeclaration(identifiers[1].text, null, false)
@@ -210,6 +249,21 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         return defaultResult()
     }
 
+    override fun visitNamespace(ctx: WebIDLParser.NamespaceContext): IDLTopLevelDeclaration {
+        kind = DefinitionKind.NAMESPACE
+        name = ctx.getName()
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
+    override fun visitNamespaceMember(ctx: WebIDLParser.NamespaceMemberContext): IDLTopLevelDeclaration {
+        when (val member = MemberVisitor().visit(ctx)) {
+            is IDLAttributeDeclaration -> myAttributes.add(member)
+            is IDLOperationDeclaration -> operations.add(member)
+        }
+        return defaultResult()
+    }
+
     override fun visitPartial(ctx: WebIDLParser.PartialContext): IDLTopLevelDeclaration {
         partial = true
         visitChildren(ctx)
@@ -218,5 +272,5 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 }
 
 private enum class DefinitionKind {
-    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, DICTIONARY, ENUM
+    INTERFACE, TYPEDEF, IMPLEMENTS_STATEMENT, INCLUDES_STATEMENT, DICTIONARY, ENUM, NAMESPACE
 }

@@ -16,6 +16,14 @@ internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
 
     override fun defaultResult() = IDLArgumentDeclaration(name, type, defaultValue, optional, variadic)
 
+    override fun visitArgumentRest(ctx: WebIDLParser.ArgumentRestContext): IDLArgumentDeclaration {
+        if (ctx.getFirstValueOrNull() == "optional") {
+            optional = true
+        }
+        visitChildren(ctx)
+        return defaultResult()
+    }
+
     override fun visitType(ctx: WebIDLParser.TypeContext): IDLArgumentDeclaration {
         type = TypeVisitor().visit(ctx)
         return defaultResult()
@@ -28,14 +36,6 @@ internal class ArgumentVisitor: WebIDLBaseVisitor<IDLArgumentDeclaration>() {
 
     override fun visitDefaultValue(ctx: WebIDLParser.DefaultValueContext): IDLArgumentDeclaration {
         defaultValue = ctx.text
-        return defaultResult()
-    }
-
-    override fun visitOptionalOrRequiredArgument(ctx: WebIDLParser.OptionalOrRequiredArgumentContext): IDLArgumentDeclaration {
-        if (ctx.getFirstValueOrNull() == "optional") {
-            optional = true
-        }
-        visitChildren(ctx)
         return defaultResult()
     }
 
