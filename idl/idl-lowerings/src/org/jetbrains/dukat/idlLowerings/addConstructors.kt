@@ -64,8 +64,30 @@ private class ConstructorLowering : IDLLowering {
         })
     }
 
+
+    private fun processOptionalConstructors(constructors: List<IDLConstructorDeclaration>): List<IDLConstructorDeclaration> {
+        val (optionalConstructors, requiredConstructors) =
+                constructors.partition { constructor ->
+                    constructor.arguments.all { it.optional || it.defaultValue != null }
+                }
+        return if (optionalConstructors.size > 1) {
+            val mainOptionalConstructor = optionalConstructors.maxBy { it.arguments.size }
+            requiredConstructors + optionalConstructors.map { constructor ->
+                if (constructor == mainOptionalConstructor) {
+                    constructor
+                } else {
+                    constructor.copy(arguments = constructor.arguments.map {
+                        it.copy(optional = false, defaultValue = null)
+                    })
+                }
+            }
+        } else {
+            constructors
+        }
+    }
+
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        val ordinaryConstructors = declaration.extendedAttributes.mapNotNull { it.convertToOrdinaryConstructor() }
+        val ordinaryConstructors = processOptionalConstructors(declaration.extendedAttributes.mapNotNull { it.convertToOrdinaryConstructor() })
         addNamedConstructors(declaration)
         return when {
             ordinaryConstructors.size == 1 -> declaration.copy(
