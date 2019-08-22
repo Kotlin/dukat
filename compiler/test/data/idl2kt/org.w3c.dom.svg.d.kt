@@ -666,12 +666,6 @@ external abstract class SVGUseElement : SVGGraphicsElement, SVGURIReference {
 }
 
 external open class SVGUseElementShadowRoot : ShadowRoot {
-    override fun getElementById(elementId: String): Element?
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short

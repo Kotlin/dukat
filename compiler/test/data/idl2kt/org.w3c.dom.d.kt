@@ -3109,7 +3109,6 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
  * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
  */
 external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindowProxy {
-    override val performance: Performance
     open val window: Window
     open val self: Window
     open val document: Document
@@ -4971,16 +4970,6 @@ inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
  * Exposes the JavaScript [XMLDocument](https://developer.mozilla.org/en/docs/Web/API/XMLDocument) to Kotlin
  */
 external open class XMLDocument : Document {
-    override fun getElementById(elementId: String): Element?
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -5099,11 +5088,6 @@ external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
     open val mode: ShadowRootMode
     open val host: Element
     override val fullscreenElement: Element?
-    override fun getElementById(elementId: String): Element?
-    override fun prepend(vararg nodes: dynamic)
-    override fun append(vararg nodes: dynamic)
-    override fun querySelector(selectors: String): Element?
-    override fun querySelectorAll(selectors: String): NodeList
 
     companion object {
         val ELEMENT_NODE: Short
@@ -5357,15 +5341,6 @@ external open class Text(data: String = definedExternally) : CharacterData, Slot
  * Exposes the JavaScript [CDATASection](https://developer.mozilla.org/en/docs/Web/API/CDATASection) to Kotlin
  */
 external open class CDATASection : Text {
-    override fun before(vararg nodes: dynamic)
-    override fun after(vararg nodes: dynamic)
-    override fun replaceWith(vararg nodes: dynamic)
-    override fun remove()
-    override fun getBoxQuads(options: BoxQuadOptions /* = definedExternally */): Array<DOMQuad>
-    override fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMQuad
-    override fun convertPointFromNode(point: DOMPointInit, from: dynamic, options: ConvertCoordinateOptions /* = definedExternally */): DOMPoint
-
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short

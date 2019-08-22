@@ -43,7 +43,8 @@ private class ItemArrayLikeLowering : IDLLowering {
                         name = "length",
                         type = IDLSingleTypeDeclaration("unsignedlong", null, false),
                         static = false,
-                        readOnly = true
+                        readOnly = true,
+                        override = false
                 )),
                 operations = listOf(IDLOperationDeclaration(
                         name = "item",
@@ -55,7 +56,8 @@ private class ItemArrayLikeLowering : IDLLowering {
                                 optional = false,
                                 variadic = false
                         )),
-                        static = false
+                        static = false,
+                        override = false
                 )),
                 primaryConstructor = null,
                 constructors = listOf(),
