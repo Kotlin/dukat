@@ -1,4 +1,3 @@
-
 import kotlin.js.*
 
 external open class A(x: Int, y: Boolean = definedExternally) {

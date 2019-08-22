@@ -1,4 +1,3 @@
-
 import kotlin.js.*
 
 external open class A

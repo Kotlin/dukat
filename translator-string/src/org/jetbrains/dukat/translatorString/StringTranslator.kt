@@ -583,7 +583,9 @@ class StringTranslator : ModelVisitor {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {
-                addOutput(translateAnnotations)
+                if (translateAnnotations.isNotEmpty()) {
+                    addOutput(translateAnnotations)
+                }
             }
         }
 
