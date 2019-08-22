@@ -45,7 +45,7 @@ abstract class OutputTests {
                     "Q.d.ts",
                     "_skippedReferenced.d.ts"
             )
-            units.filter { (name, fileName, _, _) ->
+            units.filter { (_, fileName, _, _) ->
                 !skipDeclarations.contains(File(fileName).name)
             }.joinToString("""
 
@@ -75,7 +75,7 @@ abstract class OutputTests {
         )
 
         val outputDirectory = File("./build/tests/out")
-        translated?.let {
+        translated.let {
             val outputFile = outputDirectory.resolve(targetShortName)
             outputFile.parentFile.mkdirs()
             outputFile.writeText(translated)

@@ -58,7 +58,7 @@ class CoreSetTests : OutputTests() {
         )
 
         val outputDirectory = File("./build/tests/out")
-        translated?.let {
+        translated.let {
             val outputFile = outputDirectory.resolve(targetShortName)
             outputFile.parentFile.mkdirs()
             outputFile.writeText(translated)
