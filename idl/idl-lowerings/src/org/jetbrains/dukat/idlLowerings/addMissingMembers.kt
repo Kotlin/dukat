@@ -129,7 +129,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                         newOperations += parentOperation.copy(
                                 arguments = parentOperation.arguments.map {
                                     it.copy(
-                                            type = if (it.defaultValue != null) {
+                                            type = if (it.defaultValue != null || it.optional) {
                                                 it.type.changeComment("= definedExternally")
                                             } else {
                                                 it.type
