@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.tests.extended
+package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -19,7 +19,6 @@ class Idl2KtTests : OutputTests() {
     @DisplayName("idl2kt test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("idl2ktSet")
-    @EnabledIfSystemProperty(named = "dukat.test.idl2kt", matches = "true")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEquals(name, tsPath, ktPath)
     }
@@ -36,7 +35,7 @@ class Idl2KtTests : OutputTests() {
                 content ?: "//NO DECLARATIONS"
     }
 
-    override fun getTranslator(): InputTranslator = translator
+    override fun getTranslator(): InputTranslator<String> = translator
 
     companion object : FileFetcher() {
         override val postfix = WEBIDL_DECLARATION_EXTENSION
@@ -46,7 +45,7 @@ class Idl2KtTests : OutputTests() {
             return fileSetWithDescriptors("./test/data/idl2kt")
         }
 
-        val translator: InputTranslator = IdlInputTranslator(DirectoryReferencesResolver())
+        val translator: InputTranslator<String> = IdlInputTranslator(DirectoryReferencesResolver())
     }
 
 }

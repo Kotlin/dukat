@@ -23,9 +23,14 @@ external interface `T$0` {
     var tcpport: String
     var forceturn: Boolean
 }
+
 external interface ClientConfig {
     var mode: dynamic /* 'live' | 'rtc' */
     var codec: dynamic /* 'vp8' | 'h264' */
-    var proxyServer: String? get() = definedExternally; set(value) = definedExternally
-    var turnServer: `T$0`? get() = definedExternally; set(value) = definedExternally
+    var proxyServer: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var turnServer: `T$0`?
+        get() = definedExternally
+        set(value) = definedExternally
 }

@@ -20,12 +20,15 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SimpleCommentModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -34,7 +37,6 @@ import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
@@ -55,8 +57,11 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.changeComment
+import org.jetbrains.dukat.idlDeclarations.processEnumMember
 import org.jetbrains.dukat.idlDeclarations.toNullable
+import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
@@ -72,7 +77,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "long" -> "Int"
                 "unsignedlong" -> "Int"
                 "longlong" -> "Int"
-                "unsignedlonglong" -> "Int"
+                "unsignedlonglong" -> "Number"
                 "octet" -> "Byte"
                 "byte" -> "Byte"
                 "short" -> "Short"
@@ -80,16 +85,27 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "boolean" -> "Boolean"
                 "ByteString" -> "String"
                 "DOMString" -> "String"
+                "String" -> "String"
                 "USVString" -> "String"
                 "\$Array" -> "Array"
                 "sequence" -> "Array"
+                "FrozenArray" -> "Array"
+                "Promise" -> "Promise"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
                 "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name
             }),
-            params = listOfNotNull(typeParameter?.process()),
+            params = listOfNotNull(typeParameter?.process())
+                    .map { TypeParameterModel(it, listOf()) }
+                    .map {
+                        if (name == "FrozenArray") {
+                            it.copy(variance = Variance.COVARIANT)
+                        } else {
+                            it
+                        }
+                    },
             metaDescription = comment
     )
     return typeModel.copy(
@@ -102,9 +118,16 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 }
 
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
+
+    val returnTypeModel = if (returnType.name == "any") {
+        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null)
+    } else {
+        returnType.process()
+    }
+
     return FunctionTypeModel(
-            parameters = arguments.map { it.process() },
-            type = returnType.process(),
+            parameters = arguments.filterNot { it.variadic }.map { it.process() },
+            type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
     )
@@ -123,15 +146,22 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.process(),
-            initializer = null,
-            vararg = false,
+            initializer = if (optional || defaultValue != null) {
+                StatementCallModel(
+                        IdentifierEntity("definedExternally"),
+                        null
+                )
+            } else {
+                null
+            },
+            vararg = variadic,
             optional = false
     )
 }
 
-fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
-            name = IdentifierEntity(name),
+            name = IdentifierEntity("set"),
             parameters = listOf(key.process(), value.process()),
             type = TypeValueModel(
                     value = IdentifierEntity("Unit"),
@@ -169,11 +199,11 @@ fun IDLSetterDeclaration.process(ownerName: NameEntity): FunctionModel {
     )
 }
 
-fun IDLGetterDeclaration.process(ownerName: NameEntity): FunctionModel {
+fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
     return FunctionModel(
-            name = IdentifierEntity(name),
+            name = IdentifierEntity("get"),
             parameters = listOf(key.process()),
-            type = valueType.process(),
+            type = valueType.toNullableIfNotPrimitive().process(),
             typeParameters = listOf(),
             annotations = mutableListOf(AnnotationModel(
                     name = "kotlin.internal.InlineOnly",
@@ -208,10 +238,11 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
 
     val dynamicMemberModels = (constructors +
             attributes.filterNot { it.static } +
-            operations.filterNot { it.static }).mapNotNull { it.process() }
-    val staticMemberModels = (constants +
-            operations.filter { it.static } +
-            attributes.filter { it.static }).mapNotNull { it.process() }
+            operations.filterNot { it.static } +
+            getters.filterNot { it.name == "get" } +
+            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }.distinct()
+    val staticMemberModels = (attributes.filter { it.static } +
+            operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
         CompanionObjectModel(
@@ -231,30 +262,31 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         )
     }
 
-    val declaration = if (
-        callback || extendedAttributes.contains(
-                IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
+    val annotationModels = listOfNotNull(if (companionObjectModel != null) {
+        AnnotationModel(
+                "Suppress",
+                listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
         )
-    ) {
+    } else {
+        null
+    }).toMutableList()
+
+    val declaration = if (
+            kind == InterfaceKind.INTERFACE) {
         InterfaceModel(
                 name = IdentifierEntity(name),
                 members = dynamicMemberModels,
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
-                annotations = mutableListOf(),
+                comment = null,
+                annotations = annotationModels,
                 external = true
         )
     } else {
         ClassModel(
                 name = IdentifierEntity(name),
-                members = dynamicMemberModels.map {
-                    if (it is PropertyModel && !it.setter) {
-                        it.copy(open = true)
-                    } else {
-                        it
-                    }
-                },
+                members = dynamicMemberModels,
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
@@ -264,12 +296,13 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                     null
                 },
                 annotations = mutableListOf(),
+                comment = null,
                 external = true,
-                abstract = constructors.isEmpty() && primaryConstructor == null
+                abstract = kind == InterfaceKind.ABSTRACT_CLASS
         )
     }
-    val getterModels = getters.map { it.process(declaration.name) }
-    val setterModels = setters.map { it.process(declaration.name) }
+    val getterModels = getters.map { it.processAsTopLevel(declaration.name) }
+    val setterModels = setters.map { it.processAsTopLevel(declaration.name) }
     return listOf(declaration) + getterModels + setterModels
 }
 
@@ -277,7 +310,7 @@ fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
     return ParameterModel(
             name = name,
             type = type.toNullable().changeComment(null).process(),
-            initializer = if (defaultValue != null) {
+            initializer = if (defaultValue != null && !required) {
                 StatementCallModel(
                         IdentifierEntity(defaultValue!!),
                         null
@@ -330,7 +363,7 @@ fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
 fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
-            members = members.mapNotNull { it.process() },
+            members = members.filterNot { it.inherited }.mapNotNull { it.process() },
             companionObject = null,
             typeParameters = listOf(),
             parentEntities = parents.map {
@@ -340,6 +373,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
                         null
                 )
             },
+            comment = null,
             annotations = mutableListOf(),
             external = true
     )
@@ -365,10 +399,6 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration, generatedFunction)
 }
 
-fun processEnumMember(memberName: String): String {
-    return memberName.toUpperCase().replace('-', '_').ifEmpty { "EMPTY" }
-}
-
 fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
@@ -380,7 +410,15 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            annotations = mutableListOf(),
+            comment = SimpleCommentModel(
+                    "please, don't implement this interface!"
+            ),
+            annotations = mutableListOf(
+                    AnnotationModel(
+                            "Suppress",
+                            listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                    )
+            ),
             external = true
     )
     val generatedVariables = members.map { memberName ->
@@ -398,7 +436,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                 get = ChainCallModel(
                         StatementCallModel(
                                 value = QualifierEntity(
-                                        left = IdentifierEntity("\"$memberName\""),
+                                        left = IdentifierEntity(memberName),
                                         right = IdentifierEntity("asDynamic")
                                 ),
                                 params = listOf()
@@ -455,7 +493,7 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 override = false,
                 getter = true,
                 setter = !readOnly,
-                open = false
+                open = open
         )
         is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
@@ -473,16 +511,6 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 generated = false
         )
-        is IDLConstantDeclaration -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.process(),
-                typeParameters = listOf(),
-                static = false,
-                override = false,
-                getter = true,
-                setter = false,
-                open = false
-        )
         is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
                 type = type.toNullable().process(),
@@ -493,17 +521,51 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 setter = true,
                 open = false
         )
+        is IDLGetterDeclaration -> MethodModel(
+                name = IdentifierEntity(name),
+                parameters = listOf(key.process()),
+                type = valueType.process(),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                operator = false,
+                annotations = listOf(),
+                open = false
+        )
+        is IDLSetterDeclaration -> MethodModel(
+                name = IdentifierEntity(name),
+                parameters = listOf(key.process(), value.process()),
+                type = TypeValueModel(
+                        value = IdentifierEntity("Unit"),
+                        params = listOf(),
+                        metaDescription = null
+                ),
+                typeParameters = listOf(),
+                static = false,
+                override = false,
+                operator = false,
+                annotations = listOf(),
+                open = false
+        )
         else -> raiseConcern("unprocessed member declaration: ${this}") { null }
     }
 }
 
 fun IDLFileDeclaration.process(): SourceFileModel {
-    val modelDeclarations = declarations.mapNotNull { it.convertToModel() }.flatten()
+    val modelsExceptEnumsAndGenerated = declarations.filterNot {
+        it is IDLEnumDeclaration || (it is IDLInterfaceDeclaration && it.generated)
+    }.mapNotNull { it.convertToModel() }.flatten()
+
+    val enumModels = declarations.filterIsInstance<IDLEnumDeclaration>().map { it.convertToModel() }.flatten()
+
+    val generatedModels = declarations.filter {
+        it is IDLInterfaceDeclaration && it.generated
+    }.mapNotNull { it.convertToModel() }.flatten()
 
     val module = ModuleModel(
             name = packageName ?: ROOT_PACKAGENAME,
             shortName = packageName?.rightMost() ?: ROOT_PACKAGENAME,
-            declarations = modelDeclarations,
+            declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
             imports = mutableListOf("kotlin.js.*".toNameEntity())
@@ -519,6 +581,7 @@ fun IDLFileDeclaration.process(): SourceFileModel {
 
 fun IDLSourceSetDeclaration.process(): SourceSetModel {
     return SourceSetModel(
+            "<IRRELEVANT>",
             sources = files.map { it.process() }
     )
 }

@@ -20,9 +20,11 @@ external open class ExpectedOverrides {
     override fun hashCode(): Number
     override fun toString(): String
 }
+
 external open class ExpectedOverrides2 {
     override fun equals(a: Any)
 }
+
 external open class ExpectedNoOverrides {
     open fun equals()
     open fun equals(a: Number)

@@ -10,6 +10,7 @@ data class ClassModel(
         val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationModel>,
+        val comment: CommentModel?,
         val external: Boolean,
         val abstract: Boolean
 ) : ClassLikeModel, DelegationModel, MemberModel

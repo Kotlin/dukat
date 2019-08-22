@@ -21,18 +21,21 @@ external object foo {
     @nativeSetter
     operator fun set(someKey: String, value: Number)
 }
+
 external interface `T$0` {
     @nativeGetter
     operator fun get(someValue: String): Number?
     @nativeSetter
     operator fun set(someValue: String, value: Number)
 }
+
 external interface `T$1` {
     @nativeGetter
     operator fun get(someName: String): `T$0`?
     @nativeSetter
     operator fun set(someName: String, value: `T$0`)
 }
+
 external open class Foo {
     @nativeGetter
     open operator fun get(n: Number): Bar?

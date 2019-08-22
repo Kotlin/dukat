@@ -5,13 +5,19 @@ import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import translateModule
+import org.jetbrains.dukat.translatorString.translateModule
 import java.io.File
 import kotlin.test.assertEquals
 
 
 abstract class OutputTests {
-    abstract fun getTranslator(): InputTranslator
+    abstract fun getTranslator(): InputTranslator<String>
+
+    companion object {
+        val DEFAULT_LIB_PATH = "../ts/build/package/node_modules/typescript/lib/lib.d.ts"
+        val NODE_PATH = "node"
+        val SOURCE_PATH = "../ts/build/bundle/converter.js"
+    }
 
     init {
         if (System.getProperty("dukat.test.failure.always") == "true") {
@@ -39,7 +45,7 @@ abstract class OutputTests {
                     "Q.d.ts",
                     "_skippedReferenced.d.ts"
             )
-            units.filter { (name, fileName, _, _) ->
+            units.filter { (_, fileName, _, _) ->
                 !skipDeclarations.contains(File(fileName).name)
             }.joinToString("""
 
@@ -48,7 +54,7 @@ abstract class OutputTests {
         }
     }
 
-    private fun output(fileName: String, translator: InputTranslator): String {
+    private fun output(fileName: String, translator: InputTranslator<String>): String {
         return concatenate(fileName, translateModule(fileName, translator))
     }
 
@@ -69,7 +75,7 @@ abstract class OutputTests {
         )
 
         val outputDirectory = File("./build/tests/out")
-        translated?.let {
+        translated.let {
             val outputFile = outputDirectory.resolve(targetShortName)
             outputFile.parentFile.mkdirs()
             outputFile.writeText(translated)

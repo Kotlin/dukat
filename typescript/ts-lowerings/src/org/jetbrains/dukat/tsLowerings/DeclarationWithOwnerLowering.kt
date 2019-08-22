@@ -38,6 +38,7 @@ interface DeclarationWithOwnerLowering {
     fun lowerObjectDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>): ParameterValueDeclaration
     fun lowerTupleDeclaration(owner: NodeOwner<TupleDeclaration>): TupleDeclaration
 
+    @Suppress("UNCHECKED_CAST")
     fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
         return when (declaration) {
@@ -51,7 +52,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-
+    @Suppress("UNCHECKED_CAST")
     fun lowerClassLikeDeclaration(owner: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
         val declaration = owner.node
         return when (declaration) {
@@ -61,6 +62,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
         val declaration = owner.node
         return when (declaration) {

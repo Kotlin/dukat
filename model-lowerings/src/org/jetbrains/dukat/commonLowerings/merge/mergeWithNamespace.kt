@@ -1,7 +1,18 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.VariableModel
 
 private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     visitor(this)
@@ -17,7 +28,7 @@ private fun ModuleModel.visitTopLevelNode(visitor: (TopLevelModel, ModuleModel) 
 private fun ModuleModel.transformTopLevelNode(visitor: (TopLevelModel) -> TopLevelModel?): TopLevelModel? {
     val moduleResolved = visitor(this)
     return if (moduleResolved is ModuleModel) {
-        return (moduleResolved as ModuleModel).copy(
+        return moduleResolved.copy(
                 declarations = declarations.mapNotNull { declaration -> visitor(declaration) },
                 submodules = submodules.mapNotNull { submodule -> (submodule.transformTopLevelNode(visitor) as ModuleModel?) }
         )

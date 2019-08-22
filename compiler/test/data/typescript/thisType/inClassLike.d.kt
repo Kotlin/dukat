@@ -20,6 +20,7 @@ external open class MyClass {
     open fun that(): MyClass /* this */
     open fun load(ids: String, handler: (self: MyClass /* this */, args: Array<Any>) -> Unit)
 }
+
 external interface MyInterface {
     var self: MyInterface /* this */
     fun that(): MyInterface /* this */

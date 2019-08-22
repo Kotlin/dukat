@@ -18,6 +18,9 @@ import org.w3c.notifications.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/**
+ * Exposes the JavaScript [Performance](https://developer.mozilla.org/en/docs/Web/API/Performance) to Kotlin
+ */
 external abstract class Performance : EventTarget {
     open val timing: PerformanceTiming
     open val navigation: PerformanceNavigation
@@ -28,30 +31,36 @@ external interface GlobalPerformance {
     val performance: Performance
 }
 
+/**
+ * Exposes the JavaScript [PerformanceTiming](https://developer.mozilla.org/en/docs/Web/API/PerformanceTiming) to Kotlin
+ */
 external abstract class PerformanceTiming {
-    open val navigationStart: Int
-    open val unloadEventStart: Int
-    open val unloadEventEnd: Int
-    open val redirectStart: Int
-    open val redirectEnd: Int
-    open val fetchStart: Int
-    open val domainLookupStart: Int
-    open val domainLookupEnd: Int
-    open val connectStart: Int
-    open val connectEnd: Int
-    open val secureConnectionStart: Int
-    open val requestStart: Int
-    open val responseStart: Int
-    open val responseEnd: Int
-    open val domLoading: Int
-    open val domInteractive: Int
-    open val domContentLoadedEventStart: Int
-    open val domContentLoadedEventEnd: Int
-    open val domComplete: Int
-    open val loadEventStart: Int
-    open val loadEventEnd: Int
+    open val navigationStart: Number
+    open val unloadEventStart: Number
+    open val unloadEventEnd: Number
+    open val redirectStart: Number
+    open val redirectEnd: Number
+    open val fetchStart: Number
+    open val domainLookupStart: Number
+    open val domainLookupEnd: Number
+    open val connectStart: Number
+    open val connectEnd: Number
+    open val secureConnectionStart: Number
+    open val requestStart: Number
+    open val responseStart: Number
+    open val responseEnd: Number
+    open val domLoading: Number
+    open val domInteractive: Number
+    open val domContentLoadedEventStart: Number
+    open val domContentLoadedEventEnd: Number
+    open val domComplete: Number
+    open val loadEventStart: Number
+    open val loadEventEnd: Number
 }
 
+/**
+ * Exposes the JavaScript [PerformanceNavigation](https://developer.mozilla.org/en/docs/Web/API/PerformanceNavigation) to Kotlin
+ */
 external abstract class PerformanceNavigation {
     open val type: Short
     open val redirectCount: Short

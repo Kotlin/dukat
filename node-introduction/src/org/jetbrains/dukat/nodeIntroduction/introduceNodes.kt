@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
@@ -29,7 +28,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
-import org.jetbrains.dukat.ast.model.nodes.processing.toNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -68,6 +66,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.isSimpleType
 import java.io.File
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
 
 
 private fun unquote(name: String): String {
@@ -103,7 +102,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
         return typeParams.map { typeParam ->
             TypeValueNode(
-                    value = typeParam.name.toNode(),
+                    value = typeParam.name,
                     params = typeParam.constraints
             )
         }
@@ -189,7 +188,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         }
     }
 
-    private fun ClassDeclaration.convert(owner: DocumentRootNode?): ClassNode {
+    private fun ClassDeclaration.convert(): ClassNode {
 
         val exportQualifier = if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
             JsDefault()
@@ -199,7 +198,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name.toNode(), typeParameter.constraints)
+                    TypeValueNode(typeParameter.name, typeParameter.constraints)
                 },
                 convertToHeritageNodes(parentEntities),
                 null,
@@ -263,7 +262,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
 
     private fun TypeAliasDeclaration.convert(): TypeAliasNode {
         return TypeAliasNode(
-                name = aliasName.toNode(),
+                name = aliasName,
                 typeReference = typeReference,
                 typeParameters = typeParameters.map { typeParameter -> IdentifierEntity(typeParameter.value) },
                 uid = uid,
@@ -496,7 +495,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> listOf(declaration.convert())
-            is ClassDeclaration -> listOf(declaration.convert(null))
+            is ClassDeclaration -> listOf(declaration.convert())
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
             is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
@@ -535,7 +534,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode {
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode1 {
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<ModuleDeclaration>>
 
@@ -562,7 +561,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
-        return DocumentRootNode(
+        return DocumentRootNode1(
                 moduleName = moduleName,
                 packageName = documentRoot.packageName,
                 qualifiedPackageName = fullPackageName,
@@ -585,6 +584,6 @@ fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver)
 }
 
 fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver) =
-        SourceSetNode(sources = sources.map { source ->
+        SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
             source.introduceNodes(moduleNameResolver)
         })

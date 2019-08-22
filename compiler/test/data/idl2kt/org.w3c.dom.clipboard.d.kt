@@ -27,19 +27,30 @@ external interface ClipboardEventInit : EventInit {
 @kotlin.internal.InlineOnly
 inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ClipboardEventInit {
     val o = js("({})")
-
     o["clipboardData"] = clipboardData
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-
     return o
 }
 
+/**
+ * Exposes the JavaScript [ClipboardEvent](https://developer.mozilla.org/en/docs/Web/API/ClipboardEvent) to Kotlin
+ */
 external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventInit = definedExternally) : Event {
     open val clipboardData: DataTransfer?
+
+    companion object {
+        val NONE: Short
+        val CAPTURING_PHASE: Short
+        val AT_TARGET: Short
+        val BUBBLING_PHASE: Short
+    }
 }
 
+/**
+ * Exposes the JavaScript [Clipboard](https://developer.mozilla.org/en/docs/Web/API/Clipboard) to Kotlin
+ */
 external abstract class Clipboard : EventTarget {
     fun read(): Promise<DataTransfer>
     fun readText(): Promise<String>
@@ -56,9 +67,7 @@ external interface ClipboardPermissionDescriptor {
 @kotlin.internal.InlineOnly
 inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = false): ClipboardPermissionDescriptor {
     val o = js("({})")
-
     o["allowWithoutGesture"] = allowWithoutGesture
-
     return o
 }
 

@@ -56,7 +56,7 @@ interface ModelWithOwnerLowering {
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
             is TypeAliasModel -> declaration
-            else -> raiseConcern("unknown TopeLevelDeclaration ${declaration::class.simpleName}") { declaration }
+            else -> raiseConcern("unknown TopeLevelDeclaration ${declaration}") { declaration }
         }
     }
 

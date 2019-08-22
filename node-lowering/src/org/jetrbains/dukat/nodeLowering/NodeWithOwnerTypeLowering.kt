@@ -78,7 +78,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
             is PropertyNode -> lowerPropertyNode(owner.wrap(declaration))
             is ConstructorNode -> lowerConstructorNode(owner.wrap(declaration))
             else -> {
-                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this}] skipping ${declaration}")
                 declaration
             }
         }

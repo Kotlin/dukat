@@ -2,34 +2,16 @@ package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.AnnotationModel
-import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
-import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.ConstructorModel
-import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.EnumModel
-import org.jetbrains.dukat.astModel.ExternalDelegationModel
-import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.FunctionTypeModel
-import org.jetbrains.dukat.astModel.HeritageModel
-import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MethodModel
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
-import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TypeAliasModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.isGeneric
-import org.jetbrains.dukat.astModel.statements.*
+import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.StatementCallModel
+import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import translate
 
 const val FORMAT_TAB = "    "
 
@@ -40,6 +22,18 @@ private fun String?.translateMeta(): String {
         ""
     }
 }
+
+private fun CommentModel.translate(output: (String) -> Unit) {
+    when (this) {
+        is SimpleCommentModel -> output(text.translateMeta().trim())
+        is DocumentationCommentModel -> {
+            output("/**")
+            output(" * $text")
+            output(" */")
+        }
+    }
+}
+
 
 private fun TypeModel.translateMeta(): String {
     return when (this) {
@@ -62,7 +56,7 @@ fun TypeModel.translate(): String {
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
             if (isGeneric()) {
-                res.add(translateTypeParams(params))
+                res.add(translateTypeParameters(params))
             }
             if (nullable) {
                 res.add("?")
@@ -118,12 +112,18 @@ private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): S
         ""
     } else {
         "<" + typeParameters.map { typeParameter ->
+            val varianceDescription = when (typeParameter.variance) {
+                Variance.INVARIANT -> ""
+                Variance.COVARIANT -> "out "
+                Variance.CONTRAVARIANT -> "in "
+            }
             val constraintDescription = if (typeParameter.constraints.isEmpty()) {
                 ""
             } else {
                 " : ${typeParameter.constraints[0].translate()}"
             }
-            typeParameter.name.translate() + constraintDescription
+            varianceDescription + typeParameter.type.translate() +
+                    typeParameter.type.translateMeta() + constraintDescription
         }.joinToString(", ") + ">"
     }
 }
@@ -146,7 +146,7 @@ private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boo
 }
 
 private fun translateAnnotations(annotations: List<AnnotationModel>): String {
-    val annotations = annotations.map { annotationNode ->
+    val annotationsResolved = annotations.map { annotationNode ->
         var res = "@" + annotationNode.name
         if (annotationNode.params.isNotEmpty()) {
             res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
@@ -154,7 +154,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
         res
     }
 
-    val annotationTranslated = if (annotations.isEmpty()) "" else annotations.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
+    val annotationTranslated = if (annotationsResolved.isEmpty()) "" else annotationsResolved.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
 
     return annotationTranslated
 }
@@ -182,7 +182,7 @@ private fun ClassLikeReferenceModel.translate(): String {
     }
 }
 
-private fun FunctionModel.translate(): String {
+private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val returnsUnit = (type is TypeValueModel) &&
             (type as TypeValueModel).value == IdentifierEntity("Unit")
 
@@ -196,12 +196,16 @@ private fun FunctionModel.translate(): String {
     val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
     val operator = if (operator) " operator" else ""
 
-    val body = if (body.isEmpty()) {
+    val bodyFirstLine = if (body.isEmpty()) {
         ""
-    } else if (body.size == 1 && body[0] is ReturnStatementModel) {
-        " = ${(body[0] as ReturnStatementModel).statement.translate()}"
+    } else if (body.size == 1) {
+        if (body[0] is ReturnStatementModel) {
+            " = ${(body[0] as ReturnStatementModel).statement.translate()}"
+        } else {
+            " { ${body[0].translate()} }"
+        }
     } else {
-        " { ${body.joinToString(separator = "; ") { statementNode -> statementNode.translate() }} }"
+        " {"
     }
 
     val funName = if (extend == null) {
@@ -209,7 +213,16 @@ private fun FunctionModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${body}"
+
+    output(FORMAT_TAB.repeat(padding) +
+            "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${bodyFirstLine}")
+
+    if (body.size > 1) {
+        body.forEach { statement ->
+            output(FORMAT_TAB.repeat(padding + 1) + statement.translate())
+        }
+        output(FORMAT_TAB.repeat(padding) + "}")
+    }
 }
 
 private fun MethodModel.translate(): List<String> {
@@ -230,7 +243,7 @@ private fun MethodModel.translate(): List<String> {
     val overrideClause = if (override) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters, !override)})${returnClause}$metaClause")
+    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause")
 }
 
 private fun ConstructorModel.translate(): List<String> {
@@ -296,11 +309,11 @@ private fun MemberModel.translate(): List<String> {
         is ConstructorModel -> translate()
         is ClassModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
-        else -> raiseConcern("can not translate MemberModel ${this::class.simpleName}") { listOf("") }
+        else -> raiseConcern("can not translate MemberModel ${this}") { listOf("") }
     }
 }
 
-private fun PropertyModel.translateSignature(): String {
+private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (getter && !setter) "val" else "var"
     val overrideClause = if (override) "override " else ""
 
@@ -310,13 +323,15 @@ private fun PropertyModel.translateSignature(): String {
         typeParams = " " + typeParams
     }
     val metaClause = type.translateMeta()
-    var res = "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
-    if (type.nullable) {
+    val res = mutableListOf(
+            "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
+    )
+    if (type.nullable || (type is TypeValueModel && (type as TypeValueModel).value == IdentifierEntity("dynamic"))) {
         if (getter) {
-            res += " get() = definedExternally"
+            res.add(FORMAT_TAB + "get() = definedExternally")
         }
         if (setter) {
-            res += "; set(value) = definedExternally"
+            res.add(FORMAT_TAB + "set(value) = definedExternally")
         }
     }
     return res
@@ -343,7 +358,7 @@ private fun MethodModel.translateSignature(): List<String> {
 private fun MemberModel.translateSignature(): List<String> {
     return when (this) {
         is MethodModel -> translateSignature()
-        is PropertyModel -> listOf(translateSignature())
+        is PropertyModel -> translateSignature()
         is ClassModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
         else -> raiseConcern("can not translate signature ${this}") { emptyList<String>() }
@@ -367,7 +382,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
             val typeParams = if (params.isEmpty()) {
                 ""
             } else {
-                "<${params.joinToString("::") { it.translateAsHeritageClause() }}>"
+                "<${params.joinToString("::") { it.type.translateAsHeritageClause() }}>"
             }
 
             when (value) {
@@ -400,11 +415,14 @@ private fun ClassModel.translate(padding: Int): String {
 
 private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
+    val hasSecondaryConstructors = members.any { it is ConstructorModel }
+
+    comment?.translate(output)
 
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty()) "" else "(${translateParameters(primaryConstructor.parameters)})"
+        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
     val openClause = if (abstract) "abstract" else "open"
     val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
@@ -425,6 +443,9 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     }
 
     if (companionObject != null) {
+        if (hasMembers) {
+            output("")
+        }
         output(FORMAT_TAB.repeat(padding + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
     }
     if (hasStaticMembers) {
@@ -446,6 +467,9 @@ private fun InterfaceModel.translate(padding: Int): String {
 }
 
 fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
+
+    comment?.translate(output)
+
     val hasMembers = members.isNotEmpty()
     val staticMembers = companionObject?.members.orEmpty()
 
@@ -458,13 +482,16 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
         if (companionObject != null) {
-            val parents = if (companionObject!!.parentEntities.isEmpty()) {
+            val parentsResolved = if (companionObject!!.parentEntities.isEmpty()) {
                 ""
             } else {
                 " : ${companionObject!!.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
             }
 
-            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parents}${if (staticMembers.isEmpty()) "" else " {"}")
+            if (hasMembers) {
+                output("")
+            }
+            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parentsResolved}${if (staticMembers.isEmpty()) "" else " {"}")
 
             if (staticMembers.isNotEmpty()) {
                 staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }.forEach { output(it) }
@@ -489,18 +516,22 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitTypeAlias(typeAlias: TypeAliasModel) {
+        addOutput("")
         addOutput(typeAlias.translate())
     }
 
     override fun visitVariable(variable: VariableModel) {
+        addOutput("")
         addOutput(variable.translate())
     }
 
     override fun visitFunction(function: FunctionModel) {
-        addOutput(function.translate())
+        addOutput("")
+        function.translate(0, ::addOutput)
     }
 
     override fun visitObject(objectNode: ObjectModel) {
+        addOutput("")
         val objectModel = "${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
@@ -520,14 +551,17 @@ class StringTranslator : ModelVisitor {
     }
 
     override fun visitEnum(enumNode: EnumModel) {
+        addOutput("")
         addOutput(enumNode.translate())
     }
 
     override fun visitInterface(interfaceModel: InterfaceModel) {
+        addOutput("")
         interfaceModel.translate(0, ::addOutput)
     }
 
     override fun visitClass(classModel: ClassModel) {
+        addOutput("")
         classModel.translate(0, ::addOutput)
     }
 
@@ -549,15 +583,14 @@ class StringTranslator : ModelVisitor {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {
-                addOutput(translateAnnotations)
+                if (translateAnnotations.isNotEmpty()) {
+                    addOutput(translateAnnotations)
+                }
             }
         }
 
-        moduleModel.imports.forEachIndexed { index, importNode ->
+        moduleModel.imports.forEachIndexed { _, importNode ->
             visitImport(importNode)
-            if (index == (moduleModel.imports.size - 1)) {
-                addOutput("")
-            }
         }
     }
 

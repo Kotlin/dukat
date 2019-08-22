@@ -20,7 +20,9 @@ import org.w3c.xhr.*
 external interface I {
     fun foo(): String
 }
+
 external fun foo(): I
+
 external fun bar(): b.I
 
 // ------------------------------------------------------------------------------------------
@@ -46,5 +48,7 @@ import org.w3c.xhr.*
 external interface I {
     fun foo(): String
 }
+
 external fun foo(): I
+
 external fun bar(): a.I

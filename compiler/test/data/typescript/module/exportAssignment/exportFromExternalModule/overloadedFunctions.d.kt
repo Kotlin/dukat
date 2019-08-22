@@ -19,9 +19,14 @@ external interface BrowserifyObject : NodeJS.EventEmitter {
     fun add(file: String): BrowserifyObject
     fun require(file: String): BrowserifyObject
 }
+
 external interface Options {
-    var entries: Array<String>? get() = definedExternally; set(value) = definedExternally
-    var noParse: Array<String>? get() = definedExternally; set(value) = definedExternally
+    var entries: Array<String>?
+        get() = definedExternally
+        set(value) = definedExternally
+    var noParse: Array<String>?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 // ------------------------------------------------------------------------------------------
@@ -45,7 +50,9 @@ import org.w3c.xhr.*
 
 @JsModule("browserify")
 external fun browserify(): BrowserifyObject
+
 @JsModule("browserify")
 external fun browserify(files: Array<String>): BrowserifyObject
+
 @JsModule("browserify")
 external fun browserify(opts: Options): BrowserifyObject

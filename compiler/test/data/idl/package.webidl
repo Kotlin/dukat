@@ -1,4 +1,4 @@
-namespace org.example.name;
+package org.example.name;
 
 interface A {
 

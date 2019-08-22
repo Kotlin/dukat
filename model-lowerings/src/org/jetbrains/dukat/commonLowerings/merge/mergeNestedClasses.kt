@@ -18,6 +18,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myClassMap: MutableMap<ClassKey, ClassModel> = mutableMapOf()
     private val myModuleClassesMap: MutableMap<NameEntity, MutableList<ClassModel>> = mutableMapOf()
 
+    @Suppress("UNCHECKED_CAST")
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName())] = ownerContext.node
 

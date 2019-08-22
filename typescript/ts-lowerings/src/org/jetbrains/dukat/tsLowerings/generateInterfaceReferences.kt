@@ -50,7 +50,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
         is UnionTypeDeclaration -> emptyList()
         is VariableDeclaration -> emptyList()
-        else -> raiseConcern("unknown Entity ${this::class.simpleName}") { emptyList<TypeParameterDeclaration>() };
+        else -> raiseConcern("unknown Entity ${this}") { emptyList<TypeParameterDeclaration>() };
     }
 }
 

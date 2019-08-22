@@ -1,11 +1,10 @@
-
 import kotlin.js.*
 
 external abstract class interfaceName {
-    var byteVar: Byte
-    var shortVar: Short
-    var intVar: Int
-    var longVar: Int
-    var floatVar: Float
-    var doubleVar: Double
+    open var byteVar: Byte
+    open var shortVar: Short
+    open var intVar: Int
+    open var longVar: Int
+    open var floatVar: Float
+    open var doubleVar: Double
 }

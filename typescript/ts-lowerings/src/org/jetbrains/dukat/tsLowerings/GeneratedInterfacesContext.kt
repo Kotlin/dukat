@@ -35,10 +35,11 @@ internal fun Entity.getUID(): String {
         is InterfaceDeclaration -> uid
         is GeneratedInterfaceDeclaration -> uid
         is VariableDeclaration -> uid
-        else -> raiseConcern("unknown Entity uid ${this::class.simpleName}") { "" };
+        else -> raiseConcern("unknown Entity uid ${this}") { "" };
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 private fun NodeOwner<*>.findOwnerPackage(): ModuleDeclaration {
     val ownerPackage = getOwners().first() {
         (it is NodeOwner<*>) && (it.node is ModuleDeclaration)

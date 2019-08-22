@@ -16,11 +16,14 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun foo(s: String /* "number" */): Number
+
 external fun foo(s: String /* "string" */): String
+
 external interface I {
     fun bar(s: String /* "number" */): Number
     fun bar(s: String /* "string" */): String
 }
+
 external open class C {
     open fun baz(s: String /* "number" */): Number
     open fun baz(s: String /* "string" */): String

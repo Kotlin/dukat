@@ -9,7 +9,7 @@ dictionary WebGLContextAttributes {
     boolean failIfMajorPerformanceCaveat = false;
 };
 
-dictionary PointerEventInit : MouseEventInit {
+dictionary PointerEventInit {
     long pointerId = 0;
     double width = 1;
     double height = 1;
@@ -27,5 +27,6 @@ interface A {
 };
 
 dictionary UndefinedMemberDictionary {
-    DOMString str;
+    required DOMString str;
+    DOMString str2;
 };

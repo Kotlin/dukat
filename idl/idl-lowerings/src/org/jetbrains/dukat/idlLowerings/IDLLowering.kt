@@ -2,10 +2,10 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
@@ -31,10 +31,6 @@ interface IDLLowering {
     }
 
     fun lowerArgumentDeclaration(declaration: IDLArgumentDeclaration): IDLArgumentDeclaration {
-        return declaration.copy(type = lowerTypeDeclaration(declaration.type))
-    }
-
-    fun lowerConstantDeclaration(declaration: IDLConstantDeclaration): IDLConstantDeclaration {
         return declaration.copy(type = lowerTypeDeclaration(declaration.type))
     }
 
@@ -97,7 +93,6 @@ interface IDLLowering {
                 attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
                 operations = declaration.operations.map { lowerOperationDeclaration(it) },
                 constructors = declaration.constructors.map { lowerConstructorDeclaration(it) },
-                constants = declaration.constants.map { lowerConstantDeclaration(it) },
                 parents = declaration.parents.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration },
                 primaryConstructor = if (declaration.primaryConstructor == null) {
                     null
@@ -109,12 +104,17 @@ interface IDLLowering {
         )
     }
 
+    fun lowerEnumDeclaration(declaration: IDLEnumDeclaration) : IDLEnumDeclaration {
+        return declaration
+    }
+
     fun lowerTopLevelDeclaration(declaration: IDLTopLevelDeclaration): IDLTopLevelDeclaration {
         return when (declaration) {
             is IDLInterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
             is IDLTypedefDeclaration -> lowerTypedefDeclaration(declaration)
             is IDLImplementsStatementDeclaration -> lowerImplementStatementDeclaration(declaration)
             is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
+            is IDLEnumDeclaration -> lowerEnumDeclaration(declaration)
             is IDLIncludesStatementDeclaration -> lowerIncludesStatementDeclaration(declaration)
             else -> declaration
         }

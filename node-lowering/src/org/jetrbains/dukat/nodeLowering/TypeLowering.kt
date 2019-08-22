@@ -65,7 +65,7 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
             is PropertyNode -> lowerPropertyNode(declaration)
             is ConstructorNode -> lowerConstructorNode(declaration)
             else -> {
-                logger.debug("[${this::class.simpleName}] skipping ${declaration}")
+                logger.debug("[${this}] skipping ${declaration}")
                 declaration
             }
         }

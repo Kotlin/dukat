@@ -18,7 +18,7 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetrbains.dukat.nodeLowering.IdentityLowering
 
-private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: Int): List<List<ParameterNode>> {
+private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNode>> {
 
     var currentComplexity = 1
 
@@ -45,7 +45,7 @@ private fun specifyArguments(params: List<ParameterNode>, complexityThreshold: I
 private class SpecifyUnionTypeLowering : IdentityLowering {
 
     fun generateParams(params: List<ParameterNode>): List<List<ParameterNode>> {
-        val specifyParams = specifyArguments(params, 16)
+        val specifyParams = specifyArguments(params)
 
         return if (specifyParams.size == 1) {
             specifyParams.first().map { param -> listOf(param) }

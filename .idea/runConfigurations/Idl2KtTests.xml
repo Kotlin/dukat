@@ -3,12 +3,12 @@
     <module name="compiler_test" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.extended.*" />
+        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.core.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.extended" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.Idl2KtTests" />
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.core" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.Idl2KtTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
     <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -Ddukat.test.failure.always=true -Ddukat.test.idl2kt=true" />

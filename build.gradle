@@ -26,11 +26,20 @@ allprojects {
       compileKotlin {
         kotlinOptions {
           jvmTarget = '1.6'
+          allWarningsAsErrors = true
+          freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
         }
       }
 
       dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib:$gradle.kotlinVersion")
+      }
+    }
+
+    if (project.plugins.hasPlugin("java")) {
+      compileJava {
+        sourceCompatibility = '1.6'
+        targetCompatibility = '1.6'
       }
     }
   }

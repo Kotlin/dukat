@@ -27,7 +27,7 @@ private class ImplementsStatementContext : IDLLowering {
 
 private class ImplementsStatementResolver(val context: ImplementsStatementContext) : IDLLowering {
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        return declaration.copy(parents = declaration.parents + context.getMissingInheritances(declaration))
+        return declaration.copy(parents = (declaration.parents + context.getMissingInheritances(declaration)).distinct())
     }
 }
 

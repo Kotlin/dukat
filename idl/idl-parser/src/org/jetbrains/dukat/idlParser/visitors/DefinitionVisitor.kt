@@ -5,7 +5,6 @@ import org.antlr.webidl.WebIDLBaseVisitor
 import org.antlr.webidl.WebIDLLexer
 import org.antlr.webidl.WebIDLParser
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstantDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
@@ -21,6 +20,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlParser.filterIdentifiers
 import org.jetbrains.dukat.idlParser.getFirstValueOrNull
 import org.jetbrains.dukat.idlParser.getName
@@ -32,7 +32,6 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     private val myAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
     private val operations: MutableList<IDLOperationDeclaration> = mutableListOf()
     private val parents: MutableList<IDLSingleTypeDeclaration> = mutableListOf()
-    private val constants: MutableList<IDLConstantDeclaration> = mutableListOf()
     private var typeReference: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private var childType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
     private var parentType: IDLTypeDeclaration = IDLSingleTypeDeclaration("", null, false)
@@ -51,7 +50,6 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.INTERFACE -> IDLInterfaceDeclaration(
                     name = name,
                     attributes = myAttributes,
-                    constants = constants,
                     operations = operations,
                     primaryConstructor = null,
                     constructors = listOf(),
@@ -62,7 +60,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     callback = isCallback,
                     generated = false,
                     partial = partial,
-                    mixin = mixin
+                    mixin = mixin,
+                    kind = InterfaceKind.INTERFACE
             )
             DefinitionKind.TYPEDEF -> IDLTypedefDeclaration(
                     name = name,
@@ -107,7 +106,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
     }
 
     override fun visitConst_(ctx: WebIDLParser.Const_Context?): IDLTopLevelDeclaration {
-        constants.add(MemberVisitor().visit(ctx) as IDLConstantDeclaration)
+        myAttributes.add(MemberVisitor().visit(ctx) as IDLAttributeDeclaration)
         return defaultResult()
     }
 
@@ -143,6 +142,14 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
 
     override fun visitRegularOperation(ctx: WebIDLParser.RegularOperationContext): IDLTopLevelDeclaration {
         operations.add(MemberVisitor().visit(ctx) as IDLOperationDeclaration)
+        return defaultResult()
+    }
+
+    override fun visitStringifier(ctx: WebIDLParser.StringifierContext): IDLTopLevelDeclaration {
+        when (val stringifier = MemberVisitor().visit(ctx)) {
+            is IDLOperationDeclaration -> operations.add(stringifier)
+            is IDLAttributeDeclaration -> myAttributes.add(stringifier)
+        }
         return defaultResult()
     }
 
@@ -235,7 +242,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
         object : WebIDLBaseVisitor<Unit>() {
             override fun visitTerminal(node: TerminalNode) {
                 if (node.symbol.type == WebIDLLexer.STRING_WEBIDL) {
-                    enumMembers.add(node.text.removeSurrounding("\""))
+                    enumMembers.add(node.text)
                 }
             }
         }.visit(ctx)

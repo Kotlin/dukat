@@ -17,5 +17,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface PingResult
+
 @JsName("default")
 external fun ping(): PingResult

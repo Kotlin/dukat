@@ -17,7 +17,6 @@ node {
 
 configurations {
     cliBinary
-    cliRuntime
 }
 
 task buildDistrib {
@@ -34,6 +33,17 @@ task buildDistrib {
         }
 
         copy {
+            from "${project(":ts").buildDir}/package/node_modules/typescript/lib"
+            include "*.d.ts"
+            into "${DISTRIB_PATH}/d.ts.libs"
+        }
+
+        copy {
+            from "${project(":ts").buildDir}/bundle/converter.js"
+            into "${DISTRIB_PATH}/lib"
+        }
+
+        copy {
             from "bin"
             into "${DISTRIB_PATH}/bin"
         }
@@ -43,11 +53,6 @@ task buildDistrib {
             into "${DISTRIB_PATH}/build/runtime"
         }
 
-        copy {
-            from configurations.cliRuntime
-            into "${DISTRIB_PATH}/build/runtime"
-            rename "js-${gradle.graalVersion}.jar", "js.jar"
-        }
     }
 }
 
@@ -90,10 +95,6 @@ task npmPublish(type: NpmTask) {
 
 dependencies {
     cliBinary(project(":cli")) {
-        transitive = false
-    }
-
-    cliRuntime("org.graalvm.js:js:${gradle.graalVersion}") {
         transitive = false
     }
 }

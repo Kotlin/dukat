@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
@@ -8,10 +9,15 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.isKnown
+import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.isPrimitive
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 
 private class TypeResolver : IDLLowering {
+
+    private val logger: Logging = Logging("resolveTypes")
 
     private val resolvedUnionTypes: MutableSet<String> = mutableSetOf()
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
@@ -28,12 +34,12 @@ private class TypeResolver : IDLLowering {
         for (member in unionType.unionMembers) {
             when (member) {
                 is IDLUnionTypeDeclaration -> {
+                    if (member.name !in resolvedUnionTypes && member.name !in failedToResolveUnionTypes) {
+                        processUnionType(member)
+                    }
                     if (member.name in failedToResolveUnionTypes) {
                         failedToResolveUnionTypes += unionType.name
                         return
-                    }
-                    if (member.name !in resolvedUnionTypes) {
-                        processUnionType(member)
                     }
                     newDependenciesToAdd.putIfAbsent(member.name, mutableSetOf())
                     newDependenciesToAdd[member.name]!!.add(IDLSingleTypeDeclaration(
@@ -43,7 +49,7 @@ private class TypeResolver : IDLLowering {
                     ))
                 }
                 is IDLSingleTypeDeclaration -> {
-                    if (member.typeParameter != null || !sourceSet.containsInterface(member.name)) {
+                    if (member.typeParameter != null || !sourceSet.containsType(member.name)) {
                         failedToResolveUnionTypes += unionType.name
                         return
                     }
@@ -53,6 +59,10 @@ private class TypeResolver : IDLLowering {
                             typeParameter = null,
                             nullable = false
                     ))
+                }
+                is IDLFunctionTypeDeclaration -> {
+                    failedToResolveUnionTypes += unionType.name
+                    return
                 }
             }
         }
@@ -73,19 +83,26 @@ private class TypeResolver : IDLLowering {
                 in resolvedUnionTypes -> IDLSingleTypeDeclaration(
                         name = declaration.name,
                         typeParameter = null,
-                        nullable = declaration.nullable
+                        nullable = declaration.nullable,
+                        comment = declaration.comment
                 )
                 in failedToResolveUnionTypes -> IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
-                        nullable = false
+                        nullable = false,
+                        comment = declaration.comment
                 )
                 else -> raiseConcern("unprocessed UnionTypeDeclaration: $this") { declaration }
             }
         }
         if (declaration is IDLSingleTypeDeclaration) {
-            return if (!declaration.isPrimitive() && !sourceSet.containsInterface(declaration.name)) {
-                IDLSingleTypeDeclaration("\$dynamic", null, false)
+            return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
+                IDLSingleTypeDeclaration(
+                        name = "\$dynamic",
+                        typeParameter = null,
+                        nullable = false,
+                        comment = declaration.comment
+                )
             } else {
                 declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
             }
@@ -99,6 +116,28 @@ private class TypeResolver : IDLLowering {
         return declaration
     }
 
+    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration, ownerName: String): IDLSingleTypeDeclaration? {
+        return if (sourceSet.containsType(inheritance.name)) {
+            inheritance
+        } else {
+            logger.warn("Failed to find parent of ${ownerName}: ${inheritance.name}").let { null }
+        }
+    }
+
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+        val newDeclaration = super.lowerInterfaceDeclaration(declaration)
+        return newDeclaration.copy(
+                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+        )
+    }
+
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+        val newDeclaration = super.lowerDictionaryDeclaration(declaration)
+        return newDeclaration.copy(
+                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+        )
+    }
+
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
         var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         newFileDeclaration = newFileDeclaration.copy(
@@ -106,7 +145,6 @@ private class TypeResolver : IDLLowering {
                     IDLInterfaceDeclaration(
                             name = it,
                             attributes = listOf(),
-                            constants = listOf(),
                             operations = listOf(),
                             primaryConstructor = null,
                             constructors = listOf(),
@@ -119,7 +157,8 @@ private class TypeResolver : IDLLowering {
                             callback = false,
                             generated = true,
                             partial = false,
-                            mixin = false
+                            mixin = false,
+                            kind = InterfaceKind.INTERFACE
                     )
                 }
         )

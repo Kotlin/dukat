@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 
+@Suppress("UNCHECKED_CAST")
 fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {

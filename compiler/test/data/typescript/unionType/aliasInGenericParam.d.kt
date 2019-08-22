@@ -31,4 +31,5 @@ external interface OurObject {
     @nativeSetter
     operator fun set(x: String, value: OurListArray)
 }
+
 external interface OurListArray : ReadonlyArray<dynamic /* String | Number | Boolean | Date | OurObject | OurListArray */>

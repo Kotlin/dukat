@@ -19,11 +19,13 @@ import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
-import org.jetbrains.dukat.ts.translator.createGraalTranslator
-import translateModule
+import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
 import java.io.File
 import kotlin.system.exitProcess
 
+
+val PACKAGE_DIR = System.getProperty("dukat.cli.internal.packagedir")
 
 @Serializable
 private data class Report(val outputs: List<String>)
@@ -36,11 +38,13 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(filename: String, outDir: String?, translator: InputTranslator, pathToReport: String?) {
-    val sourceFile = File(filename)
+private fun compile(outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
+    val translatedUnits = translateModule(System.`in`.readBytes(), translator)
 
-    val translatedUnits = translateModule(sourceFile.absolutePath, translator)
+    compileUnits(translatedUnits, outDir, pathToReport)
+}
 
+private fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
     val dirFile = File(outDir ?: "./")
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()
@@ -51,23 +55,25 @@ private fun compile(filename: String, outDir: String?, translator: InputTranslat
     val output = mutableListOf<String>()
 
     translatedUnits.forEach { translationUnitResult ->
-
         if (translationUnitResult is ModuleTranslationUnit) {
             val targetName = "${translationUnitResult.name}.kt"
 
-            if (targetName != null) {
-                val resolvedTarget = dirFile.resolve(targetName)
+            val resolvedTarget = dirFile.resolve(targetName)
 
-                println(resolvedTarget.name)
+            println(resolvedTarget.name)
 
-                if (buildReport) {
-                    output.add(resolvedTarget.name)
-                }
-
-                resolvedTarget.writeText(translationUnitResult.content)
+            if (buildReport) {
+                output.add(resolvedTarget.name)
             }
+
+            resolvedTarget.writeText(translationUnitResult.content)
         } else {
-            print("ERROR: ${translationUnitResult.resolveAsError(filename)}")
+            val fileName = when (translationUnitResult) {
+                is TranslationErrorInvalidFile -> translationUnitResult.fileName
+                is TranslationErrorFileNotFound -> translationUnitResult.fileName
+                is ModuleTranslationUnit -> translationUnitResult.fileName
+            }
+            println("ERROR: ${translationUnitResult.resolveAsError(fileName)}")
         }
     }
 
@@ -76,6 +82,17 @@ private fun compile(filename: String, outDir: String?, translator: InputTranslat
     }
 }
 
+private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
+    val translatedUnits: List<TranslationUnitResult> =  filenames.flatMap { filename ->
+        val sourceFile = File(filename)
+
+        translateModule(sourceFile.absolutePath, translator)
+    }
+
+    compileUnits(translatedUnits, outDir, pathToReport)
+}
+
+@UseExperimental(kotlinx.serialization.UnstableDefault::class)
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
 
@@ -100,12 +117,6 @@ fun Iterator<String>.readArg(): String? {
     } else null
 }
 
-private fun printVersion() {
-    println("""
-dukat version ${System.getProperty("dukat.cli.internal.version")}
-""".trimIndent())
-}
-
 private fun printUsage(program: String) {
     println("""
 Usage: $program [<options>] <d.ts files>
@@ -119,17 +130,13 @@ where possible options include:
 }
 
 
-private enum class Engine {
-    GRAAL
-}
-
 private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
-        val engine: Engine,
         val basePackageName: NameEntity,
         val jsModuleName: String?,
-        val reportPath: String?
+        val reportPath: String?,
+        val tsDefaultLib: String
 )
 
 
@@ -146,7 +153,6 @@ private fun process(args: List<String>): CliOptions? {
 
     val sources = mutableListOf<String>()
     var outDir: String? = null
-    var engine = Engine.GRAAL
     var basePackageName: NameEntity = ROOT_PACKAGENAME
     var jsModuleName: String? = null
     var reportPath: String? = null
@@ -154,7 +160,6 @@ private fun process(args: List<String>): CliOptions? {
         val arg = argsIterator.next()
 
         when (arg) {
-            "-v", "-version" -> printVersion()
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)
             }
@@ -165,21 +170,6 @@ private fun process(args: List<String>): CliOptions? {
                     return null
                 } else {
                     outDir = outDirArg
-                }
-            }
-
-            "-js" -> {
-                val engineId = argsIterator.readArg()
-                printWarning("'-js' is an obsolete flag and planned to be removed")
-                engine = when (engineId) {
-                    "graal" -> Engine.GRAAL
-                    "j2v8" -> {
-                        printWarning("j2v8 backend is not supported any more, '-js' option is ignored")
-                        Engine.GRAAL
-                    }
-                    else -> {
-                        Engine.GRAAL
-                    }
                 }
             }
 
@@ -215,6 +205,7 @@ private fun process(args: List<String>): CliOptions? {
             }
 
             else -> when {
+                arg.equals("-") -> sources.add("-")
                 arg.endsWith(TS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
@@ -235,7 +226,9 @@ following file extensions are supported:
         }
     }
 
-    return CliOptions(sources, outDir, engine, basePackageName, jsModuleName, reportPath)
+    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath;
+
+    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
 }
 
 fun main(vararg args: String) {
@@ -249,34 +242,46 @@ fun main(vararg args: String) {
     if (options == null) {
         exitProcess(1)
     } else {
-        options.engine == Engine.GRAAL
-
         val moduleResolver = if (options.jsModuleName != null) {
             ConstNameResolver(options.jsModuleName)
         } else {
             CommonJsNameResolver()
         }
 
-        options.sources.forEach { sourceName ->
-            when {
-                sourceName.endsWith(TS_DECLARATION_EXTENSION) -> compile(
-                        sourceName,
+        if (options.sources.isEmpty()) {
+            printError("please, specify at least one input source")
+            exitProcess(1)
+        }
+
+        val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
+        val isIdlTranslation = options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
+
+        when {
+            isTsTranslation -> {
+                compile(
                         options.outDir,
-                        when (options.engine) {
-                            Engine.GRAAL -> createGraalTranslator(options.basePackageName, moduleResolver)
-                        },
+                        createJsByteArrayTranslator(
+                                options.basePackageName,
+                                moduleResolver
+                        ),
                         options.reportPath
                 )
-                sourceName.endsWith(IDL_DECLARATION_EXTENSION) ||
-                        sourceName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
-                    compile(
-                            sourceName,
-                            options.outDir,
-                            IdlInputTranslator(DirectoryReferencesResolver()),
-                            options.reportPath
-                    )
 
-                }
+            }
+
+            isIdlTranslation-> {
+                compile(
+                        options.sources,
+                        options.outDir,
+                        IdlInputTranslator(DirectoryReferencesResolver()),
+                        options.reportPath
+                )
+
+            }
+
+            else -> {
+                printError("in a single pass you can either pass only *.d.ts files or *.idl files")
+                exitProcess(1)
             }
         }
     }

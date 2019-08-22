@@ -15,6 +15,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
+@Suppress("UNCHECKED_CAST")
 private fun NodeOwner<*>.getModule(): DocumentRootNode {
     return (getOwners().first { (it is NodeOwner<*>) && (it.node is DocumentRootNode) } as NodeOwner<DocumentRootNode>).node
 }
@@ -80,13 +81,6 @@ private class LowerQualifiedDeclarations(private val uidData: UidData) : NodeWit
                         right = IdentifierEntity(value.right.value)
                 )
             }
-            is IdentifierEntity -> {
-                resolve(value.value, owner)
-            }
-            is QualifierEntity -> value.copy(
-                    left = resolve(value.left, owner),
-                    right = IdentifierEntity(value.right.value)
-            )
             else -> raiseConcern("unknown NameEntity subtype ${value::class.simpleName}") { value }
         }
     }

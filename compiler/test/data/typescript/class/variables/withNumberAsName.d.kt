@@ -16,6 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface IBar
+
 external open class Foo {
     open var `200`: String
     open var `300`: Number

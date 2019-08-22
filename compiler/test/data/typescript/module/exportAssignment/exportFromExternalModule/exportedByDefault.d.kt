@@ -18,10 +18,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun foo(): String
+
 external var bar: Number
+
 external interface IBaz {
     fun doSomething()
 }
+
 external open class Klass {
     open fun method(s: Any): String
 }

@@ -20,7 +20,7 @@ private class OverrideResolver(val context: ModelContext) {
         return when (this) {
             is InterfaceModel -> getKnownParents()
             is ClassModel -> getKnownParents()
-            else -> raiseConcern("unknown ClassLikeDeclaration ${this::class.simpleName}") { emptyList<ClassLikeModel>() }
+            else -> raiseConcern("unknown ClassLikeDeclaration ${this}") { emptyList<ClassLikeModel>() }
         }
     }
 
@@ -134,6 +134,12 @@ private class OverrideResolver(val context: ModelContext) {
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
 
+            if (value == otherParameterType.value
+                    && params == otherParameterType.params
+                    && nullable == otherParameterType.nullable) {
+                return true
+            }
+
             val classLike: ClassLikeModel? = context.resolveClass(value) ?: context.resolveInterface(value)
             val otherClassLike: ClassLikeModel? = context.resolveClass(otherParameterType.value)
                     ?: context.resolveInterface(otherParameterType.value)
@@ -216,16 +222,14 @@ private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
         if (declaration is ClassModel) {
             context.registerClass(declaration)
         }
-        if (declaration is ModuleModel) {
-            declaration.updateContext(context)
-        }
     }
+
+    submodules.forEach { declaration -> declaration.updateContext(context) }
 
     return this
 }
 
 private fun SourceSetModel.updateContext(astContext: ModelContext) = transform { it.updateContext(astContext) }
-
 
 fun SourceSetModel.lowerOverrides(): SourceSetModel {
     val astContext = ModelContext()

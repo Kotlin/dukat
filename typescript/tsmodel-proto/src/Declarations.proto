@@ -3,7 +3,7 @@ package dukat.ast.proto;
 
 option java_outer_classname = "Declarations";
 
-message DefinitionInfoDeclaration {
+message DefinitionInfoDeclarationProto {
     string fileName = 1;
 }
 
@@ -15,4 +15,245 @@ message EnumTokenDeclaration {
 message EnumDeclaration {
     string name = 1;
     repeated EnumTokenDeclaration values = 2;
+}
+
+message ExportAssignmentDeclarationProto {
+    string name = 1;
+    bool isExportEquals = 2;
+}
+
+message NameEntityProto {
+    oneof type {
+        IdentifierEntityProto identifier = 1;
+        QualifierEntityProto qualifier = 2;
+    }
+}
+
+message IdentifierEntityProto {
+    string value = 1;
+}
+
+message QualifierEntityProto {
+    NameEntityProto left = 1;
+    IdentifierEntityProto right = 3;
+}
+
+
+message ParameterValueDeclarationProto {
+    oneof type {
+        StringLiteralDeclarationProto stringLiteral = 1;
+        ThisTypeDeclarationProto thisType = 2;
+        GeneratedInterfaceReferenceDeclarationProto generatedInterfaceReference = 3;
+        IntersectionTypeDeclarationProto intersectionType = 4;
+        TupleDeclarationProto tupleDeclaration = 5;
+        UnionTypeDeclarationProto unionType = 6;
+        ObjectLiteralDeclarationProto objectLiteral = 7;
+        TypeDeclarationProto typeDeclaration = 8;
+        FunctionTypeDeclarationProto functionTypeDeclaration = 9;
+    }
+}
+
+message StringLiteralDeclarationProto {
+    string token = 1;
+}
+
+message ThisTypeDeclarationProto {
+}
+
+message ImportEqualsDeclarationProto {
+    string name = 1;
+    NameEntityProto moduleReference = 2;
+    string uid = 3;
+}
+
+message FunctionTypeDeclarationProto {
+    repeated ParameterDeclarationProto parameters = 1;
+    ParameterValueDeclarationProto type = 2;
+}
+
+message TypeParameterDeclarationProto {
+    NameEntityProto name = 1;
+    repeated ParameterValueDeclarationProto constraints = 2;
+}
+
+message GeneratedInterfaceReferenceDeclarationProto {
+    NameEntityProto name = 1;
+    repeated TypeParameterDeclarationProto typeParameters = 2;
+}
+
+message IntersectionTypeDeclarationProto {
+    repeated ParameterValueDeclarationProto params = 1;
+}
+
+message TupleDeclarationProto {
+    repeated ParameterValueDeclarationProto params = 1;
+}
+
+message UnionTypeDeclarationProto {
+    repeated ParameterValueDeclarationProto params = 1;
+}
+
+message TypeDeclarationProto {
+    NameEntityProto value = 1;
+    repeated ParameterValueDeclarationProto params = 2;
+    ReferenceEntityProto typeReference = 3;
+}
+
+message CallSignatureDeclarationProto {
+    repeated ParameterDeclarationProto parameters = 1;
+    ParameterValueDeclarationProto type = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+}
+
+message ConstructorDeclarationProto {
+    repeated ParameterDeclarationProto parameters = 1;
+    repeated TypeParameterDeclarationProto typeParameters = 2;
+    repeated ModifierDeclarationProto modifiers = 3;
+}
+
+message FunctionDeclarationProto {
+    string name = 1;
+    repeated ParameterDeclarationProto parameters = 2;
+    ParameterValueDeclarationProto type = 3;
+    repeated TypeParameterDeclarationProto typeParameters = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+    string uid = 6;
+}
+
+message IndexSignatureDeclarationProto {
+    repeated ParameterDeclarationProto indexTypes = 1;
+    ParameterValueDeclarationProto returnType = 2;
+}
+
+message MethodSignatureDeclarationProto {
+    string name = 1;
+    repeated ParameterDeclarationProto parameters = 2;
+    ParameterValueDeclarationProto type = 3;
+    repeated TypeParameterDeclarationProto typeParameters = 4;
+    bool optional = 5;
+    repeated ModifierDeclarationProto modifiers = 6;
+}
+
+message PropertyDeclarationProto {
+    string name = 1;
+    ParameterValueDeclarationProto type = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+    bool optional = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+}
+
+message ModifierDeclarationProto {
+    string token = 1;
+}
+
+message ObjectLiteralDeclarationProto {
+    repeated MemberEntityProto members = 1;
+}
+
+message MemberEntityProto {
+    oneof type {
+        CallSignatureDeclarationProto callSignature = 1;
+        ConstructorDeclarationProto constructorDeclaration = 2;
+        FunctionDeclarationProto functionDeclaration = 3;
+        IndexSignatureDeclarationProto indexSignature = 4;
+        MethodSignatureDeclarationProto methodSignature = 5;
+        PropertyDeclarationProto property = 6;
+        ObjectLiteralDeclarationProto objectLiteral = 7;
+    }
+}
+
+message ReferenceEntityProto {
+    string uid = 1;
+}
+
+message ExpressionDeclarationProto {
+    TypeDeclarationProto kind = 1;
+    string meta = 2;
+}
+
+message ParameterDeclarationProto {
+    string name = 1;
+    ParameterValueDeclarationProto type = 2;
+    ExpressionDeclarationProto initializer = 3;
+    bool vararg = 4;
+    bool optional = 5;
+}
+
+message VariableDeclarationProto {
+    string name = 1;
+    ParameterValueDeclarationProto type = 2;
+    repeated ModifierDeclarationProto modifiers = 3;
+    string uid = 4;
+}
+
+message TypeAliasDeclarationProto {
+    NameEntityProto aliasName = 1;
+    repeated IdentifierEntityProto typeParameters = 2;
+    ParameterValueDeclarationProto typeReference = 3;
+    string uid = 4;
+}
+
+message HeritageClauseDeclarationProto {
+    NameEntityProto name = 1;
+    repeated ParameterValueDeclarationProto typeArguments = 2;
+    bool extending = 3;
+    ReferenceEntityProto typeReference = 4;
+}
+
+message SourceFileDeclarationProto {
+    string fileName = 1;
+    ModuleDeclarationProto root = 2;
+    repeated IdentifierEntityProto referencedFiles = 3;
+}
+
+message SourceSetDeclarationProto {
+    string sourceName = 1;
+    repeated SourceFileDeclarationProto sources = 2;
+}
+
+message SourceSetBundleProto {
+    repeated SourceSetDeclarationProto sources = 1;
+}
+
+message ModuleDeclarationProto {
+    NameEntityProto packageName = 1;
+    repeated TopLevelEntityProto declarations = 2;
+    repeated ModifierDeclarationProto modifiers = 3;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 4;
+    string uid = 5;
+    string resourceName = 6;
+    bool root = 7;
+}
+
+message TopLevelEntityProto {
+    oneof type {
+        ClassDeclarationProto classDeclaration = 1;
+        InterfaceDeclarationProto interfaceDeclaration = 2;
+        VariableDeclarationProto variableDeclaration = 3;
+        FunctionDeclarationProto functionDeclaration = 4;
+        TypeAliasDeclarationProto aliasDeclaration = 5;
+        EnumDeclaration enumDeclaration = 6;
+        ModuleDeclarationProto moduleDeclaration = 7;
+        ExportAssignmentDeclarationProto exportAssignment = 8;
+        ImportEqualsDeclarationProto importEquals = 9;
+    }
+}
+
+message ClassDeclarationProto {
+    NameEntityProto name = 1;
+    repeated MemberEntityProto members = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+    repeated HeritageClauseDeclarationProto parentEntities = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+    string uid = 6;
+}
+
+
+message InterfaceDeclarationProto {
+    NameEntityProto name = 1;
+    repeated MemberEntityProto members = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+    repeated HeritageClauseDeclarationProto parentEntities = 4;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
+    string uid = 6;
 }

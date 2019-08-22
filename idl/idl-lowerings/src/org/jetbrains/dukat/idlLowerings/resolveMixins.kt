@@ -11,8 +11,7 @@ private class MixinResolver(val context: MixinContext) : IDLLowering {
         val includedMixins = context.getIncludedMixins(declaration)
         return declaration.copy(
                 attributes = (declaration.attributes + includedMixins.flatMap { it.attributes }).distinct(),
-                operations = (declaration.operations + includedMixins.flatMap { it.operations }).distinct(),
-                constants = (declaration.constants + includedMixins.flatMap { it.constants }).distinct()
+                operations = (declaration.operations + includedMixins.flatMap { it.operations }).distinct()
         )
     }
 }
