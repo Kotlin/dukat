@@ -232,9 +232,9 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             attributes.filterNot { it.static } +
             operations.filterNot { it.static } +
             getters.filterNot { it.name == "get" } +
-            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }
+            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }.distinct()
     val staticMemberModels = (attributes.filter { it.static } +
-            operations.filter { it.static }).mapNotNull { it.process() }
+            operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
         CompanionObjectModel(
