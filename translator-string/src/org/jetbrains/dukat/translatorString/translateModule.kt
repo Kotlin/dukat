@@ -70,12 +70,14 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
 
     var res = ktFileNamePrefix
 
-    packageName.fileNameFragment()?.let { packageFragment ->
-        res += ".${packageFragment}"
-    }
+    if (sourceFile.endsWith(TS_DECLARATION_EXTENSION)) {
+        packageName.fileNameFragment()?.let { packageFragment ->
+            res += ".${packageFragment}"
+        }
 
-    name?.let {
-        res += ".${it}"
+        name?.let {
+            res += ".${it}"
+        }
     }
 
     return res
