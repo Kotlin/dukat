@@ -15,7 +15,7 @@ dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
   implementation(project(":ast-common"))
-  implementation(project(":ast-declarations"))
+  implementation(project(":ts-ast-declarations"))
   implementation(project(":ast-model"))
   implementation(project(":compiler"))
   implementation(project(":idl-reference-resolver"))
@@ -24,7 +24,7 @@ dependencies {
   implementation(project(":translator"))
   implementation(project(":translator-string"))
   implementation(project(":ts-translator"))
-  implementation(project(":tsmodel"))
+  implementation(project(":ts-model"))
 
 
   cliRuntime(project(":compiler"))

@@ -4,13 +4,13 @@ plugins {
 
 dependencies {
     implementation(project(":ast-common"))
-    implementation(project(":ast-declarations"))
+    implementation(project(":ts-ast-declarations"))
     implementation(project(":ast-model"))
     implementation(project(":itertools"))
     implementation(project(":logging"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":translator-string"))
-    implementation(project(":tsmodel"))
+    implementation(project(":ts-model"))
     compile "org.jetbrains.kotlin:kotlin-reflect:1.3.41"
 }

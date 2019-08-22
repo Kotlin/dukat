@@ -38,33 +38,32 @@ gradle.ext {
   protobufImplementationVersion = "3.9.0"
 }
 
-
-include 'ast-declarations'
 include 'ast-common'
 include 'ast-model'
 include 'cli'
 include 'compiler'
-include 'model-lowerings'
 include 'idl-declarations'
 include 'idl-lowerings'
 include 'idl-models'
 include 'idl-parser'
 include 'idl-reference-resolver'
-include 'itertools'
 include 'interop'
+include 'itertools'
 include 'logging'
+include 'model-lowerings'
 include 'module-name-resolver'
-include 'node-introduction'
 include 'node-package'
-include 'node-lowering'
 include 'ownerContext'
 include 'panic'
-include 'translator-string'
-include 'ts-converter'
-include 'tsmodel'
-include 'tsmodel-proto'
 include 'translator'
+include 'translator-string'
+include 'ts-ast-declarations'
+include 'ts-converter'
 include 'ts-lowerings'
+include 'ts-model'
+include 'ts-model-proto'
+include 'ts-node-introduction'
+include 'ts-node-lowering'
 include 'ts-translator'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
@@ -72,10 +71,13 @@ project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
-project(':tsmodel-proto').projectDir = file("$rootDir/typescript/tsmodel-proto")
 
+project(':ts-ast-declarations').projectDir = file("$rootDir/typescript/ts-ast-declarations")
+project(':ts-converter').projectDir = file("$rootDir/typescript/ts-converter")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
+project(':ts-model').projectDir = file("$rootDir/typescript/ts-model")
+project(':ts-model-proto').projectDir = file("$rootDir/typescript/ts-model-proto")
+project(':ts-node-introduction').projectDir = file("$rootDir/typescript/ts-node-introduction")
+project(':ts-node-lowering').projectDir = file("$rootDir/typescript/ts-node-lowering")
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
-project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
-project(':ts-converter').projectDir = file("$rootDir/typescript/converter")
 

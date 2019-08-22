@@ -6,7 +6,7 @@ dependencies {
     implementation(project(":ast-common"))
     implementation(project(":logging"))
     implementation(project(":ownerContext"))
-    implementation(project(":tsmodel"))
+    implementation(project(":ts-model"))
     implementation(project(":panic"))
 
 }

@@ -26,7 +26,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
     implementation(project(":ast-common"))
-    implementation(project(":ast-declarations"))
+    implementation(project(":ts-ast-declarations"))
     implementation(project(":ast-model"))
     implementation(project(":idl-declarations"))
     implementation(project(":idl-models"))
@@ -36,14 +36,14 @@ dependencies {
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":module-name-resolver"))
-    implementation(project(":node-introduction"))
-    implementation(project(":node-lowering"))
+    implementation(project(":ts-node-introduction"))
+    implementation(project(":ts-node-lowering"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))
     implementation(project(":ts-translator"))
-    implementation(project(":tsmodel"))
+    implementation(project(":ts-model"))
     implementation(project(":idl-lowerings"))
     implementation(project(":ts-lowerings"))
 
