@@ -60,7 +60,7 @@ include 'node-lowering'
 include 'ownerContext'
 include 'panic'
 include 'translator-string'
-include 'ts'
+include 'ts-converter'
 include 'tsmodel'
 include 'tsmodel-proto'
 include 'translator'
@@ -77,4 +77,5 @@ project(':tsmodel-proto').projectDir = file("$rootDir/typescript/tsmodel-proto")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
 project(':ast-declarations').projectDir = file("$rootDir/typescript/ast-declarations")
+project(':ts-converter').projectDir = file("$rootDir/typescript/converter")
 

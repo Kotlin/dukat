@@ -65,24 +65,24 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
     testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
 
-    compile(project(path: ':ts', configuration: 'dukatTsResources'))
+    compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 
     toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
 
 def getTsDependency() {
-    return zipTree(project(":ts").getTasksByName("createJar", true).archivePath[0])
+    return zipTree(project(":ts-converter").getTasksByName("createJar", true).archivePath[0])
 }
 
 processResources {
-    dependsOn = [":ts:createJar"]
+    dependsOn = [":ts-converter:createJar"]
     from(getTsDependency()) {
         into "/"
     }
 }
 
 task propagateToIdeaRuntime(type: Copy) {
-    dependsOn = [":ts:createJar"]
+    dependsOn = [":ts-converter:createJar"]
 
     from(getTsDependency())
     into "out/production/resources/"
@@ -113,11 +113,11 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
 test.dependsOn(download)
 
 task generateBinary(type: NodeTask) {
-    def scriptName = "${project(":ts").buildDir}/bundle/runtime.js"
+    def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/typescript"
-    def libPath = "${project(":ts").buildDir}/package/node_modules/typescript/lib/lib.d.ts"
+    def libPath = "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib/lib.d.ts"
 
     inputs.dir(declarationsDir)
     inputs.file(scriptName)
@@ -140,7 +140,7 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
-generateBinary.dependsOn = [":ts:webpack"]
+generateBinary.dependsOn = [":ts-converter:webpack"]
 
 test.dependsOn = [generateBinary]
 

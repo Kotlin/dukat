@@ -13,7 +13,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "declarations": path.resolve("../typescript/tsmodel-proto/build/generated/source/proto/main/js/Declarations_pb.js"),
+      "declarations": path.resolve("../tsmodel-proto/build/generated/source/proto/main/js/Declarations_pb.js"),
       "google-protobuf": path.resolve("./build/package/node_modules/google-protobuf"),
       "typescript-services-api": path.resolve("./build/package/node_modules/typescript/lib/typescriptServices.js")
     }

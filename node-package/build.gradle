@@ -33,13 +33,13 @@ task buildDistrib {
         }
 
         copy {
-            from "${project(":ts").buildDir}/package/node_modules/typescript/lib"
+            from "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib"
             include "*.d.ts"
             into "${DISTRIB_PATH}/d.ts.libs"
         }
 
         copy {
-            from "${project(":ts").buildDir}/bundle/converter.js"
+            from "${project(":ts-converter").buildDir}/bundle/converter.js"
             into "${DISTRIB_PATH}/lib"
         }
 
