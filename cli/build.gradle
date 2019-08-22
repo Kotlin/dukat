@@ -44,7 +44,7 @@ jar {
 }
 
 publishing {
-  def configFile = file("${project("node-package").projectDir}/package.template.json")
+  def configFile = file("${project(":node-package").projectDir}/package.template.json")
   def json = new JsonSlurper().parseText(configFile.text)
   def dukatVersion = json.version
 
