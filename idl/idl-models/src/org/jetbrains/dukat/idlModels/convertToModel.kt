@@ -122,7 +122,7 @@ fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
     }
 
     return FunctionTypeModel(
-            parameters = arguments.map { it.process() },
+            parameters = arguments.filterNot { it.variadic }.map { it.process() },
             type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
