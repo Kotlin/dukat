@@ -11,7 +11,8 @@
     "baseUrl": "./",
     "noImplicitAny": false,
     "typeRoots": [
-      "./build/package/node_modules/@types"
+      "./build/package/node_modules/@types",
+      "./.tsdeclarations"
     ],
     "paths": {
       "typescript-services-api": ["./build/package/node_modules/typescript/lib/typescriptServices.js"],

@@ -13,3 +13,8 @@ out
 gradle
 wrapper
 build
+
+
+//project-specific
+//we can not generate this in build folder because in this case it will be ignored - see https://youtrack.jetbrains.com/issue/WEB-39930
+.tsdeclarations
