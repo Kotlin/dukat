@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
   id("kotlin")
   id("kotlinx-serialization")
@@ -42,11 +44,15 @@ jar {
 }
 
 publishing {
+  def configFile = file("$rootDir/node-package/package.template.json")
+  def json = new JsonSlurper().parseText(configFile.text)
+  def dukatVersion = json.version
+
   publications {
     mavenJava(MavenPublication) {
       groupId "org.jetbrains"
       artifactId "dukat"
-      version "0.0.14"
+      version dukatVersion
       artifact jar
     }
   }
