@@ -23,6 +23,18 @@ private fun String?.translateMeta(): String {
     }
 }
 
+private fun CommentModel.translate(output: (String) -> Unit) {
+    when (this) {
+        is SimpleCommentModel -> output(text.translateMeta().trim())
+        is DocumentationCommentModel -> {
+            output("/**")
+            output(" * $text")
+            output(" */")
+        }
+    }
+}
+
+
 private fun TypeModel.translateMeta(): String {
     return when (this) {
         is TypeValueModel -> metaDescription.translateMeta()
@@ -405,11 +417,7 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
     val hasSecondaryConstructors = members.any { it is ConstructorModel }
 
-    if (documentation != null) {
-        output("/**")
-        output(" * $documentation")
-        output(" */")
-    }
+    comment?.translate(output)
 
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
@@ -460,21 +468,13 @@ private fun InterfaceModel.translate(padding: Int): String {
 
 fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
 
-    if (documentation != null) {
-        output("/**")
-        output(" * $documentation")
-        output(" */")
-    }
+    comment?.translate(output)
 
     val hasMembers = members.isNotEmpty()
     val staticMembers = companionObject?.members.orEmpty()
 
     val isBlock = hasMembers || staticMembers.isNotEmpty() || companionObject != null
     val parents = translateHeritagModels(parentEntities)
-
-    if (metaDescription != null) {
-        output(metaDescription.translateMeta().trim())
-    }
 
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
     output("${translateAnnotations(annotations)}${externalClause}interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
@@ -583,7 +583,9 @@ class StringTranslator : ModelVisitor {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {
-                addOutput(translateAnnotations)
+                if (translateAnnotations.isNotEmpty()) {
+                    addOutput(translateAnnotations)
+                }
             }
         }
 

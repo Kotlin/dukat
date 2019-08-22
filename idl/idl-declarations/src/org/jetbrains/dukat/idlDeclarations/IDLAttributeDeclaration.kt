@@ -5,5 +5,6 @@ data class IDLAttributeDeclaration(
         val type: IDLTypeDeclaration,
         val static: Boolean,
         val readOnly: Boolean,
+        val override: Boolean,
         val open: Boolean = false
 ) : IDLMemberDeclaration

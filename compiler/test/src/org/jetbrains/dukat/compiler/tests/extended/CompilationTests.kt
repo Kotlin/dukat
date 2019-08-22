@@ -28,7 +28,11 @@ class CompilationTests : OutputTests() {
     @ParameterizedTest(name = "{0}")
     @MethodSource("extendedSet")
     @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
-    fun withValueSourceCompiled(name: String, tsPath: String, ktPath: String) {
+    fun withValueSourceCompiled(
+            name: String,
+            tsPath: String,
+            @Suppress("UNUSED_PARAMETER") ktPath: String
+    ) {
         assertContentCompiles(name, tsPath)
     }
 
@@ -52,7 +56,7 @@ class CompilationTests : OutputTests() {
 
 
     private fun assertContentCompiles(
-            descriptor: String,
+            @Suppress("UNUSED_PARAMETER") descriptor: String,
             tsPath: String
     ) {
         val translated = translateModule(tsPath, translator)
@@ -63,7 +67,7 @@ class CompilationTests : OutputTests() {
         val targetDir =
                 File(outputDirectory, sourceFile.parentFile.absolutePath.removePrefix(pathToTypes))
 
-        val targetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
+        val mainTargetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
 
         targetDir.mkdirs()
 
@@ -75,14 +79,14 @@ class CompilationTests : OutputTests() {
 
         val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
 
-        units.forEach { (name, fileName, packageName, content) ->
+        units.forEach { (name, _, _, content) ->
             val targetName = "${name}.kt"
             val resolvedTarget = targetDir.resolve(targetName)
 
             resolvedTarget.writeText(content)
         }
 
-        val targetPath = targetDir.resolve(targetName).absolutePath
+        val targetPath = targetDir.resolve(mainTargetName).absolutePath
         assertEquals(ExitCode.OK,
                 compile(
                         targetPath,

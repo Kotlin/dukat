@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.tests.extended
+package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -19,7 +19,6 @@ class Idl2KtTests : OutputTests() {
     @DisplayName("idl2kt test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("idl2ktSet")
-    @EnabledIfSystemProperty(named = "dukat.test.idl2kt", matches = "true")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEquals(name, tsPath, ktPath)
     }

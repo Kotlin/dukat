@@ -30,12 +30,12 @@ internal class MemberVisitor : WebIDLBaseVisitor<IDLMemberDeclaration?>() {
     override fun defaultResult(): IDLMemberDeclaration? {
         return when (kind) {
             MemberKind.OPERATION -> if (name != "") {
-                IDLOperationDeclaration(name, type, arguments, static)
+                IDLOperationDeclaration(name, type, arguments, static, override = false)
             } else {
                 null
             }
-            MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly)
-            MemberKind.CONSTANT -> IDLAttributeDeclaration(name, type, static = true, readOnly = true)
+            MemberKind.ATTRIBUTE -> IDLAttributeDeclaration(name, type, static, readOnly, override = false)
+            MemberKind.CONSTANT -> IDLAttributeDeclaration(name, type, static = true, readOnly = true, override = false)
             MemberKind.DICTIONARY_MEMBER -> IDLDictionaryMemberDeclaration(name, type, constValue, required)
             MemberKind.GETTER -> IDLGetterDeclaration(
                     name.ifEmpty { "get" },

@@ -19,6 +19,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SimpleCommentModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -122,7 +123,7 @@ fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
     }
 
     return FunctionTypeModel(
-            parameters = arguments.map { it.process() },
+            parameters = arguments.filterNot { it.variadic }.map { it.process() },
             type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
@@ -232,9 +233,9 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             attributes.filterNot { it.static } +
             operations.filterNot { it.static } +
             getters.filterNot { it.name == "get" } +
-            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }
+            setters.filterNot { it.name == "set" }).mapNotNull { it.process() }.distinct()
     val staticMemberModels = (attributes.filter { it.static } +
-            operations.filter { it.static }).mapNotNull { it.process() }
+            operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
         CompanionObjectModel(
@@ -271,7 +272,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 companionObject = companionObjectModel,
                 typeParameters = listOf(),
                 parentEntities = parentModels,
-                documentation = null,
+                comment = null,
                 annotations = annotationModels,
                 external = true
         )
@@ -288,7 +289,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                     null
                 },
                 annotations = mutableListOf(),
-                documentation = null,
+                comment = null,
                 external = true,
                 abstract = kind == InterfaceKind.ABSTRACT_CLASS
         )
@@ -365,7 +366,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
                         null
                 )
             },
-            documentation = null,
+            comment = null,
             annotations = mutableListOf(),
             external = true
     )
@@ -402,15 +403,16 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            documentation = null,
+            comment = SimpleCommentModel(
+                    "please, don't implement this interface!"
+            ),
             annotations = mutableListOf(
                     AnnotationModel(
                             "Suppress",
                             listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                     )
             ),
-            external = true,
-            metaDescription = "please, don't implement this interface!"
+            external = true
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(

@@ -1,4 +1,3 @@
-
 import kotlin.js.*
 
 external abstract class A : ItemArrayLike<String> {
