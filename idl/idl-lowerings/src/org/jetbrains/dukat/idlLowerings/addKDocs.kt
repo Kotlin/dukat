@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.DocumentationCommentModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -13,12 +14,12 @@ fun TopLevelModel.addKDocs(): TopLevelModel {
             "Exposes the JavaScript [${name.translate()}](https://developer.mozilla.org/en/docs/Web/API/${name.translate()}) to Kotlin"
     return when (this) {
         is ClassModel -> if (name in classesToBeDocumented) {
-            copy(documentation = documentation)
+            copy(comment = DocumentationCommentModel(documentation))
         } else {
             this
         }
         is InterfaceModel -> if (name in classesToBeDocumented) {
-            copy(documentation = documentation)
+            copy(comment = DocumentationCommentModel(documentation))
         } else {
             this
         }
