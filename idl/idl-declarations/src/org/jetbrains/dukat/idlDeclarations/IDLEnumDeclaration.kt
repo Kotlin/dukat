@@ -6,10 +6,19 @@ data class IDLEnumDeclaration(
         val partial: Boolean = false
 ) : IDLTopLevelDeclaration
 
+private fun String.addUnderscoreIfStartsWithNumber(): String {
+    return if (matches(Regex("^[0-9].*$"))) {
+        "_$this"
+    } else {
+        this
+    }
+}
+
 fun processEnumMember(memberName: String): String {
     return memberName
             .removeSurrounding("\"")
             .toUpperCase()
             .replace('-', '_')
+            .addUnderscoreIfStartsWithNumber()
             .ifEmpty { "EMPTY" }
 }
