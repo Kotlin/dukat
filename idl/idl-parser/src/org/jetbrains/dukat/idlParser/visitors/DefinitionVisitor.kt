@@ -88,7 +88,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             DefinitionKind.NAMESPACE -> IDLNamespaceDeclaration(
                     name = name,
                     attributes = myAttributes,
-                    operations = operations
+                    operations = operations,
+                    partial = partial
             )
         }
     }

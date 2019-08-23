@@ -4,6 +4,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 
@@ -11,27 +12,27 @@ private class PartialContext : IDLLowering {
     private val interfaces: MutableMap<String, MutableList<IDLInterfaceDeclaration>> = mutableMapOf()
     private val dictionaries: MutableMap<String, MutableList<IDLDictionaryDeclaration>> = mutableMapOf()
     private val enums: MutableMap<String, MutableList<IDLEnumDeclaration>> = mutableMapOf()
+    private val namespaces: MutableMap<String, MutableList<IDLNamespaceDeclaration>> = mutableMapOf()
 
     private val alreadyResolvedPartials: MutableList<String> = mutableListOf()
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        if (!interfaces.containsKey(declaration.name)) {
-            interfaces[declaration.name] = mutableListOf()
-        }
-        interfaces[declaration.name]!!.add(declaration)
+        interfaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
-        if (!dictionaries.containsKey(declaration.name)) {
-            dictionaries[declaration.name] = mutableListOf()
-        }
-        dictionaries[declaration.name]!!.add(declaration)
+        dictionaries.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
     override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
         enums.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
+        return declaration
+    }
+
+    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration): IDLNamespaceDeclaration {
+        namespaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
@@ -45,6 +46,10 @@ private class PartialContext : IDLLowering {
 
     fun getEnums(name: String): List<IDLEnumDeclaration> {
         return enums[name].orEmpty()
+    }
+
+    fun getNamespaces(name: String): List<IDLNamespaceDeclaration> {
+        return namespaces[name].orEmpty()
     }
 
     fun addResolvedPartial(name: String) {
@@ -109,11 +114,30 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                     partial = true
             )
         }
-        val partials = context.getEnums(declaration.name)
+        var partials = context.getEnums(declaration.name)
+        partials = partials.filterNot { it.partial } + partials.filter { it.partial }
         context.addResolvedPartial(declaration.name)
         return IDLEnumDeclaration(
                 name = declaration.name,
-                members = partials.flatMap { it.members }.distinct()
+                members = partials.flatMap { it.members }.distinct(),
+                partial = false
+        )
+    }
+
+    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration): IDLNamespaceDeclaration {
+        if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
+            return declaration.copy(
+                    partial = true
+            )
+        }
+        var partials = context.getNamespaces(declaration.name)
+        partials = partials.filterNot { it.partial } + partials.filter { it.partial }
+        context.addResolvedPartial(declaration.name)
+        return IDLNamespaceDeclaration(
+                name = declaration.name,
+                attributes = partials.flatMap { it.attributes }.distinctBy { it.name },
+                operations = partials.flatMap { it.operations }.distinct(),
+                partial = false
         )
     }
 
@@ -125,6 +149,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                         is IDLInterfaceDeclaration -> !it.partial
                         is IDLDictionaryDeclaration -> !it.partial
                         is IDLEnumDeclaration -> !it.partial
+                        is IDLNamespaceDeclaration -> !it.partial
                         else -> true
                     }
                 }
