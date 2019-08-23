@@ -10,6 +10,7 @@ data class IDLSingleTypeDeclaration(
 fun IDLSingleTypeDeclaration.isKnown(): Boolean {
     return name in setOf(
             "ByteString",
+            "CSSOMString",
             "DOMError",
             "DOMString",
             "String",

@@ -84,6 +84,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "unsignedshort" -> "Short"
                 "boolean" -> "Boolean"
                 "ByteString" -> "String"
+                "CSSOMString" -> "String"
                 "DOMString" -> "String"
                 "String" -> "String"
                 "USVString" -> "String"

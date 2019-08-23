@@ -3,6 +3,7 @@ interface A {
     attribute DOMString s2;
     attribute USVString s3;
     attribute String s4;
+    attribute CSSOMString s5;
     attribute DOMString? nullableString;
 
     attribute object obj;
