@@ -5,7 +5,7 @@ plugins {
 
 def packagePath = "${project.buildDir}/package"
 def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.5.2"
-
+def tsDeclarationsPath = ".tsdeclarations"
 
 node {
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
@@ -34,7 +34,7 @@ task copyTypescriptDeclarations(type: Copy) {
   dependsOn = ["yarn"]
 
   from "${packagePath}/node_modules/typescript/lib"
-  into ".tsdeclarations"
+  into tsDeclarationsPath
   include "*.d.ts"
 }
 
@@ -92,3 +92,7 @@ configurations {
 }
 
 configurations.default.extendsFrom(configurations.dukatTsResources)
+
+clean {
+  delete tsDeclarationsPath
+}
