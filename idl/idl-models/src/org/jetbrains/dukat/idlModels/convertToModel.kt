@@ -242,7 +242,6 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             operations.filterNot { it.static } +
             getters.filterNot { it.name == "get" } +
             setters.filterNot { it.name == "set" }).mapNotNull { it.process() }.distinct()
-    println(dynamicMemberModels)
     val staticMemberModels = (attributes.filter { it.static } +
             operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
