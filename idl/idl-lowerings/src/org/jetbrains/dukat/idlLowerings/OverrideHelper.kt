@@ -27,8 +27,12 @@ internal class OverrideHelper(val context: MissingMemberContext) {
         return firstLevelParents + firstLevelParents.flatMap { getAllDictionaryParents(it) }
     }
 
-    fun isOverriding(type: IDLTypeDeclaration, parentType: IDLTypeDeclaration): Boolean {
+    private fun isOverriding(type: IDLTypeDeclaration, parentType: IDLTypeDeclaration): Boolean {
         if (type == parentType) {
+            return true
+        }
+
+        if (parentType is IDLSingleTypeDeclaration && parentType.name == "any") {
             return true
         }
 
@@ -48,10 +52,6 @@ internal class OverrideHelper(val context: MissingMemberContext) {
             return parentType.unionMembers.any { isOverriding(type, it) }
         }
 
-        if (parentType == IDLSingleTypeDeclaration("any", null, false)) {
-            return true
-        }
-
         return false
     }
 
@@ -62,7 +62,8 @@ internal class OverrideHelper(val context: MissingMemberContext) {
     fun isOverriding(member: IDLAttributeDeclaration, parentMember: IDLAttributeDeclaration): Boolean {
         return member.name == parentMember.name &&
                 member.static == parentMember.static &&
-                isOverriding(member.type, parentMember.type)
+                isOverriding(member.type, parentMember.type) &&
+                !(member.readOnly && !parentMember.readOnly)
     }
 
     fun isConflicting(member: IDLAttributeDeclaration, parentMember: IDLAttributeDeclaration): Boolean {
@@ -91,6 +92,23 @@ internal class OverrideHelper(val context: MissingMemberContext) {
         return member.name == parentMember.name &&
                 isOverriding(member.key.type, parentMember.key.type) &&
                 isOverriding(member.value.type, parentMember.value.type)
+    }
+
+    fun isSimilar(member: IDLAttributeDeclaration, parentMember: IDLAttributeDeclaration): Boolean {
+        return member.name == parentMember.name &&
+                member.type == parentMember.type &&
+                member.readOnly == parentMember.readOnly &&
+                member.override == parentMember.override
+    }
+
+    fun isSimilar(member: IDLOperationDeclaration, parentMember: IDLOperationDeclaration): Boolean {
+        return member.name == parentMember.name &&
+                member.returnType == parentMember.returnType &&
+                member.arguments.size == parentMember.arguments.size &&
+                member.arguments.zip(parentMember.arguments).all { arguments ->
+                    arguments.first.type == arguments.second.type
+                } &&
+                member.override == parentMember.override
     }
 
 }

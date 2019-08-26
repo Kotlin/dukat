@@ -53,7 +53,11 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
 
         allParents.forEach { parent ->
             parent.operations.forEach { parentOperation ->
-                if (declaration.operations.none { helper.isOverriding(it, parentOperation) }) {
+                if (declaration.operations.none {
+                            helper.isOverriding(it, parentOperation) ||
+                                    helper.isConflicting(it, parentOperation) ||
+                                    helper.isConflicting(parentOperation, it)
+                        }) {
                     if (parentOperation.static || parent.kind == InterfaceKind.INTERFACE) {
                         newOperations += parentOperation.copy(
                                 arguments = parentOperation.arguments.map {
@@ -73,14 +77,18 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
                 }
             }
             parent.attributes.forEach { parentAttribute ->
-                if (declaration.attributes.none { helper.isOverriding(it, parentAttribute) }) {
+                if (declaration.attributes.none {
+                            helper.isOverriding(it, parentAttribute) ||
+                                    helper.isConflicting(it, parentAttribute) ||
+                                    helper.isConflicting(parentAttribute, it)
+                        }) {
                     if (declaration.attributes.none { it.name == parentAttribute.name }) {
                         if (parentAttribute.static || parent.kind == InterfaceKind.INTERFACE) {
                             newAttributes += parentAttribute.copy(override = true)
                         }
-                    } else {
-                        conflictingAttributes.addAll(declaration.attributes.filter { helper.isConflicting(it, parentAttribute) })
                     }
+                } else {
+                    conflictingAttributes.addAll(declaration.attributes.filter { helper.isConflicting(it, parentAttribute) })
                 }
             }
             parent.getters.forEach { parentGetter ->
@@ -129,23 +137,14 @@ private class DuplicateRemover(val context: MissingMemberContext) : IDLLowering 
             parent.operations.filterNot { it.static }.forEach { parentOperation ->
                 if (declaration.operations.any { it == parentOperation }) {
                     val (duplicated, _) = declaration.operations.partition {
-                        it.name == parentOperation.name &&
-                                it.returnType == parentOperation.returnType &&
-                                it.arguments.size == parentOperation.arguments.size &&
-                                it.arguments.zip(parentOperation.arguments).all { arguments ->
-                                    arguments.first.type == arguments.second.type
-                                } &&
-                                it.override == parentOperation.override
+                        helper.isSimilar(it, parentOperation)
                     }
                     duplicatedOperations += duplicated
                 }
             }
             parent.attributes.filterNot { it.static }.forEach { parentAttribute ->
                 val (duplicated, _) = declaration.attributes.partition {
-                    it.name == parentAttribute.name &&
-                            it.type == parentAttribute.type &&
-                            it.readOnly == parentAttribute.readOnly &&
-                            it.override == parentAttribute.override
+                    helper.isSimilar(it, parentAttribute)
                 }
                 duplicatedAttributes += duplicated
             }

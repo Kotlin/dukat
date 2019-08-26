@@ -48,7 +48,7 @@ private class ItemArrayLikeLowering : IDLLowering {
                 )),
                 operations = listOf(IDLOperationDeclaration(
                         name = "item",
-                        returnType = IDLSingleTypeDeclaration("any", null, false),
+                        returnType = IDLSingleTypeDeclaration("any", null, true),
                         arguments = listOf(IDLArgumentDeclaration(
                                 name = "index",
                                 type = IDLSingleTypeDeclaration("unsignedlong", null, false),

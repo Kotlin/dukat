@@ -10,19 +10,30 @@ private class MixinResolver(val mixinContext: MixinContext, val missingMemberCon
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val includedMixins = mixinContext.getIncludedMixins(declaration)
         val overrideHelper = OverrideHelper(missingMemberContext)
-        return declaration.copy(
-                attributes = (declaration.attributes + includedMixins.flatMap { it.attributes }.filter { newAttribute ->
-                    declaration.attributes.none { oldAttribute ->
+        val newAttributes = declaration.attributes.toMutableList()
+        val newOperations = declaration.operations.toMutableList()
+        includedMixins.flatMap { it.attributes }.forEach { newAttribute ->
+            if (newAttributes.none { oldAttribute ->
                         overrideHelper.isConflicting(newAttribute, oldAttribute) ||
-                                overrideHelper.isConflicting(oldAttribute, newAttribute)
-                    }
-                }).distinct(),
-                operations = (declaration.operations + includedMixins.flatMap { it.operations }.filter { newOperation ->
-                    declaration.operations.none { oldOperation ->
+                                overrideHelper.isConflicting(oldAttribute, newAttribute) ||
+                                overrideHelper.isSimilar(newAttribute, oldAttribute)
+                    }) {
+                newAttributes += newAttribute
+            }
+        }
+
+        includedMixins.flatMap { it.operations }.forEach { newOperation ->
+            if (newOperations.none { oldOperation ->
                         overrideHelper.isConflicting(newOperation, oldOperation) ||
-                                overrideHelper.isConflicting(oldOperation, newOperation)
-                    }
-                }).distinct()
+                                overrideHelper.isConflicting(oldOperation, newOperation) ||
+                                overrideHelper.isSimilar(newOperation, oldOperation)
+                    }) {
+                newOperations += newOperation
+            }
+        }
+        return declaration.copy(
+                attributes = newAttributes,
+                operations = newOperations
         )
     }
 }
