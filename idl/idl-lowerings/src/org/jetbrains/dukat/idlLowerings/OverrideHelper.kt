@@ -10,6 +10,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.changeComment
 
 
 internal class OverrideHelper(val context: MissingMemberContext) {
@@ -28,7 +29,7 @@ internal class OverrideHelper(val context: MissingMemberContext) {
     }
 
     private fun isOverriding(type: IDLTypeDeclaration, parentType: IDLTypeDeclaration): Boolean {
-        if (type == parentType) {
+        if (type.changeComment(null) == parentType.changeComment(null)) {
             return true
         }
 
@@ -75,7 +76,7 @@ internal class OverrideHelper(val context: MissingMemberContext) {
                 member.static == parentMember.static &&
                 member.arguments.size == parentMember.arguments.size &&
                 (member.arguments.isEmpty() ||
-                        !member.arguments.zip(parentMember.arguments) { a, b -> isOverriding(a.type, b.type) }.all { it })
+                        member.arguments.zip(parentMember.arguments) { a, b -> isOverriding(a.type, b.type) }.all { it })
     }
 
     fun isConflicting(member: IDLOperationDeclaration, parentMember: IDLOperationDeclaration): Boolean {
