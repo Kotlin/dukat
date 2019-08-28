@@ -94,6 +94,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "Promise" -> "Promise"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
+                "record" -> "dynamic"
                 "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name

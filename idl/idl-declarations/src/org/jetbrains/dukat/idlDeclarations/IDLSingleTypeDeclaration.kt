@@ -28,6 +28,7 @@ fun IDLSingleTypeDeclaration.isKnown(): Boolean {
             "object",
             "octet",
             "Promise",
+            "record",
             "sequence",
             "short",
             "unrestricteddouble",

@@ -17,6 +17,7 @@ interface A {
 
     attribute Promise<void> promise;
     attribute FrozenArray<long> readArray;
+    attribute record<DOMString, long> rec;
 
     sequence<long> f(sequence<long> x);
     A<long> g(A<long> x);
