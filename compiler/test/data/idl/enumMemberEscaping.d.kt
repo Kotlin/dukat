@@ -19,3 +19,7 @@ inline val A.Companion.E55: A get() = "e55".asDynamic().unsafeCast<A>()
 inline val A.Companion._5FF: A get() = "5ff".asDynamic().unsafeCast<A>()
 
 inline val A.Companion._55G: A get() = "55g".asDynamic().unsafeCast<A>()
+
+inline val A.Companion.A_B: A get() = "a/b".asDynamic().unsafeCast<A>()
+
+inline val A.Companion.A_B_C: A get() = "a/b+c".asDynamic().unsafeCast<A>()

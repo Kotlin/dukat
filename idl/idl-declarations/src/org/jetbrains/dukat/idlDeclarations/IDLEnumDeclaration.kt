@@ -19,6 +19,8 @@ fun processEnumMember(memberName: String): String {
             .removeSurrounding("\"")
             .toUpperCase()
             .replace('-', '_')
+            .replace('/', '_')
+            .replace('+', '_')
             .addUnderscoreIfStartsWithNumber()
             .ifEmpty { "EMPTY" }
 }
