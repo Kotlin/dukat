@@ -70,7 +70,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String
 
     var res = ktFileNamePrefix
 
-    if (sourceFile.endsWith(TS_DECLARATION_EXTENSION)) {
+    if (sourceFile.absolutePath.endsWith(TS_DECLARATION_EXTENSION)) {
         packageName.fileNameFragment()?.let { packageFragment ->
             res += ".${packageFragment}"
         }
