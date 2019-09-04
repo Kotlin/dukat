@@ -5,6 +5,8 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 require("../lib/converter");
 var Readable = require('stream').Readable;
+var fs = require("fs");
+var readline = require("readline");
 
 function isWin() {
     return process.platform == "win32";
@@ -108,9 +110,7 @@ function endsWith(str, postfix) {
 }
 
 
-var main = function () {
-    var args = process.argv.slice(2);
-
+function cliMode(args) {
     var packageDir = path.resolve(__dirname, "..");
 
     if (args[0] == "-v" || args[0] == "version") {
@@ -152,7 +152,52 @@ var main = function () {
 
         var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
     }
+}
 
+function readFileListsFromFile(fileName) {
+    return new Promise(function(resolve, reject) {
+        try {
+            var lineReader = readline.createInterface({
+                input: fs.createReadStream(fileName),
+                crlfDelay: Infinity
+            });
+
+            var lines = [];
+            lineReader.on("line", function (line) {
+                if (!/^\s*$/.test(line)) {
+                    lines.push(line);
+                }
+            });
+
+            lineReader.on("close", function (line) {
+            resolve(lines);
+            });
+
+        } catch (e) {
+            reject(e.message);
+        }
+    });
+}
+
+
+function batchMode(batchFile) {
+    readFileListsFromFile(batchFile).then(function(lines) {
+        var total = lines.length;
+
+        lines.forEach(function(line, count) {
+           var args = line.split(" ");
+           console.log("[", count + 1, "/", total, "] dukat", line);
+           cliMode(args);
+       });
+    });
+}
+
+var main = function (args) {
+    if (Array.isArray(args) && (args[0] == "--batch")) {
+        batchMode(args[1]);
+    } else {
+        cliMode(args);
+    }
 };
 
-main();
+main(process.argv.slice(2));
