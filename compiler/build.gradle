@@ -100,7 +100,7 @@ task download(type: Copy) {
 task downloadDefinitelyTyped(type: Download) {
     onlyIfModified true
     overwrite false
-    def version = '10aca630788ef193f994ac31de63ea9cf44630a3'
+    def version = '31929c09c7b4490f87766206b412da4a6a581dc3'
     src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
     dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${version}.zip")
 }
