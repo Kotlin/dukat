@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addStandardImportsAndAnnotations
@@ -44,7 +43,6 @@ import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 
 
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
-    val packageName: NameEntity
     val moduleNameResolver: ModuleNameResolver
 
     fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {

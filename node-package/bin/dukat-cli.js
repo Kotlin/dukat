@@ -16,38 +16,12 @@ var printError = function (errorMessage) {
     console.error("ERROR: " + errorMessage);
 };
 
-var processError = function (error) {
-    printError("code: " + error.code);
-    printError(error.message);
-    if (!isWin()) {
-        if (error.code == 1) {
-            printError("File not found");
-        } else if (error.code == 127) {
-            // actually never supposed to be here because we have guardJavaExists()
-            printNoJava()
-        }
-    }
-};
-
-var execHandler = function (error, stdout, stderr) {
-    if (error) {
-        processError(error);
-        process.exitCode = error.code;
-    } else {
-        console.log(stdout);
-    }
-};
-
 var run = function (command, args) {
     var child = spawn(command, args);
     process.stdin.pipe(child.stdin);
 
     child.stdout.pipe(process.stdout);
     child.stderr.pipe(process.stderr);
-
-    child.on('exit', function () {
-        process.exit()
-    });
 
     return child;
 };
@@ -70,7 +44,6 @@ function createReadable() {
     var readable = new Readable();
     readable._read = function(chunk) {};
 
-    readable.on("unpipe", function(){});
     return readable
 }
 
@@ -143,57 +116,73 @@ function cliMode(args) {
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
-        var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
+        var dukatProcess = run("java", commandArgs);
         inputStream.pipe(dukatProcess.stdin);
+        return dukatProcess;
     } else if (is_idl) {
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
-        var dukatProcess = run("java", commandArgs, {stdio: [process.stdin, process.stdout, process.stderr]});
+        run("java", commandArgs);
     }
 }
 
-function readFileListsFromFile(fileName) {
-    return new Promise(function(resolve, reject) {
-        try {
-            var lineReader = readline.createInterface({
-                input: fs.createReadStream(fileName),
-                crlfDelay: Infinity
-            });
+function eachLine(fileName, handler) {
+    var lineReader = readline.createInterface({
+        input: fs.createReadStream(fileName),
+        crlfDelay: Infinity
+    });
 
-            var lines = [];
-            lineReader.on("line", function (line) {
-                if (!/^\s*$/.test(line)) {
-                    lines.push(line);
-                }
-            });
-
-            lineReader.on("close", function (line) {
-            resolve(lines);
-            });
-
-        } catch (e) {
-            reject(e.message);
+    var count = 0;
+    lineReader.on("line", function (line) {
+        if (!/^\s*$/.test(line)) {
+            handler(line, count++);
         }
     });
 }
 
 
-function batchMode(batchFile) {
-    readFileListsFromFile(batchFile).then(function(lines) {
-        var total = lines.length;
+var QUEUE = [];
+var CURRENTLY_RUNNING = 0;
+var POOL_SIZE = 32;
 
-        lines.forEach(function(line, count) {
-           var args = line.split(" ");
-           console.log("[", count + 1, "/", total, "] dukat", line);
-           cliMode(args);
-       });
+function batchMode(batchFile) {
+    eachLine(batchFile, function(line, count) {
+        var args = line.split(" ");
+        console.log("[", count + 1, "] dukat", line);
+
+        QUEUE.push(args);
+        if (count === 0) {
+            queueMode();
+        }
     });
 }
 
+function queueMode() {
+    if (QUEUE.length > 0) {
+        var args = QUEUE.pop();
+        if (Array.isArray(args)) {
+            console.log("PROCESSING ", args);
+            var proc = cliMode(args);
+            if (proc) {
+                CURRENTLY_RUNNING++;
+                proc.on("exit", function(exitCode) {
+                    proc.removeAllListeners();
+                    CURRENTLY_RUNNING--;
+                    console.log("EXITING ", proc.pid, exitCode);
+
+                    for (var i = 0; i <= (POOL_SIZE - CURRENTLY_RUNNING); i++) {
+                        queueMode();
+                    }
+                });
+            }
+        }
+    }
+}
+
 var main = function (args) {
-    if (Array.isArray(args) && (args[0] == "--batch")) {
+    if (Array.isArray(args) && (args[0] === "--batch")) {
         batchMode(args[1]);
     } else {
         cliMode(args);

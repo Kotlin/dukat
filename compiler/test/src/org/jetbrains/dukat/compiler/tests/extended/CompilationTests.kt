@@ -6,7 +6,6 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.createJsFileTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -98,7 +97,7 @@ class CompilationTests : OutputTests() {
 
         override val postfix = ".d.ts"
 
-        val translator: InputTranslator<String> = createJsFileTranslator(ROOT_PACKAGENAME, ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
+        val translator: InputTranslator<String> = createJsFileTranslator(ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
         val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
 
         @JvmStatic

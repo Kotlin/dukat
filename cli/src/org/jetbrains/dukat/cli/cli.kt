@@ -44,6 +44,16 @@ private fun compile(outDir: String?, translator: InputTranslator<ByteArray>, pat
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
+private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
+    val translatedUnits: List<TranslationUnitResult> =  filenames.flatMap { filename ->
+        val sourceFile = File(filename)
+
+        translateModule(sourceFile.absolutePath, translator)
+    }
+
+    compileUnits(translatedUnits, outDir, pathToReport)
+}
+
 private fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
     val dirFile = File(outDir ?: "./")
     if (translatedUnits.isNotEmpty()) {
@@ -80,16 +90,6 @@ private fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: S
     if (buildReport) {
         saveReport(pathToReport!!, Report(output))
     }
-}
-
-private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
-    val translatedUnits: List<TranslationUnitResult> =  filenames.flatMap { filename ->
-        val sourceFile = File(filename)
-
-        translateModule(sourceFile.absolutePath, translator)
-    }
-
-    compileUnits(translatedUnits, outDir, pathToReport)
 }
 
 @UseExperimental(kotlinx.serialization.UnstableDefault::class)
@@ -261,7 +261,6 @@ fun main(vararg args: String) {
                 compile(
                         options.outDir,
                         createJsByteArrayTranslator(
-                                options.basePackageName,
                                 moduleResolver
                         ),
                         options.reportPath
@@ -276,7 +275,6 @@ fun main(vararg args: String) {
                         IdlInputTranslator(DirectoryReferencesResolver()),
                         options.reportPath
                 )
-
             }
 
             else -> {

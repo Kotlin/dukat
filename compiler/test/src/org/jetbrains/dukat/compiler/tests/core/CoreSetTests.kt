@@ -5,7 +5,6 @@ import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.createJsFileTranslator
@@ -37,7 +36,7 @@ class CoreSetTests : OutputTests() {
             return fileSetWithDescriptors("./test/data")
         }
 
-        val translator = createJsFileTranslator(ROOT_PACKAGENAME, ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
+        val translator = createJsFileTranslator(ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
     }
 
 
