@@ -162,6 +162,16 @@ task generateBatchConfig() {
     }
 }
 
+task generateBatch(type: NodeTask) {
+    dependsOn = [generateBatchConfig, ":node-package:buildDistrib"]
+
+    inputs.file("${project.buildDir}/batch.list")
+    outputs.dir("${project.buildDir}/tests/definitelyTyped")
+
+    script = file("${project(":node-package").buildDir}/distrib/bin/dukat-cli.js")
+    args = ["--batch", "${project.buildDir}/batch.list"]
+}
+
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
 test.dependsOn = [generateBinary]
