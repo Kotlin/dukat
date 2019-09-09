@@ -178,6 +178,8 @@ function queueMode() {
                 });
             }
         }
+    } else {
+        process.exit();
     }
 }
 
