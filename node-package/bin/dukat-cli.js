@@ -148,34 +148,46 @@ var CURRENTLY_RUNNING = 0;
 var POOL_SIZE = 32;
 
 function batchMode(batchFile) {
-    eachLine(batchFile, function(line, count) {
-        var args = line.split(" ");
-        console.log("[", count + 1, "] dukat", line);
+    return new Promise(function(resolve) {
+        eachLine(batchFile, function(line, count) {
+            var args = line.split(" ");
+            console.log("[", count + 1, "] dukat", line);
 
-        QUEUE.push(args);
-        if (count === 0) {
-            queueMode();
-        }
+            QUEUE.push(args);
+            if (count === 0) {
+                resolve();
+            }
+        });
     });
 }
+
+var PROCESSED_COUNT = 0;
 
 function queueMode() {
     if (QUEUE.length > 0) {
         var args = QUEUE.pop();
         if (Array.isArray(args)) {
-            console.log("PROCESSING ", args);
-            var proc = cliMode(args);
-            if (proc) {
-                CURRENTLY_RUNNING++;
-                proc.on("exit", function(exitCode) {
-                    proc.removeAllListeners();
-                    CURRENTLY_RUNNING--;
-                    console.log("EXITING ", proc.pid, exitCode);
+            try {
+                PROCESSED_COUNT++;
+                console.log("PROCESSING [", PROCESSED_COUNT, "]", args);
+                var proc = cliMode(args);
+                if (proc) {
+                    CURRENTLY_RUNNING++;
+                    proc.on("exit", function (exitCode) {
+                        proc.removeAllListeners();
+                        CURRENTLY_RUNNING--;
+                        console.log("EXITING ", proc.pid, exitCode);
 
-                    for (var i = 0; i <= (POOL_SIZE - CURRENTLY_RUNNING); i++) {
-                        queueMode();
-                    }
-                });
+                        for (var i = 0; i <= (POOL_SIZE - CURRENTLY_RUNNING); i++) {
+                            queueMode();
+                        }
+                    });
+                }
+            } catch (e) {
+                console.log("SKIPPING ", args, "DUE TO ERROR ", e.message);
+                for (var i = 0; i <= (POOL_SIZE - CURRENTLY_RUNNING); i++) {
+                    queueMode();
+                }
             }
         }
     } else {
@@ -185,7 +197,9 @@ function queueMode() {
 
 var main = function (args) {
     if (Array.isArray(args) && (args[0] === "--batch")) {
-        batchMode(args[1]);
+        batchMode(args[1]).then(function() {
+            queueMode();
+        })
     } else {
         var childProcess = cliMode(args);
         childProcess.on("exit", function() {
