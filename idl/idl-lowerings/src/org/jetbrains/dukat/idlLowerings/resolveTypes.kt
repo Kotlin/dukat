@@ -27,6 +27,7 @@ private class TypeResolver : IDLLowering {
     private val dependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
 
     private var sourceSet: IDLSourceSetDeclaration = IDLSourceSetDeclaration(listOf())
+    private var currentFile: IDLFileDeclaration = IDLFileDeclaration("", listOf(), listOf(), null)
 
     fun getDependencies(declaration: IDLClassLikeDeclaration): List<IDLSingleTypeDeclaration> {
         return dependenciesToAdd[declaration.name]?.toList() ?: listOf()
@@ -100,6 +101,7 @@ private class TypeResolver : IDLLowering {
         }
         if (declaration is IDLSingleTypeDeclaration) {
             return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
+                logger.warn("Unknown type ${declaration.name} in file ${currentFile.fileName}")
                 IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
@@ -119,29 +121,30 @@ private class TypeResolver : IDLLowering {
         return declaration
     }
 
-    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration, ownerName: String): IDLSingleTypeDeclaration? {
+    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration): IDLSingleTypeDeclaration? {
         return if (sourceSet.containsType(inheritance.name)) {
             inheritance
         } else {
-            logger.warn("Failed to find parent of ${ownerName}: ${inheritance.name}").let { null }
+            null
         }
     }
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val newDeclaration = super.lowerInterfaceDeclaration(declaration)
         return newDeclaration.copy(
-                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+                parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         val newDeclaration = super.lowerDictionaryDeclaration(declaration)
         return newDeclaration.copy(
-                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+                parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
+        currentFile = fileDeclaration
         var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         newFileDeclaration = newFileDeclaration.copy(
                 declarations = newFileDeclaration.declarations + resolvedUnionTypes.map {
