@@ -20,6 +20,8 @@ configurations {
 }
 
 task buildDistrib {
+    dependsOn = [":ts-converter:webpack"]
+
     doLast {
         copy {
             from "package.template.json"
