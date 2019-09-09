@@ -18,6 +18,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 
 
 interface IDLLowering {
@@ -108,6 +109,12 @@ interface IDLLowering {
         return declaration
     }
 
+    fun lowerUnionDeclaration(declaration: IDLUnionDeclaration): IDLUnionDeclaration {
+        return declaration.copy(
+                unions = declaration.unions.map { lowerTypeDeclaration(it) as IDLSingleTypeDeclaration }
+        )
+    }
+
     fun lowerTopLevelDeclaration(declaration: IDLTopLevelDeclaration): IDLTopLevelDeclaration {
         return when (declaration) {
             is IDLInterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
@@ -116,6 +123,7 @@ interface IDLLowering {
             is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
             is IDLEnumDeclaration -> lowerEnumDeclaration(declaration)
             is IDLIncludesStatementDeclaration -> lowerIncludesStatementDeclaration(declaration)
+            is IDLUnionDeclaration -> lowerUnionDeclaration(declaration)
             else -> declaration
         }
     }

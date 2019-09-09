@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.idlDeclarations
 
 data class IDLEnumDeclaration(
-        val name: String,
+        override val name: String,
         val members: List<String>,
+        val unions: List<IDLSingleTypeDeclaration>,
         val partial: Boolean = false
-) : IDLTopLevelDeclaration
+) : IDLClassLikeDeclaration
 
 fun processEnumMember(memberName: String): String {
     return memberName

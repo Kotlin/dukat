@@ -57,6 +57,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.processEnumMember
@@ -254,7 +255,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         null
     }
 
-    val parentModels = parents.map {
+    val parentModels = (parents + unions).map {
         HeritageModel(
                 it.process(),
                 listOf(),
@@ -366,7 +367,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             members = members.filterNot { it.inherited }.mapNotNull { it.process() },
             companionObject = null,
             typeParameters = listOf(),
-            parentEntities = parents.map {
+            parentEntities = (parents + unions).map {
                 HeritageModel(
                         it.process(),
                         listOf(),
@@ -409,7 +410,13 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                     parentEntities = listOf()
             ),
             typeParameters = listOf(),
-            parentEntities = listOf(),
+            parentEntities = unions.map {
+                HeritageModel(
+                        it.process(),
+                        listOf(),
+                        null
+                )
+            },
             comment = SimpleCommentModel(
                     "please, don't implement this interface!"
             ),
@@ -461,12 +468,31 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration) + generatedVariables
 }
 
-fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
+fun IDLNamespaceDeclaration.convertToModel(): TopLevelModel {
     return ObjectModel(
             name = IdentifierEntity(name),
             members = attributes.mapNotNull { it.process() } +
                     operations.mapNotNull { it.process() },
             parentEntities = listOf()
+    )
+}
+
+fun IDLUnionDeclaration.convertToModel(): TopLevelModel {
+    return InterfaceModel(
+            name = IdentifierEntity(name),
+            members = listOf(),
+            companionObject = null,
+            typeParameters = listOf(),
+            parentEntities = unions.map {
+                HeritageModel(
+                        it.process(),
+                        listOf(),
+                        null
+                )
+            },
+            comment = null,
+            annotations = mutableListOf(),
+            external = true
     )
 }
 
@@ -479,6 +505,7 @@ fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
         is IDLIncludesStatementDeclaration -> null
+        is IDLUnionDeclaration -> listOf(convertToModel())
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }

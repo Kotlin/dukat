@@ -75,6 +75,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                 primaryConstructor = null,
                 constructors = listOf(),
                 parents = partials.flatMap { it.parents }.distinct(),
+                unions = partials.flatMap { it.unions }.distinct(),
                 extendedAttributes = partials.flatMap { it.extendedAttributes }.distinct(),
                 getters = partials.flatMap { it.getters }.distinct(),
                 setters = partials.flatMap { it.setters }.distinct(),
@@ -99,6 +100,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
                 name = declaration.name,
                 members = partials.flatMap { it.members }.distinctBy { it.name },
                 parents = partials.flatMap { it.parents }.distinct(),
+                unions = partials.flatMap { it.unions }.distinct(),
                 partial = false
         )
     }
@@ -113,7 +115,8 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         context.addResolvedPartial(declaration.name)
         return IDLEnumDeclaration(
                 name = declaration.name,
-                members = partials.flatMap { it.members }.distinct()
+                members = partials.flatMap { it.members }.distinct(),
+                unions = partials.flatMap { it.unions }.distinct()
         )
     }
 

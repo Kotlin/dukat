@@ -62,6 +62,7 @@ private class ItemArrayLikeLowering : IDLLowering {
                 primaryConstructor = null,
                 constructors = listOf(),
                 parents = listOf(),
+                unions = listOf(),
                 extendedAttributes = listOf(
                         IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
                 ),

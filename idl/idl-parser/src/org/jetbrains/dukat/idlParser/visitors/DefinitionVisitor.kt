@@ -54,6 +54,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     primaryConstructor = null,
                     constructors = listOf(),
                     parents = parents,
+                    unions = listOf(),
                     extendedAttributes = extendedAttributes,
                     getters = getters,
                     setters = setters,
@@ -71,6 +72,7 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
                     name = name,
                     members = dictionaryMembers,
                     parents = parents,
+                    unions = listOf(),
                     partial = partial
             )
             DefinitionKind.IMPLEMENTS_STATEMENT -> IDLImplementsStatementDeclaration(
@@ -83,7 +85,8 @@ internal class DefinitionVisitor(private val extendedAttributes: List<IDLExtende
             )
             DefinitionKind.ENUM -> IDLEnumDeclaration(
                     name = name,
-                    members = enumMembers
+                    members = enumMembers,
+                    unions = listOf()
             )
             DefinitionKind.NAMESPACE -> IDLNamespaceDeclaration(
                     name = name,

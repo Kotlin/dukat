@@ -1,3 +1,5 @@
 package org.jetbrains.dukat.idlDeclarations
 
-interface IDLClassLikeDeclaration : IDLTopLevelDeclaration
+interface IDLClassLikeDeclaration : IDLTopLevelDeclaration {
+    val name: String
+}
