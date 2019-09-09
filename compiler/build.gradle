@@ -1,4 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
+import static groovy.io.FileType.FILES
 
 buildscript {
     repositories {
@@ -21,6 +22,9 @@ configurations {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+def DEF_TYPE_CHANGESET = '31929c09c7b4490f87766206b412da4a6a581dc3'
+def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/DefinitelyTyped-${DEF_TYPE_CHANGESET}/types"
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
@@ -100,9 +104,8 @@ task download(type: Copy) {
 task downloadDefinitelyTyped(type: Download) {
     onlyIfModified true
     overwrite false
-    def version = '31929c09c7b4490f87766206b412da4a6a581dc3'
-    src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
-    dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${version}.zip")
+    src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${DEF_TYPE_CHANGESET}.zip"
+    dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${DEF_TYPE_CHANGESET}.zip")
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
@@ -140,6 +143,25 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
+task generateBatchConfig() {
+    dependsOn = [fetchDefinitelyTyped]
+
+    def batchFile = file("${project.buildDir}/batch.list")
+    inputs.dir(DEF_TYPE_DIR)
+    outputs.file(batchFile)
+
+    doLast {
+        batchFile.text = ""
+        def newLine = System.getProperty("line.separator")
+
+        file(DEF_TYPE_DIR).eachFileRecurse (FILES) { file ->
+            if (file.name == "index.d.ts") {
+                batchFile.append("-d ${project.buildDir}/tests/definitelyTyped/${file.parentFile.name} ${file.absolutePath}${newLine}")
+            }
+        }
+    }
+}
+
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
 test.dependsOn = [generateBinary]
@@ -154,5 +176,5 @@ test {
         }
     }
 
-    systemProperty("dukat.test.resources.definitelyTyped", "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped")
+    systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
 }
