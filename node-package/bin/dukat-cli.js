@@ -124,7 +124,7 @@ function cliMode(args) {
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
-        run("java", commandArgs);
+        return run("java", commandArgs);
     }
 }
 
@@ -185,7 +185,10 @@ var main = function (args) {
     if (Array.isArray(args) && (args[0] === "--batch")) {
         batchMode(args[1]);
     } else {
-        cliMode(args);
+        var childProcess = cliMode(args);
+        childProcess.on("exit", function() {
+            process.exit();
+        });
     }
 };
 
