@@ -13,12 +13,6 @@ import kotlin.test.assertEquals
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator<String>
 
-    companion object {
-        val DEFAULT_LIB_PATH = "../ts/build/package/node_modules/typescript/lib/lib.d.ts"
-        val NODE_PATH = "node"
-        val SOURCE_PATH = "../ts/build/bundle/converter.js"
-    }
-
     init {
         if (System.getProperty("dukat.test.failure.always") == "true") {
             setPanicMode(PanicMode.ALWAYS_FAIL)

@@ -9,6 +9,7 @@ def DISTRIB_PATH = "${project.buildDir}/distrib"
 node {
     version = gradle.nodeVersion
     npmVersion = gradle.npmVersion
+    yarnVersion = gradle.yarnVersion
 
     nodeModulesDir = file(DISTRIB_PATH)
 
@@ -63,6 +64,28 @@ task npmVersion(type: NpmTask) {
         project.hasProperty(PROPERTY_PACKAGE_VERSION)
     }
     args = ["version", project.findProperty(PROPERTY_PACKAGE_VERSION) ?: "NEVER" ]
+}
+
+task nodeEnv(type: YarnTask) {
+    args = ["run", "env"]
+
+    ignoreExitValue = true
+    def execRunner = null
+    execOverrides {
+        execRunner = it
+        it.standardOutput = new ByteArrayOutputStream()
+        it.errorOutput = new ByteArrayOutputStream()
+    }
+
+    doLast {
+        def lineSeparator = System.getProperty("line.separator")
+        def outputBuf = execRunner.standardOutput.toString().split(lineSeparator) as List
+
+        println(outputBuf.removeAt(0))
+        println(outputBuf.removeAt(outputBuf.size() - 1))
+
+        new File(project.buildDir, "env.json").text = outputBuf.join(lineSeparator)
+    }
 }
 
 task npmPack(type: NpmTask) {

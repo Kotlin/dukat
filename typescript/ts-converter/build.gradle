@@ -10,7 +10,7 @@ def tsDeclarationsPath = ".tsdeclarations"
 node {
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
   version = gradle.nodeVersion
-  yarnVersion = '1.17.3'
+  yarnVersion = gradle.yarnVersion
 
   download = true
 

@@ -3,6 +3,10 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
+import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
+import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
+import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
+import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
@@ -97,8 +101,8 @@ class CompilationTests : OutputTests() {
 
         override val postfix = ".d.ts"
 
-        val translator: InputTranslator<String> = createJsFileTranslator(ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
-        val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
+        val translator: InputTranslator<String> = createJsFileTranslator(ConstNameResolver(), CONVERTER_SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
+        val pathToTypes = DEFINITELY_TYPED_DIR
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {

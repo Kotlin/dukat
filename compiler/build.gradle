@@ -13,6 +13,7 @@ buildscript {
 plugins {
     id("kotlin")
     id("com.moowork.node")
+    id("kotlinx-serialization")
 }
 
 configurations {
@@ -68,6 +69,8 @@ dependencies {
 
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
     testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
+
+    testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 

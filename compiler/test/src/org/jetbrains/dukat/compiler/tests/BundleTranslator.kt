@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import java.io.File
 
-class Bundle(private val inputName: String) {
+class BundleTranslator(private val inputName: String) {
 
     companion object {
         val byteTranslator = createJsByteArrayTranslator(ConstNameResolver())
