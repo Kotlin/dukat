@@ -190,4 +190,8 @@ test {
     }
 
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
+
+    testLogging {
+        showStandardStreams = true
+    }
 }
