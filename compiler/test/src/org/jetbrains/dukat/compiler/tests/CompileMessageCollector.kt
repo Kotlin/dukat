@@ -19,7 +19,9 @@ class CompileMessageCollector : MessageCollector {
         if (severity.isError) {
             myHasErrors = true
 
-            System.err.println("MESSAGE ${severity} ${message} ${location}")
+            System.err.println("[failure] ${severity} ${message} ${location}")
+        } else {
+            println("[warning] ${severity} ${message} ${location}")
         }
     }
 }

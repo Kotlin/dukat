@@ -18,6 +18,7 @@ plugins {
 
 configurations {
     toDownload
+    kotlinJsLibs
 }
 
 compileTestKotlin {
@@ -73,6 +74,8 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
+
+    kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 
     toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
@@ -162,6 +165,16 @@ task generateBatchConfig() {
                 batchFile.append("-d ${project.buildDir}/tests/definitelyTyped/${file.parentFile.name} ${file.absolutePath}${newLine}")
             }
         }
+    }
+}
+
+task extractKoltinJsLibs(type: Copy) {
+    configurations.kotlinJsLibs.each {
+        from it.absolutePath
+    }
+    into "${project.buildDir}/kotlinHome"
+    rename { String fileName ->
+        return fileName.replace("-${gradle.kotlinVersion}.jar", ".jar")
     }
 }
 

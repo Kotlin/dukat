@@ -31,15 +31,20 @@ class CompilationTests {
 
 
     private fun compile(sourcePath: String, targetPath: String): ExitCode {
+
         val options =
                 K2JSCompilerArguments().apply {
                     outputFile = targetPath
                     metaInfo = false
                     sourceMap = false
-                    kotlinHome = "./build"
+                    noStdlib = true
+                    libraries = listOf(
+                            "./build/kotlinHome/kotlin-stdlib-js.jar"
+                    ).joinToString(File.pathSeparator)
                 }
 
         options.freeArgs = listOf(sourcePath)
+
         return K2JSCompiler().exec(
                 CompileMessageCollector(),
                 Services.EMPTY,
@@ -56,9 +61,9 @@ class CompilationTests {
         val targetPath = "./build/tests/compiled/${descriptor}"
         getTranslator().translate(sourcePath, targetPath)
         val targetSource = File(targetPath, "index.kt")
-        val outSource = "${targetSource}/${descriptor}.js"
+        val outSource = "${targetPath}/${descriptor}.js"
 
-        assert(targetSource.exists())
+        assert(targetSource.exists()) { "$targetSource no found " }
 
         assertEquals(
                 ExitCode.OK,
@@ -86,4 +91,9 @@ class CompilationTests {
         }
 
     }
+}
+
+
+fun main() {
+
 }
