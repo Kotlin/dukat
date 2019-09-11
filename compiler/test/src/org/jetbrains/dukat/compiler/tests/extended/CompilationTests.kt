@@ -1,17 +1,8 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
-import org.jetbrains.dukat.compiler.tests.FileFetcher
-import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
-import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
-import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translatorString.translateModule
-import org.jetbrains.dukat.ts.translator.createJsFileTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -23,20 +14,19 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-class CompilationTests : OutputTests() {
+class CompilationTests {
 
-    override fun getTranslator(): InputTranslator<String> = translator
+    private fun getTranslator(): CliTranslator = CliTranslator("../node-package/build/env.json", "../node-package/build/distrib/bin/dukat-cli.js")
 
     @DisplayName("core test set compile")
     @ParameterizedTest(name = "{0}")
     @MethodSource("extendedSet")
     @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
     fun withValueSourceCompiled(
-            name: String,
-            tsPath: String,
-            @Suppress("UNUSED_PARAMETER") ktPath: String
+            descriptor: String,
+            sourcePath: String
     ) {
-        assertContentCompiles(name, tsPath)
+        assertContentCompiles(descriptor, sourcePath)
     }
 
 
@@ -59,54 +49,40 @@ class CompilationTests : OutputTests() {
 
 
     private fun assertContentCompiles(
-            @Suppress("UNUSED_PARAMETER") descriptor: String,
-            tsPath: String
+            descriptor: String,
+            sourcePath: String
     ) {
-        val translated = translateModule(tsPath, translator)
-        val outputDirectory = File("./build/tests/out")
-        outputDirectory.mkdirs()
 
-        val sourceFile = File(tsPath)
-        val targetDir =
-                File(outputDirectory, sourceFile.parentFile.absolutePath.removePrefix(pathToTypes))
+        val targetPath = "./build/tests/compiled/${descriptor}"
+        getTranslator().translate(sourcePath, targetPath)
+        val targetSource = File(targetPath, "index.kt")
+        val outSource = "${targetSource}/${descriptor}.js"
 
-        val mainTargetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
+        assert(targetSource.exists())
 
-        targetDir.mkdirs()
-
-        val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
-
-        if (failedTranslations.isNotEmpty()) {
-            throw Exception("translation failed")
-        }
-
-        val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
-
-        units.forEach { (name, _, _, content) ->
-            val targetName = "${name}.kt"
-            val resolvedTarget = targetDir.resolve(targetName)
-
-            resolvedTarget.writeText(content)
-        }
-
-        val targetPath = targetDir.resolve(mainTargetName).absolutePath
-        assertEquals(ExitCode.OK,
+        assertEquals(
+                ExitCode.OK,
                 compile(
-                        targetPath,
-                        targetPath.replace(".kt", ".js")
-                ))
+                        targetSource.absolutePath,
+                        outSource
+                )
+        )
     }
 
-    companion object : FileFetcher() {
-
-        override val postfix = ".d.ts"
-
-        val translator: InputTranslator<String> = createJsFileTranslator(ConstNameResolver(), CONVERTER_SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
-        val pathToTypes = DEFINITELY_TYPED_DIR
+    companion object {
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-            return fileSetWithDescriptors(pathToTypes)
+            val files = File(DEFINITELY_TYPED_DIR).walk()
+                    .filter { it.isFile() && it.name == "index.d.ts" }
+                    .map {
+                        arrayOf(
+                                it.parentFile.name,
+                                it.absolutePath
+                        )
+                    }.toList().toTypedArray()
+
+            return files
         }
 
     }
