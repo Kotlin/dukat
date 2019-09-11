@@ -66,27 +66,11 @@ task npmVersion(type: NpmTask) {
     args = ["version", project.findProperty(PROPERTY_PACKAGE_VERSION) ?: "NEVER" ]
 }
 
-task nodeEnv(type: YarnTask) {
-    args = ["run", "env"]
-
-    ignoreExitValue = true
-    def execRunner = null
-    execOverrides {
-        execRunner = it
-        it.standardOutput = new ByteArrayOutputStream()
-        it.errorOutput = new ByteArrayOutputStream()
-    }
-
-    doLast {
-        def lineSeparator = System.getProperty("line.separator")
-        def outputBuf = execRunner.standardOutput.toString().split(lineSeparator) as List
-
-        println(outputBuf.removeAt(0))
-        println(outputBuf.removeAt(outputBuf.size() - 1))
-
-        new File(project.buildDir, "env.json").text = outputBuf.join(lineSeparator)
-    }
+task nodeEnv(type: NodeTask) {
+    script = file("env.js")
+    args = ["${project.buildDir}/env.json"]
 }
+
 
 task npmPack(type: NpmTask) {
     dependsOn = [":cli:build", buildDistrib, npmVersion]
