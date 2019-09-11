@@ -1,5 +1,6 @@
 plugins {
-    id "com.moowork.node"
+    id("base")
+    id("com.moowork.node")
 }
 
 def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
