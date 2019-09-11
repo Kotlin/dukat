@@ -190,7 +190,7 @@ task generateBatch(type: NodeTask) {
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
-test.dependsOn = [generateBinary, fetchDefinitelyTyped, ":node-package:nodeEnv", ":node-package:buildDistrib"]
+test.dependsOn = [generateBinary, fetchDefinitelyTyped, extractKoltinJsLibs, ":node-package:nodeEnv", ":node-package:buildDistrib"]
 
 test {
     [
