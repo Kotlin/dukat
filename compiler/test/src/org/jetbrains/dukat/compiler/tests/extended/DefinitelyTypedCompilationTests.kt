@@ -58,8 +58,6 @@ private class TestEnded : AfterTestExecutionCallback {
             else -> TestStatus.OK
         }
 
-        println(context.executionException)
-
         totalTimes[displayName] = TestData(
                 displayName,
                 System.currentTimeMillis() - startTimes[displayName]!!,
