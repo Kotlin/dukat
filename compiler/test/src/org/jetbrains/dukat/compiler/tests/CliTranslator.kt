@@ -18,7 +18,7 @@ class CliTranslator(private val envDataPath: String, private val translatorPath:
 
     fun translate(input: String, dirName: String) {
         val proc = ProcessBuilder(nodePath, translatorPath, "-d", dirName, input).start()
-        proc.waitFor(600, TimeUnit.SECONDS)
+        proc.waitFor(180, TimeUnit.SECONDS)
 
         if (proc.exitValue() > 0) {
             println("exited with value ${proc.exitValue()}")
