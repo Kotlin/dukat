@@ -40,6 +40,10 @@ abstract class CompilationTests {
         )
     }
 
+    companion object {
+        val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
+        val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
+    }
 
     protected fun assertContentCompiles(
             descriptor: String,
@@ -51,14 +55,14 @@ abstract class CompilationTests {
         val targetSource = File(targetPath, "index.kt")
         val outSource = "${targetPath}/${descriptor}.js"
 
-        assert(targetSource.exists()) { "$targetSource no found " }
+        assert(targetSource.exists()) { "$FILE_NOT_FIND_ASSERTION: $targetSource" }
 
         assertEquals(
                 ExitCode.OK,
                 compile(
                         targetSource.absolutePath,
                         outSource
-                )
+                ), COMPILATION_ERROR_ASSERTION
         )
     }
 
