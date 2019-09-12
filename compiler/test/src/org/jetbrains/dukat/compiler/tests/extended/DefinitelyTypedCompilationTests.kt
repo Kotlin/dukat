@@ -7,6 +7,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
+private fun File.isDefinitelyTypedDeclaration(): Boolean {
+    return isFile() && name == "index.d.ts"
+}
+
 class DefinitelyTypedCompilationTests : CompilationTests() {
 
     @DisplayName("core test set compile")
@@ -21,11 +25,18 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
     }
 
     companion object {
-
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
+
+            val filterFunc: (File) -> Boolean = if (System.getProperty("dukat.test.definitelyTyped.repexp") == null) {
+                File::isDefinitelyTypedDeclaration
+            } else {
+                val nameRegex = Regex(System.getProperty("dukat.test.definitelyTyped.repexp"), RegexOption.IGNORE_CASE)
+                ({ file: File -> file.isDefinitelyTypedDeclaration() && nameRegex.matches(file.parentFile.name) })
+            }
+
             val files = File(DEFINITELY_TYPED_DIR).walk()
-                    .filter { it.isFile() && it.name == "index.d.ts" }
+                    .filter(filterFunc)
                     .map {
                         arrayOf(
                                 it.parentFile.name,
