@@ -204,6 +204,14 @@ test {
         }
     }
 
+    [
+        "dukat.test.definitelyTyped.repexp"
+    ].forEach { String projectProperty ->
+        if (project.hasProperty(projectProperty)) {
+            systemProperty(projectProperty, project.getProperty(projectProperty))
+        }
+    }
+
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
 
     testLogging {

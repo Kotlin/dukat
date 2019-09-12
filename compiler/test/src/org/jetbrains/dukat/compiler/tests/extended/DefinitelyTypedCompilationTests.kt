@@ -99,7 +99,6 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
     companion object {
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-
             val filterFunc: (File) -> Boolean = if (System.getProperty("dukat.test.definitelyTyped.repexp") == null) {
                 File::isDefinitelyTypedDeclaration
             } else {
