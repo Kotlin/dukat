@@ -47,11 +47,17 @@ private class TestEnded : AfterTestExecutionCallback {
                 val exception = context.executionException.get()
 
                 when (exception) {
-                    is AssertionFailedError -> {
+                    is AssertionFailedError  -> {
+                        val message = exception.message!!
+                        when {
+                            message.startsWith(CompilationTests.COMPILATION_ERROR_ASSERTION) -> TestStatus.FAILED_COMPILATION
+                            else -> TestStatus.UNKNOWN
+                        }
+                    }
+                    is AssertionError -> {
                         val message = exception.message!!
                         when {
                             message.startsWith(CompilationTests.FILE_NOT_FIND_ASSERTION) -> TestStatus.FAILED_TRANSLATION
-                            message.startsWith(CompilationTests.COMPILATION_ERROR_ASSERTION) -> TestStatus.FAILED_COMPILATION
                             else -> TestStatus.UNKNOWN
                         }
                     }
@@ -59,6 +65,7 @@ private class TestEnded : AfterTestExecutionCallback {
                     else -> TestStatus.UNKNOWN
                 }
             }
+
             else -> TestStatus.OK
         }
 
