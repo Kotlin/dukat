@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -25,6 +26,7 @@ private enum class TestStatus {
     OK,
     FAILED_COMPILATION,
     FAILED_TRANSLATION,
+    FAILED_TIMEOUT,
     UNKNOWN
 }
 
@@ -43,6 +45,7 @@ private class TestEnded : AfterTestExecutionCallback {
         val status = when {
             context.executionException.isPresent -> {
                 val exception = context.executionException.get()
+
                 when (exception) {
                     is AssertionFailedError -> {
                         val message = exception.message!!
@@ -52,6 +55,7 @@ private class TestEnded : AfterTestExecutionCallback {
                             else -> TestStatus.UNKNOWN
                         }
                     }
+                    is IllegalThreadStateException -> TestStatus.FAILED_TIMEOUT
                     else -> TestStatus.UNKNOWN
                 }
             }
@@ -72,14 +76,16 @@ private class TestSuiteEnded : AfterAllCallback {
         val report = File("./build/reports/report.csv");
         report.writeText("")
 
-        val times = totalTimes.values.sortedByDescending { it.executionTime }
+        val records = totalTimes.values.sortedByDescending { it.executionTime }
 
         report.appendText("name, status, time(millis)\n")
-        times.forEach { (key, value, status) ->
+        records.forEach { (key, value, status) ->
             report.appendText("$key, $status, $value\n")
         }
 
-        report.appendText("AVG, ${times.map { it.executionTime }.average()}\n")
+        val times = records.map { it.executionTime }
+        report.appendText("AVG, ${times.average()}\n")
+        report.appendText("AVG[DROP_TIMEOUT], ${times.filter{ it < TestConfig.COMPILATION_TIMEOUT_MILLIS }.average()}\n")
     }
 }
 

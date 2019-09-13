@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.tests
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -18,7 +19,7 @@ class CliTranslator(private val envDataPath: String, private val translatorPath:
 
     fun translate(input: String, dirName: String) {
         val proc = ProcessBuilder(nodePath, translatorPath, "-d", dirName, input).start()
-        proc.waitFor(180, TimeUnit.SECONDS)
+        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         if (proc.exitValue() > 0) {
             println("exited with value ${proc.exitValue()}")
