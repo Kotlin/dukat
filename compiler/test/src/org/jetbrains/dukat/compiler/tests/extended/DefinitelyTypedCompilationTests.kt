@@ -99,6 +99,9 @@ private class TestSuiteEnded : AfterAllCallback {
 
         val avgDropTimeout = records.filter { it.status != TestStatus.FAILED_TIMEOUT }.map { it.executionTime }.average()
         report.appendText("AVG[DROP_TIMEOUT], $avgDropTimeout\n")
+
+        val avgOnlyOk = records.filter { it.status == TestStatus.OK }.map { it.executionTime }.average()
+        report.appendText("AVG[ONLY_OK], $avgOnlyOk\n")
     }
 }
 
