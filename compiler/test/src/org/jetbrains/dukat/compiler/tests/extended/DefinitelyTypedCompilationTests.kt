@@ -74,7 +74,7 @@ private class TestSuiteEnded : AfterAllCallback {
 
         val times = totalTimes.values.sortedByDescending { it.executionTime }
 
-        report.appendText("name, time(millis), status\n")
+        report.appendText("name, status, time(millis)\n")
         times.forEach { (key, value, status) ->
             report.appendText("$key, $status, $value\n")
         }
