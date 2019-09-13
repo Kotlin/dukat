@@ -19,6 +19,10 @@ private fun File.isDefinitelyTypedDeclaration(): Boolean {
     return isFile() && name == "index.d.ts"
 }
 
+private fun File.getTestDescriptorName(): String {
+    return parentFile.relativeTo(File(TestConfig.DEFINITELY_TYPED_DIR)).path
+}
+
 private val startTimes: MutableMap<String, Long> = mutableMapOf()
 private val totalTimes: MutableMap<String, TestData> = mutableMapOf()
 
@@ -47,7 +51,7 @@ private class TestEnded : AfterTestExecutionCallback {
                 val exception = context.executionException.get()
 
                 when (exception) {
-                    is AssertionFailedError  -> {
+                    is AssertionFailedError -> {
                         val message = exception.message!!
                         when {
                             message.startsWith(CompilationTests.COMPILATION_ERROR_ASSERTION) -> TestStatus.FAILED_COMPILATION
@@ -92,7 +96,7 @@ private class TestSuiteEnded : AfterAllCallback {
 
         val times = records.map { it.executionTime }
         report.appendText("AVG, ${times.average()}\n")
-        report.appendText("AVG[DROP_TIMEOUT], ${times.filter{ it < TestConfig.COMPILATION_TIMEOUT_MILLIS }.average()}\n")
+        report.appendText("AVG[DROP_TIMEOUT], ${times.filter { it < TestConfig.COMPILATION_TIMEOUT_MILLIS }.average()}\n")
     }
 }
 
@@ -116,14 +120,14 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
                 File::isDefinitelyTypedDeclaration
             } else {
                 val nameRegex = Regex(System.getProperty("dukat.test.definitelyTyped.repexp"), RegexOption.IGNORE_CASE)
-                ({ file: File -> file.isDefinitelyTypedDeclaration() && nameRegex.matches(file.parentFile.name) })
+                ({ file: File -> file.isDefinitelyTypedDeclaration() && nameRegex.matches(file.getTestDescriptorName()) })
             }
 
             val files = File(DEFINITELY_TYPED_DIR).walk()
                     .filter(filterFunc)
                     .map {
                         arrayOf(
-                                it.parentFile.name,
+                                it.getTestDescriptorName(),
                                 it.absolutePath
                         )
                     }.toList().toTypedArray()
