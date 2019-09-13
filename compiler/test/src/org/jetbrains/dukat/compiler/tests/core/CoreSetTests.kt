@@ -36,7 +36,7 @@ class CoreSetTests : OutputTests() {
 
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data")
+            return fileSetWithDescriptors("./test/data/typescript")
         }
 
         val translator = createJsFileTranslator(ConstNameResolver(), CONVERTER_SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
