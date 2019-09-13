@@ -7,6 +7,7 @@ require("../lib/converter");
 var Readable = require('stream').Readable;
 var fs = require("fs");
 var readline = require("readline");
+var EventEmitter = require('events');
 
 function isWin() {
     return process.platform == "win32";
@@ -82,7 +83,6 @@ function endsWith(str, postfix) {
     return str.lastIndexOf(postfix) == (str.length - postfix.length);
 }
 
-
 function cliMode(args) {
     var packageDir = path.resolve(__dirname, "..");
 
@@ -126,6 +126,8 @@ function cliMode(args) {
 
         return run("java", commandArgs);
     }
+
+    process.exit(1);
 }
 
 function eachLine(fileName, handler) {
@@ -202,9 +204,12 @@ var main = function (args) {
         })
     } else {
         var childProcess = cliMode(args);
-        childProcess.on("exit", function() {
-            process.exit();
-        });
+
+        if (childProcess instanceof EventEmitter) {
+            childProcess.on("exit", function() {
+                process.exit();
+            });
+        }
     }
 };
 
