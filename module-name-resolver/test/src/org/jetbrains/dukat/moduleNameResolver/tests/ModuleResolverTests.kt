@@ -23,7 +23,7 @@ class ModuleResolverTests {
 
     @Test
     fun resolveModuleC() {
-        resolve("moduleC/lib/moduleC.d.ts", null)
+        resolve("moduleC/lib/moduleC.d.ts", "moduleC")
     }
 
     @Test
@@ -39,6 +39,11 @@ class ModuleResolverTests {
     @Test
     fun resolveModuleF() {
         resolve("@types/moduleF/lib/index.d.ts", "moduleF")
+    }
+
+    @Test
+    fun resolveDeeplyNested() {
+        resolve("deeply_nested/still_should_be_resolved/moduleE/some.d.ts", "moduleE")
     }
 
     @Test
