@@ -46,6 +46,11 @@ where possible options include:
 
 # Recent Changes
 
+#### [0.0.17] - 16'September, 2019
+ - This release contains mainly idl-related changes. The idl target is considered production-ready,
+ however its support is still experimental. 
+
+#### [0.0.16] - 16'August, 2019
 #### [0.0.15] - 16'August, 2019
  - The only change is speed, however, this change is big. Since this release ts is parsed on nodejs side and
  passed in a binary form to the JVM side.

@@ -1,5 +1,9 @@
 # Changelog
 
+#### [0.0.17] - 16'September, 2019
+ - This release contains mainly idl-related changes. The idl target is considered production-ready,
+  however its support is still experimental.   
+
 #### [0.0.16] - 16'August, 2019 
  - Compiling protobuf-generated java code to 1.6 (which is currently the target version for dukat)
 #### [0.0.15] - 16'August, 2019
