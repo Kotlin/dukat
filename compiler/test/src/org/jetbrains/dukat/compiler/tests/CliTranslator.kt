@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 @Serializable
 internal data class EnvJson(val NODE: String)
 
-class CliTranslator(private val envDataPath: String, private val translatorPath: String) {
+class CliTranslator(val envDataPath: String, private val translatorPath: String) {
     private val nodePath: String
 
     init {
@@ -17,8 +17,13 @@ class CliTranslator(private val envDataPath: String, private val translatorPath:
         nodePath = envJson.NODE
     }
 
-    fun translate(input: String, dirName: String) {
-        val proc = ProcessBuilder(nodePath, translatorPath, "-d", dirName, input).start()
+    fun translate(input: String, dirName: String, reportPath: String? = null) {
+        val proc =
+                if (reportPath == null) {
+                    ProcessBuilder(nodePath, translatorPath, "-d", dirName, input).start()
+                } else {
+                    ProcessBuilder(nodePath, translatorPath, "-d", dirName, "-r", reportPath, input).start()
+                }
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         if (proc.exitValue() > 0) {

@@ -19,7 +19,10 @@ class CoreSetTestsCli {
     }
 
     companion object {
-        fun getTranslator(): CliTranslator = CliTranslator("../node-package/build/env.json", "../node-package/build/distrib/bin/dukat-cli.js")
+        fun getTranslator(): CliTranslator = CliTranslator(
+                "../node-package/build/env.json",
+                "../node-package/build/distrib/bin/dukat-cli.js"
+        )
 
         @JvmStatic
         fun testSet(): Array<Array<String>> {
@@ -37,7 +40,7 @@ class CoreSetTestsCli {
 
                 targetPath.deleteRecursively()
 
-                getTranslator().translate(sourcePath.absolutePath, targetPath.absolutePath)
+                getTranslator().translate(sourcePath.absolutePath, targetPath.absolutePath, "./build/reports/CoreSetTestsCli/${descriptor}.json")
 
                 val genFilesWalker = targetPath.walk()
                 genFilesWalker.filter { it.isFile() }.forEach {

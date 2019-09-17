@@ -11,7 +11,10 @@ import kotlin.test.assertEquals
 
 abstract class CompilationTests {
 
-    private fun getTranslator(): CliTranslator = CliTranslator("../node-package/build/env.json", "../node-package/build/distrib/bin/dukat-cli.js")
+    private fun getTranslator(): CliTranslator = CliTranslator(
+            "../node-package/build/env.json",
+            "../node-package/build/distrib/bin/dukat-cli.js"
+    )
 
     abstract fun runTests(
             descriptor: String,

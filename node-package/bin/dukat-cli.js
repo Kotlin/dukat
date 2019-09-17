@@ -49,7 +49,7 @@ function createReadable() {
 }
 
 function processArgs(args) {
-    var skip_2args = new Set(["-d", "-p", "-m", "r"]);
+    var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
     var count = 0;
 
     var packageName = "<ROOT>";

@@ -16,7 +16,6 @@ class CommonJsNameResolver : ModuleNameResolver {
         packageJsonOwner?.let { jsonOwner ->
             val jsonOwners = generateSequence(jsonOwner) { it.parentFile }
             val nodeModules = jsonOwners.find {
-                println(it.name)
                 it.name == "node_modules"
             }
 
