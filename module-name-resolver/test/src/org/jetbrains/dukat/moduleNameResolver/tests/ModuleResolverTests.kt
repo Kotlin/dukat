@@ -52,7 +52,7 @@ class ModuleResolverTests {
     }
 
     private fun resolve(path: String, expected: String?, resolver: ModuleNameResolver = CommonJsNameResolver()) {
-        val prefix = "./test/data/node_modules"
+        val prefix = "./test/data/mode_nodules"
         val fullPath = File(prefix, path).absolutePath
         assertEquals(resolver.resolveName(fullPath), expected)
     }

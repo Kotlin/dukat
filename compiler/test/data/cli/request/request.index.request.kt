@@ -1,3 +1,4 @@
+@file:JsModule("request")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package request
 
@@ -252,8 +253,6 @@ external interface UrlOptions {
     var url: dynamic /* String | Url */
 }
 
-typealias RequestCallback = (error: Any, response: Response, body: Any) -> Unit
-
 external interface `T$0` {
     var mimeType: String?
         get() = definedExternally
@@ -495,10 +494,6 @@ external interface Response : http.IncomingMessage {
         set(value) = definedExternally
 }
 
-typealias ResponseRequest = Request
-
-typealias RequestResponse = Response
-
 external interface Headers {
     @nativeGetter
     operator fun get(key: String): Any?
@@ -577,8 +572,6 @@ external interface ResponseAsJSON {
     var headers: Headers
     var request: RequestAsJSON
 }
-
-typealias Cookie = tough.Cookie
 
 external interface CookieJar {
     fun setCookie(cookieOrStr: Cookie, uri: String, options: tough.CookieJar.SetCookieOptions? = definedExternally /* null */)
