@@ -28,7 +28,8 @@ class CoreSetTestsCli {
         fun testSet(): Array<Array<String>> {
 
             val packages = listOf(
-                "request"
+                "request",
+                "universal-cookie"
             )
 
             val resolvedEntities = mutableListOf<Array<String>>()
