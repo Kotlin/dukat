@@ -580,7 +580,12 @@ private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolve
 
 fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath
-    return SourceFileNode(fileNameNormalized, root.introduceNodes(fileNameNormalized, moduleNameResolver), referencedFiles.map { referencedFile -> IdentifierEntity(referencedFile.value) })
+    return SourceFileNode(
+            fileNameNormalized,
+            root.introduceNodes(fileNameNormalized, moduleNameResolver),
+            referencedFiles.map { referencedFile -> IdentifierEntity(referencedFile.value) },
+            null
+    )
 }
 
 fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver) =

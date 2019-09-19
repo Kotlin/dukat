@@ -26,6 +26,8 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
                 }
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
+        println(proc.inputStream.bufferedReader().readText())
+
         if (proc.exitValue() > 0) {
             println("exited with value ${proc.exitValue()}")
             println(proc.errorStream.bufferedReader().readText())

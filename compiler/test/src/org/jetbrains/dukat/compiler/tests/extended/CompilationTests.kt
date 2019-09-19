@@ -54,8 +54,15 @@ abstract class CompilationTests {
     ) {
 
         val targetPath = "./build/tests/compiled/${descriptor}"
+
         getTranslator().translate(sourcePath, targetPath)
-        val targetSource = File(targetPath, "index.kt")
+        val fileResolvedWithDefTyped = File(targetPath, "index.module_definitely-typed.kt")
+        val targetSource =
+                if (fileResolvedWithDefTyped.exists()) {
+                    fileResolvedWithDefTyped
+                } else {
+                    File(targetPath, "index.module_$descriptor.kt")
+                }
         val outSource = "${targetPath}/${descriptor}.js"
 
         assert(targetSource.exists()) { "$FILE_NOT_FIND_ASSERTION: $targetSource" }
@@ -68,10 +75,5 @@ abstract class CompilationTests {
                 ), COMPILATION_ERROR_ASSERTION
         )
     }
-
-}
-
-
-fun main() {
 
 }

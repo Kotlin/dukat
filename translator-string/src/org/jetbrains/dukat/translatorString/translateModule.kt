@@ -3,6 +3,7 @@ package org.jetbrains.dukat.translatorString
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
@@ -17,10 +18,6 @@ import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.StringTranslator
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import java.io.File
 
 private typealias SourceUnit = Pair<String, NameEntity>
@@ -50,34 +47,33 @@ private fun NameEntity.fileNameFragment(): String? {
     }
 }
 
-private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): String {
+
+private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): NameEntity {
     val sourceFile = File(fileName)
     val sourceFileName = sourceFile.name
     val ktFileNamePrefix =
-            if (sourceFileName.endsWith(TS_DECLARATION_EXTENSION)) {
-                val moduleName = CommonJsNameResolver().resolveName(sourceFile)
-                val sourceName = sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
-                if (moduleName != null) {
-                    "$moduleName.$sourceName"
-                } else {
-                    sourceName
-                }
-            } else if (sourceFileName.endsWith(IDL_DECLARATION_EXTENSION)) {
-                sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
-            } else if (sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
-                sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
-            } else sourceFile.name
+            when {
+                sourceFileName.endsWith(TS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+                sourceFileName.endsWith(IDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
+                sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
+                else -> sourceFileName
+            }
 
-    var res = ktFileNamePrefix
 
-    if (sourceFile.absolutePath.endsWith(TS_DECLARATION_EXTENSION)) {
-        packageName.fileNameFragment()?.let { packageFragment ->
-            res += ".${packageFragment}"
+    var res = packageName.process {
+        if (it == ROOT_PACKAGENAME.value) {
+            ktFileNamePrefix
+        } else {
+            it
         }
+    }
 
-        name?.let {
-            res += ".${it}"
-        }
+    CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
+        res = res.appendLeft(IdentifierEntity("module_$moduleName"))
+    }
+
+    if (name != null) {
+        res = res.appendLeft(name!!)
     }
 
     return res
@@ -88,16 +84,18 @@ fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
     return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
         stringTranslator.process(module)
-        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.name), sourceFile.fileName, module.name, stringTranslator.output())
+        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.name).translate(), sourceFile.fileName, module.name, stringTranslator.output())
     }
 }
 
+private data class TranslationKey(val fileName: String, val rootName: NameEntity, val name: NameEntity?)
+
 fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
-    val visited = mutableSetOf<SourceUnit>()
+    val visited = mutableSetOf<TranslationKey>()
 
     return sourceSet.sources.mapNotNull { sourceFile ->
         // TODO: investigate whether it's safe to check just moduleName
-        val sourceKey = Pair(sourceFile.fileName, sourceFile.root.name)
+        val sourceKey = TranslationKey(sourceFile.fileName, sourceFile.root.name, sourceFile.name)
         if (!visited.contains(sourceKey)) {
             visited.add(sourceKey)
             translateModule(sourceFile)

@@ -559,7 +559,7 @@ fun SourceSetNode.introduceModels() = SourceSetModel(
             val root = source.root.introduceModels(source.fileName, generated)
 
             val module = SourceFileModel(
-                    name = null,
+                    name = source.name,
                     fileName = fileName,
                     root = root,
                     referencedFiles = source.referencedFiles.map { referenceFile ->
