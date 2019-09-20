@@ -64,7 +64,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): NameEn
         if (it == ROOT_PACKAGENAME.value) {
             ktFileNamePrefix
         } else {
-            it
+            unescape(it)
         }
     }
 
