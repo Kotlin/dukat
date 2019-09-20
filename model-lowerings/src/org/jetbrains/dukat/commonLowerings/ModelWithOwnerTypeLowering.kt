@@ -47,7 +47,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
             else -> {
-                logger.debug("[${this}] skipping ${declaration}")
+                logger.trace("skipping $declaration")
                 declaration
             }
         }
