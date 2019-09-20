@@ -1,5 +1,22 @@
 # Changelog
 
+#### [0.0.18] - 20'September, 2019
+Starting from this release generated files names will
+match following pattern:
+
+ **[file_name].[packageName]?.[module_name]?.[additional_postfix]**
+
+For instance, let's say we have file `foo.d.ts` in `fooController` package,
+and following file is generated: `foo.helpers.module_fooController.kt`.
+Then we know that the original file was called foo.d.ts, the file itself
+belongs to the package "helpers" and npm module is fooController.
+
+ - Module name resolving is based only on existence of package.json and its content (DUKAT-1 and DUKAT-4)
+ - [Losing part of generated files because of the name clash](https://github.com/Kotlin/dukat/issues/109)
+ - [Generated entities name clash, case-sensitivity related](https://github.com/Kotlin/dukat/issues/114)
+ - [regression] -r (build report) command-line flag behaviour fixed
+ - Batch mode removed completely - it was used for  dev purposes only and in it's current form proved to be quite inefficient
+
 #### [0.0.17] - 16'September, 2019
  - This release contains mainly idl-related changes. The idl target is considered production-ready,
   however its support is still experimental.   
