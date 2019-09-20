@@ -1,5 +1,4 @@
 import de.undercouch.gradle.tasks.download.Download
-import static groovy.io.FileType.FILES
 
 buildscript {
     repositories {
@@ -168,6 +167,7 @@ test.dependsOn = [generateBinary, fetchDefinitelyTyped, extractKoltinJsLibs, ":n
 test {
     [
             "dukat.test.extended",
+            "dukat.test.cli",
             "dukat.test.failure.always"
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
@@ -176,8 +176,8 @@ test {
     }
 
     [
-        "org.slf4j.simpleLogger.defaultLogLevel",
-        "dukat.test.definitelyTyped.repexp",
+            "org.slf4j.simpleLogger.defaultLogLevel",
+            "dukat.test.definitelyTyped.repexp",
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
             systemProperty(projectProperty, project.getProperty(projectProperty))

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.tests
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
+import org.jetbrains.kotlin.backend.common.push
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -17,13 +18,33 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         nodePath = envJson.NODE
     }
 
-    fun translate(input: String, dirName: String, reportPath: String? = null) {
-        val proc =
-                if (reportPath == null) {
-                    ProcessBuilder(nodePath, translatorPath, "-d", dirName, input).start()
-                } else {
-                    ProcessBuilder(nodePath, translatorPath, "-d", dirName, "-r", reportPath, input).start()
-                }
+    fun translate(
+            input: String,
+            dirName: String,
+            reportPath: String? = null,
+            moduleName: String? = null
+            ) {
+
+        val args = mutableListOf(
+                nodePath,
+                translatorPath,
+                "-d", dirName
+        )
+
+        if (reportPath != null) {
+            args.push("-r")
+            args.push(reportPath)
+        }
+
+        if (moduleName != null) {
+            args.push("-m")
+            args.push(moduleName)
+        }
+
+        args.push(input)
+
+        val proc= ProcessBuilder(*args.toTypedArray()).start()
+
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         println(proc.inputStream.bufferedReader().readText())
@@ -33,4 +54,12 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             println(proc.errorStream.bufferedReader().readText())
         }
     }
+}
+
+
+fun createStandardCliTranslator(): CliTranslator {
+    return CliTranslator(
+            "../node-package/build/env.json",
+            "../node-package/build/distrib/bin/dukat-cli.js"
+    )
 }

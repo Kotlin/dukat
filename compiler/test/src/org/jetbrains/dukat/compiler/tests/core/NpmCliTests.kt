@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-class CoreSetTestsCli {
+class NpmCliTests {
 
     @DisplayName("cli test set")
     @ParameterizedTest(name = "{0}")

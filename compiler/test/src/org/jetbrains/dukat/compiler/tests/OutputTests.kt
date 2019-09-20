@@ -19,6 +19,22 @@ abstract class OutputTests {
         }
     }
 
+    companion object {
+        val SEPARATOR: String = """
+
+// ------------------------------------------------------------------------------------------
+""".replace("\n", System.getProperty("line.separator"))
+
+        val SKIPPED_DECLARATIONS = setOf(
+                "jquery.d.ts",
+                "node-ffi-buffer.d.ts",
+                "ref-array.d.ts",
+                "ref.d.ts",
+                "Q.d.ts",
+                "_skippedReferenced.d.ts"
+        )
+    }
+
     open fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
 
         val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
@@ -31,20 +47,9 @@ abstract class OutputTests {
         return if (units.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
-            val skipDeclarations = setOf(
-                    "jquery.d.ts",
-                    "node-ffi-buffer.d.ts",
-                    "ref-array.d.ts",
-                    "ref.d.ts",
-                    "Q.d.ts",
-                    "_skippedReferenced.d.ts"
-            )
             units.filter { (_, fileName, _, _) ->
-                !skipDeclarations.contains(File(fileName).name)
-            }.joinToString("""
-
-// ------------------------------------------------------------------------------------------
-""".replace("\n", System.getProperty("line.separator"))) { it.content }
+                !SKIPPED_DECLARATIONS.contains(File(fileName).name)
+            }.joinToString(SEPARATOR) { it.content }
         }
     }
 

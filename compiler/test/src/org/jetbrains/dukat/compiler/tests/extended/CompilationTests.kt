@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
+import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -11,10 +12,7 @@ import kotlin.test.assertEquals
 
 abstract class CompilationTests {
 
-    private fun getTranslator(): CliTranslator = CliTranslator(
-            "../node-package/build/env.json",
-            "../node-package/build/distrib/bin/dukat-cli.js"
-    )
+    private fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     abstract fun runTests(
             descriptor: String,
