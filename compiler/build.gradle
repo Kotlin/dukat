@@ -151,25 +151,6 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
-task generateBatchConfig() {
-    dependsOn = [fetchDefinitelyTyped]
-
-    def batchFile = file("${project.buildDir}/batch.list")
-    inputs.dir(DEF_TYPE_DIR)
-    outputs.file(batchFile)
-
-    doLast {
-        batchFile.text = ""
-        def newLine = System.getProperty("line.separator")
-
-        file(DEF_TYPE_DIR).eachFileRecurse (FILES) { file ->
-            if (file.name == "index.d.ts") {
-                batchFile.append("-d ${project.buildDir}/tests/definitelyTyped/${file.parentFile.name} ${file.absolutePath}${newLine}")
-            }
-        }
-    }
-}
-
 task extractKoltinJsLibs(type: Copy) {
     configurations.kotlinJsLibs.each {
         from it.absolutePath
@@ -178,16 +159,6 @@ task extractKoltinJsLibs(type: Copy) {
     rename { String fileName ->
         return fileName.replace("-${gradle.kotlinVersion}.jar", ".jar")
     }
-}
-
-task generateBatch(type: NodeTask) {
-    dependsOn = [generateBatchConfig, ":node-package:buildDistrib"]
-
-    inputs.file("${project.buildDir}/batch.list")
-    outputs.dir("${project.buildDir}/tests/definitelyTyped")
-
-    script = file("${project(":node-package").buildDir}/distrib/bin/dukat-cli.js")
-    args = ["--batch", "${project.buildDir}/batch.list"]
 }
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
