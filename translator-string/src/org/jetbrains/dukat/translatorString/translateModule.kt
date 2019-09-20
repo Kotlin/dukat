@@ -48,7 +48,7 @@ private fun NameEntity.fileNameFragment(): String? {
 }
 
 
-private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): NameEntity {
+private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMap: MutableMap<String, Int>): NameEntity {
     val sourceFile = File(fileName)
     val sourceFileName = sourceFile.name
     val ktFileNamePrefix =
@@ -60,7 +60,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): NameEn
             }
 
 
-    var res = packageName.process {
+    var name = packageName.process {
         if (it == ROOT_PACKAGENAME.value) {
             ktFileNamePrefix
         } else {
@@ -69,22 +69,32 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity): NameEn
     }
 
     CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
-        res = res.appendLeft(IdentifierEntity("module_$moduleName"))
+        name = name.appendLeft(IdentifierEntity("module_$moduleName"))
     }
 
-    if (name != null) {
-        res = res.appendLeft(name!!)
+    if (this.name != null) {
+        name = name.appendLeft(this.name!!)
     }
 
-    return res
+    val nameString = name.toString().toLowerCase()
+
+    clashMap[nameString] = clashMap.getOrPut(nameString) { 0 } + 1
+    clashMap[nameString]?.let { count ->
+        if (count > 1) {
+            name = name.appendLeft(IdentifierEntity("_${count}"))
+        }
+    }
+
+    return name
 }
 
 fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
     val docRoot = sourceFile.root
+    val clashMap: MutableMap<String, Int> = mutableMapOf()
     return docRoot.flattenDeclarations().map { module ->
         val stringTranslator = StringTranslator()
         stringTranslator.process(module)
-        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.name).translate(), sourceFile.fileName, module.name, stringTranslator.output())
+        ModuleTranslationUnit(sourceFile.resolveAsTargetName(module.name, clashMap).translate(), sourceFile.fileName, module.name, stringTranslator.output())
     }
 }
 
