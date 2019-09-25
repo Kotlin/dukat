@@ -21,3 +21,8 @@ declare function returnsGenericObjectType<S>(): {
 
 declare var Tokens: Array<{}>;
 declare var PingableTokens: Array<{ping: () => boolean}>;
+
+declare class SomeSource<P, S> {
+    ping(): P;
+    withTarget<T>(): {source: S, target: T}
+}

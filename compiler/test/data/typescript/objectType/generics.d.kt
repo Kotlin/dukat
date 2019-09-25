@@ -68,3 +68,13 @@ external interface `T$5` {
 }
 
 external var PingableTokens: Array<`T$5`>
+
+external interface `T$6`<S, T> {
+    var source: S
+    var target: T
+}
+
+external open class SomeSource<P, S> {
+    open fun ping(): P
+    open fun <T> withTarget(): `T$6`<S, T>
+}
