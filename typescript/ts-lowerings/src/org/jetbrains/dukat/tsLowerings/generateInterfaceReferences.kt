@@ -30,7 +30,6 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-import org.jetbrains.dukat.tsmodel.types.isSimpleType
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {

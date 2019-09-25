@@ -14,6 +14,9 @@
     <option name="VM_PARAMETERS" value="-ea -Ddukat.test.cli=true" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <envs>
+      <env name="DUKAT_LOGLEVEL" value="5" />
+    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

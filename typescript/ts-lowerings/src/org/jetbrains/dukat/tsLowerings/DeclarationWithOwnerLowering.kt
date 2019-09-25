@@ -40,8 +40,7 @@ interface DeclarationWithOwnerLowering {
 
     @Suppress("UNCHECKED_CAST")
     fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
-        val declaration = owner.node
-        return when (declaration) {
+        return when (val declaration = owner.node) {
             is TypeDeclaration -> lowerTypeDeclaration(owner as NodeOwner<TypeDeclaration>)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(owner as NodeOwner<FunctionTypeDeclaration>)
             is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner as NodeOwner<UnionTypeDeclaration>)
@@ -54,8 +53,7 @@ interface DeclarationWithOwnerLowering {
 
     @Suppress("UNCHECKED_CAST")
     fun lowerClassLikeDeclaration(owner: NodeOwner<ClassLikeDeclaration>): ClassLikeDeclaration {
-        val declaration = owner.node
-        return when (declaration) {
+        return when (val declaration = owner.node) {
             is InterfaceDeclaration -> lowerInterfaceDeclaration(owner as NodeOwner<InterfaceDeclaration>)
             is ClassDeclaration -> lowerClassDeclaration(owner as NodeOwner<ClassDeclaration>)
             else -> declaration
@@ -64,8 +62,7 @@ interface DeclarationWithOwnerLowering {
 
     @Suppress("UNCHECKED_CAST")
     fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
-        val declaration = owner.node
-        return when (declaration) {
+        return when (val declaration = owner.node) {
             is VariableDeclaration -> lowerVariableDeclaration(owner as NodeOwner<VariableDeclaration>)
             is FunctionDeclaration -> lowerFunctionDeclaration(owner as NodeOwner<FunctionDeclaration>)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(owner as NodeOwner<ClassLikeDeclaration>)
