@@ -627,7 +627,7 @@ export class AstConverter {
           this.convertType(declaration.name) as NameEntity,
           this.convertTypeParamsToTokens(declaration.typeParameters),
           this.convertType(declaration.type),
-          declaration.name.getText() + "_TYPE"
+          this.exportContext.getUID(declaration)
         )
     }
 
