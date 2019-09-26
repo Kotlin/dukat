@@ -19,7 +19,7 @@ abstract class CompilationTests {
             sourcePath: String
     )
 
-    protected fun compile(sourcePath: String, targetPath: String): ExitCode {
+    protected fun compile(sources: List<String>, targetPath: String): ExitCode {
 
         val options =
                 K2JSCompilerArguments().apply {
@@ -32,7 +32,7 @@ abstract class CompilationTests {
                     ).joinToString(File.pathSeparator)
                 }
 
-        options.freeArgs = listOf(sourcePath)
+        options.freeArgs = sources
 
         return K2JSCompiler().exec(
                 CompileMessageCollector(),
@@ -52,23 +52,19 @@ abstract class CompilationTests {
     ) {
 
         val targetPath = "./build/tests/compiled/${descriptor}"
+        val targetDir = File("./build/tests/compiled/${descriptor}")
 
         getTranslator().translate(sourcePath, targetPath)
-        val fileResolvedWithDefTyped = File(targetPath, "index.module_definitely-typed.kt")
-        val targetSource =
-                if (fileResolvedWithDefTyped.exists()) {
-                    fileResolvedWithDefTyped
-                } else {
-                    File(targetPath, "index.module_$descriptor.kt")
-                }
         val outSource = "${targetPath}/${descriptor}.js"
 
-        assert(targetSource.exists()) { "$FILE_NOT_FIND_ASSERTION: $targetSource" }
+        val sources = targetDir.walk().map { it.absolutePath }.toList()
+
+        assert(sources.isNotEmpty()) { "$FILE_NOT_FIND_ASSERTION: $targetPath" }
 
         assertEquals(
                 ExitCode.OK,
                 compile(
-                        targetSource.absolutePath,
+                        sources,
                         outSource
                 ), COMPILATION_ERROR_ASSERTION
         )
