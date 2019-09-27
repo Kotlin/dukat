@@ -21,13 +21,13 @@ private class LowerThisType : NodeWithOwnerTypeLowering {
         return when (this) {
             is InterfaceNode -> {
                 if (generated) {
-                    TypeValueNode(IdentifierEntity("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
                 } else {
-                    TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
+                    TypeValueNode(name, typeParameters, null, false, ThisTypeInGeneratedInterfaceMetaData())
                 }
             }
-            is ClassNode -> TypeValueNode(name, typeParameters, false, ThisTypeInGeneratedInterfaceMetaData())
-            else -> TypeValueNode(IdentifierEntity("Any"), emptyList(), false, ThisTypeInGeneratedInterfaceMetaData())
+            is ClassNode -> TypeValueNode(name, typeParameters, null, false, ThisTypeInGeneratedInterfaceMetaData())
+            else -> TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
         }
     }
 

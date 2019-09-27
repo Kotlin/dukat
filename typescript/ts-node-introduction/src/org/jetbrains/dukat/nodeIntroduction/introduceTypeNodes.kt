@@ -17,6 +17,7 @@ private class TypeNodesLowering() : ParameterValueLowering {
             is TypeDeclaration -> TypeValueNode(
                     value = declaration.value,
                     params = declaration.params.map { param -> lowerType(param) },
+                    typeReference = declaration.typeReference,
                     nullable = declaration.nullable,
                     meta = declaration.meta
             )
@@ -34,7 +35,7 @@ private class TypeNodesLowering() : ParameterValueLowering {
 }
 
 fun DocumentRootNode.introduceTypeNodes(): DocumentRootNode {
-    return org.jetbrains.dukat.nodeIntroduction.TypeNodesLowering().lowerDocumentRoot(this)
+    return TypeNodesLowering().lowerDocumentRoot(this)
 }
 
 fun SourceSetNode.introduceTypeNodes() = transform { it.introduceTypeNodes() }
