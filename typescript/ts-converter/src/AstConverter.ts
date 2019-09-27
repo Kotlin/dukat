@@ -159,9 +159,10 @@ export class AstConverter {
         if (nativeTypeDeclarations) {
             typeParameterDeclarations = nativeTypeDeclarations.map(typeParam => {
                 const constraint = typeParam.constraint;
+                let defaultValue = typeParam.default ? this.convertType(typeParam.default) : null;
                 return this.astFactory.createTypeParam(this.astFactory.createIdentifierDeclarationAsNameEntity(typeParam.name.getText()), constraint ? [
                     this.convertType(constraint)
-                ] : [])
+                ] : [], defaultValue)
             });
         }
 

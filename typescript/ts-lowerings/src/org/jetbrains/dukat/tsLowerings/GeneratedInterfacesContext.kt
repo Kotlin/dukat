@@ -203,7 +203,7 @@ private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: Generated
 
 private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<NameEntity>): TypeParameterDeclaration? {
     return when (this) {
-        is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
+        is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList(), null) else null
         else -> null
     }
 }

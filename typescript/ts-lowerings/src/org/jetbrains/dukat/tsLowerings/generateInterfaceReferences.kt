@@ -46,7 +46,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is PropertyDeclaration -> typeParameters
         is TupleDeclaration -> emptyList()
         is TypeDeclaration -> emptyList()
-        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
+        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList(), null) }
         is UnionTypeDeclaration -> emptyList()
         is VariableDeclaration -> emptyList()
         else -> raiseConcern("unknown Entity ${this}") { emptyList<TypeParameterDeclaration>() };

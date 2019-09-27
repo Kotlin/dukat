@@ -74,6 +74,7 @@ message FunctionTypeDeclarationProto {
 message TypeParameterDeclarationProto {
     NameEntityProto name = 1;
     repeated ParameterValueDeclarationProto constraints = 2;
+    ParameterValueDeclarationProto defaultValue = 3;
 }
 
 message GeneratedInterfaceReferenceDeclarationProto {

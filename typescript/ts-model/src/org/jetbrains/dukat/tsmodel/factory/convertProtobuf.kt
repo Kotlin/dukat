@@ -238,7 +238,15 @@ fun Declarations.MethodSignatureDeclarationProto.convert(): MethodSignatureDecla
 }
 
 private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterDeclaration {
-    return TypeParameterDeclaration(name.convert(), constraintsList.map { constraintProto -> constraintProto.convert() })
+    return TypeParameterDeclaration(
+            name.convert(),
+            constraintsList.map { constraintProto -> constraintProto.convert() },
+            if (hasDefaultValue()) {
+                defaultValue.convert()
+            } else {
+                null
+            }
+    )
 }
 
 

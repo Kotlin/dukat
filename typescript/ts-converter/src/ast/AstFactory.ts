@@ -392,7 +392,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeParam(name: NameEntity, constraints: Array<ParameterValue>): TypeParameter {
+  createTypeParam(name: NameEntity, constraints: Array<ParameterValue>, defaultValue: ParameterValue | null): TypeParameter {
     let typeParam = new declarations.TypeParameterDeclarationProto();
     typeParam.setName(name);
     typeParam.setConstraintsList(constraints);
