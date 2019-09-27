@@ -1,4 +1,5 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+package a
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -15,4 +16,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var request: request.RequestAPI<request.Request, request.CoreOptions, dynamic /* UriOptions | UrlOptions */>
+@JsModule("<RESOLVED_MODULE_NAME>")
+external fun ping(a: String)
+
+@JsModule("<RESOLVED_MODULE_NAME>")
+external fun ping(a: Number)

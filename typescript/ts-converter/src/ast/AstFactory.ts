@@ -379,7 +379,7 @@ export class AstFactory implements AstFactory {
     typeDeclaration.setValue(value);
     typeDeclaration.setParamsList(params);
     if (typeReference != null) {
-      this.log.debug(`TYPE REFERENCE ${typeReference}`);
+      this.log.trace(`type reference for ${value} ${typeReference}`);
       typeDeclaration.setTypereference(typeReference);
     }
 

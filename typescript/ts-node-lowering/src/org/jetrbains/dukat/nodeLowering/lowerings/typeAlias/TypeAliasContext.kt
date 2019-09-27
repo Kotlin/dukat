@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -61,41 +62,14 @@ class TypeAliasContext {
         }
     }
 
-    private fun TypeAliasNode.substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
-        return when (type) {
-            is TypeValueNode -> {
-                if (type.value == name) {
-                    if (typeParameters.size == type.params.size) {
-                        val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = typeParameters.zip(type.params).associateBy({ it.first }, { it.second })
-
-                        when (typeReference) {
-                            is TypeValueNode -> return typeReference.specify(aliasParamsMap)
-                            is UnionTypeNode -> return typeReference.specify(aliasParamsMap)
-                            is FunctionTypeNode -> return typeReference.specify(aliasParamsMap)
-                            is GeneratedInterfaceReferenceDeclaration -> return typeReference
-                        }
-                    }
-                }
-
-                null
-            }
-            is UnionTypeNode -> {
-                type.copy(params = type.params.map { param ->
-                    resolveTypeAlias(param)
-                })
-            }
-            else -> null
-        }
-    }
-
-    private val myTypeAliasNodes: MutableSet<TypeAliasNode> = mutableSetOf()
+    private val myTypeAliasMap: MutableMap<String, TypeAliasNode> = mutableMapOf()
 
     fun registerTypeAlias(typeAlias: TypeAliasNode) {
-        myTypeAliasNodes.add(typeAlias)
+        myTypeAliasMap[typeAlias.uid] = typeAlias
     }
 
     fun resolveTypeAlias(heritageClause: HeritageNode): ParameterValueDeclaration? {
-        myTypeAliasNodes.forEach { typeAlias ->
+        myTypeAliasMap.forEach { (_, typeAlias) ->
             if (typeAlias.canSusbtitute(heritageClause)) {
                 return typeAlias.typeReference
             }
@@ -104,15 +78,29 @@ class TypeAliasContext {
         return null
     }
 
-    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
+    private fun substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+        return when (type) {
+            is TypeValueNode -> type.typeReference?.let { reference ->
+                myTypeAliasMap[reference.uid]?.let { aliasResolved ->
+                    val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(type.params).associateBy({ it.first }, { it.second })
 
-        myTypeAliasNodes.forEach { typeAlias ->
-            typeAlias.substitute(type)?.let {
-                return it
+                    when (aliasResolved.typeReference) {
+                        is TypeValueNode -> aliasResolved.typeReference.specify(aliasParamsMap)
+                        is UnionTypeNode -> aliasResolved.typeReference.specify(aliasParamsMap)
+                        is FunctionTypeNode -> aliasResolved.typeReference.specify(aliasParamsMap)
+                        is GeneratedInterfaceReferenceDeclaration -> aliasResolved.typeReference
+                        else -> null
+                    }
+                }
             }
+            is UnionTypeNode -> type.copy(params = type.params.map { param ->
+                resolveTypeAlias(param)
+            })
+            else -> null
         }
+    }
 
-
-        return type
+    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
+        return substitute(type) ?: type
     }
 }
