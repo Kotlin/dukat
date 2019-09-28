@@ -9,5 +9,5 @@ data class InterfaceDeclaration(
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,
-        val uid: String
-) : ClassLikeDeclaration
+        override val uid: String
+) : ClassLikeDeclaration, WithUidDeclaration

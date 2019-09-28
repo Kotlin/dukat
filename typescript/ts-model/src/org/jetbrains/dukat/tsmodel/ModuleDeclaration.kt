@@ -9,7 +9,7 @@ data class ModuleDeclaration(
 
         val modifiers: List<ModifierDeclaration>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,
-        val uid: String,
+        override val uid: String,
         val resourceName: String,
         val root: Boolean
-) : TopLevelDeclaration, FunctionOwnerDeclaration
+) : TopLevelDeclaration, FunctionOwnerDeclaration, WithUidDeclaration
