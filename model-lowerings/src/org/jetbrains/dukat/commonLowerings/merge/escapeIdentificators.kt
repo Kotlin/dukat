@@ -62,17 +62,17 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return copy(value = escapeIdentificator(value))
     }
 
-    private fun TypeValueModel.escape(): TypeValueModel {
-        return when (val typeNodeValue = value) {
-            is IdentifierEntity -> copy(value = typeNodeValue.escape())
-            is QualifierEntity -> copy(value = typeNodeValue.escape())
-        }
-    }
-
     private fun QualifierEntity.escape(): QualifierEntity {
         return when (val nodeLeft = left) {
             is IdentifierEntity -> QualifierEntity(nodeLeft.escape(), right.escape())
             is QualifierEntity -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
+        }
+    }
+
+    private fun NameEntity.escape(): NameEntity {
+        return when (this) {
+            is IdentifierEntity -> escape()
+            is QualifierEntity -> escape()
         }
     }
 
@@ -95,21 +95,8 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         }
     }
 
-    private fun NameEntity.escape(): NameEntity {
-        return when (this) {
-            is IdentifierEntity -> escape()
-            is QualifierEntity -> escape()
-        }
-    }
-
-    override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
-        val declaration = ownerContext.node
-        return when (declaration) {
-            is TypeValueModel -> declaration.escape()
-            else -> {
-                super.lowerTypeModel(ownerContext)
-            }
-        }
+    override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
+        return super.lowerTypeValueModel(ownerContext.copy(node = ownerContext.node.copy(value = ownerContext.node.value.escape())))
     }
 
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
@@ -140,39 +127,24 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = escapeIdentificator(declaration.name))))
     }
 
-    private fun TypeParameterModel.escape(): TypeParameterModel {
-        return copy(
-                type = if (type is TypeValueModel) {
-                    (type as TypeValueModel).copy(
-                            value = (type as TypeValueModel).value.escape()
-                    )
-                } else {
-                    type
-                }
-        )
-    }
-
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
+
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape(),
-                typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape()}
+                name = declaration.name.escape()
         )))
     }
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
         val declaration = ownerContext.node
-        return super.lowerClassModel(
-                ownerContext.copy(node = declaration.copy(
-                        name = declaration.name.escape(),
-                        typeParameters = declaration.typeParameters.map { typeParameter -> typeParameter.escape() }
-                )))
+
+        return super.lowerClassModel(ownerContext.copy(node = declaration.copy(
+            name = declaration.name.escape()
+        )))
     }
 
-
     override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
-        val declaration = ownerContext.node
-        return when (declaration) {
+        return when (val declaration = ownerContext.node) {
             is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = escapeIdentificator(value.value)) })
             else -> super.lowerTopLevelModel(ownerContext)
         }
