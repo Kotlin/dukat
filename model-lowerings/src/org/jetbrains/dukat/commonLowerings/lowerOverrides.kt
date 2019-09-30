@@ -114,8 +114,7 @@ private class OverrideResolver(val context: ModelContext) {
             return true
         }
 
-        if (name == IdentifierEntity("toString") && parameters.isEmpty() &&
-            returnType is TypeValueModel && returnType.value == IdentifierEntity("String")) {
+        if (name == IdentifierEntity("toString") && parameters.isEmpty()) {
             return true
         }
 
