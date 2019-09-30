@@ -397,6 +397,7 @@ export class AstFactory implements AstFactory {
     let typeParam = new declarations.TypeParameterDeclarationProto();
     typeParam.setName(name);
     typeParam.setConstraintsList(constraints);
+    typeParam.setDefaultvalue(defaultValue);
     return typeParam;
   }
 

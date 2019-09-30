@@ -26,6 +26,7 @@ import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
+import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.resolvePartials
@@ -49,6 +50,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         return sourceSet
                 .filterOutNonDeclarations()
                 .resolvePartials()
+                .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
                 .eliminateStringType()
                 .desugarArrayDeclarations()
