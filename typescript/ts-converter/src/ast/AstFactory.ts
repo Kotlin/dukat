@@ -11,7 +11,8 @@ import {
   ExportAssignmentDeclaration,
   Expression,
   FunctionDeclaration,
-  FunctionTypeDeclaration, HeritageClauseDeclaration,
+  FunctionTypeDeclaration,
+  HeritageClauseDeclaration,
   IdentifierEntity,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
@@ -169,8 +170,8 @@ export class AstFactory implements AstFactory {
     heritageClauseDeclaration.setTypeargumentsList(typeArguments);
     heritageClauseDeclaration.setExtending(extending);
 
-    if (heritageClauseDeclaration.hasTypereference()) {
-      heritageClauseDeclaration.setTypereference(typeReference)
+    if (typeReference != null) {
+      heritageClauseDeclaration.setTypereference(typeReference);
     }
 
     return heritageClauseDeclaration;
