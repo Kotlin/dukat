@@ -46,10 +46,7 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
     }
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
-        println("BEGIN ${heritageClause.typeArguments.size}")
-        println("HC ${heritageClause}")
         val params = resolveParameters(heritageClause.typeReference, heritageClause.typeArguments)
-        println("END ${params.size}")
         return super.lowerHeritageClause(heritageClause.copy(typeArguments = params))
     }
 
