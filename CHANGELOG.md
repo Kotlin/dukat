@@ -1,5 +1,13 @@
 # Changelog
 
+#### [0.0.19] - 30'September, 2019
+ - [Namespaced aliases lost in translation](https://github.com/Kotlin/dukat/issues/119)
+ - Correct escaping for entities in heritage clauses, constraint params
+ - Any toString method with no parameters is override
+ - [Generic params information is lost for lambdas in types](https://github.com/Kotlin/dukat/issues/118)
+   Support for generic params with default values pointing to some other generic params
+ 
+
 #### [0.0.18] - 20'September, 2019
 Starting from this release generated files names will
 match following pattern:
