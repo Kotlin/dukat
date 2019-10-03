@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ts-ast-declarations"))
     implementation(project(":ast-model"))
+    implementation(project(":descriptors"))
     implementation(project(":idl-declarations"))
     implementation(project(":idl-models"))
     implementation(project(":idl-parser"))
@@ -68,7 +69,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
-    testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
+    implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
 
     testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
@@ -107,6 +108,12 @@ task download(type: Copy) {
     rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
 }
 
+task downloadDist(type: Copy) {
+    from configurations.toDownload
+    into "$rootDir/compiler/dist/kotlinc/lib"
+    rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
+}
+
 
 task downloadDefinitelyTyped(type: Download) {
     onlyIfModified true
@@ -121,6 +128,7 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
 }
 
 test.dependsOn(download)
+test.dependsOn(downloadDist)
 
 task generateBinary(type: NodeTask) {
     def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
