@@ -363,7 +363,9 @@ export class AstConverter {
                         let declaration = symbol.declarations[0];
 
                         if (declaration) {
-                            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+                            if (!ts.isTypeParameterDeclaration(declaration)) {
+                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+                            }
                         }
                     }
                 }
