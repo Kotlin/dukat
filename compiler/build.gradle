@@ -27,6 +27,16 @@ compileTestKotlin {
 def DEF_TYPE_CHANGESET = '31929c09c7b4490f87766206b412da4a6a581dc3'
 def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/DefinitelyTyped-${DEF_TYPE_CHANGESET}/types"
 
+
+node {
+    workDir = gradle.nodeWorkingDir
+    // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
+    version = gradle.nodeVersion
+
+    download = true
+}
+
+
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 

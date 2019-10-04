@@ -8,12 +8,13 @@ def PROPERTY_REGISTRY = "dukat.npm.registry"
 def DISTRIB_PATH = "${project.buildDir}/distrib"
 
 node {
+    workDir = gradle.nodeWorkingDir
+
     version = gradle.nodeVersion
     npmVersion = gradle.npmVersion
     yarnVersion = gradle.yarnVersion
 
     nodeModulesDir = file(DISTRIB_PATH)
-
     download = true
 }
 
