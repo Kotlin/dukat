@@ -54,6 +54,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     val ktFileNamePrefix =
             when {
                 sourceFileName.endsWith(TS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
+                sourceFileName.endsWith(JS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(JS_DECLARATION_EXTENSION)
                 sourceFileName.endsWith(IDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
                 sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
                 else -> sourceFileName
@@ -127,6 +128,7 @@ fun translateModule(data: ByteArray, translator: InputTranslator<ByteArray>): Li
 
 fun translateModule(fileName: String, translator: InputTranslator<String>): List<TranslationUnitResult> {
     if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
+        !fileName.endsWith(JS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
         !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
         return listOf(TranslationErrorInvalidFile(fileName))
