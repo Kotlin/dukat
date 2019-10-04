@@ -1,6 +1,6 @@
 var x = 3;
 
-/*function foo(x, y) {
+exports = function foo(x, y) {
     var z = x - y;
 
     for(var i = 0; i < z; i++) {
@@ -9,5 +9,3 @@ var x = 3;
 
     return z;
 }
-
-exports = foo;*/

@@ -5,22 +5,20 @@ import com.oracle.js.parser.Parser
 import com.oracle.js.parser.ScriptEnvironment
 import com.oracle.js.parser.Source
 import com.oracle.js.parser.ir.*
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.jsDeclarations.JSModuleDeclaration
 import java.io.File
 
+fun parseJS(fileName: String): JSModuleDeclaration {
+    val source = Source.sourceFor(fileName, File(fileName).readText())
+    val scriptEnv = ScriptEnvironment.builder().ecmaScriptVersion(Integer.MAX_VALUE).build()
 
-fun parseJS(fileName: String) {
-    val sourceCode = File(fileName).readText()
-
-    val source = Source.sourceFor(fileName, sourceCode)
-
-    val parser = Parser(ScriptEnvironment.builder().ecmaScriptVersion(Integer.MAX_VALUE).build(), source, ErrorManager.ThrowErrorManager())
-
-    val baseNode = parser.parse()
+    val baseNode = Parser(scriptEnv, source, ErrorManager.ThrowErrorManager()).parse()
 
     val scriptBody = baseNode.body
 
     for (line in scriptBody.statements) {
-        println(line.lineNumber.toString() + " <" + line.javaClass.name + ">\t" + line)
+        println(line.lineNumber.toString() + ">\t" + line)
 
         if (line is ExpressionStatement) {
             val expression = line.expression
@@ -28,9 +26,11 @@ fun parseJS(fileName: String) {
             if (expression.isAssignment) {
 
                 if (expression is BinaryNode) {
-                    println("\t" + expression.assignmentDest)
+                    println("\t\t" + expression.assignmentDest)
                 }
             }
         }
     }
+
+    return JSModuleDeclaration(fileName, IdentifierEntity("test"))
 }

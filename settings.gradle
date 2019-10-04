@@ -69,6 +69,8 @@ include 'ts-node-introduction'
 include 'ts-node-lowering'
 include 'ts-translator'
 include 'js-parser'
+include 'js-declarations'
+include 'js-lowerings'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
@@ -86,3 +88,5 @@ project(':ts-node-lowering').projectDir = file("$rootDir/typescript/ts-node-lowe
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
 
 project(':js-parser').projectDir = file("$rootDir/javascript/js-parser")
+project(':js-declarations').projectDir = file("$rootDir/javascript/js-declarations")
+project(':js-lowerings').projectDir = file("$rootDir/javascript/js-lowerings")

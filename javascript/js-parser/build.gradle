@@ -4,6 +4,11 @@ plugins {
 
 
 dependencies {
+    implementation(project(":js-declarations"))
+
+    implementation(project(":ast-common"))
+
+
     //https://mvnrepository.com/artifact/org.graalvm.js/js
     compile group: 'org.graalvm.js', name: 'js', version: gradle.graaljsVersion
 }
