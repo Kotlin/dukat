@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":ts-model"))
     implementation(project(":idl-lowerings"))
     implementation(project(":ts-lowerings"))
+    implementation(project(":js-parser"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
