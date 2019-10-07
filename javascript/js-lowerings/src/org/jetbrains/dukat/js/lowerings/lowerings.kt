@@ -8,68 +8,79 @@ import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.JSParameterDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
-private val ANY_NULLABLE_TYPE = TypeValueModel(
-        IdentifierEntity("Any"),
-        emptyList<TypeParameterModel>(),
-        null,
-        true
-)
 
-fun JSParameterDeclaration.convert(): ParameterModel {
-    return ParameterModel(
-            name = name,
-            type = ANY_NULLABLE_TYPE,
-            initializer = null,
-            vararg = vararg,
-            optional = false
+class JSModuleLowerer(private val moduleDeclaration: JSModuleDeclaration) {
+
+    private val moduleName = moduleDeclaration.name
+
+    private val ANY_NULLABLE_TYPE = TypeValueModel(
+            value = IdentifierEntity("Any"),
+            params = emptyList<TypeParameterModel>(),
+            metaDescription = null,
+            nullable = true
     )
-}
 
-fun JSFunctionDeclaration.convert(): FunctionModel {
-    val parameterModels = mutableListOf<ParameterModel>()
-
-    for(jsParameter in parameters) {
-        parameterModels.add(jsParameter.convert())
+    private fun JSParameterDeclaration.convert(): ParameterModel {
+        return ParameterModel(
+                name = name,
+                type = ANY_NULLABLE_TYPE,
+                initializer = null,
+                vararg = vararg,
+                optional = false
+        )
     }
 
-    return FunctionModel(
-            name = name,
-            parameters = parameterModels,
-            type = ANY_NULLABLE_TYPE,
-            typeParameters = emptyList<TypeParameterModel>(),
+    private fun JSFunctionDeclaration.convert(): FunctionModel {
+        val parameterModels = mutableListOf<ParameterModel>()
 
-            annotations = mutableListOf<AnnotationModel>(),
+        for(jsParameter in parameters) {
+            parameterModels.add(jsParameter.convert())
+        }
 
-            export = true,
-            inline = false,
-            operator = false,
+        val annotations = mutableListOf(AnnotationModel(
+                name = "JsModule",
+                params = listOf(moduleName)
+        ))
 
-            extend = null,
-            body = emptyList<StatementModel>()
-    )
-}
+        return FunctionModel(
+                name = name,
+                parameters = parameterModels,
+                type = ANY_NULLABLE_TYPE,
+                typeParameters = emptyList<TypeParameterModel>(),
 
+                annotations = annotations,
 
-fun JSModuleDeclaration.convert(): SourceSetModel {
-    val moduleContents: MutableList<TopLevelModel> = mutableListOf()
+                export = true,
+                inline = false,
+                operator = false,
 
-    for(functionDeclaration in functions) {
-        moduleContents.add(functionDeclaration.convert())
+                extend = null,
+                body = emptyList<StatementModel>()
+        )
     }
 
-    val sourceFileModel = SourceFileModel(
-            name = null,
-            fileName = fileName,
-            root = ModuleModel(
-                    name = ROOT_PACKAGENAME,
-                    shortName = ROOT_PACKAGENAME,
-                    declarations = moduleContents,
-                    annotations = mutableListOf(),
-                    submodules = emptyList(),
-                    imports = mutableListOf()
-            ),
-            referencedFiles = emptyList()
-    )
+    fun lower() : SourceSetModel {
+        val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
-    return SourceSetModel("<IRRELEVANT>", listOf(sourceFileModel))
+        for(functionDeclaration in moduleDeclaration.functions) {
+            moduleContents.add(functionDeclaration.convert())
+        }
+
+        val sourceFileModel = SourceFileModel(
+                name = null,
+                fileName = moduleDeclaration.fileName,
+                root = ModuleModel(
+                        name = ROOT_PACKAGENAME,
+                        shortName = ROOT_PACKAGENAME,
+                        declarations = moduleContents,
+                        annotations = mutableListOf(),
+                        submodules = emptyList(),
+                        imports = mutableListOf()
+                ),
+                referencedFiles = emptyList()
+        )
+
+        return SourceSetModel("<IRRELEVANT>", listOf(sourceFileModel))
+    }
+
 }
