@@ -85,6 +85,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "unsignedshort" -> "Short"
                 "boolean" -> "Boolean"
                 "ByteString" -> "String"
+                "CSSOMString" -> "String"
                 "DOMString" -> "String"
                 "String" -> "String"
                 "USVString" -> "String"
@@ -94,6 +95,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                 "Promise" -> "Promise"
                 "object" -> "dynamic"
                 "DOMError" -> "dynamic"
+                "record" -> "dynamic"
                 "\$dynamic" -> "dynamic"
                 "any" -> "Any"
                 else -> name

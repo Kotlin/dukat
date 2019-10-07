@@ -29,7 +29,7 @@ import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
-import org.jetbrains.dukat.tsLowerings.resolvePartials
+import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
@@ -49,7 +49,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
     fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return sourceSet
                 .filterOutNonDeclarations()
-                .resolvePartials()
+                .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
                 .eliminateStringType()

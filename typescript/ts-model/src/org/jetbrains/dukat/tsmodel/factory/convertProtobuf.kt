@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.factory
 
 import dukat.ast.proto.Declarations
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -70,12 +71,16 @@ fun Declarations.ModifierDeclarationProto.convert(): ModifierDeclaration {
     return ModifierDeclaration(token)
 }
 
+fun <T : Entity> Declarations.ReferenceEntityProto.convert(): ReferenceEntity<T> {
+    return ReferenceEntity(uid)
+}
+
 fun Declarations.HeritageClauseDeclarationProto.convert(): HeritageClauseDeclaration {
     return HeritageClauseDeclaration(
-        name.convert(),
-        typeArgumentsList.map { it.convert() },
-        extending,
-        if (hasTypeReference()) ReferenceEntity(typeReference.uid) else null
+            name.convert(),
+            typeArgumentsList.map { it.convert() },
+            extending,
+            if (hasTypeReference()) typeReference.convert() else null
     )
 }
 
@@ -96,28 +101,28 @@ fun Declarations.InterfaceDeclarationProto.convert(): InterfaceDeclaration {
             membersList.map { it.convert() },
             typeParametersList.map { it.convert() },
             parentEntitiesList.map { it.convert() },
-            definitionsInfoList.map { DefinitionInfoDeclaration(it.fileName) } ,
+            definitionsInfoList.map { DefinitionInfoDeclaration(it.fileName) },
             uid
     )
 }
 
 fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
     return FunctionDeclaration(
-        name,
-        parametersList.map { it.convert() },
-        type.convert(),
-        typeParametersList.map { it.convert() },
-        modifiersList.map { it.convert() },
-        uid
+            name,
+            parametersList.map { it.convert() },
+            type.convert(),
+            typeParametersList.map { it.convert() },
+            modifiersList.map { it.convert() },
+            uid
     )
 }
 
 fun Declarations.TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
     return TypeAliasDeclaration(
-        aliasName.convert(),
-        typeParametersList.map { it.convert() },
-        typeReference.convert(),
-        uid
+            aliasName.convert(),
+            typeParametersList.map { it.convert() },
+            typeReference.convert(),
+            uid
     )
 }
 
@@ -152,43 +157,34 @@ fun Declarations.ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration
 }
 
 fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
-    return if (hasClassDeclaration()) {
-        classDeclaration.convert()
-    } else if (hasInterfaceDeclaration()) {
-        interfaceDeclaration.convert()
-    } else if (hasFunctionDeclaration()) {
-        functionDeclaration.convert()
-    } else if (hasAliasDeclaration()) {
-        aliasDeclaration.convert()
-    } else if (hasVariableDeclaration()) {
-        variableDeclaration.convert()
-    } else if (hasEnumDeclaration()) {
-        enumDeclaration.convert()
-    } else if (hasModuleDeclaration()) {
-        moduleDeclaration.convert()
-    } else if (hasExportAssignment()) {
-        exportAssignment.convert()
-    } else if (hasImportEquals()) {
-        importEquals.convert()
-    } else {
-        throw Exception("unknown TopLevelEntity: ${this}")
+    return when {
+        hasClassDeclaration() -> classDeclaration.convert()
+        hasInterfaceDeclaration() -> interfaceDeclaration.convert()
+        hasFunctionDeclaration() -> functionDeclaration.convert()
+        hasAliasDeclaration() -> aliasDeclaration.convert()
+        hasVariableDeclaration() -> variableDeclaration.convert()
+        hasEnumDeclaration() -> enumDeclaration.convert()
+        hasModuleDeclaration() -> moduleDeclaration.convert()
+        hasExportAssignment() -> exportAssignment.convert()
+        hasImportEquals() -> importEquals.convert()
+        else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
 }
 
 fun Declarations.PropertyDeclarationProto.convert(): PropertyDeclaration {
     return PropertyDeclaration(
-        name,
-        type.convert(),
-        typeParametersList.map { it.convert() },
-        optional,
-        modifiersList.map { it.convert() }
+            name,
+            type.convert(),
+            typeParametersList.map { it.convert() },
+            optional,
+            modifiersList.map { it.convert() }
     )
 }
 
 fun Declarations.IndexSignatureDeclarationProto.convert(): IndexSignatureDeclaration {
     return IndexSignatureDeclaration(
-        indexTypesList.map { it.convert() },
-        returnType.convert()
+            indexTypesList.map { it.convert() },
+            returnType.convert()
     )
 }
 
@@ -220,9 +216,9 @@ fun Declarations.MemberEntityProto.convert(): MemberEntity {
 
 fun Declarations.ConstructorDeclarationProto.convert(): ConstructorDeclaration {
     return ConstructorDeclaration(
-        parametersList.map { it.convert() },
-        typeParametersList.map { it.convert() },
-        modifiersList.map { it.convert() }
+            parametersList.map { it.convert() },
+            typeParametersList.map { it.convert() },
+            modifiersList.map { it.convert() }
     )
 }
 
@@ -251,7 +247,13 @@ private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterD
 
 
 private fun Declarations.TypeDeclarationProto.convert(): TypeDeclaration {
-    return TypeDeclaration(value.convert(), paramsList.map { it.convert() }, ReferenceEntity(typeReference.uid))
+    return TypeDeclaration(
+            value.convert(),
+            paramsList.map { it.convert() },
+            if (hasTypeReference()) {
+                typeReference.convert()
+            } else null
+    )
 }
 
 private fun Declarations.ParameterDeclarationProto.convert(): ParameterDeclaration {
@@ -267,40 +269,33 @@ private fun Declarations.ParameterDeclarationProto.convert(): ParameterDeclarati
 }
 
 private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValueDeclaration {
-    return if (hasStringLiteral()) {
-        StringLiteralDeclaration(stringLiteral.token)
-    } else if (hasThisType()) {
-        ThisTypeDeclaration()
-    } else if (hasGeneratedInterfaceReference()) {
-        GeneratedInterfaceReferenceDeclaration(generatedInterfaceReference.name.convert(), generatedInterfaceReference.typeParametersList.map { it.convert() })
-    } else if (hasIntersectionType()) {
-        IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
-    } else if (hasTupleDeclaration()) {
-        TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
-    } else if (hasUnionType()) {
-        UnionTypeDeclaration(unionType.paramsList.map { it.convert() })
-    } else if (hasTypeDeclaration()) {
-        with(typeDeclaration) {
+    return when {
+        hasStringLiteral() -> StringLiteralDeclaration(stringLiteral.token)
+        hasThisType() -> ThisTypeDeclaration()
+        hasGeneratedInterfaceReference() -> GeneratedInterfaceReferenceDeclaration(generatedInterfaceReference.name.convert(), generatedInterfaceReference.typeParametersList.map { it.convert() })
+        hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
+        hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
+        hasUnionType() -> UnionTypeDeclaration(unionType.paramsList.map { it.convert() })
+        hasTypeDeclaration() -> with(typeDeclaration) {
             TypeDeclaration(
                     value.convert(),
                     paramsList.map { it.convert() },
-                    ReferenceEntity(typeReference.uid)
+                    if (typeDeclaration.hasTypeReference()) typeReference.convert() else null
             )
         }
-    } else if (hasObjectLiteral()) {
-        val objectLiteral = objectLiteral
-        ObjectLiteralDeclaration(
-                objectLiteral.membersList.map { it.convert() }
-        )
-    } else if (hasFunctionTypeDeclaration()) {
-        with(functionTypeDeclaration) {
+        hasObjectLiteral() -> {
+            val objectLiteral = objectLiteral
+            ObjectLiteralDeclaration(
+                    objectLiteral.membersList.map { it.convert() }
+            )
+        }
+        hasFunctionTypeDeclaration() -> with(functionTypeDeclaration) {
             FunctionTypeDeclaration(
                     parametersList.map { it.convert() },
                     type.convert()
             )
         }
-    } else {
-        throw Exception("unknown ParameterValueDeclarationProto ${this}")
+        else -> throw Exception("unknown ParameterValueDeclarationProto ${this}")
     }
 }
 
