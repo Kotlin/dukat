@@ -5,6 +5,8 @@ import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
+import org.jetbrains.dukat.js.declarations.JSParameterDeclaration
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 private val ANY_NULLABLE_TYPE = TypeValueModel(
         IdentifierEntity("Any"),
@@ -13,17 +15,21 @@ private val ANY_NULLABLE_TYPE = TypeValueModel(
         true
 )
 
+fun JSParameterDeclaration.convert(): ParameterModel {
+    return ParameterModel(
+            name = name,
+            type = ANY_NULLABLE_TYPE,
+            initializer = null,
+            vararg = vararg,
+            optional = false
+    )
+}
+
 fun JSFunctionDeclaration.convert(): FunctionModel {
     val parameterModels = mutableListOf<ParameterModel>()
 
-    for(parameterName in parameters) {
-        parameterModels.add(ParameterModel(
-                name = parameterName,
-                type = ANY_NULLABLE_TYPE,
-                initializer = null,
-                vararg = false,
-                optional = false
-        ))
+    for(jsParameter in parameters) {
+        parameterModels.add(jsParameter.convert())
     }
 
     return FunctionModel(
@@ -52,11 +58,11 @@ fun JSModuleDeclaration.convert(): SourceSetModel {
     }
 
     val sourceFileModel = SourceFileModel(
-            name = name,
+            name = null,
             fileName = fileName,
             root = ModuleModel(
-                    name = name,
-                    shortName = name,
+                    name = ROOT_PACKAGENAME,
+                    shortName = ROOT_PACKAGENAME,
                     declarations = moduleContents,
                     annotations = mutableListOf(),
                     submodules = emptyList(),
@@ -65,5 +71,5 @@ fun JSModuleDeclaration.convert(): SourceSetModel {
             referencedFiles = emptyList()
     )
 
-    return SourceSetModel(fileName, listOf(sourceFileModel))
+    return SourceSetModel("<IRRELEVANT>", listOf(sourceFileModel))
 }

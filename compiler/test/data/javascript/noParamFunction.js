@@ -1,5 +1,5 @@
 var counter = 0;
 
-exports = function bar() {
+exports = function fooNoParams() {
     return counter++;
 };

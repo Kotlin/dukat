@@ -7,4 +7,5 @@ dependencies {
 
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
+    implementation(project(":translator"))
 }

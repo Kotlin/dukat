@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.tests.core
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.translator.JSModuleTranslator
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
@@ -28,6 +29,6 @@ class JSTests : OutputTests() {
             return fileSetWithDescriptors("./test/data/javascript")
         }
 
-        val translator: InputTranslator<String> = JSModuleTranslator()
+        val translator: InputTranslator<String> = JSModuleTranslator(ConstNameResolver())
     }
 }

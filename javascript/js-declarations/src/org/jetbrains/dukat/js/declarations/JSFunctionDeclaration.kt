@@ -4,5 +4,5 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class JSFunctionDeclaration(
         val name: IdentifierEntity,
-        val parameters: List<String>
+        val parameters: List<JSParameterDeclaration>
 )

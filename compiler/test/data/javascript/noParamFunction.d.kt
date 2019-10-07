@@ -1,4 +1,2 @@
-package test
 
-
-external fun bar(): Any?
+external fun fooNoParams(): Any?

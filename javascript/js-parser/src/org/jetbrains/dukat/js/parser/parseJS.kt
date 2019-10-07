@@ -8,6 +8,7 @@ import com.oracle.js.parser.ir.*
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.declarations.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
+import org.jetbrains.dukat.js.declarations.JSParameterDeclaration
 import java.io.File
 
 private fun getBodyOfJSFile(fileName: String) : Block {
@@ -45,16 +46,23 @@ private fun Block.getExportsFromJSBody() : Expression? {
     return null
 }
 
+private fun IdentNode.toJSParameterDeclaration() : JSParameterDeclaration {
+    return JSParameterDeclaration(
+            name = name,
+            vararg = false //TODO
+    )
+}
+
 private fun FunctionNode.toJSFunctionDeclaration() : JSFunctionDeclaration {
-    val parameterNames = mutableListOf<String>()
+    val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
 
     for(parameter in parameters) {
-        parameterNames.add(parameter.name)
+        parameterDeclarations.add(parameter.toJSParameterDeclaration())
     }
 
     return JSFunctionDeclaration(
             name = IdentifierEntity(name),
-            parameters = parameterNames
+            parameters = parameterDeclarations
     )
 }
 
@@ -65,7 +73,7 @@ private fun Expression.getFunctions() : List<JSFunctionDeclaration> {
     }
 }
 
-fun parseJS(fileName: String): JSModuleDeclaration {
+fun parseJS(moduleName: String, fileName: String): JSModuleDeclaration {
     val scriptBody = getBodyOfJSFile(fileName)
 
     val exports = scriptBody.getExportsFromJSBody()
@@ -73,7 +81,7 @@ fun parseJS(fileName: String): JSModuleDeclaration {
     val functions : List<JSFunctionDeclaration> = exports?.getFunctions() ?: emptyList()
 
     return JSModuleDeclaration(
-            name = IdentifierEntity("test"),
+            name = IdentifierEntity(moduleName),
             fileName = fileName,
             functions = functions
     )
