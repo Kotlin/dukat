@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
@@ -46,26 +47,24 @@ private class ItemArrayLikeLowering : IDLLowering {
                         readOnly = true,
                         override = false
                 )),
-                operations = listOf(IDLOperationDeclaration(
-                        name = "item",
-                        returnType = IDLSingleTypeDeclaration("any", null, false),
-                        arguments = listOf(IDLArgumentDeclaration(
-                                name = "index",
-                                type = IDLSingleTypeDeclaration("unsignedlong", null, false),
-                                defaultValue = null,
-                                optional = false,
-                                variadic = false
-                        )),
-                        static = false,
-                        override = false
-                )),
+                operations = listOf(),
                 primaryConstructor = null,
                 constructors = listOf(),
                 parents = listOf(),
                 extendedAttributes = listOf(
                         IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
                 ),
-                getters = listOf(),
+                getters = listOf(IDLGetterDeclaration(
+                        name = "item",
+                        valueType = IDLSingleTypeDeclaration("any", null, true),
+                        key = IDLArgumentDeclaration(
+                                name = "index",
+                                type = IDLSingleTypeDeclaration("unsignedlong", null, false),
+                                defaultValue = null,
+                                optional = false,
+                                variadic = false
+                        )
+                )),
                 setters = listOf(),
                 callback = false,
                 generated = true,

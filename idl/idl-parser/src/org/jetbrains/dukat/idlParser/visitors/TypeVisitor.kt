@@ -96,6 +96,11 @@ internal class TypeVisitor(private var name: String = "",
         return defaultResult()
     }
 
+    override fun visitRecordType(ctx: WebIDLParser.RecordTypeContext): IDLTypeDeclaration {
+        name = ctx.getFirstValueOrNull()!!
+        return defaultResult()
+    }
+
     override fun visitTypeSuffix(ctx: WebIDLParser.TypeSuffixContext): IDLTypeDeclaration {
         val suffix = ctx.getFirstValueOrNull()
         if (suffix == "?") {
