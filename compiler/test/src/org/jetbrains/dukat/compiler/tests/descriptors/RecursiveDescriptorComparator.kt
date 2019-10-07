@@ -273,6 +273,16 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
             renderer = DEFAULT_RENDERER
         )
 
+        val RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY = Configuration(
+            checkPrimaryConstructors = true,
+            checkPropertyAccessors = true,
+            includeMethodsOfKotlinAny = false,
+            renderDeclarationsFromOtherModules = false,
+            checkFunctionContracts = true,
+            recursiveFilter = { true },
+            renderer = DEFAULT_RENDERER
+        )
+
         private val KOTLIN_ANY_METHOD_NAMES = ImmutableSet.of("equals", "hashCode", "toString")
 
         private fun printEffectsIfAny(functionDescriptor: FunctionDescriptor, printer: Printer) {

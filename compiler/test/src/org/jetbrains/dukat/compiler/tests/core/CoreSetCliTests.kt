@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.tests.core
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
@@ -41,6 +42,7 @@ class CoreSetCliTests {
     }
 
 
+    @UseExperimental(UnstableDefault::class)
     protected fun assertContentEqualsBinary(
             descriptor: String,
             tsPath: String,
