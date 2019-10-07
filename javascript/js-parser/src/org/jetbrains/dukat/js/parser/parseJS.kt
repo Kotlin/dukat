@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.jsParser
+package org.jetbrains.dukat.js.parser
 
 import com.oracle.js.parser.ErrorManager
 import com.oracle.js.parser.Parser
@@ -6,7 +6,7 @@ import com.oracle.js.parser.ScriptEnvironment
 import com.oracle.js.parser.Source
 import com.oracle.js.parser.ir.*
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.jsDeclarations.JSModuleDeclaration
+import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import java.io.File
 
 fun parseJS(fileName: String): JSModuleDeclaration {

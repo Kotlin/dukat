@@ -1,10 +1,10 @@
-package org.jetbrains.dukat.jsLowerings
+package org.jetbrains.dukat.js.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.jsDeclarations.JSModuleDeclaration
+import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 
 fun JSModuleDeclaration.convert(): SourceSetModel {
     val moduleDeclarations: MutableList<TopLevelModel> = mutableListOf()

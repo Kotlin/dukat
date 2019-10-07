@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.jsDeclarations
+package org.jetbrains.dukat.js.declarations
 
 import org.jetbrains.dukat.astCommon.NameEntity
 

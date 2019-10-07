@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.jsParser.parseJS
-import org.jetbrains.dukat.jsLowerings.convert
+import org.jetbrains.dukat.js.parser.parseJS
+import org.jetbrains.dukat.js.lowerings.convert
 import org.jetbrains.dukat.astModel.*
 
 
