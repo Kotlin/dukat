@@ -1,7 +1,8 @@
 package org.jetbrains.dukat.js.declarations
 
-import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 data class JSFunctionDeclaration(
-        val name: NameEntity
+        val name: IdentifierEntity,
+        val parameters: List<String>
 )

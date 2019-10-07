@@ -1,23 +1,35 @@
 package org.jetbrains.dukat.js.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.js.declarations.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 
-fun JSModuleDeclaration.convert(): SourceSetModel {
-    val moduleDeclarations: MutableList<TopLevelModel> = mutableListOf()
+private val ANY_NULLABLE_TYPE = TypeValueModel(
+        IdentifierEntity("Any"),
+        emptyList<TypeParameterModel>(),
+        null,
+        true
+)
 
-    moduleDeclarations.add(FunctionModel(
-            name = IdentifierEntity("myFirstGeneratedFun"),
-            parameters = emptyList<ParameterModel>(),
-            type = TypeValueModel(
-                    IdentifierEntity("Unit"),
-                    emptyList<TypeParameterModel>(),
-                    null,
-                    false
-            ),
+fun JSFunctionDeclaration.convert(): FunctionModel {
+    val parameterModels = mutableListOf<ParameterModel>()
+
+    for(parameterName in parameters) {
+        parameterModels.add(ParameterModel(
+                name = parameterName,
+                type = ANY_NULLABLE_TYPE,
+                initializer = null,
+                vararg = false,
+                optional = false
+        ))
+    }
+
+    return FunctionModel(
+            name = name,
+            parameters = parameterModels,
+            type = ANY_NULLABLE_TYPE,
             typeParameters = emptyList<TypeParameterModel>(),
 
             annotations = mutableListOf<AnnotationModel>(),
@@ -28,16 +40,24 @@ fun JSModuleDeclaration.convert(): SourceSetModel {
 
             extend = null,
             body = emptyList<StatementModel>()
-    ))
+    )
+}
 
+
+fun JSModuleDeclaration.convert(): SourceSetModel {
+    val moduleContents: MutableList<TopLevelModel> = mutableListOf()
+
+    for(functionDeclaration in functions) {
+        moduleContents.add(functionDeclaration.convert())
+    }
 
     val sourceFileModel = SourceFileModel(
-            name = this.name,
-            fileName = this.fileName,
+            name = name,
+            fileName = fileName,
             root = ModuleModel(
-                    name = this.name,
-                    shortName = this.name,
-                    declarations = moduleDeclarations,
+                    name = name,
+                    shortName = name,
+                    declarations = moduleContents,
                     annotations = mutableListOf(),
                     submodules = emptyList(),
                     imports = mutableListOf()
@@ -45,5 +65,5 @@ fun JSModuleDeclaration.convert(): SourceSetModel {
             referencedFiles = emptyList()
     )
 
-    return SourceSetModel(this.fileName, listOf(sourceFileModel))
+    return SourceSetModel(fileName, listOf(sourceFileModel))
 }
