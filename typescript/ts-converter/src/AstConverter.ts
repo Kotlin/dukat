@@ -37,7 +37,7 @@ export class AstConverter {
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
 
-    private resources = new ResourceFetcher(this.sourceFileFetcher).build(this.sourceName);
+    private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
     private libVisitor = new LibraryDeclarationsVisitor(
       this.resources,
@@ -110,7 +110,7 @@ export class AstConverter {
     createSourceSet(fileName: string): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
 
-        this.resources.forEach(resource => {
+        this.resources.forEachReference(resource => {
             sources.push(this.createSourceFileDeclaration(resource))
         });
 

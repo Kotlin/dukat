@@ -19,11 +19,10 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptFileNames(): string[] {
-        var res: string[] = [];
+        const res: string[] = [];
 
         this.knownFiles.forEach((v1, v2, s) => {
-            let item = v1;
-            res.push(item);
+            res.push(v1);
         });
 
         return res;
@@ -42,7 +41,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
-        var contents = this.fileResolver.resolve(fileName);
+        const contents = this.fileResolver.resolve(fileName);
         return ts.ScriptSnapshot.fromString(contents);
     }
 
