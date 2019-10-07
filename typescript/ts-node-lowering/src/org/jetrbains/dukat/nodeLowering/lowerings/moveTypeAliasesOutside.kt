@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.visitors.visitTopLevelNode
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.rightMost
@@ -34,15 +35,16 @@ private fun SourceSetNode.transformTopLevelNode(visit: (TopLevelEntity, Document
 
 private typealias AliasBuckets = Map<AliasInfo, List<TypeAliasNode>>
 
-private data class AliasInfo(val name: NameEntity, val sourceFile: String)
+private data class AliasInfo(val name: NameEntity, val sourceFile: String, val packageName: NameEntity)
 
 private fun SourceSetNode.findTypeAliases(): AliasBuckets {
     val aliasBuckets = mutableMapOf<AliasInfo, MutableList<TypeAliasNode>>()
 
     visitTopLevelNode { node, ownerRoot, fileNode ->
         if (node.needToBeMoved(ownerRoot)) {
+            val name = IdentifierEntity("_aliases")
             aliasBuckets
-                    .getOrPut(AliasInfo(ownerRoot.qualifiedPackageName, fileNode.fileName)) { mutableListOf() }
+                    .getOrPut(AliasInfo(name, fileNode.fileName, ownerRoot.qualifiedPackageName)) { mutableListOf() }
                     .add((node as TypeAliasNode).copy())
         }
     }
@@ -65,7 +67,7 @@ fun SourceSetNode.moveTypeAliasesOutside(): SourceSetNode {
 
     return if (buckets.isNotEmpty()) {
         val newSources = buckets.map { (aliasInfo, aliases) ->
-            val packageName = aliasInfo.name
+            val packageName = aliasInfo.packageName
             SourceFileNode(
                     fileName = aliasInfo.sourceFile,
                     root = DocumentRootNode(
@@ -80,7 +82,8 @@ fun SourceSetNode.moveTypeAliasesOutside(): SourceSetNode {
                             jsQualifier = null,
                             uid = ""
                     ),
-                    referencedFiles = emptyList()
+                    referencedFiles = emptyList(),
+                    name = aliasInfo.name
             )
         }
         moduleWithoutAliases.copy(sources = newSources + moduleWithoutAliases.sources)

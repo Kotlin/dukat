@@ -16,14 +16,19 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface `T$0`<B> {
-    fun bar(a: Any): B
+    fun foo(a: Any): B
+}
+
+external interface `T$1`<T> {
+    fun bar(a: T): Boolean
 }
 
 external interface FooBazWithTypes<T> {
     fun <B> returnsB(b: B): `T$0`<B>
+    fun acceptsT(): `T$1`<T>
 }
 
-external interface `T$1`<T> {
+external interface `T$2`<T> {
     fun bar(a: Any): T
     var baz: Any?
         get() = definedExternally
@@ -34,15 +39,15 @@ external interface `T$1`<T> {
     var show: (overrideChecks: Boolean) -> Unit
 }
 
-external fun <T> withGenericObjectTypeParam(opt: `T$1`<T>)
+external fun <T> withGenericObjectTypeParam(opt: `T$2`<T>)
 
-external interface `T$2`<T> {
+external interface `T$3`<T> {
     var a: T
 }
 
-external interface `T$3`<T, S> {
+external interface `T$4`<T, S> {
     fun bar(a: Any): T
-    fun foo(t: `T$2`<T>)
+    fun foo(t: `T$3`<T>)
     fun foo(t: String)
     var baz: Any?
         get() = definedExternally
@@ -53,18 +58,33 @@ external interface `T$3`<T, S> {
     var show: (overrideChecks: Boolean) -> Unit
 }
 
-external fun <T, S> withDoublyGenericObjectTypeParam(opt: `T$3`<T, S>)
+external fun <T, S> withDoublyGenericObjectTypeParam(opt: `T$4`<T, S>)
 
-external interface `T$4`<S> {
+external interface `T$5`<S> {
     fun bar(a: Any): S
 }
 
-external fun <S> returnsGenericObjectType(): `T$4`<S>
+external fun <S> returnsGenericObjectType(): `T$5`<S>
 
 external var Tokens: Array<Any>
 
-external interface `T$5` {
+external interface `T$6` {
     var ping: () -> Boolean
 }
 
-external var PingableTokens: Array<`T$5`>
+external var PingableTokens: Array<`T$6`>
+
+external interface `T$7`<S, T> {
+    var source: S
+    var target: T
+}
+
+external interface `T$8`<S, T> {
+    fun handler(source: S, target: T): Boolean
+}
+
+external open class SomeSource<P, S> {
+    open fun ping(): P
+    open fun <T> withTarget(): `T$7`<S, T>
+    open fun <T> getTargetHandler(): `T$8`<S, T>
+}

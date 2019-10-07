@@ -8,5 +8,5 @@ data class VariableDeclaration(
         val type: ParameterValueDeclaration,
         val modifiers: List<ModifierDeclaration>,
 
-        val uid: String
-) : TopLevelDeclaration
+        override val uid: String
+) : TopLevelDeclaration, WithUidDeclaration

@@ -5,5 +5,5 @@ import org.jetbrains.dukat.astCommon.NameEntity
 data class ImportEqualsDeclaration(
         val name: String,
         val moduleReference: NameEntity,
-        val uid: String
-) : TopLevelDeclaration
+        override val uid: String
+) : TopLevelDeclaration, WithUidDeclaration

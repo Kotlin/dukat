@@ -11,7 +11,8 @@ import {
   ExportAssignmentDeclaration,
   Expression,
   FunctionDeclaration,
-  FunctionTypeDeclaration, HeritageClauseDeclaration,
+  FunctionTypeDeclaration,
+  HeritageClauseDeclaration,
   IdentifierEntity,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
@@ -169,8 +170,8 @@ export class AstFactory implements AstFactory {
     heritageClauseDeclaration.setTypeargumentsList(typeArguments);
     heritageClauseDeclaration.setExtending(extending);
 
-    if (heritageClauseDeclaration.hasTypereference()) {
-      heritageClauseDeclaration.setTypereference(typeReference)
+    if (typeReference != null) {
+      heritageClauseDeclaration.setTypereference(typeReference);
     }
 
     return heritageClauseDeclaration;
@@ -379,7 +380,7 @@ export class AstFactory implements AstFactory {
     typeDeclaration.setValue(value);
     typeDeclaration.setParamsList(params);
     if (typeReference != null) {
-      this.log.debug(`TYPE REFERENCE ${typeReference}`);
+      this.log.trace(`type reference for ${value} ${typeReference}`);
       typeDeclaration.setTypereference(typeReference);
     }
 
@@ -392,10 +393,11 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeParam(name: NameEntity, constraints: Array<ParameterValue>): TypeParameter {
+  createTypeParam(name: NameEntity, constraints: Array<ParameterValue>, defaultValue: ParameterValue | null): TypeParameter {
     let typeParam = new declarations.TypeParameterDeclarationProto();
     typeParam.setName(name);
     typeParam.setConstraintsList(constraints);
+    typeParam.setDefaultvalue(defaultValue);
     return typeParam;
   }
 

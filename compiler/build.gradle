@@ -12,15 +12,20 @@ buildscript {
 plugins {
     id("kotlin")
     id("com.moowork.node")
+    id("kotlinx-serialization")
 }
 
 configurations {
     toDownload
+    kotlinJsLibs
 }
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+def DEF_TYPE_CHANGESET = '31929c09c7b4490f87766206b412da4a6a581dc3'
+def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/DefinitelyTyped-${DEF_TYPE_CHANGESET}/types"
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
@@ -28,6 +33,7 @@ dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ts-ast-declarations"))
     implementation(project(":ast-model"))
+    implementation(project(":descriptors"))
     implementation(project(":idl-declarations"))
     implementation(project(":idl-models"))
     implementation(project(":idl-parser"))
@@ -63,9 +69,15 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}"
 
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
-    testImplementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
+    implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
+
+    testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}"
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
+
+    testImplementation(project(":cli"))
+
+    kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 
     toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
@@ -96,13 +108,18 @@ task download(type: Copy) {
     rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
 }
 
+task downloadDist(type: Copy) {
+    from configurations.toDownload
+    into "$rootDir/compiler/dist/kotlinc/lib"
+    rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
+}
+
 
 task downloadDefinitelyTyped(type: Download) {
     onlyIfModified true
     overwrite false
-    def version = '31929c09c7b4490f87766206b412da4a6a581dc3'
-    src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${version}.zip"
-    dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${version}.zip")
+    src "https://github.com/DefinitelyTyped/DefinitelyTyped/archive/${DEF_TYPE_CHANGESET}.zip"
+    dest new File(rootProject.gradle.gradleUserHomeDir, "DefinitelyTyped-${DEF_TYPE_CHANGESET}.zip")
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
@@ -111,6 +128,7 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
 }
 
 test.dependsOn(download)
+test.dependsOn(downloadDist)
 
 task generateBinary(type: NodeTask) {
     def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
@@ -140,13 +158,24 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
+task extractKoltinJsLibs(type: Copy) {
+    configurations.kotlinJsLibs.each {
+        from it.absolutePath
+    }
+    into "${project.buildDir}/kotlinHome"
+    rename { String fileName ->
+        return fileName.replace("-${gradle.kotlinVersion}.jar", ".jar")
+    }
+}
+
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
-test.dependsOn = [generateBinary]
+test.dependsOn = [generateBinary, fetchDefinitelyTyped, extractKoltinJsLibs, ":node-package:nodeEnv", ":node-package:buildDistrib"]
 
 test {
     [
             "dukat.test.extended",
+            "dukat.test.cli",
             "dukat.test.failure.always"
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
@@ -154,5 +183,18 @@ test {
         }
     }
 
-    systemProperty("dukat.test.resources.definitelyTyped", "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped")
+    [
+            "org.slf4j.simpleLogger.defaultLogLevel",
+            "dukat.test.definitelyTyped.repexp",
+    ].forEach { String projectProperty ->
+        if (project.hasProperty(projectProperty)) {
+            systemProperty(projectProperty, project.getProperty(projectProperty))
+        }
+    }
+
+    systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
+
+    testLogging {
+        showStandardStreams = true
+    }
 }

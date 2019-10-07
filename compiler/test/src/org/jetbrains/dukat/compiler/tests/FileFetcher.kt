@@ -21,7 +21,7 @@ abstract class FileFetcher {
 
             val tsPath = file.normalize().absolutePath
             val ktPath = tsPath.replace(postfix, ".d.kt")
-            val descriptor = file.relativeTo(rootFolder).path.replace(path, "").replace(postfix, "")
+            val descriptor = file.relativeTo(rootFolder).path.removeSuffix(postfix)
 
             if (!file.name.startsWith("_")) {
                 arrayOf(

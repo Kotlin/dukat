@@ -1,51 +1,39 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
-import org.jetbrains.dukat.compiler.tests.FileFetcher
-import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translatorString.translateModule
-import org.jetbrains.dukat.ts.translator.createJsFileTranslator
+import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-class CompilationTests : OutputTests() {
+abstract class CompilationTests {
 
-    override fun getTranslator(): InputTranslator<String> = translator
+    private fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
-    @DisplayName("core test set compile")
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("extendedSet")
-    @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
-    fun withValueSourceCompiled(
-            name: String,
-            tsPath: String,
-            @Suppress("UNUSED_PARAMETER") ktPath: String
-    ) {
-        assertContentCompiles(name, tsPath)
-    }
+    abstract fun runTests(
+            descriptor: String,
+            sourcePath: String
+    )
 
+    protected fun compile(sources: List<String>, targetPath: String): ExitCode {
 
-    private fun compile(sourcePath: String, targetPath: String): ExitCode {
         val options =
                 K2JSCompilerArguments().apply {
                     outputFile = targetPath
                     metaInfo = false
                     sourceMap = false
-                    kotlinHome = "./build"
+                    noStdlib = true
+                    libraries = listOf(
+                            "./build/kotlinHome/kotlin-stdlib-js.jar"
+                    ).joinToString(File.pathSeparator)
                 }
 
-        options.freeArgs = listOf(sourcePath)
+        options.freeArgs = sources
+
         return K2JSCompiler().exec(
                 CompileMessageCollector(),
                 Services.EMPTY,
@@ -53,57 +41,33 @@ class CompilationTests : OutputTests() {
         )
     }
 
+    companion object {
+        val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
+        val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
+    }
 
-    private fun assertContentCompiles(
-            @Suppress("UNUSED_PARAMETER") descriptor: String,
-            tsPath: String
+    protected fun assertContentCompiles(
+            descriptor: String,
+            sourcePath: String
     ) {
-        val translated = translateModule(tsPath, translator)
-        val outputDirectory = File("./build/tests/out")
-        outputDirectory.mkdirs()
 
-        val sourceFile = File(tsPath)
-        val targetDir =
-                File(outputDirectory, sourceFile.parentFile.absolutePath.removePrefix(pathToTypes))
+        val targetPath = "./build/tests/compiled/${descriptor}"
+        val targetDir = File("./build/tests/compiled/${descriptor}")
 
-        val mainTargetName = sourceFile.name.removeSuffix(".d.ts") + ".kt"
+        getTranslator().translate(sourcePath, targetPath)
+        val outSource = "${targetPath}/${descriptor}.js"
 
-        targetDir.mkdirs()
+        val sources = targetDir.walk().map { it.absolutePath }.toList()
 
-        val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
+        assert(sources.isNotEmpty()) { "$FILE_NOT_FIND_ASSERTION: $targetPath" }
 
-        if (failedTranslations.isNotEmpty()) {
-            throw Exception("translation failed")
-        }
-
-        val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
-
-        units.forEach { (name, _, _, content) ->
-            val targetName = "${name}.kt"
-            val resolvedTarget = targetDir.resolve(targetName)
-
-            resolvedTarget.writeText(content)
-        }
-
-        val targetPath = targetDir.resolve(mainTargetName).absolutePath
-        assertEquals(ExitCode.OK,
+        assertEquals(
+                ExitCode.OK,
                 compile(
-                        targetPath,
-                        targetPath.replace(".kt", ".js")
-                ))
+                        sources,
+                        outSource
+                ), COMPILATION_ERROR_ASSERTION
+        )
     }
 
-    companion object : FileFetcher() {
-
-        override val postfix = ".d.ts"
-
-        val translator: InputTranslator<String> = createJsFileTranslator(ConstNameResolver(), SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
-        val pathToTypes = System.getProperty("dukat.test.resources.definitelyTyped")
-
-        @JvmStatic
-        fun extendedSet(): Array<Array<String>> {
-            return fileSetWithDescriptors(pathToTypes)
-        }
-
-    }
 }

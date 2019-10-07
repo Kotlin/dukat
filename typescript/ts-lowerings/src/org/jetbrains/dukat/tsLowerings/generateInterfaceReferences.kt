@@ -30,7 +30,6 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-import org.jetbrains.dukat.tsmodel.types.isSimpleType
 
 internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
     return when (this) {
@@ -47,7 +46,7 @@ internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
         is PropertyDeclaration -> typeParameters
         is TupleDeclaration -> emptyList()
         is TypeDeclaration -> emptyList()
-        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList()) }
+        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList(), null) }
         is UnionTypeDeclaration -> emptyList()
         is VariableDeclaration -> emptyList()
         else -> raiseConcern("unknown Entity ${this}") { emptyList<TypeParameterDeclaration>() };

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CompilationTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+  <configuration default="false" name="DefinitelyTypedCompilationTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <module name="compiler_test" />
     <extension name="coverage">
       <pattern>
@@ -8,10 +8,10 @@
       </pattern>
     </extension>
     <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.extended" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.CompilationTests" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.DefinitelyTypedCompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.failure.always=true -Ddukat.test.jsbackend.graal=true -Ddukat.test.extended=true -Ddukat.test.resources.definitelyTyped=$USER_HOME$/.gradle/definitelyTyped/DefinitelyTyped-10aca630788ef193f994ac31de63ea9cf44630a3/types" />
+    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended=true -Ddukat.test.resources.definitelyTyped=$USER_HOME$/.gradle/definitelyTyped/DefinitelyTyped-31929c09c7b4490f87766206b412da4a6a581dc3/types" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">

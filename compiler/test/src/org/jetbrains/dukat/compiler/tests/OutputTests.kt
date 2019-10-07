@@ -13,16 +13,26 @@ import kotlin.test.assertEquals
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator<String>
 
-    companion object {
-        val DEFAULT_LIB_PATH = "../ts/build/package/node_modules/typescript/lib/lib.d.ts"
-        val NODE_PATH = "node"
-        val SOURCE_PATH = "../ts/build/bundle/converter.js"
-    }
-
     init {
         if (System.getProperty("dukat.test.failure.always") == "true") {
             setPanicMode(PanicMode.ALWAYS_FAIL)
         }
+    }
+
+    companion object {
+        val SEPARATOR: String = """
+
+// ------------------------------------------------------------------------------------------
+""".replace("\n", System.getProperty("line.separator"))
+
+        val SKIPPED_DECLARATIONS = setOf(
+                "jquery.d.ts",
+                "node-ffi-buffer.d.ts",
+                "ref-array.d.ts",
+                "ref.d.ts",
+                "Q.d.ts",
+                "_skippedReferenced.d.ts"
+        )
     }
 
     open fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
@@ -37,20 +47,9 @@ abstract class OutputTests {
         return if (units.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
-            val skipDeclarations = setOf(
-                    "jquery.d.ts",
-                    "node-ffi-buffer.d.ts",
-                    "ref-array.d.ts",
-                    "ref.d.ts",
-                    "Q.d.ts",
-                    "_skippedReferenced.d.ts"
-            )
             units.filter { (_, fileName, _, _) ->
-                !skipDeclarations.contains(File(fileName).name)
-            }.joinToString("""
-
-// ------------------------------------------------------------------------------------------
-""".replace("\n", System.getProperty("line.separator"))) { it.content }
+                !SKIPPED_DECLARATIONS.contains(File(fileName).name)
+            }.joinToString(SEPARATOR) { it.content }
         }
     }
 

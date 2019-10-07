@@ -2,14 +2,18 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.logger.Logging
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -26,14 +30,14 @@ private val logger = Logging.logger("TypeLowering")
 
 interface DeclarationTypeLowering : DeclarationLowering {
 
-    fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration {
+    fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberEntity>): PropertyDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
         )
     }
 
-    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
+    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberEntity>): ConstructorDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
@@ -42,7 +46,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration): CallSignatureDeclaration {
+    fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration, owner: NodeOwner<MemberEntity>): CallSignatureDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
@@ -52,21 +56,23 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): IndexSignatureDeclaration {
+    override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberEntity>): IndexSignatureDeclaration {
         return declaration.copy(
                 indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType) },
                 returnType = lowerParameterValue(declaration.returnType)
         );
     }
 
-    override fun lowerMemberDeclaration(declaration: MemberEntity): MemberEntity {
+    @Suppress("UNCHECKED_CAST")
+    override fun lowerMemberDeclaration(declaration: MemberEntity, owner: NodeOwner<ClassLikeDeclaration>): MemberEntity {
+        val newOwner = owner.wrap(declaration)
         return when (declaration) {
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-            is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
-            is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
-            is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration)
-            is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration)
-            is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration)
+            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, newOwner as NodeOwner<FunctionOwnerDeclaration>)
+            is PropertyDeclaration -> lowerPropertyDeclaration(declaration, newOwner)
+            is ConstructorDeclaration -> lowerConstructorDeclaration(declaration, newOwner)
+            is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration, newOwner)
+            is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration, newOwner)
+            is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration, newOwner)
             else -> {
                 logger.debug("[${this}] skipping ${declaration}")
                 declaration
@@ -74,7 +80,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         }
     }
 
-    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration {
+    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberEntity>): MethodSignatureDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
@@ -84,7 +90,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
@@ -125,7 +131,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+    override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>): VariableDeclaration {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
@@ -134,9 +140,9 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration {
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },
@@ -146,9 +152,9 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    override fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration {
+    override fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration {
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },
@@ -159,13 +165,13 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
     }
 
-    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration {
+    override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration, owner: NodeOwner<ModuleDeclaration>): TypeAliasDeclaration {
         return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
     }
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration {
+    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration {
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberDeclaration(member) },
+                members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageClause(heritageClause)
                 },

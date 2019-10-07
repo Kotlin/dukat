@@ -1,5 +1,6 @@
 plugins {
-    id "com.moowork.node"
+    id("base")
+    id("com.moowork.node")
 }
 
 def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
@@ -9,6 +10,7 @@ def DISTRIB_PATH = "${project.buildDir}/distrib"
 node {
     version = gradle.nodeVersion
     npmVersion = gradle.npmVersion
+    yarnVersion = gradle.yarnVersion
 
     nodeModulesDir = file(DISTRIB_PATH)
 
@@ -20,6 +22,8 @@ configurations {
 }
 
 task buildDistrib {
+    dependsOn = [":ts-converter:webpack"]
+
     doLast {
         copy {
             from "package.template.json"
@@ -62,6 +66,12 @@ task npmVersion(type: NpmTask) {
     }
     args = ["version", project.findProperty(PROPERTY_PACKAGE_VERSION) ?: "NEVER" ]
 }
+
+task nodeEnv(type: NodeTask) {
+    script = file("env.js")
+    args = ["${project.buildDir}/env.json"]
+}
+
 
 task npmPack(type: NpmTask) {
     dependsOn = [":cli:build", buildDistrib, npmVersion]

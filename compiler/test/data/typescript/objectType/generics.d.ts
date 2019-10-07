@@ -1,5 +1,6 @@
 interface FooBazWithTypes<T> {
-    returnsB<B>(b: B): { bar(a): B };
+    returnsB<B>(b: B): { foo(a): B };
+    acceptsT(): { bar(a: T): boolean };
 }
 declare function withGenericObjectTypeParam<T>(opt: {
     bar(a): T;
@@ -21,3 +22,9 @@ declare function returnsGenericObjectType<S>(): {
 
 declare var Tokens: Array<{}>;
 declare var PingableTokens: Array<{ping: () => boolean}>;
+
+declare class SomeSource<P, S> {
+    ping(): P;
+    withTarget<T>(): {source: S, target: T}
+    getTargetHandler<T>(): {handler(source: S, target: T): boolean }
+}

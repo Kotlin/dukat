@@ -2,9 +2,12 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -22,11 +25,11 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface DeclarationLowering {
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
-    fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration
-    fun lowerClassDeclaration(declaration: ClassDeclaration): ClassDeclaration
-    fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration): InterfaceDeclaration
-    fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration
+    fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>): VariableDeclaration
+    fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>): FunctionDeclaration
+    fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration
+    fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration
+    fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
@@ -34,10 +37,10 @@ interface DeclarationLowering {
     fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration
     fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(declaration: MemberEntity): MemberEntity
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MethodSignatureDeclaration
-    fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration): TypeAliasDeclaration
-    fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): IndexSignatureDeclaration
+    fun lowerMemberDeclaration(declaration: MemberEntity, owner: NodeOwner<ClassLikeDeclaration>): MemberEntity
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberEntity>): MethodSignatureDeclaration
+    fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration, owner: NodeOwner<ModuleDeclaration>): TypeAliasDeclaration
+    fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberEntity>): IndexSignatureDeclaration
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
@@ -51,34 +54,35 @@ interface DeclarationLowering {
     }
 
 
-    fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
+    fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassLikeDeclaration {
         return when (declaration) {
-            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration)
-            is ClassDeclaration -> lowerClassDeclaration(declaration)
-            is GeneratedInterfaceDeclaration -> lowerGeneratedInterfaceDeclaration(declaration)
+            is InterfaceDeclaration -> lowerInterfaceDeclaration(declaration, owner)
+            is ClassDeclaration -> lowerClassDeclaration(declaration, owner)
+            is GeneratedInterfaceDeclaration -> lowerGeneratedInterfaceDeclaration(declaration, owner)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity): TopLevelEntity {
+    @Suppress("UNCHECKED_CAST")
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): TopLevelEntity {
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(declaration)
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
-            is ModuleDeclaration -> lowerDocumentRoot(declaration)
-            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration)
+            is VariableDeclaration -> lowerVariableDeclaration(declaration, owner)
+            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner as NodeOwner<FunctionOwnerDeclaration>)
+            is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration, owner)
+            is ModuleDeclaration -> lowerDocumentRoot(declaration, owner)
+            is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration, owner)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<ModuleDeclaration>): List<TopLevelEntity> {
         return declarations.map { declaration ->
-            lowerTopLevelDeclaration(declaration)
+            lowerTopLevelDeclaration(declaration, owner)
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: ModuleDeclaration): ModuleDeclaration {
-        return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations))
+    fun lowerDocumentRoot(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration> = NodeOwner(documentRoot, null)): ModuleDeclaration {
+        return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations, NodeOwner(documentRoot, null)))
     }
 
 }

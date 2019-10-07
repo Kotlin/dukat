@@ -27,6 +27,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
+import org.jetbrains.dukat.ast.model.nodes.isUnit
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
@@ -434,7 +435,7 @@ private fun FunctionNode.resolveBody(): List<StatementModel> {
                     StatementCallModel(IdentifierEntity(nodeContext.name), nodeContext.params)
             )
 
-            listOf(if (type == TypeValueNode.UNIT) {
+            listOf(if (type.isUnit()) {
                 bodyStatement
             } else {
                 ReturnStatementModel(bodyStatement)
@@ -559,7 +560,7 @@ fun SourceSetNode.introduceModels() = SourceSetModel(
             val root = source.root.introduceModels(source.fileName, generated)
 
             val module = SourceFileModel(
-                    name = null,
+                    name = source.name,
                     fileName = fileName,
                     root = root,
                     referencedFiles = source.referencedFiles.map { referenceFile ->

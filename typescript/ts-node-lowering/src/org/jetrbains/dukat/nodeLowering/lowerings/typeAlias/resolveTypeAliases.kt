@@ -20,8 +20,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
             val resolved = context.resolveTypeAlias(parent)
 
             if (resolved is TypeValueNode) {
-                val typeNodeValue = resolved.value
-                when (typeNodeValue) {
+                when (val typeNodeValue = resolved.value) {
                     is IdentifierEntity -> HeritageNode(IdentifierEntity(typeNodeValue.value), emptyList())
                     else -> raiseConcern("unknown NameEntity $typeNodeValue") { parent }
                 }
@@ -37,6 +36,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
         return when (this) {
             is UnionTypeNode -> {
                 val paramsUnrolled = params.flatMap { param -> param.unroll() }
+                //TODO: investigate whether .toList().distinct is a better option
                 paramsUnrolled.toSet().toList()
             }
             else -> listOf(this)
@@ -69,9 +69,7 @@ private fun DocumentRootNode.registerTypeAliases(astContext: TypeAliasContext) {
             declaration.canBeTranslated = declaration.shouldBeTranslated()
 
             if (!declaration.canBeTranslated) {
-                astContext.registerTypeAlias(
-                        declaration.copy(typeReference = astContext.resolveTypeAlias(declaration.typeReference))
-                )
+                astContext.registerTypeAlias(declaration)
             }
         } else if (declaration is DocumentRootNode) {
             declaration.registerTypeAliases(astContext)

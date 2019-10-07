@@ -13,21 +13,17 @@ class CommonJsNameResolver : ModuleNameResolver {
             File(parentDir, "package.json").exists()
         }
 
-        val packageJsonOwnerOwner = packageJsonOwner?.let { File(it.parent) }
-        val isNodeModulesDir = packageJsonOwnerOwner?.name == "node_modules"
-        val isTypesDir = packageJsonOwnerOwner?.name == "@types" && packageJsonOwnerOwner.parentFile?.name == "node_modules"
-
-        if (isNodeModulesDir || isTypesDir) {
-            val packageJsonFile = File(packageJsonOwner, "package.json")
+        return packageJsonOwner?.let { jsonOwner ->
+            val packageJsonFile = File(jsonOwner, "package.json")
             val packageJsonContent = packageJsonFile.readText()
             val packageJson = Json.nonstrict.parse(PackageJsonModel.serializer(), packageJsonContent)
 
-            packageJson.name?.let { name ->
-                return name.removePrefix("@types/")
+            if (packageJson.name == null) {
+                jsonOwner.name
+            } else {
+                packageJson.name.removePrefix("@types/")
             }
         }
-
-        return null;
     }
 
     override fun resolveName(sourceName: String): String? {

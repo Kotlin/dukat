@@ -158,7 +158,6 @@ private fun process(args: List<String>): CliOptions? {
     var reportPath: String? = null
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
-
         when (arg) {
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)

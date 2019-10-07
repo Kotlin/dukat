@@ -10,7 +10,7 @@ def tsDeclarationsPath = ".tsdeclarations"
 node {
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
   version = gradle.nodeVersion
-  yarnVersion = '1.17.3'
+  yarnVersion = gradle.yarnVersion
 
   download = true
 
@@ -55,9 +55,8 @@ task webpack(type: NodeTask) {
   def scriptName = "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
 
   inputs.file(scriptName)
-  inputs.file("${project.buildDir}/ts/converter.js")
-  inputs.file("${project.buildDir}/ts/runtime.js")
   inputs.file("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js/Declarations_pb.js")
+  inputs.dir("${project.buildDir}/ts")
   inputs.dir("${project.buildDir}/package/node_modules")
 
   outputs.file("${project.buildDir}/bundle/converter.js")

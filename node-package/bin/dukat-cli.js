@@ -5,8 +5,7 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 require("../lib/converter");
 var Readable = require('stream').Readable;
-var fs = require("fs");
-var readline = require("readline");
+var EventEmitter = require('events');
 
 function isWin() {
     return process.platform == "win32";
@@ -48,7 +47,7 @@ function createReadable() {
 }
 
 function processArgs(args) {
-    var skip_2args = new Set(["-d", "-p", "-m", "r"]);
+    var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
     var count = 0;
 
     var packageName = "<ROOT>";
@@ -81,7 +80,6 @@ function processArgs(args) {
 function endsWith(str, postfix) {
     return str.lastIndexOf(postfix) == (str.length - postfix.length);
 }
-
 
 function cliMode(args) {
     var packageDir = path.resolve(__dirname, "..");
@@ -126,68 +124,13 @@ function cliMode(args) {
 
         return run("java", commandArgs);
     }
-}
 
-function eachLine(fileName, handler) {
-    var lineReader = readline.createInterface({
-        input: fs.createReadStream(fileName),
-        crlfDelay: Infinity
-    });
-
-    var count = 0;
-    lineReader.on("line", function (line) {
-        if (!/^\s*$/.test(line)) {
-            handler(line, count++);
-        }
-    });
-}
-
-
-var QUEUE = [];
-var CURRENTLY_RUNNING = 0;
-var POOL_SIZE = 32;
-
-function batchMode(batchFile) {
-    eachLine(batchFile, function(line, count) {
-        var args = line.split(" ");
-        console.log("[", count + 1, "] dukat", line);
-
-        QUEUE.push(args);
-        if (count === 0) {
-            queueMode();
-        }
-    });
-}
-
-function queueMode() {
-    if (QUEUE.length > 0) {
-        var args = QUEUE.pop();
-        if (Array.isArray(args)) {
-            console.log("PROCESSING ", args);
-            var proc = cliMode(args);
-            if (proc) {
-                CURRENTLY_RUNNING++;
-                proc.on("exit", function(exitCode) {
-                    proc.removeAllListeners();
-                    CURRENTLY_RUNNING--;
-                    console.log("EXITING ", proc.pid, exitCode);
-
-                    for (var i = 0; i <= (POOL_SIZE - CURRENTLY_RUNNING); i++) {
-                        queueMode();
-                    }
-                });
-            }
-        }
-    } else {
-        process.exit();
-    }
+    process.exit(1);
 }
 
 var main = function (args) {
-    if (Array.isArray(args) && (args[0] === "--batch")) {
-        batchMode(args[1]);
-    } else {
-        var childProcess = cliMode(args);
+    var childProcess = cliMode(args);
+    if (childProcess instanceof EventEmitter) {
         childProcess.on("exit", function() {
             process.exit();
         });

@@ -23,7 +23,7 @@ class ModuleResolverTests {
 
     @Test
     fun resolveModuleC() {
-        resolve("moduleC/lib/moduleC.d.ts", null)
+        resolve("moduleC/lib/moduleC.d.ts", "moduleC")
     }
 
     @Test
@@ -42,12 +42,17 @@ class ModuleResolverTests {
     }
 
     @Test
+    fun resolveDeeplyNested() {
+        resolve("deeply_nested/still_should_be_resolved/moduleE/some.d.ts", "moduleE")
+    }
+
+    @Test
     fun resolveModuleWithName() {
         resolve("whatever/path/we/pass.txt", "mylib", ConstNameResolver("mylib"))
     }
 
     private fun resolve(path: String, expected: String?, resolver: ModuleNameResolver = CommonJsNameResolver()) {
-        val prefix = "./test/data/node_modules"
+        val prefix = "./test/data/mode_nodules"
         val fullPath = File(prefix, path).absolutePath
         assertEquals(resolver.resolveName(fullPath), expected)
     }

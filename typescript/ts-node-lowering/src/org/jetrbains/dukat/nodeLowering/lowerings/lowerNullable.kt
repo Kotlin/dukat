@@ -27,8 +27,13 @@ private class LowerNullable : NodeTypeLowering {
         return when (declaration) {
             is UnionTypeNode -> {
                 val params = declaration.params.filter { param ->
-                    param != TypeValueNode(IdentifierEntity("undefined"), emptyList()) &&
-                            param != TypeValueNode(IdentifierEntity("null"), emptyList())
+                    when (param) {
+                        is TypeValueNode -> {
+                            val value = param.value
+                            value != IdentifierEntity("undefined") && value != IdentifierEntity("null")
+                        }
+                        else -> true
+                    }
                 }
 
                 if (params.size == 1) {

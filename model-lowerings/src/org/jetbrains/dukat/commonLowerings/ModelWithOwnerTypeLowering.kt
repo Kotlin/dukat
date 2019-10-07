@@ -12,6 +12,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -25,29 +26,31 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return ownerContext.node
     }
 
+
     fun lowerMethodModel(ownerContext: NodeOwner<MethodModel>): MethodModel {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
-                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)),
+                typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) }
         )
     }
 
     fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
+            type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)),
+            typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) }
         )
     }
 
     override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel {
-        val declaration = ownerContext.node
-        return when (declaration) {
+        return when (val declaration = ownerContext.node) {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
             else -> {
-                logger.debug("[${this}] skipping ${declaration}")
+                logger.trace("skipping $declaration")
                 declaration
             }
         }
@@ -57,7 +60,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
-                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
+                type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)),
+                typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) }
         )
     }
 
@@ -76,7 +80,10 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
 
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {
         val declaration = ownerContext.node
-        return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
+        return declaration.copy(
+            type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)),
+            typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) }
+        )
     }
 
     fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
@@ -91,8 +98,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members
-                = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
+                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
+                typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
                 }
@@ -119,6 +126,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
+                typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
                 }

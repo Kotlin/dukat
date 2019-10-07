@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -199,6 +200,21 @@ private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: Generated
     return members.isIdenticalTo(someInterface.members) { a, b -> a.isIdenticalTo(b) }
 }
 
+
+private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<NameEntity>): TypeParameterDeclaration? {
+    return when (this) {
+        is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList(), null) else null
+        else -> null
+    }
+}
+
+private fun ParameterValueDeclaration.resolveTypeParams(typeParamsSet: Set<NameEntity>, generatedTypeParams: LinkedHashSet<TypeParameterDeclaration>) {
+    findTypeParameterDeclaration(typeParamsSet)?.let {
+        generatedTypeParams.add(it)
+    }
+}
+
+
 class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<NameEntity, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
@@ -214,33 +230,25 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<NameEntity>): TypeParameterDeclaration? {
-        return when (this) {
-            is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList()) else null
-            else -> null
-        }
-    }
-
     internal fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<NameEntity>): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 
         declaration.members.forEach { member ->
             when (member) {
+                is CallSignatureDeclaration -> {
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
+                    member.type.resolveTypeParams(typeParamsSet, typeParams)
+                }
                 is PropertyDeclaration -> {
-                    member.type.findTypeParameterDeclaration(typeParamsSet)?.let {
-                        typeParams.add(it)
-                    }
+                    member.type.resolveTypeParams(typeParamsSet, typeParams)
                 }
                 is FunctionDeclaration -> {
-                    member.type.findTypeParameterDeclaration(typeParamsSet)?.let {
-                        typeParams.add(it)
-                    }
+                    member.type.resolveTypeParams(typeParamsSet, typeParams)
                 }
                 is MethodSignatureDeclaration -> {
-                    member.type.findTypeParameterDeclaration(typeParamsSet)?.let {
-                        typeParams.add(it)
-                    }
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
+                    member.type.resolveTypeParams(typeParamsSet, typeParams)
                 }
             }
         }
