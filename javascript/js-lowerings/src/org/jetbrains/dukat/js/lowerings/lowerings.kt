@@ -3,15 +3,17 @@ package org.jetbrains.dukat.js.lowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.js.declarations.JSFunctionDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
-import org.jetbrains.dukat.js.declarations.JSParameterDeclaration
+import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
+import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
+import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
-class JSModuleLowerer(private val moduleDeclaration: JSModuleDeclaration) {
+class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
-    private val moduleName = moduleDeclaration.name
+    private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
 
     private val ANY_NULLABLE_TYPE = TypeValueModel(
             value = IdentifierEntity("Any"),
@@ -43,7 +45,7 @@ class JSModuleLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         ))
 
         return FunctionModel(
-                name = name,
+                name = IdentifierEntity(name),
                 parameters = parameterModels,
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
@@ -59,11 +61,25 @@ class JSModuleLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
+    private fun JSInlineExportDeclaration.convert(): TopLevelModel {
+        return when(this.declaration) {
+            is JSFunctionDeclaration -> (this.declaration as JSFunctionDeclaration).convert()
+            else -> throw IllegalStateException("Export declaration with declaration of type <${this.javaClass}> not supported!")
+        }
+    }
+
+    private fun JSExportDeclaration.convert(): TopLevelModel {
+        return when(this) {
+            is JSInlineExportDeclaration -> this.convert()
+            else -> throw IllegalStateException("Export declaration of type <${this.javaClass}> not supported!")
+        }
+    }
+
     fun lower() : SourceSetModel {
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
-        for(functionDeclaration in moduleDeclaration.functions) {
-            moduleContents.add(functionDeclaration.convert())
+        for(exportDeclaration in moduleDeclaration.exportDeclarations) {
+            moduleContents.add(exportDeclaration.convert())
         }
 
         val sourceFileModel = SourceFileModel(
