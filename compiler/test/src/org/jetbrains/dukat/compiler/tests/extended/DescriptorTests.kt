@@ -2,14 +2,12 @@ package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.compiler.tests.core.Idl2KtTests
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
 import org.jetbrains.dukat.compiler.tests.descriptors.generatePackageDescriptor
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.descriptors.translateToDescriptors
-import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.idlReferenceResolver.EmptyReferencesResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
@@ -34,8 +32,7 @@ class DescriptorTests : OutputTests() {
 
     @Suppress("UNUSED_PARAMETER")
     private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
-        val sourceSet = IdlInputTranslator(EmptyReferencesResolver())
-            .translate(tsPath)
+        val sourceSet = translator.translate(tsPath)
         validate(
             DescriptorValidator.ValidationVisitor.errorTypesForbidden(), sourceSet.translateToDescriptors().getPackage(
                 FqName("")
@@ -48,7 +45,7 @@ class DescriptorTests : OutputTests() {
                     sourceSet.translateToDescriptors().getPackage(
                         FqName("")
                     )
-                ), RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                ), RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
                 .serializeRecursively(desc)
         )
     }
@@ -60,10 +57,10 @@ class DescriptorTests : OutputTests() {
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return Idl2KtTests.fileSetWithDescriptors("./test/data/idl")
+            return fileSetWithDescriptors("./test/data/idl")
         }
 
-        val translator: InputTranslator<String> = IdlInputTranslator(DirectoryReferencesResolver())
+        val translator: InputTranslator<String> = IdlInputTranslator(EmptyReferencesResolver())
     }
 
 }

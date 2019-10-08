@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.tests
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.kotlin.backend.common.push
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit
 @Serializable
 internal data class EnvJson(val NODE: String)
 
+@UseExperimental(UnstableDefault::class)
 class CliTranslator(val envDataPath: String, private val translatorPath: String) {
     private val nodePath: String
 

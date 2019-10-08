@@ -8,6 +8,8 @@ def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.5.2"
 def tsDeclarationsPath = ".tsdeclarations"
 
 node {
+  workDir = gradle.nodeWorkingDir
+
   // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
   version = gradle.nodeVersion
   yarnVersion = gradle.yarnVersion

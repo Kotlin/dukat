@@ -20,3 +20,12 @@ dictionary B {
 partial dictionary B {
     boolean b = false;
 };
+
+partial namespace C {
+    readonly attribute long y;
+}
+
+namespace C {
+    readonly attribute long x;
+    void f();
+}
