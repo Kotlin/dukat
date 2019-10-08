@@ -1,7 +1,8 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -47,8 +48,8 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                     listOf(declaration)
                 } else {
                     listOf(declaration.copy(
-                            companionObject = CompanionObjectModel(
-                                    "__",
+                            companionObject = ObjectModel(
+                                IdentifierEntity("__"),
                                     emptyList(),
                                     listOf(
                                             HeritageModel(
@@ -57,7 +58,8 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                                     ExternalDelegationModel()
                                             )
                                     )
-                            )))
+                            )
+                            ))
                 }
             }
             else -> listOf(declaration)

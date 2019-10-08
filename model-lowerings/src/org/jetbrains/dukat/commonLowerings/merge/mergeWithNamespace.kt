@@ -1,9 +1,10 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -90,8 +91,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                 companionObject = if (staticProperties.isNotEmpty()) {
                     companionObject?.copy(
                             members = companionObject!!.members + staticProperties)
-                            ?: CompanionObjectModel(
-                                    "",
+                            ?: ObjectModel(
+                                IdentifierEntity(""),
                                     staticProperties,
                                     listOf()
                             )
@@ -105,8 +106,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                     companionObject = if (staticProperties.isNotEmpty()) {
                         companionObject?.copy(
                                 members = companionObject!!.members + staticProperties)
-                                ?: CompanionObjectModel(
-                                        "",
+                                ?: ObjectModel(
+                                    IdentifierEntity(""),
                                         staticProperties,
                                         listOf()
                                 )

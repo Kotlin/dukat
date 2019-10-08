@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -17,7 +17,6 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SimpleCommentModel
@@ -51,7 +50,6 @@ import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
@@ -247,8 +245,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
-        CompanionObjectModel(
-                name = "",
+        ObjectModel(
+                name = IdentifierEntity(""),
                 members = staticMemberModels,
                 parentEntities = listOf()
         )
@@ -405,8 +403,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
             members = listOf(),
-            companionObject = CompanionObjectModel(
-                    name = "",
+            companionObject = ObjectModel(
+                    name = IdentifierEntity(""),
                     members = listOf(),
                     parentEntities = listOf()
             ),
