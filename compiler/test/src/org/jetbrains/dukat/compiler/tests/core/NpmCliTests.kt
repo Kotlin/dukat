@@ -14,8 +14,8 @@ class NpmCliTests {
     @DisplayName("cli test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("testSet")
-    fun withValueSource(generatedFileName: String, sourceFile: String, descriptor: String) {
-        assertGeneratedContent(generatedFileName, sourceFile, descriptor)
+    fun withValueSource(generatedFileName: String, sourceFile: String, @Suppress("UNUSED_PARAMETER") descriptor: String) {
+        assertGeneratedContent(generatedFileName, sourceFile)
     }
 
     companion object {
@@ -53,7 +53,7 @@ class NpmCliTests {
         }
     }
 
-    protected fun assertGeneratedContent(generatedFileName: String, sourceFile: String, descriptor: String) {
+    protected fun assertGeneratedContent(generatedFileName: String, sourceFile: String) {
         val refPath = File("./test/data/cli")
         val refFile = File(refPath, generatedFileName).normalize()
         assertEquals(refFile.readText(), File(sourceFile).readText())

@@ -11,6 +11,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
@@ -104,8 +105,15 @@ interface IDLLowering {
         )
     }
 
-    fun lowerEnumDeclaration(declaration: IDLEnumDeclaration) : IDLEnumDeclaration {
+    fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
         return declaration
+    }
+
+    fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration): IDLNamespaceDeclaration {
+        return declaration.copy(
+                attributes = declaration.attributes.map { lowerAttributeDeclaration(it) },
+                operations = declaration.operations.map { lowerOperationDeclaration(it) }
+        )
     }
 
     fun lowerTopLevelDeclaration(declaration: IDLTopLevelDeclaration): IDLTopLevelDeclaration {
@@ -116,6 +124,7 @@ interface IDLLowering {
             is IDLDictionaryDeclaration -> lowerDictionaryDeclaration(declaration)
             is IDLEnumDeclaration -> lowerEnumDeclaration(declaration)
             is IDLIncludesStatementDeclaration -> lowerIncludesStatementDeclaration(declaration)
+            is IDLNamespaceDeclaration -> lowerNamespaceDeclaration(declaration)
             else -> declaration
         }
     }

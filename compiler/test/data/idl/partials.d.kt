@@ -27,3 +27,9 @@ inline fun B(a: Boolean? = true, b: Boolean? = false): B {
     o["b"] = b
     return o
 }
+
+external object C {
+    val x: Int
+    val y: Int
+    fun f()
+}

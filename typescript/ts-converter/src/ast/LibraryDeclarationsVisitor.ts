@@ -3,6 +3,7 @@ import {AstConverter} from "../AstConverter";
 import * as ts from "typescript-services-api";
 import {createLogger} from "../Logger";
 import {Declaration} from "./ast";
+import {ResourceFetcher} from "./ResourceFetcher";
 
 export class LibraryDeclarationsVisitor {
 
@@ -11,7 +12,7 @@ export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
 
   constructor(
-    private resources: Set<string>,
+    private resources: ResourceFetcher,
     private typeChecker: ts.TypeChecker,
     private astConverter: AstConverter
   ) {

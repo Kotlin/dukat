@@ -52,7 +52,7 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
 
     @Suppress("UNCHECKED_CAST")
     override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>, declaration.params)))
+        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)))
     }
 }
 

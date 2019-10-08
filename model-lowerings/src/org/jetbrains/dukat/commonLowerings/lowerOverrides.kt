@@ -131,6 +131,10 @@ private class OverrideResolver(val context: ModelContext) {
             return true
         }
 
+        if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("Any")) {
+            return true
+        }
+
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
 
             if (value == otherParameterType.value
@@ -146,10 +150,6 @@ private class OverrideResolver(val context: ModelContext) {
             if (classLike != null) {
                 return classLike.getKnownParents().contains(otherClassLike)
             }
-        }
-
-        if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("Any")) {
-            return true
         }
 
         return false
