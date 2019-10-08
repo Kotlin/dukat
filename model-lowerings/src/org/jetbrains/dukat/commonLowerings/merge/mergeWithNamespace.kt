@@ -42,6 +42,7 @@ private fun VariableModel.convertToPropertyModel(): PropertyModel {
             typeParameters = typeParameters,
             static = false,
             override = false,
+            immutable = immutable,
             getter = false,
             setter = false,
             open = false

@@ -2,6 +2,7 @@ package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
@@ -81,6 +82,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .mergeNestedClasses()
                 .lowerOverrides()
                 .specifyTypeNodesWithModuleData()
+                .addExplicitGettersAndSetters()
                 .addStandardImportsAndAnnotations()
                 .omitStdLib()
     }

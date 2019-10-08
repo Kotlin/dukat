@@ -51,7 +51,6 @@ import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
@@ -493,8 +492,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = !readOnly,
+                immutable = readOnly,
+                getter = false,
+                setter = false,
                 open = open
         )
         is IDLOperationDeclaration -> MethodModel(
@@ -519,8 +519,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = true,
+                immutable = false,
+                getter = false,
+                setter = false,
                 open = false
         )
         is IDLGetterDeclaration -> MethodModel(

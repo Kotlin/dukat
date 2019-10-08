@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.idlLowerings.addKDocs
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.commonLowerings.omitStdLib
 import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
@@ -44,6 +45,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .process()
                 .lowerOverrides()
                 .escapeIdentificators()
+                .addExplicitGettersAndSetters()
                 .addKDocs()
                 .relocateDeclarations()
                 .addImportsForReferencedFiles()
