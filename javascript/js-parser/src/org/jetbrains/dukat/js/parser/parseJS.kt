@@ -9,9 +9,11 @@ import org.jetbrains.dukat.js.declarations.*
 import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
 import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSTopLevelDeclaration
 import java.io.File
+
 
 private fun getBodyOfJSFile(fileName: String) : Block {
     val source = Source.sourceFor(fileName, File(fileName).readText())
@@ -23,43 +25,6 @@ private fun getBodyOfJSFile(fileName: String) : Block {
 }
 
 
-private fun IdentNode.toJSParameterDeclaration() : JSParameterDeclaration {
-    return JSParameterDeclaration(
-            name = name,
-            vararg = false //TODO
-    )
-}
-
-private fun FunctionNode.toTopLevelDeclaration() : JSFunctionDeclaration {
-    val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
-
-    for(parameter in parameters) {
-        parameterDeclarations.add(parameter.toJSParameterDeclaration())
-    }
-
-    return JSFunctionDeclaration(
-            name = name,
-            parameters = parameterDeclarations
-    )
-}
-
-private fun FunctionNode.toExportDeclaration() : JSExportDeclaration {
-    val functionDeclaration = this.toTopLevelDeclaration()
-
-    return JSInlineExportDeclaration(
-            name = functionDeclaration.name,
-            declaration = functionDeclaration
-    )
-}
-
-private fun Expression.toTopLevelDeclaration() : JSExportDeclaration? {
-    return when(this) {
-        is FunctionNode -> this.toExportDeclaration()
-        else -> {println("Unsupported!");null}
-    }
-}
-
-
 private fun Expression.isExportsExpression() : Boolean {
     return when(toString()) {
         "module.exports" -> true
@@ -68,20 +33,101 @@ private fun Expression.isExportsExpression() : Boolean {
     }
 }
 
-private fun Block.getExportDeclarations() : List<JSExportDeclaration> {
-    val exportDeclarations = mutableListOf<JSExportDeclaration>()
 
-    for (statement in statements) {
-        if (statement is ExpressionStatement) {
-            val expression = statement.expression
+private fun IdentNode.toParameterDeclaration() : JSParameterDeclaration {
+    return JSParameterDeclaration(
+            name = name,
+            vararg = isRestParameter
+    )
+}
 
-            if (expression.isAssignment) {
-                if (expression is BinaryNode) {
-                    if(expression.assignmentDest.isExportsExpression()) {
-                        val exportDeclaration = expression.assignmentSource.toTopLevelDeclaration()
+private fun FunctionNode.toTopLevelDeclaration() : JSTopLevelDeclaration {
+    val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
 
-                        if(exportDeclaration != null) {
-                            exportDeclarations.add(exportDeclaration)
+    for(parameter in parameters) {
+        parameterDeclarations.add(parameter.toParameterDeclaration())
+    }
+
+    return JSFunctionDeclaration(
+            name = name,
+            parameters = parameterDeclarations
+    )
+}
+
+private fun VarNode.toTopLevelDeclaration() : JSTopLevelDeclaration? {
+    return when(val expression = init) {
+        null -> null
+        is FunctionNode -> expression.toTopLevelDeclaration()
+        else -> null
+    }
+}
+
+
+private fun FunctionNode.toExportDeclaration() : JSExportDeclaration {
+    return JSInlineExportDeclaration(
+            name = name,
+            declaration = this.toTopLevelDeclaration()
+    )
+}
+
+private fun Expression.toExportDeclaration() : JSExportDeclaration? {
+    return when(this) {
+        is FunctionNode -> this.toExportDeclaration()
+        else -> null
+    }
+}
+
+
+
+class JSModuleParser(moduleName: String, fileName: String) {
+
+    private val module: JSModuleDeclaration = JSModuleDeclaration(
+            moduleName = moduleName,
+            fileName = fileName,
+            exportDeclarations = mutableListOf(),
+            topLevelDeclarations = mutableMapOf()
+    )
+
+
+    private fun addTopLevelDeclaration(name: String?, declaration: JSTopLevelDeclaration?) {
+        if(name!= null && declaration != null) {
+            module.topLevelDeclarations[name] = declaration
+        }
+    }
+
+    private fun addTopLevelDeclaration(varNode: VarNode) {
+        addTopLevelDeclaration(
+                name = varNode.name.name,
+                declaration = varNode.toTopLevelDeclaration()
+        )
+    }
+
+    private fun addTopLevelDeclarations(block: Block) {
+        for (statement in block.statements) {
+            if(statement is VarNode) {
+                addTopLevelDeclaration(statement)
+            }
+        }
+    }
+
+
+    private fun addExportDeclaration(expression: Expression) {
+        val exportDeclaration = expression.toExportDeclaration()
+
+        if(exportDeclaration != null) {
+            module.exportDeclarations.add(exportDeclaration)
+        }
+    }
+
+    private fun addExportDeclarations(block: Block) {
+        for (statement in block.statements) {
+            if (statement is ExpressionStatement) {
+                val expression = statement.expression
+
+                if (expression.isAssignment) {
+                    if (expression is BinaryNode) {
+                        if(expression.assignmentDest.isExportsExpression()) {
+                            addExportDeclaration(expression.assignmentSource)
                         }
                     }
                 }
@@ -89,42 +135,14 @@ private fun Block.getExportDeclarations() : List<JSExportDeclaration> {
         }
     }
 
-    return exportDeclarations
-}
 
-private fun Block.getTopLevelDeclarations() : Map<String, JSTopLevelDeclaration> {
-    val topLevelDeclarations = mutableMapOf<String, JSTopLevelDeclaration>()
+    fun parse(): JSModuleDeclaration {
+        val scriptBody = getBodyOfJSFile(module.fileName)
 
-    /*
-    for (statement in statements) {
-        if (statement is ExpressionStatement) {
-            val expression = statement.expression
+        addTopLevelDeclarations(scriptBody)
+        addExportDeclarations(scriptBody)
 
-            if (expression.isAssignment) {
-                if (expression is BinaryNode) {
-                    if(expression.assignmentDest.isExportsExpression()) {
-                        //TODO
-                    }
-                }
-            }
-        }
+        return module
     }
-    */
-
-    return topLevelDeclarations
 }
 
-
-fun parseJS(moduleName: String, fileName: String): JSModuleDeclaration {
-    val scriptBody = getBodyOfJSFile(fileName)
-
-    val topLevelDeclarations = scriptBody.getTopLevelDeclarations()
-    val exportDeclarations = scriptBody.getExportDeclarations()
-
-    return JSModuleDeclaration(
-            moduleName = moduleName,
-            fileName = fileName,
-            exportDeclarations = exportDeclarations,
-            topLevelDeclarations = topLevelDeclarations
-    )
-}
