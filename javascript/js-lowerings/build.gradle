@@ -1,0 +1,11 @@
+plugins {
+    id 'kotlin'
+}
+
+dependencies {
+    implementation(project(":js-declarations"))
+
+    implementation(project(":ast-common"))
+    implementation(project(":ast-model"))
+    implementation(project(":translator"))
+}

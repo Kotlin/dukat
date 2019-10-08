@@ -1,43 +1,44 @@
 pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
-    jcenter()
-    maven {
-      url "https://dl.bintray.com/kotlin/kotlin-eap"
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
     }
-  }
 
-  resolutionStrategy {
-    def kotlin_plugins = ["kotlin2js", "kotlin", "kotlin-multiplatform"]
+    resolutionStrategy {
+        def kotlin_plugins = ["kotlin2js", "kotlin", "kotlin-multiplatform"]
 
-    eachPlugin {
-      def pluginId = requested.id.id
-      if (pluginId in kotlin_plugins) {
-        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
-      } else if (pluginId == "kotlinx-serialization"){
-        useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
-      } else if (pluginId == 'com.google.protobuf') {
-        useModule("com.google.protobuf:protobuf-gradle-plugin:${gradle.protobufGradlePluginVersion}")
-      } else  if (pluginId == "com.moowork.node") {
-        useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
-      }
+        eachPlugin {
+            def pluginId = requested.id.id
+            if (pluginId in kotlin_plugins) {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
+            } else if (pluginId == "kotlinx-serialization") {
+                useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
+            } else if (pluginId == 'com.google.protobuf') {
+                useModule("com.google.protobuf:protobuf-gradle-plugin:${gradle.protobufGradlePluginVersion}")
+            } else if (pluginId == "com.moowork.node") {
+                useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
+            }
+        }
     }
-  }
 }
 
 gradle.ext {
-  kotlinVersion = "1.3.50"
-  jupiterVersion = "5.4.1"
-  nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
-  nodeVersion = "10.16.2"
-  npmVersion = "6.9.0"
-  yarnVersion = "1.17.3"
-  nodePluginVersion = "1.3.1"
-  kotlinSerializationRuntimeVersion = "0.11.0"
-  antlr4_version = "4.7.1"
-  protobufGradlePluginVersion = "0.8.10"
-  protobufImplementationVersion = "3.9.0"
+    kotlinVersion = "1.3.50"
+    jupiterVersion = "5.4.1"
+    nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
+    nodeVersion = "10.16.2"
+    npmVersion = "6.9.0"
+    yarnVersion = "1.17.3"
+    nodePluginVersion = "1.3.1"
+    kotlinSerializationRuntimeVersion = "0.11.0"
+    antlr4_version = "4.7.1"
+    protobufGradlePluginVersion = "0.8.10"
+    protobufImplementationVersion = "3.9.0"
+    graaljsVersion = "19.2.0.1"
 }
 
 include 'ast-common'
@@ -68,6 +69,9 @@ include 'ts-model-proto'
 include 'ts-node-introduction'
 include 'ts-node-lowering'
 include 'ts-translator'
+include 'js-parser'
+include 'js-declarations'
+include 'js-lowerings'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
@@ -84,3 +88,6 @@ project(':ts-node-introduction').projectDir = file("$rootDir/typescript/ts-node-
 project(':ts-node-lowering').projectDir = file("$rootDir/typescript/ts-node-lowering")
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
 
+project(':js-parser').projectDir = file("$rootDir/javascript/js-parser")
+project(':js-declarations').projectDir = file("$rootDir/javascript/js-declarations")
+project(':js-lowerings').projectDir = file("$rootDir/javascript/js-lowerings")
