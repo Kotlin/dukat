@@ -8,6 +8,7 @@ import com.oracle.js.parser.ir.*
 import org.jetbrains.dukat.js.declarations.*
 import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
 import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
+import org.jetbrains.dukat.js.declarations.export.JSReferenceExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
@@ -70,9 +71,16 @@ private fun FunctionNode.toExportDeclaration() : JSExportDeclaration {
     )
 }
 
+private fun IdentNode.toExportDeclaration() : JSExportDeclaration {
+    return JSReferenceExportDeclaration(
+            name = name
+    )
+}
+
 private fun Expression.toExportDeclaration() : JSExportDeclaration? {
     return when(this) {
         is FunctionNode -> this.toExportDeclaration()
+        is IdentNode -> this.toExportDeclaration()
         else -> null
     }
 }
@@ -84,7 +92,7 @@ class JSModuleParser(moduleName: String, fileName: String) {
     private val module: JSModuleDeclaration = JSModuleDeclaration(
             moduleName = moduleName,
             fileName = fileName,
-            exportDeclarations = mutableListOf(),
+            exportDeclarations = mutableSetOf(),
             topLevelDeclarations = mutableMapOf()
     )
 
