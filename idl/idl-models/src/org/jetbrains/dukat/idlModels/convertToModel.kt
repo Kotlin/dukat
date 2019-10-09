@@ -28,6 +28,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -195,7 +196,8 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             IdentifierEntity(value.name),
                             null
                     )
-            ))
+            )),
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
 }
 
@@ -227,7 +229,8 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                                     null
                             )
                     )
-            ))
+            )),
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
 }
 
@@ -248,7 +251,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         ObjectModel(
                 name = IdentifierEntity(""),
                 members = staticMemberModels,
-                parentEntities = listOf()
+                parentEntities = listOf(),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     } else {
         null
@@ -281,7 +285,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 parentEntities = parentModels,
                 comment = null,
                 annotations = annotationModels,
-                external = true
+                external = true,
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     } else {
         ClassModel(
@@ -298,7 +303,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 annotations = mutableListOf(),
                 comment = null,
                 external = true,
-                abstract = kind == InterfaceKind.ABSTRACT_CLASS
+                abstract = kind == InterfaceKind.ABSTRACT_CLASS,
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     }
     val getterModels = getters.map { it.processAsTopLevel(declaration.name) }
@@ -375,7 +381,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             },
             comment = null,
             annotations = mutableListOf(),
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
     val generatedFunction = FunctionModel(
             name = IdentifierEntity(name),
@@ -394,7 +401,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             inline = true,
             operator = false,
             extend = null,
-            body = generateFunctionBody()
+            body = generateFunctionBody(),
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
     return listOf(declaration, generatedFunction)
 }
@@ -406,7 +414,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             companionObject = ObjectModel(
                     name = IdentifierEntity(""),
                     members = listOf(),
-                    parentEntities = listOf()
+                    parentEntities = listOf(),
+                    visibilityModifier = VisibilityModifier.DEFAULT
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
@@ -419,7 +428,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                             listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                     )
             ),
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(
@@ -455,7 +465,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                                 IdentifierEntity("Companion")
                         ),
                         typeParameters = listOf()
-                )
+                ),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     }
     return listOf(declaration) + generatedVariables
@@ -466,7 +477,8 @@ fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
             name = IdentifierEntity(name),
             members = attributes.mapNotNull { it.process() } +
                     operations.mapNotNull { it.process() },
-            parentEntities = listOf()
+            parentEntities = listOf(),
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
 }
 

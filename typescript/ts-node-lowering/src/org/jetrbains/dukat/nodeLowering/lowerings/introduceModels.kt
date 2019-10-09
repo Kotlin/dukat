@@ -60,6 +60,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -294,7 +295,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
                 ObjectModel(
                         IdentifierEntity(""),
                         membersSplitted.static,
-                        emptyList()
+                        emptyList(),
+                        VisibilityModifier.DEFAULT
                 )
             } else {
                 null
@@ -321,7 +323,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             annotations = exportQualifier.toAnnotation(),
             comment = null,
             external = true,
-            abstract = false
+            abstract = false,
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
 }
 
@@ -347,7 +350,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                 ObjectModel(
                         IdentifierEntity(""),
                         membersSplitted.static,
-                        emptyList()
+                        emptyList(),
+                        VisibilityModifier.DEFAULT
                 )
             } else {
                 null
@@ -361,7 +365,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = exportQualifier.toAnnotation(),
             comment = null,
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifier.DEFAULT
     )
 }
 
@@ -457,7 +462,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
         is EnumNode -> {
             EnumModel(
                     name = name,
-                    values = values.map { token -> EnumTokenModel(token.value, token.meta) }
+                    values = values.map { token -> EnumTokenModel(token.value, token.meta) },
+                    visibilityModifier = VisibilityModifier.DEFAULT
             )
         }
         is FunctionNode -> FunctionModel(
@@ -476,7 +482,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 inline = inline,
                 operator = operator,
                 extend = extend.convert(),
-                body = resolveBody()
+                body = resolveBody(),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
         is VariableNode -> VariableModel(
                 name = name,
@@ -493,18 +500,22 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
-                extend = extend.convert()
+                extend = extend.convert(),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
         is ObjectNode -> ObjectModel(
                 name = name,
                 members = members.mapNotNull { member -> member.process() },
-                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
+                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
         is TypeAliasNode -> if (canBeTranslated) {
             TypeAliasModel(
                     name = name,
                     typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) })
+                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
+                    visibilityModifier = VisibilityModifier.DEFAULT
+            )
         } else null
         else -> {
             logger.debug("skipping ${this}")
