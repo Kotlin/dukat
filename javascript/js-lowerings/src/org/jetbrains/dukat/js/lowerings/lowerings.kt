@@ -10,6 +10,7 @@ import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
 import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
 import org.jetbrains.dukat.js.declarations.export.JSReferenceExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
@@ -18,6 +19,11 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
     private val logger = Logging.logger("Lowering")
 
     private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
+
+    private val MODULE_ANNOTATION = AnnotationModel(
+            name = "JsModule",
+            params = listOf(moduleName)
+    )
 
     private val ANY_NULLABLE_TYPE = TypeValueModel(
             value = IdentifierEntity("Any"),
@@ -43,18 +49,13 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
             parameterModels.add(jsParameter.convert())
         }
 
-        val annotations = mutableListOf(AnnotationModel(
-                name = "JsModule",
-                params = listOf(moduleName)
-        ))
-
         return FunctionModel(
                 name = IdentifierEntity(name),
                 parameters = parameterModels,
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
-                annotations = annotations,
+                annotations = mutableListOf(MODULE_ANNOTATION),
 
                 export = true,
                 inline = false,
@@ -65,9 +66,25 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
+    private fun JSClassDeclaration.convert(): ClassModel {
+        return ClassModel(
+                name = IdentifierEntity(name),
+                members = listOf<MemberModel>(),
+                companionObject = null,
+                typeParameters = emptyList(),
+                parentEntities = emptyList(),
+                primaryConstructor = null,
+                annotations = mutableListOf(MODULE_ANNOTATION),
+                comment = null,
+                external = true,
+                abstract = false
+        )
+    }
+
     private fun JSInlineExportDeclaration.convert(): TopLevelModel {
         return when(this.declaration) {
             is JSFunctionDeclaration -> (this.declaration as JSFunctionDeclaration).convert()
+            is JSClassDeclaration -> (this.declaration as JSClassDeclaration).convert()
             else -> throw IllegalStateException("Export declaration with declaration of type <${this.javaClass}> not supported!")
         }
     }

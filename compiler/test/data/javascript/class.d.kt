@@ -1,3 +1,3 @@
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external class bar
+external open class bar

@@ -12,6 +12,7 @@ import org.jetbrains.dukat.js.declarations.export.JSReferenceExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSTopLevelDeclaration
 import java.io.File
 
@@ -42,6 +43,13 @@ private fun IdentNode.toParameterDeclaration() : JSParameterDeclaration {
     )
 }
 
+private fun ClassNode.toTopLevelDeclaration() : JSTopLevelDeclaration {
+    return JSClassDeclaration(
+            name = ident.name,
+            methods = mutableSetOf() //TODO fill
+    )
+}
+
 private fun FunctionNode.toTopLevelDeclaration() : JSTopLevelDeclaration {
     val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
 
@@ -55,13 +63,6 @@ private fun FunctionNode.toTopLevelDeclaration() : JSTopLevelDeclaration {
     )
 }
 
-private fun VarNode.toTopLevelDeclaration() : JSTopLevelDeclaration? {
-    return when(val expression = init) {
-        null -> null
-        is FunctionNode -> expression.toTopLevelDeclaration()
-        else -> null
-    }
-}
 
 
 private fun FunctionNode.toExportDeclaration() : JSExportDeclaration {
@@ -95,6 +96,29 @@ class JSModuleParser(moduleName: String, fileName: String) {
             exportDeclarations = mutableSetOf(),
             topLevelDeclarations = mutableMapOf()
     )
+
+
+    private fun BlockExpression.toTopLevelDeclaration() : JSTopLevelDeclaration? {
+        addTopLevelDeclarations(block)
+        /*
+        if(block.lastStatement is ExpressionStatement) {
+            //TODO generate return type
+            (block.lastStatement as ExpressionStatement).expression.toSOMETHING()
+        }
+        */
+
+        return null
+    }
+
+    private fun VarNode.toTopLevelDeclaration() : JSTopLevelDeclaration? {
+        return when(val expression = init) {
+            null -> null
+            is FunctionNode -> expression.toTopLevelDeclaration()
+            is BlockExpression -> expression.toTopLevelDeclaration()
+            is ClassNode -> expression.toTopLevelDeclaration()
+            else -> null
+        }
+    }
 
 
     private fun addTopLevelDeclaration(name: String?, declaration: JSTopLevelDeclaration?) {
