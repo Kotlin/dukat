@@ -3,6 +3,7 @@ package org.jetbrains.dukat.js.lowerings
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
@@ -61,7 +62,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 operator = false,
 
                 extend = null,
-                body = emptyList<StatementModel>()
+                body = emptyList<StatementModel>(),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     }
 
@@ -76,7 +78,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 annotations = mutableListOf(MODULE_ANNOTATION),
                 comment = null,
                 external = true,
-                abstract = false
+                abstract = false,
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     }
 
