@@ -49,9 +49,12 @@ class JSModuleParser(moduleName: String, fileName: String) {
     }
 
     private fun ClassNode.toDeclaration() : JSDeclaration {
+        val methods = mutableSetOf<JSFunctionDeclaration>()
+        //TODO fill
+
         return JSClassDeclaration(
                 name = ident.name,
-                methods = mutableSetOf() //TODO fill
+                methods = methods
         )
     }
 
@@ -75,8 +78,12 @@ class JSModuleParser(moduleName: String, fileName: String) {
     private fun BlockExpression.toDeclaration() : JSDeclaration? {
         addDeclarations(block)
 
-        //TODO generate return type
-        return null
+        return if(block.lastStatement is ExpressionStatement) {
+            val lastExpression = (block.lastStatement as ExpressionStatement).expression
+            lastExpression.toDeclaration()
+        } else {
+            null
+        }
     }
 
 
