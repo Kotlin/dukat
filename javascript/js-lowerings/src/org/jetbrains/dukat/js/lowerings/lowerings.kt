@@ -9,7 +9,6 @@ import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
@@ -87,38 +86,12 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         return when(this) {
             is JSFunctionDeclaration -> this.convert()
             is JSClassDeclaration -> this.convert()
-            is JSReferenceDeclaration -> throw IllegalStateException("References need to be resolved before conversion to model.")
             else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
         }
     }
 
-    private fun resolve(reference: JSReferenceDeclaration): JSDeclaration? {
-        return moduleDeclaration.topLevelDeclarations[reference.name]
-    }
-
-    private fun resolveReferencedExportDeclarations() {
-        for(declaration in moduleDeclaration.exportDeclarations) {
-            if(declaration is JSReferenceDeclaration) {
-                moduleDeclaration.exportDeclarations.remove(declaration)
-
-                var resolvedDeclaration: JSDeclaration? = declaration
-
-                while(resolvedDeclaration is JSReferenceDeclaration) {
-                    resolvedDeclaration = resolve(resolvedDeclaration)
-                }
-
-                if(resolvedDeclaration != null) {
-                    moduleDeclaration.exportDeclarations.add(resolvedDeclaration)
-                } else {
-                    logger.warn("Cannot resolve reference for export: " + declaration.name)
-                }
-            }
-        }
-    }
 
     fun lower() : SourceSetModel {
-        resolveReferencedExportDeclarations()
-
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
         for(exportDeclaration in moduleDeclaration.exportDeclarations) {

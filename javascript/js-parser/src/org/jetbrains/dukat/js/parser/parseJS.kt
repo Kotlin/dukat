@@ -9,7 +9,6 @@ import org.jetbrains.dukat.js.declarations.*
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import java.io.File
 
@@ -69,10 +68,8 @@ class JSModuleParser(moduleName: String, fileName: String) {
         )
     }
 
-    private fun IdentNode.toDeclaration() : JSDeclaration {
-        return JSReferenceDeclaration(
-                name = name
-        )
+    private fun IdentNode.toDeclaration() : JSDeclaration? {
+        return module.topLevelDeclarations[name]
     }
 
     private fun BlockExpression.toDeclaration() : JSDeclaration? {
