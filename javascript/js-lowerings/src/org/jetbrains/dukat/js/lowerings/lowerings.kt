@@ -98,7 +98,11 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
             if(declaration is JSReferenceDeclaration) {
                 moduleDeclaration.exportDeclarations.remove(declaration)
 
-                val resolvedDeclaration = resolve(declaration)
+                var resolvedDeclaration: JSDeclaration? = declaration
+
+                while(resolvedDeclaration is JSReferenceDeclaration) {
+                    resolvedDeclaration = resolve(resolvedDeclaration)
+                }
 
                 if(resolvedDeclaration != null) {
                     moduleDeclaration.exportDeclarations.add(resolvedDeclaration)
