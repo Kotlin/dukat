@@ -18,34 +18,34 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external abstract class HTMLAllCollection {
+public external abstract class HTMLAllCollection {
     open val length: Int
     fun item(nameOrIndex: String = definedExternally): UnionElementOrHTMLCollection?
     fun namedItem(name: String): UnionElementOrHTMLCollection?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLAllCollection.get(index: Int): Element? = asDynamic()[index]
+public inline operator fun HTMLAllCollection.get(index: Int): Element? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLAllCollection.get(name: String): UnionElementOrHTMLCollection? = asDynamic()[name]
+public inline operator fun HTMLAllCollection.get(name: String): UnionElementOrHTMLCollection? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [HTMLFormControlsCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection) to Kotlin
  */
-external abstract class HTMLFormControlsCollection : HTMLCollection
+public external abstract class HTMLFormControlsCollection : HTMLCollection
 
 /**
  * Exposes the JavaScript [RadioNodeList](https://developer.mozilla.org/en/docs/Web/API/RadioNodeList) to Kotlin
  */
-external abstract class RadioNodeList : NodeList, UnionElementOrRadioNodeList {
+public external abstract class RadioNodeList : NodeList, UnionElementOrRadioNodeList {
     open var value: String
 }
 
 /**
  * Exposes the JavaScript [HTMLOptionsCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLOptionsCollection) to Kotlin
  */
-external abstract class HTMLOptionsCollection : HTMLCollection {
+public external abstract class HTMLOptionsCollection : HTMLCollection {
     override var length: Int
     open var selectedIndex: Int
     fun add(element: UnionHTMLOptGroupElementOrHTMLOptionElement, before: dynamic = definedExternally)
@@ -53,12 +53,12 @@ external abstract class HTMLOptionsCollection : HTMLCollection {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
+public inline operator fun HTMLOptionsCollection.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 /**
  * Exposes the JavaScript [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) to Kotlin
  */
-external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable, ElementCSSInlineStyle {
+public external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndElementEventHandlers, ElementContentEditable, ElementCSSInlineStyle {
     open var title: String
     open var lang: String
     open var translate: Boolean
@@ -108,7 +108,7 @@ external abstract class HTMLElement : Element, GlobalEventHandlers, DocumentAndE
 /**
  * Exposes the JavaScript [HTMLUnknownElement](https://developer.mozilla.org/en/docs/Web/API/HTMLUnknownElement) to Kotlin
  */
-external abstract class HTMLUnknownElement : HTMLElement {
+public external abstract class HTMLUnknownElement : HTMLElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -134,18 +134,18 @@ external abstract class HTMLUnknownElement : HTMLElement {
 /**
  * Exposes the JavaScript [DOMStringMap](https://developer.mozilla.org/en/docs/Web/API/DOMStringMap) to Kotlin
  */
-external abstract class DOMStringMap
+public external abstract class DOMStringMap
 
 @kotlin.internal.InlineOnly
-inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
+public inline operator fun DOMStringMap.get(name: String): String? = asDynamic()[name]
 
 @kotlin.internal.InlineOnly
-inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value }
+public inline operator fun DOMStringMap.set(name: String, value: String) { asDynamic()[name] = value }
 
 /**
  * Exposes the JavaScript [HTMLHtmlElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHtmlElement) to Kotlin
  */
-external abstract class HTMLHtmlElement : HTMLElement {
+public external abstract class HTMLHtmlElement : HTMLElement {
     open var version: String
 
     companion object {
@@ -173,7 +173,7 @@ external abstract class HTMLHtmlElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLHeadElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHeadElement) to Kotlin
  */
-external abstract class HTMLHeadElement : HTMLElement {
+public external abstract class HTMLHeadElement : HTMLElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -199,7 +199,7 @@ external abstract class HTMLHeadElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTitleElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTitleElement) to Kotlin
  */
-external abstract class HTMLTitleElement : HTMLElement {
+public external abstract class HTMLTitleElement : HTMLElement {
     open var text: String
 
     companion object {
@@ -227,7 +227,7 @@ external abstract class HTMLTitleElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLBaseElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBaseElement) to Kotlin
  */
-external abstract class HTMLBaseElement : HTMLElement {
+public external abstract class HTMLBaseElement : HTMLElement {
     open var href: String
     open var target: String
 
@@ -256,7 +256,7 @@ external abstract class HTMLBaseElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLLinkElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLinkElement) to Kotlin
  */
-external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
+public external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
     open var href: String
     open var crossOrigin: String?
     open var rel: String
@@ -299,7 +299,7 @@ external abstract class HTMLLinkElement : HTMLElement, LinkStyle {
 /**
  * Exposes the JavaScript [HTMLMetaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMetaElement) to Kotlin
  */
-external abstract class HTMLMetaElement : HTMLElement {
+public external abstract class HTMLMetaElement : HTMLElement {
     open var name: String
     open var httpEquiv: String
     open var content: String
@@ -330,7 +330,7 @@ external abstract class HTMLMetaElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLStyleElement](https://developer.mozilla.org/en/docs/Web/API/HTMLStyleElement) to Kotlin
  */
-external abstract class HTMLStyleElement : HTMLElement, LinkStyle {
+public external abstract class HTMLStyleElement : HTMLElement, LinkStyle {
     open var media: String
     open var nonce: String
     open var type: String
@@ -360,7 +360,7 @@ external abstract class HTMLStyleElement : HTMLElement, LinkStyle {
 /**
  * Exposes the JavaScript [HTMLBodyElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBodyElement) to Kotlin
  */
-external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
+public external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
     open var text: String
     open var link: String
     open var vLink: String
@@ -393,7 +393,7 @@ external abstract class HTMLBodyElement : HTMLElement, WindowEventHandlers {
 /**
  * Exposes the JavaScript [HTMLHeadingElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHeadingElement) to Kotlin
  */
-external abstract class HTMLHeadingElement : HTMLElement {
+public external abstract class HTMLHeadingElement : HTMLElement {
     open var align: String
 
     companion object {
@@ -421,7 +421,7 @@ external abstract class HTMLHeadingElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLParagraphElement](https://developer.mozilla.org/en/docs/Web/API/HTMLParagraphElement) to Kotlin
  */
-external abstract class HTMLParagraphElement : HTMLElement {
+public external abstract class HTMLParagraphElement : HTMLElement {
     open var align: String
 
     companion object {
@@ -449,7 +449,7 @@ external abstract class HTMLParagraphElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLHRElement](https://developer.mozilla.org/en/docs/Web/API/HTMLHRElement) to Kotlin
  */
-external abstract class HTMLHRElement : HTMLElement {
+public external abstract class HTMLHRElement : HTMLElement {
     open var align: String
     open var color: String
     open var noShade: Boolean
@@ -481,7 +481,7 @@ external abstract class HTMLHRElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLPreElement](https://developer.mozilla.org/en/docs/Web/API/HTMLPreElement) to Kotlin
  */
-external abstract class HTMLPreElement : HTMLElement {
+public external abstract class HTMLPreElement : HTMLElement {
     open var width: Int
 
     companion object {
@@ -509,7 +509,7 @@ external abstract class HTMLPreElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLQuoteElement](https://developer.mozilla.org/en/docs/Web/API/HTMLQuoteElement) to Kotlin
  */
-external abstract class HTMLQuoteElement : HTMLElement {
+public external abstract class HTMLQuoteElement : HTMLElement {
     open var cite: String
 
     companion object {
@@ -537,7 +537,7 @@ external abstract class HTMLQuoteElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLOListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOListElement) to Kotlin
  */
-external abstract class HTMLOListElement : HTMLElement {
+public external abstract class HTMLOListElement : HTMLElement {
     open var reversed: Boolean
     open var start: Int
     open var type: String
@@ -568,7 +568,7 @@ external abstract class HTMLOListElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLUListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLUListElement) to Kotlin
  */
-external abstract class HTMLUListElement : HTMLElement {
+public external abstract class HTMLUListElement : HTMLElement {
     open var compact: Boolean
     open var type: String
 
@@ -597,7 +597,7 @@ external abstract class HTMLUListElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLLIElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLIElement) to Kotlin
  */
-external abstract class HTMLLIElement : HTMLElement {
+public external abstract class HTMLLIElement : HTMLElement {
     open var value: Int
     open var type: String
 
@@ -626,7 +626,7 @@ external abstract class HTMLLIElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLDListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDListElement) to Kotlin
  */
-external abstract class HTMLDListElement : HTMLElement {
+public external abstract class HTMLDListElement : HTMLElement {
     open var compact: Boolean
 
     companion object {
@@ -654,7 +654,7 @@ external abstract class HTMLDListElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLDivElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDivElement) to Kotlin
  */
-external abstract class HTMLDivElement : HTMLElement {
+public external abstract class HTMLDivElement : HTMLElement {
     open var align: String
 
     companion object {
@@ -682,7 +682,7 @@ external abstract class HTMLDivElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLAnchorElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAnchorElement) to Kotlin
  */
-external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUtils {
+public external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUtils {
     open var target: String
     open var download: String
     open var ping: String
@@ -723,7 +723,7 @@ external abstract class HTMLAnchorElement : HTMLElement, HTMLHyperlinkElementUti
 /**
  * Exposes the JavaScript [HTMLDataElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDataElement) to Kotlin
  */
-external abstract class HTMLDataElement : HTMLElement {
+public external abstract class HTMLDataElement : HTMLElement {
     open var value: String
 
     companion object {
@@ -751,7 +751,7 @@ external abstract class HTMLDataElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTimeElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTimeElement) to Kotlin
  */
-external abstract class HTMLTimeElement : HTMLElement {
+public external abstract class HTMLTimeElement : HTMLElement {
     open var dateTime: String
 
     companion object {
@@ -779,7 +779,7 @@ external abstract class HTMLTimeElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLSpanElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSpanElement) to Kotlin
  */
-external abstract class HTMLSpanElement : HTMLElement {
+public external abstract class HTMLSpanElement : HTMLElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -805,7 +805,7 @@ external abstract class HTMLSpanElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLBRElement](https://developer.mozilla.org/en/docs/Web/API/HTMLBRElement) to Kotlin
  */
-external abstract class HTMLBRElement : HTMLElement {
+public external abstract class HTMLBRElement : HTMLElement {
     open var clear: String
 
     companion object {
@@ -833,7 +833,7 @@ external abstract class HTMLBRElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLHyperlinkElementUtils](https://developer.mozilla.org/en/docs/Web/API/HTMLHyperlinkElementUtils) to Kotlin
  */
-external interface HTMLHyperlinkElementUtils {
+public external interface HTMLHyperlinkElementUtils {
     var href: String
     val origin: String
     var protocol: String
@@ -850,7 +850,7 @@ external interface HTMLHyperlinkElementUtils {
 /**
  * Exposes the JavaScript [HTMLModElement](https://developer.mozilla.org/en/docs/Web/API/HTMLModElement) to Kotlin
  */
-external abstract class HTMLModElement : HTMLElement {
+public external abstract class HTMLModElement : HTMLElement {
     open var cite: String
     open var dateTime: String
 
@@ -879,7 +879,7 @@ external abstract class HTMLModElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLPictureElement](https://developer.mozilla.org/en/docs/Web/API/HTMLPictureElement) to Kotlin
  */
-external abstract class HTMLPictureElement : HTMLElement {
+public external abstract class HTMLPictureElement : HTMLElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -905,7 +905,7 @@ external abstract class HTMLPictureElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLSourceElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSourceElement) to Kotlin
  */
-external abstract class HTMLSourceElement : HTMLElement {
+public external abstract class HTMLSourceElement : HTMLElement {
     open var src: String
     open var type: String
     open var srcset: String
@@ -937,7 +937,7 @@ external abstract class HTMLSourceElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLImageElement](https://developer.mozilla.org/en/docs/Web/API/HTMLImageElement) to Kotlin
  */
-external abstract class HTMLImageElement : HTMLElement, HTMLOrSVGImageElement, TexImageSource {
+public external abstract class HTMLImageElement : HTMLElement, HTMLOrSVGImageElement, TexImageSource {
     open var alt: String
     open var src: String
     open var srcset: String
@@ -987,7 +987,7 @@ external abstract class HTMLImageElement : HTMLElement, HTMLOrSVGImageElement, T
 /**
  * Exposes the JavaScript [HTMLIFrameElement](https://developer.mozilla.org/en/docs/Web/API/HTMLIFrameElement) to Kotlin
  */
-external abstract class HTMLIFrameElement : HTMLElement {
+public external abstract class HTMLIFrameElement : HTMLElement {
     open var src: String
     open var srcdoc: String
     open var name: String
@@ -1032,7 +1032,7 @@ external abstract class HTMLIFrameElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLEmbedElement](https://developer.mozilla.org/en/docs/Web/API/HTMLEmbedElement) to Kotlin
  */
-external abstract class HTMLEmbedElement : HTMLElement {
+public external abstract class HTMLEmbedElement : HTMLElement {
     open var src: String
     open var type: String
     open var width: String
@@ -1066,7 +1066,7 @@ external abstract class HTMLEmbedElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLObjectElement](https://developer.mozilla.org/en/docs/Web/API/HTMLObjectElement) to Kotlin
  */
-external abstract class HTMLObjectElement : HTMLElement {
+public external abstract class HTMLObjectElement : HTMLElement {
     open var data: String
     open var type: String
     open var typeMustMatch: Boolean
@@ -1120,7 +1120,7 @@ external abstract class HTMLObjectElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLParamElement](https://developer.mozilla.org/en/docs/Web/API/HTMLParamElement) to Kotlin
  */
-external abstract class HTMLParamElement : HTMLElement {
+public external abstract class HTMLParamElement : HTMLElement {
     open var name: String
     open var value: String
     open var type: String
@@ -1151,7 +1151,7 @@ external abstract class HTMLParamElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLVideoElement](https://developer.mozilla.org/en/docs/Web/API/HTMLVideoElement) to Kotlin
  */
-external abstract class HTMLVideoElement : HTMLMediaElement, CanvasImageSource, TexImageSource {
+public external abstract class HTMLVideoElement : HTMLMediaElement, CanvasImageSource, TexImageSource {
     open var width: Int
     open var height: Int
     open val videoWidth: Int
@@ -1193,7 +1193,7 @@ external abstract class HTMLVideoElement : HTMLMediaElement, CanvasImageSource, 
 /**
  * Exposes the JavaScript [HTMLAudioElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAudioElement) to Kotlin
  */
-external abstract class HTMLAudioElement : HTMLMediaElement {
+public external abstract class HTMLAudioElement : HTMLMediaElement {
     companion object {
         val NETWORK_EMPTY: Short
         val NETWORK_IDLE: Short
@@ -1228,7 +1228,7 @@ external abstract class HTMLAudioElement : HTMLMediaElement {
 /**
  * Exposes the JavaScript [HTMLTrackElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTrackElement) to Kotlin
  */
-external abstract class HTMLTrackElement : HTMLElement {
+public external abstract class HTMLTrackElement : HTMLElement {
     open var kind: String
     open var src: String
     open var srclang: String
@@ -1266,7 +1266,7 @@ external abstract class HTMLTrackElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLMediaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMediaElement) to Kotlin
  */
-external abstract class HTMLMediaElement : HTMLElement {
+public external abstract class HTMLMediaElement : HTMLElement {
     open val error: MediaError?
     open var src: String
     open var srcObject: dynamic
@@ -1336,7 +1336,7 @@ external abstract class HTMLMediaElement : HTMLElement {
 /**
  * Exposes the JavaScript [MediaError](https://developer.mozilla.org/en/docs/Web/API/MediaError) to Kotlin
  */
-external abstract class MediaError {
+public external abstract class MediaError {
     open val code: Short
 
     companion object {
@@ -1350,7 +1350,7 @@ external abstract class MediaError {
 /**
  * Exposes the JavaScript [AudioTrackList](https://developer.mozilla.org/en/docs/Web/API/AudioTrackList) to Kotlin
  */
-external abstract class AudioTrackList : EventTarget {
+public external abstract class AudioTrackList : EventTarget {
     open val length: Int
     open var onchange: ((Event) -> dynamic)?
     open var onaddtrack: ((TrackEvent) -> dynamic)?
@@ -1359,12 +1359,12 @@ external abstract class AudioTrackList : EventTarget {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun AudioTrackList.get(index: Int): AudioTrack? = asDynamic()[index]
+public inline operator fun AudioTrackList.get(index: Int): AudioTrack? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [AudioTrack](https://developer.mozilla.org/en/docs/Web/API/AudioTrack) to Kotlin
  */
-external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
+public external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
     open val kind: String
     open val label: String
@@ -1375,7 +1375,7 @@ external abstract class AudioTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
 /**
  * Exposes the JavaScript [VideoTrackList](https://developer.mozilla.org/en/docs/Web/API/VideoTrackList) to Kotlin
  */
-external abstract class VideoTrackList : EventTarget {
+public external abstract class VideoTrackList : EventTarget {
     open val length: Int
     open val selectedIndex: Int
     open var onchange: ((Event) -> dynamic)?
@@ -1385,12 +1385,12 @@ external abstract class VideoTrackList : EventTarget {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun VideoTrackList.get(index: Int): VideoTrack? = asDynamic()[index]
+public inline operator fun VideoTrackList.get(index: Int): VideoTrack? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [VideoTrack](https://developer.mozilla.org/en/docs/Web/API/VideoTrack) to Kotlin
  */
-external abstract class VideoTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
+public external abstract class VideoTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open val id: String
     open val kind: String
     open val label: String
@@ -1398,7 +1398,7 @@ external abstract class VideoTrack : UnionAudioTrackOrTextTrackOrVideoTrack {
     open var selected: Boolean
 }
 
-external abstract class TextTrackList : EventTarget {
+public external abstract class TextTrackList : EventTarget {
     open val length: Int
     open var onchange: ((Event) -> dynamic)?
     open var onaddtrack: ((TrackEvent) -> dynamic)?
@@ -1407,12 +1407,12 @@ external abstract class TextTrackList : EventTarget {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun TextTrackList.get(index: Int): TextTrack? = asDynamic()[index]
+public inline operator fun TextTrackList.get(index: Int): TextTrack? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [TextTrack](https://developer.mozilla.org/en/docs/Web/API/TextTrack) to Kotlin
  */
-external abstract class TextTrack : EventTarget, UnionAudioTrackOrTextTrackOrVideoTrack {
+public external abstract class TextTrack : EventTarget, UnionAudioTrackOrTextTrackOrVideoTrack {
     open val kind: TextTrackKind
     open val label: String
     open val language: String
@@ -1426,18 +1426,18 @@ external abstract class TextTrack : EventTarget, UnionAudioTrackOrTextTrackOrVid
     fun removeCue(cue: TextTrackCue)
 }
 
-external abstract class TextTrackCueList {
+public external abstract class TextTrackCueList {
     open val length: Int
     fun getCueById(id: String): TextTrackCue?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun TextTrackCueList.get(index: Int): TextTrackCue? = asDynamic()[index]
+public inline operator fun TextTrackCueList.get(index: Int): TextTrackCue? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [TextTrackCue](https://developer.mozilla.org/en/docs/Web/API/TextTrackCue) to Kotlin
  */
-external abstract class TextTrackCue : EventTarget {
+public external abstract class TextTrackCue : EventTarget {
     open val track: TextTrack?
     open var id: String
     open var startTime: Double
@@ -1450,7 +1450,7 @@ external abstract class TextTrackCue : EventTarget {
 /**
  * Exposes the JavaScript [TimeRanges](https://developer.mozilla.org/en/docs/Web/API/TimeRanges) to Kotlin
  */
-external abstract class TimeRanges {
+public external abstract class TimeRanges {
     open val length: Int
     fun start(index: Int): Double
     fun end(index: Int): Double
@@ -1459,7 +1459,7 @@ external abstract class TimeRanges {
 /**
  * Exposes the JavaScript [TrackEvent](https://developer.mozilla.org/en/docs/Web/API/TrackEvent) to Kotlin
  */
-external open class TrackEvent(type: String, eventInitDict: TrackEventInit = definedExternally) : Event {
+public external open class TrackEvent(type: String, eventInitDict: TrackEventInit = definedExternally) : Event {
     open val track: UnionAudioTrackOrTextTrackOrVideoTrack?
 
     companion object {
@@ -1470,14 +1470,14 @@ external open class TrackEvent(type: String, eventInitDict: TrackEventInit = def
     }
 }
 
-external interface TrackEventInit : EventInit {
+public external interface TrackEventInit : EventInit {
     var track: UnionAudioTrackOrTextTrackOrVideoTrack? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): TrackEventInit {
+public inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): TrackEventInit {
     val o = js("({})")
     o["track"] = track
     o["bubbles"] = bubbles
@@ -1489,7 +1489,7 @@ inline fun TrackEventInit(track: UnionAudioTrackOrTextTrackOrVideoTrack? = null,
 /**
  * Exposes the JavaScript [HTMLMapElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMapElement) to Kotlin
  */
-external abstract class HTMLMapElement : HTMLElement {
+public external abstract class HTMLMapElement : HTMLElement {
     open var name: String
     open val areas: HTMLCollection
 
@@ -1518,7 +1518,7 @@ external abstract class HTMLMapElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLAreaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLAreaElement) to Kotlin
  */
-external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils {
+public external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils {
     open var alt: String
     open var coords: String
     open var shape: String
@@ -1555,7 +1555,7 @@ external abstract class HTMLAreaElement : HTMLElement, HTMLHyperlinkElementUtils
 /**
  * Exposes the JavaScript [HTMLTableElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableElement) to Kotlin
  */
-external abstract class HTMLTableElement : HTMLElement {
+public external abstract class HTMLTableElement : HTMLElement {
     open var caption: HTMLTableCaptionElement?
     open var tHead: HTMLTableSectionElement?
     open var tFoot: HTMLTableSectionElement?
@@ -1605,7 +1605,7 @@ external abstract class HTMLTableElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTableCaptionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableCaptionElement) to Kotlin
  */
-external abstract class HTMLTableCaptionElement : HTMLElement {
+public external abstract class HTMLTableCaptionElement : HTMLElement {
     open var align: String
 
     companion object {
@@ -1633,7 +1633,7 @@ external abstract class HTMLTableCaptionElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTableColElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableColElement) to Kotlin
  */
-external abstract class HTMLTableColElement : HTMLElement {
+public external abstract class HTMLTableColElement : HTMLElement {
     open var span: Int
     open var align: String
     open var ch: String
@@ -1666,7 +1666,7 @@ external abstract class HTMLTableColElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTableSectionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableSectionElement) to Kotlin
  */
-external abstract class HTMLTableSectionElement : HTMLElement {
+public external abstract class HTMLTableSectionElement : HTMLElement {
     open val rows: HTMLCollection
     open var align: String
     open var ch: String
@@ -1700,7 +1700,7 @@ external abstract class HTMLTableSectionElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTableRowElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableRowElement) to Kotlin
  */
-external abstract class HTMLTableRowElement : HTMLElement {
+public external abstract class HTMLTableRowElement : HTMLElement {
     open val rowIndex: Int
     open val sectionRowIndex: Int
     open val cells: HTMLCollection
@@ -1737,7 +1737,7 @@ external abstract class HTMLTableRowElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLTableCellElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTableCellElement) to Kotlin
  */
-external abstract class HTMLTableCellElement : HTMLElement {
+public external abstract class HTMLTableCellElement : HTMLElement {
     open var colSpan: Int
     open var rowSpan: Int
     open var headers: String
@@ -1779,7 +1779,7 @@ external abstract class HTMLTableCellElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLFormElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFormElement) to Kotlin
  */
-external abstract class HTMLFormElement : HTMLElement {
+public external abstract class HTMLFormElement : HTMLElement {
     open var acceptCharset: String
     open var action: String
     open var autocomplete: String
@@ -1819,15 +1819,15 @@ external abstract class HTMLFormElement : HTMLElement {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLFormElement.get(index: Int): Element? = asDynamic()[index]
+public inline operator fun HTMLFormElement.get(index: Int): Element? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLFormElement.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
+public inline operator fun HTMLFormElement.get(name: String): UnionElementOrRadioNodeList? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [HTMLLabelElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLabelElement) to Kotlin
  */
-external abstract class HTMLLabelElement : HTMLElement {
+public external abstract class HTMLLabelElement : HTMLElement {
     open val form: HTMLFormElement?
     open var htmlFor: String
     open val control: HTMLElement?
@@ -1857,7 +1857,7 @@ external abstract class HTMLLabelElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLInputElement](https://developer.mozilla.org/en/docs/Web/API/HTMLInputElement) to Kotlin
  */
-external abstract class HTMLInputElement : HTMLElement {
+public external abstract class HTMLInputElement : HTMLElement {
     open var accept: String
     open var alt: String
     open var autocomplete: String
@@ -1940,7 +1940,7 @@ external abstract class HTMLInputElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLButtonElement](https://developer.mozilla.org/en/docs/Web/API/HTMLButtonElement) to Kotlin
  */
-external abstract class HTMLButtonElement : HTMLElement {
+public external abstract class HTMLButtonElement : HTMLElement {
     open var autofocus: Boolean
     open var disabled: Boolean
     open val form: HTMLFormElement?
@@ -1986,7 +1986,7 @@ external abstract class HTMLButtonElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLSelectElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSelectElement) to Kotlin
  */
-external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> {
+public external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> {
     open var autocomplete: String
     open var autofocus: Boolean
     open var disabled: Boolean
@@ -2036,15 +2036,15 @@ external abstract class HTMLSelectElement : HTMLElement, ItemArrayLike<Element> 
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
+public inline operator fun HTMLSelectElement.get(index: Int): Element? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
+public inline operator fun HTMLSelectElement.set(index: Int, option: HTMLOptionElement?) { asDynamic()[index] = option }
 
 /**
  * Exposes the JavaScript [HTMLDataListElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDataListElement) to Kotlin
  */
-external abstract class HTMLDataListElement : HTMLElement {
+public external abstract class HTMLDataListElement : HTMLElement {
     open val options: HTMLCollection
 
     companion object {
@@ -2072,7 +2072,7 @@ external abstract class HTMLDataListElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLOptGroupElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOptGroupElement) to Kotlin
  */
-external abstract class HTMLOptGroupElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
+public external abstract class HTMLOptGroupElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
     open var disabled: Boolean
     open var label: String
 
@@ -2101,7 +2101,7 @@ external abstract class HTMLOptGroupElement : HTMLElement, UnionHTMLOptGroupElem
 /**
  * Exposes the JavaScript [HTMLOptionElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOptionElement) to Kotlin
  */
-external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
+public external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElementOrHTMLOptionElement {
     open var disabled: Boolean
     open val form: HTMLFormElement?
     open var label: String
@@ -2136,7 +2136,7 @@ external abstract class HTMLOptionElement : HTMLElement, UnionHTMLOptGroupElemen
 /**
  * Exposes the JavaScript [HTMLTextAreaElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTextAreaElement) to Kotlin
  */
-external abstract class HTMLTextAreaElement : HTMLElement {
+public external abstract class HTMLTextAreaElement : HTMLElement {
     open var autocomplete: String
     open var autofocus: Boolean
     open var cols: Int
@@ -2196,7 +2196,7 @@ external abstract class HTMLTextAreaElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLKeygenElement](https://developer.mozilla.org/en/docs/Web/API/HTMLKeygenElement) to Kotlin
  */
-external abstract class HTMLKeygenElement : HTMLElement {
+public external abstract class HTMLKeygenElement : HTMLElement {
     open var autofocus: Boolean
     open var challenge: String
     open var disabled: Boolean
@@ -2237,7 +2237,7 @@ external abstract class HTMLKeygenElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLOutputElement](https://developer.mozilla.org/en/docs/Web/API/HTMLOutputElement) to Kotlin
  */
-external abstract class HTMLOutputElement : HTMLElement {
+public external abstract class HTMLOutputElement : HTMLElement {
     open val htmlFor: DOMTokenList
     open val form: HTMLFormElement?
     open var name: String
@@ -2277,7 +2277,7 @@ external abstract class HTMLOutputElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLProgressElement](https://developer.mozilla.org/en/docs/Web/API/HTMLProgressElement) to Kotlin
  */
-external abstract class HTMLProgressElement : HTMLElement {
+public external abstract class HTMLProgressElement : HTMLElement {
     open var value: Double
     open var max: Double
     open val position: Double
@@ -2308,7 +2308,7 @@ external abstract class HTMLProgressElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLMeterElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMeterElement) to Kotlin
  */
-external abstract class HTMLMeterElement : HTMLElement {
+public external abstract class HTMLMeterElement : HTMLElement {
     open var value: Double
     open var min: Double
     open var max: Double
@@ -2342,7 +2342,7 @@ external abstract class HTMLMeterElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLFieldSetElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFieldSetElement) to Kotlin
  */
-external abstract class HTMLFieldSetElement : HTMLElement {
+public external abstract class HTMLFieldSetElement : HTMLElement {
     open var disabled: Boolean
     open val form: HTMLFormElement?
     open var name: String
@@ -2380,7 +2380,7 @@ external abstract class HTMLFieldSetElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLLegendElement](https://developer.mozilla.org/en/docs/Web/API/HTMLLegendElement) to Kotlin
  */
-external abstract class HTMLLegendElement : HTMLElement {
+public external abstract class HTMLLegendElement : HTMLElement {
     open val form: HTMLFormElement?
     open var align: String
 
@@ -2409,7 +2409,7 @@ external abstract class HTMLLegendElement : HTMLElement {
 /**
  * Exposes the JavaScript [ValidityState](https://developer.mozilla.org/en/docs/Web/API/ValidityState) to Kotlin
  */
-external abstract class ValidityState {
+public external abstract class ValidityState {
     open val valueMissing: Boolean
     open val typeMismatch: Boolean
     open val patternMismatch: Boolean
@@ -2426,7 +2426,7 @@ external abstract class ValidityState {
 /**
  * Exposes the JavaScript [HTMLDetailsElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDetailsElement) to Kotlin
  */
-external abstract class HTMLDetailsElement : HTMLElement {
+public external abstract class HTMLDetailsElement : HTMLElement {
     open var open: Boolean
 
     companion object {
@@ -2451,7 +2451,7 @@ external abstract class HTMLDetailsElement : HTMLElement {
     }
 }
 
-external abstract class HTMLMenuElement : HTMLElement {
+public external abstract class HTMLMenuElement : HTMLElement {
     open var type: String
     open var label: String
     open var compact: Boolean
@@ -2478,7 +2478,7 @@ external abstract class HTMLMenuElement : HTMLElement {
     }
 }
 
-external abstract class HTMLMenuItemElement : HTMLElement {
+public external abstract class HTMLMenuItemElement : HTMLElement {
     open var type: String
     open var label: String
     open var icon: String
@@ -2509,7 +2509,7 @@ external abstract class HTMLMenuItemElement : HTMLElement {
     }
 }
 
-external open class RelatedEvent(type: String, eventInitDict: RelatedEventInit = definedExternally) : Event {
+public external open class RelatedEvent(type: String, eventInitDict: RelatedEventInit = definedExternally) : Event {
     open val relatedTarget: EventTarget?
 
     companion object {
@@ -2520,14 +2520,14 @@ external open class RelatedEvent(type: String, eventInitDict: RelatedEventInit =
     }
 }
 
-external interface RelatedEventInit : EventInit {
+public external interface RelatedEventInit : EventInit {
     var relatedTarget: EventTarget? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun RelatedEventInit(relatedTarget: EventTarget? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): RelatedEventInit {
+public inline fun RelatedEventInit(relatedTarget: EventTarget? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): RelatedEventInit {
     val o = js("({})")
     o["relatedTarget"] = relatedTarget
     o["bubbles"] = bubbles
@@ -2539,7 +2539,7 @@ inline fun RelatedEventInit(relatedTarget: EventTarget? = null, bubbles: Boolean
 /**
  * Exposes the JavaScript [HTMLDialogElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDialogElement) to Kotlin
  */
-external abstract class HTMLDialogElement : HTMLElement {
+public external abstract class HTMLDialogElement : HTMLElement {
     open var open: Boolean
     open var returnValue: String
     fun show(anchor: UnionElementOrMouseEvent = definedExternally)
@@ -2571,7 +2571,7 @@ external abstract class HTMLDialogElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLScriptElement](https://developer.mozilla.org/en/docs/Web/API/HTMLScriptElement) to Kotlin
  */
-external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement {
+public external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement {
     open var src: String
     open var type: String
     open var charset: String
@@ -2608,7 +2608,7 @@ external abstract class HTMLScriptElement : HTMLElement, HTMLOrSVGScriptElement 
 /**
  * Exposes the JavaScript [HTMLTemplateElement](https://developer.mozilla.org/en/docs/Web/API/HTMLTemplateElement) to Kotlin
  */
-external abstract class HTMLTemplateElement : HTMLElement {
+public external abstract class HTMLTemplateElement : HTMLElement {
     open val content: DocumentFragment
 
     companion object {
@@ -2636,7 +2636,7 @@ external abstract class HTMLTemplateElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLSlotElement](https://developer.mozilla.org/en/docs/Web/API/HTMLSlotElement) to Kotlin
  */
-external abstract class HTMLSlotElement : HTMLElement {
+public external abstract class HTMLSlotElement : HTMLElement {
     open var name: String
     fun assignedNodes(options: AssignedNodesOptions = definedExternally): Array<Node>
 
@@ -2662,14 +2662,14 @@ external abstract class HTMLSlotElement : HTMLElement {
     }
 }
 
-external interface AssignedNodesOptions {
+public external interface AssignedNodesOptions {
     var flatten: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions {
+public inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions {
     val o = js("({})")
     o["flatten"] = flatten
     return o
@@ -2678,7 +2678,7 @@ inline fun AssignedNodesOptions(flatten: Boolean? = false): AssignedNodesOptions
 /**
  * Exposes the JavaScript [HTMLCanvasElement](https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement) to Kotlin
  */
-external abstract class HTMLCanvasElement : HTMLElement, CanvasImageSource, TexImageSource {
+public external abstract class HTMLCanvasElement : HTMLElement, CanvasImageSource, TexImageSource {
     open var width: Int
     open var height: Int
     fun getContext(contextId: String, vararg arguments: Any?): RenderingContext?
@@ -2707,14 +2707,14 @@ external abstract class HTMLCanvasElement : HTMLElement, CanvasImageSource, TexI
     }
 }
 
-external interface CanvasRenderingContext2DSettings {
+public external interface CanvasRenderingContext2DSettings {
     var alpha: Boolean? /* = true */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun CanvasRenderingContext2DSettings(alpha: Boolean? = true): CanvasRenderingContext2DSettings {
+public inline fun CanvasRenderingContext2DSettings(alpha: Boolean? = true): CanvasRenderingContext2DSettings {
     val o = js("({})")
     o["alpha"] = alpha
     return o
@@ -2723,16 +2723,16 @@ inline fun CanvasRenderingContext2DSettings(alpha: Boolean? = true): CanvasRende
 /**
  * Exposes the JavaScript [CanvasRenderingContext2D](https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D) to Kotlin
  */
-external abstract class CanvasRenderingContext2D : CanvasState, CanvasTransform, CanvasCompositing, CanvasImageSmoothing, CanvasFillStrokeStyles, CanvasShadowStyles, CanvasFilters, CanvasRect, CanvasDrawPath, CanvasUserInterface, CanvasText, CanvasDrawImage, CanvasHitRegion, CanvasImageData, CanvasPathDrawingStyles, CanvasTextDrawingStyles, CanvasPath, RenderingContext {
+public external abstract class CanvasRenderingContext2D : CanvasState, CanvasTransform, CanvasCompositing, CanvasImageSmoothing, CanvasFillStrokeStyles, CanvasShadowStyles, CanvasFilters, CanvasRect, CanvasDrawPath, CanvasUserInterface, CanvasText, CanvasDrawImage, CanvasHitRegion, CanvasImageData, CanvasPathDrawingStyles, CanvasTextDrawingStyles, CanvasPath, RenderingContext {
     open val canvas: HTMLCanvasElement
 }
 
-external interface CanvasState {
+public external interface CanvasState {
     fun save()
     fun restore()
 }
 
-external interface CanvasTransform {
+public external interface CanvasTransform {
     fun scale(x: Double, y: Double)
     fun rotate(angle: Double)
     fun translate(x: Double, y: Double)
@@ -2743,17 +2743,17 @@ external interface CanvasTransform {
     fun resetTransform()
 }
 
-external interface CanvasCompositing {
+public external interface CanvasCompositing {
     var globalAlpha: Double
     var globalCompositeOperation: String
 }
 
-external interface CanvasImageSmoothing {
+public external interface CanvasImageSmoothing {
     var imageSmoothingEnabled: Boolean
     var imageSmoothingQuality: ImageSmoothingQuality
 }
 
-external interface CanvasFillStrokeStyles {
+public external interface CanvasFillStrokeStyles {
     var strokeStyle: dynamic
         get() = definedExternally
         set(value) = definedExternally
@@ -2765,24 +2765,24 @@ external interface CanvasFillStrokeStyles {
     fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
 }
 
-external interface CanvasShadowStyles {
+public external interface CanvasShadowStyles {
     var shadowOffsetX: Double
     var shadowOffsetY: Double
     var shadowBlur: Double
     var shadowColor: String
 }
 
-external interface CanvasFilters {
+public external interface CanvasFilters {
     var filter: String
 }
 
-external interface CanvasRect {
+public external interface CanvasRect {
     fun clearRect(x: Double, y: Double, w: Double, h: Double)
     fun fillRect(x: Double, y: Double, w: Double, h: Double)
     fun strokeRect(x: Double, y: Double, w: Double, h: Double)
 }
 
-external interface CanvasDrawPath {
+public external interface CanvasDrawPath {
     fun beginPath()
     fun fill(fillRule: CanvasFillRule = definedExternally)
     fun fill(path: Path2D, fillRule: CanvasFillRule = definedExternally)
@@ -2797,32 +2797,32 @@ external interface CanvasDrawPath {
     fun isPointInStroke(path: Path2D, x: Double, y: Double): Boolean
 }
 
-external interface CanvasUserInterface {
+public external interface CanvasUserInterface {
     fun drawFocusIfNeeded(element: Element)
     fun drawFocusIfNeeded(path: Path2D, element: Element)
     fun scrollPathIntoView()
     fun scrollPathIntoView(path: Path2D)
 }
 
-external interface CanvasText {
+public external interface CanvasText {
     fun fillText(text: String, x: Double, y: Double, maxWidth: Double = definedExternally)
     fun strokeText(text: String, x: Double, y: Double, maxWidth: Double = definedExternally)
     fun measureText(text: String): TextMetrics
 }
 
-external interface CanvasDrawImage {
+public external interface CanvasDrawImage {
     fun drawImage(image: CanvasImageSource, dx: Double, dy: Double)
     fun drawImage(image: CanvasImageSource, dx: Double, dy: Double, dw: Double, dh: Double)
     fun drawImage(image: CanvasImageSource, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double)
 }
 
-external interface CanvasHitRegion {
+public external interface CanvasHitRegion {
     fun addHitRegion(options: HitRegionOptions = definedExternally)
     fun removeHitRegion(id: String)
     fun clearHitRegions()
 }
 
-external interface CanvasImageData {
+public external interface CanvasImageData {
     fun createImageData(sw: Double, sh: Double): ImageData
     fun createImageData(imagedata: ImageData): ImageData
     fun getImageData(sx: Double, sy: Double, sw: Double, sh: Double): ImageData
@@ -2830,7 +2830,7 @@ external interface CanvasImageData {
     fun putImageData(imagedata: ImageData, dx: Double, dy: Double, dirtyX: Double, dirtyY: Double, dirtyWidth: Double, dirtyHeight: Double)
 }
 
-external interface CanvasPathDrawingStyles {
+public external interface CanvasPathDrawingStyles {
     var lineWidth: Double
     var lineCap: CanvasLineCap
     var lineJoin: CanvasLineJoin
@@ -2840,14 +2840,14 @@ external interface CanvasPathDrawingStyles {
     fun getLineDash(): Array<Double>
 }
 
-external interface CanvasTextDrawingStyles {
+public external interface CanvasTextDrawingStyles {
     var font: String
     var textAlign: CanvasTextAlign
     var textBaseline: CanvasTextBaseline
     var direction: CanvasDirection
 }
 
-external interface CanvasPath {
+public external interface CanvasPath {
     fun closePath()
     fun moveTo(x: Double, y: Double)
     fun lineTo(x: Double, y: Double)
@@ -2863,21 +2863,21 @@ external interface CanvasPath {
 /**
  * Exposes the JavaScript [CanvasGradient](https://developer.mozilla.org/en/docs/Web/API/CanvasGradient) to Kotlin
  */
-external abstract class CanvasGradient {
+public external abstract class CanvasGradient {
     fun addColorStop(offset: Double, color: String)
 }
 
 /**
  * Exposes the JavaScript [CanvasPattern](https://developer.mozilla.org/en/docs/Web/API/CanvasPattern) to Kotlin
  */
-external abstract class CanvasPattern {
+public external abstract class CanvasPattern {
     fun setTransform(transform: dynamic = definedExternally)
 }
 
 /**
  * Exposes the JavaScript [TextMetrics](https://developer.mozilla.org/en/docs/Web/API/TextMetrics) to Kotlin
  */
-external abstract class TextMetrics {
+public external abstract class TextMetrics {
     open val width: Double
     open val actualBoundingBoxLeft: Double
     open val actualBoundingBoxRight: Double
@@ -2892,7 +2892,7 @@ external abstract class TextMetrics {
     open val ideographicBaseline: Double
 }
 
-external interface HitRegionOptions {
+public external interface HitRegionOptions {
     var path: Path2D? /* = null */
         get() = definedExternally
         set(value) = definedExternally
@@ -2920,7 +2920,7 @@ external interface HitRegionOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = CanvasFillRule.NONZERO, id: String? = "", parentID: String? = null, cursor: String? = "inherit", control: Element? = null, label: String? = null, role: String? = null): HitRegionOptions {
+public inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = CanvasFillRule.NONZERO, id: String? = "", parentID: String? = null, cursor: String? = "inherit", control: Element? = null, label: String? = null, role: String? = null): HitRegionOptions {
     val o = js("({})")
     o["path"] = path
     o["fillRule"] = fillRule
@@ -2936,7 +2936,7 @@ inline fun HitRegionOptions(path: Path2D? = null, fillRule: CanvasFillRule? = Ca
 /**
  * Exposes the JavaScript [ImageData](https://developer.mozilla.org/en/docs/Web/API/ImageData) to Kotlin
  */
-external open class ImageData : ImageBitmapSource, TexImageSource {
+public external open class ImageData : ImageBitmapSource, TexImageSource {
     constructor(sw: Int, sh: Int)
     constructor(data: Uint8ClampedArray, sw: Int, sh: Int = definedExternally)
     open val width: Int
@@ -2947,7 +2947,7 @@ external open class ImageData : ImageBitmapSource, TexImageSource {
 /**
  * Exposes the JavaScript [Path2D](https://developer.mozilla.org/en/docs/Web/API/Path2D) to Kotlin
  */
-external open class Path2D() : CanvasPath {
+public external open class Path2D() : CanvasPath {
     constructor(path: Path2D)
     constructor(paths: Array<Path2D>, fillRule: CanvasFillRule = definedExternally)
     constructor(d: String)
@@ -2967,19 +2967,19 @@ external open class Path2D() : CanvasPath {
 /**
  * Exposes the JavaScript [ImageBitmapRenderingContext](https://developer.mozilla.org/en/docs/Web/API/ImageBitmapRenderingContext) to Kotlin
  */
-external abstract class ImageBitmapRenderingContext {
+public external abstract class ImageBitmapRenderingContext {
     open val canvas: HTMLCanvasElement
     fun transferFromImageBitmap(bitmap: ImageBitmap?)
 }
 
-external interface ImageBitmapRenderingContextSettings {
+public external interface ImageBitmapRenderingContextSettings {
     var alpha: Boolean? /* = true */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ImageBitmapRenderingContextSettings(alpha: Boolean? = true): ImageBitmapRenderingContextSettings {
+public inline fun ImageBitmapRenderingContextSettings(alpha: Boolean? = true): ImageBitmapRenderingContextSettings {
     val o = js("({})")
     o["alpha"] = alpha
     return o
@@ -2988,26 +2988,26 @@ inline fun ImageBitmapRenderingContextSettings(alpha: Boolean? = true): ImageBit
 /**
  * Exposes the JavaScript [CustomElementRegistry](https://developer.mozilla.org/en/docs/Web/API/CustomElementRegistry) to Kotlin
  */
-external abstract class CustomElementRegistry {
+public external abstract class CustomElementRegistry {
     fun define(name: String, constructor: () -> dynamic, options: ElementDefinitionOptions = definedExternally)
     fun get(name: String): Any?
     fun whenDefined(name: String): Promise<Unit>
 }
 
-external interface ElementDefinitionOptions {
+public external interface ElementDefinitionOptions {
     var extends: String?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ElementDefinitionOptions(extends: String? = undefined): ElementDefinitionOptions {
+public inline fun ElementDefinitionOptions(extends: String? = undefined): ElementDefinitionOptions {
     val o = js("({})")
     o["extends"] = extends
     return o
 }
 
-external interface ElementContentEditable {
+public external interface ElementContentEditable {
     var contentEditable: String
     val isContentEditable: Boolean
 }
@@ -3015,7 +3015,7 @@ external interface ElementContentEditable {
 /**
  * Exposes the JavaScript [DataTransfer](https://developer.mozilla.org/en/docs/Web/API/DataTransfer) to Kotlin
  */
-external abstract class DataTransfer {
+public external abstract class DataTransfer {
     open var dropEffect: String
     open var effectAllowed: String
     open val items: DataTransferItemList
@@ -3030,7 +3030,7 @@ external abstract class DataTransfer {
 /**
  * Exposes the JavaScript [DataTransferItemList](https://developer.mozilla.org/en/docs/Web/API/DataTransferItemList) to Kotlin
  */
-external abstract class DataTransferItemList {
+public external abstract class DataTransferItemList {
     open val length: Int
     fun add(data: String, type: String): DataTransferItem?
     fun add(data: File): DataTransferItem?
@@ -3039,12 +3039,12 @@ external abstract class DataTransferItemList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun DataTransferItemList.get(index: Int): DataTransferItem? = asDynamic()[index]
+public inline operator fun DataTransferItemList.get(index: Int): DataTransferItem? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [DataTransferItem](https://developer.mozilla.org/en/docs/Web/API/DataTransferItem) to Kotlin
  */
-external abstract class DataTransferItem {
+public external abstract class DataTransferItem {
     open val kind: String
     open val type: String
     fun getAsString(_callback: ((String) -> Unit)?)
@@ -3054,7 +3054,7 @@ external abstract class DataTransferItem {
 /**
  * Exposes the JavaScript [DragEvent](https://developer.mozilla.org/en/docs/Web/API/DragEvent) to Kotlin
  */
-external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
+public external open class DragEvent(type: String, eventInitDict: DragEventInit = definedExternally) : MouseEvent {
     open val dataTransfer: DataTransfer?
 
     companion object {
@@ -3065,14 +3065,14 @@ external open class DragEvent(type: String, eventInitDict: DragEventInit = defin
     }
 }
 
-external interface DragEventInit : MouseEventInit {
+public external interface DragEventInit : MouseEventInit {
     var dataTransfer: DataTransfer? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, screenY: Int? = 0, clientX: Int? = 0, clientY: Int? = 0, button: Short? = 0, buttons: Short? = 0, relatedTarget: EventTarget? = null, region: String? = null, ctrlKey: Boolean? = false, shiftKey: Boolean? = false, altKey: Boolean? = false, metaKey: Boolean? = false, modifierAltGraph: Boolean? = false, modifierCapsLock: Boolean? = false, modifierFn: Boolean? = false, modifierFnLock: Boolean? = false, modifierHyper: Boolean? = false, modifierNumLock: Boolean? = false, modifierScrollLock: Boolean? = false, modifierSuper: Boolean? = false, modifierSymbol: Boolean? = false, modifierSymbolLock: Boolean? = false, view: Window? = null, detail: Int? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): DragEventInit {
+public inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, screenY: Int? = 0, clientX: Int? = 0, clientY: Int? = 0, button: Short? = 0, buttons: Short? = 0, relatedTarget: EventTarget? = null, region: String? = null, ctrlKey: Boolean? = false, shiftKey: Boolean? = false, altKey: Boolean? = false, metaKey: Boolean? = false, modifierAltGraph: Boolean? = false, modifierCapsLock: Boolean? = false, modifierFn: Boolean? = false, modifierFnLock: Boolean? = false, modifierHyper: Boolean? = false, modifierNumLock: Boolean? = false, modifierScrollLock: Boolean? = false, modifierSuper: Boolean? = false, modifierSymbol: Boolean? = false, modifierSymbolLock: Boolean? = false, view: Window? = null, detail: Int? = 0, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): DragEventInit {
     val o = js("({})")
     o["dataTransfer"] = dataTransfer
     o["screenX"] = screenX
@@ -3108,7 +3108,7 @@ inline fun DragEventInit(dataTransfer: DataTransfer? = null, screenX: Int? = 0, 
 /**
  * Exposes the JavaScript [Window](https://developer.mozilla.org/en/docs/Web/API/Window) to Kotlin
  */
-external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindowProxy {
+public external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, WindowSessionStorage, WindowLocalStorage, GlobalPerformance, UnionMessagePortOrWindowProxy {
     open val window: Window
     open val self: Window
     open val document: Document
@@ -3175,16 +3175,16 @@ external abstract class Window : EventTarget, GlobalEventHandlers, WindowEventHa
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
+public inline operator fun Window.get(name: String): dynamic = asDynamic()[name]
 
-external abstract class BarProp {
+public external abstract class BarProp {
     open val visible: Boolean
 }
 
 /**
  * Exposes the JavaScript [History](https://developer.mozilla.org/en/docs/Web/API/History) to Kotlin
  */
-external abstract class History {
+public external abstract class History {
     open val length: Int
     open var scrollRestoration: ScrollRestoration
     open val state: Any?
@@ -3198,7 +3198,7 @@ external abstract class History {
 /**
  * Exposes the JavaScript [Location](https://developer.mozilla.org/en/docs/Web/API/Location) to Kotlin
  */
-external abstract class Location {
+public external abstract class Location {
     open var href: String
     open val origin: String
     open var protocol: String
@@ -3217,7 +3217,7 @@ external abstract class Location {
 /**
  * Exposes the JavaScript [PopStateEvent](https://developer.mozilla.org/en/docs/Web/API/PopStateEvent) to Kotlin
  */
-external open class PopStateEvent(type: String, eventInitDict: PopStateEventInit = definedExternally) : Event {
+public external open class PopStateEvent(type: String, eventInitDict: PopStateEventInit = definedExternally) : Event {
     open val state: Any?
 
     companion object {
@@ -3228,14 +3228,14 @@ external open class PopStateEvent(type: String, eventInitDict: PopStateEventInit
     }
 }
 
-external interface PopStateEventInit : EventInit {
+public external interface PopStateEventInit : EventInit {
     var state: Any? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PopStateEventInit {
+public inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PopStateEventInit {
     val o = js("({})")
     o["state"] = state
     o["bubbles"] = bubbles
@@ -3247,7 +3247,7 @@ inline fun PopStateEventInit(state: Any? = null, bubbles: Boolean? = false, canc
 /**
  * Exposes the JavaScript [HashChangeEvent](https://developer.mozilla.org/en/docs/Web/API/HashChangeEvent) to Kotlin
  */
-external open class HashChangeEvent(type: String, eventInitDict: HashChangeEventInit = definedExternally) : Event {
+public external open class HashChangeEvent(type: String, eventInitDict: HashChangeEventInit = definedExternally) : Event {
     open val oldURL: String
     open val newURL: String
 
@@ -3259,7 +3259,7 @@ external open class HashChangeEvent(type: String, eventInitDict: HashChangeEvent
     }
 }
 
-external interface HashChangeEventInit : EventInit {
+public external interface HashChangeEventInit : EventInit {
     var oldURL: String? /* = "" */
         get() = definedExternally
         set(value) = definedExternally
@@ -3269,7 +3269,7 @@ external interface HashChangeEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): HashChangeEventInit {
+public inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): HashChangeEventInit {
     val o = js("({})")
     o["oldURL"] = oldURL
     o["newURL"] = newURL
@@ -3282,7 +3282,7 @@ inline fun HashChangeEventInit(oldURL: String? = "", newURL: String? = "", bubbl
 /**
  * Exposes the JavaScript [PageTransitionEvent](https://developer.mozilla.org/en/docs/Web/API/PageTransitionEvent) to Kotlin
  */
-external open class PageTransitionEvent(type: String, eventInitDict: PageTransitionEventInit = definedExternally) : Event {
+public external open class PageTransitionEvent(type: String, eventInitDict: PageTransitionEventInit = definedExternally) : Event {
     open val persisted: Boolean
 
     companion object {
@@ -3293,14 +3293,14 @@ external open class PageTransitionEvent(type: String, eventInitDict: PageTransit
     }
 }
 
-external interface PageTransitionEventInit : EventInit {
+public external interface PageTransitionEventInit : EventInit {
     var persisted: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PageTransitionEventInit {
+public inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PageTransitionEventInit {
     val o = js("({})")
     o["persisted"] = persisted
     o["bubbles"] = bubbles
@@ -3312,7 +3312,7 @@ inline fun PageTransitionEventInit(persisted: Boolean? = false, bubbles: Boolean
 /**
  * Exposes the JavaScript [BeforeUnloadEvent](https://developer.mozilla.org/en/docs/Web/API/BeforeUnloadEvent) to Kotlin
  */
-external open class BeforeUnloadEvent : Event {
+public external open class BeforeUnloadEvent : Event {
     var returnValue: String
 
     companion object {
@@ -3323,7 +3323,7 @@ external open class BeforeUnloadEvent : Event {
     }
 }
 
-external abstract class ApplicationCache : EventTarget {
+public external abstract class ApplicationCache : EventTarget {
     open val status: Short
     open var onchecking: ((Event) -> dynamic)?
     open var onerror: ((Event) -> dynamic)?
@@ -3350,14 +3350,14 @@ external abstract class ApplicationCache : EventTarget {
 /**
  * Exposes the JavaScript [NavigatorOnLine](https://developer.mozilla.org/en/docs/Web/API/NavigatorOnLine) to Kotlin
  */
-external interface NavigatorOnLine {
+public external interface NavigatorOnLine {
     val onLine: Boolean
 }
 
 /**
  * Exposes the JavaScript [ErrorEvent](https://developer.mozilla.org/en/docs/Web/API/ErrorEvent) to Kotlin
  */
-external open class ErrorEvent(type: String, eventInitDict: ErrorEventInit = definedExternally) : Event {
+public external open class ErrorEvent(type: String, eventInitDict: ErrorEventInit = definedExternally) : Event {
     open val message: String
     open val filename: String
     open val lineno: Int
@@ -3372,7 +3372,7 @@ external open class ErrorEvent(type: String, eventInitDict: ErrorEventInit = def
     }
 }
 
-external interface ErrorEventInit : EventInit {
+public external interface ErrorEventInit : EventInit {
     var message: String? /* = "" */
         get() = definedExternally
         set(value) = definedExternally
@@ -3391,7 +3391,7 @@ external interface ErrorEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno: Int? = 0, colno: Int? = 0, error: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ErrorEventInit {
+public inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno: Int? = 0, colno: Int? = 0, error: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ErrorEventInit {
     val o = js("({})")
     o["message"] = message
     o["filename"] = filename
@@ -3407,7 +3407,7 @@ inline fun ErrorEventInit(message: String? = "", filename: String? = "", lineno:
 /**
  * Exposes the JavaScript [PromiseRejectionEvent](https://developer.mozilla.org/en/docs/Web/API/PromiseRejectionEvent) to Kotlin
  */
-external open class PromiseRejectionEvent(type: String, eventInitDict: PromiseRejectionEventInit) : Event {
+public external open class PromiseRejectionEvent(type: String, eventInitDict: PromiseRejectionEventInit) : Event {
     open val promise: Promise<Any?>
     open val reason: Any?
 
@@ -3419,7 +3419,7 @@ external open class PromiseRejectionEvent(type: String, eventInitDict: PromiseRe
     }
 }
 
-external interface PromiseRejectionEventInit : EventInit {
+public external interface PromiseRejectionEventInit : EventInit {
     var promise: Promise<Any?>?
         get() = definedExternally
         set(value) = definedExternally
@@ -3429,7 +3429,7 @@ external interface PromiseRejectionEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PromiseRejectionEventInit {
+public inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PromiseRejectionEventInit {
     val o = js("({})")
     o["promise"] = promise
     o["reason"] = reason
@@ -3442,7 +3442,7 @@ inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = und
 /**
  * Exposes the JavaScript [GlobalEventHandlers](https://developer.mozilla.org/en/docs/Web/API/GlobalEventHandlers) to Kotlin
  */
-external interface GlobalEventHandlers {
+public external interface GlobalEventHandlers {
     var onabort: ((Event) -> dynamic)?
         get() = definedExternally
         set(value) = definedExternally
@@ -3661,7 +3661,7 @@ external interface GlobalEventHandlers {
 /**
  * Exposes the JavaScript [WindowEventHandlers](https://developer.mozilla.org/en/docs/Web/API/WindowEventHandlers) to Kotlin
  */
-external interface WindowEventHandlers {
+public external interface WindowEventHandlers {
     var onafterprint: ((Event) -> dynamic)?
         get() = definedExternally
         set(value) = definedExternally
@@ -3709,7 +3709,7 @@ external interface WindowEventHandlers {
         set(value) = definedExternally
 }
 
-external interface DocumentAndElementEventHandlers {
+public external interface DocumentAndElementEventHandlers {
     var oncopy: ((ClipboardEvent) -> dynamic)?
         get() = definedExternally
         set(value) = definedExternally
@@ -3724,7 +3724,7 @@ external interface DocumentAndElementEventHandlers {
 /**
  * Exposes the JavaScript [WindowOrWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/WindowOrWorkerGlobalScope) to Kotlin
  */
-external interface WindowOrWorkerGlobalScope {
+public external interface WindowOrWorkerGlobalScope {
     val origin: String
     val caches: CacheStorage
     fun btoa(data: String): String
@@ -3741,7 +3741,7 @@ external interface WindowOrWorkerGlobalScope {
 /**
  * Exposes the JavaScript [Navigator](https://developer.mozilla.org/en/docs/Web/API/Navigator) to Kotlin
  */
-external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
+public external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorContentUtils, NavigatorCookies, NavigatorPlugins, NavigatorConcurrentHardware {
     open val clipboard: Clipboard
     open val mediaDevices: MediaDevices
     open val maxTouchPoints: Int
@@ -3753,7 +3753,7 @@ external abstract class Navigator : NavigatorID, NavigatorLanguage, NavigatorOnL
 /**
  * Exposes the JavaScript [NavigatorID](https://developer.mozilla.org/en/docs/Web/API/NavigatorID) to Kotlin
  */
-external interface NavigatorID {
+public external interface NavigatorID {
     val appCodeName: String
     val appName: String
     val appVersion: String
@@ -3770,12 +3770,12 @@ external interface NavigatorID {
 /**
  * Exposes the JavaScript [NavigatorLanguage](https://developer.mozilla.org/en/docs/Web/API/NavigatorLanguage) to Kotlin
  */
-external interface NavigatorLanguage {
+public external interface NavigatorLanguage {
     val language: String
     val languages: Array<out String>
 }
 
-external interface NavigatorContentUtils {
+public external interface NavigatorContentUtils {
     fun registerProtocolHandler(scheme: String, url: String, title: String)
     fun registerContentHandler(mimeType: String, url: String, title: String)
     fun isProtocolHandlerRegistered(scheme: String, url: String): String
@@ -3784,14 +3784,14 @@ external interface NavigatorContentUtils {
     fun unregisterContentHandler(mimeType: String, url: String)
 }
 
-external interface NavigatorCookies {
+public external interface NavigatorCookies {
     val cookieEnabled: Boolean
 }
 
 /**
  * Exposes the JavaScript [NavigatorPlugins](https://developer.mozilla.org/en/docs/Web/API/NavigatorPlugins) to Kotlin
  */
-external interface NavigatorPlugins {
+public external interface NavigatorPlugins {
     val plugins: PluginArray
     val mimeTypes: MimeTypeArray
     fun javaEnabled(): Boolean
@@ -3800,36 +3800,36 @@ external interface NavigatorPlugins {
 /**
  * Exposes the JavaScript [PluginArray](https://developer.mozilla.org/en/docs/Web/API/PluginArray) to Kotlin
  */
-external abstract class PluginArray : ItemArrayLike<Plugin> {
+public external abstract class PluginArray : ItemArrayLike<Plugin> {
     fun refresh(reload: Boolean = definedExternally)
     override fun item(index: Int): Plugin?
     fun namedItem(name: String): Plugin?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
+public inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
+public inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [MimeTypeArray](https://developer.mozilla.org/en/docs/Web/API/MimeTypeArray) to Kotlin
  */
-external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
+public external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
     override fun item(index: Int): MimeType?
     fun namedItem(name: String): MimeType?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun MimeTypeArray.get(index: Int): MimeType? = asDynamic()[index]
+public inline operator fun MimeTypeArray.get(index: Int): MimeType? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun MimeTypeArray.get(name: String): MimeType? = asDynamic()[name]
+public inline operator fun MimeTypeArray.get(name: String): MimeType? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [Plugin](https://developer.mozilla.org/en/docs/Web/API/Plugin) to Kotlin
  */
-external abstract class Plugin : ItemArrayLike<MimeType> {
+public external abstract class Plugin : ItemArrayLike<MimeType> {
     open val name: String
     open val description: String
     open val filename: String
@@ -3838,15 +3838,15 @@ external abstract class Plugin : ItemArrayLike<MimeType> {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
+public inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
+public inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [MimeType](https://developer.mozilla.org/en/docs/Web/API/MimeType) to Kotlin
  */
-external abstract class MimeType {
+public external abstract class MimeType {
     open val type: String
     open val description: String
     open val suffixes: String
@@ -3856,13 +3856,13 @@ external abstract class MimeType {
 /**
  * Exposes the JavaScript [ImageBitmap](https://developer.mozilla.org/en/docs/Web/API/ImageBitmap) to Kotlin
  */
-external abstract class ImageBitmap : CanvasImageSource, TexImageSource {
+public external abstract class ImageBitmap : CanvasImageSource, TexImageSource {
     open val width: Int
     open val height: Int
     fun close()
 }
 
-external interface ImageBitmapOptions {
+public external interface ImageBitmapOptions {
     var imageOrientation: ImageOrientation? /* = ImageOrientation.NONE */
         get() = definedExternally
         set(value) = definedExternally
@@ -3884,7 +3884,7 @@ external interface ImageBitmapOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrientation.NONE, premultiplyAlpha: PremultiplyAlpha? = PremultiplyAlpha.DEFAULT, colorSpaceConversion: ColorSpaceConversion? = ColorSpaceConversion.DEFAULT, resizeWidth: Int? = undefined, resizeHeight: Int? = undefined, resizeQuality: ResizeQuality? = ResizeQuality.LOW): ImageBitmapOptions {
+public inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrientation.NONE, premultiplyAlpha: PremultiplyAlpha? = PremultiplyAlpha.DEFAULT, colorSpaceConversion: ColorSpaceConversion? = ColorSpaceConversion.DEFAULT, resizeWidth: Int? = undefined, resizeHeight: Int? = undefined, resizeQuality: ResizeQuality? = ResizeQuality.LOW): ImageBitmapOptions {
     val o = js("({})")
     o["imageOrientation"] = imageOrientation
     o["premultiplyAlpha"] = premultiplyAlpha
@@ -3898,7 +3898,7 @@ inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrienta
 /**
  * Exposes the JavaScript [MessageEvent](https://developer.mozilla.org/en/docs/Web/API/MessageEvent) to Kotlin
  */
-external open class MessageEvent(type: String, eventInitDict: MessageEventInit = definedExternally) : Event {
+public external open class MessageEvent(type: String, eventInitDict: MessageEventInit = definedExternally) : Event {
     open val data: Any?
     open val origin: String
     open val lastEventId: String
@@ -3914,7 +3914,7 @@ external open class MessageEvent(type: String, eventInitDict: MessageEventInit =
     }
 }
 
-external interface MessageEventInit : EventInit {
+public external interface MessageEventInit : EventInit {
     var data: Any? /* = null */
         get() = definedExternally
         set(value) = definedExternally
@@ -3933,7 +3933,7 @@ external interface MessageEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId: String? = "", source: UnionMessagePortOrWindowProxy? = null, ports: Array<MessagePort>? = arrayOf(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MessageEventInit {
+public inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId: String? = "", source: UnionMessagePortOrWindowProxy? = null, ports: Array<MessagePort>? = arrayOf(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MessageEventInit {
     val o = js("({})")
     o["data"] = data
     o["origin"] = origin
@@ -3949,7 +3949,7 @@ inline fun MessageEventInit(data: Any? = null, origin: String? = "", lastEventId
 /**
  * Exposes the JavaScript [EventSource](https://developer.mozilla.org/en/docs/Web/API/EventSource) to Kotlin
  */
-external open class EventSource(url: String, eventSourceInitDict: EventSourceInit = definedExternally) : EventTarget {
+public external open class EventSource(url: String, eventSourceInitDict: EventSourceInit = definedExternally) : EventTarget {
     open val url: String
     open val withCredentials: Boolean
     open val readyState: Short
@@ -3965,14 +3965,14 @@ external open class EventSource(url: String, eventSourceInitDict: EventSourceIni
     }
 }
 
-external interface EventSourceInit {
+public external interface EventSourceInit {
     var withCredentials: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
+public inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
     val o = js("({})")
     o["withCredentials"] = withCredentials
     return o
@@ -3981,7 +3981,7 @@ inline fun EventSourceInit(withCredentials: Boolean? = false): EventSourceInit {
 /**
  * Exposes the JavaScript [WebSocket](https://developer.mozilla.org/en/docs/Web/API/WebSocket) to Kotlin
  */
-external open class WebSocket(url: String, protocols: dynamic = definedExternally) : EventTarget {
+public external open class WebSocket(url: String, protocols: dynamic = definedExternally) : EventTarget {
     open val url: String
     open val readyState: Short
     open val bufferedAmount: Number
@@ -4009,7 +4009,7 @@ external open class WebSocket(url: String, protocols: dynamic = definedExternall
 /**
  * Exposes the JavaScript [CloseEvent](https://developer.mozilla.org/en/docs/Web/API/CloseEvent) to Kotlin
  */
-external open class CloseEvent(type: String, eventInitDict: CloseEventInit = definedExternally) : Event {
+public external open class CloseEvent(type: String, eventInitDict: CloseEventInit = definedExternally) : Event {
     open val wasClean: Boolean
     open val code: Short
     open val reason: String
@@ -4022,7 +4022,7 @@ external open class CloseEvent(type: String, eventInitDict: CloseEventInit = def
     }
 }
 
-external interface CloseEventInit : EventInit {
+public external interface CloseEventInit : EventInit {
     var wasClean: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
@@ -4035,7 +4035,7 @@ external interface CloseEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun CloseEventInit(wasClean: Boolean? = false, code: Short? = 0, reason: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CloseEventInit {
+public inline fun CloseEventInit(wasClean: Boolean? = false, code: Short? = 0, reason: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CloseEventInit {
     val o = js("({})")
     o["wasClean"] = wasClean
     o["code"] = code
@@ -4049,7 +4049,7 @@ inline fun CloseEventInit(wasClean: Boolean? = false, code: Short? = 0, reason: 
 /**
  * Exposes the JavaScript [MessageChannel](https://developer.mozilla.org/en/docs/Web/API/MessageChannel) to Kotlin
  */
-external open class MessageChannel {
+public external open class MessageChannel {
     open val port1: MessagePort
     open val port2: MessagePort
 }
@@ -4057,7 +4057,7 @@ external open class MessageChannel {
 /**
  * Exposes the JavaScript [MessagePort](https://developer.mozilla.org/en/docs/Web/API/MessagePort) to Kotlin
  */
-external abstract class MessagePort : EventTarget, UnionMessagePortOrWindowProxy, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
+public external abstract class MessagePort : EventTarget, UnionMessagePortOrWindowProxy, UnionMessagePortOrServiceWorker, UnionClientOrMessagePortOrServiceWorker {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
     fun start()
@@ -4067,7 +4067,7 @@ external abstract class MessagePort : EventTarget, UnionMessagePortOrWindowProxy
 /**
  * Exposes the JavaScript [BroadcastChannel](https://developer.mozilla.org/en/docs/Web/API/BroadcastChannel) to Kotlin
  */
-external open class BroadcastChannel(name: String) : EventTarget {
+public external open class BroadcastChannel(name: String) : EventTarget {
     open val name: String
     var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?)
@@ -4077,7 +4077,7 @@ external open class BroadcastChannel(name: String) : EventTarget {
 /**
  * Exposes the JavaScript [WorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/WorkerGlobalScope) to Kotlin
  */
-external abstract class WorkerGlobalScope : EventTarget, WindowOrWorkerGlobalScope, GlobalPerformance {
+public external abstract class WorkerGlobalScope : EventTarget, WindowOrWorkerGlobalScope, GlobalPerformance {
     open val self: WorkerGlobalScope
     open val location: WorkerLocation
     open val navigator: WorkerNavigator
@@ -4093,7 +4093,7 @@ external abstract class WorkerGlobalScope : EventTarget, WindowOrWorkerGlobalSco
 /**
  * Exposes the JavaScript [DedicatedWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/DedicatedWorkerGlobalScope) to Kotlin
  */
-external abstract class DedicatedWorkerGlobalScope : WorkerGlobalScope {
+public external abstract class DedicatedWorkerGlobalScope : WorkerGlobalScope {
     open var onmessage: ((MessageEvent) -> dynamic)?
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
     fun close()
@@ -4102,7 +4102,7 @@ external abstract class DedicatedWorkerGlobalScope : WorkerGlobalScope {
 /**
  * Exposes the JavaScript [SharedWorkerGlobalScope](https://developer.mozilla.org/en/docs/Web/API/SharedWorkerGlobalScope) to Kotlin
  */
-external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
+public external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
     open val name: String
     open val applicationCache: ApplicationCache
     open var onconnect: ((Event) -> dynamic)?
@@ -4112,7 +4112,7 @@ external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
 /**
  * Exposes the JavaScript [AbstractWorker](https://developer.mozilla.org/en/docs/Web/API/AbstractWorker) to Kotlin
  */
-external interface AbstractWorker {
+public external interface AbstractWorker {
     var onerror: ((Event) -> dynamic)?
         get() = definedExternally
         set(value) = definedExternally
@@ -4121,14 +4121,14 @@ external interface AbstractWorker {
 /**
  * Exposes the JavaScript [Worker](https://developer.mozilla.org/en/docs/Web/API/Worker) to Kotlin
  */
-external open class Worker(scriptURL: String, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
+public external open class Worker(scriptURL: String, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
     var onmessage: ((MessageEvent) -> dynamic)?
     override var onerror: ((Event) -> dynamic)?
     fun terminate()
     fun postMessage(message: Any?, transfer: Array<dynamic> = definedExternally)
 }
 
-external interface WorkerOptions {
+public external interface WorkerOptions {
     var type: WorkerType? /* = WorkerType.CLASSIC */
         get() = definedExternally
         set(value) = definedExternally
@@ -4138,7 +4138,7 @@ external interface WorkerOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun WorkerOptions(type: WorkerType? = WorkerType.CLASSIC, credentials: RequestCredentials? = RequestCredentials.OMIT): WorkerOptions {
+public inline fun WorkerOptions(type: WorkerType? = WorkerType.CLASSIC, credentials: RequestCredentials? = RequestCredentials.OMIT): WorkerOptions {
     val o = js("({})")
     o["type"] = type
     o["credentials"] = credentials
@@ -4148,7 +4148,7 @@ inline fun WorkerOptions(type: WorkerType? = WorkerType.CLASSIC, credentials: Re
 /**
  * Exposes the JavaScript [SharedWorker](https://developer.mozilla.org/en/docs/Web/API/SharedWorker) to Kotlin
  */
-external open class SharedWorker(scriptURL: String, name: String = definedExternally, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
+public external open class SharedWorker(scriptURL: String, name: String = definedExternally, options: WorkerOptions = definedExternally) : EventTarget, AbstractWorker {
     open val port: MessagePort
     override var onerror: ((Event) -> dynamic)?
 }
@@ -4156,21 +4156,21 @@ external open class SharedWorker(scriptURL: String, name: String = definedExtern
 /**
  * Exposes the JavaScript [NavigatorConcurrentHardware](https://developer.mozilla.org/en/docs/Web/API/NavigatorConcurrentHardware) to Kotlin
  */
-external interface NavigatorConcurrentHardware {
+public external interface NavigatorConcurrentHardware {
     val hardwareConcurrency: Number
 }
 
 /**
  * Exposes the JavaScript [WorkerNavigator](https://developer.mozilla.org/en/docs/Web/API/WorkerNavigator) to Kotlin
  */
-external abstract class WorkerNavigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorConcurrentHardware {
+public external abstract class WorkerNavigator : NavigatorID, NavigatorLanguage, NavigatorOnLine, NavigatorConcurrentHardware {
     open val serviceWorker: ServiceWorkerContainer
 }
 
 /**
  * Exposes the JavaScript [WorkerLocation](https://developer.mozilla.org/en/docs/Web/API/WorkerLocation) to Kotlin
  */
-external abstract class WorkerLocation {
+public external abstract class WorkerLocation {
     open val href: String
     open val origin: String
     open val protocol: String
@@ -4185,7 +4185,7 @@ external abstract class WorkerLocation {
 /**
  * Exposes the JavaScript [Storage](https://developer.mozilla.org/en/docs/Web/API/Storage) to Kotlin
  */
-external abstract class Storage {
+public external abstract class Storage {
     open val length: Int
     fun key(index: Int): String?
     fun removeItem(key: String)
@@ -4195,29 +4195,29 @@ external abstract class Storage {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun Storage.get(key: String): String? = asDynamic()[key]
+public inline operator fun Storage.get(key: String): String? = asDynamic()[key]
 
 @kotlin.internal.InlineOnly
-inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value }
+public inline operator fun Storage.set(key: String, value: String) { asDynamic()[key] = value }
 
 /**
  * Exposes the JavaScript [WindowSessionStorage](https://developer.mozilla.org/en/docs/Web/API/WindowSessionStorage) to Kotlin
  */
-external interface WindowSessionStorage {
+public external interface WindowSessionStorage {
     val sessionStorage: Storage
 }
 
 /**
  * Exposes the JavaScript [WindowLocalStorage](https://developer.mozilla.org/en/docs/Web/API/WindowLocalStorage) to Kotlin
  */
-external interface WindowLocalStorage {
+public external interface WindowLocalStorage {
     val localStorage: Storage
 }
 
 /**
  * Exposes the JavaScript [StorageEvent](https://developer.mozilla.org/en/docs/Web/API/StorageEvent) to Kotlin
  */
-external open class StorageEvent(type: String, eventInitDict: StorageEventInit = definedExternally) : Event {
+public external open class StorageEvent(type: String, eventInitDict: StorageEventInit = definedExternally) : Event {
     open val key: String?
     open val oldValue: String?
     open val newValue: String?
@@ -4232,7 +4232,7 @@ external open class StorageEvent(type: String, eventInitDict: StorageEventInit =
     }
 }
 
-external interface StorageEventInit : EventInit {
+public external interface StorageEventInit : EventInit {
     var key: String? /* = null */
         get() = definedExternally
         set(value) = definedExternally
@@ -4251,7 +4251,7 @@ external interface StorageEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun StorageEventInit(key: String? = null, oldValue: String? = null, newValue: String? = null, url: String? = "", storageArea: Storage? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): StorageEventInit {
+public inline fun StorageEventInit(key: String? = null, oldValue: String? = null, newValue: String? = null, url: String? = "", storageArea: Storage? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): StorageEventInit {
     val o = js("({})")
     o["key"] = key
     o["oldValue"] = oldValue
@@ -4264,7 +4264,7 @@ inline fun StorageEventInit(key: String? = null, oldValue: String? = null, newVa
     return o
 }
 
-external abstract class HTMLAppletElement : HTMLElement {
+public external abstract class HTMLAppletElement : HTMLElement {
     open var align: String
     open var alt: String
     open var archive: String
@@ -4302,7 +4302,7 @@ external abstract class HTMLAppletElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLMarqueeElement](https://developer.mozilla.org/en/docs/Web/API/HTMLMarqueeElement) to Kotlin
  */
-external abstract class HTMLMarqueeElement : HTMLElement {
+public external abstract class HTMLMarqueeElement : HTMLElement {
     open var behavior: String
     open var bgColor: String
     open var direction: String
@@ -4345,7 +4345,7 @@ external abstract class HTMLMarqueeElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLFrameSetElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFrameSetElement) to Kotlin
  */
-external abstract class HTMLFrameSetElement : HTMLElement, WindowEventHandlers {
+public external abstract class HTMLFrameSetElement : HTMLElement, WindowEventHandlers {
     open var cols: String
     open var rows: String
 
@@ -4371,7 +4371,7 @@ external abstract class HTMLFrameSetElement : HTMLElement, WindowEventHandlers {
     }
 }
 
-external abstract class HTMLFrameElement : HTMLElement {
+public external abstract class HTMLFrameElement : HTMLElement {
     open var name: String
     open var scrolling: String
     open var src: String
@@ -4405,7 +4405,7 @@ external abstract class HTMLFrameElement : HTMLElement {
     }
 }
 
-external abstract class HTMLDirectoryElement : HTMLElement {
+public external abstract class HTMLDirectoryElement : HTMLElement {
     open var compact: Boolean
 
     companion object {
@@ -4433,7 +4433,7 @@ external abstract class HTMLDirectoryElement : HTMLElement {
 /**
  * Exposes the JavaScript [HTMLFontElement](https://developer.mozilla.org/en/docs/Web/API/HTMLFontElement) to Kotlin
  */
-external abstract class HTMLFontElement : HTMLElement {
+public external abstract class HTMLFontElement : HTMLElement {
     open var color: String
     open var face: String
     open var size: String
@@ -4460,12 +4460,12 @@ external abstract class HTMLFontElement : HTMLElement {
     }
 }
 
-external interface External {
+public external interface External {
     fun AddSearchProvider()
     fun IsSearchProviderInstalled()
 }
 
-external interface EventInit {
+public external interface EventInit {
     var bubbles: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
@@ -4478,7 +4478,7 @@ external interface EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): EventInit {
+public inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): EventInit {
     val o = js("({})")
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
@@ -4489,7 +4489,7 @@ inline fun EventInit(bubbles: Boolean? = false, cancelable: Boolean? = false, co
 /**
  * Exposes the JavaScript [CustomEvent](https://developer.mozilla.org/en/docs/Web/API/CustomEvent) to Kotlin
  */
-external open class CustomEvent(type: String, eventInitDict: CustomEventInit = definedExternally) : Event {
+public external open class CustomEvent(type: String, eventInitDict: CustomEventInit = definedExternally) : Event {
     open val detail: Any?
     fun initCustomEvent(type: String, bubbles: Boolean, cancelable: Boolean, detail: Any?)
 
@@ -4501,14 +4501,14 @@ external open class CustomEvent(type: String, eventInitDict: CustomEventInit = d
     }
 }
 
-external interface CustomEventInit : EventInit {
+public external interface CustomEventInit : EventInit {
     var detail: Any? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun CustomEventInit(detail: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CustomEventInit {
+public inline fun CustomEventInit(detail: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): CustomEventInit {
     val o = js("({})")
     o["detail"] = detail
     o["bubbles"] = bubbles
@@ -4517,20 +4517,20 @@ inline fun CustomEventInit(detail: Any? = null, bubbles: Boolean? = false, cance
     return o
 }
 
-external interface EventListenerOptions {
+public external interface EventListenerOptions {
     var capture: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun EventListenerOptions(capture: Boolean? = false): EventListenerOptions {
+public inline fun EventListenerOptions(capture: Boolean? = false): EventListenerOptions {
     val o = js("({})")
     o["capture"] = capture
     return o
 }
 
-external interface AddEventListenerOptions : EventListenerOptions {
+public external interface AddEventListenerOptions : EventListenerOptions {
     var passive: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
@@ -4540,7 +4540,7 @@ external interface AddEventListenerOptions : EventListenerOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun AddEventListenerOptions(passive: Boolean? = false, once: Boolean? = false, capture: Boolean? = false): AddEventListenerOptions {
+public inline fun AddEventListenerOptions(passive: Boolean? = false, once: Boolean? = false, capture: Boolean? = false): AddEventListenerOptions {
     val o = js("({})")
     o["passive"] = passive
     o["once"] = once
@@ -4548,14 +4548,14 @@ inline fun AddEventListenerOptions(passive: Boolean? = false, once: Boolean? = f
     return o
 }
 
-external interface NonElementParentNode {
+public external interface NonElementParentNode {
     fun getElementById(elementId: String): Element?
 }
 
 /**
  * Exposes the JavaScript [DocumentOrShadowRoot](https://developer.mozilla.org/en/docs/Web/API/DocumentOrShadowRoot) to Kotlin
  */
-external interface DocumentOrShadowRoot {
+public external interface DocumentOrShadowRoot {
     val fullscreenElement: Element?
         get() = definedExternally
 }
@@ -4563,7 +4563,7 @@ external interface DocumentOrShadowRoot {
 /**
  * Exposes the JavaScript [ParentNode](https://developer.mozilla.org/en/docs/Web/API/ParentNode) to Kotlin
  */
-external interface ParentNode {
+public external interface ParentNode {
     val children: HTMLCollection
     val firstElementChild: Element?
         get() = definedExternally
@@ -4579,7 +4579,7 @@ external interface ParentNode {
 /**
  * Exposes the JavaScript [NonDocumentTypeChildNode](https://developer.mozilla.org/en/docs/Web/API/NonDocumentTypeChildNode) to Kotlin
  */
-external interface NonDocumentTypeChildNode {
+public external interface NonDocumentTypeChildNode {
     val previousElementSibling: Element?
         get() = definedExternally
     val nextElementSibling: Element?
@@ -4589,7 +4589,7 @@ external interface NonDocumentTypeChildNode {
 /**
  * Exposes the JavaScript [ChildNode](https://developer.mozilla.org/en/docs/Web/API/ChildNode) to Kotlin
  */
-external interface ChildNode {
+public external interface ChildNode {
     fun before(vararg nodes: dynamic)
     fun after(vararg nodes: dynamic)
     fun replaceWith(vararg nodes: dynamic)
@@ -4599,7 +4599,7 @@ external interface ChildNode {
 /**
  * Exposes the JavaScript [Slotable](https://developer.mozilla.org/en/docs/Web/API/Slotable) to Kotlin
  */
-external interface Slotable {
+public external interface Slotable {
     val assignedSlot: HTMLSlotElement?
         get() = definedExternally
 }
@@ -4607,31 +4607,31 @@ external interface Slotable {
 /**
  * Exposes the JavaScript [NodeList](https://developer.mozilla.org/en/docs/Web/API/NodeList) to Kotlin
  */
-external abstract class NodeList : ItemArrayLike<Node> {
+public external abstract class NodeList : ItemArrayLike<Node> {
     override fun item(index: Int): Node?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
+public inline operator fun NodeList.get(index: Int): Node? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [HTMLCollection](https://developer.mozilla.org/en/docs/Web/API/HTMLCollection) to Kotlin
  */
-external abstract class HTMLCollection : ItemArrayLike<Element>, UnionElementOrHTMLCollection {
+public external abstract class HTMLCollection : ItemArrayLike<Element>, UnionElementOrHTMLCollection {
     override fun item(index: Int): Element?
     fun namedItem(name: String): Element?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLCollection.get(index: Int): Element? = asDynamic()[index]
+public inline operator fun HTMLCollection.get(index: Int): Element? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun HTMLCollection.get(name: String): Element? = asDynamic()[name]
+public inline operator fun HTMLCollection.get(name: String): Element? = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [MutationObserver](https://developer.mozilla.org/en/docs/Web/API/MutationObserver) to Kotlin
  */
-external open class MutationObserver(callback: (Array<MutationRecord>, MutationObserver) -> Unit) {
+public external open class MutationObserver(callback: (Array<MutationRecord>, MutationObserver) -> Unit) {
     fun observe(target: Node, options: MutationObserverInit = definedExternally)
     fun disconnect()
     fun takeRecords(): Array<MutationRecord>
@@ -4640,7 +4640,7 @@ external open class MutationObserver(callback: (Array<MutationRecord>, MutationO
 /**
  * Exposes the JavaScript [MutationObserverInit](https://developer.mozilla.org/en/docs/Web/API/MutationObserverInit) to Kotlin
  */
-external interface MutationObserverInit {
+public external interface MutationObserverInit {
     var childList: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
@@ -4665,7 +4665,7 @@ external interface MutationObserverInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean? = undefined, characterData: Boolean? = undefined, subtree: Boolean? = false, attributeOldValue: Boolean? = undefined, characterDataOldValue: Boolean? = undefined, attributeFilter: Array<String>? = undefined): MutationObserverInit {
+public inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean? = undefined, characterData: Boolean? = undefined, subtree: Boolean? = false, attributeOldValue: Boolean? = undefined, characterDataOldValue: Boolean? = undefined, attributeFilter: Array<String>? = undefined): MutationObserverInit {
     val o = js("({})")
     o["childList"] = childList
     o["attributes"] = attributes
@@ -4680,7 +4680,7 @@ inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean
 /**
  * Exposes the JavaScript [MutationRecord](https://developer.mozilla.org/en/docs/Web/API/MutationRecord) to Kotlin
  */
-external abstract class MutationRecord {
+public external abstract class MutationRecord {
     open val type: String
     open val target: Node
     open val addedNodes: NodeList
@@ -4695,7 +4695,7 @@ external abstract class MutationRecord {
 /**
  * Exposes the JavaScript [Node](https://developer.mozilla.org/en/docs/Web/API/Node) to Kotlin
  */
-external abstract class Node : EventTarget {
+public external abstract class Node : EventTarget {
     open val nodeType: Short
     open val nodeName: String
     open val baseURI: String
@@ -4748,14 +4748,14 @@ external abstract class Node : EventTarget {
     }
 }
 
-external interface GetRootNodeOptions {
+public external interface GetRootNodeOptions {
     var composed: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
+public inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
     val o = js("({})")
     o["composed"] = composed
     return o
@@ -4764,7 +4764,7 @@ inline fun GetRootNodeOptions(composed: Boolean? = false): GetRootNodeOptions {
 /**
  * Exposes the JavaScript [Document](https://developer.mozilla.org/en/docs/Web/API/Document) to Kotlin
  */
-external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
+public external open class Document : Node, GlobalEventHandlers, DocumentAndElementEventHandlers, NonElementParentNode, DocumentOrShadowRoot, ParentNode, GeometryUtils {
     open val implementation: DOMImplementation
     open val URL: String
     open val documentURI: String
@@ -4964,12 +4964,12 @@ external open class Document : Node, GlobalEventHandlers, DocumentAndElementEven
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
+public inline operator fun Document.get(name: String): dynamic = asDynamic()[name]
 
 /**
  * Exposes the JavaScript [XMLDocument](https://developer.mozilla.org/en/docs/Web/API/XMLDocument) to Kotlin
  */
-external open class XMLDocument : Document {
+public external open class XMLDocument : Document {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -4992,14 +4992,14 @@ external open class XMLDocument : Document {
     }
 }
 
-external interface ElementCreationOptions {
+public external interface ElementCreationOptions {
     var `is`: String?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOptions {
+public inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOptions {
     val o = js("({})")
     o["is"] = `is`
     return o
@@ -5008,7 +5008,7 @@ inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOpt
 /**
  * Exposes the JavaScript [DOMImplementation](https://developer.mozilla.org/en/docs/Web/API/DOMImplementation) to Kotlin
  */
-external abstract class DOMImplementation {
+public external abstract class DOMImplementation {
     fun createDocumentType(qualifiedName: String, publicId: String, systemId: String): DocumentType
     fun createDocument(namespace: String?, qualifiedName: String, doctype: DocumentType? = definedExternally): XMLDocument
     fun createHTMLDocument(title: String = definedExternally): Document
@@ -5018,7 +5018,7 @@ external abstract class DOMImplementation {
 /**
  * Exposes the JavaScript [DocumentType](https://developer.mozilla.org/en/docs/Web/API/DocumentType) to Kotlin
  */
-external abstract class DocumentType : Node, ChildNode {
+public external abstract class DocumentType : Node, ChildNode {
     open val name: String
     open val publicId: String
     open val systemId: String
@@ -5048,7 +5048,7 @@ external abstract class DocumentType : Node, ChildNode {
 /**
  * Exposes the JavaScript [DocumentFragment](https://developer.mozilla.org/en/docs/Web/API/DocumentFragment) to Kotlin
  */
-external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
+public external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
     override val children: HTMLCollection
     override val firstElementChild: Element?
     override val lastElementChild: Element?
@@ -5084,7 +5084,7 @@ external open class DocumentFragment : Node, NonElementParentNode, ParentNode {
 /**
  * Exposes the JavaScript [ShadowRoot](https://developer.mozilla.org/en/docs/Web/API/ShadowRoot) to Kotlin
  */
-external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
+public external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
     open val mode: ShadowRootMode
     open val host: Element
     override val fullscreenElement: Element?
@@ -5114,7 +5114,7 @@ external open class ShadowRoot : DocumentFragment, DocumentOrShadowRoot {
 /**
  * Exposes the JavaScript [Element](https://developer.mozilla.org/en/docs/Web/API/Element) to Kotlin
  */
-external abstract class Element : Node, ParentNode, NonDocumentTypeChildNode, ChildNode, Slotable, GeometryUtils, UnionElementOrHTMLCollection, UnionElementOrRadioNodeList, UnionElementOrMouseEvent, UnionElementOrProcessingInstruction {
+public external abstract class Element : Node, ParentNode, NonDocumentTypeChildNode, ChildNode, Slotable, GeometryUtils, UnionElementOrHTMLCollection, UnionElementOrRadioNodeList, UnionElementOrMouseEvent, UnionElementOrProcessingInstruction {
     open val namespaceURI: String?
     open val prefix: String?
     open val localName: String
@@ -5197,14 +5197,14 @@ external abstract class Element : Node, ParentNode, NonDocumentTypeChildNode, Ch
     }
 }
 
-external interface ShadowRootInit {
+public external interface ShadowRootInit {
     var mode: ShadowRootMode?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
+public inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
     val o = js("({})")
     o["mode"] = mode
     return o
@@ -5213,7 +5213,7 @@ inline fun ShadowRootInit(mode: ShadowRootMode?): ShadowRootInit {
 /**
  * Exposes the JavaScript [NamedNodeMap](https://developer.mozilla.org/en/docs/Web/API/NamedNodeMap) to Kotlin
  */
-external abstract class NamedNodeMap : ItemArrayLike<Attr> {
+public external abstract class NamedNodeMap : ItemArrayLike<Attr> {
     fun getNamedItemNS(namespace: String?, localName: String): Attr?
     fun setNamedItem(attr: Attr): Attr?
     fun setNamedItemNS(attr: Attr): Attr?
@@ -5224,15 +5224,15 @@ external abstract class NamedNodeMap : ItemArrayLike<Attr> {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun NamedNodeMap.get(index: Int): Attr? = asDynamic()[index]
+public inline operator fun NamedNodeMap.get(index: Int): Attr? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun NamedNodeMap.get(qualifiedName: String): Attr? = asDynamic()[qualifiedName]
+public inline operator fun NamedNodeMap.get(qualifiedName: String): Attr? = asDynamic()[qualifiedName]
 
 /**
  * Exposes the JavaScript [Attr](https://developer.mozilla.org/en/docs/Web/API/Attr) to Kotlin
  */
-external abstract class Attr : Node {
+public external abstract class Attr : Node {
     open val namespaceURI: String?
     open val prefix: String?
     open val localName: String
@@ -5266,7 +5266,7 @@ external abstract class Attr : Node {
 /**
  * Exposes the JavaScript [CharacterData](https://developer.mozilla.org/en/docs/Web/API/CharacterData) to Kotlin
  */
-external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNode {
+public external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNode {
     open var data: String
     open val length: Int
     fun substringData(offset: Int, count: Int): String
@@ -5300,7 +5300,7 @@ external abstract class CharacterData : Node, NonDocumentTypeChildNode, ChildNod
 /**
  * Exposes the JavaScript [Text](https://developer.mozilla.org/en/docs/Web/API/Text) to Kotlin
  */
-external open class Text(data: String = definedExternally) : CharacterData, Slotable, GeometryUtils {
+public external open class Text(data: String = definedExternally) : CharacterData, Slotable, GeometryUtils {
     open val wholeText: String
     override val assignedSlot: HTMLSlotElement?
     override val previousElementSibling: Element?
@@ -5340,7 +5340,7 @@ external open class Text(data: String = definedExternally) : CharacterData, Slot
 /**
  * Exposes the JavaScript [CDATASection](https://developer.mozilla.org/en/docs/Web/API/CDATASection) to Kotlin
  */
-external open class CDATASection : Text {
+public external open class CDATASection : Text {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -5366,7 +5366,7 @@ external open class CDATASection : Text {
 /**
  * Exposes the JavaScript [ProcessingInstruction](https://developer.mozilla.org/en/docs/Web/API/ProcessingInstruction) to Kotlin
  */
-external abstract class ProcessingInstruction : CharacterData, LinkStyle, UnionElementOrProcessingInstruction {
+public external abstract class ProcessingInstruction : CharacterData, LinkStyle, UnionElementOrProcessingInstruction {
     open val target: String
 
     companion object {
@@ -5394,7 +5394,7 @@ external abstract class ProcessingInstruction : CharacterData, LinkStyle, UnionE
 /**
  * Exposes the JavaScript [Comment](https://developer.mozilla.org/en/docs/Web/API/Comment) to Kotlin
  */
-external open class Comment(data: String = definedExternally) : CharacterData {
+public external open class Comment(data: String = definedExternally) : CharacterData {
     override val previousElementSibling: Element?
     override val nextElementSibling: Element?
     override fun before(vararg nodes: dynamic)
@@ -5427,7 +5427,7 @@ external open class Comment(data: String = definedExternally) : CharacterData {
 /**
  * Exposes the JavaScript [Range](https://developer.mozilla.org/en/docs/Web/API/Range) to Kotlin
  */
-external open class Range {
+public external open class Range {
     open val startContainer: Node
     open val startOffset: Int
     open val endContainer: Node
@@ -5469,7 +5469,7 @@ external open class Range {
 /**
  * Exposes the JavaScript [NodeIterator](https://developer.mozilla.org/en/docs/Web/API/NodeIterator) to Kotlin
  */
-external abstract class NodeIterator {
+public external abstract class NodeIterator {
     open val root: Node
     open val referenceNode: Node
     open val pointerBeforeReferenceNode: Boolean
@@ -5483,7 +5483,7 @@ external abstract class NodeIterator {
 /**
  * Exposes the JavaScript [TreeWalker](https://developer.mozilla.org/en/docs/Web/API/TreeWalker) to Kotlin
  */
-external abstract class TreeWalker {
+public external abstract class TreeWalker {
     open val root: Node
     open val whatToShow: Int
     open val filter: NodeFilter?
@@ -5501,7 +5501,7 @@ external abstract class TreeWalker {
  * Exposes the JavaScript [NodeFilter](https://developer.mozilla.org/en/docs/Web/API/NodeFilter) to Kotlin
  */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface NodeFilter {
+public external interface NodeFilter {
     fun acceptNode(node: Node): Short
 
     companion object {
@@ -5527,7 +5527,7 @@ external interface NodeFilter {
 /**
  * Exposes the JavaScript [DOMTokenList](https://developer.mozilla.org/en/docs/Web/API/DOMTokenList) to Kotlin
  */
-external abstract class DOMTokenList : ItemArrayLike<String> {
+public external abstract class DOMTokenList : ItemArrayLike<String> {
     open var value: String
     fun contains(token: String): Boolean
     fun add(vararg tokens: String)
@@ -5539,12 +5539,12 @@ external abstract class DOMTokenList : ItemArrayLike<String> {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun DOMTokenList.get(index: Int): String? = asDynamic()[index]
+public inline operator fun DOMTokenList.get(index: Int): String? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [DOMPointReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMPointReadOnly) to Kotlin
  */
-external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double) {
+public external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double) {
     open val x: Double
     open val y: Double
     open val z: Double
@@ -5555,7 +5555,7 @@ external open class DOMPointReadOnly(x: Double, y: Double, z: Double, w: Double)
 /**
  * Exposes the JavaScript [DOMPoint](https://developer.mozilla.org/en/docs/Web/API/DOMPoint) to Kotlin
  */
-external open class DOMPoint : DOMPointReadOnly {
+public external open class DOMPoint : DOMPointReadOnly {
     constructor(point: DOMPointInit)
     constructor(x: Double = definedExternally, y: Double = definedExternally, z: Double = definedExternally, w: Double = definedExternally)
     override var x: Double
@@ -5567,7 +5567,7 @@ external open class DOMPoint : DOMPointReadOnly {
 /**
  * Exposes the JavaScript [DOMPointInit](https://developer.mozilla.org/en/docs/Web/API/DOMPointInit) to Kotlin
  */
-external interface DOMPointInit {
+public external interface DOMPointInit {
     var x: Double? /* = 0.0 */
         get() = definedExternally
         set(value) = definedExternally
@@ -5583,7 +5583,7 @@ external interface DOMPointInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun DOMPointInit(x: Double? = 0.0, y: Double? = 0.0, z: Double? = 0.0, w: Double? = 1.0): DOMPointInit {
+public inline fun DOMPointInit(x: Double? = 0.0, y: Double? = 0.0, z: Double? = 0.0, w: Double? = 1.0): DOMPointInit {
     val o = js("({})")
     o["x"] = x
     o["y"] = y
@@ -5595,7 +5595,7 @@ inline fun DOMPointInit(x: Double? = 0.0, y: Double? = 0.0, z: Double? = 0.0, w:
 /**
  * Exposes the JavaScript [DOMRect](https://developer.mozilla.org/en/docs/Web/API/DOMRect) to Kotlin
  */
-external open class DOMRect(x: Double = definedExternally, y: Double = definedExternally, width: Double = definedExternally, height: Double = definedExternally) : DOMRectReadOnly {
+public external open class DOMRect(x: Double = definedExternally, y: Double = definedExternally, width: Double = definedExternally, height: Double = definedExternally) : DOMRectReadOnly {
     override var x: Double
     override var y: Double
     override var width: Double
@@ -5605,7 +5605,7 @@ external open class DOMRect(x: Double = definedExternally, y: Double = definedEx
 /**
  * Exposes the JavaScript [DOMRectReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMRectReadOnly) to Kotlin
  */
-external open class DOMRectReadOnly(x: Double, y: Double, width: Double, height: Double) {
+public external open class DOMRectReadOnly(x: Double, y: Double, width: Double, height: Double) {
     open val x: Double
     open val y: Double
     open val width: Double
@@ -5616,7 +5616,7 @@ external open class DOMRectReadOnly(x: Double, y: Double, width: Double, height:
     open val left: Double
 }
 
-external interface DOMRectInit {
+public external interface DOMRectInit {
     var x: Double? /* = 0.0 */
         get() = definedExternally
         set(value) = definedExternally
@@ -5632,7 +5632,7 @@ external interface DOMRectInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun DOMRectInit(x: Double? = 0.0, y: Double? = 0.0, width: Double? = 0.0, height: Double? = 0.0): DOMRectInit {
+public inline fun DOMRectInit(x: Double? = 0.0, y: Double? = 0.0, width: Double? = 0.0, height: Double? = 0.0): DOMRectInit {
     val o = js("({})")
     o["x"] = x
     o["y"] = y
@@ -5641,17 +5641,17 @@ inline fun DOMRectInit(x: Double? = 0.0, y: Double? = 0.0, width: Double? = 0.0,
     return o
 }
 
-external interface DOMRectList : ItemArrayLike<DOMRect> {
+public external interface DOMRectList : ItemArrayLike<DOMRect> {
     override fun item(index: Int): DOMRect?
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
+public inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
 
 /**
  * Exposes the JavaScript [DOMQuad](https://developer.mozilla.org/en/docs/Web/API/DOMQuad) to Kotlin
  */
-external open class DOMQuad {
+public external open class DOMQuad {
     constructor(p1: DOMPointInit = definedExternally, p2: DOMPointInit = definedExternally, p3: DOMPointInit = definedExternally, p4: DOMPointInit = definedExternally)
     constructor(rect: DOMRectInit)
     open val p1: DOMPoint
@@ -5664,7 +5664,7 @@ external open class DOMQuad {
 /**
  * Exposes the JavaScript [DOMMatrixReadOnly](https://developer.mozilla.org/en/docs/Web/API/DOMMatrixReadOnly) to Kotlin
  */
-external open class DOMMatrixReadOnly(numberSequence: Array<Double>) {
+public external open class DOMMatrixReadOnly(numberSequence: Array<Double>) {
     open val a: Double
     open val b: Double
     open val c: Double
@@ -5710,7 +5710,7 @@ external open class DOMMatrixReadOnly(numberSequence: Array<Double>) {
 /**
  * Exposes the JavaScript [DOMMatrix](https://developer.mozilla.org/en/docs/Web/API/DOMMatrix) to Kotlin
  */
-external open class DOMMatrix() : DOMMatrixReadOnly {
+public external open class DOMMatrix() : DOMMatrixReadOnly {
     constructor(transformList: String)
     constructor(other: DOMMatrixReadOnly)
     constructor(array32: Float32Array)
@@ -5753,14 +5753,14 @@ external open class DOMMatrix() : DOMMatrixReadOnly {
     fun setMatrixValue(transformList: String): DOMMatrix
 }
 
-external interface ScrollOptions {
+public external interface ScrollOptions {
     var behavior: ScrollBehavior? /* = ScrollBehavior.AUTO */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollOptions {
+public inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollOptions {
     val o = js("({})")
     o["behavior"] = behavior
     return o
@@ -5769,7 +5769,7 @@ inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO): Scrol
 /**
  * Exposes the JavaScript [ScrollToOptions](https://developer.mozilla.org/en/docs/Web/API/ScrollToOptions) to Kotlin
  */
-external interface ScrollToOptions : ScrollOptions {
+public external interface ScrollToOptions : ScrollOptions {
     var left: Double?
         get() = definedExternally
         set(value) = definedExternally
@@ -5779,7 +5779,7 @@ external interface ScrollToOptions : ScrollOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollToOptions {
+public inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollToOptions {
     val o = js("({})")
     o["left"] = left
     o["top"] = top
@@ -5790,7 +5790,7 @@ inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, 
 /**
  * Exposes the JavaScript [MediaQueryList](https://developer.mozilla.org/en/docs/Web/API/MediaQueryList) to Kotlin
  */
-external abstract class MediaQueryList : EventTarget {
+public external abstract class MediaQueryList : EventTarget {
     open val media: String
     open val matches: Boolean
     open var onchange: ((Event) -> dynamic)?
@@ -5803,7 +5803,7 @@ external abstract class MediaQueryList : EventTarget {
 /**
  * Exposes the JavaScript [MediaQueryListEvent](https://developer.mozilla.org/en/docs/Web/API/MediaQueryListEvent) to Kotlin
  */
-external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryListEventInit = definedExternally) : Event {
+public external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryListEventInit = definedExternally) : Event {
     open val media: String
     open val matches: Boolean
 
@@ -5815,7 +5815,7 @@ external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryL
     }
 }
 
-external interface MediaQueryListEventInit : EventInit {
+public external interface MediaQueryListEventInit : EventInit {
     var media: String? /* = "" */
         get() = definedExternally
         set(value) = definedExternally
@@ -5825,7 +5825,7 @@ external interface MediaQueryListEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun MediaQueryListEventInit(media: String? = "", matches: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MediaQueryListEventInit {
+public inline fun MediaQueryListEventInit(media: String? = "", matches: Boolean? = false, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): MediaQueryListEventInit {
     val o = js("({})")
     o["media"] = media
     o["matches"] = matches
@@ -5838,7 +5838,7 @@ inline fun MediaQueryListEventInit(media: String? = "", matches: Boolean? = fals
 /**
  * Exposes the JavaScript [Screen](https://developer.mozilla.org/en/docs/Web/API/Screen) to Kotlin
  */
-external abstract class Screen {
+public external abstract class Screen {
     open val availWidth: Int
     open val availHeight: Int
     open val width: Int
@@ -5850,13 +5850,13 @@ external abstract class Screen {
 /**
  * Exposes the JavaScript [CaretPosition](https://developer.mozilla.org/en/docs/Web/API/CaretPosition) to Kotlin
  */
-external abstract class CaretPosition {
+public external abstract class CaretPosition {
     open val offsetNode: Node
     open val offset: Int
     fun getClientRect(): DOMRect?
 }
 
-external interface ScrollIntoViewOptions : ScrollOptions {
+public external interface ScrollIntoViewOptions : ScrollOptions {
     var block: ScrollLogicalPosition? /* = ScrollLogicalPosition.CENTER */
         get() = definedExternally
         set(value) = definedExternally
@@ -5866,7 +5866,7 @@ external interface ScrollIntoViewOptions : ScrollOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun ScrollIntoViewOptions(block: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, inline: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollIntoViewOptions {
+public inline fun ScrollIntoViewOptions(block: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, inline: ScrollLogicalPosition? = ScrollLogicalPosition.CENTER, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollIntoViewOptions {
     val o = js("({})")
     o["block"] = block
     o["inline"] = inline
@@ -5874,7 +5874,7 @@ inline fun ScrollIntoViewOptions(block: ScrollLogicalPosition? = ScrollLogicalPo
     return o
 }
 
-external interface BoxQuadOptions {
+public external interface BoxQuadOptions {
     var box: CSSBoxType? /* = CSSBoxType.BORDER */
         get() = definedExternally
         set(value) = definedExternally
@@ -5884,14 +5884,14 @@ external interface BoxQuadOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeTo: dynamic = undefined): BoxQuadOptions {
+public inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeTo: dynamic = undefined): BoxQuadOptions {
     val o = js("({})")
     o["box"] = box
     o["relativeTo"] = relativeTo
     return o
 }
 
-external interface ConvertCoordinateOptions {
+public external interface ConvertCoordinateOptions {
     var fromBox: CSSBoxType? /* = CSSBoxType.BORDER */
         get() = definedExternally
         set(value) = definedExternally
@@ -5901,7 +5901,7 @@ external interface ConvertCoordinateOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BORDER, toBox: CSSBoxType? = CSSBoxType.BORDER): ConvertCoordinateOptions {
+public inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BORDER, toBox: CSSBoxType? = CSSBoxType.BORDER): ConvertCoordinateOptions {
     val o = js("({})")
     o["fromBox"] = fromBox
     o["toBox"] = toBox
@@ -5911,7 +5911,7 @@ inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BORDER, to
 /**
  * Exposes the JavaScript [GeometryUtils](https://developer.mozilla.org/en/docs/Web/API/GeometryUtils) to Kotlin
  */
-external interface GeometryUtils {
+public external interface GeometryUtils {
     fun getBoxQuads(options: BoxQuadOptions = definedExternally): Array<DOMQuad>
     fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad
     fun convertRectFromNode(rect: DOMRectReadOnly, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad
@@ -5921,7 +5921,7 @@ external interface GeometryUtils {
 /**
  * Exposes the JavaScript [Image](https://developer.mozilla.org/en/docs/Web/API/Image) to Kotlin
  */
-external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
+public external open class Image(width: Int = definedExternally, height: Int = definedExternally) : HTMLImageElement {
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
     override var oncancel: ((Event) -> dynamic)?
@@ -6041,7 +6041,7 @@ external open class Image(width: Int = definedExternally, height: Int = definedE
     }
 }
 
-external open class Audio(src: String = definedExternally) : HTMLAudioElement {
+public external open class Audio(src: String = definedExternally) : HTMLAudioElement {
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
     override var oncancel: ((Event) -> dynamic)?
@@ -6173,7 +6173,7 @@ external open class Audio(src: String = definedExternally) : HTMLAudioElement {
 /**
  * Exposes the JavaScript [Option](https://developer.mozilla.org/en/docs/Web/API/Option) to Kotlin
  */
-external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
+public external open class Option(text: String = definedExternally, value: String = definedExternally, defaultSelected: Boolean = definedExternally, selected: Boolean = definedExternally) : HTMLOptionElement {
     override var onabort: ((Event) -> dynamic)?
     override var onblur: ((FocusEvent) -> dynamic)?
     override var oncancel: ((Event) -> dynamic)?
@@ -6293,309 +6293,309 @@ external open class Option(text: String = definedExternally, value: String = def
     }
 }
 
-external interface UnionElementOrHTMLCollection
+public external interface UnionElementOrHTMLCollection
 
-external interface UnionElementOrRadioNodeList
+public external interface UnionElementOrRadioNodeList
 
-external interface UnionHTMLOptGroupElementOrHTMLOptionElement
+public external interface UnionHTMLOptGroupElementOrHTMLOptionElement
 
-external interface UnionAudioTrackOrTextTrackOrVideoTrack
+public external interface UnionAudioTrackOrTextTrackOrVideoTrack
 
-external interface UnionElementOrMouseEvent
+public external interface UnionElementOrMouseEvent
 
-external interface RenderingContext
+public external interface RenderingContext
 
-external interface HTMLOrSVGImageElement : CanvasImageSource
+public external interface HTMLOrSVGImageElement : CanvasImageSource
 
-external interface CanvasImageSource : ImageBitmapSource
+public external interface CanvasImageSource : ImageBitmapSource
 
-external interface ImageBitmapSource
+public external interface ImageBitmapSource
 
-external interface UnionMessagePortOrWindowProxy
+public external interface UnionMessagePortOrWindowProxy
 
-external interface HTMLOrSVGScriptElement
-
-/* please, don't implement this interface! */
-@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface DocumentReadyState {
-    companion object
-}
-
-inline val DocumentReadyState.Companion.LOADING: DocumentReadyState get() = "loading".asDynamic().unsafeCast<DocumentReadyState>()
-
-inline val DocumentReadyState.Companion.INTERACTIVE: DocumentReadyState get() = "interactive".asDynamic().unsafeCast<DocumentReadyState>()
-
-inline val DocumentReadyState.Companion.COMPLETE: DocumentReadyState get() = "complete".asDynamic().unsafeCast<DocumentReadyState>()
+public external interface HTMLOrSVGScriptElement
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanPlayTypeResult {
+public external interface DocumentReadyState {
     companion object
 }
 
-inline val CanPlayTypeResult.Companion.EMPTY: CanPlayTypeResult get() = "".asDynamic().unsafeCast<CanPlayTypeResult>()
+public inline val DocumentReadyState.Companion.LOADING: DocumentReadyState get() = "loading".asDynamic().unsafeCast<DocumentReadyState>()
 
-inline val CanPlayTypeResult.Companion.MAYBE: CanPlayTypeResult get() = "maybe".asDynamic().unsafeCast<CanPlayTypeResult>()
+public inline val DocumentReadyState.Companion.INTERACTIVE: DocumentReadyState get() = "interactive".asDynamic().unsafeCast<DocumentReadyState>()
 
-inline val CanPlayTypeResult.Companion.PROBABLY: CanPlayTypeResult get() = "probably".asDynamic().unsafeCast<CanPlayTypeResult>()
+public inline val DocumentReadyState.Companion.COMPLETE: DocumentReadyState get() = "complete".asDynamic().unsafeCast<DocumentReadyState>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface TextTrackMode {
+public external interface CanPlayTypeResult {
     companion object
 }
 
-inline val TextTrackMode.Companion.DISABLED: TextTrackMode get() = "disabled".asDynamic().unsafeCast<TextTrackMode>()
+public inline val CanPlayTypeResult.Companion.EMPTY: CanPlayTypeResult get() = "".asDynamic().unsafeCast<CanPlayTypeResult>()
 
-inline val TextTrackMode.Companion.HIDDEN: TextTrackMode get() = "hidden".asDynamic().unsafeCast<TextTrackMode>()
+public inline val CanPlayTypeResult.Companion.MAYBE: CanPlayTypeResult get() = "maybe".asDynamic().unsafeCast<CanPlayTypeResult>()
 
-inline val TextTrackMode.Companion.SHOWING: TextTrackMode get() = "showing".asDynamic().unsafeCast<TextTrackMode>()
+public inline val CanPlayTypeResult.Companion.PROBABLY: CanPlayTypeResult get() = "probably".asDynamic().unsafeCast<CanPlayTypeResult>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface TextTrackKind {
+public external interface TextTrackMode {
     companion object
 }
 
-inline val TextTrackKind.Companion.SUBTITLES: TextTrackKind get() = "subtitles".asDynamic().unsafeCast<TextTrackKind>()
+public inline val TextTrackMode.Companion.DISABLED: TextTrackMode get() = "disabled".asDynamic().unsafeCast<TextTrackMode>()
 
-inline val TextTrackKind.Companion.CAPTIONS: TextTrackKind get() = "captions".asDynamic().unsafeCast<TextTrackKind>()
+public inline val TextTrackMode.Companion.HIDDEN: TextTrackMode get() = "hidden".asDynamic().unsafeCast<TextTrackMode>()
 
-inline val TextTrackKind.Companion.DESCRIPTIONS: TextTrackKind get() = "descriptions".asDynamic().unsafeCast<TextTrackKind>()
-
-inline val TextTrackKind.Companion.CHAPTERS: TextTrackKind get() = "chapters".asDynamic().unsafeCast<TextTrackKind>()
-
-inline val TextTrackKind.Companion.METADATA: TextTrackKind get() = "metadata".asDynamic().unsafeCast<TextTrackKind>()
+public inline val TextTrackMode.Companion.SHOWING: TextTrackMode get() = "showing".asDynamic().unsafeCast<TextTrackMode>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface SelectionMode {
+public external interface TextTrackKind {
     companion object
 }
 
-inline val SelectionMode.Companion.SELECT: SelectionMode get() = "select".asDynamic().unsafeCast<SelectionMode>()
+public inline val TextTrackKind.Companion.SUBTITLES: TextTrackKind get() = "subtitles".asDynamic().unsafeCast<TextTrackKind>()
 
-inline val SelectionMode.Companion.START: SelectionMode get() = "start".asDynamic().unsafeCast<SelectionMode>()
+public inline val TextTrackKind.Companion.CAPTIONS: TextTrackKind get() = "captions".asDynamic().unsafeCast<TextTrackKind>()
 
-inline val SelectionMode.Companion.END: SelectionMode get() = "end".asDynamic().unsafeCast<SelectionMode>()
+public inline val TextTrackKind.Companion.DESCRIPTIONS: TextTrackKind get() = "descriptions".asDynamic().unsafeCast<TextTrackKind>()
 
-inline val SelectionMode.Companion.PRESERVE: SelectionMode get() = "preserve".asDynamic().unsafeCast<SelectionMode>()
+public inline val TextTrackKind.Companion.CHAPTERS: TextTrackKind get() = "chapters".asDynamic().unsafeCast<TextTrackKind>()
+
+public inline val TextTrackKind.Companion.METADATA: TextTrackKind get() = "metadata".asDynamic().unsafeCast<TextTrackKind>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasFillRule {
+public external interface SelectionMode {
     companion object
 }
 
-inline val CanvasFillRule.Companion.NONZERO: CanvasFillRule get() = "nonzero".asDynamic().unsafeCast<CanvasFillRule>()
+public inline val SelectionMode.Companion.SELECT: SelectionMode get() = "select".asDynamic().unsafeCast<SelectionMode>()
 
-inline val CanvasFillRule.Companion.EVENODD: CanvasFillRule get() = "evenodd".asDynamic().unsafeCast<CanvasFillRule>()
+public inline val SelectionMode.Companion.START: SelectionMode get() = "start".asDynamic().unsafeCast<SelectionMode>()
+
+public inline val SelectionMode.Companion.END: SelectionMode get() = "end".asDynamic().unsafeCast<SelectionMode>()
+
+public inline val SelectionMode.Companion.PRESERVE: SelectionMode get() = "preserve".asDynamic().unsafeCast<SelectionMode>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ImageSmoothingQuality {
+public external interface CanvasFillRule {
     companion object
 }
 
-inline val ImageSmoothingQuality.Companion.LOW: ImageSmoothingQuality get() = "low".asDynamic().unsafeCast<ImageSmoothingQuality>()
+public inline val CanvasFillRule.Companion.NONZERO: CanvasFillRule get() = "nonzero".asDynamic().unsafeCast<CanvasFillRule>()
 
-inline val ImageSmoothingQuality.Companion.MEDIUM: ImageSmoothingQuality get() = "medium".asDynamic().unsafeCast<ImageSmoothingQuality>()
-
-inline val ImageSmoothingQuality.Companion.HIGH: ImageSmoothingQuality get() = "high".asDynamic().unsafeCast<ImageSmoothingQuality>()
+public inline val CanvasFillRule.Companion.EVENODD: CanvasFillRule get() = "evenodd".asDynamic().unsafeCast<CanvasFillRule>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasLineCap {
+public external interface ImageSmoothingQuality {
     companion object
 }
 
-inline val CanvasLineCap.Companion.BUTT: CanvasLineCap get() = "butt".asDynamic().unsafeCast<CanvasLineCap>()
+public inline val ImageSmoothingQuality.Companion.LOW: ImageSmoothingQuality get() = "low".asDynamic().unsafeCast<ImageSmoothingQuality>()
 
-inline val CanvasLineCap.Companion.ROUND: CanvasLineCap get() = "round".asDynamic().unsafeCast<CanvasLineCap>()
+public inline val ImageSmoothingQuality.Companion.MEDIUM: ImageSmoothingQuality get() = "medium".asDynamic().unsafeCast<ImageSmoothingQuality>()
 
-inline val CanvasLineCap.Companion.SQUARE: CanvasLineCap get() = "square".asDynamic().unsafeCast<CanvasLineCap>()
+public inline val ImageSmoothingQuality.Companion.HIGH: ImageSmoothingQuality get() = "high".asDynamic().unsafeCast<ImageSmoothingQuality>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasLineJoin {
+public external interface CanvasLineCap {
     companion object
 }
 
-inline val CanvasLineJoin.Companion.ROUND: CanvasLineJoin get() = "round".asDynamic().unsafeCast<CanvasLineJoin>()
+public inline val CanvasLineCap.Companion.BUTT: CanvasLineCap get() = "butt".asDynamic().unsafeCast<CanvasLineCap>()
 
-inline val CanvasLineJoin.Companion.BEVEL: CanvasLineJoin get() = "bevel".asDynamic().unsafeCast<CanvasLineJoin>()
+public inline val CanvasLineCap.Companion.ROUND: CanvasLineCap get() = "round".asDynamic().unsafeCast<CanvasLineCap>()
 
-inline val CanvasLineJoin.Companion.MITER: CanvasLineJoin get() = "miter".asDynamic().unsafeCast<CanvasLineJoin>()
+public inline val CanvasLineCap.Companion.SQUARE: CanvasLineCap get() = "square".asDynamic().unsafeCast<CanvasLineCap>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasTextAlign {
+public external interface CanvasLineJoin {
     companion object
 }
 
-inline val CanvasTextAlign.Companion.START: CanvasTextAlign get() = "start".asDynamic().unsafeCast<CanvasTextAlign>()
+public inline val CanvasLineJoin.Companion.ROUND: CanvasLineJoin get() = "round".asDynamic().unsafeCast<CanvasLineJoin>()
 
-inline val CanvasTextAlign.Companion.END: CanvasTextAlign get() = "end".asDynamic().unsafeCast<CanvasTextAlign>()
+public inline val CanvasLineJoin.Companion.BEVEL: CanvasLineJoin get() = "bevel".asDynamic().unsafeCast<CanvasLineJoin>()
 
-inline val CanvasTextAlign.Companion.LEFT: CanvasTextAlign get() = "left".asDynamic().unsafeCast<CanvasTextAlign>()
-
-inline val CanvasTextAlign.Companion.RIGHT: CanvasTextAlign get() = "right".asDynamic().unsafeCast<CanvasTextAlign>()
-
-inline val CanvasTextAlign.Companion.CENTER: CanvasTextAlign get() = "center".asDynamic().unsafeCast<CanvasTextAlign>()
+public inline val CanvasLineJoin.Companion.MITER: CanvasLineJoin get() = "miter".asDynamic().unsafeCast<CanvasLineJoin>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasTextBaseline {
+public external interface CanvasTextAlign {
     companion object
 }
 
-inline val CanvasTextBaseline.Companion.TOP: CanvasTextBaseline get() = "top".asDynamic().unsafeCast<CanvasTextBaseline>()
+public inline val CanvasTextAlign.Companion.START: CanvasTextAlign get() = "start".asDynamic().unsafeCast<CanvasTextAlign>()
 
-inline val CanvasTextBaseline.Companion.HANGING: CanvasTextBaseline get() = "hanging".asDynamic().unsafeCast<CanvasTextBaseline>()
+public inline val CanvasTextAlign.Companion.END: CanvasTextAlign get() = "end".asDynamic().unsafeCast<CanvasTextAlign>()
 
-inline val CanvasTextBaseline.Companion.MIDDLE: CanvasTextBaseline get() = "middle".asDynamic().unsafeCast<CanvasTextBaseline>()
+public inline val CanvasTextAlign.Companion.LEFT: CanvasTextAlign get() = "left".asDynamic().unsafeCast<CanvasTextAlign>()
 
-inline val CanvasTextBaseline.Companion.ALPHABETIC: CanvasTextBaseline get() = "alphabetic".asDynamic().unsafeCast<CanvasTextBaseline>()
+public inline val CanvasTextAlign.Companion.RIGHT: CanvasTextAlign get() = "right".asDynamic().unsafeCast<CanvasTextAlign>()
 
-inline val CanvasTextBaseline.Companion.IDEOGRAPHIC: CanvasTextBaseline get() = "ideographic".asDynamic().unsafeCast<CanvasTextBaseline>()
-
-inline val CanvasTextBaseline.Companion.BOTTOM: CanvasTextBaseline get() = "bottom".asDynamic().unsafeCast<CanvasTextBaseline>()
+public inline val CanvasTextAlign.Companion.CENTER: CanvasTextAlign get() = "center".asDynamic().unsafeCast<CanvasTextAlign>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CanvasDirection {
+public external interface CanvasTextBaseline {
     companion object
 }
 
-inline val CanvasDirection.Companion.LTR: CanvasDirection get() = "ltr".asDynamic().unsafeCast<CanvasDirection>()
+public inline val CanvasTextBaseline.Companion.TOP: CanvasTextBaseline get() = "top".asDynamic().unsafeCast<CanvasTextBaseline>()
 
-inline val CanvasDirection.Companion.RTL: CanvasDirection get() = "rtl".asDynamic().unsafeCast<CanvasDirection>()
+public inline val CanvasTextBaseline.Companion.HANGING: CanvasTextBaseline get() = "hanging".asDynamic().unsafeCast<CanvasTextBaseline>()
 
-inline val CanvasDirection.Companion.INHERIT: CanvasDirection get() = "inherit".asDynamic().unsafeCast<CanvasDirection>()
+public inline val CanvasTextBaseline.Companion.MIDDLE: CanvasTextBaseline get() = "middle".asDynamic().unsafeCast<CanvasTextBaseline>()
+
+public inline val CanvasTextBaseline.Companion.ALPHABETIC: CanvasTextBaseline get() = "alphabetic".asDynamic().unsafeCast<CanvasTextBaseline>()
+
+public inline val CanvasTextBaseline.Companion.IDEOGRAPHIC: CanvasTextBaseline get() = "ideographic".asDynamic().unsafeCast<CanvasTextBaseline>()
+
+public inline val CanvasTextBaseline.Companion.BOTTOM: CanvasTextBaseline get() = "bottom".asDynamic().unsafeCast<CanvasTextBaseline>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ScrollRestoration {
+public external interface CanvasDirection {
     companion object
 }
 
-inline val ScrollRestoration.Companion.AUTO: ScrollRestoration get() = "auto".asDynamic().unsafeCast<ScrollRestoration>()
+public inline val CanvasDirection.Companion.LTR: CanvasDirection get() = "ltr".asDynamic().unsafeCast<CanvasDirection>()
 
-inline val ScrollRestoration.Companion.MANUAL: ScrollRestoration get() = "manual".asDynamic().unsafeCast<ScrollRestoration>()
+public inline val CanvasDirection.Companion.RTL: CanvasDirection get() = "rtl".asDynamic().unsafeCast<CanvasDirection>()
+
+public inline val CanvasDirection.Companion.INHERIT: CanvasDirection get() = "inherit".asDynamic().unsafeCast<CanvasDirection>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ImageOrientation {
+public external interface ScrollRestoration {
     companion object
 }
 
-inline val ImageOrientation.Companion.NONE: ImageOrientation get() = "none".asDynamic().unsafeCast<ImageOrientation>()
+public inline val ScrollRestoration.Companion.AUTO: ScrollRestoration get() = "auto".asDynamic().unsafeCast<ScrollRestoration>()
 
-inline val ImageOrientation.Companion.FLIPY: ImageOrientation get() = "flipY".asDynamic().unsafeCast<ImageOrientation>()
+public inline val ScrollRestoration.Companion.MANUAL: ScrollRestoration get() = "manual".asDynamic().unsafeCast<ScrollRestoration>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface PremultiplyAlpha {
+public external interface ImageOrientation {
     companion object
 }
 
-inline val PremultiplyAlpha.Companion.NONE: PremultiplyAlpha get() = "none".asDynamic().unsafeCast<PremultiplyAlpha>()
+public inline val ImageOrientation.Companion.NONE: ImageOrientation get() = "none".asDynamic().unsafeCast<ImageOrientation>()
 
-inline val PremultiplyAlpha.Companion.PREMULTIPLY: PremultiplyAlpha get() = "premultiply".asDynamic().unsafeCast<PremultiplyAlpha>()
-
-inline val PremultiplyAlpha.Companion.DEFAULT: PremultiplyAlpha get() = "default".asDynamic().unsafeCast<PremultiplyAlpha>()
+public inline val ImageOrientation.Companion.FLIPY: ImageOrientation get() = "flipY".asDynamic().unsafeCast<ImageOrientation>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ColorSpaceConversion {
+public external interface PremultiplyAlpha {
     companion object
 }
 
-inline val ColorSpaceConversion.Companion.NONE: ColorSpaceConversion get() = "none".asDynamic().unsafeCast<ColorSpaceConversion>()
+public inline val PremultiplyAlpha.Companion.NONE: PremultiplyAlpha get() = "none".asDynamic().unsafeCast<PremultiplyAlpha>()
 
-inline val ColorSpaceConversion.Companion.DEFAULT: ColorSpaceConversion get() = "default".asDynamic().unsafeCast<ColorSpaceConversion>()
+public inline val PremultiplyAlpha.Companion.PREMULTIPLY: PremultiplyAlpha get() = "premultiply".asDynamic().unsafeCast<PremultiplyAlpha>()
+
+public inline val PremultiplyAlpha.Companion.DEFAULT: PremultiplyAlpha get() = "default".asDynamic().unsafeCast<PremultiplyAlpha>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ResizeQuality {
+public external interface ColorSpaceConversion {
     companion object
 }
 
-inline val ResizeQuality.Companion.PIXELATED: ResizeQuality get() = "pixelated".asDynamic().unsafeCast<ResizeQuality>()
+public inline val ColorSpaceConversion.Companion.NONE: ColorSpaceConversion get() = "none".asDynamic().unsafeCast<ColorSpaceConversion>()
 
-inline val ResizeQuality.Companion.LOW: ResizeQuality get() = "low".asDynamic().unsafeCast<ResizeQuality>()
-
-inline val ResizeQuality.Companion.MEDIUM: ResizeQuality get() = "medium".asDynamic().unsafeCast<ResizeQuality>()
-
-inline val ResizeQuality.Companion.HIGH: ResizeQuality get() = "high".asDynamic().unsafeCast<ResizeQuality>()
+public inline val ColorSpaceConversion.Companion.DEFAULT: ColorSpaceConversion get() = "default".asDynamic().unsafeCast<ColorSpaceConversion>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface BinaryType {
+public external interface ResizeQuality {
     companion object
 }
 
-inline val BinaryType.Companion.BLOB: BinaryType get() = "blob".asDynamic().unsafeCast<BinaryType>()
+public inline val ResizeQuality.Companion.PIXELATED: ResizeQuality get() = "pixelated".asDynamic().unsafeCast<ResizeQuality>()
 
-inline val BinaryType.Companion.ARRAYBUFFER: BinaryType get() = "arraybuffer".asDynamic().unsafeCast<BinaryType>()
+public inline val ResizeQuality.Companion.LOW: ResizeQuality get() = "low".asDynamic().unsafeCast<ResizeQuality>()
+
+public inline val ResizeQuality.Companion.MEDIUM: ResizeQuality get() = "medium".asDynamic().unsafeCast<ResizeQuality>()
+
+public inline val ResizeQuality.Companion.HIGH: ResizeQuality get() = "high".asDynamic().unsafeCast<ResizeQuality>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface WorkerType {
+public external interface BinaryType {
     companion object
 }
 
-inline val WorkerType.Companion.CLASSIC: WorkerType get() = "classic".asDynamic().unsafeCast<WorkerType>()
+public inline val BinaryType.Companion.BLOB: BinaryType get() = "blob".asDynamic().unsafeCast<BinaryType>()
 
-inline val WorkerType.Companion.MODULE: WorkerType get() = "module".asDynamic().unsafeCast<WorkerType>()
+public inline val BinaryType.Companion.ARRAYBUFFER: BinaryType get() = "arraybuffer".asDynamic().unsafeCast<BinaryType>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ShadowRootMode {
+public external interface WorkerType {
     companion object
 }
 
-inline val ShadowRootMode.Companion.OPEN: ShadowRootMode get() = "open".asDynamic().unsafeCast<ShadowRootMode>()
+public inline val WorkerType.Companion.CLASSIC: WorkerType get() = "classic".asDynamic().unsafeCast<WorkerType>()
 
-inline val ShadowRootMode.Companion.CLOSED: ShadowRootMode get() = "closed".asDynamic().unsafeCast<ShadowRootMode>()
+public inline val WorkerType.Companion.MODULE: WorkerType get() = "module".asDynamic().unsafeCast<WorkerType>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ScrollBehavior {
+public external interface ShadowRootMode {
     companion object
 }
 
-inline val ScrollBehavior.Companion.AUTO: ScrollBehavior get() = "auto".asDynamic().unsafeCast<ScrollBehavior>()
+public inline val ShadowRootMode.Companion.OPEN: ShadowRootMode get() = "open".asDynamic().unsafeCast<ShadowRootMode>()
 
-inline val ScrollBehavior.Companion.INSTANT: ScrollBehavior get() = "instant".asDynamic().unsafeCast<ScrollBehavior>()
-
-inline val ScrollBehavior.Companion.SMOOTH: ScrollBehavior get() = "smooth".asDynamic().unsafeCast<ScrollBehavior>()
+public inline val ShadowRootMode.Companion.CLOSED: ShadowRootMode get() = "closed".asDynamic().unsafeCast<ShadowRootMode>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface ScrollLogicalPosition {
+public external interface ScrollBehavior {
     companion object
 }
 
-inline val ScrollLogicalPosition.Companion.START: ScrollLogicalPosition get() = "start".asDynamic().unsafeCast<ScrollLogicalPosition>()
+public inline val ScrollBehavior.Companion.AUTO: ScrollBehavior get() = "auto".asDynamic().unsafeCast<ScrollBehavior>()
 
-inline val ScrollLogicalPosition.Companion.CENTER: ScrollLogicalPosition get() = "center".asDynamic().unsafeCast<ScrollLogicalPosition>()
+public inline val ScrollBehavior.Companion.INSTANT: ScrollBehavior get() = "instant".asDynamic().unsafeCast<ScrollBehavior>()
 
-inline val ScrollLogicalPosition.Companion.END: ScrollLogicalPosition get() = "end".asDynamic().unsafeCast<ScrollLogicalPosition>()
-
-inline val ScrollLogicalPosition.Companion.NEAREST: ScrollLogicalPosition get() = "nearest".asDynamic().unsafeCast<ScrollLogicalPosition>()
+public inline val ScrollBehavior.Companion.SMOOTH: ScrollBehavior get() = "smooth".asDynamic().unsafeCast<ScrollBehavior>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface CSSBoxType {
+public external interface ScrollLogicalPosition {
     companion object
 }
 
-inline val CSSBoxType.Companion.MARGIN: CSSBoxType get() = "margin".asDynamic().unsafeCast<CSSBoxType>()
+public inline val ScrollLogicalPosition.Companion.START: ScrollLogicalPosition get() = "start".asDynamic().unsafeCast<ScrollLogicalPosition>()
 
-inline val CSSBoxType.Companion.BORDER: CSSBoxType get() = "border".asDynamic().unsafeCast<CSSBoxType>()
+public inline val ScrollLogicalPosition.Companion.CENTER: ScrollLogicalPosition get() = "center".asDynamic().unsafeCast<ScrollLogicalPosition>()
 
-inline val CSSBoxType.Companion.PADDING: CSSBoxType get() = "padding".asDynamic().unsafeCast<CSSBoxType>()
+public inline val ScrollLogicalPosition.Companion.END: ScrollLogicalPosition get() = "end".asDynamic().unsafeCast<ScrollLogicalPosition>()
 
-inline val CSSBoxType.Companion.CONTENT: CSSBoxType get() = "content".asDynamic().unsafeCast<CSSBoxType>()
+public inline val ScrollLogicalPosition.Companion.NEAREST: ScrollLogicalPosition get() = "nearest".asDynamic().unsafeCast<ScrollLogicalPosition>()
+
+/* please, don't implement this interface! */
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
+public external interface CSSBoxType {
+    companion object
+}
+
+public inline val CSSBoxType.Companion.MARGIN: CSSBoxType get() = "margin".asDynamic().unsafeCast<CSSBoxType>()
+
+public inline val CSSBoxType.Companion.BORDER: CSSBoxType get() = "border".asDynamic().unsafeCast<CSSBoxType>()
+
+public inline val CSSBoxType.Companion.PADDING: CSSBoxType get() = "padding".asDynamic().unsafeCast<CSSBoxType>()
+
+public inline val CSSBoxType.Companion.CONTENT: CSSBoxType get() = "content".asDynamic().unsafeCast<CSSBoxType>()
 

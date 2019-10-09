@@ -21,7 +21,7 @@ import org.w3c.xhr.*
 /**
  * Exposes the JavaScript [SVGElement](https://developer.mozilla.org/en/docs/Web/API/SVGElement) to Kotlin
  */
-external abstract class SVGElement : Element, GlobalEventHandlers, SVGElementInstance, ElementCSSInlineStyle {
+public external abstract class SVGElement : Element, GlobalEventHandlers, SVGElementInstance, ElementCSSInlineStyle {
     open val dataset: DOMStringMap
     open val ownerSVGElement: SVGSVGElement?
     open val viewportElement: SVGElement?
@@ -51,7 +51,7 @@ external abstract class SVGElement : Element, GlobalEventHandlers, SVGElementIns
     }
 }
 
-external interface SVGBoundingBoxOptions {
+public external interface SVGBoundingBoxOptions {
     var fill: Boolean? /* = true */
         get() = definedExternally
         set(value) = definedExternally
@@ -67,7 +67,7 @@ external interface SVGBoundingBoxOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun SVGBoundingBoxOptions(fill: Boolean? = true, stroke: Boolean? = false, markers: Boolean? = false, clipped: Boolean? = false): SVGBoundingBoxOptions {
+public inline fun SVGBoundingBoxOptions(fill: Boolean? = true, stroke: Boolean? = false, markers: Boolean? = false, clipped: Boolean? = false): SVGBoundingBoxOptions {
     val o = js("({})")
     o["fill"] = fill
     o["stroke"] = stroke
@@ -79,7 +79,7 @@ inline fun SVGBoundingBoxOptions(fill: Boolean? = true, stroke: Boolean? = false
 /**
  * Exposes the JavaScript [SVGGraphicsElement](https://developer.mozilla.org/en/docs/Web/API/SVGGraphicsElement) to Kotlin
  */
-external abstract class SVGGraphicsElement : SVGElement, SVGTests {
+public external abstract class SVGGraphicsElement : SVGElement, SVGTests {
     open val transform: SVGAnimatedTransformList
     fun getBBox(options: SVGBoundingBoxOptions = definedExternally): DOMRect
     fun getCTM(): DOMMatrix?
@@ -110,7 +110,7 @@ external abstract class SVGGraphicsElement : SVGElement, SVGTests {
 /**
  * Exposes the JavaScript [SVGGeometryElement](https://developer.mozilla.org/en/docs/Web/API/SVGGeometryElement) to Kotlin
  */
-external abstract class SVGGeometryElement : SVGGraphicsElement {
+public external abstract class SVGGeometryElement : SVGGraphicsElement {
     open val pathLength: SVGAnimatedNumber
     fun isPointInFill(point: DOMPoint): Boolean
     fun isPointInStroke(point: DOMPoint): Boolean
@@ -142,14 +142,14 @@ external abstract class SVGGeometryElement : SVGGraphicsElement {
 /**
  * Exposes the JavaScript [SVGNumber](https://developer.mozilla.org/en/docs/Web/API/SVGNumber) to Kotlin
  */
-external abstract class SVGNumber {
+public external abstract class SVGNumber {
     open var value: Float
 }
 
 /**
  * Exposes the JavaScript [SVGLength](https://developer.mozilla.org/en/docs/Web/API/SVGLength) to Kotlin
  */
-external abstract class SVGLength {
+public external abstract class SVGLength {
     open val unitType: Short
     open var value: Float
     open var valueInSpecifiedUnits: Float
@@ -175,7 +175,7 @@ external abstract class SVGLength {
 /**
  * Exposes the JavaScript [SVGAngle](https://developer.mozilla.org/en/docs/Web/API/SVGAngle) to Kotlin
  */
-external abstract class SVGAngle {
+public external abstract class SVGAngle {
     open val unitType: Short
     open var value: Float
     open var valueInSpecifiedUnits: Float
@@ -192,7 +192,7 @@ external abstract class SVGAngle {
     }
 }
 
-external abstract class SVGNameList {
+public external abstract class SVGNameList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -205,15 +205,15 @@ external abstract class SVGNameList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGNameList.get(index: Int): dynamic = asDynamic()[index]
+public inline operator fun SVGNameList.get(index: Int): dynamic = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGNameList.set(index: Int, newItem: dynamic) { asDynamic()[index] = newItem }
+public inline operator fun SVGNameList.set(index: Int, newItem: dynamic) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGNumberList](https://developer.mozilla.org/en/docs/Web/API/SVGNumberList) to Kotlin
  */
-external abstract class SVGNumberList {
+public external abstract class SVGNumberList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -226,15 +226,15 @@ external abstract class SVGNumberList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGNumberList.get(index: Int): SVGNumber? = asDynamic()[index]
+public inline operator fun SVGNumberList.get(index: Int): SVGNumber? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGNumberList.set(index: Int, newItem: SVGNumber) { asDynamic()[index] = newItem }
+public inline operator fun SVGNumberList.set(index: Int, newItem: SVGNumber) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGLengthList](https://developer.mozilla.org/en/docs/Web/API/SVGLengthList) to Kotlin
  */
-external abstract class SVGLengthList {
+public external abstract class SVGLengthList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -247,15 +247,15 @@ external abstract class SVGLengthList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGLengthList.get(index: Int): SVGLength? = asDynamic()[index]
+public inline operator fun SVGLengthList.get(index: Int): SVGLength? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGLengthList.set(index: Int, newItem: SVGLength) { asDynamic()[index] = newItem }
+public inline operator fun SVGLengthList.set(index: Int, newItem: SVGLength) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGAnimatedBoolean](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedBoolean) to Kotlin
  */
-external abstract class SVGAnimatedBoolean {
+public external abstract class SVGAnimatedBoolean {
     open var baseVal: Boolean
     open val animVal: Boolean
 }
@@ -263,7 +263,7 @@ external abstract class SVGAnimatedBoolean {
 /**
  * Exposes the JavaScript [SVGAnimatedEnumeration](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedEnumeration) to Kotlin
  */
-external abstract class SVGAnimatedEnumeration {
+public external abstract class SVGAnimatedEnumeration {
     open var baseVal: Short
     open val animVal: Short
 }
@@ -271,7 +271,7 @@ external abstract class SVGAnimatedEnumeration {
 /**
  * Exposes the JavaScript [SVGAnimatedInteger](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedInteger) to Kotlin
  */
-external abstract class SVGAnimatedInteger {
+public external abstract class SVGAnimatedInteger {
     open var baseVal: Int
     open val animVal: Int
 }
@@ -279,7 +279,7 @@ external abstract class SVGAnimatedInteger {
 /**
  * Exposes the JavaScript [SVGAnimatedNumber](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedNumber) to Kotlin
  */
-external abstract class SVGAnimatedNumber {
+public external abstract class SVGAnimatedNumber {
     open var baseVal: Float
     open val animVal: Float
 }
@@ -287,7 +287,7 @@ external abstract class SVGAnimatedNumber {
 /**
  * Exposes the JavaScript [SVGAnimatedLength](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedLength) to Kotlin
  */
-external abstract class SVGAnimatedLength {
+public external abstract class SVGAnimatedLength {
     open val baseVal: SVGLength
     open val animVal: SVGLength
 }
@@ -295,7 +295,7 @@ external abstract class SVGAnimatedLength {
 /**
  * Exposes the JavaScript [SVGAnimatedAngle](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedAngle) to Kotlin
  */
-external abstract class SVGAnimatedAngle {
+public external abstract class SVGAnimatedAngle {
     open val baseVal: SVGAngle
     open val animVal: SVGAngle
 }
@@ -303,7 +303,7 @@ external abstract class SVGAnimatedAngle {
 /**
  * Exposes the JavaScript [SVGAnimatedString](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedString) to Kotlin
  */
-external abstract class SVGAnimatedString {
+public external abstract class SVGAnimatedString {
     open var baseVal: String
     open val animVal: String
 }
@@ -311,7 +311,7 @@ external abstract class SVGAnimatedString {
 /**
  * Exposes the JavaScript [SVGAnimatedRect](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedRect) to Kotlin
  */
-external abstract class SVGAnimatedRect {
+public external abstract class SVGAnimatedRect {
     open val baseVal: DOMRect
     open val animVal: DOMRectReadOnly
 }
@@ -319,7 +319,7 @@ external abstract class SVGAnimatedRect {
 /**
  * Exposes the JavaScript [SVGAnimatedNumberList](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedNumberList) to Kotlin
  */
-external abstract class SVGAnimatedNumberList {
+public external abstract class SVGAnimatedNumberList {
     open val baseVal: SVGNumberList
     open val animVal: SVGNumberList
 }
@@ -327,7 +327,7 @@ external abstract class SVGAnimatedNumberList {
 /**
  * Exposes the JavaScript [SVGAnimatedLengthList](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedLengthList) to Kotlin
  */
-external abstract class SVGAnimatedLengthList {
+public external abstract class SVGAnimatedLengthList {
     open val baseVal: SVGLengthList
     open val animVal: SVGLengthList
 }
@@ -335,7 +335,7 @@ external abstract class SVGAnimatedLengthList {
 /**
  * Exposes the JavaScript [SVGStringList](https://developer.mozilla.org/en/docs/Web/API/SVGStringList) to Kotlin
  */
-external abstract class SVGStringList {
+public external abstract class SVGStringList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -348,16 +348,16 @@ external abstract class SVGStringList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
+public inline operator fun SVGStringList.get(index: Int): String? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem }
+public inline operator fun SVGStringList.set(index: Int, newItem: String) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGUnitTypes](https://developer.mozilla.org/en/docs/Web/API/SVGUnitTypes) to Kotlin
  */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface SVGUnitTypes {
+public external interface SVGUnitTypes {
     companion object {
         val SVG_UNIT_TYPE_UNKNOWN: Short
         val SVG_UNIT_TYPE_USERSPACEONUSE: Short
@@ -368,12 +368,12 @@ external interface SVGUnitTypes {
 /**
  * Exposes the JavaScript [SVGTests](https://developer.mozilla.org/en/docs/Web/API/SVGTests) to Kotlin
  */
-external interface SVGTests {
+public external interface SVGTests {
     val requiredExtensions: SVGStringList
     val systemLanguage: SVGStringList
 }
 
-external interface SVGFitToViewBox {
+public external interface SVGFitToViewBox {
     val viewBox: SVGAnimatedRect
     val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
 }
@@ -382,7 +382,7 @@ external interface SVGFitToViewBox {
  * Exposes the JavaScript [SVGZoomAndPan](https://developer.mozilla.org/en/docs/Web/API/SVGZoomAndPan) to Kotlin
  */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface SVGZoomAndPan {
+public external interface SVGZoomAndPan {
     var zoomAndPan: Short
 
     companion object {
@@ -395,14 +395,14 @@ external interface SVGZoomAndPan {
 /**
  * Exposes the JavaScript [SVGURIReference](https://developer.mozilla.org/en/docs/Web/API/SVGURIReference) to Kotlin
  */
-external interface SVGURIReference {
+public external interface SVGURIReference {
     val href: SVGAnimatedString
 }
 
 /**
  * Exposes the JavaScript [SVGSVGElement](https://developer.mozilla.org/en/docs/Web/API/SVGSVGElement) to Kotlin
  */
-external abstract class SVGSVGElement : SVGGraphicsElement, SVGFitToViewBox, SVGZoomAndPan, WindowEventHandlers {
+public external abstract class SVGSVGElement : SVGGraphicsElement, SVGFitToViewBox, SVGZoomAndPan, WindowEventHandlers {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -456,7 +456,7 @@ external abstract class SVGSVGElement : SVGGraphicsElement, SVGFitToViewBox, SVG
 /**
  * Exposes the JavaScript [SVGGElement](https://developer.mozilla.org/en/docs/Web/API/SVGGElement) to Kotlin
  */
-external abstract class SVGGElement : SVGGraphicsElement {
+public external abstract class SVGGElement : SVGGraphicsElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -479,7 +479,7 @@ external abstract class SVGGElement : SVGGraphicsElement {
     }
 }
 
-external abstract class SVGUnknownElement : SVGGraphicsElement {
+public external abstract class SVGUnknownElement : SVGGraphicsElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -505,7 +505,7 @@ external abstract class SVGUnknownElement : SVGGraphicsElement {
 /**
  * Exposes the JavaScript [SVGDefsElement](https://developer.mozilla.org/en/docs/Web/API/SVGDefsElement) to Kotlin
  */
-external abstract class SVGDefsElement : SVGGraphicsElement {
+public external abstract class SVGDefsElement : SVGGraphicsElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -531,7 +531,7 @@ external abstract class SVGDefsElement : SVGGraphicsElement {
 /**
  * Exposes the JavaScript [SVGDescElement](https://developer.mozilla.org/en/docs/Web/API/SVGDescElement) to Kotlin
  */
-external abstract class SVGDescElement : SVGElement {
+public external abstract class SVGDescElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -557,7 +557,7 @@ external abstract class SVGDescElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGMetadataElement](https://developer.mozilla.org/en/docs/Web/API/SVGMetadataElement) to Kotlin
  */
-external abstract class SVGMetadataElement : SVGElement {
+public external abstract class SVGMetadataElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -583,7 +583,7 @@ external abstract class SVGMetadataElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGTitleElement](https://developer.mozilla.org/en/docs/Web/API/SVGTitleElement) to Kotlin
  */
-external abstract class SVGTitleElement : SVGElement {
+public external abstract class SVGTitleElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -609,7 +609,7 @@ external abstract class SVGTitleElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGSymbolElement](https://developer.mozilla.org/en/docs/Web/API/SVGSymbolElement) to Kotlin
  */
-external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox {
+public external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -635,7 +635,7 @@ external abstract class SVGSymbolElement : SVGGraphicsElement, SVGFitToViewBox {
 /**
  * Exposes the JavaScript [SVGUseElement](https://developer.mozilla.org/en/docs/Web/API/SVGUseElement) to Kotlin
  */
-external abstract class SVGUseElement : SVGGraphicsElement, SVGURIReference {
+public external abstract class SVGUseElement : SVGGraphicsElement, SVGURIReference {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -665,7 +665,7 @@ external abstract class SVGUseElement : SVGGraphicsElement, SVGURIReference {
     }
 }
 
-external open class SVGUseElementShadowRoot : ShadowRoot {
+public external open class SVGUseElementShadowRoot : ShadowRoot {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -688,21 +688,21 @@ external open class SVGUseElementShadowRoot : ShadowRoot {
     }
 }
 
-external interface SVGElementInstance {
+public external interface SVGElementInstance {
     val correspondingElement: SVGElement?
         get() = definedExternally
     val correspondingUseElement: SVGUseElement?
         get() = definedExternally
 }
 
-external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
+public external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
     open val sourceAnimation: dynamic
 }
 
 /**
  * Exposes the JavaScript [SVGSwitchElement](https://developer.mozilla.org/en/docs/Web/API/SVGSwitchElement) to Kotlin
  */
-external abstract class SVGSwitchElement : SVGGraphicsElement {
+public external abstract class SVGSwitchElement : SVGGraphicsElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -725,14 +725,14 @@ external abstract class SVGSwitchElement : SVGGraphicsElement {
     }
 }
 
-external interface GetSVGDocument {
+public external interface GetSVGDocument {
     fun getSVGDocument(): Document
 }
 
 /**
  * Exposes the JavaScript [SVGStyleElement](https://developer.mozilla.org/en/docs/Web/API/SVGStyleElement) to Kotlin
  */
-external abstract class SVGStyleElement : SVGElement, LinkStyle {
+public external abstract class SVGStyleElement : SVGElement, LinkStyle {
     open var type: String
     open var media: String
     open var title: String
@@ -762,7 +762,7 @@ external abstract class SVGStyleElement : SVGElement, LinkStyle {
 /**
  * Exposes the JavaScript [SVGTransform](https://developer.mozilla.org/en/docs/Web/API/SVGTransform) to Kotlin
  */
-external abstract class SVGTransform {
+public external abstract class SVGTransform {
     open val type: Short
     open val matrix: DOMMatrix
     open val angle: Float
@@ -787,7 +787,7 @@ external abstract class SVGTransform {
 /**
  * Exposes the JavaScript [SVGTransformList](https://developer.mozilla.org/en/docs/Web/API/SVGTransformList) to Kotlin
  */
-external abstract class SVGTransformList {
+public external abstract class SVGTransformList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -802,15 +802,15 @@ external abstract class SVGTransformList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGTransformList.get(index: Int): SVGTransform? = asDynamic()[index]
+public inline operator fun SVGTransformList.get(index: Int): SVGTransform? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGTransformList.set(index: Int, newItem: SVGTransform) { asDynamic()[index] = newItem }
+public inline operator fun SVGTransformList.set(index: Int, newItem: SVGTransform) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGAnimatedTransformList](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedTransformList) to Kotlin
  */
-external abstract class SVGAnimatedTransformList {
+public external abstract class SVGAnimatedTransformList {
     open val baseVal: SVGTransformList
     open val animVal: SVGTransformList
 }
@@ -818,7 +818,7 @@ external abstract class SVGAnimatedTransformList {
 /**
  * Exposes the JavaScript [SVGPreserveAspectRatio](https://developer.mozilla.org/en/docs/Web/API/SVGPreserveAspectRatio) to Kotlin
  */
-external abstract class SVGPreserveAspectRatio {
+public external abstract class SVGPreserveAspectRatio {
     open var align: Short
     open var meetOrSlice: Short
 
@@ -843,7 +843,7 @@ external abstract class SVGPreserveAspectRatio {
 /**
  * Exposes the JavaScript [SVGAnimatedPreserveAspectRatio](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedPreserveAspectRatio) to Kotlin
  */
-external abstract class SVGAnimatedPreserveAspectRatio {
+public external abstract class SVGAnimatedPreserveAspectRatio {
     open val baseVal: SVGPreserveAspectRatio
     open val animVal: SVGPreserveAspectRatio
 }
@@ -851,7 +851,7 @@ external abstract class SVGAnimatedPreserveAspectRatio {
 /**
  * Exposes the JavaScript [SVGPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGPathElement) to Kotlin
  */
-external abstract class SVGPathElement : SVGGeometryElement {
+public external abstract class SVGPathElement : SVGGeometryElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -877,7 +877,7 @@ external abstract class SVGPathElement : SVGGeometryElement {
 /**
  * Exposes the JavaScript [SVGRectElement](https://developer.mozilla.org/en/docs/Web/API/SVGRectElement) to Kotlin
  */
-external abstract class SVGRectElement : SVGGeometryElement {
+public external abstract class SVGRectElement : SVGGeometryElement {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -910,7 +910,7 @@ external abstract class SVGRectElement : SVGGeometryElement {
 /**
  * Exposes the JavaScript [SVGCircleElement](https://developer.mozilla.org/en/docs/Web/API/SVGCircleElement) to Kotlin
  */
-external abstract class SVGCircleElement : SVGGeometryElement {
+public external abstract class SVGCircleElement : SVGGeometryElement {
     open val cx: SVGAnimatedLength
     open val cy: SVGAnimatedLength
     open val r: SVGAnimatedLength
@@ -940,7 +940,7 @@ external abstract class SVGCircleElement : SVGGeometryElement {
 /**
  * Exposes the JavaScript [SVGEllipseElement](https://developer.mozilla.org/en/docs/Web/API/SVGEllipseElement) to Kotlin
  */
-external abstract class SVGEllipseElement : SVGGeometryElement {
+public external abstract class SVGEllipseElement : SVGGeometryElement {
     open val cx: SVGAnimatedLength
     open val cy: SVGAnimatedLength
     open val rx: SVGAnimatedLength
@@ -971,7 +971,7 @@ external abstract class SVGEllipseElement : SVGGeometryElement {
 /**
  * Exposes the JavaScript [SVGLineElement](https://developer.mozilla.org/en/docs/Web/API/SVGLineElement) to Kotlin
  */
-external abstract class SVGLineElement : SVGGeometryElement {
+public external abstract class SVGLineElement : SVGGeometryElement {
     open val x1: SVGAnimatedLength
     open val y1: SVGAnimatedLength
     open val x2: SVGAnimatedLength
@@ -1002,7 +1002,7 @@ external abstract class SVGLineElement : SVGGeometryElement {
 /**
  * Exposes the JavaScript [SVGMeshElement](https://developer.mozilla.org/en/docs/Web/API/SVGMeshElement) to Kotlin
  */
-external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference {
+public external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1028,12 +1028,12 @@ external abstract class SVGMeshElement : SVGGeometryElement, SVGURIReference {
 /**
  * Exposes the JavaScript [SVGAnimatedPoints](https://developer.mozilla.org/en/docs/Web/API/SVGAnimatedPoints) to Kotlin
  */
-external interface SVGAnimatedPoints {
+public external interface SVGAnimatedPoints {
     val points: SVGPointList
     val animatedPoints: SVGPointList
 }
 
-external abstract class SVGPointList {
+public external abstract class SVGPointList {
     open val length: Int
     open val numberOfItems: Int
     fun clear()
@@ -1046,15 +1046,15 @@ external abstract class SVGPointList {
 }
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
+public inline operator fun SVGPointList.get(index: Int): DOMPoint? = asDynamic()[index]
 
 @kotlin.internal.InlineOnly
-inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
+public inline operator fun SVGPointList.set(index: Int, newItem: DOMPoint) { asDynamic()[index] = newItem }
 
 /**
  * Exposes the JavaScript [SVGPolylineElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolylineElement) to Kotlin
  */
-external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints {
+public external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoints {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1080,7 +1080,7 @@ external abstract class SVGPolylineElement : SVGGeometryElement, SVGAnimatedPoin
 /**
  * Exposes the JavaScript [SVGPolygonElement](https://developer.mozilla.org/en/docs/Web/API/SVGPolygonElement) to Kotlin
  */
-external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints {
+public external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoints {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1106,7 +1106,7 @@ external abstract class SVGPolygonElement : SVGGeometryElement, SVGAnimatedPoint
 /**
  * Exposes the JavaScript [SVGTextContentElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextContentElement) to Kotlin
  */
-external abstract class SVGTextContentElement : SVGGraphicsElement {
+public external abstract class SVGTextContentElement : SVGGraphicsElement {
     open val textLength: SVGAnimatedLength
     open val lengthAdjust: SVGAnimatedEnumeration
     fun getNumberOfChars(): Int
@@ -1147,7 +1147,7 @@ external abstract class SVGTextContentElement : SVGGraphicsElement {
 /**
  * Exposes the JavaScript [SVGTextPositioningElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextPositioningElement) to Kotlin
  */
-external abstract class SVGTextPositioningElement : SVGTextContentElement {
+public external abstract class SVGTextPositioningElement : SVGTextContentElement {
     open val x: SVGAnimatedLengthList
     open val y: SVGAnimatedLengthList
     open val dx: SVGAnimatedLengthList
@@ -1182,7 +1182,7 @@ external abstract class SVGTextPositioningElement : SVGTextContentElement {
 /**
  * Exposes the JavaScript [SVGTextElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextElement) to Kotlin
  */
-external abstract class SVGTextElement : SVGTextPositioningElement {
+public external abstract class SVGTextElement : SVGTextPositioningElement {
     companion object {
         val LENGTHADJUST_UNKNOWN: Short
         val LENGTHADJUST_SPACING: Short
@@ -1211,7 +1211,7 @@ external abstract class SVGTextElement : SVGTextPositioningElement {
 /**
  * Exposes the JavaScript [SVGTSpanElement](https://developer.mozilla.org/en/docs/Web/API/SVGTSpanElement) to Kotlin
  */
-external abstract class SVGTSpanElement : SVGTextPositioningElement {
+public external abstract class SVGTSpanElement : SVGTextPositioningElement {
     companion object {
         val LENGTHADJUST_UNKNOWN: Short
         val LENGTHADJUST_SPACING: Short
@@ -1240,7 +1240,7 @@ external abstract class SVGTSpanElement : SVGTextPositioningElement {
 /**
  * Exposes the JavaScript [SVGTextPathElement](https://developer.mozilla.org/en/docs/Web/API/SVGTextPathElement) to Kotlin
  */
-external abstract class SVGTextPathElement : SVGTextContentElement, SVGURIReference {
+public external abstract class SVGTextPathElement : SVGTextContentElement, SVGURIReference {
     open val startOffset: SVGAnimatedLength
     open val method: SVGAnimatedEnumeration
     open val spacing: SVGAnimatedEnumeration
@@ -1279,7 +1279,7 @@ external abstract class SVGTextPathElement : SVGTextContentElement, SVGURIRefere
 /**
  * Exposes the JavaScript [SVGImageElement](https://developer.mozilla.org/en/docs/Web/API/SVGImageElement) to Kotlin
  */
-external abstract class SVGImageElement : SVGGraphicsElement, SVGURIReference, HTMLOrSVGImageElement {
+public external abstract class SVGImageElement : SVGGraphicsElement, SVGURIReference, HTMLOrSVGImageElement {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -1312,7 +1312,7 @@ external abstract class SVGImageElement : SVGGraphicsElement, SVGURIReference, H
 /**
  * Exposes the JavaScript [SVGForeignObjectElement](https://developer.mozilla.org/en/docs/Web/API/SVGForeignObjectElement) to Kotlin
  */
-external abstract class SVGForeignObjectElement : SVGGraphicsElement {
+public external abstract class SVGForeignObjectElement : SVGGraphicsElement {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -1340,7 +1340,7 @@ external abstract class SVGForeignObjectElement : SVGGraphicsElement {
     }
 }
 
-external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
+public external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
     open val refX: SVGAnimatedLength
     open val refY: SVGAnimatedLength
     open val markerUnits: SVGAnimatedEnumeration
@@ -1383,7 +1383,7 @@ external abstract class SVGMarkerElement : SVGElement, SVGFitToViewBox {
 /**
  * Exposes the JavaScript [SVGSolidcolorElement](https://developer.mozilla.org/en/docs/Web/API/SVGSolidcolorElement) to Kotlin
  */
-external abstract class SVGSolidcolorElement : SVGElement {
+public external abstract class SVGSolidcolorElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1409,7 +1409,7 @@ external abstract class SVGSolidcolorElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGGradientElement](https://developer.mozilla.org/en/docs/Web/API/SVGGradientElement) to Kotlin
  */
-external abstract class SVGGradientElement : SVGElement, SVGURIReference, SVGUnitTypes {
+public external abstract class SVGGradientElement : SVGElement, SVGURIReference, SVGUnitTypes {
     open val gradientUnits: SVGAnimatedEnumeration
     open val gradientTransform: SVGAnimatedTransformList
     open val spreadMethod: SVGAnimatedEnumeration
@@ -1446,7 +1446,7 @@ external abstract class SVGGradientElement : SVGElement, SVGURIReference, SVGUni
 /**
  * Exposes the JavaScript [SVGLinearGradientElement](https://developer.mozilla.org/en/docs/Web/API/SVGLinearGradientElement) to Kotlin
  */
-external abstract class SVGLinearGradientElement : SVGGradientElement {
+public external abstract class SVGLinearGradientElement : SVGGradientElement {
     open val x1: SVGAnimatedLength
     open val y1: SVGAnimatedLength
     open val x2: SVGAnimatedLength
@@ -1484,7 +1484,7 @@ external abstract class SVGLinearGradientElement : SVGGradientElement {
 /**
  * Exposes the JavaScript [SVGRadialGradientElement](https://developer.mozilla.org/en/docs/Web/API/SVGRadialGradientElement) to Kotlin
  */
-external abstract class SVGRadialGradientElement : SVGGradientElement {
+public external abstract class SVGRadialGradientElement : SVGGradientElement {
     open val cx: SVGAnimatedLength
     open val cy: SVGAnimatedLength
     open val r: SVGAnimatedLength
@@ -1521,7 +1521,7 @@ external abstract class SVGRadialGradientElement : SVGGradientElement {
     }
 }
 
-external abstract class SVGMeshGradientElement : SVGGradientElement {
+public external abstract class SVGMeshGradientElement : SVGGradientElement {
     companion object {
         val SVG_SPREADMETHOD_UNKNOWN: Short
         val SVG_SPREADMETHOD_PAD: Short
@@ -1551,7 +1551,7 @@ external abstract class SVGMeshGradientElement : SVGGradientElement {
     }
 }
 
-external abstract class SVGMeshrowElement : SVGElement {
+public external abstract class SVGMeshrowElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1574,7 +1574,7 @@ external abstract class SVGMeshrowElement : SVGElement {
     }
 }
 
-external abstract class SVGMeshpatchElement : SVGElement {
+public external abstract class SVGMeshpatchElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1600,7 +1600,7 @@ external abstract class SVGMeshpatchElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGStopElement](https://developer.mozilla.org/en/docs/Web/API/SVGStopElement) to Kotlin
  */
-external abstract class SVGStopElement : SVGElement {
+public external abstract class SVGStopElement : SVGElement {
     open val offset: SVGAnimatedNumber
 
     companion object {
@@ -1628,7 +1628,7 @@ external abstract class SVGStopElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGPatternElement](https://developer.mozilla.org/en/docs/Web/API/SVGPatternElement) to Kotlin
  */
-external abstract class SVGPatternElement : SVGElement, SVGFitToViewBox, SVGURIReference, SVGUnitTypes {
+public external abstract class SVGPatternElement : SVGElement, SVGFitToViewBox, SVGURIReference, SVGUnitTypes {
     open val patternUnits: SVGAnimatedEnumeration
     open val patternContentUnits: SVGAnimatedEnumeration
     open val patternTransform: SVGAnimatedTransformList
@@ -1662,7 +1662,7 @@ external abstract class SVGPatternElement : SVGElement, SVGFitToViewBox, SVGURIR
     }
 }
 
-external abstract class SVGHatchElement : SVGElement {
+public external abstract class SVGHatchElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1685,7 +1685,7 @@ external abstract class SVGHatchElement : SVGElement {
     }
 }
 
-external abstract class SVGHatchpathElement : SVGElement {
+public external abstract class SVGHatchpathElement : SVGElement {
     companion object {
         val ELEMENT_NODE: Short
         val ATTRIBUTE_NODE: Short
@@ -1711,7 +1711,7 @@ external abstract class SVGHatchpathElement : SVGElement {
 /**
  * Exposes the JavaScript [SVGCursorElement](https://developer.mozilla.org/en/docs/Web/API/SVGCursorElement) to Kotlin
  */
-external abstract class SVGCursorElement : SVGElement, SVGURIReference {
+public external abstract class SVGCursorElement : SVGElement, SVGURIReference {
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
 
@@ -1740,7 +1740,7 @@ external abstract class SVGCursorElement : SVGElement, SVGURIReference {
 /**
  * Exposes the JavaScript [SVGScriptElement](https://developer.mozilla.org/en/docs/Web/API/SVGScriptElement) to Kotlin
  */
-external abstract class SVGScriptElement : SVGElement, SVGURIReference, HTMLOrSVGScriptElement {
+public external abstract class SVGScriptElement : SVGElement, SVGURIReference, HTMLOrSVGScriptElement {
     open var type: String
     open var crossOrigin: String?
 
@@ -1769,7 +1769,7 @@ external abstract class SVGScriptElement : SVGElement, SVGURIReference, HTMLOrSV
 /**
  * Exposes the JavaScript [SVGAElement](https://developer.mozilla.org/en/docs/Web/API/SVGAElement) to Kotlin
  */
-external abstract class SVGAElement : SVGGraphicsElement, SVGURIReference {
+public external abstract class SVGAElement : SVGGraphicsElement, SVGURIReference {
     open val target: SVGAnimatedString
     open val download: SVGAnimatedString
     open val rel: SVGAnimatedString
@@ -1802,7 +1802,7 @@ external abstract class SVGAElement : SVGGraphicsElement, SVGURIReference {
 /**
  * Exposes the JavaScript [SVGViewElement](https://developer.mozilla.org/en/docs/Web/API/SVGViewElement) to Kotlin
  */
-external abstract class SVGViewElement : SVGElement, SVGFitToViewBox, SVGZoomAndPan {
+public external abstract class SVGViewElement : SVGElement, SVGFitToViewBox, SVGZoomAndPan {
     companion object {
         val SVG_ZOOMANDPAN_UNKNOWN: Short
         val SVG_ZOOMANDPAN_DISABLE: Short

@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class ModuleModel(
         override val name: NameEntity,
@@ -11,8 +11,8 @@ data class ModuleModel(
         val submodules: List<ModuleModel>,
         val imports: MutableList<NameEntity>
 ) : TopLevelModel {
-    override val visibilityModifier: VisibilityModifier
-        get() = VisibilityModifier.DEFAULT
+    override val visibilityModifier: VisibilityModifierModel
+        get() = VisibilityModifierModel.DEFAULT
 }
 
 fun ModuleModel.flattenDeclarations(): List<ModuleModel> {

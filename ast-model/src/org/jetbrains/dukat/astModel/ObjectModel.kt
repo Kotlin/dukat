@@ -3,14 +3,14 @@ package org.jetbrains.dukat.astModel
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class ObjectModel(
         override val name: NameEntity,
         val members: List<MemberModel>,
 
         val parentEntities: List<HeritageModel>,
-        override val visibilityModifier: VisibilityModifier
+        override val visibilityModifier: VisibilityModifierModel
 ) : MemberEntity, TopLevelModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
@@ -22,7 +22,7 @@ fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
                 IdentifierEntity(""),
                 otherModel.members,
                 listOf(),
-                VisibilityModifier.DEFAULT
+                VisibilityModifierModel.DEFAULT
         )
     }
 

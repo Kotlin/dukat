@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class InterfaceModel(
     override val name: NameEntity,
@@ -12,5 +12,5 @@ data class InterfaceModel(
     val annotations: MutableList<AnnotationModel>,
     val comment: CommentModel?,
     val external: Boolean,
-    override val visibilityModifier: VisibilityModifier
+    override val visibilityModifier: VisibilityModifierModel
 ) : ClassLikeModel

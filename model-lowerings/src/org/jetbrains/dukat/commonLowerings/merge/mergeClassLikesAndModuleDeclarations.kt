@@ -17,7 +17,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.mergeWith
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
 
 
@@ -73,7 +73,7 @@ private fun ObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<Nam
     return this?.copy(members = members) ?: if (members.isEmpty()) {
         null
     } else {
-        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifier.DEFAULT)
+        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT)
     }
 }
 

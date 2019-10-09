@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.commonLowerings.merge
+package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -13,8 +13,6 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -24,7 +22,6 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun escapeIdentificator(identificator: String): String {
@@ -139,7 +136,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         val declaration = ownerContext.node
 
         return super.lowerClassModel(ownerContext.copy(node = declaration.copy(
-            name = declaration.name.escape()
+                name = declaration.name.escape()
         )))
     }
 

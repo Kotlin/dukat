@@ -3,7 +3,7 @@ package org.jetbrains.dukat.astModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class FunctionModel(
         override val name: NameEntity,
@@ -19,5 +19,5 @@ data class FunctionModel(
 
         val extend: ClassLikeReferenceModel?,
         val body: List<StatementModel>,
-        override val visibilityModifier: VisibilityModifier
+        override val visibilityModifier: VisibilityModifierModel
 ) : MemberEntity, MergeableModel, TopLevelModel

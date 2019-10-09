@@ -15,7 +15,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun NameEntity.shiftLeft(): NameEntity {

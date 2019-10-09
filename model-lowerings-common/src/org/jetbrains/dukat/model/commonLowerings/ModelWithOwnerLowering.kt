@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.commonLowerings
+package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel

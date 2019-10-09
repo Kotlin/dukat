@@ -43,6 +43,7 @@ gradle.ext {
 include 'ast-common'
 include 'ast-model'
 include 'cli'
+include 'model-lowerings-common'
 include 'compiler'
 include 'descriptors'
 include 'idl-declarations'

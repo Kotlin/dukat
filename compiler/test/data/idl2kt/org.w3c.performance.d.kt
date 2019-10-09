@@ -21,20 +21,20 @@ import org.w3c.xhr.*
 /**
  * Exposes the JavaScript [Performance](https://developer.mozilla.org/en/docs/Web/API/Performance) to Kotlin
  */
-external abstract class Performance : EventTarget {
+public external abstract class Performance : EventTarget {
     open val timing: PerformanceTiming
     open val navigation: PerformanceNavigation
     fun now(): Double
 }
 
-external interface GlobalPerformance {
+public external interface GlobalPerformance {
     val performance: Performance
 }
 
 /**
  * Exposes the JavaScript [PerformanceTiming](https://developer.mozilla.org/en/docs/Web/API/PerformanceTiming) to Kotlin
  */
-external abstract class PerformanceTiming {
+public external abstract class PerformanceTiming {
     open val navigationStart: Number
     open val unloadEventStart: Number
     open val unloadEventEnd: Number
@@ -61,7 +61,7 @@ external abstract class PerformanceTiming {
 /**
  * Exposes the JavaScript [PerformanceNavigation](https://developer.mozilla.org/en/docs/Web/API/PerformanceNavigation) to Kotlin
  */
-external abstract class PerformanceNavigation {
+public external abstract class PerformanceNavigation {
     open val type: Short
     open val redirectCount: Short
 

@@ -2,9 +2,8 @@ package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.commonLowerings.addStandardImportsAndAnnotations
-import org.jetbrains.dukat.commonLowerings.lowerOverrides
-import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
+import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -12,8 +11,9 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
-import org.jetbrains.dukat.commonLowerings.omitStdLib
+import org.jetbrains.dukat.model.commonLowerings.omitStdLib
 import org.jetbrains.dukat.compiler.lowerPrimitives
+import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
@@ -26,9 +26,9 @@ import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
-import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
+import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration

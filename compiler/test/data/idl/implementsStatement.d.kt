@@ -1,7 +1,7 @@
 import kotlin.js.*
 
-external interface A
+public external interface A
 
-external interface B
+public external interface B
 
-external abstract class C : A, B
+public external abstract class C : A, B

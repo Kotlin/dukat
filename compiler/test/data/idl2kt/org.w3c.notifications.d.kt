@@ -21,7 +21,7 @@ import org.w3c.xhr.*
 /**
  * Exposes the JavaScript [Notification](https://developer.mozilla.org/en/docs/Web/API/Notification) to Kotlin
  */
-external open class Notification(title: String, options: NotificationOptions = definedExternally) : EventTarget {
+public external open class Notification(title: String, options: NotificationOptions = definedExternally) : EventTarget {
     var onclick: ((MouseEvent) -> dynamic)?
     var onerror: ((Event) -> dynamic)?
     open val title: String
@@ -51,7 +51,7 @@ external open class Notification(title: String, options: NotificationOptions = d
     }
 }
 
-external interface NotificationOptions {
+public external interface NotificationOptions {
     var dir: NotificationDirection? /* = NotificationDirection.AUTO */
         get() = definedExternally
         set(value) = definedExternally
@@ -106,7 +106,7 @@ external interface NotificationOptions {
 }
 
 @kotlin.internal.InlineOnly
-inline fun NotificationOptions(dir: NotificationDirection? = NotificationDirection.AUTO, lang: String? = "", body: String? = "", tag: String? = "", image: String? = undefined, icon: String? = undefined, badge: String? = undefined, sound: String? = undefined, vibrate: dynamic = undefined, timestamp: Number? = undefined, renotify: Boolean? = false, silent: Boolean? = false, noscreen: Boolean? = false, requireInteraction: Boolean? = false, sticky: Boolean? = false, data: Any? = null, actions: Array<NotificationAction>? = arrayOf()): NotificationOptions {
+public inline fun NotificationOptions(dir: NotificationDirection? = NotificationDirection.AUTO, lang: String? = "", body: String? = "", tag: String? = "", image: String? = undefined, icon: String? = undefined, badge: String? = undefined, sound: String? = undefined, vibrate: dynamic = undefined, timestamp: Number? = undefined, renotify: Boolean? = false, silent: Boolean? = false, noscreen: Boolean? = false, requireInteraction: Boolean? = false, sticky: Boolean? = false, data: Any? = null, actions: Array<NotificationAction>? = arrayOf()): NotificationOptions {
     val o = js("({})")
     o["dir"] = dir
     o["lang"] = lang
@@ -128,7 +128,7 @@ inline fun NotificationOptions(dir: NotificationDirection? = NotificationDirecti
     return o
 }
 
-external interface NotificationAction {
+public external interface NotificationAction {
     var action: String?
         get() = definedExternally
         set(value) = definedExternally
@@ -141,7 +141,7 @@ external interface NotificationAction {
 }
 
 @kotlin.internal.InlineOnly
-inline fun NotificationAction(action: String?, title: String?, icon: String? = undefined): NotificationAction {
+public inline fun NotificationAction(action: String?, title: String?, icon: String? = undefined): NotificationAction {
     val o = js("({})")
     o["action"] = action
     o["title"] = title
@@ -149,14 +149,14 @@ inline fun NotificationAction(action: String?, title: String?, icon: String? = u
     return o
 }
 
-external interface GetNotificationOptions {
+public external interface GetNotificationOptions {
     var tag: String? /* = "" */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
+public inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
     val o = js("({})")
     o["tag"] = tag
     return o
@@ -165,7 +165,7 @@ inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
 /**
  * Exposes the JavaScript [NotificationEvent](https://developer.mozilla.org/en/docs/Web/API/NotificationEvent) to Kotlin
  */
-external open class NotificationEvent(type: String, eventInitDict: NotificationEventInit) : ExtendableEvent {
+public external open class NotificationEvent(type: String, eventInitDict: NotificationEventInit) : ExtendableEvent {
     open val notification: Notification
     open val action: String
 
@@ -177,7 +177,7 @@ external open class NotificationEvent(type: String, eventInitDict: NotificationE
     }
 }
 
-external interface NotificationEventInit : ExtendableEventInit {
+public external interface NotificationEventInit : ExtendableEventInit {
     var notification: Notification?
         get() = definedExternally
         set(value) = definedExternally
@@ -187,7 +187,7 @@ external interface NotificationEventInit : ExtendableEventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun NotificationEventInit(notification: Notification?, action: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): NotificationEventInit {
+public inline fun NotificationEventInit(notification: Notification?, action: String? = "", bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): NotificationEventInit {
     val o = js("({})")
     o["notification"] = notification
     o["action"] = action
@@ -199,25 +199,25 @@ inline fun NotificationEventInit(notification: Notification?, action: String? = 
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface NotificationPermission {
+public external interface NotificationPermission {
     companion object
 }
 
-inline val NotificationPermission.Companion.DEFAULT: NotificationPermission get() = "default".asDynamic().unsafeCast<NotificationPermission>()
+public inline val NotificationPermission.Companion.DEFAULT: NotificationPermission get() = "default".asDynamic().unsafeCast<NotificationPermission>()
 
-inline val NotificationPermission.Companion.DENIED: NotificationPermission get() = "denied".asDynamic().unsafeCast<NotificationPermission>()
+public inline val NotificationPermission.Companion.DENIED: NotificationPermission get() = "denied".asDynamic().unsafeCast<NotificationPermission>()
 
-inline val NotificationPermission.Companion.GRANTED: NotificationPermission get() = "granted".asDynamic().unsafeCast<NotificationPermission>()
+public inline val NotificationPermission.Companion.GRANTED: NotificationPermission get() = "granted".asDynamic().unsafeCast<NotificationPermission>()
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-external interface NotificationDirection {
+public external interface NotificationDirection {
     companion object
 }
 
-inline val NotificationDirection.Companion.AUTO: NotificationDirection get() = "auto".asDynamic().unsafeCast<NotificationDirection>()
+public inline val NotificationDirection.Companion.AUTO: NotificationDirection get() = "auto".asDynamic().unsafeCast<NotificationDirection>()
 
-inline val NotificationDirection.Companion.LTR: NotificationDirection get() = "ltr".asDynamic().unsafeCast<NotificationDirection>()
+public inline val NotificationDirection.Companion.LTR: NotificationDirection get() = "ltr".asDynamic().unsafeCast<NotificationDirection>()
 
-inline val NotificationDirection.Companion.RTL: NotificationDirection get() = "rtl".asDynamic().unsafeCast<NotificationDirection>()
+public inline val NotificationDirection.Companion.RTL: NotificationDirection get() = "rtl".asDynamic().unsafeCast<NotificationDirection>()
 
