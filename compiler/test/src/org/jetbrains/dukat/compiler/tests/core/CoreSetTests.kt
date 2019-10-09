@@ -7,15 +7,18 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
-import org.jetbrains.dukat.ts.translator.createJsFileTranslator
+import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
+
+private fun createJsFileTranslator(moduleNameResolver: ModuleNameResolver, translatorPath: String, libPath: String, nodePath: String) = JsRuntimeFileTranslator(moduleNameResolver, translatorPath, libPath, nodePath)
 
 class CoreSetTests : OutputTests() {
 
