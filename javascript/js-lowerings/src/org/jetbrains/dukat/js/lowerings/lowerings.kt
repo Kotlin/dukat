@@ -10,6 +10,7 @@ import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
+import org.jetbrains.dukat.js.declarations.member.JSMethodDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
@@ -41,16 +42,20 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSFunctionDeclaration.convert(): FunctionModel {
+    private fun List<JSParameterDeclaration>.convert(): MutableList<ParameterModel> {
         val parameterModels = mutableListOf<ParameterModel>()
 
-        for(jsParameter in parameters) {
-            parameterModels.add(jsParameter.convert())
+        for(parameter in this) {
+            parameterModels.add(parameter.convert())
         }
 
+        return parameterModels
+    }
+
+    private fun JSFunctionDeclaration.convert(): FunctionModel {
         return FunctionModel(
                 name = IdentifierEntity(name),
-                parameters = parameterModels,
+                parameters = parameters.convert(),
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
@@ -66,10 +71,35 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
+    private fun JSMethodDeclaration.convert(): MethodModel {
+        return MethodModel(
+                name = IdentifierEntity(name),
+                parameters = function.parameters.convert(),
+                type = ANY_NULLABLE_TYPE,
+                typeParameters = emptyList<TypeParameterModel>(),
+
+                static = static,
+                override = false,
+                operator = false,
+                annotations = emptyList(),
+
+                open = false
+        )
+    }
+
     private fun JSClassDeclaration.convert(): ClassModel {
+        val members = mutableListOf<MemberModel>()
+
+        for((_, declaration) in scopeDeclarations) {
+            when(declaration) {
+                is JSMethodDeclaration -> members.add(declaration.convert())
+                else -> logger.warn("Class member of type <${declaration.javaClass}> not supported.")
+            }
+        }
+
         return ClassModel(
                 name = IdentifierEntity(name),
-                members = listOf<MemberModel>(),
+                members = members,
                 companionObject = null,
                 typeParameters = emptyList(),
                 parentEntities = emptyList(),

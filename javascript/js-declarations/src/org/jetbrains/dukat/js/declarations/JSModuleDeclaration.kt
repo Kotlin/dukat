@@ -6,5 +6,5 @@ data class JSModuleDeclaration(
         val moduleName: String,
         val fileName: String,
         val exportDeclarations: MutableSet<JSDeclaration>,
-        val topLevelDeclarations: MutableMap<String, JSDeclaration>
-)
+        override val scopeDeclarations: MutableMap<String, JSDeclaration>
+) : JSScopedDeclaration
