@@ -1,9 +1,10 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -13,6 +14,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 
 private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     visitor(this)
@@ -90,10 +92,11 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                 companionObject = if (staticProperties.isNotEmpty()) {
                     companionObject?.copy(
                             members = companionObject!!.members + staticProperties)
-                            ?: CompanionObjectModel(
-                                    "",
+                            ?: ObjectModel(
+                                IdentifierEntity(""),
                                     staticProperties,
-                                    listOf()
+                                    listOf(),
+                                    VisibilityModifier.DEFAULT
                             )
                 } else {
                     companionObject
@@ -105,10 +108,11 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                     companionObject = if (staticProperties.isNotEmpty()) {
                         companionObject?.copy(
                                 members = companionObject!!.members + staticProperties)
-                                ?: CompanionObjectModel(
-                                        "",
+                                ?: ObjectModel(
+                                    IdentifierEntity(""),
                                         staticProperties,
-                                        listOf()
+                                        listOf(),
+                                        VisibilityModifier.DEFAULT
                                 )
                     } else {
                         companionObject
