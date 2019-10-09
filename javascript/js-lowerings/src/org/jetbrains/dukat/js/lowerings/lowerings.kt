@@ -6,11 +6,10 @@ import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
-import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
-import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
-import org.jetbrains.dukat.js.declarations.export.JSReferenceExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSTopLevelDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
@@ -81,45 +80,30 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSInlineExportDeclaration.convert(): TopLevelModel {
-        return when(this.declaration) {
-            is JSFunctionDeclaration -> (this.declaration as JSFunctionDeclaration).convert()
-            is JSClassDeclaration -> (this.declaration as JSClassDeclaration).convert()
-            else -> throw IllegalStateException("Export declaration with declaration of type <${this.javaClass}> not supported!")
-        }
-    }
-
-    private fun JSExportDeclaration.convert(): TopLevelModel {
+    private fun JSTopLevelDeclaration.convert(): TopLevelModel {
         return when(this) {
-            is JSInlineExportDeclaration -> this.convert()
-            else -> throw IllegalStateException("Export declaration of type <${this.javaClass}> not supported!")
+            is JSFunctionDeclaration -> this.convert()
+            is JSClassDeclaration -> this.convert()
+            is JSReferenceDeclaration -> throw IllegalStateException("References need to be resolved before conversion to model.")
+            else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
         }
     }
 
-    private fun JSReferenceExportDeclaration.resolve(): JSInlineExportDeclaration? {
-        val declaration = moduleDeclaration.topLevelDeclarations[name]
-
-        return if(declaration != null) {
-            JSInlineExportDeclaration(
-                    name = name,
-                    declaration = declaration
-            )
-        } else {
-            null
-        }
+    private fun resolve(reference: JSReferenceDeclaration): JSTopLevelDeclaration? {
+        return moduleDeclaration.topLevelDeclarations[reference.name]
     }
 
     private fun resolveReferenceExportDeclarations() {
         for(exportDeclaration in moduleDeclaration.exportDeclarations) {
-            if(exportDeclaration is JSReferenceExportDeclaration) {
+            if(exportDeclaration is JSReferenceDeclaration) {
                 moduleDeclaration.exportDeclarations.remove(exportDeclaration)
 
-                val resolvedExportDeclaration = exportDeclaration.resolve()
+                val resolvedDeclaration = resolve(exportDeclaration)
 
-                if(resolvedExportDeclaration != null) {
-                    moduleDeclaration.exportDeclarations.add(resolvedExportDeclaration)
+                if(resolvedDeclaration != null) {
+                    moduleDeclaration.exportDeclarations.add(resolvedDeclaration)
                 } else {
-                    logger.warn("Unresolved reference to export: " + exportDeclaration.name)
+                    logger.warn("Cannot resolve reference for export: " + exportDeclaration.name)
                 }
             }
         }
