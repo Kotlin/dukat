@@ -1,19 +1,29 @@
 package org.jetbrains.dukat.js.lowerings
 
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
-import org.jetbrains.dukat.js.declarations.export.JSExportDeclaration
-import org.jetbrains.dukat.js.declarations.export.JSInlineExportDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
 class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
+    private val logger = Logging.logger("Lowering")
+
     private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
+
+    private val MODULE_ANNOTATION = AnnotationModel(
+            name = "JsModule",
+            params = listOf(moduleName)
+    )
 
     private val ANY_NULLABLE_TYPE = TypeValueModel(
             value = IdentifierEntity("Any"),
@@ -39,43 +49,76 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
             parameterModels.add(jsParameter.convert())
         }
 
-        val annotations = mutableListOf(AnnotationModel(
-                name = "JsModule",
-                params = listOf(moduleName)
-        ))
-
         return FunctionModel(
                 name = IdentifierEntity(name),
                 parameters = parameterModels,
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
-                annotations = annotations,
+                annotations = mutableListOf(MODULE_ANNOTATION),
 
                 export = true,
                 inline = false,
                 operator = false,
 
                 extend = null,
-                body = emptyList<StatementModel>()
+                body = emptyList<StatementModel>(),
+                visibilityModifier = VisibilityModifier.DEFAULT
         )
     }
 
-    private fun JSInlineExportDeclaration.convert(): TopLevelModel {
-        return when(this.declaration) {
-            is JSFunctionDeclaration -> (this.declaration as JSFunctionDeclaration).convert()
-            else -> throw IllegalStateException("Export declaration with declaration of type <${this.javaClass}> not supported!")
+    private fun JSClassDeclaration.convert(): ClassModel {
+        return ClassModel(
+                name = IdentifierEntity(name),
+                members = listOf<MemberModel>(),
+                companionObject = null,
+                typeParameters = emptyList(),
+                parentEntities = emptyList(),
+                primaryConstructor = null,
+                annotations = mutableListOf(MODULE_ANNOTATION),
+                comment = null,
+                external = true,
+                abstract = false,
+                visibilityModifier = VisibilityModifier.DEFAULT
+        )
+    }
+
+    private fun JSDeclaration.convert(): TopLevelModel {
+        return when(this) {
+            is JSFunctionDeclaration -> this.convert()
+            is JSClassDeclaration -> this.convert()
+            is JSReferenceDeclaration -> throw IllegalStateException("References need to be resolved before conversion to model.")
+            else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
         }
     }
 
-    private fun JSExportDeclaration.convert(): TopLevelModel {
-        return when(this) {
-            is JSInlineExportDeclaration -> this.convert()
-            else -> throw IllegalStateException("Export declaration of type <${this.javaClass}> not supported!")
+    private fun resolve(reference: JSReferenceDeclaration): JSDeclaration? {
+        return moduleDeclaration.topLevelDeclarations[reference.name]
+    }
+
+    private fun resolveReferencedExportDeclarations() {
+        for(declaration in moduleDeclaration.exportDeclarations) {
+            if(declaration is JSReferenceDeclaration) {
+                moduleDeclaration.exportDeclarations.remove(declaration)
+
+                var resolvedDeclaration: JSDeclaration? = declaration
+
+                while(resolvedDeclaration is JSReferenceDeclaration) {
+                    resolvedDeclaration = resolve(resolvedDeclaration)
+                }
+
+                if(resolvedDeclaration != null) {
+                    moduleDeclaration.exportDeclarations.add(resolvedDeclaration)
+                } else {
+                    logger.warn("Cannot resolve reference for export: " + declaration.name)
+                }
+            }
         }
     }
 
     fun lower() : SourceSetModel {
+        resolveReferencedExportDeclarations()
+
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
         for(exportDeclaration in moduleDeclaration.exportDeclarations) {
