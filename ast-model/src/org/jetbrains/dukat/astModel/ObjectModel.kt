@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class ObjectModel(
@@ -7,4 +9,19 @@ data class ObjectModel(
         val members: List<MemberModel>,
 
         val parentEntities: List<HeritageModel>
-) : TopLevelModel
+) : MemberEntity, TopLevelModel
+
+fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
+    if (otherModel == null) {
+        return this
+    }
+    if (this == null) {
+        return ObjectModel(
+                IdentifierEntity(""),
+                otherModel.members,
+                listOf()
+        )
+    }
+
+    return copy(members = members + otherModel.members)
+}

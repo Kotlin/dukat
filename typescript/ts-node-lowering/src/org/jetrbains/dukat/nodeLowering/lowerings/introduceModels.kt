@@ -39,7 +39,7 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.EnumTokenModel
@@ -50,7 +50,6 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
@@ -292,8 +291,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             name = name,
             members = membersSplitted.dynamic,
             companionObject = if (membersSplitted.static.isNotEmpty()) {
-                CompanionObjectModel(
-                        "",
+                ObjectModel(
+                        IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList()
                 )
@@ -345,8 +344,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             name = name,
             members = membersSplitted.dynamic,
             companionObject = if (membersSplitted.static.isNotEmpty()) {
-                CompanionObjectModel(
-                        "",
+                ObjectModel(
+                        IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList()
                 )

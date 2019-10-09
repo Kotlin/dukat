@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -59,7 +60,7 @@ private fun MergeableModel.convert(): MemberModel {
     }
 }
 
-private fun CompanionObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): CompanionObjectModel? {
+private fun ObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): ObjectModel? {
     val members = this?.members.orEmpty().toMutableList()
     modulesToBeMerged.getOrDefault(ownerName, mutableListOf()).forEach { module ->
         val submoduleDecls = module.declarations
@@ -71,7 +72,7 @@ private fun CompanionObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged
     return this?.copy(members = members) ?: if (members.isEmpty()) {
         null
     } else {
-        CompanionObjectModel("", members, listOf())
+        ObjectModel(IdentifierEntity(""), members, listOf())
     }
 }
 
