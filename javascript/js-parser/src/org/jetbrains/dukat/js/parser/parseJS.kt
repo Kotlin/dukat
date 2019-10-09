@@ -10,7 +10,7 @@ import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSTopLevelDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import java.io.File
 
 
@@ -49,14 +49,14 @@ class JSModuleParser(moduleName: String, fileName: String) {
         )
     }
 
-    private fun ClassNode.toDeclaration() : JSTopLevelDeclaration {
+    private fun ClassNode.toDeclaration() : JSDeclaration {
         return JSClassDeclaration(
                 name = ident.name,
                 methods = mutableSetOf() //TODO fill
         )
     }
 
-    private fun FunctionNode.toDeclaration() : JSTopLevelDeclaration {
+    private fun FunctionNode.toDeclaration() : JSDeclaration {
         val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
 
         for(parameter in parameters) {
@@ -69,13 +69,13 @@ class JSModuleParser(moduleName: String, fileName: String) {
         )
     }
 
-    private fun IdentNode.toDeclaration() : JSTopLevelDeclaration {
+    private fun IdentNode.toDeclaration() : JSDeclaration {
         return JSReferenceDeclaration(
                 name = name
         )
     }
 
-    private fun BlockExpression.toDeclaration() : JSTopLevelDeclaration? {
+    private fun BlockExpression.toDeclaration() : JSDeclaration? {
         addDeclarations(block)
 
         //TODO generate return type
@@ -83,7 +83,7 @@ class JSModuleParser(moduleName: String, fileName: String) {
     }
 
 
-    private fun Expression.toDeclaration() : JSTopLevelDeclaration? {
+    private fun Expression.toDeclaration() : JSDeclaration? {
         return when(this) {
             is IdentNode -> this.toDeclaration()
             is FunctionNode -> this.toDeclaration()
@@ -93,12 +93,12 @@ class JSModuleParser(moduleName: String, fileName: String) {
         }
     }
 
-    private fun VarNode.toDeclaration() : JSTopLevelDeclaration? {
+    private fun VarNode.toDeclaration() : JSDeclaration? {
         return init?.toDeclaration()
     }
 
 
-    private fun addTopLevelDeclaration(name: String?, declaration: JSTopLevelDeclaration?) {
+    private fun addTopLevelDeclaration(name: String?, declaration: JSDeclaration?) {
         if(name!= null && declaration != null) {
             module.topLevelDeclarations[name] = declaration
         }

@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.js.declarations.toplevel
 
-interface JSTopLevelDeclaration {
+interface JSDeclaration {
     val name: String
 }

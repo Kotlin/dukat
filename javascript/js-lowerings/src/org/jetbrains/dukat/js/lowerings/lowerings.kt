@@ -9,7 +9,7 @@ import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSReferenceDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSTopLevelDeclaration
+import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
@@ -80,7 +80,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSTopLevelDeclaration.convert(): TopLevelModel {
+    private fun JSDeclaration.convert(): TopLevelModel {
         return when(this) {
             is JSFunctionDeclaration -> this.convert()
             is JSClassDeclaration -> this.convert()
@@ -89,28 +89,28 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         }
     }
 
-    private fun resolve(reference: JSReferenceDeclaration): JSTopLevelDeclaration? {
+    private fun resolve(reference: JSReferenceDeclaration): JSDeclaration? {
         return moduleDeclaration.topLevelDeclarations[reference.name]
     }
 
-    private fun resolveReferenceExportDeclarations() {
-        for(exportDeclaration in moduleDeclaration.exportDeclarations) {
-            if(exportDeclaration is JSReferenceDeclaration) {
-                moduleDeclaration.exportDeclarations.remove(exportDeclaration)
+    private fun resolveReferencedExportDeclarations() {
+        for(declaration in moduleDeclaration.exportDeclarations) {
+            if(declaration is JSReferenceDeclaration) {
+                moduleDeclaration.exportDeclarations.remove(declaration)
 
-                val resolvedDeclaration = resolve(exportDeclaration)
+                val resolvedDeclaration = resolve(declaration)
 
                 if(resolvedDeclaration != null) {
                     moduleDeclaration.exportDeclarations.add(resolvedDeclaration)
                 } else {
-                    logger.warn("Cannot resolve reference for export: " + exportDeclaration.name)
+                    logger.warn("Cannot resolve reference for export: " + declaration.name)
                 }
             }
         }
     }
 
     fun lower() : SourceSetModel {
-        resolveReferenceExportDeclarations()
+        resolveReferencedExportDeclarations()
 
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
