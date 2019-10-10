@@ -31,8 +31,13 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
                 for (i in fromIndex until reference.typeParameters.size) {
                     reference.typeParameters[i].defaultValue?.let { defValue ->
                         if (defValue is TypeDeclaration) {
-                            val defIndex = typeReferenceMap[defValue.value]!!
-                            val parameterValue = parameters[defIndex]
+                            val defIndex = typeReferenceMap[defValue.value]
+
+                            val parameterValue = if (defIndex == null) {
+                                defValue
+                            } else {
+                                parameters[defIndex]
+                            }
 
                             paramsResolved.add(parameterValue)
                         }
