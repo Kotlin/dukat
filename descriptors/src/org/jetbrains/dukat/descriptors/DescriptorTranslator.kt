@@ -44,11 +44,13 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.LazyWrappedType
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
 
-private class DescriptorTranslator {
+private class DescriptorTranslator(val context: DescriptorContext) {
 
     private fun translateType(typeModel: TypeModel): KotlinType {
         if (typeModel is TypeValueModel) {
@@ -76,7 +78,10 @@ private class DescriptorTranslator {
                 "Short" -> builtIns.shortType
                 "String" -> builtIns.stringType
                 "Unit" -> builtIns.unitType
-                else -> builtIns.anyType
+                else -> return LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
+                    context.getDescriptor(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
+                        ?: ErrorUtils.createErrorType("NOT_IMPLEMENTED")
+                }
             }.makeNullableAsSpecified(typeModel.nullable)
         }
         return builtIns.anyType
@@ -211,11 +216,12 @@ private class DescriptorTranslator {
             Name.identifier(interfaceModel.name.translate()),
             Modality.ABSTRACT,
             ClassKind.INTERFACE,
-            listOf<KotlinType>(),
+            interfaceModel.parentEntities.map { translateType(it.value) },
             SourceElement.NO_SOURCE,
             true,
             LockBasedStorageManager.NO_LOCKS
         )
+        context.registerDescriptor(interfaceModel.name, interfaceDescriptor)
         interfaceDescriptor.initialize(
             SimpleMemberScope(interfaceModel.members.mapNotNull {
                 when (it) {
@@ -245,12 +251,12 @@ private class DescriptorTranslator {
             Name.identifier(classModel.name.translate()),
             if (classModel.abstract) Modality.ABSTRACT else Modality.OPEN,
             ClassKind.CLASS,
-            listOf<KotlinType>(),
+            classModel.parentEntities.map { translateType(it.value) },
             SourceElement.NO_SOURCE,
             true,
             LockBasedStorageManager.NO_LOCKS
         )
-
+        context.registerDescriptor(classModel.name, classDescriptor)
         val constructorModels = classModel.members.filterIsInstance<ConstructorModel>()
         val primaryConstructorDescriptor = if (classModel.primaryConstructor == null && constructorModels.isEmpty()) {
             translateConstructor(ConstructorModel(listOf(), listOf()), classDescriptor, true, Visibilities.PUBLIC)
@@ -295,12 +301,12 @@ private class DescriptorTranslator {
             Name.identifier(objectModel.name.translate()),
             Modality.FINAL,
             ClassKind.OBJECT,
-            listOf<KotlinType>(),
+            objectModel.parentEntities.map { translateType(it.value) },
             SourceElement.NO_SOURCE,
             true,
             LockBasedStorageManager.NO_LOCKS
         )
-
+        context.registerDescriptor(objectModel.name, objectDescriptor)
         val privatePrimaryConstructor = translateConstructor(
             ConstructorModel(listOf(), listOf()),
             objectDescriptor,
@@ -366,5 +372,5 @@ private class DescriptorTranslator {
 }
 
 fun SourceBundleModel.translateToDescriptors(): ModuleDescriptor {
-    return DescriptorTranslator().translateModule(sources.first().sources.first().root)
+    return DescriptorTranslator(DescriptorContext()).translateModule(sources.first().sources.first().root)
 }
