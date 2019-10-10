@@ -27,21 +27,34 @@ import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
-    private val logger = Logging.logger("Lowering")
-
-    private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
-
-    private val MODULE_ANNOTATION = AnnotationModel(
-            name = "JsModule",
-            params = listOf(moduleName)
-    )
-
     private val ANY_NULLABLE_TYPE = TypeValueModel(
             value = IdentifierEntity("Any"),
             params = emptyList<TypeParameterModel>(),
             metaDescription = null,
             nullable = true
     )
+
+    private val logger = Logging.logger("Lowering")
+
+    private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
+
+    private val moduleAnnotation = AnnotationModel(
+            name = "JsModule",
+            params = listOf(moduleName)
+    )
+
+    private val moduleFileAnnotation = AnnotationModel(
+            name = "file:JsModule",
+            params = listOf(moduleName)
+    )
+
+
+    private var useFileAnnotation = false
+
+
+    private fun getIndividualAnnotations() = if (!useFileAnnotation) mutableListOf(moduleAnnotation) else mutableListOf()
+    private fun getFileAnnotations() = if (useFileAnnotation) mutableListOf(moduleFileAnnotation) else mutableListOf()
+
 
     private fun JSParameterDeclaration.convert(): ParameterModel {
         return ParameterModel(
@@ -64,7 +77,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = getIndividualAnnotations(),
 
                 export = true,
                 inline = false,
@@ -109,7 +122,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 typeParameters = emptyList(),
                 parentEntities = emptyList(),
                 primaryConstructor = null,
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = getIndividualAnnotations(),
                 comment = null,
                 external = true,
                 abstract = false,
@@ -127,12 +140,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
 
     fun lower() : SourceSetModel {
-        val moduleContents: MutableList<TopLevelModel> = mutableListOf()
-
         val exportDeclaration = moduleDeclaration.exportDeclaration
-        if (exportDeclaration != null) {
-            moduleContents.add(exportDeclaration.convert())
-        }
+        val moduleContents = exportDeclaration?.let { listOf(it.convert()) } ?: listOf()
 
         val sourceFileModel = SourceFileModel(
                 name = null,
@@ -141,7 +150,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                         name = ROOT_PACKAGENAME,
                         shortName = ROOT_PACKAGENAME,
                         declarations = moduleContents,
-                        annotations = mutableListOf(),
+                        annotations = getFileAnnotations(),
                         submodules = emptyList(),
                         imports = mutableListOf()
                 ),
