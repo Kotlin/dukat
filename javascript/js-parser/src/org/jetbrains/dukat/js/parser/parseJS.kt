@@ -63,11 +63,7 @@ private fun IdentNode.toParameterDeclaration() : JSParameterDeclaration {
 }
 
 private fun FunctionNode.toDeclaration() : JSFunctionDeclaration {
-    val parameterDeclarations = mutableListOf<JSParameterDeclaration>()
-
-    for(parameter in parameters) {
-        parameterDeclarations.add(parameter.toParameterDeclaration())
-    }
+    val parameterDeclarations = parameters.map { it.toParameterDeclaration() }.toMutableList()
 
     return JSFunctionDeclaration(
             name = name,
