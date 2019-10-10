@@ -35,7 +35,7 @@ private fun getBodyOfJSFile(fileName: String) : Block {
 
 
 private fun PropertyNode.toDeclaration() : JSDeclaration? {
-    return when(this.value) {
+    return when (this.value) {
         null -> null
         is FunctionNode -> {
             val function = (this.value as FunctionNode).toDeclaration()
@@ -57,7 +57,7 @@ private fun ClassNode.toDeclaration() : JSDeclaration {
             scopeDeclarations = mutableMapOf<String, JSDeclaration>()
     )
 
-    for(classElement in classElements) {
+    for (classElement in classElements) {
         val declaration = classElement.toDeclaration()
         classDeclaration.addTopLevelDeclaration(declaration)
     }
@@ -88,7 +88,7 @@ private fun IdentNode.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration?
 private fun BlockExpression.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration? {
     scope.addDeclarationsFrom(block)
 
-    return if(block.lastStatement is ExpressionStatement) {
+    return if (block.lastStatement is ExpressionStatement) {
         val lastExpression = (block.lastStatement as ExpressionStatement).expression
         lastExpression.toDeclaration(scope)
     } else {
@@ -98,7 +98,7 @@ private fun BlockExpression.toDeclaration(scope: JSScopedDeclaration) : JSDeclar
 
 
 private fun Expression.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration? {
-    return when(this) {
+    return when (this) {
         is IdentNode -> this.toDeclaration(scope)
         is FunctionNode -> this.toDeclaration()
         is BlockExpression -> this.toDeclaration(scope)
@@ -108,13 +108,13 @@ private fun Expression.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration
 }
 
 private fun JSScopedDeclaration.addTopLevelDeclaration(name: String?, declaration: JSDeclaration?) {
-    if(name!= null && declaration != null) {
+    if (name!= null && declaration != null) {
         scopeDeclarations[name] = declaration
     }
 }
 
 private fun JSScopedDeclaration.addTopLevelDeclaration(declaration: JSDeclaration?) {
-    if(declaration != null) {
+    if (declaration != null) {
         addTopLevelDeclaration(declaration.name, declaration)
     }
 }
@@ -128,7 +128,7 @@ private fun JSScopedDeclaration.addTopLevelDeclaration(varNode: VarNode) {
 
 
 private fun Expression.isExportsExpression() : Boolean {
-    return when(toString()) {
+    return when (toString()) {
         "module.exports" -> true
         "exports" -> true
         else -> false
@@ -140,7 +140,7 @@ private fun JSModuleDeclaration.modifyExportDeclaration(statement: ExpressionSta
     val expression = statement.expression
     if (expression.isAssignment) {
         if (expression is BinaryNode) {
-            if(expression.assignmentDest.isExportsExpression()) {
+            if (expression.assignmentDest.isExportsExpression()) {
                 exportDeclaration = expression.assignmentSource?.toDeclaration(this)
             }
         }
@@ -149,11 +149,11 @@ private fun JSModuleDeclaration.modifyExportDeclaration(statement: ExpressionSta
 
 
 private fun JSScopedDeclaration.addDeclarationsFrom(block: Block) {
-    for(statement in block.statements) {
-        if(statement is ExpressionStatement && this is JSModuleDeclaration) {
+    for (statement in block.statements) {
+        if (statement is ExpressionStatement && this is JSModuleDeclaration) {
             //Check if statement defines exports (like "module.exports = ..." or similar)
             modifyExportDeclaration(statement)
-        } else if(statement is VarNode) {
+        } else if (statement is VarNode) {
             //Register variable as declaration, if possible (might be value, class, function, etc.)
             addTopLevelDeclaration(statement)
         }

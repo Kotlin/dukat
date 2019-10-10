@@ -17,10 +17,10 @@ class JSModuleTranslator(private val moduleNameResolver: ModuleNameResolver): In
     override fun translate(data: String): SourceBundleModel {
         val moduleName = moduleNameResolver.resolveName(data)
 
-        return if(moduleName != null) {
+        return if (moduleName != null) {
             val sourceSetModel = translateFile(moduleName, data)
 
-            if(sourceSetModel != null) {
+            if (sourceSetModel != null) {
                 SourceBundleModel(listOf(sourceSetModel))
             } else {
                 SourceBundleModel(listOf())

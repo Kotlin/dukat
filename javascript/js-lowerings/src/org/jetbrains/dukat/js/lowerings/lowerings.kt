@@ -56,7 +56,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
     private fun List<JSParameterDeclaration>.convert(): MutableList<ParameterModel> {
         val parameterModels = mutableListOf<ParameterModel>()
 
-        for(parameter in this) {
+        for (parameter in this) {
             parameterModels.add(parameter.convert())
         }
 
@@ -101,8 +101,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
     private fun JSClassDeclaration.convert(): ClassModel {
         val members = mutableListOf<MemberModel>()
 
-        for((_, declaration) in scopeDeclarations) {
-            when(declaration) {
+        for ((_, declaration) in scopeDeclarations) {
+            when (declaration) {
                 is JSMethodDeclaration -> members.add(declaration.convert())
                 else -> logger.warn("Class member of type <${declaration.javaClass}> not supported.")
             }
@@ -124,7 +124,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
     }
 
     private fun JSDeclaration.convert(): TopLevelModel {
-        return when(this) {
+        return when (this) {
             is JSFunctionDeclaration -> this.convert()
             is JSClassDeclaration -> this.convert()
             else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
@@ -136,7 +136,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
         val exportDeclaration = moduleDeclaration.exportDeclaration
-        if(exportDeclaration != null) {
+        if (exportDeclaration != null) {
             moduleContents.add(exportDeclaration.convert())
         }
 
