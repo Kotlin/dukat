@@ -14,7 +14,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
@@ -72,7 +72,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
                 extend = null,
                 body = emptyList<StatementModel>(),
-                visibilityModifier = VisibilityModifier.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
 
@@ -113,7 +113,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 comment = null,
                 external = true,
                 abstract = false,
-                visibilityModifier = VisibilityModifier.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
 
