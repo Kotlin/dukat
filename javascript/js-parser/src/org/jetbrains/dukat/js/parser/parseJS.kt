@@ -20,7 +20,7 @@ import org.jetbrains.dukat.js.declarations.member.JSMethodDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
+import org.jetbrains.dukat.js.declarations.JSDeclaration
 import java.io.File
 
 
@@ -41,7 +41,6 @@ private fun PropertyNode.toDeclaration() : JSDeclaration? {
             val function = (this.value as FunctionNode).toDeclaration()
 
             JSMethodDeclaration(
-                    name = function.name,
                     function = function,
                     static = this.isStatic
             )
@@ -59,7 +58,7 @@ private fun ClassNode.toDeclaration() : JSDeclaration {
 
     for (classElement in classElements) {
         val declaration = classElement.toDeclaration()
-        classDeclaration.addTopLevelDeclaration(declaration)
+        classDeclaration.addTopLevelDeclaration(classElement.keyName.toString(), declaration)
     }
 
     return classDeclaration
@@ -110,12 +109,6 @@ private fun Expression.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration
 private fun JSScopedDeclaration.addTopLevelDeclaration(name: String?, declaration: JSDeclaration?) {
     if (name!= null && declaration != null) {
         scopeDeclarations[name] = declaration
-    }
-}
-
-private fun JSScopedDeclaration.addTopLevelDeclaration(declaration: JSDeclaration?) {
-    if (declaration != null) {
-        addTopLevelDeclaration(declaration.name, declaration)
     }
 }
 
