@@ -31,8 +31,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
 
     private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
 
-    private val MODULE_ANNOTATION = AnnotationModel(
-            name = "JsModule",
+    private val FILE_MODULE_ANNOTATION = AnnotationModel(
+            name = "file:JsModule",
             params = listOf(moduleName)
     )
 
@@ -64,7 +64,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = mutableListOf(),
 
                 export = true,
                 inline = false,
@@ -109,7 +109,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 typeParameters = emptyList(),
                 parentEntities = emptyList(),
                 primaryConstructor = null,
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = mutableListOf(),
                 comment = null,
                 external = true,
                 abstract = false,
@@ -141,7 +141,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                         name = ROOT_PACKAGENAME,
                         shortName = ROOT_PACKAGENAME,
                         declarations = moduleContents,
-                        annotations = mutableListOf(),
+                        annotations = mutableListOf(FILE_MODULE_ANNOTATION),
                         submodules = emptyList(),
                         imports = mutableListOf()
                 ),
