@@ -9,5 +9,6 @@ dependencies {
     implementation(project(":ast-model"))
     implementation(project(":translator"))
 
+    implementation(project(":panic"))
     implementation(project(":logging"))
 }

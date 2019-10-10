@@ -23,6 +23,7 @@ import org.jetbrains.dukat.js.declarations.general.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.JSDeclaration
 import org.jetbrains.dukat.js.declarations.general.JSObjectDeclaration
 import org.jetbrains.dukat.js.declarations.member.JSMethodDeclaration
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
@@ -131,27 +132,27 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSDeclaration.convertAs(name: String): TopLevelModel {
+    private fun JSDeclaration.convertAs(name: String): TopLevelModel? {
         return when (this) {
             is JSFunctionDeclaration -> this.convertAs(name)
             is JSClassDeclaration -> this.convertAs(name)
             is JSMethodDeclaration -> this.function.convertAs(name)
-            else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
+            else -> raiseConcern("Declaration of type <${this.javaClass}> cannot be converted.") { null }
         }
     }
 
-    private fun JSDeclaration.convert(): TopLevelModel {
+    private fun JSDeclaration.convert(): TopLevelModel? {
         return when (this) {
             is JSFunctionDeclaration -> this.convertAs(this.name)
             is JSClassDeclaration -> this.convertAs(this.name)
-            else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
+            else -> raiseConcern("Declaration of type <${this.javaClass}> cannot be converted.") { null }
         }
     }
 
     private fun JSObjectDeclaration.toModuleContents() : List<TopLevelModel> {
         useFileLevelAnnotation = true
 
-        return scopeDeclarations.map { (name, declaration) -> declaration.convertAs(name) }
+        return scopeDeclarations.mapNotNull { (name, declaration) -> declaration.convertAs(name) }
     }
 
 
@@ -159,7 +160,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         return when (this) {
             null -> emptyList()
             is JSObjectDeclaration -> this.toModuleContents()
-            else -> listOf(this.convert())
+            else -> listOfNotNull(this.convert())
         }
     }
 
