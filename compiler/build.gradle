@@ -49,6 +49,9 @@ dependencies {
     implementation(project(":idl-parser"))
     implementation(project(":idl-reference-resolver"))
     implementation(project(":itertools"))
+    implementation(project(":js-declarations"))
+    implementation(project(":js-lowerings"))
+    implementation(project(":js-parser"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":module-name-resolver"))
@@ -62,9 +65,6 @@ dependencies {
     implementation(project(":ts-model"))
     implementation(project(":idl-lowerings"))
     implementation(project(":ts-lowerings"))
-    implementation(project(":js-parser"))
-    implementation(project(":js-declarations"))
-    implementation(project(":js-lowerings"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'

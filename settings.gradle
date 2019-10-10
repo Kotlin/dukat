@@ -53,6 +53,9 @@ include 'idl-parser'
 include 'idl-reference-resolver'
 include 'interop'
 include 'itertools'
+include 'js-declarations'
+include 'js-lowerings'
+include 'js-parser'
 include 'logging'
 include 'model-lowerings'
 include 'module-name-resolver'
@@ -69,15 +72,16 @@ include 'ts-model-proto'
 include 'ts-node-introduction'
 include 'ts-node-lowering'
 include 'ts-translator'
-include 'js-parser'
-include 'js-declarations'
-include 'js-lowerings'
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")
 project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
+
+project(':js-declarations').projectDir = file("$rootDir/javascript/js-declarations")
+project(':js-lowerings').projectDir = file("$rootDir/javascript/js-lowerings")
+project(':js-parser').projectDir = file("$rootDir/javascript/js-parser")
 
 project(':ts-ast-declarations').projectDir = file("$rootDir/typescript/ts-ast-declarations")
 project(':ts-converter').projectDir = file("$rootDir/typescript/ts-converter")
@@ -87,7 +91,3 @@ project(':ts-model-proto').projectDir = file("$rootDir/typescript/ts-model-proto
 project(':ts-node-introduction').projectDir = file("$rootDir/typescript/ts-node-introduction")
 project(':ts-node-lowering').projectDir = file("$rootDir/typescript/ts-node-lowering")
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
-
-project(':js-parser').projectDir = file("$rootDir/javascript/js-parser")
-project(':js-declarations').projectDir = file("$rootDir/javascript/js-declarations")
-project(':js-lowerings').projectDir = file("$rootDir/javascript/js-lowerings")
