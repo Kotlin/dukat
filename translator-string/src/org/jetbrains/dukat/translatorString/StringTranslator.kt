@@ -3,6 +3,7 @@ package org.jetbrains.dukat.translatorString
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -215,7 +216,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     }
 
     output(FORMAT_TAB.repeat(padding) +
-            "${translateAnnotations(annotations)}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${bodyFirstLine}")
+            "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(parameters)})${returnClause}${type.translateMeta()}${bodyFirstLine}")
 
     if (body.size > 1) {
         body.forEach { statement ->
@@ -281,7 +282,7 @@ private fun VariableModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${modifier} ${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier} ${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumModel.translate(): String {
@@ -407,13 +408,27 @@ private fun HeritageModel.translateAsHeritageClause(): String {
     return "${value.translateAsHeritageClause()}${delegationClause}"
 }
 
-private fun ClassModel.translate(padding: Int): String {
+private fun ClassModel.translate(depth: Int): String {
     val res = mutableListOf<String>()
-    translate(padding) { res.add(it) }
+    translate(depth) { res.add(it) }
     return res.joinToString(LINE_SEPARATOR)
 }
 
-private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
+private fun VisibilityModifierModel.translate(): String? {
+    return when(this) {
+        VisibilityModifierModel.PUBLIC -> "public"
+        VisibilityModifierModel.INTERNAL -> "internal"
+        VisibilityModifierModel.PRIVATE -> "private"
+        VisibilityModifierModel.PROTECTED -> "protected"
+        VisibilityModifierModel.DEFAULT -> null
+    }
+}
+
+private fun VisibilityModifierModel.asClause(): String {
+    return translate()?.let { "$it " } ?: ""
+}
+
+private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
     val hasSecondaryConstructors = members.any { it is ConstructorModel }
 
@@ -425,7 +440,8 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
         if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(primaryConstructor.parameters)})"
 
     val openClause = if (abstract) "abstract" else "open"
-    val classDeclaration = "${translateAnnotations(annotations)}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
+
+    val classDeclaration = "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(typeParameters)}${params}${parents}"
 
     val members = members
     val staticMembers = companionObject?.members.orEmpty()
@@ -437,7 +453,7 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
     output(classDeclaration + if (isBlock) " {" else "")
 
     if (hasMembers) {
-        members.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(padding + 1) + it }).forEach {
+        members.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(depth + 1) + it }).forEach {
             output(it)
         }
     }
@@ -446,17 +462,17 @@ private fun ClassModel.translate(padding: Int, output: (String) -> Unit) {
         if (hasMembers) {
             output("")
         }
-        output(FORMAT_TAB.repeat(padding + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
+        output(FORMAT_TAB.repeat(depth + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
     }
     if (hasStaticMembers) {
-        staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(padding + 2) + it }).forEach {
+        staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(depth + 2) + it }).forEach {
             output(it)
         }
-        output(FORMAT_TAB.repeat(padding + 1) + "}")
+        output(FORMAT_TAB.repeat(depth + 1) + "}")
     }
 
     if (isBlock) {
-        output(FORMAT_TAB.repeat(padding) + "}")
+        output(FORMAT_TAB.repeat(depth) + "}")
     }
 }
 
@@ -477,7 +493,7 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     val parents = translateHeritagModels(parentEntities)
 
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
-    output("${translateAnnotations(annotations)}${externalClause}interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
+    output("${translateAnnotations(annotations)}${visibilityModifier.asClause()}${externalClause}interface ${name.translate()}${translateTypeParameters(typeParameters)}${parents}" + if (isBlock) " {" else "")
     if (isBlock) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
@@ -532,7 +548,7 @@ class StringTranslator : ModelVisitor {
 
     override fun visitObject(objectNode: ObjectModel) {
         addOutput("")
-        val objectModel = "${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
+        val objectModel = "${objectNode.visibilityModifier.asClause()}${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
 

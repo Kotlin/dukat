@@ -1,3 +1,3 @@
 import kotlin.js.*
 
-external interface A
+public external interface A

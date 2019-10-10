@@ -1,9 +1,9 @@
 import kotlin.js.*
 
-external open class A
+public external open class A
 
-external open class B() {
+public external open class B() {
     constructor(x: Double)
 }
 
-external open class C(x: Double) : B
+public external open class C(x: Double) : B

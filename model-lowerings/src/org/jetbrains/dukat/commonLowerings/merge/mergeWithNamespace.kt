@@ -14,7 +14,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 private fun ModuleModel.visit(visitor: (ModuleModel) -> Unit) {
     visitor(this)
@@ -96,7 +96,7 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                 IdentifierEntity(""),
                                     staticProperties,
                                     listOf(),
-                                    VisibilityModifier.DEFAULT
+                                    VisibilityModifierModel.DEFAULT
                             )
                 } else {
                     companionObject
@@ -112,7 +112,7 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                     IdentifierEntity(""),
                                         staticProperties,
                                         listOf(),
-                                        VisibilityModifier.DEFAULT
+                                        VisibilityModifierModel.DEFAULT
                                 )
                     } else {
                         companionObject

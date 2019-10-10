@@ -18,14 +18,14 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface ClipboardEventInit : EventInit {
+public external interface ClipboardEventInit : EventInit {
     var clipboardData: DataTransfer? /* = null */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ClipboardEventInit {
+public inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): ClipboardEventInit {
     val o = js("({})")
     o["clipboardData"] = clipboardData
     o["bubbles"] = bubbles
@@ -37,7 +37,7 @@ inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubbles: Bool
 /**
  * Exposes the JavaScript [ClipboardEvent](https://developer.mozilla.org/en/docs/Web/API/ClipboardEvent) to Kotlin
  */
-external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventInit = definedExternally) : Event {
+public external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventInit = definedExternally) : Event {
     open val clipboardData: DataTransfer?
 
     companion object {
@@ -51,21 +51,21 @@ external open class ClipboardEvent(type: String, eventInitDict: ClipboardEventIn
 /**
  * Exposes the JavaScript [Clipboard](https://developer.mozilla.org/en/docs/Web/API/Clipboard) to Kotlin
  */
-external abstract class Clipboard : EventTarget {
+public external abstract class Clipboard : EventTarget {
     fun read(): Promise<DataTransfer>
     fun readText(): Promise<String>
     fun write(data: DataTransfer): Promise<Unit>
     fun writeText(data: String): Promise<Unit>
 }
 
-external interface ClipboardPermissionDescriptor {
+public external interface ClipboardPermissionDescriptor {
     var allowWithoutGesture: Boolean? /* = false */
         get() = definedExternally
         set(value) = definedExternally
 }
 
 @kotlin.internal.InlineOnly
-inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = false): ClipboardPermissionDescriptor {
+public inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = false): ClipboardPermissionDescriptor {
     val o = js("({})")
     o["allowWithoutGesture"] = allowWithoutGesture
     return o

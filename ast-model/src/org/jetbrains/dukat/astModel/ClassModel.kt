@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class ClassModel(
         override val name: NameEntity,
@@ -14,5 +14,5 @@ data class ClassModel(
         val comment: CommentModel?,
         val external: Boolean,
         val abstract: Boolean,
-        override val visibilityModifier: VisibilityModifier
+        override val visibilityModifier: VisibilityModifierModel
 ) : ClassLikeModel, DelegationModel, MemberModel

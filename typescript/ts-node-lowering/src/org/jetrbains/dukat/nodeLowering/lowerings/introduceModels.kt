@@ -60,7 +60,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -296,7 +296,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
                         IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList(),
-                        VisibilityModifier.DEFAULT
+                        VisibilityModifierModel.DEFAULT
                 )
             } else {
                 null
@@ -324,7 +324,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             comment = null,
             external = true,
             abstract = false,
-            visibilityModifier = VisibilityModifier.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -351,7 +351,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                         IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList(),
-                        VisibilityModifier.DEFAULT
+                        VisibilityModifierModel.DEFAULT
                 )
             } else {
                 null
@@ -366,7 +366,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             annotations = exportQualifier.toAnnotation(),
             comment = null,
             external = true,
-            visibilityModifier = VisibilityModifier.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -463,7 +463,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
             EnumModel(
                     name = name,
                     values = values.map { token -> EnumTokenModel(token.value, token.meta) },
-                    visibilityModifier = VisibilityModifier.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         }
         is FunctionNode -> FunctionModel(
@@ -483,7 +483,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 operator = operator,
                 extend = extend.convert(),
                 body = resolveBody(),
-                visibilityModifier = VisibilityModifier.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is VariableNode -> VariableModel(
                 name = name,
@@ -501,20 +501,20 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                     )
                 },
                 extend = extend.convert(),
-                visibilityModifier = VisibilityModifier.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is ObjectNode -> ObjectModel(
                 name = name,
                 members = members.mapNotNull { member -> member.process() },
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-                visibilityModifier = VisibilityModifier.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is TypeAliasNode -> if (canBeTranslated) {
             TypeAliasModel(
                     name = name,
                     typeReference = typeReference.process(),
                     typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
-                    visibilityModifier = VisibilityModifier.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         } else null
         else -> {

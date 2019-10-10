@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external abstract class A {
+public external abstract class A {
     fun f()
     fun g()
 
@@ -9,7 +9,7 @@ external abstract class A {
     }
 }
 
-external abstract class B {
+public external abstract class B {
     fun f()
     fun g()
 

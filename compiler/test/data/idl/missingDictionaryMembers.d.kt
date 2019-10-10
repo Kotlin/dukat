@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external interface A {
+public external interface A {
     var a: Int? /* = 0 */
         get() = definedExternally
         set(value) = definedExternally
@@ -10,14 +10,14 @@ external interface A {
 }
 
 @kotlin.internal.InlineOnly
-inline fun A(a: Int? = 0, b: Int? = 1): A {
+public inline fun A(a: Int? = 0, b: Int? = 1): A {
     val o = js("({})")
     o["a"] = a
     o["b"] = b
     return o
 }
 
-external interface B : A {
+public external interface B : A {
     var c: Int? /* = 2 */
         get() = definedExternally
         set(value) = definedExternally
@@ -27,7 +27,7 @@ external interface B : A {
 }
 
 @kotlin.internal.InlineOnly
-inline fun B(c: Int? = 2, d: Int? = 3, a: Int? = 0, b: Int? = 1): B {
+public inline fun B(c: Int? = 2, d: Int? = 3, a: Int? = 0, b: Int? = 1): B {
     val o = js("({})")
     o["c"] = c
     o["d"] = d

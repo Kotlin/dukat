@@ -3,9 +3,9 @@ package org.jetbrains.dukat.compiler.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.idlLowerings.addKDocs
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.commonLowerings.lowerOverrides
-import org.jetbrains.dukat.commonLowerings.omitStdLib
-import org.jetbrains.dukat.commonLowerings.merge.escapeIdentificators
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
+import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.omitStdLib
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.addMissingMembers
@@ -23,7 +23,14 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.process
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
+import org.jetbrains.dukat.model.commonLowerings.VisibilityModifierResolver
+import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.resolveTopLevelVisibility
 import org.jetbrains.dukat.translator.InputTranslator
+
+private fun alwaysPublic(): VisibilityModifierResolver = object : VisibilityModifierResolver {
+    override fun resolve(): VisibilityModifierModel = VisibilityModifierModel.PUBLIC
+}
 
 class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): InputTranslator<String> {
 
@@ -46,6 +53,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .escapeIdentificators()
                 .addKDocs()
                 .relocateDeclarations()
+                .resolveTopLevelVisibility(alwaysPublic())
                 .addImportsForReferencedFiles()
                 .omitStdLib()
     }

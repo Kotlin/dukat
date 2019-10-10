@@ -20,8 +20,6 @@ import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import java.io.File
 
-private typealias SourceUnit = Pair<String, NameEntity>
-
 private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
@@ -36,17 +34,6 @@ fun NameEntity.translate(): String = when (this) {
         }
     }
 }
-
-private fun NameEntity.fileNameFragment(): String? {
-    val unprefixedName = shiftLeft()
-
-    return if (unprefixedName == null) {
-        null
-    } else {
-        unprefixedName.process(::unescape).translate()
-    }
-}
-
 
 private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMap: MutableMap<String, Int>): NameEntity {
     val sourceFile = File(fileName)

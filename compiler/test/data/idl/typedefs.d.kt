@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external abstract class A {
+public external abstract class A {
     open var x: Int
     open var y: Int
     open var z: A<Int>?
@@ -12,7 +12,7 @@ external abstract class A {
     }
 }
 
-external abstract class B : A {
+public external abstract class B : A {
     open var xx: A<Int>
 
     companion object {

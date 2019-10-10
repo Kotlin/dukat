@@ -10,7 +10,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
 
 
@@ -59,7 +59,7 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                                     ExternalDelegationModel()
                                             )
                                     ),
-                                    VisibilityModifier.DEFAULT
+                                    VisibilityModifierModel.DEFAULT
                             )
                             ))
                 }

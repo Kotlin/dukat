@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external open class A(a: Int) {
+public external open class A(a: Int) {
     var x: Int
     var y: Int
     fun g()
@@ -11,7 +11,7 @@ external open class A(a: Int) {
     }
 }
 
-external interface B {
+public external interface B {
     var a: Boolean? /* = true */
         get() = definedExternally
         set(value) = definedExternally
@@ -21,14 +21,14 @@ external interface B {
 }
 
 @kotlin.internal.InlineOnly
-inline fun B(a: Boolean? = true, b: Boolean? = false): B {
+public inline fun B(a: Boolean? = true, b: Boolean? = false): B {
     val o = js("({})")
     o["a"] = a
     o["b"] = b
     return o
 }
 
-external object C {
+public external object C {
     val x: Int
     val y: Int
     fun f()

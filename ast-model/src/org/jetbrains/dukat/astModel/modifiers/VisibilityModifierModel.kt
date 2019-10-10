@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.astModel.modifiers
 
-enum class VisibilityModifier {
+enum class VisibilityModifierModel {
     DEFAULT,
     INTERNAL,
     PRIVATE,
