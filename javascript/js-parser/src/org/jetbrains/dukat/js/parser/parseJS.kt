@@ -12,6 +12,7 @@ import com.oracle.js.parser.ir.Expression
 import com.oracle.js.parser.ir.ExpressionStatement
 import com.oracle.js.parser.ir.FunctionNode
 import com.oracle.js.parser.ir.IdentNode
+import com.oracle.js.parser.ir.ObjectNode
 import com.oracle.js.parser.ir.PropertyNode
 import com.oracle.js.parser.ir.VarNode
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
@@ -21,6 +22,7 @@ import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.general.JSClassDeclaration
 import org.jetbrains.dukat.js.declarations.general.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSObjectDeclaration
 import java.io.File
 
 
@@ -50,20 +52,6 @@ private fun PropertyNode.toDeclaration() : JSDeclaration? {
 }
 
 
-private fun ClassNode.toDeclaration() : JSDeclaration {
-    val classDeclaration = JSClassDeclaration(
-            name = ident.name,
-            scopeDeclarations = mutableMapOf<String, JSDeclaration>()
-    )
-
-    for (classElement in classElements) {
-        val declaration = classElement.toDeclaration()
-        classDeclaration.addTopLevelDeclaration(classElement.keyName.toString(), declaration)
-    }
-
-    return classDeclaration
-}
-
 private fun IdentNode.toParameterDeclaration() : JSParameterDeclaration {
     return JSParameterDeclaration(
             name = name,
@@ -78,6 +66,34 @@ private fun FunctionNode.toDeclaration() : JSFunctionDeclaration {
             name = name,
             parameters = parameterDeclarations
     )
+}
+
+private fun List<PropertyNode>.addToScope(scope: JSScopedDeclaration) {
+    for (element in this) {
+        val declaration = element.toDeclaration()
+        scope.addTopLevelDeclaration(element.keyName.toString(), declaration)
+    }
+}
+
+private fun ClassNode.toDeclaration() : JSDeclaration {
+    val classDeclaration = JSClassDeclaration(
+            name = ident.name,
+            scopeDeclarations = mutableMapOf<String, JSDeclaration>()
+    )
+
+    classElements.addToScope(classDeclaration)
+
+    return classDeclaration
+}
+
+private fun ObjectNode.toDeclaration() : JSDeclaration {
+    val objectDeclaration = JSObjectDeclaration(
+            scopeDeclarations = mutableMapOf<String, JSDeclaration>()
+    )
+
+    elements.addToScope(objectDeclaration)
+
+    return objectDeclaration
 }
 
 private fun IdentNode.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration? {
@@ -102,6 +118,7 @@ private fun Expression.toDeclaration(scope: JSScopedDeclaration) : JSDeclaration
         is FunctionNode -> this.toDeclaration()
         is BlockExpression -> this.toDeclaration(scope)
         is ClassNode -> this.toDeclaration()
+        is ObjectNode -> this.toDeclaration()
         else -> null
     }
 }
