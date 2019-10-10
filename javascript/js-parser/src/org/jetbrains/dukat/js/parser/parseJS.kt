@@ -18,8 +18,8 @@ import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.JSScopedDeclaration
 import org.jetbrains.dukat.js.declarations.member.JSMethodDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSClassDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSDeclaration
 import java.io.File
 
