@@ -130,16 +130,12 @@ private fun Expression.isExportsExpression() : Boolean {
 }
 
 
-private fun JSModuleDeclaration.addExportDeclaration(statement: ExpressionStatement) {
+private fun JSModuleDeclaration.modifyExportDeclaration(statement: ExpressionStatement) {
     val expression = statement.expression
     if (expression.isAssignment) {
         if (expression is BinaryNode) {
             if(expression.assignmentDest.isExportsExpression()) {
-                val exportDeclaration = expression.assignmentSource?.toDeclaration(this)
-
-                if(exportDeclaration != null) {
-                    exportDeclarations.add(exportDeclaration)
-                }
+                exportDeclaration = expression.assignmentSource?.toDeclaration(this)
             }
         }
     }
@@ -150,7 +146,7 @@ private fun JSScopedDeclaration.addDeclarationsFrom(block: Block) {
     for(statement in block.statements) {
         if(statement is ExpressionStatement && this is JSModuleDeclaration) {
             //Check if statement defines exports (like "module.exports = ..." or similar)
-            addExportDeclaration(statement)
+            modifyExportDeclaration(statement)
         } else if(statement is VarNode) {
             //Register variable as declaration, if possible (might be value, class, function, etc.)
             addTopLevelDeclaration(statement)
@@ -163,7 +159,7 @@ fun parseJS(moduleName: String, fileName: String): JSModuleDeclaration {
     val module = JSModuleDeclaration(
             moduleName = moduleName,
             fileName = fileName,
-            exportDeclarations = mutableSetOf(),
+            exportDeclaration = null,
             scopeDeclarations = mutableMapOf()
     )
 

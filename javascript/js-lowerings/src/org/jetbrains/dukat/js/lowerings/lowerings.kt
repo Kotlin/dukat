@@ -124,7 +124,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
     fun lower() : SourceSetModel {
         val moduleContents: MutableList<TopLevelModel> = mutableListOf()
 
-        for(exportDeclaration in moduleDeclaration.exportDeclarations) {
+        val exportDeclaration = moduleDeclaration.exportDeclaration
+        if(exportDeclaration != null) {
             moduleContents.add(exportDeclaration.convert())
         }
 
