@@ -1,7 +1,8 @@
 package org.jetbrains.dukat.compiler.translator
 
+import org.jetbrains.dukat.astModel.SourceBundleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.js.lowerings.JSModuleFileLowerer
 import org.jetbrains.dukat.js.parser.parseJS
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver

@@ -2,7 +2,18 @@ package org.jetbrains.dukat.js.lowerings
 
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifier
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration

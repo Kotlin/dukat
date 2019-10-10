@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.js.declarations.member
 
-import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
 import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
 
