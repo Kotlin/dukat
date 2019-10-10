@@ -53,14 +53,8 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun List<JSParameterDeclaration>.convert(): MutableList<ParameterModel> {
-        val parameterModels = mutableListOf<ParameterModel>()
-
-        for (parameter in this) {
-            parameterModels.add(parameter.convert())
-        }
-
-        return parameterModels
+    private fun List<JSParameterDeclaration>.convert(): List<ParameterModel> {
+        return this.map { it.convert() }
     }
 
     private fun JSFunctionDeclaration.convert(): FunctionModel {
