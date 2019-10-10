@@ -16,25 +16,18 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.js.declarations.toplevel.JSFunctionDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSFunctionDeclaration
 import org.jetbrains.dukat.js.declarations.JSModuleDeclaration
 import org.jetbrains.dukat.js.declarations.misc.JSParameterDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSClassDeclaration
-import org.jetbrains.dukat.js.declarations.toplevel.JSDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSClassDeclaration
+import org.jetbrains.dukat.js.declarations.JSDeclaration
+import org.jetbrains.dukat.js.declarations.general.JSObjectDeclaration
 import org.jetbrains.dukat.js.declarations.member.JSMethodDeclaration
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
 
 class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
-
-    private val logger = Logging.logger("Lowering")
-
-    private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
-
-    private val MODULE_ANNOTATION = AnnotationModel(
-            name = "JsModule",
-            params = listOf(moduleName)
-    )
 
     private val ANY_NULLABLE_TYPE = TypeValueModel(
             value = IdentifierEntity("Any"),
@@ -42,6 +35,28 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
             metaDescription = null,
             nullable = true
     )
+
+    private val logger = Logging.logger("Lowering")
+
+    private val moduleName = IdentifierEntity(moduleDeclaration.moduleName)
+
+    private val moduleAnnotation = AnnotationModel(
+            name = "JsModule",
+            params = listOf(moduleName)
+    )
+
+    private val moduleFileAnnotation = AnnotationModel(
+            name = "file:JsModule",
+            params = listOf(moduleName)
+    )
+
+
+    private var useFileLevelAnnotation = false
+
+
+    private fun getIndividualAnnotations() = if (!useFileLevelAnnotation) mutableListOf(moduleAnnotation) else mutableListOf()
+    private fun getFileAnnotations() = if (useFileLevelAnnotation) mutableListOf(moduleFileAnnotation) else mutableListOf()
+
 
     private fun JSParameterDeclaration.convert(): ParameterModel {
         return ParameterModel(
@@ -57,14 +72,14 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         return this.map { it.convert() }
     }
 
-    private fun JSFunctionDeclaration.convert(): FunctionModel {
+    private fun JSFunctionDeclaration.convertAs(name: String): FunctionModel {
         return FunctionModel(
                 name = IdentifierEntity(name),
                 parameters = parameters.convert(),
                 type = ANY_NULLABLE_TYPE,
                 typeParameters = emptyList<TypeParameterModel>(),
 
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = getIndividualAnnotations(),
 
                 export = true,
                 inline = false,
@@ -76,7 +91,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSMethodDeclaration.convert(): MethodModel {
+    private fun JSMethodDeclaration.convertAs(name: String): MethodModel {
         return MethodModel(
                 name = IdentifierEntity(name),
                 parameters = function.parameters.convert(),
@@ -92,12 +107,12 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSClassDeclaration.convert(): ClassModel {
+    private fun JSClassDeclaration.convertAs(name: String): ClassModel {
         val members = mutableListOf<MemberModel>()
 
-        for ((_, declaration) in scopeDeclarations) {
+        for ((memberName, declaration) in scopeDeclarations) {
             when (declaration) {
-                is JSMethodDeclaration -> members.add(declaration.convert())
+                is JSMethodDeclaration -> members.add(declaration.convertAs(memberName))
                 else -> logger.warn("Class member of type <${declaration.javaClass}> not supported.")
             }
         }
@@ -109,7 +124,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                 typeParameters = emptyList(),
                 parentEntities = emptyList(),
                 primaryConstructor = null,
-                annotations = mutableListOf(MODULE_ANNOTATION),
+                annotations = getIndividualAnnotations(),
                 comment = null,
                 external = true,
                 abstract = false,
@@ -117,22 +132,41 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
         )
     }
 
-    private fun JSDeclaration.convert(): TopLevelModel {
+    private fun JSDeclaration.convertAs(name: String): TopLevelModel? {
         return when (this) {
-            is JSFunctionDeclaration -> this.convert()
-            is JSClassDeclaration -> this.convert()
-            else -> throw IllegalStateException("Declaration of type <${this.javaClass}> cannot be converted.")
+            is JSFunctionDeclaration -> this.convertAs(name)
+            is JSClassDeclaration -> this.convertAs(name)
+            is JSMethodDeclaration -> this.function.convertAs(name)
+            else -> raiseConcern("Declaration of type <${this.javaClass}> cannot be converted.") { null }
+        }
+    }
+
+    private fun JSDeclaration.convert(): TopLevelModel? {
+        return when (this) {
+            is JSFunctionDeclaration -> this.convertAs(this.name)
+            is JSClassDeclaration -> this.convertAs(this.name)
+            else -> raiseConcern("Declaration of type <${this.javaClass}> cannot be converted.") { null }
+        }
+    }
+
+    private fun JSObjectDeclaration.toModuleContents() : List<TopLevelModel> {
+        useFileLevelAnnotation = true
+
+        return scopeDeclarations.mapNotNull { (name, declaration) -> declaration.convertAs(name) }
+    }
+
+
+    private fun JSDeclaration?.toModuleContents(): List<TopLevelModel> {
+        return when (this) {
+            null -> emptyList()
+            is JSObjectDeclaration -> this.toModuleContents()
+            else -> listOfNotNull(this.convert())
         }
     }
 
 
     fun lower() : SourceSetModel {
-        val moduleContents: MutableList<TopLevelModel> = mutableListOf()
-
-        val exportDeclaration = moduleDeclaration.exportDeclaration
-        if (exportDeclaration != null) {
-            moduleContents.add(exportDeclaration.convert())
-        }
+        val moduleContents = moduleDeclaration.exportDeclaration.toModuleContents()
 
         val sourceFileModel = SourceFileModel(
                 name = null,
@@ -141,7 +175,7 @@ class JSModuleFileLowerer(private val moduleDeclaration: JSModuleDeclaration) {
                         name = ROOT_PACKAGENAME,
                         shortName = ROOT_PACKAGENAME,
                         declarations = moduleContents,
-                        annotations = mutableListOf(),
+                        annotations = getFileAnnotations(),
                         submodules = emptyList(),
                         imports = mutableListOf()
                 ),
