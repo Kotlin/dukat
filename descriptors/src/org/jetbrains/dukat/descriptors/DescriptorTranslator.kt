@@ -84,7 +84,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 }
             }.makeNullableAsSpecified(typeModel.nullable)
         }
-        return ErrorUtils.createErrorType("NOT_IMPLEMENTED")
+        return builtIns.anyType
     }
 
     private fun translateParameters(
@@ -211,21 +211,19 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         interfaceModel: InterfaceModel,
         parent: PackageFragmentDescriptor
     ): ClassDescriptor {
-        val companionDescriptor = interfaceModel.companionObject?.let {
-            translateObject(it, parent, isCompanion = true)
-        }
-        val interfaceDescriptor = CustomClassDescriptor(
-            parent = parent,
-            name = interfaceModel.name,
-            modality = Modality.ABSTRACT,
-            classKind = ClassKind.INTERFACE,
-            parentTypes = interfaceModel.parentEntities.map { translateType(it.value) },
-            isCompanion = false,
-            companionObject = companionDescriptor
+        val interfaceDescriptor = ClassDescriptorImpl(
+            parent,
+            Name.identifier(interfaceModel.name.translate()),
+            Modality.ABSTRACT,
+            ClassKind.INTERFACE,
+            interfaceModel.parentEntities.map { translateType(it.value) },
+            SourceElement.NO_SOURCE,
+            true,
+            LockBasedStorageManager.NO_LOCKS
         )
         context.registerDescriptor(interfaceModel.name, interfaceDescriptor)
         interfaceDescriptor.initialize(
-            SimpleMemberScope((interfaceModel.members.mapNotNull {
+            SimpleMemberScope(interfaceModel.members.mapNotNull {
                 when (it) {
                     is MethodModel -> translateMethod(
                         it,
@@ -237,7 +235,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     )
                     else -> null
                 }
-            } + companionDescriptor as DeclarationDescriptor?).filterNotNull()),
+            }),
             setOf(),
             null
         )
@@ -248,17 +246,15 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         classModel: ClassModel,
         parent: PackageFragmentDescriptor
     ): ClassDescriptor {
-        val companionDescriptor = classModel.companionObject?.let {
-            translateObject(it, parent, isCompanion = true)
-        }
-        val classDescriptor = CustomClassDescriptor(
-            parent = parent,
-            name = classModel.name,
-            modality = if (classModel.abstract) Modality.ABSTRACT else Modality.OPEN,
-            classKind = ClassKind.CLASS,
-            parentTypes = classModel.parentEntities.map { translateType(it.value) },
-            isCompanion = false,
-            companionObject = companionDescriptor
+        val classDescriptor = ClassDescriptorImpl(
+            parent,
+            Name.identifier(classModel.name.translate()),
+            if (classModel.abstract) Modality.ABSTRACT else Modality.OPEN,
+            ClassKind.CLASS,
+            classModel.parentEntities.map { translateType(it.value) },
+            SourceElement.NO_SOURCE,
+            true,
+            LockBasedStorageManager.NO_LOCKS
         )
         context.registerDescriptor(classModel.name, classDescriptor)
         val constructorModels = classModel.members.filterIsInstance<ConstructorModel>()
@@ -277,7 +273,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         } + primaryConstructorDescriptor).filterNotNull().toSet()
 
         classDescriptor.initialize(
-            SimpleMemberScope((classModel.members.mapNotNull {
+            SimpleMemberScope(classModel.members.mapNotNull {
                 when (it) {
                     is MethodModel -> translateMethod(
                         it,
@@ -289,7 +285,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     )
                     else -> null
                 }
-            } + companionDescriptor as DeclarationDescriptor?).filterNotNull()),
+            }),
             constructorDescriptors,
             primaryConstructorDescriptor
         )
@@ -299,19 +295,16 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return classDescriptor
     }
 
-    private fun translateObject(
-        objectModel: ObjectModel,
-        parent: PackageFragmentDescriptor,
-        isCompanion: Boolean
-    ): ClassDescriptor {
-        val objectDescriptor = CustomClassDescriptor(
-            parent = parent,
-            name = objectModel.name,
-            modality = Modality.FINAL,
-            classKind = ClassKind.OBJECT,
-            parentTypes = objectModel.parentEntities.map { translateType(it.value) },
-            isCompanion = isCompanion,
-            companionObject = null
+    private fun translateObject(objectModel: ObjectModel, parent: PackageFragmentDescriptor): ClassDescriptor {
+        val objectDescriptor = ClassDescriptorImpl(
+            parent,
+            Name.identifier(objectModel.name.translate()),
+            Modality.FINAL,
+            ClassKind.OBJECT,
+            objectModel.parentEntities.map { translateType(it.value) },
+            SourceElement.NO_SOURCE,
+            true,
+            LockBasedStorageManager.NO_LOCKS
         )
         context.registerDescriptor(objectModel.name, objectDescriptor)
         val privatePrimaryConstructor = translateConstructor(
@@ -349,7 +342,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return when (topLevelModel) {
             is InterfaceModel -> translateInterface(topLevelModel, parent)
             is ClassModel -> translateClass(topLevelModel, parent)
-            is ObjectModel -> translateObject(topLevelModel, parent, isCompanion = false)
+            is ObjectModel -> translateObject(topLevelModel, parent)
             else -> raiseConcern("untranslated top level declaration: $topLevelModel") {
                 null
             }
