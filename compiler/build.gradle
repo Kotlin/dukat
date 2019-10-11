@@ -86,7 +86,7 @@ dependencies {
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 
-    testImplementation(project(":cli"))
+    testImplementation(project(":command-line"))
 
     kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 
