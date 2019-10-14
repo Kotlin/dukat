@@ -25,7 +25,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             dirName: String,
             reportPath: String? = null,
             moduleName: String? = null
-            ) {
+            ): Int {
 
         val args = mutableListOf(
                 nodePath,
@@ -55,6 +55,8 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             println("exited with value ${proc.exitValue()}")
             println(proc.errorStream.bufferedReader().readText())
         }
+
+        return proc.exitValue()
     }
 }
 

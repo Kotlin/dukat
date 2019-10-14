@@ -1,5 +1,15 @@
 # Changelog
 
+### [0.0.20] - 10'October, 2019
+ With this release idl target is no longer experimental. It's main focus remains the same, however: 
+ to generate stdlib for following releases of Kotlin/JS. 
+ 
+ - [idl] support for record types, partial namespaces
+ - [idl] minor improvements for mixins and enums
+ - [idl] ([#124](https://github.com/Kotlin/dukat/issues/124)) always show public visibility modifier in accordance with [KEEP-45](https://github.com/Kotlin/KEEP/issues/45) 
+ - Translate Pick<T, K> to Any (in case T is actually a type param)
+ - [#129 - Failing to translate generic params with default values when such values are not type params](https://github.com/Kotlin/dukat/issues/129)
+
 #### [0.0.19] - 30'September, 2019
  - [Namespaced aliases lost in translation](https://github.com/Kotlin/dukat/issues/119)
  - Correct escaping for entities in heritage clauses, constraint params

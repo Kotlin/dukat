@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
-    implementation(project(":logging"))
+    implementation(project(":model-lowerings-common"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
 }

@@ -1,13 +1,13 @@
 import kotlin.js.*
 
-external interface A {
+public external interface A {
     var x: Int
     fun f()
 }
 
-external abstract class B : A
+public external abstract class B : A
 
-external open class C : B {
+public external open class C : B {
     override var x: Int
     override fun f()
 }

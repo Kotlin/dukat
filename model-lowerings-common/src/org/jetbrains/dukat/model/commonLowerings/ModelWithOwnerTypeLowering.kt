@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.commonLowerings
+package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -12,7 +12,6 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner

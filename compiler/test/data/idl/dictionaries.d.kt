@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external interface WebGLContextAttributes {
+public external interface WebGLContextAttributes {
     var alpha: Boolean? /* = true */
         get() = definedExternally
         set(value) = definedExternally
@@ -28,7 +28,7 @@ external interface WebGLContextAttributes {
 }
 
 @kotlin.internal.InlineOnly
-inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true, stencil: Boolean? = false, antialias: Boolean? = true, premultipliedAlpha: Boolean? = true, preserveDrawingBuffer: Boolean? = false, preferLowPowerToHighPerformance: Boolean? = false, failIfMajorPerformanceCaveat: Boolean? = false): WebGLContextAttributes {
+public inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true, stencil: Boolean? = false, antialias: Boolean? = true, premultipliedAlpha: Boolean? = true, preserveDrawingBuffer: Boolean? = false, preferLowPowerToHighPerformance: Boolean? = false, failIfMajorPerformanceCaveat: Boolean? = false): WebGLContextAttributes {
     val o = js("({})")
     o["alpha"] = alpha
     o["depth"] = depth
@@ -41,7 +41,7 @@ inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean? = true
     return o
 }
 
-external interface PointerEventInit {
+public external interface PointerEventInit {
     var pointerId: Int? /* = 0 */
         get() = definedExternally
         set(value) = definedExternally
@@ -75,7 +75,7 @@ external interface PointerEventInit {
 }
 
 @kotlin.internal.InlineOnly
-inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: Double? = 1.0, pressure: Float? = 0f, tangentialPressure: Float? = 0f, tiltX: Int? = 0, tiltY: Int? = 0, twist: Int? = 0, pointerType: String? = "", isPrimary: Boolean? = false): PointerEventInit {
+public inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: Double? = 1.0, pressure: Float? = 0f, tangentialPressure: Float? = 0f, tiltX: Int? = 0, tiltY: Int? = 0, twist: Int? = 0, pointerType: String? = "", isPrimary: Boolean? = false): PointerEventInit {
     val o = js("({})")
     o["pointerId"] = pointerId
     o["width"] = width
@@ -90,11 +90,11 @@ inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, height: D
     return o
 }
 
-external abstract class A {
+public external abstract class A {
     open var attributes: WebGLContextAttributes
 }
 
-external interface UndefinedMemberDictionary {
+public external interface UndefinedMemberDictionary {
     var str: String?
         get() = definedExternally
         set(value) = definedExternally
@@ -104,7 +104,7 @@ external interface UndefinedMemberDictionary {
 }
 
 @kotlin.internal.InlineOnly
-inline fun UndefinedMemberDictionary(str: String?, str2: String? = undefined): UndefinedMemberDictionary {
+public inline fun UndefinedMemberDictionary(str: String?, str2: String? = undefined): UndefinedMemberDictionary {
     val o = js("({})")
     o["str"] = str
     o["str2"] = str2

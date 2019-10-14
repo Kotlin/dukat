@@ -39,7 +39,7 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.EnumTokenModel
@@ -50,7 +50,6 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
@@ -61,6 +60,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -293,10 +293,11 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             name = name,
             members = membersSplitted.dynamic,
             companionObject = if (membersSplitted.static.isNotEmpty()) {
-                CompanionObjectModel(
-                        "",
+                ObjectModel(
+                        IdentifierEntity(""),
                         membersSplitted.static,
-                        emptyList()
+                        emptyList(),
+                        VisibilityModifierModel.DEFAULT
                 )
             } else {
                 null
@@ -323,7 +324,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             annotations = exportQualifier.toAnnotation(),
             comment = null,
             external = true,
-            abstract = false
+            abstract = false,
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -346,10 +348,11 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             name = name,
             members = membersSplitted.dynamic,
             companionObject = if (membersSplitted.static.isNotEmpty()) {
-                CompanionObjectModel(
-                        "",
+                ObjectModel(
+                        IdentifierEntity(""),
                         membersSplitted.static,
-                        emptyList()
+                        emptyList(),
+                        VisibilityModifierModel.DEFAULT
                 )
             } else {
                 null
@@ -363,7 +366,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
             annotations = exportQualifier.toAnnotation(),
             comment = null,
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -459,7 +463,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
         is EnumNode -> {
             EnumModel(
                     name = name,
-                    values = values.map { token -> EnumTokenModel(token.value, token.meta) }
+                    values = values.map { token -> EnumTokenModel(token.value, token.meta) },
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         }
         is FunctionNode -> FunctionModel(
@@ -478,7 +483,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 inline = inline,
                 operator = operator,
                 extend = extend.convert(),
-                body = resolveBody()
+                body = resolveBody(),
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is VariableNode -> VariableModel(
                 name = name,
@@ -495,18 +501,22 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                             constraints = typeParam.params.map { param -> param.process() }
                     )
                 },
-                extend = extend.convert()
+                extend = extend.convert(),
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is ObjectNode -> ObjectModel(
                 name = name,
                 members = members.mapNotNull { member -> member.process() },
-                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() }
+                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         is TypeAliasNode -> if (canBeTranslated) {
             TypeAliasModel(
                     name = name,
                     typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) })
+                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
+            )
         } else null
         else -> {
             logger.debug("skipping ${this}")

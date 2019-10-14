@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.commonLowerings
+package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassModel

@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.CompanionObjectModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -17,7 +17,6 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SimpleCommentModel
@@ -29,6 +28,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
 import org.jetbrains.dukat.astModel.statements.IndexStatementModel
@@ -196,7 +196,8 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             IdentifierEntity(value.name),
                             null
                     )
-            ))
+            )),
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -228,7 +229,8 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                                     null
                             )
                     )
-            ))
+            )),
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -246,10 +248,11 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
             operations.filter { it.static }).mapNotNull { it.process() }.distinct()
 
     val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
-        CompanionObjectModel(
-                name = "",
+        ObjectModel(
+                name = IdentifierEntity(""),
                 members = staticMemberModels,
-                parentEntities = listOf()
+                parentEntities = listOf(),
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     } else {
         null
@@ -282,7 +285,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 parentEntities = parentModels,
                 comment = null,
                 annotations = annotationModels,
-                external = true
+                external = true,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     } else {
         ClassModel(
@@ -299,7 +303,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 annotations = mutableListOf(),
                 comment = null,
                 external = true,
-                abstract = kind == InterfaceKind.ABSTRACT_CLASS
+                abstract = kind == InterfaceKind.ABSTRACT_CLASS,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
     val getterModels = getters.map { it.processAsTopLevel(declaration.name) }
@@ -376,7 +381,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             },
             comment = null,
             annotations = mutableListOf(),
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
     val generatedFunction = FunctionModel(
             name = IdentifierEntity(name),
@@ -395,7 +401,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             inline = true,
             operator = false,
             extend = null,
-            body = generateFunctionBody()
+            body = generateFunctionBody(),
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
     return listOf(declaration, generatedFunction)
 }
@@ -404,10 +411,11 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     val declaration = InterfaceModel(
             name = IdentifierEntity(name),
             members = listOf(),
-            companionObject = CompanionObjectModel(
-                    name = "",
+            companionObject = ObjectModel(
+                    name = IdentifierEntity(""),
                     members = listOf(),
-                    parentEntities = listOf()
+                    parentEntities = listOf(),
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
@@ -420,7 +428,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                             listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                     )
             ),
-            external = true
+            external = true,
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
     val generatedVariables = members.map { memberName ->
         VariableModel(
@@ -456,7 +465,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                                 IdentifierEntity("Companion")
                         ),
                         typeParameters = listOf()
-                )
+                ),
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
     return listOf(declaration) + generatedVariables
@@ -467,7 +477,8 @@ fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
             name = IdentifierEntity(name),
             members = attributes.mapNotNull { it.process() } +
                     operations.mapNotNull { it.process() },
-            parentEntities = listOf()
+            parentEntities = listOf(),
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 

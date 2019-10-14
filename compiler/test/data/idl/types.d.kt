@@ -1,6 +1,6 @@
 import kotlin.js.*
 
-external abstract class A {
+public external abstract class A {
     open var s1: String
     open var s2: String
     open var s3: String

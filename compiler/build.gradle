@@ -41,27 +41,28 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
     implementation(project(":ast-common"))
-    implementation(project(":ts-ast-declarations"))
     implementation(project(":ast-model"))
     implementation(project(":descriptors"))
     implementation(project(":idl-declarations"))
+    implementation(project(":idl-lowerings"))
     implementation(project(":idl-models"))
     implementation(project(":idl-parser"))
     implementation(project(":idl-reference-resolver"))
     implementation(project(":itertools"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
+    implementation(project(":model-lowerings-common"))
     implementation(project(":module-name-resolver"))
-    implementation(project(":ts-node-introduction"))
-    implementation(project(":ts-node-lowering"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))
-    implementation(project(":ts-translator"))
-    implementation(project(":ts-model"))
-    implementation(project(":idl-lowerings"))
+    implementation(project(":ts-ast-declarations"))
     implementation(project(":ts-lowerings"))
+    implementation(project(":ts-model"))
+    implementation(project(":ts-node-introduction"))
+    implementation(project(":ts-node-lowering"))
+    implementation(project(":ts-translator"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
@@ -85,7 +86,7 @@ dependencies {
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 
-    testImplementation(project(":cli"))
+    testImplementation(project(":command-line"))
 
     kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 

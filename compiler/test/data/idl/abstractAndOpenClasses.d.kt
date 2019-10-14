@@ -1,21 +1,21 @@
 import kotlin.js.*
 
-external interface ShouldBeInterface {
+public external interface ShouldBeInterface {
     var a: Int
     val b: Int
 }
 
-external abstract class ShouldBeAbstract {
+public external abstract class ShouldBeAbstract {
     open var a: Int
     open val b: Int
 }
 
-external open class ShouldBeOpen {
+public external open class ShouldBeOpen {
     var a: Int
     open val b: Int
 }
 
-external open class ShouldBeOpenToo : ShouldBeOpen {
+public external open class ShouldBeOpenToo : ShouldBeOpen {
     var c: Int
     open val d: Int
 }

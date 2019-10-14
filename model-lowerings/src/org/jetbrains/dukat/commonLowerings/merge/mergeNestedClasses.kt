@@ -7,7 +7,7 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.commonLowerings.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 

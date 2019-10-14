@@ -2,6 +2,7 @@ package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class VariableModel(
         override var name: NameEntity,
@@ -15,5 +16,6 @@ data class VariableModel(
         val get: StatementModel?,
         val set: StatementModel?,
         val typeParameters: List<TypeParameterModel>,
-        val extend: ClassLikeReferenceModel?
+        val extend: ClassLikeReferenceModel?,
+        override val visibilityModifier: VisibilityModifierModel
 ) : MergeableModel, TopLevelModel

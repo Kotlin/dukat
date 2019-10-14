@@ -210,14 +210,13 @@ private fun process(args: List<String>): CliOptions? {
                 }
                 arg.endsWith(IDL_DECLARATION_EXTENSION) ||
                         arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
-                    printWarning("Web IDL support is at early alpha stage and is not supposed to produce any production-quality code")
                     sources.add(arg)
                 }
                 else -> {
                     printError("""
 following file extensions are supported:
     *.d.ts - for TypeScript declarations
-    *.idl, *.webidl - [EXPERIMENTAL] for Web IDL declarations                            
+    *.idl, *.webidl - for Web IDL declarations                            
                 """.trimIndent())
                     return null
                 }
