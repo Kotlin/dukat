@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.descriptors
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -8,9 +10,10 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceBundleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
@@ -20,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
@@ -28,16 +32,17 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
-import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices.builtIns
 import org.jetbrains.kotlin.name.FqName
@@ -52,37 +57,42 @@ import org.jetbrains.kotlin.types.createDynamicType
 
 private class DescriptorTranslator(val context: DescriptorContext) {
 
+    private fun translateVariance(variance: org.jetbrains.dukat.astModel.Variance): Variance {
+        return when (variance) {
+            org.jetbrains.dukat.astModel.Variance.INVARIANT -> Variance.INVARIANT
+            org.jetbrains.dukat.astModel.Variance.COVARIANT -> Variance.OUT_VARIANCE
+            org.jetbrains.dukat.astModel.Variance.CONTRAVARIANT -> Variance.IN_VARIANCE
+        }
+    }
+
     private fun translateType(typeModel: TypeModel): KotlinType {
         if (typeModel is TypeValueModel) {
-            return when (typeModel.value.translate()) {
-                "Any" -> builtIns.anyType
-                "Array" -> builtIns.getArrayType(
-                    when (typeModel.params.first().variance) {
-                        org.jetbrains.dukat.astModel.Variance.INVARIANT -> Variance.INVARIANT
-                        org.jetbrains.dukat.astModel.Variance.COVARIANT -> Variance.OUT_VARIANCE
-                        org.jetbrains.dukat.astModel.Variance.CONTRAVARIANT -> Variance.IN_VARIANCE
-                    }, translateType(
-                        typeModel.params.first().type
+            return context.getTypeParameter(typeModel.value)?.defaultType
+                ?: when (typeModel.value.translate()) {
+                    "Any" -> builtIns.anyType
+                    "Array" -> builtIns.getArrayType(
+                        translateVariance(typeModel.params.first().variance), translateType(
+                            typeModel.params.first().type
+                        )
                     )
-                )
-                "Boolean" -> builtIns.booleanType
-                "Byte" -> builtIns.byteType
-                "Char" -> builtIns.charType
-                "Double" -> builtIns.doubleType
-                "dynamic" -> createDynamicType(builtIns)
-                "Float" -> builtIns.floatType
-                "Int" -> builtIns.intType
-                "Long" -> builtIns.longType
-                "Nothing" -> builtIns.nothingType
-                "Number" -> builtIns.numberType
-                "Short" -> builtIns.shortType
-                "String" -> builtIns.stringType
-                "Unit" -> builtIns.unitType
-                else -> return LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
-                    context.getDescriptor(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
-                        ?: ErrorUtils.createErrorType("NOT_IMPLEMENTED")
-                }
-            }.makeNullableAsSpecified(typeModel.nullable)
+                    "Boolean" -> builtIns.booleanType
+                    "Byte" -> builtIns.byteType
+                    "Char" -> builtIns.charType
+                    "Double" -> builtIns.doubleType
+                    "dynamic" -> createDynamicType(builtIns)
+                    "Float" -> builtIns.floatType
+                    "Int" -> builtIns.intType
+                    "Long" -> builtIns.longType
+                    "Nothing" -> builtIns.nothingType
+                    "Number" -> builtIns.numberType
+                    "Short" -> builtIns.shortType
+                    "String" -> builtIns.stringType
+                    "Unit" -> builtIns.unitType
+                    else -> return LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
+                        context.getDescriptor(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
+                            ?: ErrorUtils.createErrorType(typeModel.value.translate())
+                    }
+                }.makeNullableAsSpecified(typeModel.nullable)
         }
         return ErrorUtils.createErrorType("NOT_IMPLEMENTED")
     }
@@ -121,6 +131,23 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
     }
 
+
+    private fun translateTypeParameters(
+        parameters: List<TypeParameterModel>,
+        parent: DeclarationDescriptor
+    ): List<TypeParameterDescriptor> {
+        return parameters.mapIndexed { index, parameter ->
+            TypeParameterDescriptorImpl.createWithDefaultBound(
+                parent,
+                Annotations.EMPTY,
+                false,
+                translateVariance(parameter.variance),
+                Name.identifier(parameter.type.translate()),
+                index
+            )
+        }
+    }
+
     private fun translateMethod(methodModel: MethodModel, parent: ClassDescriptor): FunctionDescriptor {
         val functionDescriptor = SimpleFunctionDescriptorImpl.create(
             parent,
@@ -141,6 +168,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             },
             Visibilities.PUBLIC
         )
+        functionDescriptor.isOperator = methodModel.operator
         return functionDescriptor
     }
 
@@ -160,6 +188,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             translateParameters(constructorModel.parameters, constructorDescriptor),
             visibility
         )
+        constructorDescriptor.returnType = LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
+            parent.defaultType
+        }
         return constructorDescriptor
     }
 
@@ -207,77 +238,93 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return propertyDescriptor
     }
 
-    private fun translateInterface(
-        interfaceModel: InterfaceModel,
-        parent: PackageFragmentDescriptor
+    private fun translateClassLike(
+        classLikeModel: ClassLikeModel,
+        parent: PackageFragmentDescriptor,
+        isCompanion: Boolean = false
     ): ClassDescriptor {
-        val companionDescriptor = interfaceModel.companionObject?.let {
-            translateObject(it, parent, isCompanion = true)
+        val companionDescriptor = classLikeModel.companionObject?.let {
+            translateClassLike(it, parent, isCompanion = true)
         }
-        val interfaceDescriptor = CustomClassDescriptor(
-            parent = parent,
-            name = interfaceModel.name,
-            modality = Modality.ABSTRACT,
-            classKind = ClassKind.INTERFACE,
-            parentTypes = interfaceModel.parentEntities.map { translateType(it.value) },
-            isCompanion = false,
-            companionObject = companionDescriptor
-        )
-        context.registerDescriptor(interfaceModel.name, interfaceDescriptor)
-        interfaceDescriptor.initialize(
-            SimpleMemberScope((interfaceModel.members.mapNotNull {
-                when (it) {
-                    is MethodModel -> translateMethod(
-                        it,
-                        interfaceDescriptor
-                    )
-                    is PropertyModel -> translateProperty(
-                        it,
-                        interfaceDescriptor
-                    )
-                    else -> null
-                }
-            } + companionDescriptor as DeclarationDescriptor?).filterNotNull()),
-            setOf(),
-            null
-        )
-        return interfaceDescriptor
-    }
 
-    private fun translateClass(
-        classModel: ClassModel,
-        parent: PackageFragmentDescriptor
-    ): ClassDescriptor {
-        val companionDescriptor = classModel.companionObject?.let {
-            translateObject(it, parent, isCompanion = true)
+        var typeParameters: List<TypeParameterDescriptor> = listOf()
+        if (classLikeModel is ClassModel) {
+            typeParameters = translateTypeParameters(classLikeModel.typeParameters, parent)
         }
+        if (classLikeModel is InterfaceModel) {
+            typeParameters = translateTypeParameters(classLikeModel.typeParameters, parent)
+        }
+        typeParameters.forEach {
+            context.registerTypeParameter(IdentifierEntity(it.name.identifier), it)
+        }
+
         val classDescriptor = CustomClassDescriptor(
             parent = parent,
-            name = classModel.name,
-            modality = if (classModel.abstract) Modality.ABSTRACT else Modality.OPEN,
-            classKind = ClassKind.CLASS,
-            parentTypes = classModel.parentEntities.map { translateType(it.value) },
-            isCompanion = false,
-            companionObject = companionDescriptor
+            name = classLikeModel.name,
+            modality = when (classLikeModel) {
+                is ClassModel -> if (classLikeModel.abstract) Modality.ABSTRACT else Modality.OPEN
+                is InterfaceModel -> Modality.ABSTRACT
+                is ObjectModel -> Modality.FINAL
+                else -> Modality.FINAL
+            },
+            classKind = when (classLikeModel) {
+                is ClassModel -> ClassKind.CLASS
+                is InterfaceModel -> ClassKind.INTERFACE
+                is ObjectModel -> ClassKind.OBJECT
+                else -> ClassKind.CLASS
+            },
+            parentTypes = classLikeModel.parentEntities.map { translateType(it.value) },
+            isCompanion = isCompanion,
+            companionObject = companionDescriptor,
+            typeParameters = typeParameters
         )
-        context.registerDescriptor(classModel.name, classDescriptor)
-        val constructorModels = classModel.members.filterIsInstance<ConstructorModel>()
-        val primaryConstructorDescriptor = if (classModel.primaryConstructor == null && constructorModels.isEmpty()) {
-            translateConstructor(ConstructorModel(listOf(), listOf()), classDescriptor, true, Visibilities.PUBLIC)
-        } else {
-            classModel.primaryConstructor?.let { translateConstructor(it, classDescriptor, true, Visibilities.PUBLIC) }
-        }
-        val constructorDescriptors = (constructorModels.map {
-            translateConstructor(
-                it,
+        context.registerDescriptor(classLikeModel.name, classDescriptor)
+
+        var primaryConstructorDescriptor: ClassConstructorDescriptor? = null
+        var constructorDescriptors: Set<ClassConstructorDescriptor> = setOf()
+        if (classLikeModel is ObjectModel) {
+            primaryConstructorDescriptor = translateConstructor(
+                ConstructorModel(listOf(), listOf()),
                 classDescriptor,
-                false,
-                Visibilities.PUBLIC
+                true,
+                Visibilities.PRIVATE
             )
-        } + primaryConstructorDescriptor).filterNotNull().toSet()
+            constructorDescriptors = setOf(primaryConstructorDescriptor)
+        }
+        if (classLikeModel is ClassModel) {
+            context.registerDescriptor(classLikeModel.name, classDescriptor)
+            val constructorModels = classLikeModel.members.filterIsInstance<ConstructorModel>()
+            primaryConstructorDescriptor =
+                if (classLikeModel.primaryConstructor == null && constructorModels.isEmpty()) {
+                    translateConstructor(
+                        ConstructorModel(listOf(), listOf()),
+                        classDescriptor,
+                        true,
+                        Visibilities.PUBLIC
+                    )
+                } else {
+                    classLikeModel.primaryConstructor?.let {
+                        translateConstructor(
+                            it,
+                            classDescriptor,
+                            true,
+                            Visibilities.PUBLIC
+                        )
+                    }
+                }
+            constructorDescriptors = (constructorModels.map {
+                translateConstructor(
+                    it,
+                    classDescriptor,
+                    false,
+                    Visibilities.PUBLIC
+                )
+            } + primaryConstructorDescriptor).filterNotNull().toSet()
+        }
 
         classDescriptor.initialize(
-            SimpleMemberScope((classModel.members.mapNotNull {
+            SimpleMemberScope((classLikeModel.members.mapNotNull
+            {
                 when (it) {
                     is MethodModel -> translateMethod(
                         it,
@@ -293,63 +340,23 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             constructorDescriptors,
             primaryConstructorDescriptor
         )
-        constructorDescriptors.forEach {
-            (it as ClassConstructorDescriptorImpl).returnType = classDescriptor.defaultType
+
+        typeParameters.forEach {
+            context.removeTypeParameter(IdentifierEntity(it.name.identifier))
         }
+
         return classDescriptor
-    }
-
-    private fun translateObject(
-        objectModel: ObjectModel,
-        parent: PackageFragmentDescriptor,
-        isCompanion: Boolean
-    ): ClassDescriptor {
-        val objectDescriptor = CustomClassDescriptor(
-            parent = parent,
-            name = objectModel.name,
-            modality = Modality.FINAL,
-            classKind = ClassKind.OBJECT,
-            parentTypes = objectModel.parentEntities.map { translateType(it.value) },
-            isCompanion = isCompanion,
-            companionObject = null
-        )
-        context.registerDescriptor(objectModel.name, objectDescriptor)
-        val privatePrimaryConstructor = translateConstructor(
-            ConstructorModel(listOf(), listOf()),
-            objectDescriptor,
-            true,
-            Visibilities.PRIVATE
-        )
-
-        objectDescriptor.initialize(
-            SimpleMemberScope(objectModel.members.mapNotNull {
-                when (it) {
-                    is MethodModel -> translateMethod(
-                        it,
-                        objectDescriptor
-                    )
-                    is PropertyModel -> translateProperty(
-                        it,
-                        objectDescriptor
-                    )
-                    else -> null
-                }
-            }),
-            setOf(privatePrimaryConstructor),
-            privatePrimaryConstructor
-        )
-        (privatePrimaryConstructor as ClassConstructorDescriptorImpl).returnType = objectDescriptor.defaultType
-        return objectDescriptor
     }
 
     private fun translateTopLevelModel(
         topLevelModel: TopLevelModel,
         parent: PackageFragmentDescriptorImpl
     ): DeclarationDescriptor? {
+        println(topLevelModel)
         return when (topLevelModel) {
-            is InterfaceModel -> translateInterface(topLevelModel, parent)
-            is ClassModel -> translateClass(topLevelModel, parent)
-            is ObjectModel -> translateObject(topLevelModel, parent, isCompanion = false)
+            is InterfaceModel -> translateClassLike(topLevelModel, parent)
+            is ClassModel -> translateClassLike(topLevelModel, parent)
+            is ObjectModel -> translateClassLike(topLevelModel, parent)
             else -> raiseConcern("untranslated top level declaration: $topLevelModel") {
                 null
             }
@@ -378,6 +385,6 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 }
 
-fun SourceBundleModel.translateToDescriptors(): ModuleDescriptor {
-    return DescriptorTranslator(DescriptorContext()).translateModule(sources.first().sources.first().root)
+fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
+    return DescriptorTranslator(DescriptorContext()).translateModule(sources.first().root)
 }

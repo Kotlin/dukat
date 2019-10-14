@@ -40,6 +40,11 @@ object DescriptorValidator {
         private var allowErrorTypes = false
         private var recursiveFilter = { _: DeclarationDescriptor -> true }
 
+        fun allowErrorTypes(): ValidationVisitor {
+            this.allowErrorTypes = true
+            return this
+        }
+
         private fun validateScope(
             scope: MemberScope,
             collector: DiagnosticCollector
@@ -277,6 +282,10 @@ object DescriptorValidator {
         companion object {
             fun errorTypesForbidden(): ValidationVisitor {
                 return ValidationVisitor()
+            }
+
+            fun errorTypesAllowed(): ValidationVisitor {
+                return ValidationVisitor().allowErrorTypes()
             }
 
             private fun validateTypeParameters(

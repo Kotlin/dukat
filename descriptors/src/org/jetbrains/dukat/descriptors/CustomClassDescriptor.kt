@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -20,7 +21,8 @@ class CustomClassDescriptor(
     classKind: ClassKind,
     parentTypes: List<KotlinType>,
     private val isCompanion: Boolean,
-    private val companionObject: ClassDescriptor?
+    private val companionObject: ClassDescriptor?,
+    private val typeParameters: List<TypeParameterDescriptor>
 ) :
     ClassDescriptorImpl(
         parent,
@@ -42,5 +44,9 @@ class CustomClassDescriptor(
 
     override fun getCompanionObjectDescriptor(): ClassDescriptor? {
         return companionObject
+    }
+
+    override fun getDeclaredTypeParameters(): List<TypeParameterDescriptor> {
+        return typeParameters
     }
 }
