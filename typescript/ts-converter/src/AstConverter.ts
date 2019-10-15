@@ -32,6 +32,7 @@ import {
     TypeParameter
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
+import {DeclarationResolver} from "./DeclarationResolver";
 
 export class AstConverter {
     private exportContext = createExportContent();
@@ -50,7 +51,7 @@ export class AstConverter {
       private rootPackageName: NameEntity,
       private typeChecker: ts.TypeChecker,
       private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
-      private declarationResolver: (node: ts.Node, fileName: string) => readonly ts.DefinitionInfo[] | undefined,
+      private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
     ) {
     }
@@ -733,7 +734,7 @@ export class AstConverter {
     }
 
     private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
-        let definitionInfos = this.declarationResolver(name, this.sourceName);
+        let definitionInfos = this.declarationResolver.resolve(name, this.sourceName);
 
         var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
         if (definitionInfos) {
@@ -803,7 +804,7 @@ export class AstConverter {
                 res.push(convertedFunctionDeclaration);
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
-            let definitionInfos = this.declarationResolver(statement.name, this.sourceName);
+            let definitionInfos = this.declarationResolver.resolve(statement.name, this.sourceName);
 
             var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
             if (definitionInfos) {
@@ -872,7 +873,7 @@ export class AstConverter {
     }
 
     convertModule(module: ts.ModuleDeclaration, resourceName: NameEntity): Array<Declaration> {
-        let definitionInfos = this.declarationResolver(module.name, this.sourceName);
+        let definitionInfos = this.declarationResolver.resolve(module.name, this.sourceName);
 
         const declarations: Declaration[] = [];
         if (module.body) {

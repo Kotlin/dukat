@@ -6,6 +6,7 @@ import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
+import {DeclarationResolver} from "./DeclarationResolver";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -44,6 +45,7 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
     }
 
     const sourceFile = program.getSourceFile(fileName);
+    const definitionResolver = new DeclarationResolver(languageService);
 
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)
@@ -55,7 +57,7 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
           packageName,
           program.getTypeChecker(),
           (fileName: string) => program.getSourceFile(fileName),
-          (node: ts.Node, fileName: string) => languageService.getDefinitionAtPosition(fileName, node.end),
+          new DeclarationResolver(languageService),
           astFactory
         );
 
