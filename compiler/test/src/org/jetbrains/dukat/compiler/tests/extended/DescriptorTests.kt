@@ -64,7 +64,7 @@ class DescriptorTests : OutputTests() {
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/typescript/class")
+            return fileSetWithDescriptors("./test/data/typescript/")
         }
 
         val translator: InputTranslator<String> = JsRuntimeFileTranslator(

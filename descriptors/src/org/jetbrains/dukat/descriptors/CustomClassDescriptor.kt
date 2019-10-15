@@ -26,10 +26,10 @@ class CustomClassDescriptor(
 ) :
     ClassDescriptorImpl(
         parent,
-        if (isCompanion && name == IdentifierEntity("")) {
+        if (isCompanion) {
             Name.identifier("Companion")
         } else {
-            Name.identifier(name.translate())
+            Name.identifier(translateName(name))
         },
         modality,
         classKind,
