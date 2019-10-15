@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class AddExplicitGettersAndSetters : ModelWithOwnerTypeLowering {
