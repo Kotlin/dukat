@@ -35,20 +35,23 @@ class DescriptorTests : OutputTests() {
     @Suppress("UNUSED_PARAMETER")
     private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
         val sourceSet = bundle.translate(tsPath)
+
+        val outputModuleDescriptor = sourceSet.translateToDescriptors()
         validate(
-            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), sourceSet.translateToDescriptors().getPackage(
+            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
                 FqName("")
             )
         )
-        val desc = generatePackageDescriptor(File(ktPath).parentFile.path, File(ktPath).name)
+
+        val expectedPackageDescriptor = generatePackageDescriptor(File(ktPath).parentFile.path, File(ktPath).name)
         assertEquals(
             RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
                 .serializeRecursively(
-                    sourceSet.translateToDescriptors().getPackage(
+                    outputModuleDescriptor.getPackage(
                         FqName("")
                     )
                 ), RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
-                .serializeRecursively(desc)
+                .serializeRecursively(expectedPackageDescriptor)
         )
     }
 

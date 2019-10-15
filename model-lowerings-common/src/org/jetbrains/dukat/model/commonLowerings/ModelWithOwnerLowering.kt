@@ -57,7 +57,6 @@ interface ModelWithOwnerLowering {
         return when (val declaration = ownerContext.node) {
             is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext))
             is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext))
-            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             else -> declaration
         }
     }
@@ -67,6 +66,7 @@ interface ModelWithOwnerLowering {
             is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
             is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
+            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
             is TypeAliasModel -> declaration
             else -> raiseConcern("unknown TopeLevelDeclaration ${declaration}") { declaration }

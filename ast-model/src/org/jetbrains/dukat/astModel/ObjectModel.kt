@@ -7,13 +7,11 @@ import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class ObjectModel(
         override val name: NameEntity,
-        override val members: List<MemberModel>,
+        val members: List<MemberModel>,
 
-        override val parentEntities: List<HeritageModel>,
+        val parentEntities: List<HeritageModel>,
         override val visibilityModifier: VisibilityModifierModel
-) : ClassLikeModel {
-    override val companionObject: ObjectModel? = null
-}
+) : MemberEntity, TopLevelModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
     if (otherModel == null) {
