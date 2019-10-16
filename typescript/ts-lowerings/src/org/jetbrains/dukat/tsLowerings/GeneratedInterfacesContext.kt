@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
@@ -219,6 +220,8 @@ class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<NameEntity, GeneratedInterfaceDeclaration>()
     private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
 
+    private val logger = Logging.logger("GeneratedInterfacesContext")
+
     private fun findIdenticalInterface(interfaceNode: GeneratedInterfaceDeclaration): GeneratedInterfaceDeclaration? {
 
         myGeneratedInterfaces.forEach { entry ->
@@ -236,6 +239,10 @@ class GeneratedInterfacesContext {
 
         declaration.members.forEach { member ->
             when (member) {
+                is IndexSignatureDeclaration -> {
+                    member.indexTypes.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
+                    member.returnType.resolveTypeParams(typeParamsSet, typeParams)
+                }
                 is CallSignatureDeclaration -> {
                     member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
                     member.type.resolveTypeParams(typeParamsSet, typeParams)
@@ -249,6 +256,9 @@ class GeneratedInterfacesContext {
                 is MethodSignatureDeclaration -> {
                     member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
                     member.type.resolveTypeParams(typeParamsSet, typeParams)
+                }
+                else -> {
+                    logger.warn("unknown declaration ${member}")
                 }
             }
         }

@@ -24,3 +24,24 @@ external interface Chain<T, V> {
 external interface ChainOfArrays<T> : Chain<Array<T>, Array<T>> {
     fun flatten(shallow: Boolean? = definedExternally /* null */): Chain<T, T>
 }
+
+external interface AsyncResultObjectCallback<T, E> {
+    @nativeInvoke
+    operator fun invoke(err: E?, results: Array<T?>)
+}
+
+external interface `T$0`<T> {
+    @nativeGetter
+    operator fun get(key: String): T?
+    @nativeSetter
+    operator fun set(key: String, value: T)
+}
+
+external interface `T$1`<R> {
+    @nativeGetter
+    operator fun get(key: String): R?
+    @nativeSetter
+    operator fun set(key: String, value: R)
+}
+
+external fun <T, R, E> transform(arr: `T$0`<T>, iteratee: (acc: `T$1`<R>, item: T, key: String, callback: (error: E? /* = null */) -> Unit) -> Unit, callback: AsyncResultObjectCallback<T, E>? = definedExternally /* null */)
