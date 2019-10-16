@@ -57,7 +57,7 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
           packageName,
           program.getTypeChecker(),
           (fileName: string) => program.getSourceFile(fileName),
-          new DeclarationResolver(languageService),
+          new DeclarationResolver(program),
           astFactory
         );
 

@@ -733,12 +733,12 @@ export class AstConverter {
         return classDeclaration;
     }
 
-    private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
-        let definitionInfos = this.declarationResolver.resolve(name, this.sourceName);
+    private convertDefinitions(kind: ts.SyntaxKind, name: ts.Node): Array<DefinitionInfoDeclaration> {
+        let definitionInfos = this.declarationResolver.resolve(kind, name);
 
-        var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+        let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
         if (definitionInfos) {
-            definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
+            definitionsInfoDeclarations = definitionInfos.map((definitionInfo) => {
                 return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
             });
         }
@@ -752,7 +752,7 @@ export class AstConverter {
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
-          computeDefinitions ? this.convertDefinitions(statement.name) : [],
+          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration , statement.name) : [],
           this.exportContext.getUID(statement)
         );
 
@@ -804,15 +804,6 @@ export class AstConverter {
                 res.push(convertedFunctionDeclaration);
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
-            let definitionInfos = this.declarationResolver.resolve(statement.name, this.sourceName);
-
-            var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
-            if (definitionInfos) {
-                definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
-                    return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
-                });
-            }
-
             res.push(this.convertInterfaceDeclaration(statement));
         } else if (ts.isModuleDeclaration(statement)) {
             for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
@@ -873,7 +864,7 @@ export class AstConverter {
     }
 
     convertModule(module: ts.ModuleDeclaration, resourceName: NameEntity): Array<Declaration> {
-        let definitionInfos = this.declarationResolver.resolve(module.name, this.sourceName);
+        let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
 
         const declarations: Declaration[] = [];
         if (module.body) {
