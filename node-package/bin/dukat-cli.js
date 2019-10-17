@@ -104,7 +104,8 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var bundle = createBundle(path.resolve(packageDir, "d.ts.libs/lib.d.ts"), argsProcessed.packageName, files);
+        var DEFAULT_LIB_PATH = "d.ts.libs/lib.es2015.d.ts";
+        var bundle = createBundle(path.resolve(packageDir, DEFAULT_LIB_PATH), argsProcessed.packageName, files);
 
         var inputStream = createReadable();
         inputStream.push(bundle.serializeBinary());
