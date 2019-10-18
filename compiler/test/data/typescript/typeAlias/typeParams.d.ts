@@ -1,10 +1,10 @@
-interface Map<K, V> {
+interface MapLike<K, V> {
 }
 interface List<T> {
 }
 
 type Values<V> = List<V>;
-type MultiMap<K,V> = Map<K,Values<V>>;
+type MultiMap<K,V> = MapLike<K,Values<V>>;
 type MyHeaders = MultiMap<String,String>
 type Ref<T> = string | ((instance: T) => any);
 type Ping<T> = (packet: {ip: T}) => boolean;

@@ -15,13 +15,13 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface Map<K, V>
+external interface MapLike<K, V>
 
 external interface List<T>
 
 typealias Values<V> = List<V>
 
-typealias MultiMap<K, V> = Map<K, Values<V>>
+typealias MultiMap<K, V> = MapLike<K, Values<V>>
 
 typealias MyHeaders = MultiMap<String, String>
 
