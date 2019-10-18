@@ -183,7 +183,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         return declarations.map { declaration ->
             HeritageNode(
                     name = declaration.name.convert(),
-                    typeArguments = declaration.typeArguments
+                    typeArguments = declaration.typeArguments,
+                    reference = declaration.typeReference
             )
         }
     }

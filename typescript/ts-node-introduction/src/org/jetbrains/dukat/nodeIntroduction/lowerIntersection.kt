@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -12,9 +13,12 @@ private class LowerIntersection : ParameterValueLowering {
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is IntersectionTypeDeclaration -> {
-                val firstIntersectionType = declaration.params[0].duplicate<ParameterValueDeclaration>()
+                val duplicated =
+                    declaration.params[0].duplicate<ParameterValueDeclaration>()
+                val firstIntersectionType = if (declaration.nullable) duplicated.makeNullable() else duplicated
                 firstIntersectionType.meta =
                         IntersectionMetadata(declaration.params)
+
                 return lowerType(firstIntersectionType)
             }
             else -> super.lowerType(declaration)

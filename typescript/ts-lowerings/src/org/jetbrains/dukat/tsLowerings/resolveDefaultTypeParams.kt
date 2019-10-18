@@ -61,7 +61,7 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
     }
 }
 
-private fun ModuleDeclaration.collectReferences(references: MutableMap<String, ClassLikeDeclaration>): Map<String, ClassLikeDeclaration> {
+fun ModuleDeclaration.collectReferences(references: MutableMap<String, ClassLikeDeclaration>): Map<String, ClassLikeDeclaration> {
     declarations.forEach {
         if (it is ClassDeclaration) {
             references[it.uid] = it

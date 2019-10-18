@@ -1,15 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -34,8 +25,10 @@ private fun Entity.getKey(): String {
     }
 }
 
-private class RearrangeLowering() : NodeWithOwnerTypeLowering {
+private class RearrangeLowering(generatedDeclarations: Map<NameEntity, InterfaceNode>) : NodeWithOwnerTypeLowering {
     val myReferences = mutableMapOf<String, MutableList<NameEntity>>()
+
+    val uidToGeneratedDeclaration = generatedDeclarations.values.associateBy { it.uid }
 
     fun getReferences(): Map<String, List<NameEntity>> {
         return myReferences
@@ -62,13 +55,30 @@ private class RearrangeLowering() : NodeWithOwnerTypeLowering {
         return null
     }
 
+    fun addReference(owner: NodeOwner<*>, nameEntity: NameEntity) {
+        findTopLevelOwner(owner)?.let {
+            myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(nameEntity)
+        }
+    }
+
+    override fun lowerHeritageNode(owner: NodeOwner<HeritageNode>): HeritageNode {
+        val reference = owner.node.reference
+        if (reference != null && reference.uid in uidToGeneratedDeclaration.keys) {
+            addReference(owner, owner.node.name)
+        }
+        return super.lowerHeritageNode(owner)
+    }
+
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
 
         val declaration = owner.node
 
         if (declaration is GeneratedInterfaceReferenceDeclaration) {
-            findTopLevelOwner(owner)?.let {
-                myReferences.getOrPut(it.node.getKey()) { mutableListOf() }.add(declaration.name)
+            addReference(owner, declaration.name)
+        } else if (declaration is TypeValueNode) {
+            val typeReference = declaration.typeReference
+            if (typeReference != null && uidToGeneratedDeclaration[typeReference.uid] != null) {
+                addReference(owner, declaration.value)
             }
         }
 
@@ -111,11 +121,11 @@ private fun TopLevelEntity.generateEntites(references: Map<String, List<NameEnti
 }
 
 fun DocumentRootNode.rearrangeGeneratedEntities(): DocumentRootNode {
-    val rearrangeLowering = RearrangeLowering()
+    val (generatedDeclarationsMap, nonGeneratedDeclarations) = generatedEntitiesMap()
+    val rearrangeLowering = RearrangeLowering(generatedDeclarationsMap)
     rearrangeLowering.lowerRoot(this, NodeOwner(this, null))
     val references = rearrangeLowering.getReferences()
 
-    val (generatedDeclarationsMap, nonGeneratedDeclarations) = generatedEntitiesMap()
 
     val declarationsRearranged = nonGeneratedDeclarations.flatMap { declaration ->
         declaration.generateEntites(references, generatedDeclarationsMap) + listOf(declaration)
