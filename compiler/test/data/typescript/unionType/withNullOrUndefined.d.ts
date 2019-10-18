@@ -28,6 +28,6 @@ interface IBar {
     optionalFoo3?: string | undefined | null;
     ping(o: object | null);
     pong(o: object | undefined);
-    bing(o: object | null);
-    bong(o: object | undefined);
+    bing(o: null | object);
+    bong(o: undefined | object);
 }
