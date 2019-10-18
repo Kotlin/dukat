@@ -26,4 +26,8 @@ interface IBar {
     optionalFoo?: string | null;
     optionalFoo2?: string | undefined;
     optionalFoo3?: string | undefined | null;
+    ping(o: object | null);
+    pong(o: object | undefined);
+    bing(o: object | null);
+    bong(o: object | undefined);
 }

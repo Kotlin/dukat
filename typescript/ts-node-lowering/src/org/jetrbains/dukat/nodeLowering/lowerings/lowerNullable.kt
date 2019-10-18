@@ -37,8 +37,7 @@ private class LowerNullable : NodeTypeLowering {
                 }
 
                 if (params.size == 1) {
-                    val nullableType = params[0]
-                    return when (nullableType) {
+                    return when (val nullableType = params[0]) {
                         is TypeValueNode -> {
                             val res = lowerTypeNode(nullableType)
                             res.nullable = true
@@ -53,6 +52,9 @@ private class LowerNullable : NodeTypeLowering {
                         }
                         is IntersectionTypeDeclaration -> {
                             nullableType.copy(params = nullableType.params.map {param -> lowerType(param) })
+                        }
+                        is UnionTypeNode -> {
+                            lowerType(nullableType.copy(params = nullableType.params.map {param -> lowerType(param) }))
                         }
                         else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
                             lowerUnionTypeNode(declaration)
