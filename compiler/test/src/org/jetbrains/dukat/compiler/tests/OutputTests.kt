@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.panic.PanicMode
+import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
@@ -13,11 +14,7 @@ import kotlin.test.assertEquals
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator<String>
 
-    init {
-        if (System.getProperty("dukat.test.failure.always") == "true") {
-            setPanicMode(PanicMode.ALWAYS_FAIL)
-        }
-    }
+    init { resolvePanicMode() }
 
     companion object {
         val SEPARATOR: String = """

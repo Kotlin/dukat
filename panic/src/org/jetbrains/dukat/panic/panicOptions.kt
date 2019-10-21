@@ -13,4 +13,10 @@ fun getPanicMode(): PanicMode {
     return PANIC_OPTIONS.mode
 }
 
+fun resolvePanicMode() {
+    if (System.getProperty("dukat.test.failure.always") == "true") {
+        setPanicMode(PanicMode.ALWAYS_FAIL)
+    }
+}
+
 
