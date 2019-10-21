@@ -23,7 +23,7 @@ configurations {
 }
 
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack"]
+    dependsOn = [":ts-converter:webpack", ":command-line:build"]
 
     doLast {
         copy {
