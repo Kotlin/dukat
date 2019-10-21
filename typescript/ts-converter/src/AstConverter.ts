@@ -42,8 +42,7 @@ export class AstConverter {
 
     private libVisitor = new LibraryDeclarationsVisitor(
       this.resources,
-      this.typeChecker,
-      this
+      this.typeChecker
     );
 
     constructor(
@@ -92,10 +91,20 @@ export class AstConverter {
         });
 
         this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
+
+            let declarations: Array<Declaration> = [];
+            for (let libDeclaration of libDeclarations) {
+                let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
+
+                statements.forEach((statement, index) => {
+                    declarations.push(statement);
+                });
+            }
+
             sources.push(this.astFactory.createSourceFileDeclaration(
-              "<LIBROOT>", this.astFactory.createModuleDeclaration(
+              resourceName, this.astFactory.createModuleDeclaration(
                 this.astFactory.createIdentifierDeclarationAsNameEntity("<LIBROOT>"),
-                libDeclarations,
+                declarations,
                 [],
                 [],
                 `<LIBROOT-${resourceName}>`,
@@ -759,7 +768,7 @@ export class AstConverter {
         return interfaceDeclaration;
     }
 
-    private convertStatement(statement: ts.Node, resourceName: NameEntity): Array<Declaration> {
+    convertTopLevelStatement(statement: ts.Node): Array<Declaration> {
         let res: Array<Declaration> = [];
 
         if (ts.isEnumDeclaration(statement)) {
@@ -805,10 +814,6 @@ export class AstConverter {
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
             res.push(this.convertInterfaceDeclaration(statement));
-        } else if (ts.isModuleDeclaration(statement)) {
-            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
-                res.push(moduleDeclaration);
-            }
         } else if (ts.isExportAssignment(statement)) {
             let expression = statement.expression;
             if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
@@ -847,6 +852,19 @@ export class AstConverter {
             }
         } else {
             this.log.info(`skipping ${statement.kind}`);
+        }
+
+        return res;
+    }
+
+
+    private convertStatement(statement: ts.Node, resourceName: NameEntity): Array<Declaration> {
+        let res: Array<Declaration> = this.convertTopLevelStatement(statement);
+
+        if (ts.isModuleDeclaration(statement)) {
+            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
+                res.push(moduleDeclaration);
+            }
         }
 
         return res;

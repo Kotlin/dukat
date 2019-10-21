@@ -1,25 +1,26 @@
-import {AstConverter} from "../AstConverter";
-
 import * as ts from "typescript-services-api";
-import {createLogger} from "../Logger";
-import {Declaration} from "./ast";
 import {ResourceFetcher} from "./ResourceFetcher";
 
 export class LibraryDeclarationsVisitor {
-
-  private log = createLogger("LibraryDeclarationsVisitor");
-  private libDeclarations = new Map<string, Array<Declaration>>();
   private visited = new Set<ts.Node>();
+  private libDeclarations = new Map<string, Array<ts.Node>>();
 
   constructor(
     private resources: ResourceFetcher,
-    private typeChecker: ts.TypeChecker,
-    private astConverter: AstConverter
+    private typeChecker: ts.TypeChecker
   ) {
   }
 
-  public forEachLibDeclaration(callback: (value: Array<Declaration>, key: string) => void) {
-    this.libDeclarations.forEach(callback);
+  private registerDeclaration(declaration) {
+    let sourceFile = declaration.getSourceFile();
+    let sourceName = sourceFile.fileName;
+
+    if (!Array.isArray(this.libDeclarations.get(sourceName))) {
+      this.libDeclarations.set(sourceName, []);
+    }
+
+    let declarations = this.libDeclarations.get(sourceName)!;
+    declarations.push(declaration);
   }
 
   private checkLibReferences(entity: ts.Node) {
@@ -32,27 +33,16 @@ export class LibraryDeclarationsVisitor {
 
         if (sourceFile && !this.resources.has(sourceName)) {
           if (ts.isClassDeclaration(declaration)) {
-            let classDeclaration = this.astConverter.convertClassDeclaration(declaration);
-            if (classDeclaration) {
-              if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-                this.libDeclarations.set(sourceName, []);
-              }
-              (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
-
-              if (declaration.name) {
-                if (declaration.heritageClauses) {
-                  declaration.heritageClauses.forEach(heritageClause => {
-                    this.visit(heritageClause, declaration);
-                  });
-                }
+            this.registerDeclaration(declaration);
+            if (declaration.name) {
+              if (declaration.heritageClauses) {
+                declaration.heritageClauses.forEach(heritageClause => {
+                  this.visit(heritageClause, declaration);
+                });
               }
             }
           } else if (ts.isInterfaceDeclaration(declaration)) {
-            let interfaceDeclaration = this.astConverter.convertInterfaceDeclaration(declaration, false);
-            if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-              this.libDeclarations.set(sourceName, []);
-            }
-            (this.libDeclarations.get(sourceName) as Array<Declaration>).push(interfaceDeclaration);
+            this.registerDeclaration(declaration);
 
             if (declaration.heritageClauses) {
               declaration.heritageClauses.forEach(heritageClause => {
@@ -79,11 +69,10 @@ export class LibraryDeclarationsVisitor {
           this.checkLibReferences(type);
         }
       } else if (ts.isTypeNode(declaration)) {
-          if (classLikeOwner) {
-            this.checkLibReferences(declaration);
-          }
-      }
-      else {
+        if (classLikeOwner) {
+          this.checkLibReferences(declaration);
+        }
+      } else {
         if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
           if (node.heritageClauses) {
             this.visit(declaration, node);
@@ -95,5 +84,8 @@ export class LibraryDeclarationsVisitor {
     });
   }
 
+  public forEachLibDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
+    this.libDeclarations.forEach(callback);
+  }
 
 }
