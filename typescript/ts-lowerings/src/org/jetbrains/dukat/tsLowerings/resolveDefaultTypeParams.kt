@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -50,9 +51,9 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
         return paramsResolved
     }
 
-    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
+    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
         val params = resolveParameters(heritageClause.typeReference, heritageClause.typeArguments)
-        return super.lowerHeritageClause(heritageClause.copy(typeArguments = params))
+        return super.lowerHeritageClause(heritageClause.copy(typeArguments = params), owner)
     }
 
     @Suppress("UNCHECKED_CAST")

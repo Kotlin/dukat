@@ -135,7 +135,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(type = lowerParameterValue(declaration.type))
     }
 
-    fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
+    fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
         return heritageClause.copy(typeArguments = heritageClause.typeArguments.map { typeArgument -> lowerParameterValue(typeArgument) })
     }
 
@@ -144,7 +144,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageClause(heritageClause)
+                    lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
@@ -156,7 +156,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageClause(heritageClause)
+                    lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
@@ -173,7 +173,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageClause(heritageClause)
+                    lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
