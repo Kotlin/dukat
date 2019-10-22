@@ -1,0 +1,50 @@
+plugins {
+    id("kotlin")
+    id("kotlinx-serialization")
+
+    id("com.moowork.node")
+}
+
+
+def TEST_PACKAGE_PATH = "${project.buildDir}/test"
+
+node {
+    workDir = gradle.nodeWorkingDir
+
+    version = gradle.nodeVersion
+    npmVersion = gradle.npmVersion
+    yarnVersion = gradle.yarnVersion
+
+    nodeModulesDir = file(TEST_PACKAGE_PATH)
+    download = true
+}
+
+task copyPackageFile(type: Copy) {
+    from "package.template.json"
+    into TEST_PACKAGE_PATH
+    rename { String fileName -> fileName.replace(".template", "") }
+
+    from "yarn.lock"
+    into TEST_PACKAGE_PATH
+}
+
+yarn.dependsOn = [yarnSetup, copyPackageFile]
+
+task installModules(type: YarnTask) {
+    dependsOn = [yarn]
+    args = ['install']
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":compiler"))
+    implementation(project(":module-name-resolver"))
+    implementation(project(":panic"))
+    implementation(project(":translator"))
+    implementation(project(":translator-string"))
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${gradle.kotlinSerializationRuntimeVersion}")
+
+    //https://mvnrepository.com/artifact/org.graalvm.js/js
+    implementation("org.graalvm.js:js:$gradle.graaljsVersion")
+}
