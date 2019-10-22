@@ -61,25 +61,8 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
     }
 }
 
-private fun ModuleDeclaration.collectReferences(references: MutableMap<String, ClassLikeDeclaration>): Map<String, ClassLikeDeclaration> {
-    declarations.forEach {
-        if (it is ClassDeclaration) {
-            references[it.uid] = it
-        } else if (it is InterfaceDeclaration) {
-            references[it.uid] = it
-        } else if (it is ModuleDeclaration) {
-            it.collectReferences(references)
-        }
-    }
-
-    return references
-}
-
 private fun ModuleDeclaration.resolveDefaultTypeParams(): ModuleDeclaration {
-    val references: Map<String, ClassLikeDeclaration> =
-            collectReferences(mutableMapOf())
-
-    return ResolveDefaultTypeParams(references).lowerDocumentRoot(this)
+    return ResolveDefaultTypeParams(collectReferences()).lowerDocumentRoot(this)
 }
 
 private fun SourceFileDeclaration.resolveDefaultTypeParams() = copy(root = root.resolveDefaultTypeParams())
