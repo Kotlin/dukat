@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
@@ -33,7 +34,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberEntity>): PropertyDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
-                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter) }
+                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) }
         )
     }
 
@@ -100,7 +101,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    override fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration {
+    override fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>): TypeParameterDeclaration {
         return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
     }
 
@@ -147,7 +148,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
                     lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    lowerTypeParameter(typeParameter)
+                    lowerTypeParameter(typeParameter, owner.wrap(declaration))
                 }
         )
     }
@@ -159,7 +160,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
                     lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    lowerTypeParameter(typeParameter)
+                    lowerTypeParameter(typeParameter, owner.wrap(declaration))
                 }
         )
 
@@ -176,7 +177,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
                     lowerHeritageClause(heritageClause, owner.wrap(declaration))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    lowerTypeParameter(typeParameter)
+                    lowerTypeParameter(typeParameter, owner.wrap(declaration))
                 }
         )
     }

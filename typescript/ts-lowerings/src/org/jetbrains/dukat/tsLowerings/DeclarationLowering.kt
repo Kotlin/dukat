@@ -33,7 +33,7 @@ interface DeclarationLowering {
     fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
     fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
-    fun lowerTypeParameter(declaration: TypeParameterDeclaration): TypeParameterDeclaration
+    fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>): TypeParameterDeclaration
     fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration
     fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration
     fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
