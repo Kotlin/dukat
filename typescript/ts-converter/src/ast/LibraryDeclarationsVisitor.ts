@@ -1,4 +1,5 @@
 import * as ts from "typescript-services-api";
+import {tsInternals} from "../TsInternals";
 
 export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
@@ -9,6 +10,13 @@ export class LibraryDeclarationsVisitor {
   ) {
   }
 
+  private isLibraryReference(declaration: ts.Node): boolean {
+    //TODO: consider using ts.preProcessFile to acces PreProcessedFileInfo::isLibFile
+    let resourceName = declaration.getSourceFile().fileName;
+    let fileName = resourceName.replace(tsInternals.getDirectoryPath(resourceName), "");
+    return  /lib(.*)\.d\.ts$/i.test(fileName);
+  }
+
   private registerDeclaration(declaration) {
     let sourceName = declaration.getSourceFile().fileName;
 
@@ -16,8 +24,7 @@ export class LibraryDeclarationsVisitor {
       this.libDeclarations.set(sourceName, []);
     }
 
-    let declarations = this.libDeclarations.get(sourceName)!;
-    declarations.push(declaration);
+    this.libDeclarations.get(sourceName)!.push(declaration);
   }
 
   private checkLibReferences(entity: ts.Node) {
@@ -25,10 +32,12 @@ export class LibraryDeclarationsVisitor {
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (!this.visited.has(declaration)) {
-          this.visited.add(declaration);
-          if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
-            this.registerDeclaration(declaration);
-            this.visit(declaration);
+          if (this.isLibraryReference(declaration)) {
+            this.visited.add(declaration);
+            if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
+              this.registerDeclaration(declaration);
+              this.visit(declaration);
+            }
           }
         }
       }
