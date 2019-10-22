@@ -41,7 +41,6 @@ export class AstConverter {
     private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
     private libVisitor = new LibraryDeclarationsVisitor(
-      this.resources,
       this.typeChecker
     );
 
