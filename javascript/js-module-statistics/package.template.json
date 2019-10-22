@@ -1,6 +1,8 @@
 {
   "name": "test_modules",
   "version": "1.0.0",
+  "license": "https://github.com/Kotlin/dukat/blob/master/license/LICENSE.txt",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
