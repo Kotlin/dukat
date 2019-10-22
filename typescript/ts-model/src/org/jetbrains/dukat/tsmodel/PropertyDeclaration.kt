@@ -9,4 +9,4 @@ data class PropertyDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
         val modifiers: List<ModifierDeclaration>
-) : MemberEntity, Declaration
+) : MemberDeclaration

@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -11,7 +11,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
-private fun MemberEntity.makeOptional(): MemberEntity {
+private fun MemberDeclaration.makeOptional(): MemberDeclaration {
     return when (this) {
         is PropertyDeclaration -> copy(optional = true)
         else -> this
@@ -51,8 +51,8 @@ private class UtilityTypeLowering : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         val declarationLowered = when (declaration) {
             is TypeDeclaration -> declaration.resolvePartial()
-                                    ?: declaration.resolvePick()
-                                    ?: declaration
+                    ?: declaration.resolvePick()
+                    ?: declaration
             else -> declaration
         }
 

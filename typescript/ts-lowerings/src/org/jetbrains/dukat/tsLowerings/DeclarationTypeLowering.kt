@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -31,14 +32,14 @@ private val logger = Logging.logger("TypeLowering")
 
 interface DeclarationTypeLowering : DeclarationLowering {
 
-    fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberEntity>): PropertyDeclaration {
+    fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberDeclaration>): PropertyDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) }
         )
     }
 
-    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberEntity>): ConstructorDeclaration {
+    fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberDeclaration>): ConstructorDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
@@ -47,7 +48,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration, owner: NodeOwner<MemberEntity>): CallSignatureDeclaration {
+    fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): CallSignatureDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
@@ -57,7 +58,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         )
     }
 
-    override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberEntity>): IndexSignatureDeclaration {
+    override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): IndexSignatureDeclaration {
         return declaration.copy(
                 indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType) },
                 returnType = lowerParameterValue(declaration.returnType)
@@ -65,7 +66,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerMemberDeclaration(declaration: MemberEntity, owner: NodeOwner<ClassLikeDeclaration>): MemberEntity {
+    override fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<ClassLikeDeclaration>): MemberDeclaration {
         val newOwner = owner.wrap(declaration)
         return when (declaration) {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, newOwner as NodeOwner<FunctionOwnerDeclaration>)
@@ -81,7 +82,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         }
     }
 
-    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberEntity>): MethodSignatureDeclaration {
+    override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): MethodSignatureDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
