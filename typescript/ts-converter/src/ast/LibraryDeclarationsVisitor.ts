@@ -1,99 +1,64 @@
-import {AstConverter} from "../AstConverter";
-
 import * as ts from "typescript-services-api";
-import {createLogger} from "../Logger";
-import {Declaration} from "./ast";
-import {ResourceFetcher} from "./ResourceFetcher";
+import {tsInternals} from "../TsInternals";
 
 export class LibraryDeclarationsVisitor {
-
-  private log = createLogger("LibraryDeclarationsVisitor");
-  private libDeclarations = new Map<string, Array<Declaration>>();
   private visited = new Set<ts.Node>();
+  private libDeclarations = new Map<string, Array<ts.Node>>();
 
   constructor(
-    private resources: ResourceFetcher,
-    private typeChecker: ts.TypeChecker,
-    private astConverter: AstConverter
+    private typeChecker: ts.TypeChecker
   ) {
   }
 
-  public forEachLibDeclaration(callback: (value: Array<Declaration>, key: string) => void) {
-    this.libDeclarations.forEach(callback);
+  private isLibraryReference(declaration: ts.Node): boolean {
+    //TODO: consider using ts.preProcessFile to acces PreProcessedFileInfo::isLibFile
+    let resourceName = declaration.getSourceFile().fileName;
+    let fileName = resourceName.replace(tsInternals.getDirectoryPath(resourceName), "");
+    return  /lib(.*)\.d\.ts$/i.test(fileName);
+  }
+
+  private registerDeclaration(declaration) {
+    let sourceName = declaration.getSourceFile().fileName;
+
+    if (!Array.isArray(this.libDeclarations.get(sourceName))) {
+      this.libDeclarations.set(sourceName, []);
+    }
+
+    this.libDeclarations.get(sourceName)!.push(declaration);
   }
 
   private checkLibReferences(entity: ts.Node) {
     let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        let sourceFile = declaration.getSourceFile();
-
-        let sourceName = sourceFile.fileName;
-
-        if (sourceFile && !this.resources.has(sourceName)) {
-          if (ts.isClassDeclaration(declaration)) {
-            let classDeclaration = this.astConverter.convertClassDeclaration(declaration);
-            if (classDeclaration) {
-              if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-                this.libDeclarations.set(sourceName, []);
-              }
-              (this.libDeclarations.get(sourceName) as Array<Declaration>).push(classDeclaration);
-
-              if (declaration.name) {
-                if (declaration.heritageClauses) {
-                  declaration.heritageClauses.forEach(heritageClause => {
-                    this.visit(heritageClause, declaration);
-                  });
-                }
-              }
-            }
-          } else if (ts.isInterfaceDeclaration(declaration)) {
-            let interfaceDeclaration = this.astConverter.convertInterfaceDeclaration(declaration, false);
-            if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-              this.libDeclarations.set(sourceName, []);
-            }
-            (this.libDeclarations.get(sourceName) as Array<Declaration>).push(interfaceDeclaration);
-
-            if (declaration.heritageClauses) {
-              declaration.heritageClauses.forEach(heritageClause => {
-                this.visit(heritageClause, declaration);
-              });
+        if (!this.visited.has(declaration)) {
+          if (this.isLibraryReference(declaration)) {
+            this.visited.add(declaration);
+            if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
+              this.registerDeclaration(declaration);
+              this.visit(declaration);
             }
           }
         }
-
       }
     }
   }
 
-  visit(node: ts.Node, classLikeOwner: ts.Node | null = null) {
-    if (this.visited.has(node)) {
-      return;
-    }
-
-    this.visited.add(node);
-
+  visit(node: ts.Node) {
     node.forEachChild(declaration => {
       if (ts.isHeritageClause(declaration)) {
         for (let type of declaration.types) {
           this.checkLibReferences(type);
         }
       } else if (ts.isTypeNode(declaration)) {
-          if (classLikeOwner) {
-            this.checkLibReferences(declaration);
-          }
+        this.checkLibReferences(declaration);
       }
-      else {
-        if (ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) {
-          if (node.heritageClauses) {
-            this.visit(declaration, node);
-          }
-        } else {
-          this.visit(declaration, classLikeOwner);
-        }
-      }
+      this.visit(declaration);
     });
   }
 
+  public forEachLibDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
+    this.libDeclarations.forEach(callback);
+  }
 
 }

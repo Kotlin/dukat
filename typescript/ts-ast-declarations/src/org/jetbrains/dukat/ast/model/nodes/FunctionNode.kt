@@ -30,4 +30,4 @@ data class FunctionNode(
         val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
         override val uid: String
-) : MemberEntity, TopLevelEntity, MemberNode, UniqueNode
+) : MemberEntity, TopLevelEntity, UniqueNode

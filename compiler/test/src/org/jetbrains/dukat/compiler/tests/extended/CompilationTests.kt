@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
+import org.junit.jupiter.api.BeforeAll
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -44,6 +45,7 @@ abstract class CompilationTests {
     companion object {
         val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
         val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
+        val START_TIMESTAMP = System.currentTimeMillis()
     }
 
     protected fun assertContentCompiles(
@@ -51,11 +53,12 @@ abstract class CompilationTests {
             sourcePath: String
     ) {
 
-        val targetPath = "./build/tests/compiled/${descriptor}"
-        val targetDir = File("./build/tests/compiled/${descriptor}")
+        val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
+        val targetDir = File(targetPath)
 
+        targetDir.deleteRecursively()
         getTranslator().translate(sourcePath, targetPath)
-        val outSource = "${targetPath}/${descriptor}.js"
+        val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"
 
         val sources = targetDir.walk().map { it.absolutePath }.toList()
 

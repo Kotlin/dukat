@@ -23,7 +23,7 @@ configurations {
 }
 
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack"]
+    dependsOn = [":ts-converter:webpack", ":command-line:build"]
 
     doLast {
         copy {
@@ -75,7 +75,7 @@ task nodeEnv(type: NodeTask) {
 
 
 task npmPack(type: NpmTask) {
-    dependsOn = [":cli:build", buildDistrib, npmVersion]
+    dependsOn = [":command-line:build", buildDistrib, npmVersion]
     args = ["pack"]
 }
 
@@ -105,7 +105,7 @@ task npmPublish(type: NpmTask) {
 }
 
 dependencies {
-    cliBinary(project(":cli")) {
+    cliBinary(project(":command-line")) {
         transitive = false
     }
 }

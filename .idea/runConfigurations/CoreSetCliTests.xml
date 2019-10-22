@@ -11,7 +11,7 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.CoreSetCliTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.cli=true" />
+    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.cli=true -Ddukat.test.failure.always=true" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <envs>

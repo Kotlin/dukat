@@ -521,8 +521,10 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     private fun isExternal(definitionsInfo: List<DefinitionInfoDeclaration>): Boolean {
-        return definitionsInfo.any { definition ->
-            definition.fileName.replace("/", File.separator) != fileName
+        return if (definitionsInfo.isEmpty()) {
+            false
+        } else {
+            definitionsInfo[0].fileName.replace("/", File.separator) != fileName
         }
     }
 

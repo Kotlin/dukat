@@ -1,10 +1,10 @@
-interface Map<K, V> {
+interface MapLike<K, V> {
 }
 interface List<T> {
 }
 
 type Values<V> = List<V>;
-type ListOrMultiMap<K,V> = List<V> | Map<K,Values<V>>;
+type ListOrMultiMap<K,V> = List<V> | MapLike<K,Values<V>>;
 
 declare var aliasUnionVar: ListOrMultiMap<string,number>;
 

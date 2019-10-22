@@ -15,18 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface MapLike<K, V>
-
-external interface List<T>
-
-typealias Values<V> = List<V>
-
-external var aliasUnionVar: dynamic /* List<Number> | MapLike<String, Values<Number>> */
-
-external fun aliasUnionFunction(a: List<String>)
-
-external fun aliasUnionFunction(a: MapLike<Number, Values<String>>)
-
-external var listOfUnionVar: Values<dynamic /* String | Number */>
-
-external fun listOfUnionFunction(a: Values<dynamic /* Number | String */>)
+inline fun Event.chain(): Event /* this */ = this.asDynamic().chain()

@@ -8,7 +8,7 @@ data class ClassModel(
         override var members: List<MemberModel>,
         override val companionObject: ObjectModel?,
         val typeParameters: List<TypeParameterModel>,
-        val parentEntities: List<HeritageModel>,
+        override val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationModel>,
         val comment: CommentModel?,

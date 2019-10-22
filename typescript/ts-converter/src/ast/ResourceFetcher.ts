@@ -1,14 +1,5 @@
 import * as ts from "typescript-services-api";
-
-//Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
-interface TsInternals {
-  normalizePath(path: string): string;
-
-  getDirectoryPath(path: string): string;
-
-  libMap: { get(path: string): string };
-}
-
+import {TsInternals} from "../TsInternals";
 
 export class ResourceFetcher {
   private resourceSet = new Set<string>();
@@ -46,9 +37,5 @@ export class ResourceFetcher {
 
   forEachReference(handler: (resourceName: string) => void) {
     this.resourceSet.forEach(handler);
-  }
-
-  has(resourceName: string): boolean {
-    return this.resourceSet.has(resourceName);
   }
 }

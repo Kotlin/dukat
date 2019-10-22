@@ -26,6 +26,7 @@ compileTestKotlin {
 
 def DEF_TYPE_CHANGESET = '31929c09c7b4490f87766206b412da4a6a581dc3'
 def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/DefinitelyTyped-${DEF_TYPE_CHANGESET}/types"
+def DEFAULT_LIB_PATH = "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib/lib.es6.d.ts"
 
 
 node {
@@ -89,7 +90,7 @@ dependencies {
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 
-    testImplementation(project(":cli"))
+    testImplementation(project(":command-line"))
 
     kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 
@@ -149,11 +150,10 @@ task generateBinary(type: NodeTask) {
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/typescript"
-    def libPath = "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib/lib.d.ts"
 
     inputs.dir(declarationsDir)
     inputs.file(scriptName)
-    inputs.file(libPath)
+    inputs.file(DEFAULT_LIB_PATH)
 
     def outputFile = "${project.buildDir}/declarations.dukat"
     outputs.file(outputFile)
@@ -167,7 +167,7 @@ task generateBinary(type: NodeTask) {
             }
 
     args = [
-            libPath,
+            DEFAULT_LIB_PATH,
             outputFile
     ] + files
 }

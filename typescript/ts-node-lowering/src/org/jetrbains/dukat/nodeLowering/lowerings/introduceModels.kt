@@ -222,8 +222,6 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
 }
 
 
-//private fun TypeValueModel.tra
-
 private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
         is UnionTypeNode -> TypeValueModel(

@@ -7,6 +7,7 @@ import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
+import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -20,6 +21,8 @@ import kotlin.test.assertEquals
 private data class ReportJson(val outputs: List<String>)
 
 class CoreSetCliTests {
+
+    init { resolvePanicMode() }
 
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
@@ -51,7 +54,7 @@ class CoreSetCliTests {
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        val translationResult = getTranslator().translate(tsPath, dirName, reportPath,"<RESOLVED_MODULE_NAME>")
+        val translationResult = getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
 
         assertEquals(0, translationResult, "translation failed")
 

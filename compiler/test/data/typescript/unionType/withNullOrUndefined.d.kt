@@ -51,4 +51,8 @@ external interface IBar {
     var optionalFoo3: String?
         get() = definedExternally
         set(value) = definedExternally
+    fun ping(o: Any?)
+    fun pong(o: Any?)
+    fun bing(o: Any?)
+    fun bong(o: Any?)
 }
