@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -31,8 +30,8 @@ interface DeclarationWithOwnerLowering {
     fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>): FunctionTypeDeclaration
     fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>): ParameterDeclaration
     fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
-    fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
-    fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
+    fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
+    fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>): MemberDeclaration
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
@@ -44,8 +43,8 @@ interface DeclarationWithOwnerLowering {
         return when (val declaration = owner.node) {
             is TypeDeclaration -> lowerTypeDeclaration(owner as NodeOwner<TypeDeclaration>)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(owner as NodeOwner<FunctionTypeDeclaration>)
-            is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner as NodeOwner<UnionTypeDeclaration>)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(owner as NodeOwner<IntersectionTypeDeclaration>)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner as NodeOwner<UnionTypeDeclaration>)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner as NodeOwner<IntersectionTypeDeclaration>)
             is ObjectLiteralDeclaration -> lowerObjectDeclaration(owner as NodeOwner<ObjectLiteralDeclaration>)
             is TupleDeclaration -> lowerTupleDeclaration(owner as NodeOwner<TupleDeclaration>)
             else -> declaration

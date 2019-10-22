@@ -71,12 +71,12 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
         )
     }
 
-    override fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
+    override fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }
 
-    override fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
+    override fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }
