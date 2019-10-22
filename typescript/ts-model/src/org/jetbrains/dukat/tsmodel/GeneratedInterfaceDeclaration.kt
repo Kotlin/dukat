@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 
 data class GeneratedInterfaceDeclaration(
         override val name: NameEntity,
-        val members: List<MemberEntity>,
+        override val members: List<MemberEntity>,
         override val typeParameters: List<TypeParameterDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
         override val uid: String,
