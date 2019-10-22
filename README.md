@@ -47,6 +47,12 @@ where possible options include:
 
 # Recent Changes
 
+### [0.0.21] - 22'October, 2019
+ - [#133](https://github.com/Kotlin/dukat/issues/133) Lack of type params in generated interfaces
+ - [#136](https://github.com/Kotlin/dukat/issues/136) Convert nested nullable unions correctly
+ - [#141](https://github.com/Kotlin/dukat/issues/141) ThisTypeDeclaration leak in inline functions generated from merged interfaces
+ - Default ts library is switched to lib.es6.d.ts.
+
 ### [0.0.20] - 10'October, 2019
  With this release idl target is no longer experimental. It's main focus remains the same, however: 
  to generate stdlib for following releases of Kotlin/JS. 
@@ -56,13 +62,6 @@ where possible options include:
  - [idl] ([#124](https://github.com/Kotlin/dukat/issues/124)) always show public visibility modifier in accordance with [KEEP-45](https://github.com/Kotlin/KEEP/issues/45) 
  - Translate Pick<T, K> to Any (in case T is actually a type param)
  - [#129 - Failing to translate generic params with default values when such values are not type params](https://github.com/Kotlin/dukat/issues/129) 
-
-#### [0.0.19] - 30'September, 2019
- - [Namespaced aliases lost in translation](https://github.com/Kotlin/dukat/issues/119)
- - Correct escaping for entities in heritage clauses, constraint params
- - Any toString method with no parameters is override
- - [Generic params information is lost for lambdas in types](https://github.com/Kotlin/dukat/issues/118)
-   Support for generic params with default values pointing to some other generic params
 
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 

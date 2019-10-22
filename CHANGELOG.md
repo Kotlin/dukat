@@ -1,5 +1,11 @@
 # Changelog
 
+### [0.0.21] - 22'October, 2019
+ - [#133](https://github.com/Kotlin/dukat/issues/133) Lack of type params in generated interfaces
+ - [#136](https://github.com/Kotlin/dukat/issues/136) Convert nested nullable unions correctly
+ - [#141](https://github.com/Kotlin/dukat/issues/141) ThisTypeDeclaration leak in inline functions generated from merged interfaces
+ - Default ts library is switched to lib.es6.d.ts. 
+
 ### [0.0.20] - 10'October, 2019
  With this release idl target is no longer experimental. It's main focus remains the same, however: 
  to generate stdlib for following releases of Kotlin/JS. 
