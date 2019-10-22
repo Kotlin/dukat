@@ -7,4 +7,5 @@ interface ClassLikeDeclaration : TopLevelDeclaration, FunctionOwnerDeclaration {
     val name: NameEntity
     val typeParameters: List<TypeParameterDeclaration>
     val members: List<MemberEntity>
+    val parentEntities: List<HeritageClauseDeclaration>
 }
