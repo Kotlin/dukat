@@ -32,6 +32,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.process
@@ -212,8 +213,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     private fun InterfaceDeclaration.convert(): List<TopLevelEntity> {
-        if (isExternal(definitionsInfo)) {
-            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this) }
+        resolveExternalSource(definitionsInfo)?.let { originalSource ->
+            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this, originalSource) }
         }
 
         val declaration = InterfaceNode(
@@ -288,7 +289,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 false,
                 null,
                 FunctionNodeContextIrrelevant(),
-                uid
+                uid,
+                null
         )
     }
 
@@ -324,8 +326,9 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         }
     }
 
-    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration): List<TopLevelEntity> {
+    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration, originalSource: String): List<TopLevelEntity> {
         val name = interfaceDeclaration.name
+        val inlineSourceComment = SimpleCommentEntity("extending interface from $originalSource")
 
         return when (declaration) {
             is MethodSignatureDeclaration -> {
@@ -345,7 +348,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             typeParam.name
                         }),
                         FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
-                        ""
+                        "",
+                        inlineSourceComment
                 ))
             }
             is PropertyDeclaration -> listOf(VariableNode(
@@ -358,7 +362,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     ClassLikeReferenceNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
                         typeParam.name
                     }),
-                    ""
+                    "",
+                    inlineSourceComment
             ))
             is IndexSignatureDeclaration -> listOf(
 
@@ -376,7 +381,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             true,
                             null,
                             IndexSignatureGetter(declaration.indexTypes[0].name),
-                            ""
+                            "",
+                            null
                     ),
                     FunctionNode(
                             QualifierEntity(name, IdentifierEntity("set")),
@@ -392,7 +398,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             true,
                             null,
                             IndexSignatureSetter(declaration.indexTypes[0].name),
-                            ""
+                            "",
+                            null
                     )
             )
             is CallSignatureDeclaration -> listOf(
@@ -416,7 +423,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             true,
                             null,
                             FunctionFromCallSignature(declaration.parameters.map { IdentifierEntity(it.name) }),
-                            ""
+                            "",
+                            null
                     )
             )
             else -> emptyList()
@@ -458,7 +466,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         false,
                         emptyList(),
                         null,
-                        declaration.uid
+                        declaration.uid,
+                        null
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -485,7 +494,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     false,
                     emptyList(),
                     null,
-                    declaration.uid
+                    declaration.uid,
+                    null
             )
         }
     }
@@ -519,11 +529,14 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         }
     }
 
-    private fun isExternal(definitionsInfo: List<DefinitionInfoDeclaration>): Boolean {
+    private fun resolveExternalSource(definitionsInfo: List<DefinitionInfoDeclaration>): String? {
         return if (definitionsInfo.isEmpty()) {
-            false
+            null
         } else {
-            definitionsInfo[0].fileName.replace("/", File.separator) != fileName
+            val definitionInfo = definitionsInfo[0].fileName.replace("/", File.separator)
+            if (definitionInfo != fileName) {
+                definitionInfo.split(File.separator).last()
+            } else null
         }
     }
 

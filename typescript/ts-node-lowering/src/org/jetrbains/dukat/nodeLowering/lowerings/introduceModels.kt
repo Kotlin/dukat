@@ -485,7 +485,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 extend = extend.convert(),
                 body = resolveBody(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
+                comment = comment
         )
         is VariableNode -> VariableModel(
                 name = name,

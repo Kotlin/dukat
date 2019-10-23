@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlModels
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
@@ -19,7 +20,6 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SimpleCommentModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -424,7 +424,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            comment = SimpleCommentModel(
+            comment = SimpleCommentEntity(
                     "please, don't implement this interface!"
             ),
             annotations = mutableListOf(

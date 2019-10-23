@@ -3,7 +3,32 @@ package org.jetbrains.dukat.translatorString
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.DelegationModel
+import org.jetbrains.dukat.astModel.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.EnumModel
+import org.jetbrains.dukat.astModel.ExternalDelegationModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.Variance
+import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
@@ -25,15 +50,21 @@ private fun String?.translateMeta(): String {
     }
 }
 
-private fun CommentEntity.translate(output: (String) -> Unit) {
-    when (this) {
-        is SimpleCommentModel -> output(text.translateMeta().trim())
+
+private fun CommentEntity.translate(): String {
+    return when (this) {
+        is SimpleCommentEntity -> text.translateMeta().trim()
         is DocumentationCommentModel -> {
-            output("/**")
-            output(" * $text")
-            output(" */")
+"""/**
+ * $text
+ */"""
         }
+        else -> ""
     }
+}
+
+private fun CommentEntity.translate(output: (String) -> Unit) {
+    output(translate())
 }
 
 
@@ -414,7 +445,7 @@ private fun ClassModel.translate(depth: Int): String {
 }
 
 private fun VisibilityModifierModel.translate(): String? {
-    return when(this) {
+    return when (this) {
         VisibilityModifierModel.PUBLIC -> "public"
         VisibilityModifierModel.INTERNAL -> "internal"
         VisibilityModifierModel.PRIVATE -> "private"

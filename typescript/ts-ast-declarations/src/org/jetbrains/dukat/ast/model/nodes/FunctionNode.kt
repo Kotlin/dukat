@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -29,5 +30,6 @@ data class FunctionNode(
 
         val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
-        override val uid: String
+        override val uid: String,
+        val comment: CommentEntity?
 ) : MemberEntity, TopLevelEntity, UniqueNode
