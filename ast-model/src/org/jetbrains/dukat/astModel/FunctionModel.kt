@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -20,5 +21,5 @@ data class FunctionModel(
         val extend: ClassLikeReferenceModel?,
         val body: List<StatementModel>,
         override val visibilityModifier: VisibilityModifierModel,
-        override val comment: CommentModel?
+        override val comment: CommentEntity?
 ) : MemberEntity, MergeableModel, TopLevelModel

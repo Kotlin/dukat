@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.translatorString
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.*
@@ -24,7 +25,7 @@ private fun String?.translateMeta(): String {
     }
 }
 
-private fun CommentModel.translate(output: (String) -> Unit) {
+private fun CommentEntity.translate(output: (String) -> Unit) {
     when (this) {
         is SimpleCommentModel -> output(text.translateMeta().trim())
         is DocumentationCommentModel -> {

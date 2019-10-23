@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
@@ -10,7 +11,7 @@ data class ModuleModel(
         val annotations: MutableList<AnnotationModel>,
         val submodules: List<ModuleModel>,
         val imports: MutableList<NameEntity>,
-        override val comment: CommentModel?
+        override val comment: CommentEntity?
 ) : TopLevelModel {
     override val visibilityModifier: VisibilityModifierModel
         get() = VisibilityModifierModel.DEFAULT

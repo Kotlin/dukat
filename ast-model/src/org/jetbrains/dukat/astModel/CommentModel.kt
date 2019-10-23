@@ -1,15 +1,11 @@
 package org.jetbrains.dukat.astModel
 
-import org.jetbrains.dukat.astCommon.Entity
-
-interface CommentModel : Entity {
-    val text: String
-}
+import org.jetbrains.dukat.astCommon.CommentEntity
 
 data class SimpleCommentModel(
-        override val text: String
-): CommentModel
+    val text: String
+) : CommentEntity
 
 data class DocumentationCommentModel(
-        override val text: String
-): CommentModel
+    val text: String
+) : CommentEntity
