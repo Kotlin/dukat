@@ -8,6 +8,7 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -25,7 +26,6 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
                     acc[typeParam.name] = index
                     acc
                 }
-
 
                 val fromIndex = reference.typeParameters.size - parameters.size
 
@@ -57,8 +57,8 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)))
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)), owner)
     }
 }
 

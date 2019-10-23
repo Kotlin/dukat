@@ -17,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -34,34 +35,34 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
     fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberDeclaration>): PropertyDeclaration {
         return declaration.copy(
-                type = lowerParameterValue(declaration.type),
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) }
         )
     }
 
     fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberDeclaration>): ConstructorDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 }
         )
     }
 
     fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): CallSignatureDeclaration {
         return declaration.copy(
-                type = lowerParameterValue(declaration.type),
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 }
         )
     }
 
     override fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): IndexSignatureDeclaration {
         return declaration.copy(
-                indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType) },
-                returnType = lowerParameterValue(declaration.returnType)
+                indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType, owner.wrap(declaration)) },
+                returnType = lowerParameterValue(declaration.returnType, owner.wrap(declaration))
         );
     }
 
@@ -84,61 +85,61 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
     override fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): MethodSignatureDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 },
-                type = lowerParameterValue(declaration.type)
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration))
         )
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>): FunctionDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter) },
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint) })
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 },
-                type = lowerParameterValue(declaration.type)
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration))
         )
     }
 
     override fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>): TypeParameterDeclaration {
-        return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint) })
+        return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
     }
 
-    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): UnionTypeDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
     }
 
-    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    override fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): IntersectionTypeDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
     }
 
-    override fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    override fun lowerTupleDeclaration(declaration: TupleDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TupleDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
     }
 
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param) })
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
     }
 
-    override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration {
+    override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): FunctionTypeDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { param -> lowerParameterDeclaration(param) },
-                type = lowerParameterValue(declaration.type)
+                parameters = declaration.parameters.map { param -> lowerParameterDeclaration(param, owner.wrap(declaration)) },
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration))
         )
     }
 
-    override fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration {
-        return declaration.copy(type = lowerParameterValue(declaration.type))
+    override fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterDeclaration {
+        return declaration.copy(type = lowerParameterValue(declaration.type, owner))
     }
 
     override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>): VariableDeclaration {
-        return declaration.copy(type = lowerParameterValue(declaration.type))
+        return declaration.copy(type = lowerParameterValue(declaration.type, owner.wrap(declaration)))
     }
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
-        return heritageClause.copy(typeArguments = heritageClause.typeArguments.map { typeArgument -> lowerParameterValue(typeArgument) })
+        return heritageClause.copy(typeArguments = heritageClause.typeArguments.map { typeArgument -> lowerParameterValue(typeArgument, owner.wrap(heritageClause)) })
     }
 
 
@@ -168,7 +169,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     override fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration, owner: NodeOwner<ModuleDeclaration>): TypeAliasDeclaration {
-        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference))
+        return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference, owner.wrap(declaration)))
     }
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration {

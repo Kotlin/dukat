@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -30,29 +31,28 @@ interface DeclarationLowering {
     fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration
     fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration
-    fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration
-    fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration): FunctionTypeDeclaration
-    fun lowerParameterDeclaration(declaration: ParameterDeclaration): ParameterDeclaration
+    fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration
+    fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): FunctionTypeDeclaration
+    fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterDeclaration
     fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>): TypeParameterDeclaration
-    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration): UnionTypeDeclaration
-    fun lowerTupleDeclaration(declaration: TupleDeclaration): TupleDeclaration
-    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration): IntersectionTypeDeclaration
+    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): UnionTypeDeclaration
+    fun lowerTupleDeclaration(declaration: TupleDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TupleDeclaration
+    fun lowerIntersectionTypeDeclaration(declaration: IntersectionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): IntersectionTypeDeclaration
     fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<ClassLikeDeclaration>): MemberDeclaration
     fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(declaration: TypeAliasDeclaration, owner: NodeOwner<ModuleDeclaration>): TypeAliasDeclaration
     fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>): IndexSignatureDeclaration
 
-    fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeDeclaration -> lowerTypeDeclaration(declaration)
-            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration)
-            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration)
-            is TupleDeclaration -> lowerTupleDeclaration(declaration)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration)
+            is TypeDeclaration -> lowerTypeDeclaration(declaration, owner)
+            is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration, owner)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration, owner)
+            is TupleDeclaration -> lowerTupleDeclaration(declaration, owner)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration, owner)
             else -> declaration
         }
     }
-
 
     fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassLikeDeclaration {
         return when (declaration) {

@@ -1,7 +1,9 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -10,10 +12,10 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 private class EliminateStringType : DeclarationTypeLowering {
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterValueDeclaration {
         return if (declaration is StringLiteralDeclaration) {
             TypeDeclaration(IdentifierEntity("String"), emptyList(), meta = declaration)
-        } else super.lowerParameterValue(declaration)
+        } else super.lowerParameterValue(declaration, owner)
     }
 }
 

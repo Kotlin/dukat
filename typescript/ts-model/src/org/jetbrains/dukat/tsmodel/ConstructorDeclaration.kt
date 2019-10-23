@@ -4,4 +4,4 @@ data class ConstructorDeclaration(
         val parameters: List<ParameterDeclaration>,
         val typeParameters: List<TypeParameterDeclaration>,
         val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration
+) : MemberDeclaration, ParameterOwnerDeclaration

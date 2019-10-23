@@ -6,4 +6,4 @@ data class CallSignatureDeclaration(
         val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeParameterDeclaration>
-) : MemberDeclaration
+) : MemberDeclaration, ParameterOwnerDeclaration

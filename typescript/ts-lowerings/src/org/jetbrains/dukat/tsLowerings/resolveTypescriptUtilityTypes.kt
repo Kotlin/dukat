@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -48,7 +50,7 @@ private fun TypeDeclaration.resolvePick(): ParameterValueDeclaration? {
 }
 
 private class UtilityTypeLowering : DeclarationTypeLowering {
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterValueDeclaration {
         val declarationLowered = when (declaration) {
             is TypeDeclaration -> declaration.resolvePartial()
                     ?: declaration.resolvePick()
@@ -56,7 +58,7 @@ private class UtilityTypeLowering : DeclarationTypeLowering {
             else -> declaration
         }
 
-        return super.lowerParameterValue(declarationLowered)
+        return super.lowerParameterValue(declarationLowered, owner)
     }
 }
 

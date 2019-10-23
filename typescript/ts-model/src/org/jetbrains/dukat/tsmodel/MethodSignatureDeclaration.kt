@@ -10,4 +10,4 @@ data class MethodSignatureDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
         val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration
+) : MemberDeclaration, ParameterOwnerDeclaration

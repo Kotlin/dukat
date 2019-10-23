@@ -9,4 +9,4 @@ data class FunctionDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val modifiers: List<ModifierDeclaration>,
         override val uid: String
-) : MemberDeclaration, TopLevelDeclaration, WithUidDeclaration
+) : MemberDeclaration, TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration
