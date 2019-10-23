@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration

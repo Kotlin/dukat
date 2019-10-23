@@ -1,138 +1,131 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.*
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.*
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
+private fun NameEntity.partialName(): NameEntity {
+    val shortName = IdentifierEntity(rightMost().value + "Partial")
+    return if (this is QualifierEntity) {
+        QualifierEntity(left, shortName)
+    } else {
+        shortName
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun NodeOwner<*>.moduleOwner(): NodeOwner<ModuleDeclaration>? {
+    val topOwner = generateSequence(this) {
+        it.owner
+    }.lastOrNull { (it.node is ModuleDeclaration) }
+
+    return topOwner as? NodeOwner<ModuleDeclaration>
+}
 
 private class PartialOfTUseLowering(val references: Map<String, ClassLikeDeclaration>) : DeclarationTypeLowering {
 
-    var newInterfaces = mutableMapOf<Declaration, GeneratedInterfaceDeclaration>()
+    private var generatedInterfaces = mutableMapOf<ClassLikeDeclaration, GeneratedInterfaceDeclaration>()
 
-
-
-
-    fun generatePartial(declaration: Declaration, owner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration {
-        return newInterfaces.getOrPut(declaration) {
-
-            declaration as ClassLikeDeclaration
-            val members = when(declaration) {
-                is ClassDeclaration -> declaration.members
-                is InterfaceDeclaration -> declaration.members
-                is GeneratedInterfaceDeclaration -> declaration.members
-                else -> error("Unknown declaration type: $declaration")
+    private fun ClassLikeDeclaration.generatePartialInterface(owner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration {
+        val membersResolved = members.mapNotNull {
+            when (it) {
+                is PropertyDeclaration -> it.copy(optional = true)
+                else -> null
             }
+        }
 
-            val heritage = when(declaration) {
-                is ClassDeclaration -> declaration.parentEntities
-                is InterfaceDeclaration -> declaration.parentEntities
-                is GeneratedInterfaceDeclaration -> declaration.parentEntities
-                else -> error("Unknown declaration type: $declaration")
-            }
-
-
-
-            val newName = partialName(declaration.name)
-
-            val newMembers = members.mapNotNull {
-                when (it) {
-                    is PropertyDeclaration -> it.copy(type = it.type, optional = true)
-                    else -> null
-                }
-            }
-
-            val newHeritage = heritage.map {
-                lowerHeritageClause(HeritageClauseDeclaration(
+        val parentEntitiesResolved = parentEntities.map {
+            lowerHeritageClause(HeritageClauseDeclaration(
                     IdentifierEntity("Partial"),
                     @Suppress("UNCHECKED_CAST") listOf(TypeDeclaration(it.name, it.typeArguments, it.typeReference as ReferenceEntity<Declaration>?)),
                     it.extending,
                     typeReference = null
-                ))
-            }
+            ), owner.wrap(this))
+        }
 
-            lowerGeneratedInterfaceDeclaration(GeneratedInterfaceDeclaration(
-                newName, newMembers, declaration.typeParameters, newHeritage, declaration.getUID() + "_Partial", owner.node
-            ), owner)
+        return lowerGeneratedInterfaceDeclaration(GeneratedInterfaceDeclaration(
+                name.partialName(),
+                membersResolved,
+                typeParameters,
+                parentEntitiesResolved,
+                getUID() + "_Partial",
+                owner.node), owner)
+    }
 
-
+    fun generatePartial(declaration: ClassLikeDeclaration, classLikeOwner: NodeOwner<ModuleDeclaration>): GeneratedInterfaceDeclaration {
+        return generatedInterfaces.getOrPut(declaration) {
+            declaration.generatePartialInterface(classLikeOwner)
         }
     }
 
-    fun partialName(tName: NameEntity): NameEntity {
+    @Suppress("UNCHECKED_CAST")
+    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
+        return if (heritageClause.name == IdentifierEntity("Partial")) {
 
-        val shortName = tName.rightMost() as IdentifierEntity
-        val newShortName = IdentifierEntity(shortName.value + "Partial")
-        return if (tName is QualifierEntity) {
-            QualifierEntity(tName.left, newShortName)
+            val type = lowerTypeDeclaration(TypeDeclaration(
+                    heritageClause.name,
+                    heritageClause.typeArguments,
+                    heritageClause.typeReference as ReferenceEntity<Declaration>?
+            ), owner.wrap(heritageClause))
+
+            return HeritageClauseDeclaration(
+                    type.value,
+                    type.params,
+                    heritageClause.extending,
+                    type.typeReference as ReferenceEntity<ClassLikeDeclaration>?
+            )
         } else {
-            newShortName
+            heritageClause
         }
     }
 
-    lateinit var owner: NodeOwner<ModuleDeclaration>
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+        val singleTypeParam = declaration.params.singleOrNull()
+        return if (declaration.value == IdentifierEntity("Partial") && (singleTypeParam is TypeDeclaration)) {
+            val typeReference = singleTypeParam.typeReference
 
-    override fun lowerTopLevelDeclaration(
-        declaration: TopLevelEntity,
-        owner: NodeOwner<ModuleDeclaration>
-    ): TopLevelEntity {
-        this.owner = owner
-        return super.lowerTopLevelDeclaration(declaration, owner)
-    }
+            when {
+                typeReference == null -> declaration
+                references[typeReference.uid] == null -> declaration
+                else -> {
+                    val decl = generatePartial(references[typeReference.uid]!!, owner.moduleOwner()!!)
 
-
-
-    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
-        val prev = super.lowerHeritageClause(heritageClause)
-        if (prev.name != IdentifierEntity("Partial")) return prev
-        @Suppress("UNCHECKED_CAST")
-        val type = TypeDeclaration(
-            prev.name,
-            prev.typeArguments,
-            prev.typeReference as ReferenceEntity<Declaration>?
-        )
-
-        val lowerType = lowerTypeDeclaration(type)
-        if (lowerType === type) return prev
-        @Suppress("UNCHECKED_CAST")
-        return HeritageClauseDeclaration(
-            lowerType.value,
-            lowerType.params,
-            prev.extending,
-            lowerType.typeReference as ReferenceEntity<ClassLikeDeclaration>?
-        )
-    }
-
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        val prev = super.lowerTypeDeclaration(declaration)
-        val singleTypeParam = prev.params.singleOrNull() as? TypeDeclaration
-        if (prev.value == IdentifierEntity("Partial") && singleTypeParam != null) {
-
-            val ref = singleTypeParam.typeReference ?: return prev
-            val decl = generatePartial(references[ref.uid] ?: error("could not find by uid: ${ref.uid}, type = $prev"), owner)
-
-            return TypeDeclaration(
-                decl.name,
-                singleTypeParam.params,
-                ReferenceEntity(decl.uid),
-                singleTypeParam.nullable || prev.nullable)
+                    TypeDeclaration(
+                            decl.name,
+                            singleTypeParam.params,
+                            ReferenceEntity(decl.uid),
+                            singleTypeParam.nullable || declaration.nullable)
+                }
+            }
+        } else {
+            declaration
         }
-        return prev
     }
 
-}
-
-
-
-fun ModuleDeclaration.lowerPartialOfT(): ModuleDeclaration {
-    val refs = collectReferences(mutableMapOf())
-    val lowering = PartialOfTUseLowering(refs)
-    return lowering.lowerDocumentRoot(this, NodeOwner(this, null)).let {
-        it.copy(declarations = it.declarations + lowering.newInterfaces.values)
+    override fun lowerDocumentRoot(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): ModuleDeclaration {
+        val lowerDocumentRoot = super.lowerDocumentRoot(documentRoot, owner)
+        return lowerDocumentRoot.copy(declarations = lowerDocumentRoot.declarations + generatedInterfaces.values)
     }
 }
 
-fun SourceFileDeclaration.lowerPartialOfT(): SourceFileDeclaration = copy(root = root.lowerPartialOfT())
+private fun ModuleDeclaration.lowerPartialOfT(): ModuleDeclaration {
+    return PartialOfTUseLowering(collectReferences())
+            .lowerDocumentRoot(this, NodeOwner(this, null))
+}
+
+private fun SourceFileDeclaration.lowerPartialOfT(): SourceFileDeclaration = copy(root = root.lowerPartialOfT())
 
 fun SourceSetDeclaration.lowerPartialOfT(): SourceSetDeclaration = copy(sources = sources.map(SourceFileDeclaration::lowerPartialOfT))
