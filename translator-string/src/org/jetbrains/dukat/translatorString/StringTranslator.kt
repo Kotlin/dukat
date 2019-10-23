@@ -64,7 +64,7 @@ private fun CommentEntity.translate(): String {
 }
 
 private fun CommentEntity.translate(output: (String) -> Unit) {
-    output(translate())
+    translate().split("\n").forEach(output)
 }
 
 
