@@ -96,7 +96,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                 IdentifierEntity(""),
                                     staticProperties,
                                     listOf(),
-                                    VisibilityModifierModel.DEFAULT
+                                    VisibilityModifierModel.DEFAULT,
+                                    null
                             )
                 } else {
                     companionObject
@@ -112,7 +113,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                     IdentifierEntity(""),
                                         staticProperties,
                                         listOf(),
-                                        VisibilityModifierModel.DEFAULT
+                                        VisibilityModifierModel.DEFAULT,
+                                        null
                                 )
                     } else {
                         companionObject

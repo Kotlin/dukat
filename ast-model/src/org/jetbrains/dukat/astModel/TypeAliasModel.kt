@@ -7,5 +7,6 @@ data class TypeAliasModel(
         override val name: NameEntity,
         val typeReference: TypeModel,
         val typeParameters: List<TypeParameterModel>,
-        override val visibilityModifier: VisibilityModifierModel
+        override val visibilityModifier: VisibilityModifierModel,
+        override val comment: CommentModel?
 ) : TopLevelModel

@@ -48,10 +48,6 @@ private fun StatementModel.translateMeta(): String {
     return metaDescription.translateMeta()
 }
 
-private fun translateTypeParams(params: List<TypeModel>): String {
-    return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
-}
-
 fun TypeModel.translate(): String {
     return when (this) {
         is TypeValueModel -> {
@@ -184,6 +180,8 @@ private fun ClassLikeReferenceModel.translate(): String {
 }
 
 private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
+    comment?.translate(output)
+
     val returnsUnit = (type is TypeValueModel) &&
             (type as TypeValueModel).value == IdentifierEntity("Unit")
 

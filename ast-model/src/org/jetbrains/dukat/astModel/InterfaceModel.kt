@@ -10,7 +10,7 @@ data class InterfaceModel(
     val typeParameters: List<TypeParameterModel>,
     override val parentEntities: List<HeritageModel>,
     val annotations: MutableList<AnnotationModel>,
-    val comment: CommentModel?,
+    override val comment: CommentModel?,
     val external: Boolean,
     override val visibilityModifier: VisibilityModifierModel
 ) : ClassLikeModel

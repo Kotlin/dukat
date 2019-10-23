@@ -19,5 +19,6 @@ data class FunctionModel(
 
         val extend: ClassLikeReferenceModel?,
         val body: List<StatementModel>,
-        override val visibilityModifier: VisibilityModifierModel
+        override val visibilityModifier: VisibilityModifierModel,
+        override val comment: CommentModel?
 ) : MemberEntity, MergeableModel, TopLevelModel

@@ -212,9 +212,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     private fun InterfaceDeclaration.convert(): List<TopLevelEntity> {
-        val isExternalDefinition = isExternal(definitionsInfo)
-
-        if (isExternalDefinition) {
+        if (isExternal(definitionsInfo)) {
             return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this) }
         }
 

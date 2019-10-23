@@ -9,7 +9,8 @@ data class ModuleModel(
         val declarations: List<TopLevelModel> = emptyList(),
         val annotations: MutableList<AnnotationModel>,
         val submodules: List<ModuleModel>,
-        val imports: MutableList<NameEntity>
+        val imports: MutableList<NameEntity>,
+        override val comment: CommentModel?
 ) : TopLevelModel {
     override val visibilityModifier: VisibilityModifierModel
         get() = VisibilityModifierModel.DEFAULT

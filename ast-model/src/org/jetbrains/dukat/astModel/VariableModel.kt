@@ -17,5 +17,6 @@ data class VariableModel(
         val set: StatementModel?,
         val typeParameters: List<TypeParameterModel>,
         val extend: ClassLikeReferenceModel?,
-        override val visibilityModifier: VisibilityModifierModel
+        override val visibilityModifier: VisibilityModifierModel,
+        override val comment: CommentModel?
 ) : MergeableModel, TopLevelModel

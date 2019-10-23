@@ -10,7 +10,8 @@ data class ObjectModel(
         val members: List<MemberModel>,
 
         val parentEntities: List<HeritageModel>,
-        override val visibilityModifier: VisibilityModifierModel
+        override val visibilityModifier: VisibilityModifierModel,
+        override val comment: CommentModel?
 ) : MemberEntity, TopLevelModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
@@ -22,7 +23,8 @@ fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
                 IdentifierEntity(""),
                 otherModel.members,
                 listOf(),
-                VisibilityModifierModel.DEFAULT
+                VisibilityModifierModel.DEFAULT,
+                null
         )
     }
 

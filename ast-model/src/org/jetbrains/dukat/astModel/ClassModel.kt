@@ -11,7 +11,7 @@ data class ClassModel(
         override val parentEntities: List<HeritageModel>,
         val primaryConstructor: ConstructorModel?,
         val annotations: MutableList<AnnotationModel>,
-        val comment: CommentModel?,
+        override val comment: CommentModel?,
         val external: Boolean,
         val abstract: Boolean,
         override val visibilityModifier: VisibilityModifierModel

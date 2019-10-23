@@ -197,7 +197,8 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             null
                     )
             )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -230,7 +231,8 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             )
                     )
             )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -252,7 +254,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 name = IdentifierEntity(""),
                 members = staticMemberModels,
                 parentEntities = listOf(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
     } else {
         null
@@ -402,7 +405,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             operator = false,
             extend = null,
             body = generateFunctionBody(),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
     return listOf(declaration, generatedFunction)
 }
@@ -415,7 +419,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                     name = IdentifierEntity(""),
                     members = listOf(),
                     parentEntities = listOf(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
@@ -466,7 +471,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                         ),
                         typeParameters = listOf()
                 ),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
     }
     return listOf(declaration) + generatedVariables
@@ -478,7 +484,8 @@ fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
             members = attributes.mapNotNull { it.process() } +
                     operations.mapNotNull { it.process() },
             parentEntities = listOf(),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -580,7 +587,8 @@ fun IDLFileDeclaration.process(): SourceFileModel {
             declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
-            imports = mutableListOf("kotlin.js.*".toNameEntity())
+            imports = mutableListOf("kotlin.js.*".toNameEntity()),
+            comment = null
     )
 
     return SourceFileModel(

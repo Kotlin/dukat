@@ -73,7 +73,7 @@ private fun ObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<Nam
     return this?.copy(members = members) ?: if (members.isEmpty()) {
         null
     } else {
-        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT)
+        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT, null)
     }
 }
 

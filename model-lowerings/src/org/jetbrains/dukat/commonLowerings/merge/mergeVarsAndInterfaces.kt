@@ -59,7 +59,8 @@ fun ModuleModel.mergeVarsAndInterfaces(): ModuleModel {
                                                     ExternalDelegationModel()
                                             )
                                     ),
-                                    VisibilityModifierModel.DEFAULT
+                                    VisibilityModifierModel.DEFAULT,
+                                    null
                             )
                             ))
                 }
