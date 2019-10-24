@@ -26,12 +26,24 @@ export class ResourceFetcher {
       referencedFile => tsInternals.normalizePath(curDir + referencedFile.fileName)
     );
 
+    let referencedTypeFiles: Array<string> = [];
+
+    if (sourceFile.resolvedTypeReferenceDirectiveNames) {
+      sourceFile.resolvedTypeReferenceDirectiveNames.forEach(
+        referenceDirective => {
+          if (referenceDirective && (typeof referenceDirective.resolvedFileName == "string")) {
+            referencedTypeFiles.push(tsInternals.normalizePath(referenceDirective.resolvedFileName))
+          }
+        }
+      );
+    }
+
     let libReferences = sourceFile.libReferenceDirectives.map(libReference => {
       let libName = libReference.fileName.toLocaleLowerCase();
       return tsInternals.libMap.get(libName);
     });
 
-    referencedFiles.concat(libReferences).forEach(reference => this.build(reference));
+    referencedFiles.concat(referencedTypeFiles).concat(libReferences).forEach(reference => this.build(reference));
     return this.resourceSet;
   }
 

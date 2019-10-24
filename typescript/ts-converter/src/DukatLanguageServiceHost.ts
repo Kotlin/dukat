@@ -46,4 +46,8 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     register(knownFile: string) {
         this.knownFiles.add(knownFile);
     }
+
+    fileExists(filePath: string): boolean {
+        return this.fileResolver.exists(filePath);
+    }
 }
