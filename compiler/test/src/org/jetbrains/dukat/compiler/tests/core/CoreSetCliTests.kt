@@ -27,7 +27,6 @@ class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
-    @EnabledIfSystemProperty(named = "dukat.test.cli", matches = "true")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEqualsBinary(name, tsPath, ktPath)
     }
@@ -40,7 +39,7 @@ class CoreSetCliTests {
 
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/typescript/aaa")
+            return fileSetWithDescriptors("./test/data/typescript")
         }
     }
 

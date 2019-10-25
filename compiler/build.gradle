@@ -139,8 +139,6 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
-test.dependsOn(download)
-test.dependsOn(downloadDist)
 
 task generateBinary(type: NodeTask) {
     def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
@@ -181,7 +179,17 @@ task extractKoltinJsLibs(type: Copy) {
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
-test.dependsOn = [generateBinary, fetchDefinitelyTyped, extractKoltinJsLibs, ":node-package:nodeEnv", ":node-package:buildDistrib"]
+
+//TODO: having download and downloadDist is a shame
+test.dependsOn = [
+        download,
+        downloadDist,
+        generateBinary,
+        fetchDefinitelyTyped,
+        extractKoltinJsLibs,
+        ":node-package:nodeEnv",
+        ":node-package:buildDistrib"
+]
 
 test {
     [
@@ -207,5 +215,9 @@ test {
 
     testLogging {
         showStandardStreams = true
+    }
+
+    if (project.hasProperty('coreTests')) {
+        exclude "**/CoreSetCliTests*"
     }
 }
