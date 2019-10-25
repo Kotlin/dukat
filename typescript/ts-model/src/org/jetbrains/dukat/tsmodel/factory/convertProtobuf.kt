@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -33,6 +34,13 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -156,6 +164,10 @@ fun Declarations.ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration
     return ImportEqualsDeclaration(name, moduleReference.convert(), uid)
 }
 
+fun Declarations.ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaration {
+    return ExpressionStatementDeclaration(expression.convert())
+}
+
 fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
     return when {
         hasClassDeclaration() -> classDeclaration.convert()
@@ -167,6 +179,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
         hasModuleDeclaration() -> moduleDeclaration.convert()
         hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
+        hasExpressionStatement() -> expressionStatement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
 }
@@ -261,7 +274,7 @@ private fun Declarations.ParameterDeclarationProto.convert(): ParameterDeclarati
             name,
             type.convert(),
             if (hasInitializer()) {
-                ExpressionDeclaration(initializer.kind.convert(), initializer.meta)
+                initializer.convert()
             } else null,
             vararg,
             optional
@@ -296,6 +309,44 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
             )
         }
         else -> throw Exception("unknown ParameterValueDeclarationProto ${this}")
+    }
+}
+
+fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
+fun Declarations.BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
+fun Declarations.StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
+fun Declarations.RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
+
+fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
+    return when {
+        hasNumericLiteral() -> numericLiteral.convert()
+        hasBigIntLiteral() -> bigIntLiteral.convert()
+        hasStringLiteral() -> stringLiteral.convert()
+        hasRegExLiteral() -> regExLiteral.convert()
+        else -> throw Exception("unknown literalExpression: ${this}")
+    }
+}
+
+fun Declarations.BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
+    return BinaryExpressionDeclaration(
+            left = left.convert(),
+            operator = operator,
+            right = right.convert()
+    )
+}
+
+fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpressionDeclaration {
+    return IdentifierExpressionDeclaration(
+            identifier = identifier.convert()
+    )
+}
+
+fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
+    return when {
+        hasBinaryExpression() -> binaryExpression.convert()
+        hasIdentifierExpression() -> identifierExpression.convert()
+        hasLiteralExpression() -> literalExpression.convert()
+        else -> throw Exception("unknown expression: ${this}")
     }
 }
 

@@ -167,9 +167,51 @@ message ReferenceEntityProto {
     string uid = 1;
 }
 
+message StringLiteralExpressionDeclarationProto {
+    string value = 1;
+}
+
+message NumericLiteralExpressionDeclarationProto {
+    string value = 1;
+}
+
+message BigIntLiteralExpressionDeclarationProto {
+    string value = 1;
+}
+
+message RegExLiteralExpressionDeclarationProto {
+    string value = 1;
+}
+
+message LiteralExpressionDeclarationProto {
+    oneof type {
+        StringLiteralExpressionDeclarationProto stringLiteral = 1;
+        NumericLiteralExpressionDeclarationProto numericLiteral = 2;
+        BigIntLiteralExpressionDeclarationProto bigIntLiteral = 3;
+        RegExLiteralExpressionDeclarationProto regExLiteral = 4;
+    }
+}
+
+message IdentifierExpressionDeclarationProto {
+    IdentifierEntityProto identifier = 1;
+}
+
+message BinaryExpressionDeclarationProto {
+    ExpressionDeclarationProto left = 1;
+    string operator = 2;
+    ExpressionDeclarationProto right = 3;
+}
+
 message ExpressionDeclarationProto {
-    TypeDeclarationProto kind = 1;
-    string meta = 2;
+    oneof type {
+        IdentifierExpressionDeclarationProto identifierExpression = 1;
+        BinaryExpressionDeclarationProto binaryExpression = 2;
+        LiteralExpressionDeclarationProto literalExpression = 3;
+    }
+}
+
+message ExpressionStatementDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
 }
 
 message ParameterDeclarationProto {
@@ -237,6 +279,7 @@ message TopLevelEntityProto {
         ModuleDeclarationProto moduleDeclaration = 7;
         ExportAssignmentDeclarationProto exportAssignment = 8;
         ImportEqualsDeclarationProto importEquals = 9;
+        ExpressionStatementDeclarationProto expressionStatement = 10;
     }
 }
 

@@ -44,7 +44,6 @@ import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -60,11 +59,11 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-import org.jetbrains.dukat.tsmodel.types.isSimpleType
 import java.io.File
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
 
@@ -400,8 +399,11 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     FunctionNode(
                             QualifierEntity(name, IdentifierEntity("invoke")),
                             convertParameters(declaration.parameters.map { param ->
-                                val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
-                                    ExpressionDeclaration(TypeDeclaration(IdentifierEntity("null"), emptyList()), null)
+                                val initializer = if (
+                                        param.initializer is IdentifierExpressionDeclaration &&
+                                        (param.initializer as IdentifierExpressionDeclaration).identifier.value == "definedExternally"
+                                ) {
+                                    IdentifierExpressionDeclaration(IdentifierEntity("null"))
                                 } else {
                                     param.initializer
                                 }

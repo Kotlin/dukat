@@ -194,6 +194,8 @@ export class AstConverter {
 
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
+        functionDeclaration.body
+
         let parameterDeclarations = functionDeclaration.parameters
           .map(
             (param, count) => this.convertParameterDeclaration(param, count)
@@ -306,6 +308,92 @@ export class AstConverter {
 
     private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
         return this.astFactory.declareProperty(value, type, typeParams, optional, []);
+    }
+
+
+    createIdentifierExpression(name: string): Expression {
+        return this.astFactory.createIdentifierExpressionDeclarationAsExpression(
+            this.astFactory.createIdentifierDeclaration(name)
+        );
+    }
+
+    createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
+        return this.astFactory.createBinaryExpressionDeclarationAsExpression(left, operator, right);
+    }
+
+    createNumericLiteralExpression(value: string): Expression {
+        return this.astFactory.createNumericLiteralDeclarationAsExpression(value);
+    }
+
+    createBigIntLiteralExpression(value: string): Expression {
+        return this.astFactory.createBigIntLiteralDeclarationAsExpression(value);
+    }
+
+    createStringLiteralExpression(value: string): Expression {
+        return this.astFactory.createStringLiteralDeclarationAsExpression(value);
+    }
+
+    createRegExLiteralExpression(value: string): Expression {
+        return this.astFactory.createRegExLiteralDeclarationAsExpression(value);
+    }
+
+    convertIdentifierExpression(expression: ts.Expression): Expression {
+        /*console.log('Identifier:');
+        console.log('\tEscaped text: ' + expression.escapedText);
+        console.log('\tUnescaped text: ' + expression.getText());
+        console.log('\tOriginal keyword kind: ' + expression.originalKeywordKind);
+        console.log('\tIs in JSDoc namespace: ' + expression.isInJSDocNamespace);*/
+
+        return this.createIdentifierExpression(
+            expression.getText()
+        )
+    }
+
+    convertBinaryExpression(expression: ts.Expression): Expression {
+        /*console.log('Binary expression:');
+        console.log('\tLeft:\n' + this.convertExpression(expression.left));
+        console.log('\tOperator:\n' + ts.tokenToString(expression.operatorToken));
+        console.log('\tRight:\n' + this.convertExpression(expression.right));*/
+
+        return this.createBinaryExpression(
+            this.convertExpression(expression.left),
+            ts.tokenToString(expression.operatorToken),
+            this.convertExpression(expression.right)
+        )
+    }
+
+    convertNumericLiteralExpression(expression: ts.Expression): Expression {
+        return this.createNumericLiteralExpression(expression.getText())
+    }
+
+    convertBigIntLiteralExpression(expression: ts.Expression): Expression {
+        return this.createBigIntLiteralExpression(expression.getText())
+    }
+
+    convertStringLiteralExpression(expression: ts.Expression): Expression {
+        return this.createStringLiteralExpression(expression.getText())
+    }
+
+    convertRegExLiteralExpression(expression: ts.Expression): Expression {
+        return this.createRegExLiteralExpression(expression.getText())
+    }
+
+    convertExpression(expression: ts.Expression): Expression {
+        if(ts.isBinaryExpression(expression)) {
+            return this.convertBinaryExpression(expression);
+        } else if(ts.isIdentifier(expression)) {
+            return this.convertIdentifierExpression(expression);
+        } else if(ts.isNumericLiteral(expression)) {
+            return this.convertNumericLiteralExpression(expression);
+        } else if(ts.isBigIntLiteral(expression)) {
+            return this.convertBigIntLiteralExpression(expression);
+        } else if(ts.isStringLiteral(expression)) {
+            return this.convertStringLiteralExpression(expression);
+        } else if(ts.isRegularExpressionLiteral(expression)) {
+            return this.convertRegExLiteralExpression(expression);
+        } else {
+            return this.createIdentifierExpression('/* ' + expression.getText()  + ' */')
+        }
     }
 
 
@@ -437,14 +525,12 @@ export class AstConverter {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
-            initializer = this.astFactory.createExpression(
-              this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
-              param.initializer.getText()
+            initializer = this.createIdentifierExpression(
+              "definedExternally",
             )
         } else if (param.questionToken != null) {
-            initializer = this.astFactory.createExpression(
-              this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
-              "null"
+            initializer = this.createIdentifierExpression(
+              "definedExternally",
             )
         }
 
@@ -790,6 +876,10 @@ export class AstConverter {
                   this.exportContext.getUID(declaration)
                 ));
             }
+        } else if (ts.isExpressionStatement(statement)) {
+            res.push(this.astFactory.createExpressionStatement(
+                this.convertExpression(statement.expression)
+            ));
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
                 res.push(this.convertTypeLiteralToInterfaceDeclaration(

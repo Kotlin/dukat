@@ -1,5 +1,6 @@
 import * as declarations from "declarations";
 import {
+  BinaryExpression,
   CallSignatureDeclaration,
   ClassDeclaration,
   ClassLikeDeclaration,
@@ -10,20 +11,21 @@ import {
   EnumTokenDeclaration,
   ExportAssignmentDeclaration,
   Expression,
+  ExpressionStatement,
   FunctionDeclaration,
   FunctionTypeDeclaration,
   HeritageClauseDeclaration,
-  IdentifierEntity,
+  IdentifierEntity, IdentifierExpression,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
   InterfaceDeclaration,
-  IntersectionTypeDeclaration,
+  IntersectionTypeDeclaration, LiteralExpression,
   MemberDeclaration,
   MethodSignatureDeclaration,
   ModifierDeclaration,
   ModuleDeclaration,
   ModuleReferenceDeclaration,
-  NameEntity,
+  NameEntity, NumericLiteralExpression,
   ObjectLiteral,
   ParameterDeclaration,
   ParameterValue,
@@ -117,12 +119,75 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
-  createExpression(kind: TypeDeclaration, meta: string): Expression {
-    let expression = new declarations.ExpressionDeclarationProto();
-    expression.setKind(kind);
-    expression.setMeta(meta);
+  createExpressionStatement(expression: Expression): ExpressionStatement {
+    let expressionStatement = new declarations.ExpressionStatementDeclarationProto();
+    expressionStatement.setExpression(expression);
 
+    let topLevelEntity = new declarations.TopLevelEntityProto();
+    topLevelEntity.setExpressionstatement(expressionStatement);
+    return topLevelEntity;
+  }
+
+  createIdentifierExpressionDeclarationAsExpression(identifier: IdentifierEntity): IdentifierExpression {
+    let identifierExpressionProto = new declarations.IdentifierExpressionDeclarationProto();
+    identifierExpressionProto.setIdentifier(identifier);
+
+    let expression = new declarations.ExpressionDeclarationProto();
+    expression.setIdentifierexpression(identifierExpressionProto);
     return expression;
+  }
+
+  createBinaryExpressionDeclarationAsExpression(left: Expression, operator: string, right: Expression): BinaryExpression {
+    let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
+    binaryExpression.setLeft(left);
+    binaryExpression.setOperator(operator);
+    binaryExpression.setRight(right);
+
+    let expression = new declarations.ExpressionDeclarationProto();
+    expression.setBinaryexpression(binaryExpression);
+    return expression;
+  }
+
+  private asExpression(literalExpression: LiteralExpression): Expression {
+    let expression = new declarations.ExpressionDeclarationProto();
+    expression.setLiteralexpression(literalExpression);
+    return expression;
+  }
+
+  createNumericLiteralDeclarationAsExpression(value: string): Expression {
+    let numericLiteralExpression = new declarations.NumericLiteralExpressionDeclarationProto();
+    numericLiteralExpression.setValue(value);
+
+    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+    literalExpression.setNumericliteral(numericLiteralExpression);
+    return this.asExpression(literalExpression);
+  }
+
+  createBigIntLiteralDeclarationAsExpression(value: string): Expression {
+    let bigIntLiteralExpression = new declarations.BigIntLiteralExpressionDeclarationProto();
+    bigIntLiteralExpression.setValue(value);
+
+    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+    literalExpression.setBigintliteral(bigIntLiteralExpression);
+    return this.asExpression(literalExpression);
+  }
+
+  createStringLiteralDeclarationAsExpression(value: string): Expression {
+    let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
+    stringLiteralExpression.setValue(value);
+
+    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+    literalExpression.setStringliteral(stringLiteralExpression);
+    return this.asExpression(literalExpression);
+  }
+
+  createRegExLiteralDeclarationAsExpression(value: string): Expression {
+    let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
+    regExLiteralExpression.setValue(value);
+
+    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+    literalExpression.setRegExliteral(regExLiteralExpression);
+    return this.asExpression(literalExpression);
   }
 
 
