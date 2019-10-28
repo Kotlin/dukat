@@ -374,7 +374,7 @@ export class AstConverter {
 
         return this.createBinaryExpression(
             this.convertExpression(expression.left),
-            ts.tokenToString(expression.operatorToken),
+            ts.tokenToString(expression.operatorToken.kind),
             this.convertExpression(expression.right)
         )
     }
