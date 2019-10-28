@@ -2,6 +2,8 @@ package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.shiftRight
+import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -25,6 +27,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -41,6 +44,7 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
@@ -52,26 +56,66 @@ import org.jetbrains.kotlin.descriptors.impl.PropertySetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices.builtIns
 import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
+import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.LazyWrappedType
+import org.jetbrains.kotlin.types.StarProjectionImpl
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
-import org.jetbrains.kotlin.types.isDynamic
+import org.jetbrains.kotlin.types.isError
 
 internal fun translateName(name: NameEntity): String {
     return name.translate().trim('`')
 }
 
 private class DescriptorTranslator(val context: DescriptorContext) {
+
+    private fun findClassInStdlib(typeModel: TypeValueModel): ClassDescriptor? {
+        val packageNames = context.registeredImports.map { FqName(it) }
+        val stdlibModule = context.config.moduleDescriptors.first { it.name == Name.special("<kotlin>") }
+        return packageNames.map { packageName ->
+            val packageDescriptor = stdlibModule.getPackage(packageName)
+            packageDescriptor.fragments.mapNotNull { fragment ->
+                fragment.getMemberScope().getContributedClassifier(
+                    Name.identifier(translateName(typeModel.value)),
+                    NoLookupLocation.FROM_TEST
+                )
+            }
+        }.flatten().filterIsInstance<ClassDescriptor>().firstOrNull()
+    }
+
+    private fun findClass(typeModel: TypeValueModel): ClassDescriptor? {
+        return when (translateName(typeModel.value)) {
+            "Any" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.any.toSafe())
+            "Array" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.array.toSafe())
+            "Boolean" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._boolean.toSafe())
+            "Byte" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._byte.toSafe())
+            "Char" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._char.toSafe())
+            "Double" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._double.toSafe())
+            "Float" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._float.toSafe())
+            "Function" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.functionSupertype.toSafe())
+            "Int" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._int.toSafe())
+            "Long" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._long.toSafe())
+            "List" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.list)
+            "Nothing" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.nothing.toSafe())
+            "Number" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.number.toSafe())
+            "Short" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._short.toSafe())
+            "String" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.string.toSafe())
+            "Suppress" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.suppress)
+            "Unit" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
+            else -> context.getDescriptor(typeModel.value) ?: findClassInStdlib(typeModel)
+        }
+    }
 
     private fun translateVariance(variance: org.jetbrains.dukat.astModel.Variance): Variance {
         return when (variance) {
@@ -84,46 +128,38 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun translateType(typeModel: TypeModel): KotlinType {
         if (typeModel is TypeValueModel) {
             val typeProjectionTypes = typeModel.params.map {
-                translateType(it.type)
+                if (it.type is TypeValueModel && (it.type as TypeValueModel).value == IdentifierEntity("*")) {
+                    null
+                } else {
+                    translateType(it.type)
+                }
             }
             return context.getTypeParameter(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
                 ?: LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
-                    val type = when (translateName(typeModel.value)) {
-                        "Any" -> builtIns.anyType
-                        "Array" -> builtIns.getArrayType(
-                            translateVariance(typeModel.params.first().variance), translateType(
-                                typeModel.params.first().type
-                            )
-                        )
-                        "Boolean" -> builtIns.booleanType
-                        "Byte" -> builtIns.byteType
-                        "Char" -> builtIns.charType
-                        "Double" -> builtIns.doubleType
-                        "dynamic" -> createDynamicType(builtIns)
-                        "Float" -> builtIns.floatType
-                        "Int" -> builtIns.intType
-                        "Long" -> builtIns.longType
-                        "Nothing" -> builtIns.nothingType
-                        "Number" -> builtIns.numberType
-                        "Short" -> builtIns.shortType
-                        "String" -> builtIns.stringType
-                        "Unit" -> builtIns.unitType
-                        else -> context.getDescriptor(typeModel.value)?.defaultType
-                    }
-                    if (type == null) {
-                        ErrorUtils.createErrorType(translateName(typeModel.value))
-                            .makeNullableAsSpecified(typeModel.nullable)
-                    } else if (type.isDynamic()) {
-                        type
+                    val classDescriptor = findClass(typeModel)
+                    if (classDescriptor == null) {
+                        if (typeModel.value == IdentifierEntity("dynamic")) {
+                            createDynamicType(builtIns)
+                        } else {
+                            ErrorUtils.createErrorType(translateName(typeModel.value))
+                                .makeNullableAsSpecified(typeModel.nullable)
+                        }
                     } else {
                         KotlinTypeFactory.simpleType(
                             annotations = Annotations.EMPTY,
-                            constructor = type.constructor,
-                            arguments = typeModel.params.zip(typeProjectionTypes).map { (model, projectionType) ->
-                                TypeProjectionImpl(
-                                    translateVariance(model.variance),
-                                    projectionType
-                                )
+                            constructor = classDescriptor.defaultType.constructor,
+                            arguments = typeModel.params.zip(typeProjectionTypes).mapIndexed { index, (model, projectionType) ->
+                                if (model.type is TypeValueModel && (model.type as TypeValueModel).value == IdentifierEntity(
+                                        "*"
+                                    )
+                                ) {
+                                    StarProjectionImpl(classDescriptor.declaredTypeParameters[index])
+                                } else {
+                                    TypeProjectionImpl(
+                                        translateVariance(model.variance),
+                                        projectionType!!
+                                    )
+                                }
                             },
                             nullable = typeModel.nullable
                         )
@@ -172,7 +208,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 annotations = Annotations.EMPTY,
                 name = Name.identifier(translateName(IdentifierEntity(parameter.name))),
                 outType = outType,
-                declaresDefaultValue = parameter.optional || parameter.initializer != null,
+                declaresDefaultValue = parameter.initializer != null,
                 isCrossinline = false,
                 isNoinline = false,
                 varargElementType = varargElementType,
@@ -209,8 +245,25 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return parametersDescriptors
     }
 
-    private fun translateHeritage(heritageModel: HeritageModel): KotlinType {
-        return translateType(
+    private fun translateAnnotations(annotationModels: List<AnnotationModel>): Annotations {
+        return Annotations.create(annotationModels.map { annotationModel ->
+            val typeModel = TypeValueModel(
+                value = IdentifierEntity(annotationModel.name),
+                params = listOf(),
+                metaDescription = null
+            )
+            val annotationClassDescriptor = findClass(typeModel)
+            AnnotationDescriptorImpl(
+                translateType(typeModel),
+                annotationClassDescriptor?.constructors?.first()?.valueParameters?.map { it.name }?.zip(
+                    annotationModel.params.map { StringValue(it.translate()) })?.toMap().orEmpty(),
+                SourceElement.NO_SOURCE
+            )
+        })
+    }
+
+    private fun translateHeritage(heritageModel: HeritageModel): KotlinType? {
+        val type = translateType(
             TypeValueModel(
                 value = heritageModel.value.value,
                 params = heritageModel.typeParams.map {
@@ -222,12 +275,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 metaDescription = null
             )
         )
+        return if (type.isError) null else type
     }
 
     private fun translateMethod(methodModel: MethodModel, parent: ClassDescriptor): FunctionDescriptor {
         val functionDescriptor = SimpleFunctionDescriptorImpl.create(
             parent,
-            Annotations.EMPTY,
+            translateAnnotations(methodModel.annotations),
             Name.identifier(translateName(methodModel.name)),
             CallableMemberDescriptor.Kind.DECLARATION,
             SourceElement.NO_SOURCE
@@ -242,6 +296,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             translateType(methodModel.type),
             when (parent.kind) {
                 ClassKind.INTERFACE -> Modality.ABSTRACT
+                ClassKind.OBJECT -> Modality.FINAL
                 else -> Modality.OPEN
             },
             Visibilities.PUBLIC
@@ -258,7 +313,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun translateFunction(functionModel: FunctionModel, parent: PackageFragmentDescriptor): FunctionDescriptor {
         val functionDescriptor = SimpleFunctionDescriptorImpl.create(
             parent,
-            Annotations.EMPTY,
+            translateAnnotations(functionModel.annotations),
             Name.identifier(translateName(functionModel.name)),
             CallableMemberDescriptor.Kind.DECLARATION,
             SourceElement.NO_SOURCE
@@ -309,6 +364,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             when {
                 propertyModel.getter || propertyModel.setter -> Modality.OPEN
                 parent.kind == ClassKind.INTERFACE -> Modality.ABSTRACT
+                parent.kind == ClassKind.OBJECT -> Modality.FINAL
                 propertyModel.open -> Modality.OPEN
                 else -> Modality.FINAL
             },
@@ -382,12 +438,14 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 )
             }
 
-        } else {
+        } else if (!propertyModel.immutable) {
             DescriptorFactory.createDefaultSetter(
                 propertyDescriptor,
                 Annotations.EMPTY,
                 Annotations.EMPTY
             )
+        } else {
+            null
         }
         propertyDescriptor.initialize(
             getter,
@@ -399,10 +457,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun translateVariable(variableModel: VariableModel, parent: PackageFragmentDescriptor): PropertyDescriptor {
         val variableDescriptor = PropertyDescriptorImpl.create(
             parent,
-            Annotations.EMPTY,
+            translateAnnotations(variableModel.annotations),
             Modality.FINAL,
             Visibilities.PUBLIC,
-            true,
+            !variableModel.immutable,
             Name.identifier(translateName(variableModel.name)),
             CallableMemberDescriptor.Kind.DECLARATION,
             SourceElement.NO_SOURCE,
@@ -425,11 +483,15 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             Annotations.EMPTY
         )
         getter.initialize(variableDescriptor.type)
-        val setter = DescriptorFactory.createDefaultSetter(
-            variableDescriptor,
-            Annotations.EMPTY,
-            Annotations.EMPTY
-        )
+        val setter = if (!variableModel.immutable) {
+            DescriptorFactory.createDefaultSetter(
+                variableDescriptor,
+                Annotations.EMPTY,
+                Annotations.EMPTY
+            )
+        } else {
+            null
+        }
         variableDescriptor.initialize(
             getter,
             setter
@@ -469,12 +531,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 is InterfaceModel -> ClassKind.INTERFACE
                 else -> ClassKind.CLASS
             },
-            parentTypes = classLikeModel.parentEntities.map {
+            parentTypes = classLikeModel.parentEntities.mapNotNull {
                 translateHeritage(it)
             },
             isCompanion = isCompanion,
             companionObject = companionDescriptor,
-            typeParameters = typeParameters
+            typeParameters = typeParameters,
+            annotations = translateAnnotations(classLikeModel.annotations)
         )
         context.registerDescriptor(classLikeModel.name, classDescriptor)
 
@@ -546,12 +609,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             name = objectModel.name,
             modality = Modality.FINAL,
             classKind = ClassKind.OBJECT,
-            parentTypes = objectModel.parentEntities.map {
+            parentTypes = objectModel.parentEntities.mapNotNull {
                 translateHeritage(it)
             },
             isCompanion = isCompanion,
             companionObject = null,
-            typeParameters = listOf()
+            typeParameters = listOf(),
+            annotations = Annotations.EMPTY
         )
         context.registerDescriptor(objectModel.name, objectDescriptor)
         val privatePrimaryConstructor = translateConstructor(
@@ -605,6 +669,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     fun translateModule(moduleModel: ModuleModel): ModuleDescriptor {
+        context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
+
         val moduleDescriptor = ModuleDescriptorImpl(
             Name.special("<main>"),
             LockBasedStorageManager.NO_LOCKS,
@@ -633,5 +699,5 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 }
 
 fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
-    return DescriptorTranslator(DescriptorContext()).translateModule(sources.first().root)
+    return DescriptorTranslator(DescriptorContext(generateJSConfig())).translateModule(sources.first().root)
 }

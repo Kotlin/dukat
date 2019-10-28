@@ -1,14 +1,13 @@
 package org.jetbrains.dukat.descriptors
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -22,7 +21,8 @@ class CustomClassDescriptor(
     parentTypes: List<KotlinType>,
     private val isCompanion: Boolean,
     private val companionObject: ClassDescriptor?,
-    private val typeParameters: List<TypeParameterDescriptor>
+    private val typeParameters: List<TypeParameterDescriptor>,
+    override val annotations: Annotations
 ) :
     ClassDescriptorImpl(
         parent,
