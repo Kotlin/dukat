@@ -69,9 +69,6 @@ task npmVersion(type: NpmTask) {
 }
 
 task nodeEnv(type: NodeTask) {
-    doFirst {
-        mkdir project.buildDir
-    }
     script = file("env.js")
     args = ["${project.buildDir}/env.json"]
 }
