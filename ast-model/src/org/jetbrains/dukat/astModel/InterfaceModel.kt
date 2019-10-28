@@ -10,7 +10,7 @@ data class InterfaceModel(
         override val companionObject: ObjectModel?,
         val typeParameters: List<TypeParameterModel>,
         override val parentEntities: List<HeritageModel>,
-        overrideval annotations: MutableList<AnnotationModel>,
+        override val annotations: MutableList<AnnotationModel>,
         override val comment: CommentEntity?,
         val external: Boolean,
         override val visibilityModifier: VisibilityModifierModel
