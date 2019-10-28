@@ -10,11 +10,13 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private fun NameEntity.partialName(): NameEntity {
@@ -35,6 +37,21 @@ private fun NodeOwner<*>.moduleOwner(): NodeOwner<ModuleDeclaration>? {
     return topOwner as? NodeOwner<ModuleDeclaration>
 }
 
+private fun MethodSignatureDeclaration.convertToLambdaProperty(): PropertyDeclaration {
+    return PropertyDeclaration(
+        name = name,
+        type = FunctionTypeDeclaration(
+            parameters = parameters,
+            type = type,
+            nullable = false, //TODO: I'm not sure what's nullable stands for in FunctionTypeDeclaration
+            meta = null
+        ),
+        optional = true,
+        modifiers = modifiers,
+        typeParameters = typeParameters
+    )
+}
+
 private class PartialOfTUseLowering(val references: Map<String, ClassLikeDeclaration>) : DeclarationTypeLowering {
 
     private var generatedInterfaces = mutableMapOf<ClassLikeDeclaration, GeneratedInterfaceDeclaration>()
@@ -43,6 +60,7 @@ private class PartialOfTUseLowering(val references: Map<String, ClassLikeDeclara
         val membersResolved = members.mapNotNull {
             when (it) {
                 is PropertyDeclaration -> it.copy(optional = true)
+                is MethodSignatureDeclaration -> it.convertToLambdaProperty()
                 else -> null
             }
         }

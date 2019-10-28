@@ -16,21 +16,29 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Low {
-    var p: String
+    var propInLow: String
+    fun methodInLow(): Boolean
+    fun lambdaInLow(): Boolean
 }
 
 external interface Some : Low {
-    var prop: String
+    var propInSome: String
 }
 
 external interface LowPartial {
-    var p: String?
+    var propInLow: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var methodInLow: (() -> Boolean)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var lambdaInLow: (() -> Boolean)?
         get() = definedExternally
         set(value) = definedExternally
 }
 
 external interface SomePartial : LowPartial {
-    var prop: String?
+    var propInSome: String?
         get() = definedExternally
         set(value) = definedExternally
 }

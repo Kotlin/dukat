@@ -1,9 +1,11 @@
 export interface Low {
-    p: String
+    propInLow: String;
+    methodInLow(): boolean;
+    lambdaInLow(): boolean;
 }
 
 export interface Some extends Low {
-    prop: string
+    propInSome: string;
 }
 
 export function usePartial(some: Some, partial_some: Partial<Some>);
