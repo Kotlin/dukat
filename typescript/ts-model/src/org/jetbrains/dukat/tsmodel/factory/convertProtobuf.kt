@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -114,6 +115,12 @@ fun Declarations.InterfaceDeclarationProto.convert(): InterfaceDeclaration {
     )
 }
 
+fun Declarations.BlockDeclarationProto.convert() : BlockDeclaration {
+    return BlockDeclaration(
+            statements = statementsList.map { it.convert() }
+    )
+}
+
 fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
     return FunctionDeclaration(
             name,
@@ -121,6 +128,9 @@ fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
             type.convert(),
             typeParametersList.map { it.convert() },
             modifiersList.map { it.convert() },
+            if(hasBody()) {
+                body.convert()
+            } else null,
             uid
     )
 }
