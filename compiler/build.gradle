@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":idl-parser"))
     implementation(project(":idl-reference-resolver"))
     implementation(project(":itertools"))
+    implementation(project(":js-type-analysis"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":model-lowerings-common"))
