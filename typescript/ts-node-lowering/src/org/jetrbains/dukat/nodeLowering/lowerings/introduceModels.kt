@@ -170,8 +170,9 @@ private fun MemberNode.process(): MemberModel? {
                 },
                 static = static,
                 override = override,
-                getter = getter,
-                setter = setter,
+                immutable = getter && !setter,
+                getter = false,
+                setter = false,
                 open = open
         )
         else -> raiseConcern("unprocessed MemberNode: ${this}") { null }

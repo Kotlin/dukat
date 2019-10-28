@@ -32,6 +32,7 @@ private fun VariableModel.convert(): MemberModel {
             typeParameters = emptyList(),
             static = false,
             override = false,
+            immutable = immutable,
             getter = false,
             setter = false,
             open = false

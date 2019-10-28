@@ -47,6 +47,8 @@ import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.PropertyGetterDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.PropertySetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
@@ -240,7 +242,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             translateType(methodModel.type),
             when (parent.kind) {
                 ClassKind.INTERFACE -> Modality.ABSTRACT
-                else -> Modality.FINAL
+                else -> Modality.OPEN
             },
             Visibilities.PUBLIC
         )
@@ -305,12 +307,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             parent,
             Annotations.EMPTY,
             when {
-                parent.kind == ClassKind.INTERFACE -> Modality.OPEN
+                propertyModel.getter || propertyModel.setter -> Modality.OPEN
+                parent.kind == ClassKind.INTERFACE -> Modality.ABSTRACT
                 propertyModel.open -> Modality.OPEN
                 else -> Modality.FINAL
             },
             Visibilities.PUBLIC,
-            true,
+            !propertyModel.immutable,
             Name.identifier(translateName(propertyModel.name)),
             CallableMemberDescriptor.Kind.DECLARATION,
             SourceElement.NO_SOURCE,
@@ -331,16 +334,61 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         typeParameters.forEach {
             context.removeTypeParameter(IdentifierEntity(it.name.identifier))
         }
-        val getter = DescriptorFactory.createDefaultGetter(
-            propertyDescriptor,
-            Annotations.EMPTY
-        )
+        val getter = if (parent.kind == ClassKind.INTERFACE && propertyModel.getter) {
+            PropertyGetterDescriptorImpl(
+                propertyDescriptor,
+                Annotations.EMPTY,
+                propertyDescriptor.modality,
+                propertyDescriptor.visibility,
+                false,
+                false,
+                false,
+                CallableMemberDescriptor.Kind.DECLARATION,
+                null,
+                propertyDescriptor.source
+            )
+        } else {
+            DescriptorFactory.createDefaultGetter(
+                propertyDescriptor,
+                Annotations.EMPTY
+            )
+        }
         getter.initialize(propertyDescriptor.type)
-        val setter = DescriptorFactory.createDefaultSetter(
-            propertyDescriptor,
-            Annotations.EMPTY,
-            Annotations.EMPTY
-        )
+        val setter = if (parent.kind == ClassKind.INTERFACE && propertyModel.setter) {
+            PropertySetterDescriptorImpl(
+                propertyDescriptor,
+                Annotations.EMPTY,
+                propertyDescriptor.modality,
+                propertyDescriptor.visibility,
+                false,
+                false,
+                false,
+                CallableMemberDescriptor.Kind.DECLARATION,
+                null,
+                propertyDescriptor.source
+            ).also {
+                it.initialize(
+                    translateParameters(
+                        listOf(
+                            ParameterModel(
+                                name = "value",
+                                type = propertyModel.type,
+                                initializer = null,
+                                vararg = false,
+                                optional = false
+                            )
+                        ), parent = it
+                    ).first()
+                )
+            }
+
+        } else {
+            DescriptorFactory.createDefaultSetter(
+                propertyDescriptor,
+                Annotations.EMPTY,
+                Annotations.EMPTY
+            )
+        }
         propertyDescriptor.initialize(
             getter,
             setter

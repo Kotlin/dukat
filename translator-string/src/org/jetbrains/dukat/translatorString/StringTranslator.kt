@@ -328,7 +328,7 @@ private fun EnumModel.translate(): String {
 private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
-    val varModifier = if (getter && !setter) "val" else "var"
+    val varModifier = if (immutable) "val" else "var"
 
     return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
 }
@@ -345,7 +345,7 @@ private fun MemberModel.translate(): List<String> {
 }
 
 private fun PropertyModel.translateSignature(): List<String> {
-    val varModifier = if (getter && !setter) "val" else "var"
+    val varModifier = if (immutable) "val" else "var"
     val overrideClause = if (override) "override " else ""
 
 
@@ -357,13 +357,11 @@ private fun PropertyModel.translateSignature(): List<String> {
     val res = mutableListOf(
             "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
     )
-    if (type.nullable || (type is TypeValueModel && (type as TypeValueModel).value == IdentifierEntity("dynamic"))) {
-        if (getter) {
-            res.add(FORMAT_TAB + "get() = definedExternally")
-        }
-        if (setter) {
-            res.add(FORMAT_TAB + "set(value) = definedExternally")
-        }
+    if (getter) {
+        res.add(FORMAT_TAB + "get() = definedExternally")
+    }
+    if (setter) {
+        res.add(FORMAT_TAB + "set(value) = definedExternally")
     }
     return res
 }

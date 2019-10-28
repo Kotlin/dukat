@@ -510,8 +510,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = !readOnly,
+                immutable = readOnly,
+                getter = false,
+                setter = false,
                 open = open
         )
         is IDLOperationDeclaration -> MethodModel(
@@ -536,8 +537,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = true,
+                immutable = false,
+                getter = false,
+                setter = false,
                 open = false
         )
         is IDLGetterDeclaration -> MethodModel(
