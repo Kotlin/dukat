@@ -213,6 +213,17 @@ test {
 
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
 
+
+    /*
+        execute top-level classes in sequentially but their methods in parallel
+        see https://junit.org/junit5/docs/5.5.1/user-guide/index.html#writing-tests-parallel-execution
+    */
+    systemProperties = [
+            "junit.jupiter.execution.parallel.enabled": "true",
+            "junit.jupiter.execution.parallel.mode.default": "concurrent",
+            "junit.jupiter.execution.parallel.mode.classes.default": "same_thread"
+    ]
+
     testLogging {
         showStandardStreams = true
     }
