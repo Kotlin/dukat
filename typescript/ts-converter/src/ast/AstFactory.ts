@@ -128,14 +128,14 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
-  createReturnStatement(expression: Expression): ExpressionStatement {
+  createReturnStatement(expression: Expression | null): ExpressionStatement {
     let returnStatement = new declarations.ReturnStatementDeclarationProto();
-    if(expression != null) {
+    if(expression) {
       returnStatement.setExpression(expression);
     }
 
     let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setExpressionstatement(returnStatement);
+    topLevelEntity.setReturnstatement(returnStatement);
     return topLevelEntity;
   }
 

@@ -9,3 +9,7 @@ export function foo(a, b) {
 function nonExport() {
     return "not gonna get exported!!!"
 }
+
+function undefined() {
+    return;
+}

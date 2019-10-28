@@ -27,6 +27,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -178,6 +179,14 @@ fun Declarations.ExpressionStatementDeclarationProto.convert(): ExpressionStatem
     return ExpressionStatementDeclaration(expression.convert())
 }
 
+fun Declarations.ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
+    return ReturnStatementDeclaration(
+            if(hasExpression()) {
+                expression.convert()
+            } else null
+    )
+}
+
 fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
     return when {
         hasClassDeclaration() -> classDeclaration.convert()
@@ -190,6 +199,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
         hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
         hasExpressionStatement() -> expressionStatement.convert()
+        hasReturnStatement() -> returnStatement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
 }

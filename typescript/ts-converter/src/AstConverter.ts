@@ -898,8 +898,13 @@ export class AstConverter {
                 this.convertExpression(statement.expression)
             ));
         } else if (ts.isReturnStatement(statement)) {
+            let expression : Expression | null = null;
+            if(statement.expression) {
+                expression = this.convertExpression(statement.expression)
+            }
+
             res.push(this.astFactory.createReturnStatement(
-                this.convertExpression(statement.expression)
+                expression
             ));
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
