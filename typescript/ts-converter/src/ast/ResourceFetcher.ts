@@ -12,6 +12,9 @@ export class ResourceFetcher {
   }
 
   private build(fileName: string): Set<string> {
+    if (this.resourceSet.has(fileName)) {
+      return this.resourceSet;
+    }
     this.resourceSet.add(fileName);
     const sourceFile = this.sourceFileFetcher(fileName);
 
@@ -43,7 +46,20 @@ export class ResourceFetcher {
       return tsInternals.libMap.get(libName);
     });
 
-    referencedFiles.concat(referencedTypeFiles).concat(libReferences).forEach(reference => this.build(reference));
+    let importFiles: Array<string> = [];
+    sourceFile.imports.forEach(importDeclaration => {
+      var module = ts.getResolvedModule(sourceFile, importDeclaration.text);
+      if (module && (typeof module.resolvedFileName == "string")) {
+        importFiles.push(tsInternals.normalizePath(module.resolvedFileName))
+      }
+    });
+
+    let references = referencedFiles
+      .concat(referencedTypeFiles)
+      .concat(libReferences)
+      .concat(importFiles);
+
+    references.forEach(reference => this.build(reference));
     return this.resourceSet;
   }
 
