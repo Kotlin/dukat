@@ -189,6 +189,11 @@ export declare class TypeDeclaration implements ParameterValue {
     serializeBinary(): Int8Array;
 }
 
+export declare class Block implements Declaration {
+    statements: Array<Declaration>
+    serializeBinary(): Int8Array;
+}
+
 export declare class FunctionDeclaration implements MemberDeclaration {
     serializeBinary(): Int8Array;
 }

@@ -5,6 +5,7 @@ import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {createExportContent} from "./ExportContent";
 import {
+    Block,
     ClassDeclaration,
     Declaration,
     DefinitionInfoDeclaration,
@@ -190,11 +191,25 @@ export class AstConverter {
         return typeParameterDeclarations;
     }
 
+    convertBlock(block: ts.Block): Block | null {
+        if(block) {
+            const statements: Declaration[] = [];
+
+            for (let statement of block.statements) {
+                for (let decl of this.convertTopLevelStatement(statement)) {
+                    this.registerDeclaration(decl, statements)
+                }
+            }
+
+            return this.astFactory.createBlockDeclaration(statements);
+        } else {
+            return null;
+        }
+    }
+
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration): FunctionDeclaration | null {
 
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
-
-        functionDeclaration.body
 
         let parameterDeclarations = functionDeclaration.parameters
           .map(
@@ -217,6 +232,7 @@ export class AstConverter {
               returnType,
               typeParameterDeclarations,
               this.convertModifiers(functionDeclaration.modifiers),
+              this.convertBlock(functionDeclaration.body),
               uid
             );
         }
@@ -285,7 +301,8 @@ export class AstConverter {
               declaration.type ?
                 this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
               typeParameterDeclarations,
-              this.convertModifiers(declaration.modifiers)
+              this.convertModifiers(declaration.modifiers),
+              this.convertBlock(declaration.body),
             );
         }
 
@@ -293,9 +310,9 @@ export class AstConverter {
     }
 
 
-    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): FunctionDeclaration {
+    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): FunctionDeclaration {
         // TODO: reintroduce method declaration
-        return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, "__NO_UID__");
+        return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__");
     }
 
     private createTypeDeclaration(value: string, params: Array<ParameterValue> = [], typeReference: string | null = null): TypeDeclaration {
@@ -524,13 +541,13 @@ export class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
-            // TODO: this never happens in tests and I should add one
+            // TODO: move this logic to kotlin
             initializer = this.createIdentifierExpression(
-              "definedExternally",
+              "definedExternally /* " + param.initializer.getText() + " */",
             )
         } else if (param.questionToken != null) {
             initializer = this.createIdentifierExpression(
-              "definedExternally",
+              "definedExternally /* null */",
             )
         }
 
@@ -878,6 +895,10 @@ export class AstConverter {
             }
         } else if (ts.isExpressionStatement(statement)) {
             res.push(this.astFactory.createExpressionStatement(
+                this.convertExpression(statement.expression)
+            ));
+        } else if (ts.isReturnStatement(statement)) {
+            res.push(this.astFactory.createReturnStatement(
                 this.convertExpression(statement.expression)
             ));
         } else if (ts.isTypeAliasDeclaration(statement)) {

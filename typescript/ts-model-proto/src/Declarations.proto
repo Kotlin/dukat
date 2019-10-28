@@ -112,13 +112,18 @@ message ConstructorDeclarationProto {
     repeated ModifierDeclarationProto modifiers = 3;
 }
 
+message BlockDeclarationProto {
+    repeated TopLevelEntityProto statements = 1;
+}
+
 message FunctionDeclarationProto {
     string name = 1;
     repeated ParameterDeclarationProto parameters = 2;
     ParameterValueDeclarationProto type = 3;
     repeated TypeParameterDeclarationProto typeParameters = 4;
     repeated ModifierDeclarationProto modifiers = 5;
-    string uid = 6;
+    BlockDeclarationProto body = 6;
+    string uid = 7;
 }
 
 message IndexSignatureDeclarationProto {
@@ -214,6 +219,10 @@ message ExpressionStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message ReturnStatementDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message ParameterDeclarationProto {
     string name = 1;
     ParameterValueDeclarationProto type = 2;
@@ -280,6 +289,7 @@ message TopLevelEntityProto {
         ExportAssignmentDeclarationProto exportAssignment = 8;
         ImportEqualsDeclarationProto importEquals = 9;
         ExpressionStatementDeclarationProto expressionStatement = 10;
+        ReturnStatementDeclarationProto returnStatement = 11;
     }
 }
 

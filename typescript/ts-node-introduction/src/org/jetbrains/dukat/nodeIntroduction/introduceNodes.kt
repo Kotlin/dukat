@@ -401,7 +401,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             convertParameters(declaration.parameters.map { param ->
                                 val initializer = if (
                                         param.initializer is IdentifierExpressionDeclaration &&
-                                        (param.initializer as IdentifierExpressionDeclaration).identifier.value == "definedExternally"
+                                        (param.initializer as IdentifierExpressionDeclaration).identifier.value == "definedExternally /* null */"
                                 ) {
                                     IdentifierExpressionDeclaration(IdentifierEntity("null"))
                                 } else {

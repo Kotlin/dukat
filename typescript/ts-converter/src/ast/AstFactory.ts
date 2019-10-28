@@ -1,6 +1,6 @@
 import * as declarations from "declarations";
 import {
-  BinaryExpression,
+  BinaryExpression, Block,
   CallSignatureDeclaration,
   ClassDeclaration,
   ClassLikeDeclaration,
@@ -128,6 +128,17 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
+  createReturnStatement(expression: Expression): ExpressionStatement {
+    let returnStatement = new declarations.ReturnStatementDeclarationProto();
+    if(expression != null) {
+      returnStatement.setExpression(expression);
+    }
+
+    let topLevelEntity = new declarations.TopLevelEntityProto();
+    topLevelEntity.setExpressionstatement(returnStatement);
+    return topLevelEntity;
+  }
+
   createIdentifierExpressionDeclarationAsExpression(identifier: IdentifierEntity): IdentifierExpression {
     let identifierExpressionProto = new declarations.IdentifierExpressionDeclarationProto();
     identifierExpressionProto.setIdentifier(identifier);
@@ -191,27 +202,36 @@ export class AstFactory implements AstFactory {
   }
 
 
-  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): ProtoMessage {
+  createBlockDeclaration(statements: Array<Declaration>): Block {
+    let block = new declarations.BlockDeclarationProto();
+    block.setStatementsList(statements);
+    return block
+  }
+
+  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): ProtoMessage {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
     functionDeclaration.setName(name);
     functionDeclaration.setParametersList(parameters);
     functionDeclaration.setType(type);
     functionDeclaration.setTypeparametersList(typeParams);
     functionDeclaration.setModifiersList(modifiers);
+    if(body) {
+      functionDeclaration.setBody(body);
+    }
     functionDeclaration.setUid(uid);
     return functionDeclaration
   }
 
-  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, uid);
+  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let memberProto = new declarations.MemberEntityProto();
     memberProto.setFunctiondeclaration(functionDeclaration);
     return memberProto;
   }
 
-  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: String): FunctionDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, uid);
+  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let topLevelEntity = new declarations.TopLevelEntityProto();
     topLevelEntity.setFunctiondeclaration(functionDeclaration);
