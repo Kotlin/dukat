@@ -12,6 +12,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
@@ -27,6 +28,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -62,6 +64,8 @@ import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
+import org.jetbrains.kotlin.resolve.calls.components.isVararg
+import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.ErrorUtils
@@ -73,6 +77,7 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
 import org.jetbrains.kotlin.types.isError
+import org.jetbrains.kotlin.types.typeUtil.isArrayOfNothing
 
 internal fun translateName(name: NameEntity): String {
     return name.translate().trim('`')
@@ -253,10 +258,22 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 metaDescription = null
             )
             val annotationClassDescriptor = findClass(typeModel)
+            val primaryConstructor = annotationClassDescriptor?.constructors?.first()
+            // for now we will assume that all parameters are String
+            val parameterValues = annotationModel.params.map { StringValue(it.translate()) }
             AnnotationDescriptorImpl(
                 translateType(typeModel),
-                annotationClassDescriptor?.constructors?.first()?.valueParameters?.map { it.name }?.zip(
-                    annotationModel.params.map { StringValue(it.translate()) })?.toMap().orEmpty(),
+                primaryConstructor?.valueParameters?.map { it.name }?.zip(
+                    if (parameterValues.isNotEmpty() && primaryConstructor.valueParameters[0].isVararg) {
+                        listOf(ArrayValue(parameterValues) { module ->
+                            module.builtIns.getPrimitiveArrayKotlinTypeByPrimitiveKotlinType(
+                                module.builtIns.stringType
+                            )!!
+                        })
+                    } else {
+                        parameterValues
+                    }
+                )?.toMap().orEmpty(),
                 SourceElement.NO_SOURCE
             )
         })
@@ -502,13 +519,32 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return variableDescriptor
     }
 
+    private fun translateMember(memberModel: MemberModel, parent: ClassDescriptor): DeclarationDescriptor? {
+        return when (memberModel) {
+            is MethodModel -> translateMethod(
+                memberModel,
+                parent
+            )
+            is PropertyModel -> translateProperty(
+                memberModel,
+                parent
+            )
+            is ClassLikeModel -> translateClassLike(
+                memberModel,
+                parent,
+                isTopLevel = false
+            )
+            else -> null
+        }
+    }
+
     private fun translateClassLike(
         classLikeModel: ClassLikeModel,
-        parent: PackageFragmentDescriptor,
-        isCompanion: Boolean = false
+        parent: DeclarationDescriptor,
+        isTopLevel: Boolean
     ): ClassDescriptor {
         val companionDescriptor = classLikeModel.companionObject?.let {
-            translateObject(it, parent, isCompanion = true)
+            translateObject(it, parent, isCompanion = true, isTopLevel = false)
         }
 
         var typeParameters: List<TypeParameterDescriptor> = listOf()
@@ -534,7 +570,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             parentTypes = classLikeModel.parentEntities.mapNotNull {
                 translateHeritage(it)
             },
-            isCompanion = isCompanion,
+            isCompanion = false,
+            isTopLevel = isTopLevel,
             companionObject = companionDescriptor,
             typeParameters = typeParameters,
             annotations = translateAnnotations(classLikeModel.annotations)
@@ -576,17 +613,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         classDescriptor.initialize(
             SimpleMemberScope((classLikeModel.members.mapNotNull
             {
-                when (it) {
-                    is MethodModel -> translateMethod(
-                        it,
-                        classDescriptor
-                    )
-                    is PropertyModel -> translateProperty(
-                        it,
-                        classDescriptor
-                    )
-                    else -> null
-                }
+                translateMember(it, classDescriptor)
             } + companionDescriptor as DeclarationDescriptor?).filterNotNull()),
             constructorDescriptors,
             primaryConstructorDescriptor
@@ -601,8 +628,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 
     private fun translateObject(
         objectModel: ObjectModel,
-        parent: PackageFragmentDescriptor,
-        isCompanion: Boolean
+        parent: DeclarationDescriptor,
+        isCompanion: Boolean,
+        isTopLevel: Boolean
     ): ClassDescriptor {
         val objectDescriptor = CustomClassDescriptor(
             parent = parent,
@@ -613,6 +641,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 translateHeritage(it)
             },
             isCompanion = isCompanion,
+            isTopLevel = isTopLevel,
             companionObject = null,
             typeParameters = listOf(),
             annotations = Annotations.EMPTY
@@ -627,17 +656,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 
         objectDescriptor.initialize(
             SimpleMemberScope(objectModel.members.mapNotNull {
-                when (it) {
-                    is MethodModel -> translateMethod(
-                        it,
-                        objectDescriptor
-                    )
-                    is PropertyModel -> translateProperty(
-                        it,
-                        objectDescriptor
-                    )
-                    else -> null
-                }
+                translateMember(it, objectDescriptor)
             }),
             setOf(privatePrimaryConstructor),
             privatePrimaryConstructor
@@ -656,9 +675,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         parent: PackageFragmentDescriptorImpl
     ): DeclarationDescriptor? {
         return when (topLevelModel) {
-            is InterfaceModel -> translateClassLike(topLevelModel, parent)
-            is ClassModel -> translateClassLike(topLevelModel, parent)
-            is ObjectModel -> translateObject(topLevelModel, parent, isCompanion = false)
+            is InterfaceModel -> translateClassLike(topLevelModel, parent, isTopLevel = true)
+            is ClassModel -> translateClassLike(topLevelModel, parent, isTopLevel = true)
+            is ObjectModel -> translateObject(topLevelModel, parent, isCompanion = false, isTopLevel = true)
             is FunctionModel -> translateFunction(topLevelModel, parent)
             is VariableModel -> translateVariable(topLevelModel, parent)
             is EnumModel -> null
