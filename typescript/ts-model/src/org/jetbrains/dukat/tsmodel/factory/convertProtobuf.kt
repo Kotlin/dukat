@@ -129,7 +129,7 @@ fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
             type.convert(),
             typeParametersList.map { it.convert() },
             modifiersList.map { it.convert() },
-            if(hasBody()) {
+            if (hasBody()) {
                 body.convert()
             } else null,
             uid
