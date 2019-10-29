@@ -355,23 +355,12 @@ export class AstConverter {
     }
 
     convertIdentifierExpression(expression: ts.Expression): Expression {
-        /*console.log('Identifier:');
-        console.log('\tEscaped text: ' + expression.escapedText);
-        console.log('\tUnescaped text: ' + expression.getText());
-        console.log('\tOriginal keyword kind: ' + expression.originalKeywordKind);
-        console.log('\tIs in JSDoc namespace: ' + expression.isInJSDocNamespace);*/
-
         return this.createIdentifierExpression(
             expression.getText()
         )
     }
 
     convertBinaryExpression(expression: ts.Expression): Expression {
-        /*console.log('Binary expression:');
-        console.log('\tLeft:\n' + this.convertExpression(expression.left));
-        console.log('\tOperator:\n' + ts.tokenToString(expression.operatorToken));
-        console.log('\tRight:\n' + this.convertExpression(expression.right));*/
-
         return this.createBinaryExpression(
             this.convertExpression(expression.left),
             ts.tokenToString(expression.operatorToken.kind),
