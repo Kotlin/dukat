@@ -192,7 +192,7 @@ export class AstConverter {
     }
 
     convertBlock(block: ts.Block): Block | null {
-        if(block) {
+        if (block) {
             const statements: Declaration[] = [];
 
             for (let statement of block.statements) {
@@ -396,17 +396,17 @@ export class AstConverter {
     }
 
     convertExpression(expression: ts.Expression): Expression {
-        if(ts.isBinaryExpression(expression)) {
+        if (ts.isBinaryExpression(expression)) {
             return this.convertBinaryExpression(expression);
-        } else if(ts.isIdentifier(expression)) {
+        } else if (ts.isIdentifier(expression)) {
             return this.convertIdentifierExpression(expression);
-        } else if(ts.isNumericLiteral(expression)) {
+        } else if (ts.isNumericLiteral(expression)) {
             return this.convertNumericLiteralExpression(expression);
-        } else if(ts.isBigIntLiteral(expression)) {
+        } else if (ts.isBigIntLiteral(expression)) {
             return this.convertBigIntLiteralExpression(expression);
-        } else if(ts.isStringLiteral(expression)) {
+        } else if (ts.isStringLiteral(expression)) {
             return this.convertStringLiteralExpression(expression);
-        } else if(ts.isRegularExpressionLiteral(expression)) {
+        } else if (ts.isRegularExpressionLiteral(expression)) {
             return this.convertRegExLiteralExpression(expression);
         } else {
             return this.createIdentifierExpression('/* ' + expression.getText()  + ' */')
@@ -899,7 +899,7 @@ export class AstConverter {
             ));
         } else if (ts.isReturnStatement(statement)) {
             let expression : Expression | null = null;
-            if(statement.expression) {
+            if (statement.expression) {
                 expression = this.convertExpression(statement.expression)
             }
 

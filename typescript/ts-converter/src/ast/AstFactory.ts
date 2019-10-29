@@ -130,7 +130,7 @@ export class AstFactory implements AstFactory {
 
   createReturnStatement(expression: Expression | null): ExpressionStatement {
     let returnStatement = new declarations.ReturnStatementDeclarationProto();
-    if(expression) {
+    if (expression) {
       returnStatement.setExpression(expression);
     }
 
@@ -215,7 +215,7 @@ export class AstFactory implements AstFactory {
     functionDeclaration.setType(type);
     functionDeclaration.setTypeparametersList(typeParams);
     functionDeclaration.setModifiersList(modifiers);
-    if(body) {
+    if (body) {
       functionDeclaration.setBody(body);
     }
     functionDeclaration.setUid(uid);
