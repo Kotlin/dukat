@@ -267,7 +267,6 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
     return when {
         hasStringLiteral() -> StringLiteralDeclaration(stringLiteral.token)
         hasThisType() -> ThisTypeDeclaration()
-        hasGeneratedInterfaceReference() -> GeneratedInterfaceReferenceDeclaration(generatedInterfaceReference.name.convert(), generatedInterfaceReference.typeParametersList.map { it.convert() })
         hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
         hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
         hasUnionType() -> UnionTypeDeclaration(unionType.paramsList.map { it.convert() })
