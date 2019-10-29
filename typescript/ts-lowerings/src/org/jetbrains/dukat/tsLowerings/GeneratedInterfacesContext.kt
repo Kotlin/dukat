@@ -23,6 +23,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -292,28 +293,18 @@ class GeneratedInterfacesContext {
         }
     }
 
-    private fun resolveGeneratedInterfacesFor(node: ClassLikeDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.getUID(), mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun resolveGeneratedInterfacesFor(node: FunctionDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun resolveGeneratedInterfacesFor(node: VariableDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun resolveGeneratedInterfacesFor(node: TypeAliasDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
+    private fun <T> T.resolveGeneratedInterfaces(): List<TopLevelDeclaration> where T : WithUidDeclaration, T : TopLevelDeclaration {
+        return myReferences.getOrDefault(uid, mutableListOf())
+                .mapNotNull { referenceNode -> myGeneratedInterfaces[referenceNode.name] }
+                .flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(this)
     }
 
     private fun introduceGeneratedEntities(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
-            is ClassLikeDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is VariableDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is FunctionDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is TypeAliasDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is ClassLikeDeclaration -> declaration.resolveGeneratedInterfaces()
+            is VariableDeclaration -> declaration.resolveGeneratedInterfaces()
+            is FunctionDeclaration -> declaration.resolveGeneratedInterfaces()
+            is TypeAliasDeclaration -> declaration.resolveGeneratedInterfaces()
             is ModuleDeclaration -> listOf(introduceGeneratedEntities(declaration))
             else -> listOf(declaration)
         }

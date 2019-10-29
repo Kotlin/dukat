@@ -9,4 +9,4 @@ data class ClassDeclaration(
         override val parentEntities: List<HeritageClauseDeclaration>,
         val modifiers: List<ModifierDeclaration>,
         override val uid: String
-) : ClassLikeDeclaration, WithUidDeclaration
+) : ClassLikeDeclaration
