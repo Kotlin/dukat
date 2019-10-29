@@ -6,18 +6,15 @@ import org.jetbrains.dukat.js.type_analysis.constraint.resolved.NumberTypeConstr
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 
-fun constraintFromOperator(operator: String) : Set<Constraint> {
-    return when (operator) {
-        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> setOf(NumberTypeConstraint)
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "&&", "!" -> setOf(BooleanTypeConstraint)
-        else -> emptySet()
-    }
-}
-
 fun BinaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
-    return when(operator) {
+    return when (operator) {
         "=" -> right.calculateConstraints()
-        else -> constraintFromOperator(operator)
+        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=", //result and parameters must be numbers
+        "&", "|", "^", "<<", ">>" //result must be a number
+            -> setOf(NumberTypeConstraint)
+        "==", "===", "!=", "!==", ">", "<", ">=", "<=" //result must be a boolean
+            -> setOf(BooleanTypeConstraint)
+        else -> emptySet()
     }
 }
 
