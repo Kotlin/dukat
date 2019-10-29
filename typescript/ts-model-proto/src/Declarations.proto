@@ -207,11 +207,16 @@ message BinaryExpressionDeclarationProto {
     ExpressionDeclarationProto right = 3;
 }
 
+message UnknownExpressionDeclarationProto {
+    string meta = 1;
+}
+
 message ExpressionDeclarationProto {
     oneof type {
         IdentifierExpressionDeclarationProto identifierExpression = 1;
         BinaryExpressionDeclarationProto binaryExpression = 2;
         LiteralExpressionDeclarationProto literalExpression = 3;
+        UnknownExpressionDeclarationProto unknownExpression = 4;
     }
 }
 

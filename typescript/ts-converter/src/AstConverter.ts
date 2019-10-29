@@ -354,10 +354,12 @@ export class AstConverter {
         return this.astFactory.createRegExLiteralDeclarationAsExpression(value);
     }
 
+    createUnknownExpression(value: string): Expression {
+        return this.astFactory.createUnknownExpressionDeclarationAsExpression(value);
+    }
+
     convertIdentifierExpression(expression: ts.Expression): Expression {
-        return this.createIdentifierExpression(
-            expression.getText()
-        )
+        return this.createIdentifierExpression(expression.getText())
     }
 
     convertBinaryExpression(expression: ts.Expression): Expression {
@@ -384,6 +386,10 @@ export class AstConverter {
         return this.createRegExLiteralExpression(expression.getText())
     }
 
+    convertUnknownExpression(expression: ts.Expression): Expression {
+        return this.createUnknownExpression(expression.getText())
+    }
+
     convertExpression(expression: ts.Expression): Expression {
         if (ts.isBinaryExpression(expression)) {
             return this.convertBinaryExpression(expression);
@@ -398,7 +404,7 @@ export class AstConverter {
         } else if (ts.isRegularExpressionLiteral(expression)) {
             return this.convertRegExLiteralExpression(expression);
         } else {
-            return this.createIdentifierExpression('/* ' + expression.getText()  + ' */')
+            return this.convertUnknownExpression(expression)
         }
     }
 
@@ -530,14 +536,7 @@ export class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
-            // TODO: move this logic to kotlin
-            initializer = this.createIdentifierExpression(
-              "definedExternally /* " + param.initializer.getText() + " */",
-            )
-        } else if (param.questionToken != null) {
-            initializer = this.createIdentifierExpression(
-              "definedExternally /* null */",
-            )
+            initializer = this.convertUnknownExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);

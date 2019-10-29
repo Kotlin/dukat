@@ -1,8 +1,10 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class ParameterNode(
@@ -19,10 +21,12 @@ data class ParameterNode(
 fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         name = name,
         type = type,
-        initializer = if (initializer != null && initializer is IdentifierExpressionDeclaration) {
-            TypeValueNode((initializer as IdentifierExpressionDeclaration).identifier, emptyList())
+        initializer = if (initializer != null || optional) {
+            TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
         } else null,
-        meta = null,
+        meta = if (initializer != null && initializer is UnknownExpressionDeclaration) {
+            (initializer as UnknownExpressionDeclaration).meta
+        } else null,
         vararg = vararg,
         optional = optional
 )

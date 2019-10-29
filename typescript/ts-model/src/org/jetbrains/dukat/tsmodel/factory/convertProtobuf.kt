@@ -38,6 +38,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
@@ -361,11 +362,18 @@ fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpr
     )
 }
 
+fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
+    return UnknownExpressionDeclaration(
+            meta = meta
+    )
+}
+
 fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasIdentifierExpression() -> identifierExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
+        hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }
 }
