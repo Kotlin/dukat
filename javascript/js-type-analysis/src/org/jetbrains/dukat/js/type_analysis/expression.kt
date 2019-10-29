@@ -1,49 +1,29 @@
 package org.jetbrains.dukat.js.type_analysis
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.js.type_analysis.constraint.Constraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-fun constraintFromOperator(operator: String) : TypeDeclaration {
+fun constraintFromOperator(operator: String) : Set<Constraint> {
     return when (operator) {
-        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> TypeDeclaration(
-                value = IdentifierEntity("number"),
-                params = emptyList(),
-                nullable = false
-        )
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "&&", "||", "!" -> TypeDeclaration(
-                value = IdentifierEntity("boolean"),
-                params = emptyList(),
-                nullable = false
-        )
-        else -> TypeDeclaration(
-                value = IdentifierEntity("Any"),
-                params = emptyList(),
-                nullable = true
-        )
+        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> setOf(NumberTypeConstraint)
+        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "&&", "!" -> setOf(BooleanTypeConstraint)
+        else -> emptySet()
     }
 }
 
-fun BinaryExpressionDeclaration.calculateConstraint() : TypeDeclaration {
+fun BinaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
     return when(operator) {
-        "=" -> right.calculateConstraint()
+        "=" -> right.calculateConstraints()
         else -> constraintFromOperator(operator)
     }
 }
 
-fun ExpressionDeclaration?.calculateConstraint() : TypeDeclaration {
+fun ExpressionDeclaration?.calculateConstraints() : Set<Constraint> {
     return when(this) {
-        is BinaryExpressionDeclaration -> this.calculateConstraint()
-        null -> TypeDeclaration(
-                value = IdentifierEntity("Unit"),
-                params = emptyList(),
-                nullable = false
-        )
-        else -> TypeDeclaration(
-                value = IdentifierEntity("Any"),
-                params = emptyList(),
-                nullable = true
-        )
+        is BinaryExpressionDeclaration -> this.calculateConstraints()
+        else -> emptySet()
     }
 }

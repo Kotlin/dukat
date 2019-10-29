@@ -2,6 +2,7 @@ package org.jetbrains.dukat.js.type_analysis
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.js.type_analysis.constraint.container.ReturnConstraintContainer
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -23,13 +24,17 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 
 fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
     if(this.body != null) {
+        val returnTypeConstraints = ReturnConstraintContainer()
+
         for(statement in this.body!!.statements) {
             when(statement) {
-                is ReturnStatementDeclaration -> return copy(type = statement.expression.calculateConstraint())
+                is ReturnStatementDeclaration -> returnTypeConstraints += statement.expression.calculateConstraints()
             }
         }
 
-        return copy(type = null.calculateConstraint())
+        return copy(
+                type = returnTypeConstraints.resolveToType()
+        )
     } else {
         return this;
     }
