@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -38,6 +39,7 @@ fun ModuleDeclaration.filterOutNonDeclarations(isSubModule: Boolean): ModuleDecl
                     listOf(declaration.filterOutNonDeclarations(true))
                 } else emptyList()
             }
+            is ExpressionStatementDeclaration -> emptyList()
             else -> listOf(declaration)
         }
     }.flatten()
