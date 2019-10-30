@@ -10,6 +10,7 @@ import org.jetbrains.dukat.js.type_analysis.constraint.resolved.StringTypeConstr
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
@@ -29,6 +30,17 @@ fun BinaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
     }
 }
 
+fun UnaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
+    return when (operator) {
+        "--", "++", "~", //result and parameters must be numbers
+        "-", "+" //result must be a number
+        -> setOf(NumberTypeConstraint)
+        "!" //result and parameters must be booleans
+        -> setOf(BooleanTypeConstraint)
+        else -> setOf(NoTypeConstraint)
+    }
+}
+
 fun LiteralExpressionDeclaration.calculateConstraints() : Set<Constraint> {
     return when (this) {
         is StringLiteralExpressionDeclaration -> setOf(StringTypeConstraint)
@@ -43,6 +55,7 @@ fun LiteralExpressionDeclaration.calculateConstraints() : Set<Constraint> {
 fun ExpressionDeclaration?.calculateConstraints() : Set<Constraint> {
     return when (this) {
         is BinaryExpressionDeclaration -> this.calculateConstraints()
+        is UnaryExpressionDeclaration -> this.calculateConstraints()
         is LiteralExpressionDeclaration -> this.calculateConstraints()
         null -> emptySet()
         else -> setOf(NoTypeConstraint)
