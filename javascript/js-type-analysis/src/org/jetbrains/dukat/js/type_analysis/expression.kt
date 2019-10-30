@@ -11,6 +11,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
@@ -33,6 +34,7 @@ fun LiteralExpressionDeclaration.calculateConstraints() : Set<Constraint> {
         is StringLiteralExpressionDeclaration -> setOf(StringTypeConstraint)
         is NumericLiteralExpressionDeclaration -> setOf(NumberTypeConstraint)
         is BigIntLiteralExpressionDeclaration -> setOf(BigIntTypeConstraint)
+        is BooleanLiteralExpressionDeclaration -> setOf(BooleanTypeConstraint)
         is RegExLiteralExpressionDeclaration -> setOf(RegExTypeConstraint)
         else -> raiseConcern("Unexpected literal expression type <${this.javaClass}>") { setOf(NoTypeConstraint) }
     }
