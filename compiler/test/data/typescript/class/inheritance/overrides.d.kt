@@ -23,9 +23,9 @@ external interface BaseEvent {
     var data: dynamic /* String | Number */
     fun getDelegateTarget(): Shape
     fun getElement(): Element
-    fun <T : Shape> transform(shape: T? = definedExternally /* null */): T
+    fun <T : Shape> transform(shape: T? = definedExternally): T
     var prop: Any
-    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally /* null */): Promise<Any>
+    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): Promise<Any>
 }
 
 external open class BoxStringEvent : BaseEvent {
