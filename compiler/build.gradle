@@ -228,6 +228,4 @@ test {
     if (project.hasProperty('coreTests')) {
         exclude "**/CoreSetCliTests*"
     }
-
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 }
