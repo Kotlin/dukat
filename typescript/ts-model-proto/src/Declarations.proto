@@ -176,6 +176,10 @@ message StringLiteralExpressionDeclarationProto {
     string value = 1;
 }
 
+message BooleanLiteralExpressionDeclarationProto {
+    bool value = 1;
+}
+
 message NumericLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -191,9 +195,10 @@ message RegExLiteralExpressionDeclarationProto {
 message LiteralExpressionDeclarationProto {
     oneof type {
         StringLiteralExpressionDeclarationProto stringLiteral = 1;
-        NumericLiteralExpressionDeclarationProto numericLiteral = 2;
-        BigIntLiteralExpressionDeclarationProto bigIntLiteral = 3;
-        RegExLiteralExpressionDeclarationProto regExLiteral = 4;
+        BooleanLiteralExpressionDeclarationProto booleanLiteral = 2;
+        NumericLiteralExpressionDeclarationProto numericLiteral = 3;
+        BigIntLiteralExpressionDeclarationProto bigIntLiteral = 4;
+        RegExLiteralExpressionDeclarationProto regExLiteral = 5;
     }
 }
 

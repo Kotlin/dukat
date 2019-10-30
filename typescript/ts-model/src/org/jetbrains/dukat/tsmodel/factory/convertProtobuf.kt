@@ -40,6 +40,7 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
@@ -336,6 +337,7 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
 fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
 fun Declarations.BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
 fun Declarations.StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
+fun Declarations.BooleanLiteralExpressionDeclarationProto.convert() = BooleanLiteralExpressionDeclaration(value)
 fun Declarations.RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
 
 fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
@@ -343,6 +345,7 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
         hasNumericLiteral() -> numericLiteral.convert()
         hasBigIntLiteral() -> bigIntLiteral.convert()
         hasStringLiteral() -> stringLiteral.convert()
+        hasBooleanLiteral() -> booleanLiteral.convert()
         hasRegExLiteral() -> regExLiteral.convert()
         else -> throw Exception("unknown literalExpression: ${this}")
     }
