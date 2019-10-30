@@ -25,7 +25,7 @@ external open class SomeClass {
     open fun <T : `T$0`> ping(source: T)
 
     companion object {
-        fun <T : `T$0`> foo(array: Array<T>, classes: Array<Any>? = definedExternally /* null */): Array<T>
+        fun <T : `T$0`> foo(array: Array<T>, classes: Array<Any>? = definedExternally): Array<T>
     }
 }
 
