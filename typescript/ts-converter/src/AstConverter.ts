@@ -34,6 +34,7 @@ import {
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
+import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 
 export class AstConverter {
     private exportContext = createExportContent();
@@ -328,87 +329,6 @@ export class AstConverter {
     }
 
 
-    createIdentifierExpression(name: string): Expression {
-        return this.astFactory.createIdentifierExpressionDeclarationAsExpression(
-            this.astFactory.createIdentifierDeclaration(name)
-        );
-    }
-
-    createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
-        return this.astFactory.createBinaryExpressionDeclarationAsExpression(left, operator, right);
-    }
-
-    createNumericLiteralExpression(value: string): Expression {
-        return this.astFactory.createNumericLiteralDeclarationAsExpression(value);
-    }
-
-    createBigIntLiteralExpression(value: string): Expression {
-        return this.astFactory.createBigIntLiteralDeclarationAsExpression(value);
-    }
-
-    createStringLiteralExpression(value: string): Expression {
-        return this.astFactory.createStringLiteralDeclarationAsExpression(value);
-    }
-
-    createRegExLiteralExpression(value: string): Expression {
-        return this.astFactory.createRegExLiteralDeclarationAsExpression(value);
-    }
-
-    createUnknownExpression(value: string): Expression {
-        return this.astFactory.createUnknownExpressionDeclarationAsExpression(value);
-    }
-
-    convertIdentifierExpression(expression: ts.Expression): Expression {
-        return this.createIdentifierExpression(expression.getText())
-    }
-
-    convertBinaryExpression(expression: ts.Expression): Expression {
-        return this.createBinaryExpression(
-            this.convertExpression(expression.left),
-            ts.tokenToString(expression.operatorToken.kind),
-            this.convertExpression(expression.right)
-        )
-    }
-
-    convertNumericLiteralExpression(expression: ts.Expression): Expression {
-        return this.createNumericLiteralExpression(expression.getText())
-    }
-
-    convertBigIntLiteralExpression(expression: ts.Expression): Expression {
-        return this.createBigIntLiteralExpression(expression.getText())
-    }
-
-    convertStringLiteralExpression(expression: ts.Expression): Expression {
-        return this.createStringLiteralExpression(expression.getText())
-    }
-
-    convertRegExLiteralExpression(expression: ts.Expression): Expression {
-        return this.createRegExLiteralExpression(expression.getText())
-    }
-
-    convertUnknownExpression(expression: ts.Expression): Expression {
-        return this.createUnknownExpression(expression.getText())
-    }
-
-    convertExpression(expression: ts.Expression): Expression {
-        if (ts.isBinaryExpression(expression)) {
-            return this.convertBinaryExpression(expression);
-        } else if (ts.isIdentifier(expression)) {
-            return this.convertIdentifierExpression(expression);
-        } else if (ts.isNumericLiteral(expression)) {
-            return this.convertNumericLiteralExpression(expression);
-        } else if (ts.isBigIntLiteral(expression)) {
-            return this.convertBigIntLiteralExpression(expression);
-        } else if (ts.isStringLiteral(expression)) {
-            return this.convertStringLiteralExpression(expression);
-        } else if (ts.isRegularExpressionLiteral(expression)) {
-            return this.convertRegExLiteralExpression(expression);
-        } else {
-            return this.convertUnknownExpression(expression)
-        }
-    }
-
-
     createIntersectionType(params: Array<TypeDeclaration>) {
         return this.astFactory.createIntersectionTypeDeclaration(params);
     }
@@ -536,7 +456,7 @@ export class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
-            initializer = this.convertUnknownExpression(param.initializer)
+            initializer = AstExpressionConverter.convertUnknownExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);
@@ -883,12 +803,12 @@ export class AstConverter {
             }
         } else if (ts.isExpressionStatement(statement)) {
             res.push(this.astFactory.createExpressionStatement(
-                this.convertExpression(statement.expression)
+                AstExpressionConverter.convertExpression(statement.expression)
             ));
         } else if (ts.isReturnStatement(statement)) {
             let expression : Expression | null = null;
             if (statement.expression) {
-                expression = this.convertExpression(statement.expression)
+                expression = AstExpressionConverter.convertExpression(statement.expression)
             }
 
             res.push(this.astFactory.createReturnStatement(

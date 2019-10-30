@@ -1,6 +1,5 @@
 import * as declarations from "declarations";
 import {
-  BinaryExpression,
   Block,
   CallSignatureDeclaration,
   ClassDeclaration,
@@ -17,12 +16,10 @@ import {
   FunctionTypeDeclaration,
   HeritageClauseDeclaration,
   IdentifierEntity,
-  IdentifierExpression,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
   InterfaceDeclaration,
   IntersectionTypeDeclaration,
-  LiteralExpression,
   MemberDeclaration,
   MethodSignatureDeclaration,
   ModifierDeclaration,
@@ -142,78 +139,6 @@ export class AstFactory implements AstFactory {
     topLevelEntity.setReturnstatement(returnStatement);
     return topLevelEntity;
   }
-
-  createIdentifierExpressionDeclarationAsExpression(identifier: IdentifierEntity): IdentifierExpression {
-    let identifierExpressionProto = new declarations.IdentifierExpressionDeclarationProto();
-    identifierExpressionProto.setIdentifier(identifier);
-
-    let expression = new declarations.ExpressionDeclarationProto();
-    expression.setIdentifierexpression(identifierExpressionProto);
-    return expression;
-  }
-
-  createBinaryExpressionDeclarationAsExpression(left: Expression, operator: string, right: Expression): BinaryExpression {
-    let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
-    binaryExpression.setLeft(left);
-    binaryExpression.setOperator(operator);
-    binaryExpression.setRight(right);
-
-    let expression = new declarations.ExpressionDeclarationProto();
-    expression.setBinaryexpression(binaryExpression);
-    return expression;
-  }
-
-  createUnknownExpressionDeclarationAsExpression(meta: string): Expression {
-    let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
-    unknownExpression.setMeta(meta);
-
-    let expression = new declarations.ExpressionDeclarationProto();
-    expression.setUnknownexpression(unknownExpression);
-    return expression;
-  }
-
-  private asExpression(literalExpression: LiteralExpression): Expression {
-    let expression = new declarations.ExpressionDeclarationProto();
-    expression.setLiteralexpression(literalExpression);
-    return expression;
-  }
-
-  createNumericLiteralDeclarationAsExpression(value: string): Expression {
-    let numericLiteralExpression = new declarations.NumericLiteralExpressionDeclarationProto();
-    numericLiteralExpression.setValue(value);
-
-    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
-    literalExpression.setNumericliteral(numericLiteralExpression);
-    return this.asExpression(literalExpression);
-  }
-
-  createBigIntLiteralDeclarationAsExpression(value: string): Expression {
-    let bigIntLiteralExpression = new declarations.BigIntLiteralExpressionDeclarationProto();
-    bigIntLiteralExpression.setValue(value);
-
-    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
-    literalExpression.setBigintliteral(bigIntLiteralExpression);
-    return this.asExpression(literalExpression);
-  }
-
-  createStringLiteralDeclarationAsExpression(value: string): Expression {
-    let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
-    stringLiteralExpression.setValue(value);
-
-    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
-    literalExpression.setStringliteral(stringLiteralExpression);
-    return this.asExpression(literalExpression);
-  }
-
-  createRegExLiteralDeclarationAsExpression(value: string): Expression {
-    let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
-    regExLiteralExpression.setValue(value);
-
-    let literalExpression = new declarations.LiteralExpressionDeclarationProto();
-    literalExpression.setRegExliteral(regExLiteralExpression);
-    return this.asExpression(literalExpression);
-  }
-
 
   createBlockDeclaration(statements: Array<Declaration>): Block {
     let block = new declarations.BlockDeclarationProto();
