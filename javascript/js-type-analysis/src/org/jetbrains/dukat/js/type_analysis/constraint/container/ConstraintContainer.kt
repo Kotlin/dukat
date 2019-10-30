@@ -11,7 +11,7 @@ import org.jetbrains.dukat.js.type_analysis.type.numberType
 import org.jetbrains.dukat.js.type_analysis.type.stringType
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-abstract class ConstraintContainer(protected val constraints: MutableSet<Constraint> = mutableSetOf()) {
+open class ConstraintContainer(protected val constraints: MutableSet<Constraint> = mutableSetOf()) {
     operator fun plusAssign(constraint: Constraint) {
         constraints += constraint
     }
@@ -20,7 +20,9 @@ abstract class ConstraintContainer(protected val constraints: MutableSet<Constra
         constraints.addAll(newConstraints)
     }
 
-    abstract fun copy() : ConstraintContainer
+    open fun copy() : ConstraintContainer {
+        return ConstraintContainer(constraints)
+    }
 
     open fun resolveToType() : TypeDeclaration {
         return when {

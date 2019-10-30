@@ -2,6 +2,7 @@ package org.jetbrains.dukat.js.type_analysis
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.js.type_analysis.constraint.container.ConstraintContainer
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ReturnConstraintContainer
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
@@ -16,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -25,6 +27,9 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
     if (this.body != null) {
         val returnTypeConstraints = ReturnConstraintContainer()
+        val parameterConstraintContainers = List(parameters.size) {
+            ConstraintContainer()
+        }
 
         for(statement in this.body!!.statements) {
             when(statement) {
@@ -33,7 +38,12 @@ fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
         }
 
         return copy(
-                type = returnTypeConstraints.resolveToType()
+                type = returnTypeConstraints.resolveToType(),
+                parameters = parameterConstraintContainers.mapIndexed { i, parameterConstraints ->
+                    parameters[i].copy(
+                            type = parameterConstraints.resolveToType()
+                    )
+                }
         )
     } else {
         return this;
