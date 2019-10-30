@@ -212,16 +212,23 @@ message BinaryExpressionDeclarationProto {
     ExpressionDeclarationProto right = 3;
 }
 
+message UnaryExpressionDeclarationProto {
+    ExpressionDeclarationProto operand = 1;
+    string operator = 2;
+    bool isPrefix = 3;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
 
 message ExpressionDeclarationProto {
     oneof type {
-        IdentifierExpressionDeclarationProto identifierExpression = 1;
-        BinaryExpressionDeclarationProto binaryExpression = 2;
-        LiteralExpressionDeclarationProto literalExpression = 3;
-        UnknownExpressionDeclarationProto unknownExpression = 4;
+        BinaryExpressionDeclarationProto binaryExpression = 1;
+        UnaryExpressionDeclarationProto unaryExpression = 2;
+        IdentifierExpressionDeclarationProto identifierExpression = 3;
+        LiteralExpressionDeclarationProto literalExpression = 4;
+        UnknownExpressionDeclarationProto unknownExpression = 5;
     }
 }
 
