@@ -19,13 +19,8 @@ external interface Low {
     var propInLow: String
     fun methodInLow(): Boolean
     fun lambdaInLow(): Boolean
+    fun producePartialSome(): SomePartial
 }
-
-external interface Some : Low {
-    var propInSome: String
-}
-
-external fun usePartial(some: Some, partial_some: SomePartial)
 
 external interface LowPartial {
     var propInLow: String?
@@ -37,6 +32,13 @@ external interface LowPartial {
     var lambdaInLow: (() -> Boolean)?
         get() = definedExternally
         set(value) = definedExternally
+    var producePartialSome: (() -> SomePartial)?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+external interface Some : Low {
+    var propInSome: String
 }
 
 external interface SomePartial : LowPartial {
@@ -44,3 +46,5 @@ external interface SomePartial : LowPartial {
         get() = definedExternally
         set(value) = definedExternally
 }
+
+external fun usePartial(some: Some, partial_some: SomePartial)
