@@ -38,6 +38,7 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
@@ -334,6 +335,29 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
     }
 }
 
+
+fun Declarations.BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
+    return BinaryExpressionDeclaration(
+            left = left.convert(),
+            operator = operator,
+            right = right.convert()
+    )
+}
+
+fun Declarations.UnaryExpressionDeclarationProto.convert() : UnaryExpressionDeclaration {
+    return UnaryExpressionDeclaration(
+            operand = operand.convert(),
+            operator = operator,
+            isPrefix = isPrefix
+    )
+}
+
+fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpressionDeclaration {
+    return IdentifierExpressionDeclaration(
+            identifier = identifier.convert()
+    )
+}
+
 fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
 fun Declarations.BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
 fun Declarations.StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
@@ -351,20 +375,6 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
     }
 }
 
-fun Declarations.BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
-    return BinaryExpressionDeclaration(
-            left = left.convert(),
-            operator = operator,
-            right = right.convert()
-    )
-}
-
-fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpressionDeclaration {
-    return IdentifierExpressionDeclaration(
-            identifier = identifier.convert()
-    )
-}
-
 fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
@@ -374,6 +384,7 @@ fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpression
 fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
+        hasUnaryExpression() -> unaryExpression.convert()
         hasIdentifierExpression() -> identifierExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()

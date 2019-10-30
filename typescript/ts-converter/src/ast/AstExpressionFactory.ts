@@ -5,6 +5,28 @@ import {
 } from "./ast";
 
 export class AstExpressionFactory {
+    static createBinaryExpressionDeclarationAsExpression(left: Expression, operator: string, right: Expression): Expression {
+        let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
+        binaryExpression.setLeft(left);
+        binaryExpression.setOperator(operator);
+        binaryExpression.setRight(right);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setBinaryexpression(binaryExpression);
+        return expression;
+    }
+
+    static createUnaryExpressionDeclarationAsExpression(operand: Expression, operator: string, isPrefix: boolean): Expression {
+        let unaryExpression = new declarations.UnaryExpressionDeclarationProto();
+        unaryExpression.setOperand(operand);
+        unaryExpression.setOperator(operator);
+        unaryExpression.setIsprefix(isPrefix);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setUnaryexpression(unaryExpression);
+        return expression;
+    }
+
     static createIdentifierExpressionDeclarationAsExpression(value: string): Expression {
         let identifier = new declarations.IdentifierEntityProto();
         identifier.setValue(value);
@@ -14,17 +36,6 @@ export class AstExpressionFactory {
 
         let expression = new declarations.ExpressionDeclarationProto();
         expression.setIdentifierexpression(identifierExpressionProto);
-        return expression;
-    }
-
-    static createBinaryExpressionDeclarationAsExpression(left: Expression, operator: string, right: Expression): Expression {
-        let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
-        binaryExpression.setLeft(left);
-        binaryExpression.setOperator(operator);
-        binaryExpression.setRight(right);
-
-        let expression = new declarations.ExpressionDeclarationProto();
-        expression.setBinaryexpression(binaryExpression);
         return expression;
     }
 

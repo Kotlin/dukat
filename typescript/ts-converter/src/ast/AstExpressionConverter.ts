@@ -7,6 +7,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createBinaryExpressionDeclarationAsExpression(left, operator, right);
     }
 
+    static createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
+        return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
+    }
+
     static createIdentifierExpression(name: string): Expression {
         return AstExpressionFactory.createIdentifierExpressionDeclarationAsExpression(name);
     }
@@ -41,6 +45,22 @@ export class AstExpressionConverter {
             this.convertExpression(expression.left),
             ts.tokenToString(expression.operatorToken.kind),
             this.convertExpression(expression.right)
+        )
+    }
+
+    static convertPrefixUnaryExpression(expression: ts.Expression): Expression {
+        return this.createUnaryExpression(
+            this.convertExpression(expression.operand),
+            ts.tokenToString(expression.operator),
+            true
+        )
+    }
+
+    static convertPostfixUnaryExpression(expression: ts.Expression): Expression {
+        return this.createUnaryExpression(
+            this.convertExpression(expression.operand),
+            ts.tokenToString(expression.operator),
+            false
         )
     }
 
@@ -99,6 +119,10 @@ export class AstExpressionConverter {
     static convertExpression(expression: ts.Expression): Expression {
         if (ts.isBinaryExpression(expression)) {
             return this.convertBinaryExpression(expression);
+        } else if (ts.isPrefixUnaryExpression(expression)) {
+            return this.convertPrefixUnaryExpression(expression)
+        } else if (ts.isPostfixUnaryExpression(expression)) {
+            return this.convertPostfixUnaryExpression(expression)
         } else if (ts.isIdentifier(expression)) {
             return this.convertIdentifierExpression(expression);
         } else if (ts.isLiteralExpression(expression)) {
