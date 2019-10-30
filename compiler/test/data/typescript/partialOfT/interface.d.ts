@@ -1,12 +1,16 @@
-export interface Low {
+declare interface StaticContext extends Low {}
+
+declare interface Low {
     propInLow: String;
     methodInLow(): boolean;
     lambdaInLow(): boolean;
     producePartialSome(): Partial<Some>;
+    create: () => Partial<StaticContext>;
+    createFromUnkown: () => Partial<UnkownContext>;
 }
 
-export interface Some extends Low {
+declare interface Some extends Low {
     propInSome: string;
 }
 
-export function usePartial(some: Some, partial_some: Partial<Some>);
+declare function usePartial(some: Some, partial_some: Partial<Some>);

@@ -113,21 +113,20 @@ private class TypeVisitor(
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
         val singleTypeParam = declaration.params.singleOrNull()
-        val normalResult = lazy { super.lowerTypeDeclaration(declaration, owner) }
         return if (declaration.value == IdentifierEntity("Partial") && (singleTypeParam is TypeDeclaration)) {
             val uid = singleTypeParam.typeReference?.uid
+            val typeAny = TypeDeclaration(IdentifierEntity("Any"), emptyList())
             if (uid != null) {
                 classLikeReferences[uid]?.let { (classLike, owner) ->
                     val generatePartialInterface = classLike.generatePartialInterface(owner, heritageClauses)
                     partialReferences.putIfAbsent(uid, generatePartialInterface)
-                    return singleTypeParam.copy(value = generatePartialInterface.name, typeReference = ReferenceEntity(generatePartialInterface.uid))
-                }
-                normalResult.value
+                    singleTypeParam.copy(value = generatePartialInterface.name, typeReference = ReferenceEntity(generatePartialInterface.uid))
+                } ?: typeAny
             } else {
-                normalResult.value
+                typeAny
             }
         } else {
-            normalResult.value
+            super.lowerTypeDeclaration(declaration, owner)
         }
     }
 }

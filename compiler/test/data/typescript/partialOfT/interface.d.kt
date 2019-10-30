@@ -15,11 +15,17 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external interface StaticContext : Low
+
+external interface StaticContextPartial : LowPartial
+
 external interface Low {
     var propInLow: String
     fun methodInLow(): Boolean
     fun lambdaInLow(): Boolean
     fun producePartialSome(): SomePartial
+    var create: () -> StaticContextPartial
+    var createFromUnkown: () -> Any
 }
 
 external interface LowPartial {
@@ -33,6 +39,12 @@ external interface LowPartial {
         get() = definedExternally
         set(value) = definedExternally
     var producePartialSome: (() -> SomePartial)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var create: (() -> StaticContextPartial)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var createFromUnkown: (() -> Any)?
         get() = definedExternally
         set(value) = definedExternally
 }
