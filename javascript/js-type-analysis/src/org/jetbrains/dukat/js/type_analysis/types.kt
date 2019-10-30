@@ -23,7 +23,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 
 fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
-    if(this.body != null) {
+    if (this.body != null) {
         val returnTypeConstraints = ReturnConstraintContainer()
 
         for(statement in this.body!!.statements) {
@@ -45,7 +45,7 @@ fun ConstructorDeclaration.introduceTypes() : ConstructorDeclaration {
 }
 
 fun MemberEntity.introduceTypes(): MemberEntity {
-    return when(this) {
+    return when (this) {
         is FunctionDeclaration -> this.introduceTypes()
         is ConstructorDeclaration -> this.introduceTypes()
         is PropertyDeclaration -> this
@@ -59,7 +59,7 @@ fun ClassDeclaration.introduceTypes() = copy(members = members.map { it.introduc
 fun BlockDeclaration.introduceTypes() = copy(statements = statements.map { it.introduceTypes() })
 
 fun TopLevelEntity.introduceTypes(): TopLevelEntity {
-    return when(this) {
+    return when (this) {
         is FunctionDeclaration -> this.introduceTypes()
         is ClassDeclaration -> this.introduceTypes()
         is BlockDeclaration -> this.introduceTypes()

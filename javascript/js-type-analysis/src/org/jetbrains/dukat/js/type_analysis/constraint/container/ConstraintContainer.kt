@@ -1,6 +1,14 @@
 package org.jetbrains.dukat.js.type_analysis.constraint.container
 
 import org.jetbrains.dukat.js.type_analysis.constraint.Constraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.BigIntTypeConstraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.NumberTypeConstraint
+import org.jetbrains.dukat.js.type_analysis.constraint.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type_analysis.type.anyNullableType
+import org.jetbrains.dukat.js.type_analysis.type.booleanType
+import org.jetbrains.dukat.js.type_analysis.type.numberType
+import org.jetbrains.dukat.js.type_analysis.type.stringType
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 abstract class ConstraintContainer(protected val constraints: MutableSet<Constraint> = mutableSetOf()) {
@@ -14,5 +22,13 @@ abstract class ConstraintContainer(protected val constraints: MutableSet<Constra
 
     abstract fun copy() : ConstraintContainer
 
-    abstract fun resolveToType() : TypeDeclaration
+    open fun resolveToType() : TypeDeclaration {
+        return when {
+            constraints.contains(NumberTypeConstraint) -> numberType
+            constraints.contains(BigIntTypeConstraint) -> numberType
+            constraints.contains(BooleanTypeConstraint) -> booleanType
+            constraints.contains(StringTypeConstraint) -> stringType
+            else -> anyNullableType
+        }
+    }
 }

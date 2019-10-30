@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.js.type_analysis.constraint.container
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type_analysis.constraint.Constraint
+import org.jetbrains.dukat.js.type_analysis.type.unitType
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 class ReturnConstraintContainer(constraints: MutableSet<Constraint> = mutableSetOf()) : ConstraintContainer(constraints) {
@@ -11,17 +11,9 @@ class ReturnConstraintContainer(constraints: MutableSet<Constraint> = mutableSet
 
     override fun resolveToType(): TypeDeclaration {
         return if(constraints.isEmpty()) {
-            TypeDeclaration(
-                    value = IdentifierEntity("Unit"),
-                    params = emptyList(),
-                    nullable = false
-            )
+            unitType
         } else {
-            TypeDeclaration(
-                    value = IdentifierEntity("Any"),
-                    params = emptyList(),
-                    nullable = true
-            )
+            super.resolveToType()
         }
     }
 }
