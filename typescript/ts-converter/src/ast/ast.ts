@@ -114,38 +114,6 @@ export declare class PropertyDeclaration implements MemberDeclaration {
     serializeBinary(): Int8Array;
 }
 
-export declare class IdentifierExpression implements Expression {
-    identifier: IdentifierEntity;
-    serializeBinary(): Int8Array;
-}
-
-export declare class BinaryExpression implements Expression {
-    left: Expression;
-    operator: string;
-    right: Expression;
-    serializeBinary(): Int8Array;
-}
-
-export declare class NumericLiteralExpression implements LiteralExpression {
-    value: string;
-    serializeBinary(): Int8Array;
-}
-
-export declare class BigIntLiteralExpression implements LiteralExpression {
-    value: string;
-    serializeBinary(): Int8Array;
-}
-
-export declare class StringLiteralExpression implements LiteralExpression {
-    value: string;
-    serializeBinary(): Int8Array;
-}
-
-export declare class RegExLiteralExpression implements LiteralExpression {
-    value: string;
-    serializeBinary(): Int8Array;
-}
-
 export declare interface LiteralExpression extends Expression {}
 
 export declare interface Expression extends Declaration {}
