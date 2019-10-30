@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external interface JQueryStatic {
     fun ajax(settings: JQueryAjaxSettings): JQueryXHR
-    fun ajax(url: String, settings: JQueryAjaxSettings? = definedExternally /* null */): JQueryXHR
+    fun ajax(url: String, settings: JQueryAjaxSettings? = definedExternally): JQueryXHR
 }
 
 @JsModule("jquery")

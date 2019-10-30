@@ -354,24 +354,15 @@ export class AstConverter {
         return this.astFactory.createRegExLiteralDeclarationAsExpression(value);
     }
 
-    convertIdentifierExpression(expression: ts.Expression): Expression {
-        /*console.log('Identifier:');
-        console.log('\tEscaped text: ' + expression.escapedText);
-        console.log('\tUnescaped text: ' + expression.getText());
-        console.log('\tOriginal keyword kind: ' + expression.originalKeywordKind);
-        console.log('\tIs in JSDoc namespace: ' + expression.isInJSDocNamespace);*/
+    createUnknownExpression(value: string): Expression {
+        return this.astFactory.createUnknownExpressionDeclarationAsExpression(value);
+    }
 
-        return this.createIdentifierExpression(
-            expression.getText()
-        )
+    convertIdentifierExpression(expression: ts.Expression): Expression {
+        return this.createIdentifierExpression(expression.getText())
     }
 
     convertBinaryExpression(expression: ts.Expression): Expression {
-        /*console.log('Binary expression:');
-        console.log('\tLeft:\n' + this.convertExpression(expression.left));
-        console.log('\tOperator:\n' + ts.tokenToString(expression.operatorToken));
-        console.log('\tRight:\n' + this.convertExpression(expression.right));*/
-
         return this.createBinaryExpression(
             this.convertExpression(expression.left),
             ts.tokenToString(expression.operatorToken.kind),
@@ -395,6 +386,10 @@ export class AstConverter {
         return this.createRegExLiteralExpression(expression.getText())
     }
 
+    convertUnknownExpression(expression: ts.Expression): Expression {
+        return this.createUnknownExpression(expression.getText())
+    }
+
     convertExpression(expression: ts.Expression): Expression {
         if (ts.isBinaryExpression(expression)) {
             return this.convertBinaryExpression(expression);
@@ -409,7 +404,7 @@ export class AstConverter {
         } else if (ts.isRegularExpressionLiteral(expression)) {
             return this.convertRegExLiteralExpression(expression);
         } else {
-            return this.createIdentifierExpression('/* ' + expression.getText()  + ' */')
+            return this.convertUnknownExpression(expression)
         }
     }
 
@@ -541,14 +536,7 @@ export class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
-            // TODO: move this logic to kotlin
-            initializer = this.createIdentifierExpression(
-              "definedExternally /* " + param.initializer.getText() + " */",
-            )
-        } else if (param.questionToken != null) {
-            initializer = this.createIdentifierExpression(
-              "definedExternally /* null */",
-            )
+            initializer = this.convertUnknownExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);

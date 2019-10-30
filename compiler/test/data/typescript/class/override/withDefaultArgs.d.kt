@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external open class Foo {
     open fun bar(a: Number = definedExternally /* 1 */)
-    open fun baz(a: Any? = definedExternally /* null */)
+    open fun baz(a: Any? = definedExternally)
 }
 
 external open class Boo : Foo {

@@ -44,6 +44,7 @@ import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -60,6 +61,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -398,18 +400,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
                             QualifierEntity(name, IdentifierEntity("invoke")),
-                            convertParameters(declaration.parameters.map { param ->
-                                val initializer = if (
-                                        param.initializer is IdentifierExpressionDeclaration &&
-                                        (param.initializer as IdentifierExpressionDeclaration).identifier.value == "definedExternally /* null */"
-                                ) {
-                                    IdentifierExpressionDeclaration(IdentifierEntity("null"))
-                                } else {
-                                    param.initializer
-                                }
-
-                                param.copy(initializer = initializer)
-                            }),
+                            convertParameters(declaration.parameters),
                             declaration.type,
                             emptyList(),
                             mutableListOf(),

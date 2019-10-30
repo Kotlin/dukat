@@ -163,6 +163,15 @@ export class AstFactory implements AstFactory {
     return expression;
   }
 
+  createUnknownExpressionDeclarationAsExpression(meta: string): Expression {
+    let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
+    unknownExpression.setMeta(meta);
+
+    let expression = new declarations.ExpressionDeclarationProto();
+    expression.setUnknownexpression(unknownExpression);
+    return expression;
+  }
+
   private asExpression(literalExpression: LiteralExpression): Expression {
     let expression = new declarations.ExpressionDeclarationProto();
     expression.setLiteralexpression(literalExpression);
