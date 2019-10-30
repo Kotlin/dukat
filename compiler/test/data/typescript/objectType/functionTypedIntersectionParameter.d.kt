@@ -17,14 +17,14 @@ import org.w3c.xhr.*
 
 external interface FooPart<T>
 
-external interface `T$0`<T> {
-    var foo: T
-    var sup: Any
-}
-
 external interface `T$1`<T> {
     var foo: T
     var bar: Any
+}
+
+external interface `T$0`<T> {
+    var foo: T
+    var sup: Any
 }
 
 external open class FooTypedUnion {

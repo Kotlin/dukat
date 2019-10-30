@@ -79,7 +79,7 @@ private class PartialOfTUseLowering(val references: Map<String, ClassLikeDeclara
                 membersResolved,
                 typeParameters,
                 parentEntitiesResolved,
-                getUID() + "_Partial",
+                uid + "_Partial",
                 owner.node), owner)
     }
 
