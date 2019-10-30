@@ -70,6 +70,15 @@ export class AstExpressionFactory {
         return this.asExpression(literalExpression);
     }
 
+    static createBooleanLiteralDeclarationAsExpression(value: boolean): Expression {
+        let booleanLiteralExpression = new declarations.BooleanLiteralExpressionDeclarationProto();
+        booleanLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setBooleanliteral(booleanLiteralExpression);
+        return this.asExpression(literalExpression);
+    }
+
     static createRegExLiteralDeclarationAsExpression(value: string): Expression {
         let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
         regExLiteralExpression.setValue(value);
