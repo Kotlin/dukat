@@ -1,5 +1,8 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.dukat.cli.compileUnits
 import org.jetbrains.dukat.compiler.tests.BundleTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -7,18 +10,23 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
-import org.jetbrains.dukat.compiler.tests.descriptors.generatePackageDescriptor
+import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
+import org.jetbrains.dukat.descriptors.translatePackageName
 import org.jetbrains.dukat.descriptors.translateToDescriptors
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.isChildOf
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
+import java.io.OutputStream
+import java.io.PrintStream
 import kotlin.test.assertEquals
 
 @Suppress("unused")
@@ -35,23 +43,58 @@ class DescriptorTests : OutputTests() {
     @Suppress("UNUSED_PARAMETER")
     private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
         val sourceSet = bundle.translate(tsPath)
+        val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
+            sourceFile.root.flattenDeclarations().map {
+                SourceFileModel(
+                    sourceFile.name,
+                    sourceFile.fileName,
+                    it,
+                    sourceFile.referencedFiles
+                )
+            }
+        })
 
-        val outputModuleDescriptor = sourceSet.translateToDescriptors()
-        validate(
-            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
-                FqName("")
-            )
-        )
+        val targetPath = "./build/test/data/descriptors/$name"
+        File(targetPath).deleteRecursively()
+        val outPrintStream = System.out
+        System.setOut(PrintStream(object : OutputStream() {
+            override fun write(b: Int) {
 
-        val expectedPackageDescriptor = generatePackageDescriptor(File(ktPath).parentFile.path, File(ktPath).name)
-        assertEquals(
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                .serializeRecursively(
-                    outputModuleDescriptor.getPackage(
-                        FqName("")
+            }
+        }))
+        compileUnits(translateModule(flattenedSourceSet), "./build/test/data/descriptors/$name", null)
+        System.setOut(outPrintStream)
+
+        val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
+        val expectedModuleDescriptor =
+            generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
+
+        val packageNames =
+            flattenedSourceSet.sources.map { translatePackageName(it.root.name) }.sortedBy { it.asString() }.distinct()
+                .ifEmpty {
+                    listOf(FqName.ROOT)
+                }
+        val output = mutableListOf<String>()
+        val expectedOutput = mutableListOf<String>()
+        packageNames.forEach { packageName ->
+            if (packageNames.none { packageName.isChildOf(it) }) {
+                validate(
+                    DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
+                        packageName
                     )
-                ), RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
-                .serializeRecursively(expectedPackageDescriptor)
+                )
+                output +=
+                    RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                        .serializeRecursively(
+                            outputModuleDescriptor.getPackage(packageName)
+                        )
+                expectedOutput += RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
+                    .serializeRecursively(expectedModuleDescriptor.getPackage(packageName))
+            }
+        }
+        assertEquals(
+            output.joinToString(separator = SEPARATOR),
+            expectedOutput.joinToString(separator = SEPARATOR)
         )
     }
 

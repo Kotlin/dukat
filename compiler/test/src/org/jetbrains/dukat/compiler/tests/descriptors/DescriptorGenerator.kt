@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.vfs.CharsetToolkit
 import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
 import org.jetbrains.kotlin.com.intellij.psi.impl.PsiFileFactoryImpl
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.psi.KtFile
@@ -51,15 +51,18 @@ fun doLoadFile(file: File): String {
 }
 
 fun analyze(
-    file: KtFile
+    files: List<KtFile>
 ): AnalysisResult {
-    return TopDownAnalyzerFacadeForJS.analyzeFiles(listOf(file), generateJSConfig())
+    return TopDownAnalyzerFacadeForJS.analyzeFiles(files, generateJSConfig())
 }
 
-fun generatePackageDescriptor(filePath: String, fileName: String): PackageViewDescriptor {
+fun generateModuleDescriptor(files: List<File>): ModuleDescriptor {
     val environment = generateDefaultEnvironment()
     val project = environment.project
-    val psiFile = createFile(fileName, doLoadFile(filePath, fileName), project)
-    val moduleDescriptor = analyze(psiFile).moduleDescriptor
-    return moduleDescriptor.getPackage(psiFile.packageFqName)
+    val psiFiles = files.map { file ->
+        val fileName = file.name
+        val filePath = file.parent
+        createFile(fileName, doLoadFile(filePath, fileName), project)
+    }
+    return analyze(psiFiles).moduleDescriptor
 }
