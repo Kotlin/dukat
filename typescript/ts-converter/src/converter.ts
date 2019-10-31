@@ -45,7 +45,6 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
     }
 
     const sourceFile = program.getSourceFile(fileName);
-    const definitionResolver = new DeclarationResolver(languageService);
 
     if (sourceFile == null) {
         throw new Error(`failed to resolve ${fileName}`)

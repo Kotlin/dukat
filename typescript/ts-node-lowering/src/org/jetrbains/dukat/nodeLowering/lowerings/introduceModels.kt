@@ -170,8 +170,9 @@ private fun MemberNode.process(): MemberModel? {
                 },
                 static = static,
                 override = override,
-                getter = getter,
-                setter = setter,
+                immutable = getter && !setter,
+                getter = false,
+                setter = false,
                 open = open
         )
         else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
@@ -294,7 +295,8 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
                         IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList(),
-                        VisibilityModifierModel.DEFAULT
+                        VisibilityModifierModel.DEFAULT,
+                        null
                 )
             } else {
                 null
@@ -349,7 +351,8 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
                         IdentifierEntity(""),
                         membersSplitted.static,
                         emptyList(),
-                        VisibilityModifierModel.DEFAULT
+                        VisibilityModifierModel.DEFAULT,
+                        null
                 )
             } else {
                 null
@@ -461,7 +464,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
             EnumModel(
                     name = name,
                     values = values.map { token -> EnumTokenModel(token.value, token.meta) },
-                    visibilityModifier = VisibilityModifierModel.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
             )
         }
         is FunctionNode -> FunctionModel(
@@ -481,7 +485,8 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 operator = operator,
                 extend = extend.convert(),
                 body = resolveBody(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = comment
         )
         is VariableNode -> VariableModel(
                 name = name,
@@ -499,20 +504,23 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                     )
                 },
                 extend = extend.convert(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
         is ObjectNode -> ObjectModel(
                 name = name,
                 members = members.mapNotNull { member -> member.process() },
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
         is TypeAliasNode -> if (canBeTranslated) {
             TypeAliasModel(
                     name = name,
                     typeReference = typeReference.process(),
                     typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
-                    visibilityModifier = VisibilityModifierModel.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
             )
         } else null
         else -> {
@@ -552,7 +560,8 @@ fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableL
             declarations = declarationsFiltered,
             annotations = annotations,
             submodules = submodules,
-            imports = mutableListOf()
+            imports = mutableListOf(),
+            comment = null
     )
 
     return module

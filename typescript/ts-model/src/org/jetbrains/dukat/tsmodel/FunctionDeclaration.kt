@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class FunctionDeclaration(
@@ -11,4 +10,4 @@ data class FunctionDeclaration(
         val modifiers: List<ModifierDeclaration>,
         val body: BlockDeclaration?,
         override val uid: String
-) : MemberEntity, TopLevelDeclaration, WithUidDeclaration
+) : MemberDeclaration, TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration

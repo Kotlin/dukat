@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class ModuleDeclaration(
         val packageName: NameEntity,
-        val declarations: List<TopLevelEntity> = emptyList(),
+        val declarations: List<TopLevelDeclaration> = emptyList(),
 
         val modifiers: List<ModifierDeclaration>,
         val definitionsInfo: List<DefinitionInfoDeclaration>,

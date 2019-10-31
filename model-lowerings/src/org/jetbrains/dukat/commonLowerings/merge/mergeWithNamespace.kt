@@ -44,6 +44,7 @@ private fun VariableModel.convertToPropertyModel(): PropertyModel {
             typeParameters = typeParameters,
             static = false,
             override = false,
+            immutable = immutable,
             getter = false,
             setter = false,
             open = false
@@ -96,7 +97,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                 IdentifierEntity(""),
                                     staticProperties,
                                     listOf(),
-                                    VisibilityModifierModel.DEFAULT
+                                    VisibilityModifierModel.DEFAULT,
+                                    null
                             )
                 } else {
                     companionObject
@@ -112,7 +114,8 @@ private fun ClassLikeModel.merge(module: ModuleModel): ClassLikeModel {
                                     IdentifierEntity(""),
                                         staticProperties,
                                         listOf(),
-                                        VisibilityModifierModel.DEFAULT
+                                        VisibilityModifierModel.DEFAULT,
+                                        null
                                 )
                     } else {
                         companionObject

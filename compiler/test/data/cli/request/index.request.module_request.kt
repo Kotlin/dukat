@@ -247,10 +247,14 @@ external interface CoreOptions {
 
 external interface UriOptions {
     var uri: dynamic /* String | Url */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface UrlOptions {
     var url: dynamic /* String | Url */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface `T$0` {
@@ -429,17 +433,25 @@ external interface Request : caseless.Httpified, stream.Stream {
     var headers: Headers
     var method: String
     var pool: dynamic /* false | `T$2` */
+        get() = definedExternally
+        set(value) = definedExternally
     var dests: Array<stream.Readable>
     var callback: RequestCallback?
         get() = definedExternally
         set(value) = definedExternally
     var uri: Url /* Url & `T$3` */
     var proxy: dynamic /* Nothing? | String | Url */
+        get() = definedExternally
+        set(value) = definedExternally
     var tunnel: Boolean
     var setHost: Boolean
     var path: String
     var agent: dynamic /* false | http.Agent | https.Agent */
+        get() = definedExternally
+        set(value) = definedExternally
     var body: dynamic /* Buffer | Array<Buffer> | String | Array<String> | stream.Readable */
+        get() = definedExternally
+        set(value) = definedExternally
     var timing: Boolean?
         get() = definedExternally
         set(value) = definedExternally

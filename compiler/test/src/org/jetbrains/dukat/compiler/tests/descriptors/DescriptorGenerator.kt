@@ -1,10 +1,9 @@
 package org.jetbrains.dukat.compiler.tests.descriptors
 
+import org.jetbrains.dukat.descriptors.generateDefaultEnvironment
+import org.jetbrains.dukat.descriptors.generateJSConfig
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.lang.Language
-import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
@@ -12,18 +11,9 @@ import org.jetbrains.kotlin.com.intellij.openapi.vfs.CharsetToolkit
 import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
 import org.jetbrains.kotlin.com.intellij.psi.impl.PsiFileFactoryImpl
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.config.AnalysisFlag
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.config.LanguageVersion
-import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
-import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
-import org.jetbrains.kotlin.js.config.JSConfigurationKeys
-import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 import java.io.FileNotFoundException
@@ -61,37 +51,15 @@ fun doLoadFile(file: File): String {
 }
 
 fun analyze(
-    file: KtFile,
-    explicitLanguageVersion: LanguageVersion?,
-    specificFeatures: Map<LanguageFeature, LanguageFeature.State>,
-    environment: KotlinCoreEnvironment
+    file: KtFile
 ): AnalysisResult {
-    val configuration = environment.configuration.copy()
-    configuration.put(CommonConfigurationKeys.MODULE_NAME, "test-module")
-    configuration.put(JSConfigurationKeys.LIBRARIES, JsConfig.JS_STDLIB)
-    configuration.put(CommonConfigurationKeys.DISABLE_INLINE, true)
-
-    val languageVersion = explicitLanguageVersion ?: configuration.languageVersionSettings.languageVersion
-
-    configuration.languageVersionSettings = LanguageVersionSettingsImpl(
-        languageVersion,
-        LanguageVersionSettingsImpl.DEFAULT.apiVersion,
-        emptyMap<AnalysisFlag<*>, Any>(),
-        specificFeatures
-    )
-    val config = JsConfig(environment.project, configuration)
-
-    return TopDownAnalyzerFacadeForJS.analyzeFiles(listOf(file), config)
+    return TopDownAnalyzerFacadeForJS.analyzeFiles(listOf(file), generateJSConfig())
 }
 
 fun generatePackageDescriptor(filePath: String, fileName: String): PackageViewDescriptor {
-    val environment = KotlinCoreEnvironment.createForTests(
-        Disposable { },
-        CompilerConfiguration(),
-        EnvironmentConfigFiles.JS_CONFIG_FILES
-    )
+    val environment = generateDefaultEnvironment()
     val project = environment.project
     val psiFile = createFile(fileName, doLoadFile(filePath, fileName), project)
-    val moduleDescriptor = analyze(psiFile, null, mapOf(), environment).moduleDescriptor
+    val moduleDescriptor = analyze(psiFile).moduleDescriptor
     return moduleDescriptor.getPackage(psiFile.packageFqName)
 }

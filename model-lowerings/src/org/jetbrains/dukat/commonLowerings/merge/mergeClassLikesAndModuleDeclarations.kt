@@ -32,6 +32,7 @@ private fun VariableModel.convert(): MemberModel {
             typeParameters = emptyList(),
             static = false,
             override = false,
+            immutable = immutable,
             getter = false,
             setter = false,
             open = false
@@ -73,7 +74,7 @@ private fun ObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<Nam
     return this?.copy(members = members) ?: if (members.isEmpty()) {
         null
     } else {
-        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT)
+        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT, null)
     }
 }
 

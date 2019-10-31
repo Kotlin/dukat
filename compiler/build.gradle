@@ -139,8 +139,6 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
-test.dependsOn(download)
-test.dependsOn(downloadDist)
 
 task generateBinary(type: NodeTask) {
     def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
@@ -181,7 +179,17 @@ task extractKoltinJsLibs(type: Copy) {
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
-test.dependsOn = [generateBinary, fetchDefinitelyTyped, extractKoltinJsLibs, ":node-package:nodeEnv", ":node-package:buildDistrib"]
+
+//TODO: having download and downloadDist is a shame
+test.dependsOn = [
+        download,
+        downloadDist,
+        generateBinary,
+        fetchDefinitelyTyped,
+        extractKoltinJsLibs,
+        ":node-package:nodeEnv",
+        ":node-package:buildDistrib"
+]
 
 test {
     [
@@ -205,7 +213,19 @@ test {
 
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
 
+    /*
+        execute top-level classes in sequentially but their methods in parallel
+        see https://junit.org/junit5/docs/5.5.1/user-guide/index.html#writing-tests-parallel-execution
+    */
+    systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+    systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+    systemProperty("junit.jupiter.execution.parallel.mode.classes.default", "same_thread")
+
     testLogging {
         showStandardStreams = true
+    }
+
+    if (project.hasProperty('coreTests')) {
+        exclude "**/CoreSetCliTests*"
     }
 }

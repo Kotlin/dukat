@@ -15,6 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/* extending interface from lib.dom.d.ts */
 inline fun Event.foo() { this.asDynamic().foo() }
 
 inline var Event.bar: Any get() = this.asDynamic().bar; set(value) { this.asDynamic().bar = value }

@@ -880,7 +880,6 @@ export class AstConverter {
         return res;
     }
 
-
     private convertStatement(statement: ts.Node, resourceName: NameEntity): Array<Declaration> {
         let res: Array<Declaration> = this.convertTopLevelStatement(statement);
 
@@ -904,12 +903,24 @@ export class AstConverter {
         return declarations;
     }
 
+    private resolveAmbientModuleName(moduleDeclaration: ts.ModuleDeclaration): string {
+        if (ts.isNonGlobalAmbientModule(moduleDeclaration) && ts.isExternalModuleAugmentation(moduleDeclaration) && ts.isExternalModuleAugmentation(moduleDeclaration)) {
+            let moduleSymbol = this.typeChecker.getSymbolAtLocation(moduleDeclaration.name);
+
+            if (moduleSymbol && Array.isArray(moduleSymbol.declarations) && moduleSymbol.declarations[0]) {
+                return moduleSymbol.declarations[0].name.getText();
+            }
+        }
+
+        return moduleDeclaration.name.getText();
+    }
+
     convertModule(module: ts.ModuleDeclaration, resourceName: NameEntity): Array<Declaration> {
         let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
 
         const declarations: Declaration[] = [];
         if (module.body) {
-            var definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+            let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
             if (definitionInfos) {
                 definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
                     return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
@@ -919,7 +930,7 @@ export class AstConverter {
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
-            let sourceNameFragment = module.name.getText();
+            let sourceNameFragment = this.resolveAmbientModuleName(module);
 
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName);

@@ -8,4 +8,4 @@ data class TypeParameterDeclaration(
         val name: NameEntity,
         val constraints: List<ParameterValueDeclaration>,
         val defaultValue: ParameterValueDeclaration?
-) : Entity
+) : Entity, ParameterOwnerDeclaration

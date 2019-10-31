@@ -43,13 +43,12 @@ message ParameterValueDeclarationProto {
     oneof type {
         StringLiteralDeclarationProto stringLiteral = 1;
         ThisTypeDeclarationProto thisType = 2;
-        GeneratedInterfaceReferenceDeclarationProto generatedInterfaceReference = 3;
-        IntersectionTypeDeclarationProto intersectionType = 4;
-        TupleDeclarationProto tupleDeclaration = 5;
-        UnionTypeDeclarationProto unionType = 6;
-        ObjectLiteralDeclarationProto objectLiteral = 7;
-        TypeDeclarationProto typeDeclaration = 8;
-        FunctionTypeDeclarationProto functionTypeDeclaration = 9;
+        IntersectionTypeDeclarationProto intersectionType = 3;
+        TupleDeclarationProto tupleDeclaration = 4;
+        UnionTypeDeclarationProto unionType = 5;
+        ObjectLiteralDeclarationProto objectLiteral = 6;
+        TypeDeclarationProto typeDeclaration = 7;
+        FunctionTypeDeclarationProto functionTypeDeclaration = 8;
     }
 }
 
@@ -75,11 +74,6 @@ message TypeParameterDeclarationProto {
     NameEntityProto name = 1;
     repeated ParameterValueDeclarationProto constraints = 2;
     ParameterValueDeclarationProto defaultValue = 3;
-}
-
-message GeneratedInterfaceReferenceDeclarationProto {
-    NameEntityProto name = 1;
-    repeated TypeParameterDeclarationProto typeParameters = 2;
 }
 
 message IntersectionTypeDeclarationProto {

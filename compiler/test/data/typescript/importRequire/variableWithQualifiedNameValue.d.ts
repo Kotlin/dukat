@@ -1,7 +1,5 @@
 // based on https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/browserify/index.d.ts
 
-/// <reference types="node" />
-
 //TODO: currently both ts2k and dukat not supporting this, this causing a compilation error
 import insertGlobals = require('insert-module-globals');
 

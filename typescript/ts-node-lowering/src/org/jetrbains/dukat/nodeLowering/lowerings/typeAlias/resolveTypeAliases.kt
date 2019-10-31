@@ -9,7 +9,9 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -20,8 +22,14 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
             val resolved = context.resolveTypeAlias(parent)
 
             if (resolved is TypeValueNode) {
+
                 when (val typeNodeValue = resolved.value) {
-                    is IdentifierEntity -> HeritageNode(IdentifierEntity(typeNodeValue.value), emptyList())
+                    is IdentifierEntity ->
+                        HeritageNode(
+                            IdentifierEntity(typeNodeValue.value),
+                            emptyList(),
+                            @Suppress("UNCHECKED_CAST") (resolved.typeReference as ReferenceEntity<ClassLikeDeclaration>?)
+                        )
                     else -> raiseConcern("unknown NameEntity $typeNodeValue") { parent }
                 }
             } else {
