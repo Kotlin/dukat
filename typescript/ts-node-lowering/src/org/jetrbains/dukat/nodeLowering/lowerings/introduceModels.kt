@@ -191,8 +191,7 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
                     StatementCallModel(valueNode.value, null, listOf(), meta)
                 }
             },
-            vararg = vararg,
-            optional = optional
+            vararg = vararg
     )
 }
 

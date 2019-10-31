@@ -447,8 +447,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                 name = "value",
                                 type = propertyModel.type,
                                 initializer = null,
-                                vararg = false,
-                                optional = false
+                                vararg = false
                             )
                         ), parent = it
                     ).first()
