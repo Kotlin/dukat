@@ -5,6 +5,7 @@ import org.jetbrains.dukat.js.type_analysis.constraint.container.ConstraintConta
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ReturnConstraintContainer
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -17,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
@@ -39,8 +41,10 @@ fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
 
         for(statement in this.body!!.statements) {
             when(statement) {
+                is VariableDeclaration -> functionScope[statement.name] = statement.initializer.calculateConstraints(functionScope)
                 is ExpressionStatementDeclaration -> statement.expression.calculateConstraints(functionScope)
                 is ReturnStatementDeclaration -> returnTypeConstraints = ReturnConstraintContainer(statement.expression.calculateConstraints(functionScope))
+                else -> raiseConcern("Cannot derive types in function with statement of type <${statement::class}>") {  }
             }
         }
 
@@ -68,7 +72,9 @@ fun MemberDeclaration.introduceTypes(): MemberDeclaration {
         is ConstructorDeclaration -> this.introduceTypes()
         is PropertyDeclaration -> this
         is IndexSignatureDeclaration -> this
-        else -> raiseConcern("Unexpected member entity type <${this.javaClass}>") { this }
+        is MethodSignatureDeclaration -> this
+        is CallSignatureDeclaration -> this
+        else -> raiseConcern("Unexpected member entity type <${this::class}>") { this }
     }
 }
 
@@ -92,7 +98,7 @@ fun TopLevelDeclaration.introduceTypes(): TopLevelDeclaration {
         is TypeAliasDeclaration,
         is ReturnStatementDeclaration,
         is ExpressionStatementDeclaration -> this
-        else -> raiseConcern("Unexpected top level entity type <${this.javaClass}>") { this }
+        else -> raiseConcern("Unexpected top level entity type <${this::class}>") { this }
     }
 }
 
