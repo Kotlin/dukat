@@ -19,12 +19,20 @@ import org.w3c.xhr.*
 
 external interface ChildProcess : events.EventEmitter {
     var stdin: Writable?
+        get() = definedExternally
+        set(value) = definedExternally
     var stdout: Readable?
+        get() = definedExternally
+        set(value) = definedExternally
     var stderr: Readable?
+        get() = definedExternally
+        set(value) = definedExternally
     var channel: Pipe?
         get() = definedExternally
         set(value) = definedExternally
     var stdio: dynamic /* JsTuple<Writable?, Readable?, Readable?, dynamic, dynamic> */
+        get() = definedExternally
+        set(value) = definedExternally
     var killed: Boolean
     var pid: Number
     var connected: Boolean
@@ -82,6 +90,8 @@ external interface ChildProcessWithoutNullStreams : ChildProcess {
     var stdout: Readable
     var stderr: Readable
     override var stdio: dynamic /* JsTuple<Writable, Readable, Readable, dynamic, dynamic> */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ChildProcessByStdio<I : Writable?, O : Readable?, E : Readable?> : ChildProcess {
@@ -89,6 +99,8 @@ external interface ChildProcessByStdio<I : Writable?, O : Readable?, E : Readabl
     var stdout: O
     var stderr: E
     override var stdio: dynamic /* JsTuple<I, O, E, dynamic, dynamic> */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface MessageOptions {
@@ -147,6 +159,8 @@ external interface SpawnOptionsWithoutStdio : SpawnOptions {
 
 external interface SpawnOptionsWithStdioTuple<Stdin : dynamic, Stdout : dynamic, Stderr : dynamic> : SpawnOptions {
     override var stdio: dynamic /* JsTuple<Stdin, Stdout, Stderr> */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external fun spawn(command: String, options: SpawnOptionsWithoutStdio? = definedExternally /* null */): ChildProcessWithoutNullStreams
@@ -203,10 +217,14 @@ external interface ExecOptions : CommonOptions {
 
 external interface ExecOptionsWithStringEncoding : ExecOptions {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecOptionsWithBufferEncoding : ExecOptions {
     var encoding: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecException : Error {
@@ -228,12 +246,16 @@ external fun exec(command: String, callback: ((error: ExecException?, stdout: St
 
 external interface `T$0` {
     var encoding: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external fun exec(command: String, options: `T$0` /* `T$0` & ExecOptions */, callback: ((error: ExecException?, stdout: Buffer, stderr: Buffer) -> Unit)? = definedExternally /* null */): ChildProcess
 
 external interface `T$1` {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external fun exec(command: String, options: `T$1` /* `T$1` & ExecOptions */, callback: ((error: ExecException?, stdout: String, stderr: String) -> Unit)? = definedExternally /* null */): ChildProcess
@@ -275,10 +297,14 @@ external interface ExecFileOptions : CommonOptions {
 
 external interface ExecFileOptionsWithStringEncoding : ExecFileOptions {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecFileOptionsWithBufferEncoding : ExecFileOptions {
     var encoding: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecFileOptionsWithOtherEncoding : ExecFileOptions {
@@ -369,6 +395,8 @@ external interface SpawnSyncOptions : CommonOptions {
 
 external interface SpawnSyncOptionsWithStringEncoding : SpawnSyncOptions {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface SpawnSyncOptionsWithBufferEncoding : SpawnSyncOptions {
@@ -381,7 +409,11 @@ external interface SpawnSyncReturns<T> {
     var stdout: T
     var stderr: T
     var status: Number?
+        get() = definedExternally
+        set(value) = definedExternally
     var signal: String?
+        get() = definedExternally
+        set(value) = definedExternally
     var error: Error?
         get() = definedExternally
         set(value) = definedExternally
@@ -424,6 +456,8 @@ external interface ExecSyncOptions : CommonOptions {
 
 external interface ExecSyncOptionsWithStringEncoding : ExecSyncOptions {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecSyncOptionsWithBufferEncoding : ExecSyncOptions {
@@ -461,6 +495,8 @@ external interface ExecFileSyncOptions : CommonOptions {
 
 external interface ExecFileSyncOptionsWithStringEncoding : ExecFileSyncOptions {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface ExecFileSyncOptionsWithBufferEncoding : ExecFileSyncOptions {

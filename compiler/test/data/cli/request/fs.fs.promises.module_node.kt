@@ -45,6 +45,8 @@ external interface `T$40` {
 
 external interface `T$41` {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
     var flag: dynamic /* String | Number */
         get() = definedExternally
         set(value) = definedExternally

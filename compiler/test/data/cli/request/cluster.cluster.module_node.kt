@@ -48,6 +48,8 @@ external interface Address {
     var address: String
     var port: Number
     var addressType: dynamic /* Number | "udp4" | "udp6" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external open class Worker : events.EventEmitter {
