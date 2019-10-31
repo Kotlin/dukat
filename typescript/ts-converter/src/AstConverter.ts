@@ -798,6 +798,7 @@ export class AstConverter {
                   declaration.name.getText(),
                   this.convertType(declaration.type),
                   this.convertModifiers(statement.modifiers),
+                  declaration.initializer == null ? null : AstExpressionConverter.convertExpression(declaration.initializer),
                   this.exportContext.getUID(declaration)
                 ));
             }
