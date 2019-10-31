@@ -2,6 +2,7 @@ package org.jetbrains.dukat.js.type_analysis
 
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.js.interpretation.Scope
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ConstraintContainer
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ReturnConstraintContainer
 import org.jetbrains.dukat.panic.raiseConcern
@@ -26,14 +27,21 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 
 fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
     if (this.body != null) {
-        val returnTypeConstraints = ReturnConstraintContainer()
-        val parameterConstraintContainers = List(parameters.size) {
-            ConstraintContainer()
+        val functionScope = Scope<ConstraintContainer>()
+
+        var returnTypeConstraints = ReturnConstraintContainer()
+        val parameterConstraintContainers = MutableList(parameters.size) { i ->
+            // Store constraints of parameters in scope,
+            // and in parameter list (in case the variable is replaced)
+            val parameterConstraintContainer = ConstraintContainer()
+            functionScope[parameters[i].name] = parameterConstraintContainer
+            parameterConstraintContainer
         }
 
         for(statement in this.body!!.statements) {
             when(statement) {
-                is ReturnStatementDeclaration -> returnTypeConstraints += statement.expression.calculateConstraints()
+                is ExpressionStatementDeclaration -> statement.expression.calculateConstraints(functionScope)
+                is ReturnStatementDeclaration -> returnTypeConstraints = ReturnConstraintContainer(statement.expression.calculateConstraints(functionScope))
             }
         }
 
@@ -51,6 +59,7 @@ fun FunctionDeclaration.introduceTypes() : FunctionDeclaration {
 }
 
 fun ConstructorDeclaration.introduceTypes() : ConstructorDeclaration {
+    // TODO add body to constructor in AST and process it like a function
     return this
 }
 
@@ -74,7 +83,7 @@ fun TopLevelEntity.introduceTypes(): TopLevelEntity {
         is ClassDeclaration -> this.introduceTypes()
         is BlockDeclaration -> this.introduceTypes()
         is ModuleDeclaration -> this.introduceTypes()
-        is InterfaceDeclaration -> this //TODO check if this needs modification
+        is InterfaceDeclaration, //TODO check if this needs modification
         is VariableDeclaration,
         is EnumDeclaration,
         is ExportAssignmentDeclaration,

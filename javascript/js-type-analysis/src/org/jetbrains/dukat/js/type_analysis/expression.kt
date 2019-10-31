@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.js.type_analysis
 
-import org.jetbrains.dukat.js.type_analysis.constraint.Constraint
+import org.jetbrains.dukat.js.interpretation.Scope
+import org.jetbrains.dukat.js.type_analysis.constraint.container.ConstraintContainer
 import org.jetbrains.dukat.js.type_analysis.constraint.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type_analysis.constraint.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type_analysis.constraint.resolved.NoTypeConstraint
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.js.type_analysis.constraint.resolved.StringTypeConstr
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
@@ -18,46 +20,69 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 
-fun BinaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
+fun BinaryExpressionDeclaration.calculateConstraints(scope: Scope<ConstraintContainer>) : ConstraintContainer {
+    val rightConstraints = right.calculateConstraints(scope)
+    left.calculateConstraints(scope)
+
     return when (operator) {
-        "=" -> right.calculateConstraints()
-        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=", //result and parameters must be numbers
-        "&", "|", "^", "<<", ">>" //result must be a number
-            -> setOf(NumberTypeConstraint)
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=" //result must be a boolean
-            -> setOf(BooleanTypeConstraint)
-        else -> setOf(NoTypeConstraint)
+        "=" -> {
+            scope[left] = rightConstraints
+            rightConstraints
+        }
+        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> {
+            scope[right]?.plusAssign(NumberTypeConstraint)
+            scope[left]?.plusAssign(NumberTypeConstraint)
+            ConstraintContainer(NumberTypeConstraint)
+        }
+        "&", "|", "^", "<<", ">>" -> {
+            ConstraintContainer(NumberTypeConstraint)
+        }
+        "==", "===", "!=", "!==", ">", "<", ">=", "<=" -> {
+            ConstraintContainer(BooleanTypeConstraint)
+        }
+        else -> {
+            ConstraintContainer(NoTypeConstraint)
+        }
     }
 }
 
-fun UnaryExpressionDeclaration.calculateConstraints() : Set<Constraint> {
+fun UnaryExpressionDeclaration.calculateConstraints(scope: Scope<ConstraintContainer>) : ConstraintContainer {
     return when (operator) {
-        "--", "++", "~", //result and parameters must be numbers
-        "-", "+" //result must be a number
-        -> setOf(NumberTypeConstraint)
-        "!" //result and parameters must be booleans
-        -> setOf(BooleanTypeConstraint)
-        else -> setOf(NoTypeConstraint)
+        "--", "++", "~" -> {
+            scope[operand]?.plusAssign(NumberTypeConstraint)
+            ConstraintContainer(NumberTypeConstraint)
+        }
+        "-", "+" -> {
+            ConstraintContainer(NumberTypeConstraint)
+        }
+        "!" -> {
+            scope[operand]?.plusAssign(BooleanTypeConstraint)
+            ConstraintContainer(BooleanTypeConstraint)
+        }
+        else -> {
+            ConstraintContainer(NoTypeConstraint)
+        }
     }
 }
 
-fun LiteralExpressionDeclaration.calculateConstraints() : Set<Constraint> {
+fun LiteralExpressionDeclaration.calculateConstraints() : ConstraintContainer {
     return when (this) {
-        is StringLiteralExpressionDeclaration -> setOf(StringTypeConstraint)
-        is NumericLiteralExpressionDeclaration -> setOf(NumberTypeConstraint)
-        is BigIntLiteralExpressionDeclaration -> setOf(BigIntTypeConstraint)
-        is BooleanLiteralExpressionDeclaration -> setOf(BooleanTypeConstraint)
-        is RegExLiteralExpressionDeclaration -> setOf(RegExTypeConstraint)
-        else -> raiseConcern("Unexpected literal expression type <${this.javaClass}>") { setOf(NoTypeConstraint) }
+        is StringLiteralExpressionDeclaration -> ConstraintContainer(StringTypeConstraint)
+        is NumericLiteralExpressionDeclaration -> ConstraintContainer(NumberTypeConstraint)
+        is BigIntLiteralExpressionDeclaration -> ConstraintContainer(BigIntTypeConstraint)
+        is BooleanLiteralExpressionDeclaration -> ConstraintContainer(BooleanTypeConstraint)
+        is RegExLiteralExpressionDeclaration -> ConstraintContainer(RegExTypeConstraint)
+        else -> raiseConcern("Unexpected literal expression type <${this.javaClass}>") { ConstraintContainer(NoTypeConstraint) }
     }
 }
 
-fun ExpressionDeclaration?.calculateConstraints() : Set<Constraint> {
+fun ExpressionDeclaration?.calculateConstraints(scope: Scope<ConstraintContainer>) : ConstraintContainer {
     return when (this) {
-        is BinaryExpressionDeclaration -> this.calculateConstraints()
-        is UnaryExpressionDeclaration -> this.calculateConstraints()
+        is IdentifierExpressionDeclaration -> scope[this] ?: ConstraintContainer(NoTypeConstraint)
+        is BinaryExpressionDeclaration -> this.calculateConstraints(scope)
+        is UnaryExpressionDeclaration -> this.calculateConstraints(scope)
         is LiteralExpressionDeclaration -> this.calculateConstraints()
-        null -> emptySet()
-        else -> setOf(NoTypeConstraint)
+        null -> ConstraintContainer()
+        else -> ConstraintContainer(NoTypeConstraint)
     }
 }

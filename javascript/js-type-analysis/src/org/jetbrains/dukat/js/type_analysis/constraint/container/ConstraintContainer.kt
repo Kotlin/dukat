@@ -11,12 +11,14 @@ import org.jetbrains.dukat.js.type_analysis.type.numberType
 import org.jetbrains.dukat.js.type_analysis.type.stringType
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-open class ConstraintContainer(protected val constraints: MutableSet<Constraint> = mutableSetOf()) {
-    operator fun plusAssign(constraint: Constraint) {
+open class ConstraintContainer(protected val constraints: MutableSet<Constraint>) : Constraint {
+    constructor(vararg params: Constraint) : this(mutableSetOf(*params))
+
+    open operator fun plusAssign(constraint: Constraint) {
         constraints += constraint
     }
 
-    operator fun plusAssign(newConstraints: Collection<Constraint>) {
+    open operator fun plusAssign(newConstraints: Collection<Constraint>) {
         constraints.addAll(newConstraints)
     }
 
@@ -24,12 +26,23 @@ open class ConstraintContainer(protected val constraints: MutableSet<Constraint>
         return ConstraintContainer(constraints)
     }
 
+    open fun getFlatConstraints() : List<Constraint> {
+        return constraints.flatMap { constraint ->
+            if(constraint is ConstraintContainer) {
+                constraint.getFlatConstraints()
+            } else {
+                listOf(constraint)
+            }
+        }
+    }
+
     open fun resolveToType() : TypeDeclaration {
+        val flatConstraints = getFlatConstraints()
         return when {
-            constraints.contains(NumberTypeConstraint) -> numberType
-            constraints.contains(BigIntTypeConstraint) -> numberType
-            constraints.contains(BooleanTypeConstraint) -> booleanType
-            constraints.contains(StringTypeConstraint) -> stringType
+            flatConstraints.contains(NumberTypeConstraint) -> numberType
+            flatConstraints.contains(BigIntTypeConstraint) -> numberType
+            flatConstraints.contains(BooleanTypeConstraint) -> booleanType
+            flatConstraints.contains(StringTypeConstraint) -> stringType
             else -> anyNullableType
         }
     }
