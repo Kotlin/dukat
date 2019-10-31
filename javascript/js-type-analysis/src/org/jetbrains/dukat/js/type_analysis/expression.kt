@@ -72,7 +72,7 @@ fun LiteralExpressionDeclaration.calculateConstraints() : ConstraintContainer {
         is BigIntLiteralExpressionDeclaration -> ConstraintContainer(BigIntTypeConstraint)
         is BooleanLiteralExpressionDeclaration -> ConstraintContainer(BooleanTypeConstraint)
         is RegExLiteralExpressionDeclaration -> ConstraintContainer(RegExTypeConstraint)
-        else -> raiseConcern("Unexpected literal expression type <${this.javaClass}>") { ConstraintContainer(NoTypeConstraint) }
+        else -> raiseConcern("Unexpected literal expression type <${this::class}>") { ConstraintContainer(NoTypeConstraint) }
     }
 }
 
