@@ -446,11 +446,14 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  declareVariable(name: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, uid: String): VariableDeclaration {
+  declareVariable(name: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: String): VariableDeclaration {
     let variableDeclaration = new declarations.VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
     variableDeclaration.setModifiersList(modifiers);
+    if(initializer) {
+      variableDeclaration.setInitializer(initializer);
+    }
     variableDeclaration.setUid(uid);
 
     let topLevelEntity = new declarations.TopLevelEntityProto();

@@ -150,7 +150,15 @@ fun Declarations.TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
 }
 
 fun Declarations.VariableDeclarationProto.convert(): VariableDeclaration {
-    return VariableDeclaration(name, type.convert(), modifiersList.map { it.convert() }, uid)
+    return VariableDeclaration(
+            name,
+            type.convert(),
+            modifiersList.map { it.convert() },
+            if (hasInitializer()) {
+                initializer?.convert()
+            } else null,
+            uid
+    )
 }
 
 fun Declarations.EnumDeclaration.convert(): EnumDeclaration {
