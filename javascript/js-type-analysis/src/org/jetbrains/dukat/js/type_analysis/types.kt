@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.js.type_analysis
 
-import org.jetbrains.dukat.astCommon.MemberEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.js.interpretation.Scope
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ConstraintContainer
 import org.jetbrains.dukat.js.type_analysis.constraint.container.ReturnConstraintContainer
@@ -18,9 +16,10 @@ import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
@@ -63,7 +62,7 @@ fun ConstructorDeclaration.introduceTypes() : ConstructorDeclaration {
     return this
 }
 
-fun MemberEntity.introduceTypes(): MemberEntity {
+fun MemberDeclaration.introduceTypes(): MemberDeclaration {
     return when (this) {
         is FunctionDeclaration -> this.introduceTypes()
         is ConstructorDeclaration -> this.introduceTypes()
@@ -77,7 +76,7 @@ fun ClassDeclaration.introduceTypes() = copy(members = members.map { it.introduc
 
 fun BlockDeclaration.introduceTypes() = copy(statements = statements.map { it.introduceTypes() })
 
-fun TopLevelEntity.introduceTypes(): TopLevelEntity {
+fun TopLevelDeclaration.introduceTypes(): TopLevelDeclaration {
     return when (this) {
         is FunctionDeclaration -> this.introduceTypes()
         is ClassDeclaration -> this.introduceTypes()
