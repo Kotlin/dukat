@@ -441,11 +441,6 @@ export class AstConverter {
               this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
               param.initializer.getText()
             )
-        } else if (param.questionToken != null) {
-            initializer = this.astFactory.createExpression(
-              this.astFactory.createTypeDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
-              "null"
-            )
         }
 
         let paramType = this.convertType(param.type);

@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external interface JQueryXHR : MyXMLHttpRequest, JQueryPromise<Any> {
     fun overrideMimeType(mimeType: String): Any
-    fun abort(statusText: String? = definedExternally /* null */)
+    fun abort(statusText: String? = definedExternally)
 }
 
 external interface Property<T>

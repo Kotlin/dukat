@@ -55,5 +55,5 @@ external interface ArrayType<T> {
         get() = definedExternally
         set(value) = definedExternally
     @nativeInvoke
-    operator fun invoke(resourceId: String, hash: Any? = definedExternally /* null */, callback: Function<*>? = definedExternally /* null */)
+    operator fun invoke(resourceId: String, hash: Any? = definedExternally, callback: Function<*>? = definedExternally)
 }

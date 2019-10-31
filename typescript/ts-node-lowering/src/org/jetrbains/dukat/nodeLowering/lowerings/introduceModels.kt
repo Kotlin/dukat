@@ -186,9 +186,10 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             initializer = if (context == TranslationContext.CONSTRUCTOR) {
                 null
             } else {
-                initializer?.let { valueNode ->
-                    // TODO: don't like this particular cast
-                    StatementCallModel(valueNode.value, null, listOf(), meta)
+                when {
+                    initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
+                    optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                    else -> null
                 }
             },
             vararg = vararg

@@ -25,6 +25,6 @@ external interface `T$0` {
 }
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external open class App(opts: `T$0` = definedExternally /* null */) {
+external open class App(opts: `T$0` = definedExternally) {
     open fun <T, K : Any> pick(obj: T, keys: Array<K>): Any
 }

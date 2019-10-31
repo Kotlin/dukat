@@ -21,7 +21,7 @@ external var bar: String?
 
 external fun bar(a: String?): Foo?
 
-external fun baz(a: Foo?, b: Number? = definedExternally /* null */): Any?
+external fun baz(a: Foo?, b: Number? = definedExternally): Any?
 
 external interface `T$0` {
     @nativeGetter

@@ -15,10 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withOneAny(a: Any? = definedExternally /* null */): Any
+external fun withOneAny(a: Any? = definedExternally): Any
 
-external fun withOneString(s: String? = definedExternally /* null */): String
+external fun withOneString(s: String? = definedExternally): String
 
-external fun withManyArguments(s: String? = definedExternally /* null */, settings: JQueryAjaxSettings? = definedExternally /* null */): Boolean
+external fun withManyArguments(s: String? = definedExternally, settings: JQueryAjaxSettings? = definedExternally): Boolean
 
-external fun withOptionalQualified(opts: ping.Options? = definedExternally /* null */)
+external fun withOptionalQualified(opts: ping.Options? = definedExternally)
