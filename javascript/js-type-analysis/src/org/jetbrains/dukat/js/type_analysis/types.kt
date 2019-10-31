@@ -74,15 +74,17 @@ fun MemberDeclaration.introduceTypes(): MemberDeclaration {
 
 fun ClassDeclaration.introduceTypes() = copy(members = members.map { it.introduceTypes() })
 
+fun InterfaceDeclaration.introduceTypes() = copy(members = members.map { it.introduceTypes() })
+
 fun BlockDeclaration.introduceTypes() = copy(statements = statements.map { it.introduceTypes() })
 
 fun TopLevelDeclaration.introduceTypes(): TopLevelDeclaration {
     return when (this) {
         is FunctionDeclaration -> this.introduceTypes()
-        is ClassDeclaration -> this.introduceTypes()
         is BlockDeclaration -> this.introduceTypes()
+        is ClassDeclaration -> this.introduceTypes()
+        is InterfaceDeclaration -> this.introduceTypes()
         is ModuleDeclaration -> this.introduceTypes()
-        is InterfaceDeclaration, //TODO check if this needs modification
         is VariableDeclaration,
         is EnumDeclaration,
         is ExportAssignmentDeclaration,
