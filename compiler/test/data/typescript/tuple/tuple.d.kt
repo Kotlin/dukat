@@ -17,6 +17,8 @@ import org.w3c.xhr.*
 
 external interface Options {
     var mode: dynamic /* JsTuple<dynamic> */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external var foo: dynamic /* JsTuple<String, Any> */

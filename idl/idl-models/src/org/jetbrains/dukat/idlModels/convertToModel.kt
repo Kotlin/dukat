@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlModels
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
@@ -19,7 +20,6 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SimpleCommentModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -197,7 +197,8 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             null
                     )
             )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -230,7 +231,8 @@ fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
                             )
                     )
             )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -252,7 +254,8 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
                 name = IdentifierEntity(""),
                 members = staticMemberModels,
                 parentEntities = listOf(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
     } else {
         null
@@ -402,7 +405,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             operator = false,
             extend = null,
             body = generateFunctionBody(),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
     return listOf(declaration, generatedFunction)
 }
@@ -415,11 +419,12 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                     name = IdentifierEntity(""),
                     members = listOf(),
                     parentEntities = listOf(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
             ),
             typeParameters = listOf(),
             parentEntities = listOf(),
-            comment = SimpleCommentModel(
+            comment = SimpleCommentEntity(
                     "please, don't implement this interface!"
             ),
             annotations = mutableListOf(
@@ -466,7 +471,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                         ),
                         typeParameters = listOf()
                 ),
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
         )
     }
     return listOf(declaration) + generatedVariables
@@ -478,7 +484,8 @@ fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
             members = attributes.mapNotNull { it.process() } +
                     operations.mapNotNull { it.process() },
             parentEntities = listOf(),
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+            visibilityModifier = VisibilityModifierModel.DEFAULT,
+            comment = null
     )
 }
 
@@ -503,8 +510,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = !readOnly,
+                immutable = readOnly,
+                getter = false,
+                setter = false,
                 open = open
         )
         is IDLOperationDeclaration -> MethodModel(
@@ -529,8 +537,9 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 typeParameters = listOf(),
                 static = false,
                 override = false,
-                getter = true,
-                setter = true,
+                immutable = false,
+                getter = false,
+                setter = false,
                 open = false
         )
         is IDLGetterDeclaration -> MethodModel(
@@ -580,7 +589,8 @@ fun IDLFileDeclaration.process(): SourceFileModel {
             declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
-            imports = mutableListOf("kotlin.js.*".toNameEntity())
+            imports = mutableListOf("kotlin.js.*".toNameEntity()),
+            comment = null
     )
 
     return SourceFileModel(

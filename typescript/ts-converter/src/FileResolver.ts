@@ -8,6 +8,10 @@ export class FileResolver {
     return fs.readFileSync(fileName, "utf-8");
   }
 
+  exists(fileName: string): boolean {
+    return fs.existsSync(fileName);
+  }
+
   resolve(fileName: string): string {
     FileResolver.logger.debug(`resolving ${fileName}`);
     return FileResolver.readFile(fileName);

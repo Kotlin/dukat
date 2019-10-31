@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.astModel
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -10,7 +11,8 @@ data class ObjectModel(
         val members: List<MemberModel>,
 
         val parentEntities: List<HeritageModel>,
-        override val visibilityModifier: VisibilityModifierModel
+        override val visibilityModifier: VisibilityModifierModel,
+        override val comment: CommentEntity?
 ) : MemberEntity, TopLevelModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
@@ -22,7 +24,8 @@ fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
                 IdentifierEntity(""),
                 otherModel.members,
                 listOf(),
-                VisibilityModifierModel.DEFAULT
+                VisibilityModifierModel.DEFAULT,
+                null
         )
     }
 

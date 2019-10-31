@@ -7,7 +7,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 

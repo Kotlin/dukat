@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -20,9 +20,11 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -218,7 +220,7 @@ private fun ParameterValueDeclaration.resolveTypeParams(typeParamsSet: Set<NameE
 
 class GeneratedInterfacesContext {
     private val myGeneratedInterfaces = mutableMapOf<NameEntity, GeneratedInterfaceDeclaration>()
-    private val myReferences: MutableMap<String, MutableList<GeneratedInterfaceReferenceDeclaration>> = mutableMapOf()
+    private val registeredGeneratedInterfaces = mutableMapOf<String, MutableList<GeneratedInterfaceDeclaration>>()
 
     private val logger = Logging.logger("GeneratedInterfacesContext")
 
@@ -282,38 +284,30 @@ class GeneratedInterfacesContext {
         val identicalInterface = findIdenticalInterface(interfaceNode)
         return if (identicalInterface == null) {
             myGeneratedInterfaces[name] = interfaceNode
-            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters)
+            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters, ReferenceEntity(interfaceNode.uid))
 
-            myReferences.getOrPut(uid) { mutableListOf() }.add(referenceNode)
+            registeredGeneratedInterfaces.getOrPut(uid) { mutableListOf() }.add(interfaceNode)
 
             referenceNode
         } else {
-            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, identicalInterface.typeParameters)
+            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, identicalInterface.typeParameters, ReferenceEntity(identicalInterface.uid))
         }
     }
 
-    private fun resolveGeneratedInterfacesFor(node: ClassLikeDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.getUID(), mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
+    private fun <T> T.resolveGeneratedInterfaces(): List<TopLevelDeclaration> where T : WithUidDeclaration, T : TopLevelDeclaration {
+        return if (registeredGeneratedInterfaces[uid] is List<GeneratedInterfaceDeclaration>) {
+            registeredGeneratedInterfaces[uid]!! + listOf(this)
+        } else {
+            listOf(this)
+        }
     }
 
-    private fun resolveGeneratedInterfacesFor(node: FunctionDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun resolveGeneratedInterfacesFor(node: VariableDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun resolveGeneratedInterfacesFor(node: TypeAliasDeclaration): List<GeneratedInterfaceDeclaration> {
-        return myReferences.getOrDefault(node.uid, mutableListOf()).mapNotNull { referenceNode -> myGeneratedInterfaces.get(referenceNode.name) }
-    }
-
-    private fun introduceGeneratedEntities(declaration: TopLevelEntity): List<TopLevelEntity> {
+    private fun introduceGeneratedEntities(declaration: TopLevelDeclaration): List<TopLevelDeclaration> {
         return when (declaration) {
-            is ClassLikeDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is VariableDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is FunctionDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
-            is TypeAliasDeclaration -> resolveGeneratedInterfacesFor(declaration).flatMap { genInterface -> introduceGeneratedEntities(genInterface) } + listOf(declaration)
+            is ClassLikeDeclaration -> declaration.resolveGeneratedInterfaces()
+            is VariableDeclaration -> declaration.resolveGeneratedInterfaces()
+            is FunctionDeclaration -> declaration.resolveGeneratedInterfaces()
+            is TypeAliasDeclaration -> declaration.resolveGeneratedInterfaces()
             is ModuleDeclaration -> listOf(introduceGeneratedEntities(declaration))
             else -> listOf(declaration)
         }

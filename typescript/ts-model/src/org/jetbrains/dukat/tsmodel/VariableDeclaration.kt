@@ -9,4 +9,4 @@ data class VariableDeclaration(
         val modifiers: List<ModifierDeclaration>,
 
         override val uid: String
-) : TopLevelDeclaration, WithUidDeclaration
+) : TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration

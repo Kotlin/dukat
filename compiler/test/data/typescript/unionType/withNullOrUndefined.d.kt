@@ -42,6 +42,8 @@ external open class Foo(a: String?) {
 external interface IBar {
     fun someMethod(): dynamic /* String | Number | Nothing? */
     var foo: Foo?
+        get() = definedExternally
+        set(value) = definedExternally
     var optionalFoo: String?
         get() = definedExternally
         set(value) = definedExternally

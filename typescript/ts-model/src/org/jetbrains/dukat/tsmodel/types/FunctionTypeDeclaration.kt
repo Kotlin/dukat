@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsmodel.types
 
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 
 
 data class FunctionTypeDeclaration(
@@ -8,4 +9,4 @@ data class FunctionTypeDeclaration(
         val type: ParameterValueDeclaration,
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration
+) : ParameterValueDeclaration, ParameterOwnerDeclaration

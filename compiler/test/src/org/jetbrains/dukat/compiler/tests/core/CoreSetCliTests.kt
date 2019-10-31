@@ -27,7 +27,6 @@ class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
-    @EnabledIfSystemProperty(named = "dukat.test.cli", matches = "true")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEqualsBinary(name, tsPath, ktPath)
     }

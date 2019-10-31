@@ -12,6 +12,7 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -70,12 +71,12 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
         )
     }
 
-    override fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
+    override fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }
 
-    override fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
+    override fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }
@@ -153,7 +154,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
         }
     }
 
-    override fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>): MemberEntity {
+    override fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>): MemberDeclaration {
         val declaration = owner.node
         return when (declaration) {
             is IndexSignatureDeclaration -> {

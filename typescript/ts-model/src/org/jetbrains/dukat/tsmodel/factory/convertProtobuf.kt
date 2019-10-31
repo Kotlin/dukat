@@ -22,6 +22,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -232,21 +233,15 @@ fun Declarations.CallSignatureDeclarationProto.convert(): CallSignatureDeclarati
     )
 }
 
-fun Declarations.MemberEntityProto.convert(): MemberEntity {
-    return if (hasConstructorDeclaration()) {
-        constructorDeclaration.convert()
-    } else if (hasMethodSignature()) {
-        methodSignature.convert()
-    } else if (hasFunctionDeclaration()) {
-        functionDeclaration.convert()
-    } else if (hasProperty()) {
-        property.convert()
-    } else if (hasIndexSignature()) {
-        indexSignature.convert()
-    } else if (hasCallSignature()) {
-        callSignature.convert()
-    } else {
-        throw Exception("unknown MemberEntityProto: ${this}")
+fun Declarations.MemberEntityProto.convert(): MemberDeclaration {
+    return when {
+        hasConstructorDeclaration() -> constructorDeclaration.convert()
+        hasMethodSignature() -> methodSignature.convert()
+        hasFunctionDeclaration() -> functionDeclaration.convert()
+        hasProperty() -> property.convert()
+        hasIndexSignature() -> indexSignature.convert()
+        hasCallSignature() -> callSignature.convert()
+        else -> throw Exception("unknown MemberEntityProto: ${this}")
     }
 }
 
@@ -308,7 +303,6 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
     return when {
         hasStringLiteral() -> StringLiteralDeclaration(stringLiteral.token)
         hasThisType() -> ThisTypeDeclaration()
-        hasGeneratedInterfaceReference() -> GeneratedInterfaceReferenceDeclaration(generatedInterfaceReference.name.convert(), generatedInterfaceReference.typeParametersList.map { it.convert() })
         hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
         hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
         hasUnionType() -> UnionTypeDeclaration(unionType.paramsList.map { it.convert() })

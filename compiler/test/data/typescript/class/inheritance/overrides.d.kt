@@ -21,6 +21,8 @@ external interface Box : Shape
 
 external interface BaseEvent {
     var data: dynamic /* String | Number */
+        get() = definedExternally
+        set(value) = definedExternally
     fun getDelegateTarget(): Shape
     fun getElement(): Element
     fun <T : Shape> transform(shape: T? = definedExternally): T

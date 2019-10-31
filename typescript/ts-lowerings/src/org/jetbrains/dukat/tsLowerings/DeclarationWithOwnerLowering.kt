@@ -1,15 +1,16 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -30,9 +31,9 @@ interface DeclarationWithOwnerLowering {
     fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>): FunctionTypeDeclaration
     fun lowerParameterDeclaration(owner: NodeOwner<ParameterDeclaration>): ParameterDeclaration
     fun lowerTypeParameter(owner: NodeOwner<TypeParameterDeclaration>): TypeParameterDeclaration
-    fun lowerUnionTypeDeclation(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
-    fun lowerIntersectionTypeDeclatation(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
-    fun lowerMemberDeclaration(owner: NodeOwner<MemberEntity>): MemberEntity
+    fun lowerUnionTypeDeclaration(owner: NodeOwner<UnionTypeDeclaration>): UnionTypeDeclaration
+    fun lowerIntersectionTypeDeclaration(owner: NodeOwner<IntersectionTypeDeclaration>): IntersectionTypeDeclaration
+    fun lowerMemberDeclaration(owner: NodeOwner<MemberDeclaration>): MemberDeclaration
     fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>): MethodSignatureDeclaration
     fun lowerTypeAliasDeclaration(owner: NodeOwner<TypeAliasDeclaration>): TypeAliasDeclaration
     fun lowerObjectDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>): ParameterValueDeclaration
@@ -43,8 +44,8 @@ interface DeclarationWithOwnerLowering {
         return when (val declaration = owner.node) {
             is TypeDeclaration -> lowerTypeDeclaration(owner as NodeOwner<TypeDeclaration>)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(owner as NodeOwner<FunctionTypeDeclaration>)
-            is UnionTypeDeclaration -> lowerUnionTypeDeclation(owner as NodeOwner<UnionTypeDeclaration>)
-            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclatation(owner as NodeOwner<IntersectionTypeDeclaration>)
+            is UnionTypeDeclaration -> lowerUnionTypeDeclaration(owner as NodeOwner<UnionTypeDeclaration>)
+            is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(owner as NodeOwner<IntersectionTypeDeclaration>)
             is ObjectLiteralDeclaration -> lowerObjectDeclaration(owner as NodeOwner<ObjectLiteralDeclaration>)
             is TupleDeclaration -> lowerTupleDeclaration(owner as NodeOwner<TupleDeclaration>)
             else -> declaration
@@ -61,7 +62,7 @@ interface DeclarationWithOwnerLowering {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelEntity>): TopLevelEntity {
+    fun lowerTopLevelDeclaration(owner: NodeOwner<TopLevelDeclaration>): TopLevelDeclaration {
         return when (val declaration = owner.node) {
             is VariableDeclaration -> lowerVariableDeclaration(owner as NodeOwner<VariableDeclaration>)
             is FunctionDeclaration -> lowerFunctionDeclaration(owner as NodeOwner<FunctionDeclaration>)
@@ -72,7 +73,7 @@ interface DeclarationWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: NodeOwner<ModuleDeclaration>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<ModuleDeclaration>): List<TopLevelDeclaration> {
         return declarations.map { declaration ->
             lowerTopLevelDeclaration(owner.wrap(declaration))
         }

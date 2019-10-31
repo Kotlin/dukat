@@ -3,10 +3,13 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.js.config.JsConfig
 
-class DescriptorContext {
+class DescriptorContext(val config: JsConfig) {
+
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
     private val typeParameters: MutableMap<NameEntity, TypeParameterDescriptor> = mutableMapOf()
+    val registeredImports: MutableList<String> = mutableListOf()
 
     fun registerDescriptor(name: NameEntity, descriptor: ClassDescriptor) {
         registeredDescriptors[name] = descriptor

@@ -28,7 +28,7 @@ pluginManagement {
 
 gradle.ext {
   kotlinVersion = "1.3.50"
-  jupiterVersion = "5.4.1"
+  jupiterVersion = "5.5.1"
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
   nodeVersion = "10.16.2"
   npmVersion = "6.9.0"
@@ -54,6 +54,7 @@ include 'idl-reference-resolver'
 include 'interop'
 include 'itertools'
 include 'js-interpretation'
+include 'js-module-statistics'
 include 'js-type-analysis'
 include 'logging'
 include 'model-lowerings'
@@ -79,6 +80,7 @@ project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
 
 project(':js-interpretation').projectDir = file("$rootDir/javascript/js-interpretation")
+project(':js-module-statistics').projectDir = file("$rootDir/javascript/js-module-statistics")
 project(':js-type-analysis').projectDir = file("$rootDir/javascript/js-type-analysis")
 
 project(':ts-ast-declarations').projectDir = file("$rootDir/typescript/ts-ast-declarations")

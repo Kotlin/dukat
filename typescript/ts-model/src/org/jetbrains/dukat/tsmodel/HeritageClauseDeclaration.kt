@@ -10,4 +10,4 @@ data class HeritageClauseDeclaration(
         val typeArguments: List<ParameterValueDeclaration>,
         val extending: Boolean,
         val typeReference: ReferenceEntity<ClassLikeDeclaration>?
-) : Entity
+) : Entity, ParameterOwnerDeclaration

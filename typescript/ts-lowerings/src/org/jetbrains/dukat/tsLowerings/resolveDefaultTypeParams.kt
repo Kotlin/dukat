@@ -2,11 +2,13 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -24,7 +26,6 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
                     acc[typeParam.name] = index
                     acc
                 }
-
 
                 val fromIndex = reference.typeParameters.size - parameters.size
 
@@ -50,36 +51,19 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
         return paramsResolved
     }
 
-    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration): HeritageClauseDeclaration {
+    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
         val params = resolveParameters(heritageClause.typeReference, heritageClause.typeArguments)
-        return super.lowerHeritageClause(heritageClause.copy(typeArguments = params))
+        return super.lowerHeritageClause(heritageClause.copy(typeArguments = params), owner)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration): TypeDeclaration {
-        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)))
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)), owner)
     }
-}
-
-private fun ModuleDeclaration.collectReferences(references: MutableMap<String, ClassLikeDeclaration>): Map<String, ClassLikeDeclaration> {
-    declarations.forEach {
-        if (it is ClassDeclaration) {
-            references[it.uid] = it
-        } else if (it is InterfaceDeclaration) {
-            references[it.uid] = it
-        } else if (it is ModuleDeclaration) {
-            it.collectReferences(references)
-        }
-    }
-
-    return references
 }
 
 private fun ModuleDeclaration.resolveDefaultTypeParams(): ModuleDeclaration {
-    val references: Map<String, ClassLikeDeclaration> =
-            collectReferences(mutableMapOf())
-
-    return ResolveDefaultTypeParams(references).lowerDocumentRoot(this)
+    return ResolveDefaultTypeParams(collectReferences()).lowerDocumentRoot(this)
 }
 
 private fun SourceFileDeclaration.resolveDefaultTypeParams() = copy(root = root.resolveDefaultTypeParams())

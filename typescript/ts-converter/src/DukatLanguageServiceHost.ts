@@ -19,13 +19,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptFileNames(): string[] {
-        const res: string[] = [];
-
-        this.knownFiles.forEach((v1, v2, s) => {
-            res.push(v1);
-        });
-
-        return res;
+        return Array.from(this.knownFiles);
     }
 
     getScriptVersion(fileName: string): string {
@@ -51,5 +45,9 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     register(knownFile: string) {
         this.knownFiles.add(knownFile);
+    }
+
+    fileExists(filePath: string): boolean {
+        return this.fileResolver.exists(filePath);
     }
 }

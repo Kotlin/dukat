@@ -1,8 +1,34 @@
 package org.jetbrains.dukat.translatorString
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.DelegationModel
+import org.jetbrains.dukat.astModel.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.EnumModel
+import org.jetbrains.dukat.astModel.ExternalDelegationModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.Variance
+import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
@@ -24,15 +50,21 @@ private fun String?.translateMeta(): String {
     }
 }
 
-private fun CommentModel.translate(output: (String) -> Unit) {
-    when (this) {
-        is SimpleCommentModel -> output(text.translateMeta().trim())
+
+private fun CommentEntity.translate(): String {
+    return when (this) {
+        is SimpleCommentEntity -> text.translateMeta().trim()
         is DocumentationCommentModel -> {
-            output("/**")
-            output(" * $text")
-            output(" */")
+"""/**
+ * $text
+ */"""
         }
+        else -> ""
     }
+}
+
+private fun CommentEntity.translate(output: (String) -> Unit) {
+    translate().split("\n").forEach(output)
 }
 
 
@@ -46,10 +78,6 @@ private fun TypeModel.translateMeta(): String {
 
 private fun StatementModel.translateMeta(): String {
     return metaDescription.translateMeta()
-}
-
-private fun translateTypeParams(params: List<TypeModel>): String {
-    return "<" + params.joinToString(", ") { param -> "${param.translate()}${param.translateMeta()}" } + ">"
 }
 
 fun TypeModel.translate(): String {
@@ -184,6 +212,8 @@ private fun ClassLikeReferenceModel.translate(): String {
 }
 
 private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
+    comment?.translate(output)
+
     val returnsUnit = (type is TypeValueModel) &&
             (type as TypeValueModel).value == IdentifierEntity("Unit")
 
@@ -298,7 +328,7 @@ private fun EnumModel.translate(): String {
 private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override) "override " else if (open) "open " else ""
-    val varModifier = if (getter && !setter) "val" else "var"
+    val varModifier = if (immutable) "val" else "var"
 
     return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
 }
@@ -315,7 +345,7 @@ private fun MemberModel.translate(): List<String> {
 }
 
 private fun PropertyModel.translateSignature(): List<String> {
-    val varModifier = if (getter && !setter) "val" else "var"
+    val varModifier = if (immutable) "val" else "var"
     val overrideClause = if (override) "override " else ""
 
 
@@ -327,13 +357,11 @@ private fun PropertyModel.translateSignature(): List<String> {
     val res = mutableListOf(
             "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
     )
-    if (type.nullable || (type is TypeValueModel && (type as TypeValueModel).value == IdentifierEntity("dynamic"))) {
-        if (getter) {
-            res.add(FORMAT_TAB + "get() = definedExternally")
-        }
-        if (setter) {
-            res.add(FORMAT_TAB + "set(value) = definedExternally")
-        }
+    if (getter) {
+        res.add(FORMAT_TAB + "get() = definedExternally")
+    }
+    if (setter) {
+        res.add(FORMAT_TAB + "set(value) = definedExternally")
     }
     return res
 }
@@ -415,7 +443,7 @@ private fun ClassModel.translate(depth: Int): String {
 }
 
 private fun VisibilityModifierModel.translate(): String? {
-    return when(this) {
+    return when (this) {
         VisibilityModifierModel.PUBLIC -> "public"
         VisibilityModifierModel.INTERNAL -> "internal"
         VisibilityModifierModel.PRIVATE -> "private"

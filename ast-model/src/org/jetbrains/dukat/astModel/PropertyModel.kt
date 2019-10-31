@@ -9,6 +9,7 @@ data class PropertyModel(
 
         val static: Boolean,
         val override: Boolean,
+        val immutable: Boolean,
 
         val getter: Boolean,
         val setter: Boolean,

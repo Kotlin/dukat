@@ -31,6 +31,12 @@ allprojects {
         }
       }
 
+      compileTestKotlin {
+        kotlinOptions {
+          freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
+        }
+      }
+
       dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib:$gradle.kotlinVersion")
       }

@@ -15,4 +15,5 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+/* extending interface from lib.dom.d.ts */
 inline fun Event.chain(): Event /* this */ = this.asDynamic().chain()
