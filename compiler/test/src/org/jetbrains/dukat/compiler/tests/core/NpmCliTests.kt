@@ -2,6 +2,7 @@ package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -13,6 +14,7 @@ class NpmCliTests {
     @DisplayName("cli test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("testSet")
+    @Disabled
     fun withValueSource(descriptor: String) {
         val sourceDir = File(DEFINITELY_TYPED_DIR, descriptor)
         val sourcePath = File(sourceDir, "index.d.ts")
