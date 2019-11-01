@@ -89,9 +89,11 @@ private class OverrideResolver(val context: ModelContext) {
             return false
         }
 
-        return parameters
-                .zip(otherMethodModel.parameters) { a, b -> a.type.isOverriding(b.type) }
+        val parametersAreEquivalent = parameters
+                .zip(otherMethodModel.parameters) { a, b -> a.type.isEquivalent(b.type) }
                 .all { it }
+
+        return parametersAreEquivalent && type.isOverriding(otherMethodModel.type)
     }
 
     private fun PropertyModel.isOverriding(otherPropertyModel: PropertyModel): Boolean {
@@ -121,14 +123,34 @@ private class OverrideResolver(val context: ModelContext) {
         return false
     }
 
-    private fun TypeModel.isOverriding(otherParameterType: TypeModel): Boolean {
-        //TODO: we need to do this the right way
+    private fun TypeModel.isDynamic(): Boolean {
+        return (this is TypeValueModel && value == IdentifierEntity("dynamic"))
+    }
+
+    private fun TypeModel.isEquivalent(otherParameterType: TypeModel): Boolean {
         if (this == otherParameterType) {
             return true
         }
 
-        if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("dynamic")) {
+        if (isDynamic() || otherParameterType.isDynamic()) {
             return true
+        }
+
+        if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
+            if (value == otherParameterType.value
+                && params == otherParameterType.params
+                && nullable == otherParameterType.nullable) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+
+    private fun TypeModel.isOverriding(otherParameterType: TypeModel): Boolean {
+        if (isEquivalent(otherParameterType)) {
+            return true;
         }
 
         if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("Any")) {
@@ -136,13 +158,6 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-
-            if (value == otherParameterType.value
-                    && params == otherParameterType.params
-                    && nullable == otherParameterType.nullable) {
-                return true
-            }
-
             val classLike: ClassLikeModel? = context.resolveClass(value) ?: context.resolveInterface(value)
             val otherClassLike: ClassLikeModel? = context.resolveClass(otherParameterType.value)
                     ?: context.resolveInterface(otherParameterType.value)

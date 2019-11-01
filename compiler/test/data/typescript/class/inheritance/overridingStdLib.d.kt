@@ -18,9 +18,17 @@ import org.w3c.xhr.*
 external interface AppEvent : Event {
     override var currentTarget: Element
     override var target: Element
-    override fun preventDefault(): Any
+    fun preventDefault(): Any
+}
+
+external interface LibEvent : Event {
+    override fun preventDefault()
 }
 
 external open class NativeEvent : Event {
-    override fun preventDefault(): Any
+    open fun preventDefault(): Any
+}
+
+external open class FrameworkEvent : Event {
+    override fun preventDefault()
 }
