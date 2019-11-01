@@ -18,9 +18,9 @@ data class ParameterNode(
 fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         name = name,
         type = type,
-        initializer = if (initializer != null) {
-            TypeValueNode(initializer!!.kind.value, emptyList())
-        } else null,
+        initializer = initializer?.kind?.let {
+            TypeValueNode(it.value, emptyList(), it.typeReference)
+        },
         meta = initializer?.meta,
         vararg = vararg,
         optional = optional

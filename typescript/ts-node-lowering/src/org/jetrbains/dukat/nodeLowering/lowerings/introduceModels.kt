@@ -286,18 +286,18 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             } else {
                 null
             },
-            primaryConstructor = if (primaryConstructor != null) {
+            primaryConstructor = primaryConstructor?.let { constructor ->
                 ConstructorModel(
-                        parameters = primaryConstructor!!.parameters.map { param -> param.process() },
-                        typeParameters = primaryConstructor!!.typeParameters.map { typeParam ->
+                        parameters = constructor.parameters.map { param -> param.process() },
+                        typeParameters = constructor.typeParameters.map { typeParam ->
                             TypeParameterModel(
                                     type = TypeValueModel(typeParam.value, listOf(), null),
                                     constraints = typeParam.params.map { param -> param.process() }
                             )
                         },
-                        generated = primaryConstructor!!.generated
+                        generated = constructor.generated
                 )
-            } else null,
+            },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
                         type = TypeValueModel(typeParam.value, listOf(), null),
