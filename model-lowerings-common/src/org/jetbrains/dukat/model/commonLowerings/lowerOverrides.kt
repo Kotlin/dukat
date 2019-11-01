@@ -104,7 +104,7 @@ private class OverrideResolver(val context: ModelContext) {
 
         if (name == IdentifierEntity("equals") && parameters.size == 1) {
             val firstParameterType = parameters[0].type
-            if (firstParameterType is TypeValueModel && firstParameterType.value == IdentifierEntity("Any")) {
+            if (firstParameterType is TypeValueModel && firstParameterType.value == IdentifierEntity("Any") && firstParameterType.nullable) {
                 return true
             }
         }
