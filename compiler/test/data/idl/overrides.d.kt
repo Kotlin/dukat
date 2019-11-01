@@ -9,12 +9,12 @@ public external abstract class A {
 
 public external abstract class B : A {
     fun f2(): Double
-    override fun f2(other: B): Double
+    fun f2(other: B): Double
     fun f2(other: D): Double
 }
 
 public external abstract class C : A {
-    override fun f2(other: C): Double
+    fun f2(other: C): Double
 }
 
 public external abstract class D
