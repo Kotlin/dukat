@@ -53,3 +53,11 @@ external open class ParentClass {
 external open class ChildClass : ParentClass {
     override var prop: String
 }
+
+external interface _Chain<T, V> {
+    fun flatten(shallow: Boolean? = definedExternally): _Chain<Any, Any>
+}
+
+external interface _ChainOfArrays<T> : _Chain<Array<T>, Array<T>> {
+    override fun flatten(shallow: Boolean?): _Chain<T, T>
+}

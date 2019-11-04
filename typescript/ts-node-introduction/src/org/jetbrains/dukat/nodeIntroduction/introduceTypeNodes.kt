@@ -24,7 +24,8 @@ private class TypeNodesLowering : ParameterValueLowering {
         return when (declaration) {
             is TypeParamReferenceDeclaration -> TypeParameterNode(
                     name = declaration.value,
-                    nullable = declaration.nullable
+                    nullable = declaration.nullable,
+                    meta = declaration.meta
             )
             is TypeDeclaration -> TypeValueNode(
                     value = declaration.value,

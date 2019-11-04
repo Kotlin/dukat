@@ -41,7 +41,6 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
-import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.EnumTokenModel
@@ -52,6 +51,7 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
@@ -60,6 +60,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
@@ -71,7 +72,6 @@ import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import java.io.File
@@ -228,6 +228,13 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                 emptyList(),
                 "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
         )
+        is TypeParameterNode -> {
+            TypeParameterReferenceModel(
+                    name = name,
+                    metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                    nullable = nullable
+            )
+        }
         is TypeValueNode -> {
             if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
                 TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token)
@@ -259,14 +266,6 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                     nullable
             )
 
-        }
-        is TypeParameterNode -> {
-            TypeValueModel(
-                value = name,
-                params = emptyList(),
-                nullable = nullable,
-                metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions())
-            )
         }
         else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
             TypeValueModel(
