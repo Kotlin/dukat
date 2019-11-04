@@ -155,8 +155,7 @@ fun IDLArgumentDeclaration.process(): ParameterModel {
             } else {
                 null
             },
-            vararg = variadic,
-            optional = false
+            vararg = variadic
     )
 }
 
@@ -327,8 +326,7 @@ fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
             } else {
                 null
             },
-            vararg = false,
-            optional = false
+            vararg = false
     )
 }
 

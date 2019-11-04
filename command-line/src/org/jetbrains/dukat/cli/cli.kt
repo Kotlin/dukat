@@ -54,7 +54,7 @@ private fun compile(filenames: List<String>, outDir: String?, translator: InputT
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
-private fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
+fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
     val dirFile = File(outDir ?: "./")
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()

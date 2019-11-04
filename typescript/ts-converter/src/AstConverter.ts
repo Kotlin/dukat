@@ -39,6 +39,7 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 export class AstConverter {
     private exportContext = createExportContent();
     private log = createLogger("AstConverter");
+    private unsupportedDeclarations = new Set<Number>();
 
     private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
@@ -116,6 +117,13 @@ export class AstConverter {
         });
 
         return this.astFactory.createSourceSet(fileName, sources);
+    }
+
+    printDiagnostics() {
+        this.log.debug("following declarations has been skipped: ");
+        this.unsupportedDeclarations.forEach(id => {
+           this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
+        });
     }
 
     createSourceSet(fileName: string): SourceSet {
@@ -443,7 +451,7 @@ export class AstConverter {
                 )
             } else {
                 // TODO: use raiseConcern for this
-                this.log.debug(`unsupported declaration type: [${type.kind}]`);
+                this.unsupportedDeclarations.add(type.kind);
                 return this.createTypeDeclaration("any");
             }
         }
@@ -875,7 +883,7 @@ export class AstConverter {
                 this.log.info(`skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
         } else {
-            this.log.info(`skipping ${statement.kind}`);
+            this.unsupportedDeclarations.add(statement.kind);
         }
 
         return res;

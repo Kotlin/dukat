@@ -25,10 +25,10 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -67,6 +67,7 @@ import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
+import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
@@ -77,10 +78,18 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
 import org.jetbrains.kotlin.types.isError
-import org.jetbrains.kotlin.types.typeUtil.isArrayOfNothing
 
 internal fun translateName(name: NameEntity): String {
     return name.translate().trim('`')
+}
+
+fun translatePackageName(name: NameEntity): FqName {
+    return FqName(
+        when (name) {
+            ROOT_PACKAGENAME -> ""
+            else -> translateName(name)
+        }
+    )
 }
 
 private class DescriptorTranslator(val context: DescriptorContext) {
@@ -314,7 +323,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             when (parent.kind) {
                 ClassKind.INTERFACE -> Modality.ABSTRACT
                 ClassKind.OBJECT -> Modality.FINAL
-                else -> Modality.OPEN
+                else -> if (methodModel.open) Modality.OPEN else Modality.FINAL
             },
             Visibilities.PUBLIC
         )
@@ -447,8 +456,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                 name = "value",
                                 type = propertyModel.type,
                                 initializer = null,
-                                vararg = false,
-                                optional = false
+                                vararg = false
                             )
                         ), parent = it
                     ).first()
@@ -687,36 +695,47 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
     }
 
-    fun translateModule(moduleModel: ModuleModel): ModuleDescriptor {
+    fun translateModule(moduleModel: ModuleModel, moduleDescriptor: ModuleDescriptorImpl): PackageFragmentDescriptor {
+        context.registeredImports.clear()
         context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
 
-        val moduleDescriptor = ModuleDescriptorImpl(
-            Name.special("<main>"),
-            LockBasedStorageManager.NO_LOCKS,
-            DefaultBuiltIns.Instance
-        )
-
-        val fragmentDescriptor = object : PackageFragmentDescriptorImpl(
-            moduleDescriptor, FqName("")
+        return object : PackageFragmentDescriptorImpl(
+            moduleDescriptor, translatePackageName(moduleModel.name)
         ) {
             override fun getMemberScope() =
                 SimpleMemberScope(moduleModel.declarations.mapNotNull { translateTopLevelModel(it, this) })
         }
-
-        val provider = PackageFragmentProviderImpl(listOf(fragmentDescriptor))
-        moduleDescriptor.setDependencies(
-            ModuleDependenciesImpl(
-                listOf(moduleDescriptor) + builtIns.builtInsModule,
-                setOf(),
-                listOf()
-            )
-        )
-        moduleDescriptor.initialize(provider)
-
-        return moduleDescriptor
     }
 }
 
 fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
-    return DescriptorTranslator(DescriptorContext(generateJSConfig())).translateModule(sources.first().root)
+
+    val moduleDescriptor = ModuleDescriptorImpl(
+        Name.special("<main>"),
+        LockBasedStorageManager.NO_LOCKS,
+        DefaultBuiltIns.Instance
+    )
+
+    val translator = DescriptorTranslator(DescriptorContext(generateJSConfig()))
+
+    val provider = PackageFragmentProviderImpl(sources.map {
+        translator.translateModule(
+            it.root,
+            moduleDescriptor
+        )
+    })
+    moduleDescriptor.setDependencies(
+        ModuleDependenciesImpl(
+            listOf(moduleDescriptor) + builtIns.builtInsModule,
+            setOf(),
+            listOf()
+        )
+    )
+    moduleDescriptor.initialize(provider)
+    sources.forEach { sourceFile ->
+        moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
+            .fragments.forEach { it.getMemberScope() }
+    }
+
+    return moduleDescriptor
 }

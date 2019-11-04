@@ -17,6 +17,8 @@ import org.w3c.xhr.*
 
 external interface Shape
 
+external interface InvariantBox<T>
+
 external interface Box : Shape
 
 external interface BaseEvent {
@@ -27,7 +29,7 @@ external interface BaseEvent {
     fun getElement(): Element
     fun <T : Shape> transform(shape: T? = definedExternally): T
     var prop: Any
-    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): Promise<Any>
+    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): InvariantBox<Any>
 }
 
 external open class BoxStringEvent : BaseEvent {
@@ -36,7 +38,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getElement(): HTMLElement
     override fun <T : Shape> transform(shape: T?): T
     override var prop: String
-    override fun queryByReturnType(query: String, parameters: Array<Any>?): Promise<String>
+    open fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): InvariantBox<String>
 }
 
 external interface NumberEvent : BaseEvent {

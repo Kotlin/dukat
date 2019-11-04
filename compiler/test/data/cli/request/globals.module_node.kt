@@ -145,6 +145,8 @@ external interface NodeRequire : NodeRequireFunction {
     var cache: Any
     var extensions: NodeExtensions
     var main: NodeModule?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface `T$0` {
@@ -178,6 +180,8 @@ external interface NodeModule {
     var filename: String
     var loaded: Boolean
     var parent: NodeModule?
+        get() = definedExternally
+        set(value) = definedExternally
     var children: Array<NodeModule>
     var paths: Array<String>
 }

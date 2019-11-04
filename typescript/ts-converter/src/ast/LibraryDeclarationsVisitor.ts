@@ -4,6 +4,7 @@ import {tsInternals} from "../TsInternals";
 export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
   private libDeclarations = new Map<string, Array<ts.Node>>();
+  private skipTypes = new Set(["Array", "Boolean", "Number", "String"]);
 
   constructor(
     private typeChecker: ts.TypeChecker
@@ -51,7 +52,10 @@ export class LibraryDeclarationsVisitor {
           this.checkLibReferences(type);
         }
       } else if (ts.isTypeNode(declaration)) {
-        this.checkLibReferences(declaration);
+        let shouldNotBeProcessed = ts.isTypeReferenceNode(declaration) && this.skipTypes.has(declaration.typeName.getText());
+        if (!shouldNotBeProcessed) {
+          this.checkLibReferences(declaration);
+        }
       }
       this.visit(declaration);
     });

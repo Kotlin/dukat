@@ -246,6 +246,8 @@ external interface ProcessReport {
     var reportOnSignal: Boolean
     var reportOnUncaughtException: Boolean
     var signal: dynamic /* "SIGABRT" | "SIGALRM" | "SIGBUS" | "SIGCHLD" | "SIGCONT" | "SIGFPE" | "SIGHUP" | "SIGILL" | "SIGINT" | "SIGIO" | "SIGIOT" | "SIGKILL" | "SIGPIPE" | "SIGPOLL" | "SIGPROF" | "SIGPWR" | "SIGQUIT" | "SIGSEGV" | "SIGSTKFLT" | "SIGSTOP" | "SIGSYS" | "SIGTERM" | "SIGTRAP" | "SIGTSTP" | "SIGTTIN" | "SIGTTOU" | "SIGUNUSED" | "SIGURG" | "SIGUSR1" | "SIGUSR2" | "SIGVTALRM" | "SIGWINCH" | "SIGXCPU" | "SIGXFSZ" | "SIGBREAK" | "SIGLOST" | "SIGINFO" */
+        get() = definedExternally
+        set(value) = definedExternally
     fun writeReport(fileName: String? = definedExternally /* null */): String
     fun writeReport(error: Error? = definedExternally /* null */): String
     fun writeReport(fileName: String? = definedExternally /* null */, err: Error? = definedExternally /* null */): String
@@ -364,6 +366,8 @@ external interface Process : EventEmitter {
     var title: String
     var arch: String
     var platform: dynamic /* 'aix' | 'android' | 'darwin' | 'freebsd' | 'linux' | 'openbsd' | 'sunos' | 'win32' | 'cygwin' | 'netbsd' */
+        get() = definedExternally
+        set(value) = definedExternally
     var mainModule: NodeModule?
         get() = definedExternally
         set(value) = definedExternally

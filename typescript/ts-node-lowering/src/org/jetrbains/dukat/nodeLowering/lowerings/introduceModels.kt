@@ -132,24 +132,14 @@ private fun MemberNode.process(): MemberModel? {
     return when (this) {
         is ConstructorNode -> ConstructorModel(
                 parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 generated = generated
         )
         is MethodNode -> MethodModel(
                 name = IdentifierEntity(name),
                 parameters = parameters.map { param -> param.process() },
                 type = type.process(),
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
 
                 static = static,
 
@@ -162,12 +152,7 @@ private fun MemberNode.process(): MemberModel? {
         is PropertyNode -> PropertyModel(
                 name = IdentifierEntity(name),
                 type = type.process(),
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 static = static,
                 override = override,
                 immutable = getter && !setter,
@@ -186,13 +171,13 @@ private fun ParameterNode.process(context: TranslationContext = TranslationConte
             initializer = if (context == TranslationContext.CONSTRUCTOR) {
                 null
             } else {
-                initializer?.let { valueNode ->
-                    // TODO: don't like this particular cast
-                    StatementCallModel(valueNode.value, null, listOf(), meta)
+                when {
+                    initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
+                    optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                    else -> null
                 }
             },
-            vararg = vararg,
-            optional = optional
+            vararg = vararg
     )
 }
 
@@ -301,18 +286,18 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             } else {
                 null
             },
-            primaryConstructor = if (primaryConstructor != null) {
+            primaryConstructor = primaryConstructor?.let { constructor ->
                 ConstructorModel(
-                        parameters = primaryConstructor!!.parameters.map { param -> param.process() },
-                        typeParameters = primaryConstructor!!.typeParameters.map { typeParam ->
+                        parameters = constructor.parameters.map { param -> param.process() },
+                        typeParameters = constructor.typeParameters.map { typeParam ->
                             TypeParameterModel(
                                     type = TypeValueModel(typeParam.value, listOf(), null),
                                     constraints = typeParam.params.map { param -> param.process() }
                             )
                         },
-                        generated = primaryConstructor!!.generated
+                        generated = constructor.generated
                 )
-            } else null,
+            },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
                         type = TypeValueModel(typeParam.value, listOf(), null),
@@ -403,8 +388,7 @@ private fun VariableNode.resolveSetter(): StatementModel? {
 }
 
 private fun FunctionNode.resolveBody(): List<StatementModel> {
-    val nodeContext = this.context
-    return when (nodeContext) {
+    return when (val nodeContext = this.context) {
         is IndexSignatureGetter -> listOf(
                 ReturnStatementModel(
                         ChainCallModel(
@@ -456,6 +440,15 @@ private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
     }
 }
 
+private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {
+    return typeParameters.map { typeParam ->
+        TypeParameterModel(
+                type = TypeValueModel(typeParam.value, listOf(), null),
+                constraints = typeParam.params.map { param -> param.process() }
+        )
+    }
+}
+
 fun TopLevelEntity.convertToModel(): TopLevelModel? {
     return when (this) {
         is ClassNode -> convertToClassModel()
@@ -473,12 +466,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 parameters = parameters.map { param -> param.process() },
                 type = type.process(),
 
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 annotations = exportQualifier.toAnnotation(),
                 export = export,
                 inline = inline,
@@ -497,12 +485,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 initializer = null,
                 get = resolveGetter(),
                 set = resolveSetter(),
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 extend = extend.convert(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null

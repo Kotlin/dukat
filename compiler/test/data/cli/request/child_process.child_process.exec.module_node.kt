@@ -26,6 +26,8 @@ external fun __promisify__(command: String): child_process.PromiseWithChild
 
 external interface `T$5` {
     var encoding: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface `T$6` {
@@ -37,6 +39,8 @@ external fun __promisify__(command: String, options: `T$5` /* `T$5` & ExecOption
 
 external interface `T$7` {
     var encoding: dynamic /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external fun __promisify__(command: String, options: `T$7` /* `T$7` & ExecOptions */): child_process.PromiseWithChild
@@ -51,7 +55,11 @@ external interface `T$8` {
 
 external interface `T$9` {
     var stdout: dynamic /* String | Buffer */
+        get() = definedExternally
+        set(value) = definedExternally
     var stderr: dynamic /* String | Buffer */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external fun __promisify__(command: String, options: `T$8` /* `T$8` & ExecOptions */ = definedExternally /* null */): child_process.PromiseWithChild
