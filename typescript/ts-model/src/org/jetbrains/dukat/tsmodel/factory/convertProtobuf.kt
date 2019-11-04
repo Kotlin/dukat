@@ -40,6 +40,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 fun Declarations.NameEntityProto.convert(): NameEntity {
@@ -276,7 +277,7 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
             )
         }
         hasTypeParamReferenceDeclaration() -> with(typeParamReferenceDeclaration) {
-            TypeDeclaration(value.convert(), emptyList(), null)
+            TypeParamReferenceDeclaration(value.convert())
         }
         hasObjectLiteral() -> {
             val objectLiteral = objectLiteral

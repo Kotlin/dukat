@@ -9,11 +9,18 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 private class TypeNodesLowering() : ParameterValueLowering {
 
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
+            is TypeParamReferenceDeclaration -> TypeValueNode(
+                    value = declaration.value,
+                    params = emptyList(),
+                    typeReference = null,
+                    nullable = declaration.nullable
+            )
             is TypeDeclaration -> TypeValueNode(
                     value = declaration.value,
                     params = declaration.params.map { param -> lowerType(param) },

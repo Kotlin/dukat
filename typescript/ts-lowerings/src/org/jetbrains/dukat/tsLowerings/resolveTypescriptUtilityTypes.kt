@@ -11,6 +11,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 
 private fun MemberDeclaration.makeOptional(): MemberDeclaration {
@@ -39,10 +40,8 @@ private fun TypeDeclaration.resolvePick(): ParameterValueDeclaration? {
     if (((value is IdentifierEntity)) && (value.value == "Pick")) {
         if (params.size == 2) {
             val tParam = params[0]
-            if ((tParam is TypeDeclaration)) {
-                if ((tParam.typeReference == null)) {
-                    return TypeDeclaration(IdentifierEntity("Any"), emptyList())
-                }
+            if ((tParam is TypeParamReferenceDeclaration)) {
+                return TypeDeclaration(IdentifierEntity("Any"), emptyList())
             }
         }
     }
