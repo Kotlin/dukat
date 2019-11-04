@@ -3,7 +3,6 @@ package org.jetbrains.dukat.tsmodel.factory
 import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
@@ -16,7 +15,6 @@ import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -241,7 +239,7 @@ private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterD
 }
 
 
-private fun Declarations.TypeDeclarationProto.convert(): TypeDeclaration {
+private fun Declarations.TypeReferenceDeclarationProto.convert(): TypeDeclaration {
     return TypeDeclaration(
             value.convert(),
             paramsList.map { it.convert() },
@@ -270,12 +268,15 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
         hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
         hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
         hasUnionType() -> UnionTypeDeclaration(unionType.paramsList.map { it.convert() })
-        hasTypeDeclaration() -> with(typeDeclaration) {
+        hasTypeReferenceDeclaration() -> with(typeReferenceDeclaration) {
             TypeDeclaration(
                     value.convert(),
                     paramsList.map { it.convert() },
-                    if (typeDeclaration.hasTypeReference()) typeReference.convert() else null
+                    if (typeReferenceDeclaration.hasTypeReference()) typeReference.convert() else null
             )
+        }
+        hasTypeParamReferenceDeclaration() -> with(typeParamReferenceDeclaration) {
+            TypeDeclaration(value.convert(), emptyList(), null)
         }
         hasObjectLiteral() -> {
             val objectLiteral = objectLiteral

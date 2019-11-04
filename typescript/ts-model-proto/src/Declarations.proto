@@ -47,8 +47,9 @@ message ParameterValueDeclarationProto {
         TupleDeclarationProto tupleDeclaration = 4;
         UnionTypeDeclarationProto unionType = 5;
         ObjectLiteralDeclarationProto objectLiteral = 6;
-        TypeDeclarationProto typeDeclaration = 7;
+        TypeReferenceDeclarationProto typeReferenceDeclaration = 7;
         FunctionTypeDeclarationProto functionTypeDeclaration = 8;
+        TypeParamReferenceDeclarationProto typeParamReferenceDeclaration = 9;
     }
 }
 
@@ -88,10 +89,14 @@ message UnionTypeDeclarationProto {
     repeated ParameterValueDeclarationProto params = 1;
 }
 
-message TypeDeclarationProto {
+message TypeReferenceDeclarationProto {
     NameEntityProto value = 1;
     repeated ParameterValueDeclarationProto params = 2;
     ReferenceEntityProto typeReference = 3;
+}
+
+message TypeParamReferenceDeclarationProto {
+    NameEntityProto value = 1;
 }
 
 message CallSignatureDeclarationProto {
@@ -162,7 +167,7 @@ message ReferenceEntityProto {
 }
 
 message ExpressionDeclarationProto {
-    TypeDeclarationProto kind = 1;
+    TypeReferenceDeclarationProto kind = 1;
     string meta = 2;
 }
 

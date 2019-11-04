@@ -375,8 +375,8 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
-  createTypeDeclaration(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null = null): TypeDeclaration {
-    let typeDeclaration = new declarations.TypeDeclarationProto();
+  createTypeReferenceDeclaration(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null = null): TypeDeclaration {
+    let typeDeclaration = new declarations.TypeReferenceDeclarationProto();
     typeDeclaration.setValue(value);
     typeDeclaration.setParamsList(params);
     if (typeReference != null) {
@@ -387,9 +387,21 @@ export class AstFactory implements AstFactory {
     return typeDeclaration;
   }
 
-  createTypeDeclarationAsParamValue(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null): ParameterValue {
+  createTypeParamReferenceDeclaration(value: NameEntity): TypeDeclaration {
+    let typeDeclaration = new declarations.TypeParamReferenceDeclarationProto();
+    typeDeclaration.setValue(value);
+    return typeDeclaration;
+  }
+
+  createTypeParamReferenceDeclarationAsParamValue(value: NameEntity) {
     let paramValueDeclaration = new declarations.ParameterValueDeclarationProto();
-    paramValueDeclaration.setTypedeclaration(this.createTypeDeclaration(value, params, typeReference));
+    paramValueDeclaration.setTypeparamreferencedeclaration(this.createTypeParamReferenceDeclaration(value));
+    return paramValueDeclaration;
+  }
+
+  createTypeReferenceDeclarationAsParamValue(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null): ParameterValue {
+    let paramValueDeclaration = new declarations.ParameterValueDeclarationProto();
+    paramValueDeclaration.setTypereferencedeclaration(this.createTypeReferenceDeclaration(value, params, typeReference));
     return paramValueDeclaration;
   }
 
