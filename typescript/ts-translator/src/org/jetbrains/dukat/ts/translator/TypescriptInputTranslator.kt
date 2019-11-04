@@ -18,7 +18,6 @@ import org.jetbrains.dukat.model.commonLowerings.omitStdLib
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
-import org.jetbrains.dukat.nodeIntroduction.introduceTupleNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
@@ -59,7 +58,6 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .introduceNodes(moduleNameResolver)
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
-                .introduceTupleNodes()
                 .resolveModuleAnnotations()
                 .lowerNullable()
                 .lowerPrimitives()
