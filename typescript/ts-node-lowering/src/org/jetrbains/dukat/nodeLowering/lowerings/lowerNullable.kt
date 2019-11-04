@@ -1,5 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
+import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -44,6 +45,7 @@ private class LowerNullable : NodeTypeLowering {
                             res.meta = MuteMetadata()
                             res
                         }
+                        is TypeParameterNode -> nullableType.copy(nullable = true)
                         is FunctionTypeNode -> {
                             val res = lowerFunctionNode(nullableType)
                             res.nullable = true

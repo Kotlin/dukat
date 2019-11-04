@@ -1,5 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
+import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -258,6 +259,14 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                     nullable
             )
 
+        }
+        is TypeParameterNode -> {
+            TypeValueModel(
+                value = name,
+                params = emptyList(),
+                nullable = nullable,
+                metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions())
+            )
         }
         else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
             TypeValueModel(

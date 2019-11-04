@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
@@ -21,10 +22,8 @@ private class TypeNodesLowering : ParameterValueLowering {
 
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
-            is TypeParamReferenceDeclaration -> TypeValueNode(
-                    value = declaration.value,
-                    params = emptyList(),
-                    typeReference = null,
+            is TypeParamReferenceDeclaration -> TypeParameterNode(
+                    name = declaration.value,
                     nullable = declaration.nullable
             )
             is TypeDeclaration -> TypeValueNode(
