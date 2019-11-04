@@ -13,4 +13,4 @@ data class GeneratedInterfaceReferenceNode(
 
         override val nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration
+) : TypeNode

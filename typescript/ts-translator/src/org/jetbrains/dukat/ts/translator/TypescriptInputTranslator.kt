@@ -22,7 +22,6 @@ import org.jetbrains.dukat.nodeIntroduction.introduceTupleNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
-import org.jetbrains.dukat.nodeIntroduction.lowerUnionType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
@@ -62,7 +61,6 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .introduceQualifiedNode()
                 .introduceTupleNodes()
                 .resolveModuleAnnotations()
-                .lowerUnionType()
                 .lowerNullable()
                 .lowerPrimitives()
                 .lowerVarargs()
