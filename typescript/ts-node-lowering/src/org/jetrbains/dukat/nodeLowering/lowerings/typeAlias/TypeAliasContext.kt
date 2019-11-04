@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -87,7 +88,7 @@ class TypeAliasContext {
                         is TypeValueNode -> aliasResolved.typeReference.specify(aliasParamsMap)
                         is UnionTypeNode -> aliasResolved.typeReference.specify(aliasParamsMap)
                         is FunctionTypeNode -> aliasResolved.typeReference.specify(aliasParamsMap)
-                        is GeneratedInterfaceReferenceDeclaration -> aliasResolved.typeReference
+                        is GeneratedInterfaceReferenceNode -> aliasResolved.typeReference
                         else -> null
                     }
                 }

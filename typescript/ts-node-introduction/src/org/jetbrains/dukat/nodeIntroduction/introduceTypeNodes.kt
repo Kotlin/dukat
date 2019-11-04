@@ -2,10 +2,12 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -35,6 +37,13 @@ private class TypeNodesLowering() : ParameterValueLowering {
                     type = lowerType(declaration.type),
                     nullable = declaration.nullable,
                     meta = declaration.meta
+            )
+            is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
+                declaration.name,
+                declaration.typeParameters,
+                declaration.reference,
+                declaration.nullable,
+                declaration.meta
             )
             else -> super.lowerType(declaration)
         }

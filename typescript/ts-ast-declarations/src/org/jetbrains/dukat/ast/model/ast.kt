@@ -3,6 +3,7 @@ package org.jetbrains.dukat.ast.model
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
@@ -56,6 +57,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is FunctionTypeDeclaration -> copy() as T
         is FunctionTypeNode -> copy() as T
         is GeneratedInterfaceReferenceDeclaration -> copy() as T
+        is GeneratedInterfaceReferenceNode -> copy() as T
         is ImportEqualsDeclaration -> copy() as T
         is InterfaceDeclaration -> copy() as T
         is InterfaceNode -> copy() as T

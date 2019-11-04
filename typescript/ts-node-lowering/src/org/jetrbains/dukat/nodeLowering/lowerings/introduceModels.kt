@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
@@ -248,7 +249,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                     nullable = nullable
             )
         }
-        is GeneratedInterfaceReferenceDeclaration -> {
+        is GeneratedInterfaceReferenceNode -> {
             TypeValueModel(
                     name,
                     typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) }
