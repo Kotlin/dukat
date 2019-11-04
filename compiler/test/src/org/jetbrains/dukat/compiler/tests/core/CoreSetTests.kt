@@ -59,7 +59,8 @@ class CoreSetTests : OutputTests() {
 
         assertEquals(
                 translated,
-                File(ktPath).readText().trimEnd()
+                File(ktPath).readText().trimEnd(),
+                "\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}"
         )
 
         val outputDirectory = File("./build/tests/out")

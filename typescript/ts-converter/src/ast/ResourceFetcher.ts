@@ -48,7 +48,7 @@ export class ResourceFetcher {
 
     let importFiles: Array<string> = [];
     sourceFile.imports.forEach(importDeclaration => {
-      var module = ts.getResolvedModule(sourceFile, importDeclaration.text);
+      const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
       if (module && (typeof module.resolvedFileName == "string")) {
         importFiles.push(tsInternals.normalizePath(module.resolvedFileName))
       }

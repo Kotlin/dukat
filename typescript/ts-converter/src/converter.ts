@@ -60,7 +60,9 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
           astFactory
         );
 
-        return astConverter.createSourceSet(fileName);
+        let sourceSet = astConverter.createSourceSet(fileName);
+        astConverter.printDiagnostics();
+        return sourceSet;
     }
 }
 

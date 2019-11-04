@@ -60,16 +60,18 @@ abstract class CompilationTests {
         getTranslator().translate(sourcePath, targetPath)
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"
 
-        val sources = targetDir.walk().map { it.absolutePath }.toList()
+        val sources = targetDir.walk().map { it.normalize().absolutePath }.toList()
 
         assert(sources.isNotEmpty()) { "$FILE_NOT_FIND_ASSERTION: $targetPath" }
+
+        val compilationErrorMessage = "$COMPILATION_ERROR_ASSERTION:\n" + sources.joinToString("\n") { source -> "file:///${source}" }
 
         assertEquals(
                 ExitCode.OK,
                 compile(
                         sources,
                         outSource
-                ), COMPILATION_ERROR_ASSERTION
+                ), compilationErrorMessage
         )
     }
 

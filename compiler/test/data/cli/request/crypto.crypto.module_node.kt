@@ -133,6 +133,8 @@ external open class Hmac : stream.Transform {
 
 external interface KeyExportOptions<T : dynamic> {
     var type: dynamic /* 'pkcs1' | 'spki' | 'pkcs8' | 'sec1' */
+        get() = definedExternally
+        set(value) = definedExternally
     var format: T
     var cipher: String?
         get() = definedExternally
@@ -1012,10 +1014,14 @@ external interface DSAKeyPairKeyObjectOptions {
 external interface `T$1`<PubF> {
     var type: dynamic /* 'pkcs1' | 'spki' */
     var format: PubF
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface `T$2` {
     var type: dynamic /* 'pkcs1' | 'pkcs8' */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external interface RSAKeyPairOptions<PubF : dynamic, PrivF : dynamic> {

@@ -47,21 +47,17 @@ where possible options include:
 
 # Recent Changes
 
+### [0.0.22] - 31'October, 2019
+ - Better support for Partial. Whenever this class is defined in this particular declaration source set,
+   new class is generated which mimicks Partial behaviour.
+ - Resolving relative module names (see [#110](https://github.com/Kotlin/dukat/issues/110) - Inconsistent naming while translating @types/lodash)
+ - Support type references in typescript declarations. 
+
 ### [0.0.21] - 22'October, 2019
  - [#133](https://github.com/Kotlin/dukat/issues/133) Lack of type params in generated interfaces
  - [#136](https://github.com/Kotlin/dukat/issues/136) Convert nested nullable unions correctly
  - [#141](https://github.com/Kotlin/dukat/issues/141) ThisTypeDeclaration leak in inline functions generated from merged interfaces
  - Default ts library is switched to lib.es6.d.ts.
-
-### [0.0.20] - 10'October, 2019
- With this release idl target is no longer experimental. It's main focus remains the same, however: 
- to generate stdlib for following releases of Kotlin/JS. 
- 
- - [idl] support for record types, partial namespaces
- - [idl] minor improvements for mixins and enums
- - [idl] ([#124](https://github.com/Kotlin/dukat/issues/124)) always show public visibility modifier in accordance with [KEEP-45](https://github.com/Kotlin/KEEP/issues/45) 
- - Translate Pick<T, K> to Any (in case T is actually a type param)
- - [#129 - Failing to translate generic params with default values when such values are not type params](https://github.com/Kotlin/dukat/issues/129) 
 
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 

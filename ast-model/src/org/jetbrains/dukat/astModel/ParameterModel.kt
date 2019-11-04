@@ -7,6 +7,5 @@ data class ParameterModel(
         val name: String,
         val type: TypeModel,
         val initializer: StatementModel?,
-        val vararg: Boolean,
-        val optional: Boolean
+        val vararg: Boolean
 ) : Entity

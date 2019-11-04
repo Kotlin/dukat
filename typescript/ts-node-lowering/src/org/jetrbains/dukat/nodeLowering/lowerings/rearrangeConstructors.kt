@@ -17,11 +17,11 @@ fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
                 generatedConstructors = generatedConstructors.toMutableList()
                 declaredConstructors = declaredConstructors.toMutableList()
 
-                val primaryConstructor = if (declaredConstructors.isNotEmpty()) {
-                    declaredConstructors.removeAt(0)
-                } else if (generatedConstructors.size == 1) {
-                    generatedConstructors.removeAt(0)
-                } else null
+                val primaryConstructor = when {
+                    declaredConstructors.isNotEmpty() -> declaredConstructors.removeAt(0)
+                    generatedConstructors.size == 1 -> generatedConstructors.removeAt(0)
+                    else -> null
+                }
 
                 declaration.copy(
                     members = (declaredConstructors + generatedConstructors + members),

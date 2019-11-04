@@ -56,7 +56,8 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     }
 
     CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
-        name = name.appendLeft(IdentifierEntity("module_$moduleName"))
+        val moduleNameFlattened = moduleName.replace("/", "_")
+        name = name.appendLeft(IdentifierEntity("module_$moduleNameFlattened"))
     }
 
     if (this.name != null) {

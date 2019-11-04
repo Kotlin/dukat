@@ -1,5 +1,11 @@
 # Changelog
 
+### [0.0.22] - 31'October, 2019
+ - Better support for Partial. Whenever this class is defined in this particular declaration source set,
+   new class is generated which mimicks Partial behaviour.
+ - Resolving relative module names (see [#110](https://github.com/Kotlin/dukat/issues/110) - Inconsistent naming while translating @types/lodash)
+ - Support type references in typescript declarations.     
+
 ### [0.0.21] - 22'October, 2019
  - [#133](https://github.com/Kotlin/dukat/issues/133) Lack of type params in generated interfaces
  - [#136](https://github.com/Kotlin/dukat/issues/136) Convert nested nullable unions correctly

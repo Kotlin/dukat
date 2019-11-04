@@ -1,4 +1,5 @@
 declare interface Shape {}
+declare interface InvariantBox<T> {}
 
 declare interface Box extends Shape {}
 
@@ -8,7 +9,7 @@ declare interface BaseEvent {
     getElement(): Element;
     transform<T extends Shape>(shape?: T): T;
     prop: any;
-    queryByReturnType(query: string, parameters?: any[]): Promise<any>;
+    queryByReturnType(query: string, parameters?: any[]): InvariantBox<any>;
 }
 declare class BoxStringEvent implements BaseEvent {
     data: string;
@@ -16,7 +17,7 @@ declare class BoxStringEvent implements BaseEvent {
     getElement(): HTMLElement;
     transform<T extends Shape>(shape?: T): T;
     prop: string;
-    queryByReturnType(query: string, parameters?: any[]): Promise<string>;
+    queryByReturnType(query: string, parameters?: any[]): InvariantBox<string>;
 }
 declare interface NumberEvent extends BaseEvent {
     data: number;

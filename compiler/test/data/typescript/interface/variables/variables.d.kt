@@ -21,6 +21,7 @@ external interface Foo {
     var varAsNumber: Number
     var varAsBoolean: Boolean
     var varAsString: String
+    var varAsSimpleLambda: (force: Boolean) -> Unit
 }
 
 // ------------------------------------------------------------------------------------------
