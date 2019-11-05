@@ -1,8 +1,7 @@
-package org.jetbrains.dukat.tsmodel.expression
+package org.jetbrains.dukat.tsmodel.expression.name
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 
 data class IdentifierExpressionDeclaration(
         val identifier: IdentifierEntity
-) : ExpressionDeclaration
+) : NameExpressionDeclaration

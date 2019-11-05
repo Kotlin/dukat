@@ -47,8 +47,9 @@ message ParameterValueDeclarationProto {
         TupleDeclarationProto tupleDeclaration = 4;
         UnionTypeDeclarationProto unionType = 5;
         ObjectLiteralDeclarationProto objectLiteral = 6;
-        TypeDeclarationProto typeDeclaration = 7;
+        TypeReferenceDeclarationProto typeReferenceDeclaration = 7;
         FunctionTypeDeclarationProto functionTypeDeclaration = 8;
+        TypeParamReferenceDeclarationProto typeParamReferenceDeclaration = 9;
     }
 }
 
@@ -88,10 +89,14 @@ message UnionTypeDeclarationProto {
     repeated ParameterValueDeclarationProto params = 1;
 }
 
-message TypeDeclarationProto {
+message TypeReferenceDeclarationProto {
     NameEntityProto value = 1;
     repeated ParameterValueDeclarationProto params = 2;
     ReferenceEntityProto typeReference = 3;
+}
+
+message TypeParamReferenceDeclarationProto {
+    NameEntityProto value = 1;
 }
 
 message CallSignatureDeclarationProto {
@@ -196,8 +201,8 @@ message LiteralExpressionDeclarationProto {
     }
 }
 
-message IdentifierExpressionDeclarationProto {
-    IdentifierEntityProto identifier = 1;
+message NameExpressionDeclarationProto {
+    NameEntityProto name = 1;
 }
 
 message BinaryExpressionDeclarationProto {
@@ -212,6 +217,16 @@ message UnaryExpressionDeclarationProto {
     bool isPrefix = 3;
 }
 
+message PropertyAccessExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    IdentifierEntityProto name = 2;
+}
+
+message ElementAccessExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    ExpressionDeclarationProto argumentExpression = 2;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -220,9 +235,11 @@ message ExpressionDeclarationProto {
     oneof type {
         BinaryExpressionDeclarationProto binaryExpression = 1;
         UnaryExpressionDeclarationProto unaryExpression = 2;
-        IdentifierExpressionDeclarationProto identifierExpression = 3;
+        NameExpressionDeclarationProto nameExpression = 3;
         LiteralExpressionDeclarationProto literalExpression = 4;
-        UnknownExpressionDeclarationProto unknownExpression = 5;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 5;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 6;
+        UnknownExpressionDeclarationProto unknownExpression = 7;
     }
 }
 

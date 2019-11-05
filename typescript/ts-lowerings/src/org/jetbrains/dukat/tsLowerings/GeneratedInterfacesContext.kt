@@ -29,7 +29,7 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 internal fun Entity.getUID(): String {
     return when (this) {
@@ -204,15 +204,15 @@ private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: Generated
 }
 
 
-private fun ParameterValueDeclaration.findTypeParameterDeclaration(typeParamsSet: Set<NameEntity>): TypeParameterDeclaration? {
+private fun ParameterValueDeclaration.findTypeParameterDeclaration(): TypeParameterDeclaration? {
     return when (this) {
-        is TypeDeclaration -> if (typeParamsSet.contains(value)) TypeParameterDeclaration(value, emptyList(), null) else null
+        is TypeParamReferenceDeclaration -> TypeParameterDeclaration(value, emptyList(), null)
         else -> null
     }
 }
 
-private fun ParameterValueDeclaration.resolveTypeParams(typeParamsSet: Set<NameEntity>, generatedTypeParams: LinkedHashSet<TypeParameterDeclaration>) {
-    findTypeParameterDeclaration(typeParamsSet)?.let {
+private fun ParameterValueDeclaration.resolveTypeParams(generatedTypeParams: LinkedHashSet<TypeParameterDeclaration>) {
+    findTypeParameterDeclaration()?.let {
         generatedTypeParams.add(it)
     }
 }
@@ -235,29 +235,29 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    internal fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String, typeParamsSet: Set<NameEntity>): GeneratedInterfaceReferenceDeclaration {
+    internal fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String): GeneratedInterfaceReferenceDeclaration {
         val declaration = owner.node
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 
         declaration.members.forEach { member ->
             when (member) {
                 is IndexSignatureDeclaration -> {
-                    member.indexTypes.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
-                    member.returnType.resolveTypeParams(typeParamsSet, typeParams)
+                    member.indexTypes.forEach { param -> param.type.resolveTypeParams(typeParams) }
+                    member.returnType.resolveTypeParams(typeParams)
                 }
                 is CallSignatureDeclaration -> {
-                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
-                    member.type.resolveTypeParams(typeParamsSet, typeParams)
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParams) }
+                    member.type.resolveTypeParams(typeParams)
                 }
                 is PropertyDeclaration -> {
-                    member.type.resolveTypeParams(typeParamsSet, typeParams)
+                    member.type.resolveTypeParams(typeParams)
                 }
                 is FunctionDeclaration -> {
-                    member.type.resolveTypeParams(typeParamsSet, typeParams)
+                    member.type.resolveTypeParams(typeParams)
                 }
                 is MethodSignatureDeclaration -> {
-                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParamsSet, typeParams) }
-                    member.type.resolveTypeParams(typeParamsSet, typeParams)
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParams) }
+                    member.type.resolveTypeParams(typeParams)
                 }
                 else -> {
                     logger.warn("unknown declaration ${member}")

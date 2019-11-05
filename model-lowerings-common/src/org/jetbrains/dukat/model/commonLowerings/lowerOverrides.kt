@@ -10,9 +10,15 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.panic.raiseConcern
+
+
+private fun TypeModel.isAny(): Boolean {
+    return this is TypeValueModel && value == IdentifierEntity("Any")
+}
 
 private class OverrideResolver(val context: ModelContext) {
 
@@ -90,7 +96,9 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         val parametersAreEquivalent = parameters
-                .zip(otherMethodModel.parameters) { a, b -> a.type.isEquivalent(b.type) }
+                .zip(otherMethodModel.parameters) { a, b ->
+                    a.type.isEquivalent(b.type)
+                }
                 .all { it }
 
         return parametersAreEquivalent && type.isOverriding(otherMethodModel.type)
@@ -148,22 +156,37 @@ private class OverrideResolver(val context: ModelContext) {
     }
 
 
-    private fun TypeModel.isOverriding(otherParameterType: TypeModel): Boolean {
-        if (isEquivalent(otherParameterType)) {
+    private fun TypeModel.isOverriding(otherParameterType: TypeModel, inBox: Boolean = false): Boolean {
+        if (isEquivalent(otherParameterType) && !inBox) {
             return true;
         }
 
-        if (otherParameterType is TypeValueModel && otherParameterType.value == IdentifierEntity("Any")) {
-            return true
+        if (otherParameterType.isAny()) {
+            return if (inBox) {
+                this is TypeParameterReferenceModel
+            } else {
+                true
+            }
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            val classLike: ClassLikeModel? = context.resolveClass(value) ?: context.resolveInterface(value)
-            val otherClassLike: ClassLikeModel? = context.resolveClass(otherParameterType.value)
-                    ?: context.resolveInterface(otherParameterType.value)
+            val classLike: ClassLikeModel? = context.resolve(value)
+            val otherClassLike: ClassLikeModel? = context.resolve(otherParameterType.value)
 
-            if (classLike != null) {
-                return classLike.getKnownParents().contains(otherClassLike)
+
+            val isSameClass = classLike != null && classLike === otherClassLike
+            val isParentClass = classLike?.getKnownParents()?.contains(otherClassLike) == true
+
+            if (params.isEmpty() && otherParameterType.params.isEmpty()) {
+                if (isSameClass || isParentClass) {
+                    return true
+                }
+            } else if (params.size == otherParameterType.params.size) {
+                if (isSameClass) {
+                    return params.zip(otherParameterType.params).all { (paramA, paramB) ->
+                        paramA.type.isOverriding(paramB.type, true)
+                    }
+                }
             }
         }
 
@@ -177,7 +200,9 @@ private class OverrideResolver(val context: ModelContext) {
         return when (this) {
             is MethodModel -> {
                 val override =
-                        allSuperDeclarations.any { superMethod -> isOverriding(superMethod) } || isSpecialCase()
+                        allSuperDeclarations.any { superMethod ->
+                            isOverriding(superMethod)
+                        } || isSpecialCase()
 
                 if (override) {
                     copy(override = override, parameters = parameters.map { param -> param.copy(initializer = null) })

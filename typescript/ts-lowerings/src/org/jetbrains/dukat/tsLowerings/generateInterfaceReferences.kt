@@ -2,7 +2,6 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -60,7 +59,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
     override fun lowerTypeDeclaration(owner: NodeOwner<TypeDeclaration>): TypeDeclaration {
         val declaration = owner.node
-        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param))})
+        return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(owner.wrap(param)) })
     }
 
     override fun lowerFunctionTypeDeclaration(owner: NodeOwner<FunctionTypeDeclaration>): FunctionTypeDeclaration {
@@ -96,16 +95,11 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
                 val ownerUID = ownerEntity?.getUID() ?: ""
 
-                val ownerTypeParameters = ownerEntity?.getTypeParams() ?: emptyList()
-                val parentTypeParams = owner.owner?.node?.getTypeParams() ?: emptyList()
-                val typeParameters = ownerTypeParameters + parentTypeParams
-
                 myAstContext.registerObjectLiteralDeclaration(
                         owner.wrap(declaration.copy(members = declaration.members.map { param ->
                             lowerMemberDeclaration(owner.wrap(param))
                         })),
-                        ownerUID,
-                        typeParameters.map { it.name }.toSet()
+                        ownerUID
                 )
             }
         }
@@ -126,16 +120,16 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     override fun lowerInterfaceDeclaration(owner: NodeOwner<InterfaceDeclaration>): InterfaceDeclaration {
         val declaration = owner.node
         return declaration.copy(
-            typeParameters = lowerTypeParams(owner, declaration.typeParameters),
-            members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
+                typeParameters = lowerTypeParams(owner, declaration.typeParameters),
+                members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
         )
     }
 
     override fun lowerClassDeclaration(owner: NodeOwner<ClassDeclaration>): ClassDeclaration {
         val declaration = owner.node
         return declaration.copy(
-            typeParameters = lowerTypeParams(owner, declaration.typeParameters),
-            members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
+                typeParameters = lowerTypeParams(owner, declaration.typeParameters),
+                members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
         )
     }
 
@@ -148,9 +142,9 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
         return (topOwner?.node as? TopLevelEntity)
     }
 
-    private fun <T: Entity> lowerTypeParams(owner: NodeOwner<T>, typeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
-        return typeParams.map {typeParam ->
-            typeParam.copy(constraints = typeParam.constraints.map { constraint ->  lowerParameterValue(owner.wrap(constraint)) } )
+    private fun <T : Entity> lowerTypeParams(owner: NodeOwner<T>, typeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
+        return typeParams.map { typeParam ->
+            typeParam.copy(constraints = typeParam.constraints.map { constraint -> lowerParameterValue(owner.wrap(constraint)) })
         }
     }
 
@@ -181,8 +175,8 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
             }
             is PropertyDeclaration -> {
                 declaration.copy(
-                    typeParameters = lowerTypeParams(owner, declaration.typeParameters),
-                    type = lowerParameterValue(owner.wrap(declaration.type))
+                        typeParameters = lowerTypeParams(owner, declaration.typeParameters),
+                        type = lowerParameterValue(owner.wrap(declaration.type))
                 )
             }
             is MethodSignatureDeclaration -> {

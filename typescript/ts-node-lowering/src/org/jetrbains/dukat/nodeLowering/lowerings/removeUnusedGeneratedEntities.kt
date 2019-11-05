@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -53,7 +54,7 @@ fun DocumentRootNode.removeUnusedGeneratedEntities(): DocumentRootNode {
     ParameterValueVisitor(this) { value ->
         when (value) {
             //TODO: we are not supposed to have reference declaration up to this point (but we have)
-            is GeneratedInterfaceReferenceDeclaration -> {
+            is GeneratedInterfaceReferenceNode -> {
                 value.reference?.uid?.let { uid ->
                     typeRefs.add(uid)
                 }

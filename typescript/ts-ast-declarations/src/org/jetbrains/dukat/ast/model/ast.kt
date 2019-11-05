@@ -3,6 +3,7 @@ package org.jetbrains.dukat.ast.model
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
@@ -27,12 +28,15 @@ import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
         is TypeValueNode -> copy(nullable = true)
+        is TypeParameterNode -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
+        is TypeParamReferenceDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
@@ -56,6 +60,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is FunctionTypeDeclaration -> copy() as T
         is FunctionTypeNode -> copy() as T
         is GeneratedInterfaceReferenceDeclaration -> copy() as T
+        is GeneratedInterfaceReferenceNode -> copy() as T
         is ImportEqualsDeclaration -> copy() as T
         is InterfaceDeclaration -> copy() as T
         is InterfaceNode -> copy() as T
@@ -66,6 +71,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is TypeAliasNode -> copy() as T
         is TypeDeclaration -> copy() as T
         is TypeValueNode -> copy() as T
+        is TypeParameterNode -> copy() as T
         is UnionTypeNode -> copy() as T
         is VariableDeclaration -> copy() as T
         is VariableNode -> copy() as T

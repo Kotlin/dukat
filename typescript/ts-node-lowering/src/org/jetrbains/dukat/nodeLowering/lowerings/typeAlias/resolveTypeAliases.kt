@@ -1,5 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 
+import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
@@ -65,6 +66,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
 private fun TypeAliasNode.shouldBeTranslated(): Boolean {
     return when (this.typeReference) {
         is TypeValueNode -> this.typeReference.meta == null
+        is TypeParameterNode -> this.typeReference.meta == null
         is FunctionTypeNode -> true
         else -> false
     }

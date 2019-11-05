@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.Entity
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class TypeValueModel(

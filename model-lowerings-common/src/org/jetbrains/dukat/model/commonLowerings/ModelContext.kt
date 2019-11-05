@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 
@@ -20,5 +21,9 @@ class ModelContext {
 
     fun resolveClass(name: NameEntity): ClassModel? {
         return myClassNodes[name]
+    }
+
+    fun resolve(name: NameEntity): ClassLikeModel? {
+        return resolveClass(name) ?: resolveInterface(name)
     }
 }

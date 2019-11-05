@@ -3,7 +3,6 @@ package org.jetbrains.dukat.tsmodel.factory
 import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
@@ -18,7 +17,6 @@ import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -38,7 +36,9 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
@@ -47,6 +47,8 @@ import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclarati
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -55,6 +57,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 fun Declarations.NameEntityProto.convert(): NameEntity {
@@ -285,7 +288,7 @@ private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterD
 }
 
 
-private fun Declarations.TypeDeclarationProto.convert(): TypeDeclaration {
+private fun Declarations.TypeReferenceDeclarationProto.convert(): TypeDeclaration {
     return TypeDeclaration(
             value.convert(),
             paramsList.map { it.convert() },
@@ -314,12 +317,15 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
         hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
         hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })
         hasUnionType() -> UnionTypeDeclaration(unionType.paramsList.map { it.convert() })
-        hasTypeDeclaration() -> with(typeDeclaration) {
+        hasTypeReferenceDeclaration() -> with(typeReferenceDeclaration) {
             TypeDeclaration(
                     value.convert(),
                     paramsList.map { it.convert() },
-                    if (typeDeclaration.hasTypeReference()) typeReference.convert() else null
+                    if (typeReferenceDeclaration.hasTypeReference()) typeReference.convert() else null
             )
+        }
+        hasTypeParamReferenceDeclaration() -> with(typeParamReferenceDeclaration) {
+            TypeParamReferenceDeclaration(value.convert())
         }
         hasObjectLiteral() -> {
             val objectLiteral = objectLiteral
@@ -354,10 +360,12 @@ fun Declarations.UnaryExpressionDeclarationProto.convert() : UnaryExpressionDecl
     )
 }
 
-fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpressionDeclaration {
-    return IdentifierExpressionDeclaration(
-            identifier = identifier.convert()
-    )
+fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
+    return when {
+        name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
+        name.hasQualifier() -> QualifierExpressionDeclaration(qualifier = name.qualifier.convert())
+        else -> throw Exception("unknown nameExpression: ${this}")
+    }
 }
 
 fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
@@ -377,6 +385,20 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
     }
 }
 
+fun Declarations.PropertyAccessExpressionDeclarationProto.convert() : PropertyAccessExpressionDeclaration {
+    return PropertyAccessExpressionDeclaration(
+            expression = expression.convert(),
+            name = name.convert()
+    )
+}
+
+fun Declarations.ElementAccessExpressionDeclarationProto.convert() : ElementAccessExpressionDeclaration {
+    return ElementAccessExpressionDeclaration(
+            expression = expression.convert(),
+            argumentExpression = argumentExpression.convert()
+    )
+}
+
 fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
@@ -387,8 +409,10 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()
-        hasIdentifierExpression() -> identifierExpression.convert()
+        hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
+        hasPropertyAccessExpression() -> propertyAccessExpression.convert()
+        hasElementAccessExpression() -> elementAccessExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

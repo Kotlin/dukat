@@ -1,7 +1,7 @@
 import * as declarations from "declarations";
 import {
-    Expression,
-    LiteralExpression
+    Expression, IdentifierEntity,
+    LiteralExpression, NameEntity
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -27,15 +27,54 @@ export class AstExpressionFactory {
         return expression;
     }
 
-    static createIdentifierExpressionDeclarationAsExpression(value: string): Expression {
-        let identifier = new declarations.IdentifierEntityProto();
-        identifier.setValue(value);
+    static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierEntity): Expression {
+        let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
+        propertyAccessExpression.setExpression(expression);
+        propertyAccessExpression.setName(name);
 
-        let identifierExpressionProto = new declarations.IdentifierExpressionDeclarationProto();
-        identifierExpressionProto.setIdentifier(identifier);
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setPropertyaccessexpression(propertyAccessExpression);
+        return expressionProto;
+    }
+
+    static createElementAccessExpressionDeclarationAsExpression(expression: Expression, argumentExpression: Expression): Expression {
+        let elementAccessExpression = new declarations.ElementAccessExpressionDeclarationProto();
+        elementAccessExpression.setExpression(expression);
+        elementAccessExpression.setArgumentexpression(argumentExpression);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setElementaccessexpression(elementAccessExpression);
+        return expressionProto;
+    }
+
+    static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
+        let qualifier = new declarations.QualifierEntityProto();
+        qualifier.setLeft(left);
+        qualifier.setRight(right);
+
+        let nameEntity = new declarations.NameEntityProto();
+        nameEntity.setQualifier(qualifier);
+        return nameEntity;
+    }
+
+    static createIdentifier(value: string): IdentifierEntity {
+        let identifierProto = new declarations.IdentifierEntityProto();
+        identifierProto.setValue(value);
+        return identifierProto;
+    }
+
+    static createIdentifierAsNameEntity(value: string): NameEntity {
+        let nameEntity = new declarations.NameEntityProto();
+        nameEntity.setIdentifier(this.createIdentifier(value));
+        return nameEntity;
+    }
+
+    static createNameExpressionDeclarationAsExpression(name: NameEntity): Expression {
+        let nameExpressionProto = new declarations.NameExpressionDeclarationProto();
+        nameExpressionProto.setName(name);
 
         let expression = new declarations.ExpressionDeclarationProto();
-        expression.setIdentifierexpression(identifierExpressionProto);
+        expression.setNameexpression(nameExpressionProto);
         return expression;
     }
 

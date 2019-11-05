@@ -25,6 +25,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
@@ -70,6 +71,7 @@ private fun CommentEntity.translate(output: (String) -> Unit) {
 
 private fun TypeModel.translateMeta(): String {
     return when (this) {
+        is TypeParameterReferenceModel -> metaDescription.translateMeta()
         is TypeValueModel -> metaDescription.translateMeta()
         is FunctionTypeModel -> metaDescription.translateMeta()
         else -> ""
@@ -82,6 +84,13 @@ private fun StatementModel.translateMeta(): String {
 
 fun TypeModel.translate(): String {
     return when (this) {
+        is TypeParameterReferenceModel -> {
+            val res = mutableListOf(name.translate())
+            if (nullable) {
+                res.add("?")
+            }
+            res.joinToString("")
+        }
         is TypeValueModel -> {
             val res = mutableListOf(value.translate())
             if (isGeneric()) {
