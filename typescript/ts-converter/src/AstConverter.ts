@@ -90,10 +90,13 @@ export class AstConverter {
             sources.push(source);
         });
 
-        this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
 
-            let declarations: Array<Declaration> = [];
-            for (let libDeclaration of libDeclarations) {
+      let libRootUid = "<LIBROOT>";
+      this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
+          let declarations: Array<Declaration> = [];
+
+
+          for (let libDeclaration of libDeclarations) {
                 let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
 
                 statements.forEach((statement, index) => {
@@ -101,17 +104,17 @@ export class AstConverter {
                 });
             }
 
-            sources.push(this.astFactory.createSourceFileDeclaration(
-              resourceName, this.astFactory.createModuleDeclaration(
-                this.astFactory.createIdentifierDeclarationAsNameEntity("<LIBROOT>"),
-                declarations,
-                [],
-                [],
-                `<LIBROOT-${resourceName}>`,
-                resourceName,
-                true
-              ), []
-            ));
+          sources.push(this.astFactory.createSourceFileDeclaration(
+            resourceName, this.astFactory.createModuleDeclaration(
+              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+              declarations,
+              [],
+              [],
+              libRootUid,
+              fileName,
+              true
+            ), []
+          ));
         });
 
         return this.astFactory.createSourceSet(fileName, sources);

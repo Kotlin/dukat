@@ -6,5 +6,5 @@ export type OurAlias =
 export interface OurObject {
     readonly [x: string]: OurAlias;
 }
-export interface OurListArray extends ReadonlyArray<OurAlias> { }
+export interface OurListArray extends Array<OurAlias> { }
 
