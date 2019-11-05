@@ -16,3 +16,18 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun frequencies(a: Array<String>): Array<Number>
+
+external interface `T$0` {
+    @nativeGetter
+    operator fun get(shortName: String): dynamic /* String | Array<String> */
+    @nativeSetter
+    operator fun set(shortName: String, value: String)
+    @nativeSetter
+    operator fun set(shortName: String, value: Array<String>)
+}
+
+external interface Processor<T> {
+    fun process(arg: T)
+    fun process(arg: Array<T>)
+    fun alias(aliases: `T$0`)
+}
