@@ -27,6 +27,26 @@ export class AstExpressionFactory {
         return expression;
     }
 
+    static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierEntity): Expression {
+        let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
+        propertyAccessExpression.setExpression(expression);
+        propertyAccessExpression.setName(name);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setPropertyaccessexpression(propertyAccessExpression);
+        return expressionProto;
+    }
+
+    static createElementAccessExpressionDeclarationAsExpression(expression: Expression, argumentExpression: Expression): Expression {
+        let elementAccessExpression = new declarations.ElementAccessExpressionDeclarationProto();
+        elementAccessExpression.setExpression(expression);
+        elementAccessExpression.setArgumentexpression(argumentExpression);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setElementaccessexpression(elementAccessExpression);
+        return expressionProto;
+    }
+
     static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
         let qualifier = new declarations.QualifierEntityProto();
         qualifier.setLeft(left);
@@ -37,12 +57,15 @@ export class AstExpressionFactory {
         return nameEntity;
     }
 
-    static createIdentifierAsNameEntity(value: string): NameEntity {
+    static createIdentifier(value: string): IdentifierEntity {
         let identifierProto = new declarations.IdentifierEntityProto();
         identifierProto.setValue(value);
+        return identifierProto;
+    }
 
+    static createIdentifierAsNameEntity(value: string): NameEntity {
         let nameEntity = new declarations.NameEntityProto();
-        nameEntity.setIdentifier(identifierProto);
+        nameEntity.setIdentifier(this.createIdentifier(value));
         return nameEntity;
     }
 

@@ -217,6 +217,16 @@ message UnaryExpressionDeclarationProto {
     bool isPrefix = 3;
 }
 
+message PropertyAccessExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    IdentifierEntityProto name = 2;
+}
+
+message ElementAccessExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    ExpressionDeclarationProto argumentExpression = 2;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -227,7 +237,9 @@ message ExpressionDeclarationProto {
         UnaryExpressionDeclarationProto unaryExpression = 2;
         NameExpressionDeclarationProto nameExpression = 3;
         LiteralExpressionDeclarationProto literalExpression = 4;
-        UnknownExpressionDeclarationProto unknownExpression = 5;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 5;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 6;
+        UnknownExpressionDeclarationProto unknownExpression = 7;
     }
 }
 

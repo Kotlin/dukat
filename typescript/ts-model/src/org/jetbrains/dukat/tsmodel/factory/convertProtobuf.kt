@@ -36,6 +36,8 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -383,6 +385,20 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
     }
 }
 
+fun Declarations.PropertyAccessExpressionDeclarationProto.convert() : PropertyAccessExpressionDeclaration {
+    return PropertyAccessExpressionDeclaration(
+            expression = expression.convert(),
+            name = name.convert()
+    )
+}
+
+fun Declarations.ElementAccessExpressionDeclarationProto.convert() : ElementAccessExpressionDeclaration {
+    return ElementAccessExpressionDeclaration(
+            expression = expression.convert(),
+            argumentExpression = argumentExpression.convert()
+    )
+}
+
 fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
@@ -395,6 +411,8 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
         hasUnaryExpression() -> unaryExpression.convert()
         hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
+        hasPropertyAccessExpression() -> propertyAccessExpression.convert()
+        hasElementAccessExpression() -> elementAccessExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

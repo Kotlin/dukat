@@ -1,5 +1,5 @@
 import * as ts from "typescript-services-api";
-import {Expression, NameEntity} from "./ast";
+import {Expression, IdentifierEntity, NameEntity} from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 
 export class AstExpressionConverter {
@@ -9,6 +9,14 @@ export class AstExpressionConverter {
 
     static createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
+    }
+
+    static createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
+        return AstExpressionFactory.createPropertyAccessExpressionDeclarationAsExpression(expression, name);
+    }
+
+    static createElementAccessExpression(expression: Expression, argumentExpression: Expression) {
+        return AstExpressionFactory.createElementAccessExpressionDeclarationAsExpression(expression, argumentExpression);
     }
 
     static createNameExpression(name: NameEntity): Expression {
@@ -61,6 +69,20 @@ export class AstExpressionConverter {
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
             false
+        )
+    }
+
+    static convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
+        return this.createPropertyAccessExpression(
+            this.convertExpression(expression.expression),
+            AstExpressionFactory.createIdentifier(expression.name.getText())
+        )
+    }
+
+    static convertElementAccessExpression(expression: ts.ElementAccessExpression): Expression {
+        return this.createElementAccessExpression(
+            this.convertExpression(expression.expression),
+            this.convertExpression(expression.argumentExpression)
         )
     }
 
@@ -137,6 +159,10 @@ export class AstExpressionConverter {
             return this.convertPrefixUnaryExpression(expression)
         } else if (ts.isPostfixUnaryExpression(expression)) {
             return this.convertPostfixUnaryExpression(expression)
+        } else if (ts.isPropertyAccessExpression(expression)) {
+            return this.convertPropertyAccessExpression(expression)
+        } else if (ts.isElementAccessExpression(expression)) {
+            return this.convertElementAccessExpression(expression)
         } else if (ts.isIdentifier(expression) || ts.isQualifiedName(expression)) {
             return this.convertNameExpression(expression);
         } else if (ts.isLiteralExpression(expression)) {
