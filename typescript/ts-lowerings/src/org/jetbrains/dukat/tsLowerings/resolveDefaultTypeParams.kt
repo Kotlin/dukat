@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsLowerings
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -9,6 +10,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -26,12 +28,19 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
                     acc
                 }
 
-                val fromIndex = reference.typeParameters.size - parameters.size
+                var fromIndex = reference.typeParameters.size - parameters.size
+                if (parameters.isEmpty()) {
+                    fromIndex -= 1
+                }
 
                 for (i in fromIndex until reference.typeParameters.size) {
                     reference.typeParameters[i].defaultValue?.let { defValue ->
-
                         val value = when (defValue) {
+                            is ObjectLiteralDeclaration -> if (defValue.members.isEmpty()) {
+                                TypeDeclaration(IdentifierEntity("Any"), emptyList())
+                            } else {
+                                defValue
+                            }
                             is TypeDeclaration -> defValue.value
                             is TypeParamReferenceDeclaration -> defValue.value
                             else -> null
