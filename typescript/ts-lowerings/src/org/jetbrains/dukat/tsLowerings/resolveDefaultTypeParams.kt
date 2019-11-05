@@ -3,16 +3,15 @@ package org.jetbrains.dukat.tsLowerings
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 private class ResolveDefaultTypeParams(private val references: Map<String, ClassLikeDeclaration>) : DeclarationTypeLowering {
 
@@ -31,8 +30,15 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
 
                 for (i in fromIndex until reference.typeParameters.size) {
                     reference.typeParameters[i].defaultValue?.let { defValue ->
-                        if (defValue is TypeDeclaration) {
-                            val defIndex = typeReferenceMap[defValue.value]
+
+                        val value = when (defValue) {
+                            is TypeDeclaration -> defValue.value
+                            is TypeParamReferenceDeclaration -> defValue.value
+                            else -> null
+                        }
+
+                        if (value != null) {
+                            val defIndex = typeReferenceMap[value]
 
                             val parameterValue = if (defIndex == null) {
                                 defValue

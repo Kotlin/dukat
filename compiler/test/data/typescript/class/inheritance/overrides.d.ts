@@ -31,3 +31,11 @@ export class ParentClass {
 export class ChildClass extends ParentClass {
     prop: string;
 }
+
+declare interface _Chain<T, V> {
+    flatten(shallow?: boolean): _Chain<any, any>
+}
+
+declare interface _ChainOfArrays<T> extends _Chain<Array<T>, Array<T>> {
+    flatten(shallow?: boolean): _Chain<T, T>
+}

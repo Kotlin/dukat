@@ -325,7 +325,7 @@ export class AstConverter {
     }
 
     private createTypeDeclaration(value: string, params: Array<ParameterValue> = [], typeReference: string | null = null): TypeDeclaration {
-        return this.astFactory.createTypeDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
+        return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
     createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
@@ -400,14 +400,16 @@ export class AstConverter {
                         let declaration = symbol.declarations[0];
 
                         if (declaration) {
-                            if (!ts.isTypeParameterDeclaration(declaration)) {
-                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+                            if (ts.isTypeParameterDeclaration(declaration)) {
+                                return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
                             }
+
+                            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
                         }
                     }
                 }
 
-                return this.astFactory.createTypeDeclarationAsParamValue(
+                return this.astFactory.createTypeReferenceDeclarationAsParamValue(
                   entity,
                   params,
                   typeReference
