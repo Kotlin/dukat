@@ -32,9 +32,10 @@ export class LibraryDeclarationsVisitor {
     let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        if (!this.visited.has(declaration)) {
-          if (this.isLibraryReference(declaration)) {
+        if (this.isLibraryReference(declaration)) {
+          if (!this.visited.has(declaration)) {
             this.visited.add(declaration);
+
             if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
               this.registerDeclaration(declaration);
               this.visit(declaration);

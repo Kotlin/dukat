@@ -3,7 +3,6 @@ import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
-import {createExportContent} from "./ExportContent";
 import {
     ClassDeclaration,
     Declaration,
@@ -33,9 +32,9 @@ import {
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
+import {ExportContext} from "./ExportContext";
 
 export class AstConverter {
-    private exportContext = createExportContent();
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
@@ -48,6 +47,7 @@ export class AstConverter {
     constructor(
       private sourceName: string,
       private rootPackageName: NameEntity,
+      private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
       private declarationResolver: DeclarationResolver,
