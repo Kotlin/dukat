@@ -4,7 +4,13 @@ import {tsInternals} from "../TsInternals";
 export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
   private libDeclarations = new Map<string, Array<ts.Node>>();
-  private skipTypes = new Set(["Array", "Boolean", "Number", "String"]);
+  private skipTypes = new Set([
+    "Array",
+    "Boolean",
+    "Number",
+    "ReadonlyArray",
+    "String"
+  ]);
 
   constructor(
     private typeChecker: ts.TypeChecker

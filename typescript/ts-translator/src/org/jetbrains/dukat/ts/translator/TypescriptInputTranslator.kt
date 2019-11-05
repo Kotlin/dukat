@@ -41,6 +41,7 @@ import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
+import substituteTsStdLibEntities
 
 
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
@@ -49,6 +50,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
     fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return sourceSet
                 .filterOutNonDeclarations()
+                .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
