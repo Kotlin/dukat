@@ -1,5 +1,5 @@
 import * as ts from "typescript-services-api";
-import {Expression} from "./ast";
+import {Expression, NameEntity} from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 
 export class AstExpressionConverter {
@@ -11,8 +11,8 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
     }
 
-    static createIdentifierExpression(name: string): Expression {
-        return AstExpressionFactory.createIdentifierExpressionDeclarationAsExpression(name);
+    static createNameExpression(name: NameEntity): Expression {
+        return AstExpressionFactory.createNameExpressionDeclarationAsExpression(name)
     }
 
     static createNumericLiteralExpression(value: string): Expression {
@@ -40,7 +40,7 @@ export class AstExpressionConverter {
     }
 
 
-    static convertBinaryExpression(expression: ts.Expression): Expression {
+    static convertBinaryExpression(expression: ts.BinaryExpression): Expression {
         return this.createBinaryExpression(
             this.convertExpression(expression.left),
             ts.tokenToString(expression.operatorToken.kind),
@@ -48,7 +48,7 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertPrefixUnaryExpression(expression: ts.Expression): Expression {
+    static convertPrefixUnaryExpression(expression: ts.PrefixUnaryExpression): Expression {
         return this.createUnaryExpression(
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
@@ -56,7 +56,7 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertPostfixUnaryExpression(expression: ts.Expression): Expression {
+    static convertPostfixUnaryExpression(expression: ts.PostfixUnaryExpression): Expression {
         return this.createUnaryExpression(
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
@@ -64,10 +64,24 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertIdentifierExpression(expression: ts.Expression): Expression {
-        return this.createIdentifierExpression(expression.getText())
+    static convertNameExpression(name: ts.EntityName): Expression {
+        return this.createNameExpression(
+            this.convertEntityName(name)
+        )
     }
 
+    static convertEntityName(entityName: ts.EntityName): NameEntity {
+        if (ts.isQualifiedName(entityName)) {
+            return AstExpressionFactory.createQualifierAsNameEntity(
+                this.convertEntityName(entityName.left),
+                this.convertEntityName(entityName.right).getIdentifier()
+            )
+        } else {
+            return AstExpressionFactory.createIdentifierAsNameEntity(
+                entityName.getText()
+            )
+        }
+    }
 
     static convertNumericLiteralExpression(expression: ts.Expression): Expression {
         return this.createNumericLiteralExpression(expression.getText())
@@ -123,8 +137,8 @@ export class AstExpressionConverter {
             return this.convertPrefixUnaryExpression(expression)
         } else if (ts.isPostfixUnaryExpression(expression)) {
             return this.convertPostfixUnaryExpression(expression)
-        } else if (ts.isIdentifier(expression)) {
-            return this.convertIdentifierExpression(expression);
+        } else if (ts.isIdentifier(expression) || ts.isQualifiedName(expression)) {
+            return this.convertNameExpression(expression);
         } else if (ts.isLiteralExpression(expression)) {
             return this.convertLiteralExpression(expression);
         } else if (ts.isToken(expression)) {

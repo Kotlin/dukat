@@ -1,7 +1,7 @@
 import * as declarations from "declarations";
 import {
-    Expression,
-    LiteralExpression
+    Expression, IdentifierEntity,
+    LiteralExpression, NameEntity
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -27,15 +27,31 @@ export class AstExpressionFactory {
         return expression;
     }
 
-    static createIdentifierExpressionDeclarationAsExpression(value: string): Expression {
-        let identifier = new declarations.IdentifierEntityProto();
-        identifier.setValue(value);
+    static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
+        let qualifier = new declarations.QualifierEntityProto();
+        qualifier.setLeft(left);
+        qualifier.setRight(right);
 
-        let identifierExpressionProto = new declarations.IdentifierExpressionDeclarationProto();
-        identifierExpressionProto.setIdentifier(identifier);
+        let nameEntity = new declarations.NameEntityProto();
+        nameEntity.setQualifier(qualifier);
+        return nameEntity;
+    }
+
+    static createIdentifierAsNameEntity(value: string): NameEntity {
+        let identifierProto = new declarations.IdentifierEntityProto();
+        identifierProto.setValue(value);
+
+        let nameEntity = new declarations.NameEntityProto();
+        nameEntity.setIdentifier(identifierProto);
+        return nameEntity;
+    }
+
+    static createNameExpressionDeclarationAsExpression(name: NameEntity): Expression {
+        let nameExpressionProto = new declarations.NameExpressionDeclarationProto();
+        nameExpressionProto.setName(name);
 
         let expression = new declarations.ExpressionDeclarationProto();
-        expression.setIdentifierexpression(identifierExpressionProto);
+        expression.setNameexpression(nameExpressionProto);
         return expression;
     }
 

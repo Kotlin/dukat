@@ -36,7 +36,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
@@ -45,6 +45,8 @@ import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclarati
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -356,10 +358,12 @@ fun Declarations.UnaryExpressionDeclarationProto.convert() : UnaryExpressionDecl
     )
 }
 
-fun Declarations.IdentifierExpressionDeclarationProto.convert() : IdentifierExpressionDeclaration {
-    return IdentifierExpressionDeclaration(
-            identifier = identifier.convert()
-    )
+fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
+    return when {
+        name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
+        name.hasQualifier() -> QualifierExpressionDeclaration(qualifier = name.qualifier.convert())
+        else -> throw Exception("unknown nameExpression: ${this}")
+    }
 }
 
 fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
@@ -389,7 +393,7 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()
-        hasIdentifierExpression() -> identifierExpression.convert()
+        hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")

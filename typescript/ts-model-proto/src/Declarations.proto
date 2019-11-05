@@ -201,8 +201,8 @@ message LiteralExpressionDeclarationProto {
     }
 }
 
-message IdentifierExpressionDeclarationProto {
-    IdentifierEntityProto identifier = 1;
+message NameExpressionDeclarationProto {
+    NameEntityProto name = 1;
 }
 
 message BinaryExpressionDeclarationProto {
@@ -225,7 +225,7 @@ message ExpressionDeclarationProto {
     oneof type {
         BinaryExpressionDeclarationProto binaryExpression = 1;
         UnaryExpressionDeclarationProto unaryExpression = 2;
-        IdentifierExpressionDeclarationProto identifierExpression = 3;
+        NameExpressionDeclarationProto nameExpression = 3;
         LiteralExpressionDeclarationProto literalExpression = 4;
         UnknownExpressionDeclarationProto unknownExpression = 5;
     }
