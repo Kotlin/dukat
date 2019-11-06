@@ -11,6 +11,7 @@ import org.jetbrains.dukat.js.type.constraint.resolved.StringTypeConstraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
@@ -66,6 +67,11 @@ fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Cons
     }
 }
 
+fun TypeOfExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+    expression.calculateConstraints(owner)
+    return ConstraintContainer(StringTypeConstraint)
+}
+
 fun LiteralExpressionDeclaration.calculateConstraints() : ConstraintContainer {
     return when (this) {
         is StringLiteralExpressionDeclaration -> ConstraintContainer(StringTypeConstraint)
@@ -81,6 +87,7 @@ fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : Constrai
         is IdentifierExpressionDeclaration -> owner[this] ?: ConstraintContainer(ReferenceConstraint(this.identifier))
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner)
+        is TypeOfExpressionDeclaration -> this.calculateConstraints(owner)
         is LiteralExpressionDeclaration -> this.calculateConstraints()
         null -> ConstraintContainer()
         else -> ConstraintContainer(NoTypeConstraint)
