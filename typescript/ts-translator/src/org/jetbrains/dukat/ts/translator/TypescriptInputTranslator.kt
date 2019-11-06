@@ -10,11 +10,11 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
+import org.jetbrains.dukat.model.commonLowerings.generateStdLib
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
-import org.jetbrains.dukat.model.commonLowerings.omitStdLib
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
@@ -41,6 +41,7 @@ import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
+import substituteTsStdLibEntities
 
 
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
@@ -49,6 +50,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
     fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return sourceSet
                 .filterOutNonDeclarations()
+                .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
@@ -82,7 +84,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addStandardImportsAndAnnotations()
-                .omitStdLib()
+                .generateStdLib()
     }
 
     fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {

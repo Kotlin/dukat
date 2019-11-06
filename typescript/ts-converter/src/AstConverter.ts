@@ -3,7 +3,6 @@ import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
-import {createExportContent} from "./ExportContent";
 import {
     Block,
     ClassDeclaration,
@@ -35,9 +34,9 @@ import {
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {AstExpressionConverter} from "./ast/AstExpressionConverter";
+import {ExportContext} from "./ExportContext";
 
 export class AstConverter {
-    private exportContext = createExportContent();
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
@@ -50,6 +49,7 @@ export class AstConverter {
     constructor(
       private sourceName: string,
       private rootPackageName: NameEntity,
+      private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
       private declarationResolver: DeclarationResolver,
@@ -92,10 +92,13 @@ export class AstConverter {
             sources.push(source);
         });
 
-        this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
 
-            let declarations: Array<Declaration> = [];
-            for (let libDeclaration of libDeclarations) {
+      let libRootUid = "<LIBROOT>";
+      this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
+          let declarations: Array<Declaration> = [];
+
+
+          for (let libDeclaration of libDeclarations) {
                 let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
 
                 statements.forEach((statement, index) => {
@@ -103,17 +106,17 @@ export class AstConverter {
                 });
             }
 
-            sources.push(this.astFactory.createSourceFileDeclaration(
-              resourceName, this.astFactory.createModuleDeclaration(
-                this.astFactory.createIdentifierDeclarationAsNameEntity("<LIBROOT>"),
-                declarations,
-                [],
-                [],
-                `<LIBROOT-${resourceName}>`,
-                resourceName,
-                true
-              ), []
-            ));
+          sources.push(this.astFactory.createSourceFileDeclaration(
+            resourceName, this.astFactory.createModuleDeclaration(
+              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+              declarations,
+              [],
+              [],
+              libRootUid,
+              fileName,
+              true
+            ), []
+          ));
         });
 
         return this.astFactory.createSourceSet(fileName, sources);

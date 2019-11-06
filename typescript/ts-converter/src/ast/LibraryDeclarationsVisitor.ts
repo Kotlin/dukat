@@ -4,7 +4,13 @@ import {tsInternals} from "../TsInternals";
 export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
   private libDeclarations = new Map<string, Array<ts.Node>>();
-  private skipTypes = new Set(["Array", "Boolean", "Number", "String"]);
+  private skipTypes = new Set([
+    "Array",
+    "Boolean",
+    "Number",
+    "ReadonlyArray",
+    "String"
+  ]);
 
   constructor(
     private typeChecker: ts.TypeChecker
@@ -32,9 +38,10 @@ export class LibraryDeclarationsVisitor {
     let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        if (!this.visited.has(declaration)) {
-          if (this.isLibraryReference(declaration)) {
+        if (this.isLibraryReference(declaration)) {
+          if (!this.visited.has(declaration)) {
             this.visited.add(declaration);
+
             if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
               this.registerDeclaration(declaration);
               this.visit(declaration);

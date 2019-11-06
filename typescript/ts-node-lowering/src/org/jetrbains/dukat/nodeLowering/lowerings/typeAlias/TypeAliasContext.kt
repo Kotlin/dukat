@@ -23,8 +23,8 @@ private fun ParameterValueDeclaration?.resolveAsValue(): NameEntity? {
 
 class TypeAliasContext {
 
-    private fun TypeAliasNode.canSusbtitute(heritageNode: HeritageNode): Boolean {
-        return (!canBeTranslated) && (name == heritageNode.name)
+    private fun TypeAliasNode.canSubstitute(heritageNode: HeritageNode): Boolean {
+        return (name == heritageNode.name)
     }
 
     private fun ParameterValueDeclaration.specify(aliasParamsMap: Map<NameEntity, ParameterValueDeclaration>): ParameterValueDeclaration {
@@ -38,10 +38,10 @@ class TypeAliasContext {
                 val paramsSpecified = params.map { param ->
                     when (param) {
                         is TypeParameterNode -> {
-                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.name, param.specify(aliasParamsMap)))
+                            substitute(aliasParamsMap.getOrDefault(param.name, param.specify(aliasParamsMap)))
                         }
                         is TypeValueNode -> {
-                            resolveTypeAlias(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
+                            substitute(aliasParamsMap.getOrDefault(param.value, param.specify(aliasParamsMap)))
                         }
                         else -> param
                     }
@@ -52,25 +52,17 @@ class TypeAliasContext {
                 copy(value = valueResolved, params = paramsSpecified, meta = meta?.specify(aliasParamsMap))
             }
             is IntersectionMetadata -> {
-                val paramsResolved = if (params.isEmpty()) {
-                    params
-                } else {
-                    // IntersectionMetadata stores reference to param we've already specified
-                    val allParams = params.toMutableList()
-                    val firstParam = allParams.first()
-                    firstParam.meta = null
-                    allParams
-                }
+                params.firstOrNull()?.meta = null
                 // TODO: we can not make IntersectionMetadata data class since we'll end up in recursion - https://youtrack.jetbrains.com/issue/KT-29786
-                IntersectionMetadata(params = paramsResolved.map { param -> resolveTypeAlias(param).specify(aliasParamsMap) })
+                IntersectionMetadata(params = params.map { param -> substitute(param).specify(aliasParamsMap) })
             }
             is UnionTypeNode -> {
-                copy(params = params.map { param -> resolveTypeAlias(param).specify(aliasParamsMap) })
+                copy(params = params.map { param -> substitute(param).specify(aliasParamsMap) })
             }
             is FunctionTypeNode -> {
                 copy(parameters = parameters.map { parameterDeclaration ->
-                    parameterDeclaration.copy(type = resolveTypeAlias(parameterDeclaration.type).specify(aliasParamsMap))
-                }, type = resolveTypeAlias(type).specify(aliasParamsMap))
+                    parameterDeclaration.copy(type = substitute(parameterDeclaration.type).specify(aliasParamsMap))
+                }, type = substitute(type).specify(aliasParamsMap))
             }
             else -> this
         }
@@ -83,36 +75,28 @@ class TypeAliasContext {
     }
 
     fun resolveTypeAlias(heritageClause: HeritageNode): ParameterValueDeclaration? {
-        myTypeAliasMap.forEach { (_, typeAlias) ->
-            if (typeAlias.canSusbtitute(heritageClause)) {
-                return typeAlias.typeReference
-            }
-        }
-
-        return null
+        return myTypeAliasMap.values.firstOrNull { typeAlias ->
+            typeAlias.canSubstitute(heritageClause)
+        }?.typeReference
     }
 
-    private fun substitute(type: ParameterValueDeclaration): ParameterValueDeclaration? {
+    fun substitute(type: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (type) {
-            is TypeValueNode -> type.typeReference?.let { reference ->
-                myTypeAliasMap[reference.uid]?.let { aliasResolved ->
-                    val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(type.params).associateBy({ it.first }, { it.second })
-
+            is TypeValueNode ->
+                myTypeAliasMap[type.typeReference?.uid]?.let { aliasResolved ->
                     when (aliasResolved.typeReference) {
                         is GeneratedInterfaceReferenceNode -> aliasResolved.typeReference
-                        is TypeNode -> aliasResolved.typeReference.specify(aliasParamsMap)
+                        is TypeNode -> {
+                            val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(type.params).associateBy({ it.first }, { it.second })
+                            aliasResolved.typeReference.specify(aliasParamsMap)
+                        }
                         else -> null
                     }
-                }
-            }
+                } ?: type
             is UnionTypeNode -> type.copy(params = type.params.map { param ->
-                resolveTypeAlias(param)
+                this.substitute(param)
             })
-            else -> null
+            else -> type
         }
-    }
-
-    fun resolveTypeAlias(type: ParameterValueDeclaration): ParameterValueDeclaration {
-        return substitute(type) ?: type
     }
 }

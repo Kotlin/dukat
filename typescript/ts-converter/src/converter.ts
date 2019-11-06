@@ -7,6 +7,7 @@ import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
+import {createExportContext} from "./ExportContext";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -54,6 +55,7 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
         let astConverter: AstConverter = new AstConverter(
           fileName,
           packageName,
+          createExportContext((node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile())),
           program.getTypeChecker(),
           (fileName: string) => program.getSourceFile(fileName),
           new DeclarationResolver(program),
