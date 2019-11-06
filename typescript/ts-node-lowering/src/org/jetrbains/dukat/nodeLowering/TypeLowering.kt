@@ -95,7 +95,10 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
 
 
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
-        return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
+        return declaration.copy(
+            params = declaration.params.map { param -> lowerType(param) },
+            meta = declaration.meta?.let { lowerType(it) }
+        )
     }
 
     override fun lowerFunctionNode(declaration: FunctionTypeNode): FunctionTypeNode {
