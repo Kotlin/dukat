@@ -53,7 +53,6 @@ include 'idl-parser'
 include 'idl-reference-resolver'
 include 'interop'
 include 'itertools'
-include 'js-interpretation'
 include 'js-module-statistics'
 include 'js-type-analysis'
 include 'logging'
@@ -79,7 +78,6 @@ project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
 
-project(':js-interpretation').projectDir = file("$rootDir/javascript/js-interpretation")
 project(':js-module-statistics').projectDir = file("$rootDir/javascript/js-module-statistics")
 project(':js-type-analysis').projectDir = file("$rootDir/javascript/js-type-analysis")
 

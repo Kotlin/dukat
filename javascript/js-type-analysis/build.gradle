@@ -4,7 +4,6 @@ plugins {
 
 dependencies {
     implementation(project(":ast-common"))
-    implementation(project(":js-interpretation"))
     implementation(project(":panic"))
     implementation(project(":ts-model"))
 }
