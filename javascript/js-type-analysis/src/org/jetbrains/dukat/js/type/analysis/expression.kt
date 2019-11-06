@@ -41,7 +41,7 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Con
         "&", "|", "^", "<<", ">>" -> {
             ConstraintContainer(NumberTypeConstraint)
         }
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=" -> {
+        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in" -> {
             ConstraintContainer(BooleanTypeConstraint)
         }
         else -> {
