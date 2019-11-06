@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -24,6 +25,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -66,7 +68,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<ClassLikeDeclaration>): MemberDeclaration {
+    override fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<MemberOwnerDeclaration>): MemberDeclaration {
         val newOwner = owner.wrap(declaration)
         return when (declaration) {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, newOwner as NodeOwner<FunctionOwnerDeclaration>)
@@ -120,6 +122,10 @@ interface DeclarationTypeLowering : DeclarationLowering {
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
+    }
+
+    override fun lowerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ObjectLiteralDeclaration {
+        return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) })
     }
 
     override fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): FunctionTypeDeclaration {

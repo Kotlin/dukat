@@ -263,8 +263,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 name = aliasName,
                 typeReference = typeReference,
                 typeParameters = typeParameters.map { typeParameter -> IdentifierEntity(typeParameter.value) },
-                uid = uid,
-                canBeTranslated = true
+                uid = uid
         )
     }
 

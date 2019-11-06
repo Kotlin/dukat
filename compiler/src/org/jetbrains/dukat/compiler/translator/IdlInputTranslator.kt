@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
-import org.jetbrains.dukat.model.commonLowerings.omitStdLib
+import org.jetbrains.dukat.model.commonLowerings.generateStdLib
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
 import org.jetbrains.dukat.idlLowerings.addMissingMembers
@@ -57,7 +57,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .relocateDeclarations()
                 .resolveTopLevelVisibility(alwaysPublic())
                 .addImportsForReferencedFiles()
-                .omitStdLib()
+                .generateStdLib()
     }
 
     override fun translate(data: String): SourceBundleModel {
