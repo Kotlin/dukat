@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -58,7 +59,7 @@ private class LowerTypeAliases(val context: TypeAliasContext) : NodeTypeLowering
     }
 
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return super.lowerType(context.resolveTypeAlias(declaration))
+        return super.lowerType(context.substitute(declaration))
     }
 
 }
@@ -72,19 +73,23 @@ private fun TypeAliasNode.shouldBeTranslated(): Boolean {
     }
 }
 
-private fun DocumentRootNode.registerTypeAliases(astContext: TypeAliasContext) {
-    declarations.forEach { declaration ->
+private fun DocumentRootNode.filterAliases(astContext: TypeAliasContext): DocumentRootNode {
+     val declarationsFiltered = mutableListOf<TopLevelEntity>()
+     declarations.forEach { declaration ->
         if (declaration is TypeAliasNode) {
-
-            declaration.canBeTranslated = declaration.shouldBeTranslated()
-
-            if (!declaration.canBeTranslated) {
+            if (!declaration.shouldBeTranslated()) {
                 astContext.registerTypeAlias(declaration)
+            } else {
+                declarationsFiltered.add(declaration)
             }
         } else if (declaration is DocumentRootNode) {
-            declaration.registerTypeAliases(astContext)
+            declarationsFiltered.add(declaration.filterAliases(astContext))
+        } else {
+            declarationsFiltered.add(declaration)
         }
     }
+
+    return copy(declarations = declarationsFiltered)
 }
 
 fun DocumentRootNode.resolveTypeAliases(astContext: TypeAliasContext): DocumentRootNode {
@@ -94,11 +99,11 @@ fun DocumentRootNode.resolveTypeAliases(astContext: TypeAliasContext): DocumentR
 fun SourceSetNode.resolveTypeAliases(): SourceSetNode  {
     val astContext = TypeAliasContext()
 
-    sources.forEach { source ->
-        source.root.registerTypeAliases(astContext)
+    val sourcesResolved = sources.map { source ->
+        source.copy(root = source.root.filterAliases(astContext))
     }
 
-    return copy(sources = sources.map { source ->
+    return copy(sources = sourcesResolved.map { source ->
         source.copy(root = source.root.resolveTypeAliases(astContext))
     })
 }

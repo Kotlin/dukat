@@ -506,15 +506,13 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null
         )
-        is TypeAliasNode -> if (canBeTranslated) {
-            TypeAliasModel(
-                    name = name,
-                    typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null
-            )
-        } else null
+        is TypeAliasNode -> TypeAliasModel(
+                name = name,
+                typeReference = typeReference.process(),
+                typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
+        )
         else -> {
             logger.debug("skipping ${this}")
             null
