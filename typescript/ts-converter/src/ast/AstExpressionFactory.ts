@@ -27,6 +27,15 @@ export class AstExpressionFactory {
         return expression;
     }
 
+    static createTypeOfExpressionDeclarationAsExpression(expression: Expression): Expression {
+        let typeOfExpression = new declarations.TypeOfExpressionDeclarationProto();
+        typeOfExpression.setExpression(expression);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setTypeofexpression(typeOfExpression);
+        return expressionProto;
+    }
+
     static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierEntity): Expression {
         let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
         propertyAccessExpression.setExpression(expression);

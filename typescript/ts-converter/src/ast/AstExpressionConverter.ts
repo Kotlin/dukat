@@ -11,6 +11,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
     }
 
+    static createTypeOfExpression(expression: Expression) {
+        return AstExpressionFactory.createTypeOfExpressionDeclarationAsExpression(expression);
+    }
+
     static createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
         return AstExpressionFactory.createPropertyAccessExpressionDeclarationAsExpression(expression, name);
     }
@@ -69,6 +73,12 @@ export class AstExpressionConverter {
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
             false
+        )
+    }
+
+    static convertTypeOfExpression(expression: ts.TypeOfExpression): Expression {
+        return this.createTypeOfExpression(
+            this.convertExpression(expression.expression),
         )
     }
 
@@ -159,6 +169,8 @@ export class AstExpressionConverter {
             return this.convertPrefixUnaryExpression(expression)
         } else if (ts.isPostfixUnaryExpression(expression)) {
             return this.convertPostfixUnaryExpression(expression)
+        } else if (ts.isTypeOfExpression(expression)) {
+            return this.convertTypeOfExpression(expression);
         } else if (ts.isPropertyAccessExpression(expression)) {
             return this.convertPropertyAccessExpression(expression)
         } else if (ts.isElementAccessExpression(expression)) {
