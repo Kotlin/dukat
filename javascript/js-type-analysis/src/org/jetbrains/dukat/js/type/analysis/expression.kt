@@ -29,6 +29,10 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Con
             owner[left] = rightConstraints
             rightConstraints
         }
+        "&&", "||" -> {
+            //TODO make this branching
+            leftConstraints
+        }
         "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> {
             rightConstraints += NumberTypeConstraint
             leftConstraints += NumberTypeConstraint
@@ -58,7 +62,6 @@ fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Cons
             ConstraintContainer(NumberTypeConstraint)
         }
         "!" -> {
-            operandConstraints += BooleanTypeConstraint
             ConstraintContainer(BooleanTypeConstraint)
         }
         else -> {
