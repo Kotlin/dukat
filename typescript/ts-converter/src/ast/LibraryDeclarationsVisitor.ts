@@ -7,6 +7,7 @@ export class LibraryDeclarationsVisitor {
   private skipTypes = new Set([
     "Array",
     "Boolean",
+    "Error",
     "Number",
     "ReadonlyArray",
     "String"
