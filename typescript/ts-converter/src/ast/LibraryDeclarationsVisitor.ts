@@ -14,15 +14,9 @@ export class LibraryDeclarationsVisitor {
   ]);
 
   constructor(
-    private typeChecker: ts.TypeChecker
+    private typeChecker: ts.TypeChecker,
+    private libChecker: (node: ts.Node) => boolean
   ) {
-  }
-
-  private isLibraryReference(declaration: ts.Node): boolean {
-    //TODO: consider using ts.preProcessFile to acces PreProcessedFileInfo::isLibFile
-    let resourceName = declaration.getSourceFile().fileName;
-    let fileName = resourceName.replace(tsInternals.getDirectoryPath(resourceName), "");
-    return  /lib(.*)\.d\.ts$/i.test(fileName);
   }
 
   private registerDeclaration(declaration) {
@@ -39,7 +33,7 @@ export class LibraryDeclarationsVisitor {
     let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        if (this.isLibraryReference(declaration)) {
+        if (this.libChecker(declaration)) {
           if (!this.visited.has(declaration)) {
             this.visited.add(declaration);
 

@@ -55,8 +55,8 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
         let astConverter: AstConverter = new AstConverter(
           fileName,
           packageName,
-          createExportContext((node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile())),
           program.getTypeChecker(),
+          (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile()),
           (fileName: string) => program.getSourceFile(fileName),
           new DeclarationResolver(program),
           astFactory

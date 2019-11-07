@@ -32,23 +32,25 @@ import {
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {ExportContext} from "./ExportContext";
+import {createExportContext, ExportContext} from "./ExportContext";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
+    private exportContext: ExportContext = createExportContext(this.libChecker);
 
     private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
     private libVisitor = new LibraryDeclarationsVisitor(
-      this.typeChecker
+      this.typeChecker,
+      this.libChecker
     );
 
     constructor(
       private sourceName: string,
       private rootPackageName: NameEntity,
-      private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
+      private libChecker: (node: ts.Node) => boolean,
       private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
       private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
