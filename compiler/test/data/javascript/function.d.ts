@@ -6,6 +6,10 @@ function numBinaryFun(a, b) {
     return a - b
 }
 
+function numBinaryFunWrapper(a, b) {
+    return numBinaryFun(a, b)
+}
+
 function numUnaryFun(a) {
     var b = a
     a = "text"

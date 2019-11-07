@@ -23,6 +23,8 @@ external var str: String
 
 external fun numBinaryFun(a: Number, b: Number): Number
 
+external fun numBinaryFunWrapper(a: Number, b: Number): Number
+
 external fun numUnaryFun(a: Number): Number
 
 external fun numReferenceFun(): Number
