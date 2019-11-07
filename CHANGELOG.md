@@ -1,5 +1,14 @@
 # Changelog
 
+### [0.0.23] - 07'November, 2019
+ - equals should have "override" modifier only when param is Any?
+ - Resolve file names from namespaced nodejs packages.
+ - Correct override resolving for methods with return type.
+ - Resolve overrides when return type is generic.
+ - Replace ReadonlyArray from ts stdlib with just Array.
+ - Preserve TypeParams in unaliased entities in cases when they were lost.
+ - Replace entity inherited from a final class (in a Kotlin stdlib sense with alias.
+
 ### [0.0.22] - 31'October, 2019
  - Better support for Partial. Whenever this class is defined in this particular declaration source set,
    new class is generated which mimicks Partial behaviour.
