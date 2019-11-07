@@ -44,10 +44,10 @@ import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 import substituteTsStdLibEntities
 
 
-interface TypescriptInputTranslator<T> : InputTranslator<T> {
-    val moduleNameResolver: ModuleNameResolver
-
-    fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
+open class TypescriptLowerer(
+        private val moduleNameResolver: ModuleNameResolver
+) : ECMAScriptLowerer {
+    override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return sourceSet
                 .filterOutNonDeclarations()
                 .substituteTsStdLibEntities()
@@ -87,7 +87,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .generateStdLib()
     }
 
-    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+    override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
         return SourceBundleModel(sourceBundle.sources.map { source -> lower(source) })
     }
 }

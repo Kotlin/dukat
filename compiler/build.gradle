@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":idl-reference-resolver"))
     implementation(project(":itertools"))
     implementation(project(":js-type-analysis"))
+    implementation(project(":js-translator"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":model-lowerings-common"))
@@ -168,6 +169,33 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
+task generateJSBinary(type: NodeTask) {
+    def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
+    script = file(scriptName)
+
+    def declarationsDir = "${project.projectDir}/test/data/javascript"
+
+    inputs.dir(declarationsDir)
+    inputs.file(scriptName)
+    inputs.file(DEFAULT_LIB_PATH)
+
+    def outputFile = "${project.buildDir}/javascript/declarations.dukat"
+    outputs.file(outputFile)
+
+    def files = []
+    file(declarationsDir)
+            .eachFileRecurse() {
+                if (it.isFile() && it.name.endsWith(".d.ts")) {
+                    files << it
+                }
+            }
+
+    args = [
+            DEFAULT_LIB_PATH,
+            outputFile
+    ] + files
+}
+
 task extractKoltinJsLibs(type: Copy) {
     configurations.kotlinJsLibs.each {
         from it.absolutePath
@@ -179,6 +207,7 @@ task extractKoltinJsLibs(type: Copy) {
 }
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
+generateJSBinary.dependsOn = [":ts-converter:webpack"]
 
 
 //TODO: having download and downloadDist is a shame
@@ -186,6 +215,7 @@ test.dependsOn = [
         download,
         downloadDist,
         generateBinary,
+        generateJSBinary,
         fetchDefinitelyTyped,
         extractKoltinJsLibs,
         ":node-package:nodeEnv",
