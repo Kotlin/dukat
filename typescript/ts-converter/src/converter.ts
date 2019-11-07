@@ -7,7 +7,6 @@ import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {createExportContext} from "./ExportContext";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();

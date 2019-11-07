@@ -32,12 +32,12 @@ import {
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {createExportContext, ExportContext} from "./ExportContext";
+import {ExportContext} from "./ExportContext";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
-    private exportContext: ExportContext = createExportContext(this.libChecker);
+    private exportContext: ExportContext = new ExportContext(this.libChecker);
 
     private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
