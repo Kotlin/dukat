@@ -4,13 +4,12 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 
 internal data class DereferenceNode(
-        val dereferenced: ParameterValueDeclaration,
+        val dereferenced: TypeNode,
         val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration>,
 
         override val nullable: Boolean = false,
@@ -42,10 +41,6 @@ class TypeAliasContext {
                 myTypeAliasMap[declaration.typeReference?.uid]?.let { aliasResolved ->
                     when (val typeReference = aliasResolved.typeReference) {
                         is TypeNode -> {
-                            val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first }, { it.second })
-                            DereferenceNode(typeReference, aliasParamsMap)
-                        }
-                        is IntersectionMetadata -> {
                             val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first }, { it.second })
                             DereferenceNode(typeReference, aliasParamsMap)
                         }
