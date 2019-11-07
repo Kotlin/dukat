@@ -25,23 +25,30 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Con
     val leftConstraints = left.calculateConstraints(owner)
 
     return when (operator) {
+        // Assignments
         "=" -> {
             owner[left] = rightConstraints
             rightConstraints
         }
+        "-=", "*=", "/=", "%=", "**=", "&=", "^=", "|=", "<<=", ">>=", ">>>=" -> {
+            owner[left] = ConstraintContainer(NumberTypeConstraint)
+            ConstraintContainer(NumberTypeConstraint)
+        }
+
+        // Non-assignments
         "&&", "||" -> {
             //TODO make this branching
             leftConstraints
         }
-        "-", "*", "/", "**", "%", "++", "--", "-=", "*=", "/=", "%=", "**=" -> {
+        "-", "*", "/", "**", "%", "++", "--" -> {
             rightConstraints += NumberTypeConstraint
             leftConstraints += NumberTypeConstraint
             ConstraintContainer(NumberTypeConstraint)
         }
-        "&", "|", "^", "<<", ">>" -> {
+        "&", "|", "^", "<<", ">>", ">>>" -> {
             ConstraintContainer(NumberTypeConstraint)
         }
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in" -> {
+        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in", "instanceof" -> {
             ConstraintContainer(BooleanTypeConstraint)
         }
         else -> {
