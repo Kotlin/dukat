@@ -153,7 +153,7 @@ export class AstExpressionFactory {
         regExLiteralExpression.setValue(value);
 
         let literalExpression = new declarations.LiteralExpressionDeclarationProto();
-        literalExpression.setRegExliteral(regExLiteralExpression);
+        literalExpression.setRegexliteral(regExLiteralExpression);
         return this.asExpression(literalExpression);
     }
 }
