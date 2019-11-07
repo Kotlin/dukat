@@ -1,54 +1,54 @@
-export var num = 3
-export var bool = true
-export var str = "text"
+var num = 3
+var bool = true
+var str = "text"
 
-export function numBinaryFun(a, b) {
+function numBinaryFun(a, b) {
     return a - b
 }
 
-export function numUnaryFun(a) {
+function numUnaryFun(a) {
     var b = a
     a = "text"
     return b++
 }
 
-export function numReferenceFun() {
+function numReferenceFun() {
     return num
 }
 
-export function boolBinaryFun(a, b) {
+function boolBinaryFun(a, b) {
     return a == b
 }
 
-export function boolUnaryFun(a) {
+function boolUnaryFun(a) {
     return !a
 }
 
-export function boolReferenceFun() {
+function boolReferenceFun() {
     return bool
 }
 
-export function stringReferenceFun() {
+function stringReferenceFun() {
     return str
 }
 
-export function anyFun(a, b) {
+function anyFun(a, b) {
     return a + b
 }
 
-export function unitFunction() {
+function unitFunction() {
     return;
 }
 
-export function typeOf(o) {
+function typeOf(o) {
     return typeof o
 }
 
-export function instanceOfObject(o) {
+function instanceOfObject(o) {
     return o instanceof Object
 }
 
-export class Literals {
+class Literals {
     static getStringLiteral() {
         return "text"
     }
@@ -62,7 +62,7 @@ export class Literals {
     }
 }
 
-export class TestSet {
+class TestSet {
     isElement(obj) {
         return !!(obj && obj.nodeType === 1);
     }
