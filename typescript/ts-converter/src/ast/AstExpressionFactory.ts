@@ -36,6 +36,16 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
+    static createCallExpressionDeclarationAsExpression(expression: Expression, args: Array<Expression>): Expression {
+        let callExpression = new declarations.CallExpressionDeclarationProto();
+        callExpression.setExpression(expression);
+        callExpression.setArgumentsList(args);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setCallexpression(callExpression);
+        return expressionProto;
+    }
+
     static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierEntity): Expression {
         let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
         propertyAccessExpression.setExpression(expression);

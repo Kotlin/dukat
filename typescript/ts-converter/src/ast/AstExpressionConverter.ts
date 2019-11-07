@@ -1,6 +1,7 @@
 import * as ts from "typescript-services-api";
 import {Expression, IdentifierEntity, NameEntity} from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
+import {LeftHandSideExpression, NodeArray, TypeNode} from "../../.tsdeclarations/tsserverlibrary";
 
 export class AstExpressionConverter {
     static createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
@@ -13,6 +14,10 @@ export class AstExpressionConverter {
 
     static createTypeOfExpression(expression: Expression) {
         return AstExpressionFactory.createTypeOfExpressionDeclarationAsExpression(expression);
+    }
+
+    static createCallExpression(expression: Expression, args: Array<Expression>) {
+        return AstExpressionFactory.createCallExpressionDeclarationAsExpression(expression, args);
     }
 
     static createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
@@ -79,6 +84,13 @@ export class AstExpressionConverter {
     static convertTypeOfExpression(expression: ts.TypeOfExpression): Expression {
         return this.createTypeOfExpression(
             this.convertExpression(expression.expression),
+        )
+    }
+
+    static convertCallExpression(expression: ts.CallExpression): Expression {
+        return this.createCallExpression(
+            this.convertExpression(expression.expression),
+            expression.arguments.map(arg => this.convertExpression(arg))
         )
     }
 
@@ -171,6 +183,8 @@ export class AstExpressionConverter {
             return this.convertPostfixUnaryExpression(expression)
         } else if (ts.isTypeOfExpression(expression)) {
             return this.convertTypeOfExpression(expression);
+        } else if (ts.isCallExpression(expression)) {
+            return this.convertCallExpression(expression);
         } else if (ts.isPropertyAccessExpression(expression)) {
             return this.convertPropertyAccessExpression(expression)
         } else if (ts.isElementAccessExpression(expression)) {

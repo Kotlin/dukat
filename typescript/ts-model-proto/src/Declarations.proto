@@ -221,6 +221,11 @@ message TypeOfExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message CallExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    repeated ExpressionDeclarationProto arguments = 2;
+}
+
 message PropertyAccessExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
     IdentifierEntityProto name = 2;
@@ -240,11 +245,12 @@ message ExpressionDeclarationProto {
         BinaryExpressionDeclarationProto binaryExpression = 1;
         UnaryExpressionDeclarationProto unaryExpression = 2;
         TypeOfExpressionDeclarationProto typeOfExpression = 3;
-        NameExpressionDeclarationProto nameExpression = 4;
-        LiteralExpressionDeclarationProto literalExpression = 5;
-        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 6;
-        ElementAccessExpressionDeclarationProto elementAccessExpression = 7;
-        UnknownExpressionDeclarationProto unknownExpression = 8;
+        CallExpressionDeclarationProto callExpression = 4;
+        NameExpressionDeclarationProto nameExpression = 5;
+        LiteralExpressionDeclarationProto literalExpression = 6;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 7;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 8;
+        UnknownExpressionDeclarationProto unknownExpression = 9;
     }
 }
 

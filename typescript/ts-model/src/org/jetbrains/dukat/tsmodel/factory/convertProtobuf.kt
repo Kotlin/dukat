@@ -36,6 +36,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
@@ -367,6 +368,13 @@ fun Declarations.TypeOfExpressionDeclarationProto.convert(): TypeOfExpressionDec
     )
 }
 
+fun Declarations.CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
+    return CallExpressionDeclaration(
+            expression = expression.convert(),
+            arguments = argumentsList.map { it.convert() }
+    )
+}
+
 fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
     return when {
         name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
@@ -417,6 +425,7 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()
         hasTypeOfExpression() -> typeOfExpression.convert()
+        hasCallExpression() -> callExpression.convert()
         hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
         hasPropertyAccessExpression() -> propertyAccessExpression.convert()
