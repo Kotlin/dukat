@@ -30,7 +30,7 @@ class DocumentCache {
 
 let cache = new DocumentCache();
 
-function translateFile(fileName: string, stdlib: string, packageNameString: string): SourceSet {
+function createSourceSet(fileName: string, stdlib: string, packageNameString: string): SourceSet {
     let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
     host.register(fileName);
 
@@ -68,14 +68,14 @@ function translateFile(fileName: string, stdlib: string, packageNameString: stri
 }
 
 export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
-    let sourceSets = files.map(fileName => translateFile(fileName, stdlib, packageName));
+    let sourceSets = files.map(fileName => createSourceSet(fileName, stdlib, packageName));
     let sourceSetBundle = new declarations.SourceSetBundleProto();
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
 }
 
 
-function createBundle(lib, packageName, files) {
+function createBundle(lib: string, packageName:string, files: Array<string>) {
     let sourceSetBundle = translate(lib, packageName, files);
     return sourceSetBundle;
 }

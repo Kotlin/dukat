@@ -1,5 +1,4 @@
 import * as ts from "typescript-services-api";
-import {tsInternals} from "../TsInternals";
 
 export class LibraryDeclarationsVisitor {
   private visited = new Set<ts.Node>();
@@ -20,7 +19,7 @@ export class LibraryDeclarationsVisitor {
   }
 
   private registerDeclaration(declaration) {
-    let sourceName = declaration.getSourceFile().fileName;
+    const sourceName = declaration.getSourceFile().fileName;
 
     if (!Array.isArray(this.libDeclarations.get(sourceName))) {
       this.libDeclarations.set(sourceName, []);
@@ -30,37 +29,24 @@ export class LibraryDeclarationsVisitor {
   }
 
   private checkLibReferences(entity: ts.Node) {
-    let symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
+    const symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (this.libChecker(declaration)) {
           if (!this.visited.has(declaration)) {
             this.visited.add(declaration);
-
-            if (ts.isClassDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) {
-              this.registerDeclaration(declaration);
-              this.visit(declaration);
-            }
+            this.registerDeclaration(declaration);
           }
         }
       }
     }
   }
 
-  visit(node: ts.Node) {
-    node.forEachChild(declaration => {
-      if (ts.isHeritageClause(declaration)) {
-        for (let type of declaration.types) {
-          this.checkLibReferences(type);
-        }
-      } else if (ts.isTypeNode(declaration)) {
-        let shouldNotBeProcessed = ts.isTypeReferenceNode(declaration) && this.skipTypes.has(declaration.typeName.getText());
-        if (!shouldNotBeProcessed) {
-          this.checkLibReferences(declaration);
-        }
-      }
-      this.visit(declaration);
-    });
+  simpleVisit(node: ts.ExpressionWithTypeArguments | ts.TypeNode) {
+    const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
+    if (!shouldNotBeProcessed) {
+      this.checkLibReferences(node)
+    }
   }
 
   public forEachLibDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {

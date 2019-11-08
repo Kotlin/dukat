@@ -68,8 +68,6 @@ export class AstConverter {
             throw new Error(`failed to resolve source file ${sourceFileName}`)
         }
 
-        this.libVisitor.visit(sourceFile);
-
         let resourceName = this.rootPackageName;
 
         let packageNameFragments = sourceFile.fileName.split("/");
@@ -96,7 +94,6 @@ export class AstConverter {
       let libRootUid = "<LIBROOT>";
       this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
           let declarations: Array<Declaration> = [];
-
 
           for (let libDeclaration of libDeclarations) {
                 let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
@@ -355,6 +352,9 @@ export class AstConverter {
             if (ts.isIdentifier(type)) {
                 return this.astFactory.createIdentifierDeclarationAsNameEntity(type.text)
             }
+
+            this.libVisitor.simpleVisit(type);
+
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
             } else if (ts.isArrayTypeNode(type)) {
@@ -689,6 +689,8 @@ export class AstConverter {
                 let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                 for (let type of heritageClause.types) {
+                    this.libVisitor.simpleVisit(type);
+
                     let typeArguments: Array<IdentifierEntity> = [];
 
                     if (type.typeArguments) {

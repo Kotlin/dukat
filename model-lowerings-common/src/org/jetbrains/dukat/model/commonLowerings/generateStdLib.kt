@@ -5,13 +5,12 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
-import org.jetbrains.dukat.astModel.transform
 
 private fun ModuleModel.isLib(): Boolean {
     return name == IdentifierEntity("<LIBROOT>")
 }
 
-private fun  TopLevelModel.isInKotlinStdLib(): Boolean {
+private fun TopLevelModel.isInKotlinStdLib(): Boolean {
     return if (this is FunctionModel) {
         extend?.let { KotlinStdlibEntities.contains(it.name) } ?: false
     } else {
