@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.js.type.property_owner
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
+import org.jetbrains.dukat.js.type.constraint.composite.ReferenceConstraint
 
 class Scope : PropertyOwner {
     override val propertyNames: Set<String>
@@ -12,7 +14,7 @@ class Scope : PropertyOwner {
         properties[name] = data
     }
 
-    override fun get(name: String): Constraint? {
-        return properties[name]
+    override fun get(name: String): Constraint {
+        return properties[name] ?: ReferenceConstraint(IdentifierEntity(name))
     }
 }
