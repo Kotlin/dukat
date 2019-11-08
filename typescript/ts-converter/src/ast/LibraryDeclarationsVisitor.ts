@@ -1,7 +1,7 @@
 import * as ts from "typescript-services-api";
 
 export class LibraryDeclarationsVisitor {
-  private visited = new Set<ts.Node>();
+  private processed = new Set<ts.Node>();
   private libDeclarations = new Map<string, Array<ts.Node>>();
   private skipTypes = new Set([
     "Array",
@@ -33,8 +33,8 @@ export class LibraryDeclarationsVisitor {
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (this.libChecker(declaration)) {
-          if (!this.visited.has(declaration)) {
-            this.visited.add(declaration);
+          if (!this.processed.has(declaration)) {
+            this.processed.add(declaration);
             this.registerDeclaration(declaration);
           }
         }
@@ -42,7 +42,7 @@ export class LibraryDeclarationsVisitor {
     }
   }
 
-  simpleVisit(node: ts.ExpressionWithTypeArguments | ts.TypeNode) {
+  process(node: ts.ExpressionWithTypeArguments | ts.TypeNode) {
     const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
     if (!shouldNotBeProcessed) {
       this.checkLibReferences(node)

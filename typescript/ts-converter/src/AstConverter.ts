@@ -353,7 +353,7 @@ export class AstConverter {
                 return this.astFactory.createIdentifierDeclarationAsNameEntity(type.text)
             }
 
-            this.libVisitor.simpleVisit(type);
+            this.libVisitor.process(type);
 
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
@@ -689,7 +689,7 @@ export class AstConverter {
                 let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                 for (let type of heritageClause.types) {
-                    this.libVisitor.simpleVisit(type);
+                    this.libVisitor.process(type);
 
                     let typeArguments: Array<IdentifierEntity> = [];
 
