@@ -1,12 +1,11 @@
-package org.jetbrains.dukat.js.type.constraint.unresolved
+package org.jetbrains.dukat.js.type.constraint.properties
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
-import org.jetbrains.dukat.js.type.constraint.container.ConstraintContainer
-import org.jetbrains.dukat.js.type.constraint.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class ObjectConstraint(
         private val instantiatedClass: ClassConstraint? = null
-) : PropertyOwner, Constraint {
+) : PropertyOwnerConstraint {
     override val propertyNames: Set<String>
         get() {
             val names = mutableSetOf<String>()
@@ -17,9 +16,9 @@ class ObjectConstraint(
             return names
         }
 
-    private val properties = LinkedHashMap<String, ConstraintContainer>()
+    private val properties = LinkedHashMap<String, Constraint>()
 
-    override fun set(name: String, data: ConstraintContainer) {
+    override fun set(name: String, data: Constraint) {
         properties[name] = data
     }
 
@@ -27,7 +26,7 @@ class ObjectConstraint(
         return properties.containsKey(name) || instantiatedClass?.prototype?.has(name) == true
     }
 
-    override fun get(name: String): ConstraintContainer? {
+    override fun get(name: String): Constraint? {
         return when {
             properties.containsKey(name) -> properties[name]
             instantiatedClass?.prototype?.has(name) == true -> instantiatedClass.prototype[name]
@@ -39,7 +38,7 @@ class ObjectConstraint(
         val resolvedConstraint = ObjectConstraint()
 
         propertyNames.forEach {
-            resolvedConstraint[it] = ConstraintContainer(this[it]!!.resolve(owner))
+            resolvedConstraint[it] = this[it]!!.resolve(owner)
         }
 
         return resolvedConstraint

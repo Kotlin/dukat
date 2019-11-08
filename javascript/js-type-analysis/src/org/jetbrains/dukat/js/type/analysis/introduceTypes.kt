@@ -1,11 +1,13 @@
 package org.jetbrains.dukat.js.type.analysis
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.js.type.constraint.unresolved.ClassConstraint
-import org.jetbrains.dukat.js.type.constraint.container.ConstraintContainer
-import org.jetbrains.dukat.js.type.constraint.unresolved.FunctionConstraint
-import org.jetbrains.dukat.js.type.constraint.property_owner.PropertyOwner
-import org.jetbrains.dukat.js.type.constraint.property_owner.Scope
+import org.jetbrains.dukat.js.type.constraint.Constraint
+import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.property_owner.Scope
 import org.jetbrains.dukat.js.type.export_resolution.GeneralExportResolver
 import org.jetbrains.dukat.js.type.export_resolution.ExportResolver
 import org.jetbrains.dukat.panic.raiseConcern
@@ -27,36 +29,30 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) {
     if (this.body != null) {
         val functionScope = Scope()
 
-        val parameterConstraintContainers = MutableList(parameters.size) { i ->
+        val parameterConstraints = MutableList(parameters.size) { i ->
             // Store constraints of parameters in scope,
             // and in parameter list (in case the variable is replaced)
-            val parameterConstraintContainer = ConstraintContainer()
-            functionScope[parameters[i].name] = parameterConstraintContainer
-            parameters[i].name to parameterConstraintContainer
+            val parameterConstraint = CompositeConstraint()
+            functionScope[parameters[i].name] = parameterConstraint
+            parameters[i].name to parameterConstraint
         }
 
         val returnTypeConstraints = body!!.calculateConstraints(functionScope)
 
-        owner[name] = ConstraintContainer(FunctionConstraint(
+        owner[name] = FunctionConstraint(
                 returnConstraints = returnTypeConstraints,
-                parameterConstraints = parameterConstraintContainers
-        ))
+                parameterConstraints = parameterConstraints
+        )
     }
 }
 
-/*fun ConstructorDeclaration.addTo(owner: PropertyOwner) {
+/*
+fun ConstructorDeclaration.addTo(owner: PropertyOwner) {
     // TODO add body to constructor in AST and process it like a function
 }
 
-fun InterfaceDeclaration.addTo(owner: PropertyOwner) {
-    val scope = Scope<ConstraintContainer>()
-
-    for(member in members) {
-        member.calculateConstraints(scope)
-    }
-
-    //owner[name] = scope
-}*/
+fun InterfaceDeclaration.addTo(owner: PropertyOwner)
+*/
 
 fun MemberDeclaration.addTo(owner: PropertyOwner) {
     when (this) {
@@ -79,13 +75,13 @@ fun ClassDeclaration.addTo(owner: PropertyOwner) {
 
         members.forEach { it.addToClass(classConstraint) }
 
-        owner[className.value] = ConstraintContainer(classConstraint)
+        owner[className.value] = classConstraint
     } else {
         raiseConcern("Cannot convert class with name of type <${className::class}>.") {  }
     }
 }
 
-fun BlockDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun BlockDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     return statements.calculateConstraints(owner)
 }
 
@@ -97,12 +93,12 @@ fun ExpressionStatementDeclaration.calculateConstraints(owner: PropertyOwner) {
     expression.calculateConstraints(owner)
 }
 
-fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
-    return ConstraintContainer(expression.calculateConstraints(owner))
+fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
+    return expression.calculateConstraints(owner)
 }
 
-fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer? {
-    var returnTypeConstraints: ConstraintContainer? = null
+fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint? {
+    var returnTypeConstraints: Constraint? = null
 
     when (this) {
         is FunctionDeclaration -> this.addTo(owner)
@@ -119,8 +115,8 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintC
     return returnTypeConstraints
 }
 
-fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
-    var returnTypeConstraints = ConstraintContainer()
+fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner) : Constraint {
+    var returnTypeConstraints: Constraint = VoidTypeConstraint
 
     for(statement in this) {
         val statementReturnTypeConstraints = statement.calculateConstraints(owner)

@@ -1,15 +1,17 @@
 package org.jetbrains.dukat.js.type.analysis
 
-import org.jetbrains.dukat.js.type.constraint.unresolved.ReferenceConstraint
-import org.jetbrains.dukat.js.type.constraint.container.ConstraintContainer
-import org.jetbrains.dukat.js.type.constraint.property_owner.PropertyOwner
-import org.jetbrains.dukat.js.type.constraint.resolved.BigIntTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.BooleanTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.NoTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.NumberTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.StringTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.unresolved.call.CallArgumentConstraint
-import org.jetbrains.dukat.js.type.constraint.unresolved.call.CallResultConstraint
+import org.jetbrains.dukat.js.type.constraint.Constraint
+import org.jetbrains.dukat.js.type.constraint.composite.ReferenceConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.call.CallArgumentConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.call.CallResultConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
@@ -23,7 +25,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
-fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     val rightConstraints = right.calculateConstraints(owner)
     val leftConstraints = left.calculateConstraints(owner)
 
@@ -34,8 +36,8 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Con
             rightConstraints
         }
         "-=", "*=", "/=", "%=", "**=", "&=", "^=", "|=", "<<=", ">>=", ">>>=" -> {
-            owner[left] = ConstraintContainer(NumberTypeConstraint)
-            ConstraintContainer(NumberTypeConstraint)
+            owner[left] = NumberTypeConstraint
+            NumberTypeConstraint
         }
 
         // Non-assignments
@@ -46,46 +48,46 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Con
         "-", "*", "/", "**", "%", "++", "--" -> {
             rightConstraints += NumberTypeConstraint
             leftConstraints += NumberTypeConstraint
-            ConstraintContainer(NumberTypeConstraint)
+            NumberTypeConstraint
         }
         "&", "|", "^", "<<", ">>", ">>>" -> {
-            ConstraintContainer(NumberTypeConstraint)
+            NumberTypeConstraint
         }
         "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in", "instanceof" -> {
-            ConstraintContainer(BooleanTypeConstraint)
+            BooleanTypeConstraint
         }
         else -> {
-            ConstraintContainer(NoTypeConstraint)
+            CompositeConstraint(NoTypeConstraint)
         }
     }
 }
 
-fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     val operandConstraints = operand.calculateConstraints(owner)
 
     return when (operator) {
         "--", "++", "~" -> {
             operandConstraints += NumberTypeConstraint
-            ConstraintContainer(NumberTypeConstraint)
+            NumberTypeConstraint
         }
         "-", "+" -> {
-            ConstraintContainer(NumberTypeConstraint)
+            NumberTypeConstraint
         }
         "!" -> {
-            ConstraintContainer(BooleanTypeConstraint)
+            BooleanTypeConstraint
         }
         else -> {
-            ConstraintContainer(NoTypeConstraint)
+            CompositeConstraint(NoTypeConstraint)
         }
     }
 }
 
-fun TypeOfExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun TypeOfExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     expression.calculateConstraints(owner)
-    return ConstraintContainer(StringTypeConstraint)
+    return StringTypeConstraint
 }
 
-fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     val callTargetConstraints = expression.calculateConstraints(owner)
     val argumentConstraints = arguments.map { it.calculateConstraints(owner) }
 
@@ -97,31 +99,31 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Const
         )
     }
 
-    return ConstraintContainer(CallResultConstraint(
+    return CallResultConstraint(
             callTargetConstraints,
             argumentConstraints
-    ))
+    )
 }
 
-fun LiteralExpressionDeclaration.calculateConstraints() : ConstraintContainer {
+fun LiteralExpressionDeclaration.calculateConstraints() : Constraint {
     return when (this) {
-        is StringLiteralExpressionDeclaration -> ConstraintContainer(StringTypeConstraint)
-        is NumericLiteralExpressionDeclaration -> ConstraintContainer(NumberTypeConstraint)
-        is BigIntLiteralExpressionDeclaration -> ConstraintContainer(BigIntTypeConstraint)
-        is BooleanLiteralExpressionDeclaration -> ConstraintContainer(BooleanTypeConstraint)
-        else -> raiseConcern("Unexpected literal expression type <${this::class}>") { ConstraintContainer(NoTypeConstraint) }
+        is StringLiteralExpressionDeclaration -> StringTypeConstraint
+        is NumericLiteralExpressionDeclaration -> NumberTypeConstraint
+        is BigIntLiteralExpressionDeclaration -> BigIntTypeConstraint
+        is BooleanLiteralExpressionDeclaration -> BooleanTypeConstraint
+        else -> raiseConcern("Unexpected literal expression type <${this::class}>") { CompositeConstraint(NoTypeConstraint) }
     }
 }
 
-fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : ConstraintContainer {
+fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : Constraint {
     return when (this) {
-        is IdentifierExpressionDeclaration -> owner[this] ?: ConstraintContainer(ReferenceConstraint(this.identifier))
+        is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner)
         is CallExpressionDeclaration -> this.calculateConstraints(owner)
         is LiteralExpressionDeclaration -> this.calculateConstraints()
-        null -> ConstraintContainer()
-        else -> ConstraintContainer(NoTypeConstraint)
+        null -> VoidTypeConstraint
+        else -> CompositeConstraint()
     }
 }

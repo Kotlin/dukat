@@ -3,7 +3,7 @@ package org.jetbrains.dukat.js.type.type
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-val unitType = TypeDeclaration(
+val voidType = TypeDeclaration(
         value = IdentifierEntity("Unit"),
         params = emptyList(),
         nullable = false

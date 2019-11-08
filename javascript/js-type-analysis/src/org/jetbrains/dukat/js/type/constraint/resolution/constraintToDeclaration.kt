@@ -2,18 +2,19 @@ package org.jetbrains.dukat.js.type.constraint.resolution
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
-import org.jetbrains.dukat.js.type.constraint.container.ConstraintContainer
-import org.jetbrains.dukat.js.type.constraint.resolved.BigIntTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.BooleanTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.NumberTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.resolved.StringTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.unresolved.ClassConstraint
-import org.jetbrains.dukat.js.type.constraint.unresolved.FunctionConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.type.anyNullableType
 import org.jetbrains.dukat.js.type.type.booleanType
 import org.jetbrains.dukat.js.type.type.numberType
 import org.jetbrains.dukat.js.type.type.stringType
-import org.jetbrains.dukat.js.type.type.unitType
+import org.jetbrains.dukat.js.type.type.voidType
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -36,9 +37,9 @@ fun getVariableDeclaration(name: String, type: ParameterValueDeclaration) = Vari
     uid = getUID()
 )
 
-fun ConstraintContainer.toParameterDeclaration(name: String) = ParameterDeclaration(
+fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
         name = name,
-        type = this.toType(),
+        type = this.toType() ?: anyNullableType,
         initializer = null,
         vararg = false,
         optional = false
@@ -47,17 +48,25 @@ fun ConstraintContainer.toParameterDeclaration(name: String) = ParameterDeclarat
 fun FunctionConstraint.toDeclaration(name: String) = FunctionDeclaration(
         name = name,
         parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-        type = returnConstraints.toType(unitType),
+        type = returnConstraints.toType() ?: voidType,
         typeParameters = emptyList(),
         modifiers = EXPORT_MODIFIERS,
         body = null,
         uid = getUID()
 )
 
-fun ConstraintContainer.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
-    return when (val declaration = toDeclaration(name)) {
-        is FunctionDeclaration -> return declaration.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
-        else -> raiseConcern("Cannot convert declaration of type <${declaration?.let {declaration::class} ?: "null"} to member.>") { null }
+fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
+    return this.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
+}
+
+fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
+    return this.toDeclaration(name).withStaticModifier(isStatic)
+}
+
+fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
+    return when (this) {
+        is FunctionConstraint -> this.toMemberDeclaration(name, isStatic)
+        else -> raiseConcern("Cannot treat constraint of type <${this::class}> as member.") { null }
     }
 }
 
@@ -86,48 +95,22 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     )
 }
 
-fun List<Constraint>.toType() : TypeDeclaration? {
-    return when {
-        this.contains(NumberTypeConstraint) -> numberType
-        this.contains(BigIntTypeConstraint) -> numberType
-        this.contains(BooleanTypeConstraint) -> booleanType
-        this.contains(StringTypeConstraint) -> stringType
-        this.isEmpty() -> null
+fun Constraint.toType() : TypeDeclaration? {
+    return when (this) {
+        is NumberTypeConstraint -> numberType
+        is BigIntTypeConstraint -> numberType
+        is BooleanTypeConstraint -> booleanType
+        is StringTypeConstraint -> stringType
+        is VoidTypeConstraint -> voidType
         else -> anyNullableType
     }
 }
 
-fun ConstraintContainer.toType(defaultType: TypeDeclaration = anyNullableType) : TypeDeclaration {
-    val flatConstraints = getFlatConstraints()
-    return flatConstraints.toType() ?: defaultType
-}
-
-fun ConstraintContainer.toDeclaration(name: String) : TopLevelDeclaration? {
-    var declaration: TopLevelDeclaration? = null
-
-    val flatConstraints = getFlatConstraints()
-
-    flatConstraints.forEach {
-        when (it) {
-            is ClassConstraint -> declaration = it.toDeclaration(name)
-            is FunctionConstraint -> declaration = it.toDeclaration(name)
-        }
-    }
-
-    if(declaration == null) {
-        val type = flatConstraints.toType()
-
-        if(type != null) {
-            declaration = getVariableDeclaration(name, type)
-        }
-    }
-
-    return declaration
-}
-
 fun Constraint.toDeclaration(name: String) : TopLevelDeclaration? {
     return when (this) {
-        is ConstraintContainer -> this.toDeclaration(name)
-        else -> raiseConcern("Export cannot be defined by constraint directly.") { null }
+        is ClassConstraint -> this.toDeclaration(name)
+        is FunctionConstraint -> this.toDeclaration(name)
+        is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { null }
+        else -> this.toType()?.let { type -> getVariableDeclaration(name, type) }
     }
 }
