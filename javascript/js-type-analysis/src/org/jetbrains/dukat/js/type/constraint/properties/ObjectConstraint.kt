@@ -2,6 +2,7 @@ package org.jetbrains.dukat.js.type.constraint.properties
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 
 class ObjectConstraint(
         private val instantiatedClass: ClassConstraint? = null
@@ -22,19 +23,14 @@ class ObjectConstraint(
         properties[name] = data
     }
 
-    override fun has(name: String): Boolean {
-        return properties.containsKey(name) || instantiatedClass?.prototype?.has(name) == true
-    }
-
     override fun get(name: String): Constraint? {
         return when {
             properties.containsKey(name) -> properties[name]
-            instantiatedClass?.prototype?.has(name) == true -> instantiatedClass.prototype[name]
-            else -> null
+            else -> instantiatedClass?.prototype?.get(name)
         }
     }
 
-    override fun resolve(owner: PropertyOwner): Constraint {
+    override fun resolve(owner: PropertyOwner): ObjectConstraint {
         val resolvedConstraint = ObjectConstraint()
 
         propertyNames.forEach {

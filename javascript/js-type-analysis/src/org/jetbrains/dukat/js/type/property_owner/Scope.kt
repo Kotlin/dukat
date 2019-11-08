@@ -12,10 +12,6 @@ class Scope : PropertyOwner {
         properties[name] = data
     }
 
-    override fun has(name: String): Boolean {
-        return properties.containsKey(name)
-    }
-
     override fun get(name: String): Constraint? {
         return properties[name]
     }

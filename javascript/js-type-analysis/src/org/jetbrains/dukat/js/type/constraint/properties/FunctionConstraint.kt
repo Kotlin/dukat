@@ -8,7 +8,7 @@ class FunctionConstraint(
         val returnConstraints: Constraint,
         val parameterConstraints: List<Pair<String, Constraint>>
 ) : ImmutableConstraint { //TODO make property owner (since functions technically are, in javascript)
-    override fun resolve(owner: PropertyOwner): Constraint {
+    override fun resolve(owner: PropertyOwner): FunctionConstraint {
         return FunctionConstraint(
                 returnConstraints.resolve(owner),
                 parameterConstraints.map { (name, constraint) -> name to constraint.resolve(owner) }

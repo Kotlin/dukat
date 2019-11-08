@@ -16,6 +16,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
@@ -118,6 +119,7 @@ fun LiteralExpressionDeclaration.calculateConstraints() : Constraint {
 fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : Constraint {
     return when (this) {
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier)
+        is PropertyAccessExpressionDeclaration -> owner[this] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner)
