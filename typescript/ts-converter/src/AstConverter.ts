@@ -684,8 +684,6 @@ export class AstConverter {
                 let extending = heritageClause.token == ts.SyntaxKind.ExtendsKeyword;
 
                 for (let type of heritageClause.types) {
-                    this.libVisitor.process(type);
-
                     let typeArguments: Array<IdentifierEntity> = [];
 
                     if (type.typeArguments) {
