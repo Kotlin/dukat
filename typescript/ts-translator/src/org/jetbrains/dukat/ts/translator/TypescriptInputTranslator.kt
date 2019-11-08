@@ -50,6 +50,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .eliminateStringType()
                 .desugarArrayDeclarations()
                 .lowerPartialOfT()
+                .cleanupDotNames()
                 .introduceNodes(moduleNameResolver)
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
