@@ -5,21 +5,21 @@ export class ResourceFetcher {
   private resourceSet = new Set<string>();
 
   constructor(
-    private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
-    fileName: string
+    private fileName: string,
+    private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined
   ) {
     this.build(fileName);
   }
 
-  private build(fileName: string): Set<string> {
+  private build(fileName: string) {
     if (this.resourceSet.has(fileName)) {
-      return this.resourceSet;
+      return;
     }
     this.resourceSet.add(fileName);
     const sourceFile = this.sourceFileFetcher(fileName);
 
     if (!sourceFile) {
-      return this.resourceSet;
+      return;
     }
 
     let tsInternals = ((ts as any) as TsInternals);
@@ -60,10 +60,13 @@ export class ResourceFetcher {
       .concat(importFiles);
 
     references.forEach(reference => this.build(reference));
-    return this.resourceSet;
   }
 
   forEachReference(handler: (resourceName: string) => void) {
     this.resourceSet.forEach(handler);
+  }
+
+  getSourceFile(fileName: string): ts.SourceFile {
+    return this.sourceFileFetcher(fileName);
   }
 }

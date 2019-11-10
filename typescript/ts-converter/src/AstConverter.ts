@@ -39,19 +39,16 @@ export class AstConverter {
     private unsupportedDeclarations = new Set<Number>();
     private exportContext: ExportContext = new ExportContext(this.libChecker);
 
-    private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
-
     private libVisitor = new LibraryDeclarationsVisitor(
       this.typeChecker,
       this.libChecker
     );
 
     constructor(
-      private sourceName: string,
       private rootPackageName: NameEntity,
+      private resources,
       private typeChecker: ts.TypeChecker,
       private libChecker: (node: ts.Node) => boolean,
-      private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
       private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
     ) {
@@ -62,7 +59,7 @@ export class AstConverter {
     }
 
     createSourceFileDeclaration(sourceFileName: string): SourceFileDeclaration {
-        const sourceFile = this.sourceFileFetcher(sourceFileName);
+        const sourceFile = this.resources.getSourceFile(sourceFileName);
 
         if (sourceFile == null) {
             throw new Error(`failed to resolve source file ${sourceFileName}`)

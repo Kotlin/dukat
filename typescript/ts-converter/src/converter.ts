@@ -7,6 +7,7 @@ import {AstFactory} from "./ast/AstFactory";
 import {SourceBundle, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
+import {ResourceFetcher} from "./ast/ResourceFetcher";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -44,27 +45,20 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
         throw new Error(`failed to create languageService ${fileName}`)
     }
 
-    const sourceFile = program.getSourceFile(fileName);
+    let astFactory = createAstFactory();
+    let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
+    let astConverter: AstConverter = new AstConverter(
+      packageName,
+      new ResourceFetcher(fileName, (fileName: string) => program.getSourceFile(fileName)),
+      program.getTypeChecker(),
+      (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile()),
+      new DeclarationResolver(program),
+      astFactory
+    );
 
-    if (sourceFile == null) {
-        throw new Error(`failed to resolve ${fileName}`)
-    } else {
-        let astFactory = createAstFactory();
-        let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
-        let astConverter: AstConverter = new AstConverter(
-          fileName,
-          packageName,
-          program.getTypeChecker(),
-          (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile()),
-          (fileName: string) => program.getSourceFile(fileName),
-          new DeclarationResolver(program),
-          astFactory
-        );
-
-        let sourceSet = astConverter.createSourceSet(fileName);
-        astConverter.printDiagnostics();
-        return sourceSet;
-    }
+    let sourceSet = astConverter.createSourceSet(fileName);
+    astConverter.printDiagnostics();
+    return sourceSet;
 }
 
 export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
