@@ -1,16 +1,15 @@
 import * as ts from "typescript-services-api";
 import {
-    Block,
-    Expression, FunctionDeclaration,
+    Expression,
+    FunctionDeclaration,
     IdentifierEntity,
-    MemberDeclaration, ModifierDeclaration,
+    MemberDeclaration,
     NameEntity,
-    ObjectMember,
-    ParameterDeclaration, ParameterValue,
-    TypeParameter
+    PropertyDeclaration
 } from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
+import {ObjectLiteralElementLike} from "../../.tsdeclarations/typescript";
 
 export class AstExpressionConverter {
     constructor(
@@ -62,7 +61,7 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createBooleanLiteralDeclarationAsExpression(value);
     }
 
-    createObjectLiteralExpression(members: Array<ObjectMember>): Expression {
+    createObjectLiteralExpression(members: Array<MemberDeclaration>): Expression {
         return AstExpressionFactory.createObjectLiteralDeclarationAsExpression(members);
     }
 
@@ -72,14 +71,6 @@ export class AstExpressionConverter {
 
     createUnknownExpression(value: string): Expression {
         return AstExpressionFactory.createUnknownExpressionDeclarationAsExpression(value);
-    }
-
-    private createObjectProperty(name: string, initializer: Expression | null): ObjectMember {
-        return AstExpressionFactory.createObjectProperty(name, initializer);
-    }
-
-    private createObjectMethod(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): ObjectMember {
-        return AstExpressionFactory.createObjectMethod(name, parameters, type, typeParams, modifiers, body);
     }
 
 
@@ -165,21 +156,27 @@ export class AstExpressionConverter {
         return this.createStringLiteralExpression(literal.getText())
     }
 
-    private convertObjectProperty(name: ts.PropertyName, value: ts.Expression): ObjectMember | null {
+    private convertObjectProperty(name: ts.PropertyName, initializer: ts.Expression, optional: boolean): PropertyDeclaration | null {
         let convertedName = this.astConverter.convertName(name);
 
         if (convertedName) {
-            return this.createObjectProperty(convertedName, this.convertExpression(value))
+            return this.astConverter.createProperty(
+                convertedName,
+                this.convertExpression(initializer),
+                this.astConverter.createTypeDeclaration("Unit"),
+                [],
+                optional
+            )
         } else {
             return null;
         }
     }
 
-    private convertObjectMethod(method: ts.MethodDeclaration): ObjectMember | null {
+    private convertObjectMethod(method: ts.MethodDeclaration): FunctionDeclaration | null {
         let convertedName = this.astConverter.convertName(method.name);
 
         if (convertedName) {
-            return this.createObjectMethod(
+            return this.astConverter.createMethodDeclaration(
                 convertedName,
                 method.parameters.map((param, count) => this.astConverter.convertParameterDeclaration(param, count)),
                 method.type ? this.astConverter.convertType(method.type) : this.astConverter.createTypeDeclaration("Unit"),
@@ -193,25 +190,25 @@ export class AstExpressionConverter {
     }
 
     convertObjectLiteralExpression(literal: ts.ObjectLiteralExpression): Expression {
-        let members: Array<ObjectMember> = [];
+        let members: Array<MemberDeclaration> = [];
 
-        literal.properties.forEach(member => {
-            let objectMember: ObjectMember | null = null;
+        literal.properties.forEach(property => {
+            let member: MemberDeclaration | null = null;
 
-            if (ts.isPropertyAssignment(member)) {
-                objectMember = this.convertObjectProperty(member.name, member.initializer);
-            } else if (ts.isShorthandPropertyAssignment(member)) {
-                objectMember = this.convertObjectProperty(member.name, member.name);
-            } else if (ts.isMethodDeclaration(member)) {
-                objectMember = this.convertObjectMethod(member)
-            } else if (ts.isSpreadAssignment(member)) {
+            if (ts.isPropertyAssignment(property)) {
+                member = this.convertObjectProperty(property.name, property.initializer, !!property.questionToken);
+            } else if (ts.isShorthandPropertyAssignment(property)) {
+                member = this.convertObjectProperty(property.name, property.name, !!property.questionToken);
+            } else if (ts.isMethodDeclaration(property)) {
+                member = this.convertObjectMethod(property)
+            } else if (ts.isSpreadAssignment(property)) {
                 //TODO support spread assignments
-            } else if (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) {
+            } else if (ts.isGetAccessorDeclaration(property) || ts.isSetAccessorDeclaration(property)) {
                 //TODO support accessor declarations
             }
 
-            if (objectMember) {
-                members.push(objectMember);
+            if (member) {
+                members.push(member);
             }
         });
 

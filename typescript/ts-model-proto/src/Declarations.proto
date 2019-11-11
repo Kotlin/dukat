@@ -141,10 +141,11 @@ message MethodSignatureDeclarationProto {
 
 message PropertyDeclarationProto {
     string name = 1;
-    ParameterValueDeclarationProto type = 2;
-    repeated TypeParameterDeclarationProto typeParameters = 3;
-    bool optional = 4;
-    repeated ModifierDeclarationProto modifiers = 5;
+    ExpressionDeclarationProto initializer = 2;
+    ParameterValueDeclarationProto type = 3;
+    repeated TypeParameterDeclarationProto typeParameters = 4;
+    bool optional = 5;
+    repeated ModifierDeclarationProto modifiers = 6;
 }
 
 message ModifierDeclarationProto {
@@ -171,18 +172,6 @@ message ReferenceEntityProto {
     string uid = 1;
 }
 
-message ObjectPropertyDeclarationProto {
-    string name = 1;
-    ExpressionDeclarationProto initializer = 2;
-}
-
-message ObjectMemberDeclarationProto {
-    oneof type {
-        ObjectPropertyDeclarationProto objectProperty = 1;
-        FunctionDeclarationProto functionDeclaration = 2;
-    }
-}
-
 message StringLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -200,7 +189,7 @@ message BigIntLiteralExpressionDeclarationProto {
 }
 
 message ObjectLiteralExpressionDeclarationProto {
-    repeated ObjectMemberDeclarationProto members = 1;
+    repeated MemberEntityProto members = 1;
 }
 
 message RegExLiteralExpressionDeclarationProto {
