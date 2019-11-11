@@ -11,7 +11,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConst
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.call.CallArgumentConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.call.CallResultConstraint
-import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
@@ -23,6 +23,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
@@ -106,12 +107,19 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Const
     )
 }
 
+fun ObjectLiteralExpressionDeclaration.calculateConstraints() : ObjectConstraint {
+    val obj = ObjectConstraint()
+    members.forEach { it.addTo(obj) }
+    return obj
+}
+
 fun LiteralExpressionDeclaration.calculateConstraints() : Constraint {
     return when (this) {
         is StringLiteralExpressionDeclaration -> StringTypeConstraint
         is NumericLiteralExpressionDeclaration -> NumberTypeConstraint
         is BigIntLiteralExpressionDeclaration -> BigIntTypeConstraint
         is BooleanLiteralExpressionDeclaration -> BooleanTypeConstraint
+        is ObjectLiteralExpressionDeclaration -> this.calculateConstraints()
         else -> raiseConcern("Unexpected literal expression type <${this::class}>") { CompositeConstraint(NoTypeConstraint) }
     }
 }

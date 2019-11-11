@@ -21,6 +21,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -54,9 +55,14 @@ fun ConstructorDeclaration.addTo(owner: PropertyOwner) {
 fun InterfaceDeclaration.addTo(owner: PropertyOwner)
 */
 
+fun PropertyDeclaration.addTo(owner: PropertyOwner) {
+    owner[name] = initializer?.calculateConstraints(owner) ?: VoidTypeConstraint
+}
+
 fun MemberDeclaration.addTo(owner: PropertyOwner) {
     when (this) {
         is FunctionDeclaration -> this.addTo(owner)
+        is PropertyDeclaration -> this.addTo(owner)
         else -> raiseConcern("Unexpected member entity type <${this::class}>") { this }
     }
 }
@@ -64,6 +70,7 @@ fun MemberDeclaration.addTo(owner: PropertyOwner) {
 fun MemberDeclaration.addToClass(owner: ClassConstraint) {
     when (this) {
         is FunctionDeclaration -> if (this.modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)) { this.addTo(owner) } else { this.addTo(owner.prototype) }
+        is PropertyDeclaration -> this.addTo(owner)
         else -> raiseConcern("Unexpected member entity type <${this::class}>") { this }
     }
 }

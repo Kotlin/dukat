@@ -10,6 +10,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConst
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.type.anyNullableType
 import org.jetbrains.dukat.js.type.type.booleanType
 import org.jetbrains.dukat.js.type.type.numberType
@@ -21,8 +22,10 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -30,11 +33,20 @@ val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
 val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
 
 fun getVariableDeclaration(name: String, type: ParameterValueDeclaration) = VariableDeclaration(
-    name = name,
-    type = type,
-    modifiers = EXPORT_MODIFIERS,
-    initializer = null,
-    uid = getUID()
+        name = name,
+        type = type,
+        modifiers = EXPORT_MODIFIERS,
+        initializer = null,
+        uid = getUID()
+)
+
+fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStatic: Boolean) = PropertyDeclaration(
+        name = name,
+        initializer = null,
+        type = type,
+        typeParameters = emptyList(),
+        optional = false,
+        modifiers = if (isStatic) emptyList() else STATIC_MODIFIERS
 )
 
 fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
@@ -63,10 +75,10 @@ fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : Me
     return this.toDeclaration(name).withStaticModifier(isStatic)
 }
 
-fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
+fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : MemberDeclaration? {
     return when (this) {
         is FunctionConstraint -> this.toMemberDeclaration(name, isStatic)
-        else -> raiseConcern("Cannot treat constraint of type <${this::class}> as member.") { null }
+        else -> this.toType()?.let { type -> getPropertyDeclaration(name, type, isStatic) }
     }
 }
 
@@ -95,13 +107,23 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     )
 }
 
-fun Constraint.toType() : TypeDeclaration? {
+fun ObjectConstraint.toType() : ObjectLiteralDeclaration? {
+    return ObjectLiteralDeclaration(
+            members = propertyNames.mapNotNull { memberName ->
+                this[memberName]?.toMemberDeclaration(name = memberName)
+            },
+            nullable = true
+    )
+}
+
+fun Constraint.toType() : ParameterValueDeclaration? {
     return when (this) {
         is NumberTypeConstraint -> numberType
         is BigIntTypeConstraint -> numberType
         is BooleanTypeConstraint -> booleanType
         is StringTypeConstraint -> stringType
         is VoidTypeConstraint -> voidType
+        is ObjectConstraint -> this.toType()
         else -> anyNullableType
     }
 }
