@@ -53,6 +53,7 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.EnumEntrySyntheticClassDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
@@ -72,6 +73,7 @@ import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
+import org.jetbrains.kotlin.resolve.scopes.StaticScopeForKotlinEnum
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.NotNullLazyValue
 import org.jetbrains.kotlin.types.AbbreviatedType
@@ -127,6 +129,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             "Byte" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._byte.toSafe())
             "Char" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._char.toSafe())
             "Double" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._double.toSafe())
+            "Enum" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._enum.toSafe())
             "Float" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._float.toSafe())
             "Function" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.functionSupertype.toSafe())
             "Int" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._int.toSafe())
@@ -793,9 +796,72 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return objectDescriptor
     }
 
-//    private fun translateEnum(enumModel: EnumModel, parent: PackageFragmentDescriptor) {
-//
-//    }
+    private fun translateEnum(enumModel: EnumModel, parent: PackageFragmentDescriptor): ClassDescriptor {
+        val enumDescriptor = CustomClassDescriptor(
+            parent = parent,
+            name = enumModel.name,
+            modality = Modality.FINAL,
+            classKind = ClassKind.ENUM_CLASS,
+            parentTypes = listOf(
+                translateType(
+                    TypeValueModel(
+                        value = IdentifierEntity("Enum"),
+                        params = listOf(
+                            TypeParameterModel(
+                                TypeValueModel(
+                                    value = enumModel.name,
+                                    params = listOf(),
+                                    metaDescription = null
+                                ), constraints = listOf(), variance = org.jetbrains.dukat.astModel.Variance.INVARIANT
+                            )
+                        ),
+                        metaDescription = null
+                    )
+                )
+            ),
+            isCompanion = false,
+            isTopLevel = true,
+            companionObject = null,
+            typeParameters = listOf(),
+            annotations = Annotations.EMPTY
+        )
+        enumDescriptor.staticEnumScope = StaticScopeForKotlinEnum(
+            LockBasedStorageManager.NO_LOCKS,
+            enumDescriptor
+        )
+        context.registerDescriptor(
+            enumModel.name, enumDescriptor
+        )
+        val privatePrimaryConstructor = translateConstructor(
+            ConstructorModel(listOf(), listOf()),
+            enumDescriptor,
+            true,
+            Visibilities.PRIVATE
+        )
+        val enumMemberNames = enumModel.values.map { Name.identifier(translateName(IdentifierEntity(it.value))) }
+        enumDescriptor.initialize(
+            SimpleMemberScope(enumMemberNames.map {
+                val constructor = EnumEntrySyntheticClassDescriptor::class.java.declaredConstructors[0]
+                constructor.isAccessible = true
+                constructor.newInstance(
+                    LockBasedStorageManager.NO_LOCKS,
+                    enumDescriptor,
+                    LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
+                        enumDescriptor.defaultType
+                    },
+                    it,
+                    LockBasedStorageManager.NO_LOCKS.createLazyValue {
+                        enumMemberNames.toSet()
+                    },
+                    Annotations.EMPTY,
+                    SourceElement.NO_SOURCE
+                ) as EnumEntrySyntheticClassDescriptor
+            }),
+            setOf(privatePrimaryConstructor),
+            privatePrimaryConstructor
+        )
+        return enumDescriptor
+    }
 
 
     private fun translateTopLevelModel(
@@ -809,7 +875,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             is FunctionModel -> translateFunction(topLevelModel, parent)
             is VariableModel -> translateVariable(topLevelModel, parent)
             is TypeAliasModel -> translateTypeAlias(topLevelModel, parent)
-            is EnumModel -> null
+            is EnumModel -> translateEnum(topLevelModel, parent)
             else -> raiseConcern("untranslated top level declaration: $topLevelModel") {
                 null
             }
