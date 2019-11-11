@@ -32,31 +32,29 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun InterfaceModel.getKnownParents(): List<InterfaceModel> {
         return parentEntities.flatMap { heritageModel ->
-            val interfaceNode = context.resolveInterface(heritageModel.value.value)
-            if (interfaceNode == null) {
-                emptyList()
-            } else {
-                listOf(interfaceNode) + interfaceNode.getKnownParents()
-            }
+            context.resolveInterface(heritageModel.value.value)?.let { parentInterface ->
+                listOf(parentInterface) + parentInterface.getKnownParents()
+            } ?: emptyList()
         }
     }
 
     private fun ClassModel.getKnownParents(): List<ClassLikeModel> {
         return parentEntities.flatMap {
-            listOf(context.resolveInterface(it.value.value),
-                    context.resolveClass(it.value.value))
-        }.filterNotNull()
+            (context.resolveInterface(it.value.value) ?: context.resolveClass(it.value.value))?.let { parentModel ->
+                listOf(parentModel) + parentModel.getKnownParents()
+            } ?: emptyList()
+        }
     }
 
     private fun InterfaceModel.allParentMethods(): List<MethodModel> {
         return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
+            parentEntity.members.filterIsInstance(MethodModel::class.java)
         }
     }
 
     private fun InterfaceModel.allParentProperties(): List<PropertyModel> {
         return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
+            parentEntity.members.filterIsInstance(PropertyModel::class.java)
         }
     }
 
@@ -64,8 +62,8 @@ private class OverrideResolver(val context: ModelContext) {
     private fun ClassModel.allParentMethods(): List<MethodModel> {
         return getKnownParents().flatMap { parentEntity ->
             when (parentEntity) {
-                is InterfaceModel -> parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
-                is ClassModel -> parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
+                is InterfaceModel -> parentEntity.members.filterIsInstance(MethodModel::class.java)
+                is ClassModel -> parentEntity.members.filterIsInstance(MethodModel::class.java)
                 else -> raiseConcern("unknown ClassLikeDeclaration $parentEntity") { emptyList<MethodModel>() }
             }
         }
