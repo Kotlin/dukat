@@ -20,6 +20,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
+import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -43,6 +45,7 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
@@ -67,20 +70,26 @@ import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
-import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.storage.NotNullLazyValue
+import org.jetbrains.kotlin.types.AbbreviatedType
 import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.LazyWrappedType
+import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.StarProjectionImpl
+import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
 import org.jetbrains.kotlin.types.isError
+import org.jetbrains.kotlin.types.replace
+import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 internal fun translateName(name: NameEntity): String {
-    return name.translate().trim('`')
+    return name.translate().replace("`", "")
 }
 
 fun translatePackageName(name: NameEntity): FqName {
@@ -109,7 +118,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun findClass(typeModel: TypeValueModel): ClassDescriptor? {
-        return when (translateName(typeModel.value)) {
+        return context.getDescriptor(typeModel.value) ?: when (translateName(typeModel.value)) {
+            "@@None" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
             "Any" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.any.toSafe())
             "Array" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.array.toSafe())
             "Boolean" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._boolean.toSafe())
@@ -127,7 +137,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             "String" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.string.toSafe())
             "Suppress" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.suppress)
             "Unit" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
-            else -> context.getDescriptor(typeModel.value) ?: findClassInStdlib(typeModel)
+            else -> findClassInStdlib(typeModel)
         }
     }
 
@@ -139,57 +149,115 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
     }
 
-    private fun translateType(typeModel: TypeModel): KotlinType {
+    private fun generateReplacementTypeArguments(
+        typeModel: TypeValueModel,
+        typeProjectionTypes: List<KotlinType?>,
+        oldTypeArguments: List<TypeParameterDescriptor>
+    ): List<TypeProjection> {
+        return typeModel.params.zip(typeProjectionTypes).mapIndexed { index, (model, projectionType) ->
+            if (model.type is TypeValueModel && (model.type as TypeValueModel).value == IdentifierEntity(
+                    "*"
+                )
+            ) {
+                StarProjectionImpl(oldTypeArguments[index])
+            } else {
+                TypeProjectionImpl(
+                    translateVariance(model.variance),
+                    projectionType!!
+                )
+            }
+        }
+    }
+
+    private fun expandTypeAlias(
+        key: KotlinType,
+        typeParameters: List<TypeParameterDescriptor>,
+        newTypeArguments: List<TypeProjection>
+    ): TypeProjection {
+        val otherAlias = context.getTypeAliasDescriptorByConstructor(key.constructor)
+        val replacement = key.arguments.map { keyArgument ->
+            val replacementProjection =
+                newTypeArguments.getOrNull(typeParameters.indexOfLast { it.defaultType.constructor == keyArgument.type.constructor })
+                    ?: expandTypeAlias(keyArgument.type, typeParameters, newTypeArguments)
+            TypeProjectionImpl(
+                replacementProjection.type.replaceAnnotations(keyArgument.type.annotations)
+            )
+        }
+        if (otherAlias != null) {
+            return TypeProjectionImpl(
+                AbbreviatedType(
+                    expandTypeAlias(
+                        otherAlias.underlyingType,
+                        typeParameters + otherAlias.defaultType.constructor.parameters,
+                        newTypeArguments + replacement
+                    ).type as SimpleType,
+                    otherAlias.defaultType.replace(replacement)
+                )
+            )
+        }
+        return TypeProjectionImpl(key.replace(replacement))
+    }
+
+    private fun translateType(typeModel: TypeModel, shouldExpand: Boolean = true): KotlinType {
         if (typeModel is TypeValueModel) {
             val typeProjectionTypes = typeModel.params.map {
                 if (it.type is TypeValueModel && (it.type as TypeValueModel).value == IdentifierEntity("*")) {
                     null
                 } else {
-                    translateType(it.type)
+                    translateType(it.type, shouldExpand)
                 }
             }
             return context.getTypeParameter(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
                 ?: LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
-                    val classDescriptor = findClass(typeModel)
-                    if (classDescriptor == null) {
-                        if (typeModel.value == IdentifierEntity("dynamic")) {
-                            createDynamicType(builtIns)
+                    val typeAlias = context.getTypeAlias(typeModel.value)
+                    if (typeAlias != null) {
+                        val typeParameters = typeAlias.defaultType.constructor.parameters
+                        val newTypeArguments = generateReplacementTypeArguments(
+                            typeModel,
+                            typeProjectionTypes,
+                            typeParameters
+                        )
+                        if (shouldExpand) {
+                            expandTypeAlias(typeAlias.defaultType, typeParameters, newTypeArguments).type
                         } else {
-                            ErrorUtils.createErrorType(translateName(typeModel.value))
-                                .makeNullableAsSpecified(typeModel.nullable)
+                            typeAlias.defaultType.replace(newTypeArguments)
                         }
                     } else {
-                        KotlinTypeFactory.simpleType(
-                            annotations = Annotations.EMPTY,
-                            constructor = classDescriptor.defaultType.constructor,
-                            arguments = typeModel.params.zip(typeProjectionTypes).mapIndexed { index, (model, projectionType) ->
-                                if (model.type is TypeValueModel && (model.type as TypeValueModel).value == IdentifierEntity(
-                                        "*"
-                                    )
-                                ) {
-                                    StarProjectionImpl(classDescriptor.declaredTypeParameters[index])
-                                } else {
-                                    TypeProjectionImpl(
-                                        translateVariance(model.variance),
-                                        projectionType!!
-                                    )
-                                }
-                            },
-                            nullable = typeModel.nullable
-                        )
+                        val classDescriptor = findClass(typeModel)
+                        if (classDescriptor == null) {
+                            if (typeModel.value == IdentifierEntity("dynamic")) {
+                                createDynamicType(builtIns)
+                            } else {
+                                ErrorUtils.createErrorType(translateName(typeModel.value))
+                                    .makeNullableAsSpecified(typeModel.nullable)
+                            }
+                        } else {
+                            KotlinTypeFactory.simpleType(
+                                annotations = Annotations.EMPTY,
+                                constructor = classDescriptor.defaultType.constructor,
+                                arguments = generateReplacementTypeArguments(
+                                    typeModel,
+                                    typeProjectionTypes,
+                                    classDescriptor.declaredTypeParameters
+                                ),
+                                nullable = typeModel.nullable
+                            )
+                        }
                     }
                 }
         }
         if (typeModel is FunctionTypeModel) {
-            val parameterTypes = typeModel.parameters.map { translateType(it.type) }
-            val returnType = translateType(typeModel.type)
+            val parameterTypes = typeModel.parameters.map { translateType(it.type, shouldExpand) }
+            val returnType = translateType(typeModel.type, shouldExpand)
             return LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
                 createFunctionType(
                     builtIns = builtIns,
                     annotations = Annotations.EMPTY,
                     receiverType = null,
                     parameterTypes = parameterTypes,
-                    parameterNames = typeModel.parameters.map { Name.identifier(it.name) },
+                    parameterNames = typeModel.parameters.map {
+                        Name.identifier(translateName(IdentifierEntity(it.name)))
+                    },
                     returnType = returnType
                 ).makeNullableAsSpecified(typeModel.nullable)
             }
@@ -246,7 +314,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 index,
                 parent.toSourceElement
             )
-            context.registerTypeParameter(IdentifierEntity(parameterDescriptor.name.identifier), parameterDescriptor)
+            context.registerTypeParameter(
+                IdentifierEntity(parameterDescriptor.name.identifier),
+                parameterDescriptor
+            )
             parameterDescriptor
         }
         parametersDescriptors.zip(parameters).forEach { (descriptor, model) ->
@@ -257,6 +328,45 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             descriptor.setInitialized()
         }
         return parametersDescriptors
+    }
+
+    private fun translateTypeAlias(
+        typeAliasModel: TypeAliasModel,
+        parent: PackageFragmentDescriptor
+    ): TypeAliasDescriptor {
+        val typeAliasDescriptor = LazyTypeAliasDescriptor.create(
+            LockBasedStorageManager.NO_LOCKS,
+            NoScopeRecordCliBindingTrace(),
+            parent,
+            Annotations.EMPTY,
+            Name.identifier(translateName(typeAliasModel.name)),
+            SourceElement.NO_SOURCE,
+            Visibilities.PUBLIC
+        )
+        val typeParameters = translateTypeParameters(typeAliasModel.typeParameters, typeAliasDescriptor)
+        fun computeUnderlyingType(shouldExpand: Boolean): NotNullLazyValue<SimpleType> {
+            return LockBasedStorageManager.NO_LOCKS.createLazyValue {
+                typeParameters.forEach {
+                    context.registerTypeParameter(IdentifierEntity(it.name.identifier), it)
+
+                }
+                val result = translateType(typeAliasModel.typeReference, shouldExpand).unwrap() as SimpleType
+                typeParameters.forEach {
+                    context.removeTypeParameter(IdentifierEntity(it.name.identifier))
+                }
+                result
+            }
+        }
+        typeAliasDescriptor.initialize(
+            typeParameters,
+            computeUnderlyingType(shouldExpand = false),
+            computeUnderlyingType(shouldExpand = true)
+        )
+        context.registerTypeAlias(typeAliasModel.name, typeAliasDescriptor)
+        typeParameters.forEach {
+            context.removeTypeParameter(IdentifierEntity(it.name.identifier))
+        }
+        return typeAliasDescriptor
     }
 
     private fun translateAnnotations(annotationModels: List<AnnotationModel>): Annotations {
@@ -336,7 +446,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return functionDescriptor
     }
 
-    private fun translateFunction(functionModel: FunctionModel, parent: PackageFragmentDescriptor): FunctionDescriptor {
+    private fun translateFunction(
+        functionModel: FunctionModel,
+        parent: PackageFragmentDescriptor
+    ): FunctionDescriptor {
         val functionDescriptor = SimpleFunctionDescriptorImpl.create(
             parent,
             translateAnnotations(functionModel.annotations),
@@ -479,7 +592,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return propertyDescriptor
     }
 
-    private fun translateVariable(variableModel: VariableModel, parent: PackageFragmentDescriptor): PropertyDescriptor {
+    private fun translateVariable(
+        variableModel: VariableModel,
+        parent: PackageFragmentDescriptor
+    ): PropertyDescriptor {
         val variableDescriptor = PropertyDescriptorImpl.create(
             parent,
             translateAnnotations(variableModel.annotations),
@@ -688,6 +804,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             is ObjectModel -> translateObject(topLevelModel, parent, isCompanion = false, isTopLevel = true)
             is FunctionModel -> translateFunction(topLevelModel, parent)
             is VariableModel -> translateVariable(topLevelModel, parent)
+            is TypeAliasModel -> translateTypeAlias(topLevelModel, parent)
             is EnumModel -> null
             else -> raiseConcern("untranslated top level declaration: $topLevelModel") {
                 null
@@ -695,7 +812,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
     }
 
-    fun translateModule(moduleModel: ModuleModel, moduleDescriptor: ModuleDescriptorImpl): PackageFragmentDescriptor {
+    fun translateModule(
+        moduleModel: ModuleModel,
+        moduleDescriptor: ModuleDescriptorImpl
+    ): PackageFragmentDescriptor {
         context.registeredImports.clear()
         context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
 

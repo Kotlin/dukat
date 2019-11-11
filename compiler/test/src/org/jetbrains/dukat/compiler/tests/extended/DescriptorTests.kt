@@ -62,7 +62,7 @@ class DescriptorTests : OutputTests() {
 
             }
         }))
-        compileUnits(translateModule(flattenedSourceSet), "./build/test/data/descriptors/$name", null)
+        compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
         System.setOut(outPrintStream)
 
         val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
