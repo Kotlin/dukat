@@ -42,6 +42,8 @@ export class AstConverter {
 
     private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
 
+    private astExpressionConverter = new AstExpressionConverter(this);
+
     private libVisitor = new LibraryDeclarationsVisitor(
       this.typeChecker
     );
@@ -327,7 +329,7 @@ export class AstConverter {
         return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__");
     }
 
-    private createTypeDeclaration(value: string, params: Array<ParameterValue> = [], typeReference: string | null = null): TypeDeclaration {
+    createTypeDeclaration(value: string, params: Array<ParameterValue> = [], typeReference: string | null = null): TypeDeclaration {
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
@@ -469,7 +471,7 @@ export class AstConverter {
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
         if (param.initializer != null) {
-            initializer = AstExpressionConverter.convertUnknownExpression(param.initializer)
+            initializer = this.astExpressionConverter.convertUnknownExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);
@@ -811,18 +813,18 @@ export class AstConverter {
                   declaration.name.getText(),
                   this.convertType(declaration.type),
                   this.convertModifiers(statement.modifiers),
-                  declaration.initializer == null ? null : AstExpressionConverter.convertExpression(declaration.initializer),
+                  declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
                   this.exportContext.getUID(declaration)
                 ));
             }
         } else if (ts.isExpressionStatement(statement)) {
             res.push(this.astFactory.createExpressionStatement(
-                AstExpressionConverter.convertExpression(statement.expression)
+                this.astExpressionConverter.convertExpression(statement.expression)
             ));
         } else if (ts.isReturnStatement(statement)) {
             let expression : Expression | null = null;
             if (statement.expression) {
-                expression = AstExpressionConverter.convertExpression(statement.expression)
+                expression = this.astExpressionConverter.convertExpression(statement.expression)
             }
 
             res.push(this.astFactory.createReturnStatement(

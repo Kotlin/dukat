@@ -1,63 +1,89 @@
 import * as ts from "typescript-services-api";
-import {Expression, IdentifierEntity, NameEntity} from "./ast";
+import {
+    Block,
+    Expression, FunctionDeclaration,
+    IdentifierEntity,
+    MemberDeclaration, ModifierDeclaration,
+    NameEntity,
+    ObjectMember,
+    ParameterDeclaration, ParameterValue,
+    TypeParameter
+} from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
-import {LeftHandSideExpression, NodeArray, TypeNode} from "../../.tsdeclarations/tsserverlibrary";
+import {AstConverter} from "../AstConverter";
 
 export class AstExpressionConverter {
-    static createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
+    constructor(
+        private astConverter: AstConverter
+    ) {
+    }
+
+    createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
         return AstExpressionFactory.createBinaryExpressionDeclarationAsExpression(left, operator, right);
     }
 
-    static createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
+    createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
     }
 
-    static createTypeOfExpression(expression: Expression) {
+    createTypeOfExpression(expression: Expression) {
         return AstExpressionFactory.createTypeOfExpressionDeclarationAsExpression(expression);
     }
 
-    static createCallExpression(expression: Expression, args: Array<Expression>) {
+    createCallExpression(expression: Expression, args: Array<Expression>) {
         return AstExpressionFactory.createCallExpressionDeclarationAsExpression(expression, args);
     }
 
-    static createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
+    createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
         return AstExpressionFactory.createPropertyAccessExpressionDeclarationAsExpression(expression, name);
     }
 
-    static createElementAccessExpression(expression: Expression, argumentExpression: Expression) {
+    createElementAccessExpression(expression: Expression, argumentExpression: Expression) {
         return AstExpressionFactory.createElementAccessExpressionDeclarationAsExpression(expression, argumentExpression);
     }
 
-    static createNameExpression(name: NameEntity): Expression {
+    createNameExpression(name: NameEntity): Expression {
         return AstExpressionFactory.createNameExpressionDeclarationAsExpression(name)
     }
 
-    static createNumericLiteralExpression(value: string): Expression {
+    createNumericLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createNumericLiteralDeclarationAsExpression(value);
     }
 
-    static createBigIntLiteralExpression(value: string): Expression {
+    createBigIntLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createBigIntLiteralDeclarationAsExpression(value);
     }
 
-    static createStringLiteralExpression(value: string): Expression {
+    createStringLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createStringLiteralDeclarationAsExpression(value);
     }
 
-    static createBooleanLiteralExpression(value: boolean): Expression {
+    createBooleanLiteralExpression(value: boolean): Expression {
         return AstExpressionFactory.createBooleanLiteralDeclarationAsExpression(value);
     }
 
-    static createRegExLiteralExpression(value: string): Expression {
+    createObjectLiteralExpression(members: Array<ObjectMember>): Expression {
+        return AstExpressionFactory.createObjectLiteralDeclarationAsExpression(members);
+    }
+
+    createRegExLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
     }
 
-    static createUnknownExpression(value: string): Expression {
+    createUnknownExpression(value: string): Expression {
         return AstExpressionFactory.createUnknownExpressionDeclarationAsExpression(value);
     }
 
+    private createObjectProperty(name: string, initializer: Expression | null): ObjectMember {
+        return AstExpressionFactory.createObjectProperty(name, initializer);
+    }
 
-    static convertBinaryExpression(expression: ts.BinaryExpression): Expression {
+    private createObjectMethod(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): ObjectMember {
+        return AstExpressionFactory.createObjectMethod(name, parameters, type, typeParams, modifiers, body);
+    }
+
+
+    convertBinaryExpression(expression: ts.BinaryExpression): Expression {
         return this.createBinaryExpression(
             this.convertExpression(expression.left),
             ts.tokenToString(expression.operatorToken.kind),
@@ -65,7 +91,7 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertPrefixUnaryExpression(expression: ts.PrefixUnaryExpression): Expression {
+    convertPrefixUnaryExpression(expression: ts.PrefixUnaryExpression): Expression {
         return this.createUnaryExpression(
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
@@ -73,7 +99,7 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertPostfixUnaryExpression(expression: ts.PostfixUnaryExpression): Expression {
+    convertPostfixUnaryExpression(expression: ts.PostfixUnaryExpression): Expression {
         return this.createUnaryExpression(
             this.convertExpression(expression.operand),
             ts.tokenToString(expression.operator),
@@ -81,40 +107,40 @@ export class AstExpressionConverter {
         )
     }
 
-    static convertTypeOfExpression(expression: ts.TypeOfExpression): Expression {
+    convertTypeOfExpression(expression: ts.TypeOfExpression): Expression {
         return this.createTypeOfExpression(
             this.convertExpression(expression.expression),
         )
     }
 
-    static convertCallExpression(expression: ts.CallExpression): Expression {
+    convertCallExpression(expression: ts.CallExpression): Expression {
         return this.createCallExpression(
             this.convertExpression(expression.expression),
             expression.arguments.map(arg => this.convertExpression(arg))
         )
     }
 
-    static convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
+    convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
         return this.createPropertyAccessExpression(
             this.convertExpression(expression.expression),
             AstExpressionFactory.createIdentifier(expression.name.getText())
         )
     }
 
-    static convertElementAccessExpression(expression: ts.ElementAccessExpression): Expression {
+    convertElementAccessExpression(expression: ts.ElementAccessExpression): Expression {
         return this.createElementAccessExpression(
             this.convertExpression(expression.expression),
             this.convertExpression(expression.argumentExpression)
         )
     }
 
-    static convertNameExpression(name: ts.EntityName): Expression {
+    convertNameExpression(name: ts.EntityName): Expression {
         return this.createNameExpression(
             this.convertEntityName(name)
         )
     }
 
-    static convertEntityName(entityName: ts.EntityName): NameEntity {
+    convertEntityName(entityName: ts.EntityName): NameEntity {
         if (ts.isQualifiedName(entityName)) {
             return AstExpressionFactory.createQualifierAsNameEntity(
                 this.convertEntityName(entityName.left),
@@ -127,23 +153,76 @@ export class AstExpressionConverter {
         }
     }
 
-    static convertNumericLiteralExpression(expression: ts.Expression): Expression {
-        return this.createNumericLiteralExpression(expression.getText())
+    convertNumericLiteralExpression(literal: ts.NumericLiteral): Expression {
+        return this.createNumericLiteralExpression(literal.getText())
     }
 
-    static convertBigIntLiteralExpression(expression: ts.Expression): Expression {
-        return this.createBigIntLiteralExpression(expression.getText())
+    convertBigIntLiteralExpression(literal: ts.BigIntLiteral): Expression {
+        return this.createBigIntLiteralExpression(literal.getText())
     }
 
-    static convertStringLiteralExpression(expression: ts.Expression): Expression {
-        return this.createStringLiteralExpression(expression.getText())
+    convertStringLiteralExpression(literal: ts.StringLiteral): Expression {
+        return this.createStringLiteralExpression(literal.getText())
     }
 
-    static convertRegExLiteralExpression(expression: ts.Expression): Expression {
-        return this.createRegExLiteralExpression(expression.getText())
+    private convertObjectProperty(name: ts.PropertyName, value: ts.Expression): ObjectMember | null {
+        let convertedName = this.astConverter.convertName(name);
+
+        if (convertedName) {
+            return this.createObjectProperty(convertedName, this.convertExpression(value))
+        } else {
+            return null;
+        }
     }
 
-    static convertLiteralExpression(expression: ts.LiteralExpression): Expression {
+    private convertObjectMethod(method: ts.MethodDeclaration): ObjectMember | null {
+        let convertedName = this.astConverter.convertName(method.name);
+
+        if (convertedName) {
+            return this.createObjectMethod(
+                convertedName,
+                method.parameters.map((param, count) => this.astConverter.convertParameterDeclaration(param, count)),
+                method.type ? this.astConverter.convertType(method.type) : this.astConverter.createTypeDeclaration("Unit"),
+                this.astConverter.convertTypeParams(method.typeParameters),
+                this.astConverter.convertModifiers(method.modifiers),
+                this.astConverter.convertBlock(method.body),
+            );
+        } else {
+            return null;
+        }
+    }
+
+    convertObjectLiteralExpression(literal: ts.ObjectLiteralExpression): Expression {
+        let members: Array<ObjectMember> = [];
+
+        literal.properties.forEach(member => {
+            let objectMember: ObjectMember | null = null;
+
+            if (ts.isPropertyAssignment(member)) {
+                objectMember = this.convertObjectProperty(member.name, member.initializer);
+            } else if (ts.isShorthandPropertyAssignment(member)) {
+                objectMember = this.convertObjectProperty(member.name, member.name);
+            } else if (ts.isMethodDeclaration(member)) {
+                objectMember = this.convertObjectMethod(member)
+            } else if (ts.isSpreadAssignment(member)) {
+                //TODO support spread assignments
+            } else if (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) {
+                //TODO support accessor declarations
+            }
+
+            if (objectMember) {
+                members.push(objectMember);
+            }
+        });
+
+        return this.createObjectLiteralExpression(members)
+    }
+
+    convertRegExLiteralExpression(literal: ts.RegularExpressionLiteral): Expression {
+        return this.createRegExLiteralExpression(literal.getText())
+    }
+
+    convertLiteralExpression(expression: ts.LiteralExpression): Expression {
         if (ts.isNumericLiteral(expression)) {
             return this.convertNumericLiteralExpression(expression);
         } else if (ts.isBigIntLiteral(expression)) {
@@ -158,7 +237,7 @@ export class AstExpressionConverter {
     }
 
 
-    static convertToken(expression: ts.Expression): Expression {
+    private convertToken(expression: ts.Expression): Expression {
         if (expression.kind == ts.SyntaxKind.TrueKeyword) {
             return this.createBooleanLiteralExpression(true)
         } else if (expression.kind == ts.SyntaxKind.FalseKeyword) {
@@ -169,12 +248,12 @@ export class AstExpressionConverter {
     }
 
 
-    static convertUnknownExpression(expression: ts.Expression): Expression {
+    convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
     }
 
 
-    static convertExpression(expression: ts.Expression): Expression {
+    convertExpression(expression: ts.Expression): Expression {
         if (ts.isBinaryExpression(expression)) {
             return this.convertBinaryExpression(expression);
         } else if (ts.isPrefixUnaryExpression(expression)) {
@@ -193,6 +272,8 @@ export class AstExpressionConverter {
             return this.convertNameExpression(expression);
         } else if (ts.isLiteralExpression(expression)) {
             return this.convertLiteralExpression(expression);
+        } else if (ts.isObjectLiteralExpression(expression)) {
+            return this.convertObjectLiteralExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
         } else {

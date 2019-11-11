@@ -47,8 +47,11 @@ import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectMemberDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectPropertyDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -383,11 +386,29 @@ fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclar
     }
 }
 
+private fun Declarations.ObjectPropertyDeclarationProto.convert(): ObjectPropertyDeclaration {
+    return ObjectPropertyDeclaration(
+            name = name,
+            initializer = if (hasInitializer()) {
+                initializer.convert()
+            } else null
+    )
+}
+
+private fun Declarations.ObjectMemberDeclarationProto.convert(): ObjectMemberDeclaration {
+    return when {
+        hasFunctionDeclaration() -> functionDeclaration.convert()
+        hasObjectProperty() -> objectProperty.convert()
+        else -> throw Exception("unknown object member: $this")
+    }
+}
+
 fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
 fun Declarations.BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
 fun Declarations.StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
 fun Declarations.BooleanLiteralExpressionDeclarationProto.convert() = BooleanLiteralExpressionDeclaration(value)
 fun Declarations.RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
+fun Declarations.ObjectLiteralExpressionDeclarationProto.convert() = ObjectLiteralExpressionDeclaration(membersList.map { it.convert() })
 
 fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
     return when {
@@ -395,6 +416,7 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
         hasBigIntLiteral() -> bigIntLiteral.convert()
         hasStringLiteral() -> stringLiteral.convert()
         hasBooleanLiteral() -> booleanLiteral.convert()
+        hasObjectLiteral() -> objectLiteral.convert()
         hasRegExLiteral() -> regExLiteral.convert()
         else -> throw Exception("unknown literalExpression: ${this}")
     }
