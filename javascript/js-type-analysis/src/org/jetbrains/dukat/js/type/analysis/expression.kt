@@ -70,9 +70,11 @@ fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Cons
     return when (operator) {
         "--", "++", "~" -> {
             operandConstraints += NumberTypeConstraint
+            owner[operand] = NumberTypeConstraint
             NumberTypeConstraint
         }
         "-", "+" -> {
+            operandConstraints += NumberTypeConstraint
             NumberTypeConstraint
         }
         "!" -> {
