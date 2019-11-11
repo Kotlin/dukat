@@ -15,12 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun numBinaryFun(a: Number, b: Number): Number
+external fun emptyReturnFunction()
 
-external fun numUnaryFun(a: Number): Number
-
-external fun boolBinaryFun(a: Any?, b: Any?): Boolean
-
-external fun boolUnaryFun(a: Any?): Boolean
-
-external fun anyFun(a: Any?, b: Any?): Any?
+external fun unitFunction()

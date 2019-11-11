@@ -19,7 +19,3 @@ function boolUnaryFun(a) {
 function anyFun(a, b) {
     return a + b
 }
-
-function unitFunction() {
-    return;
-}
