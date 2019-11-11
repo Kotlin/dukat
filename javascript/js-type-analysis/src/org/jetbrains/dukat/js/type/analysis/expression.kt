@@ -116,7 +116,7 @@ fun LiteralExpressionDeclaration.calculateConstraints() : Constraint {
     }
 }
 
-fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : Constraint {
+fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
     return when (this) {
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier)
         is PropertyAccessExpressionDeclaration -> owner[this] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
@@ -125,7 +125,6 @@ fun ExpressionDeclaration?.calculateConstraints(owner: PropertyOwner) : Constrai
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner)
         is CallExpressionDeclaration -> this.calculateConstraints(owner)
         is LiteralExpressionDeclaration -> this.calculateConstraints()
-        null -> VoidTypeConstraint
-        else -> CompositeConstraint()
+        else -> CompositeConstraint(NoTypeConstraint)
     }
 }

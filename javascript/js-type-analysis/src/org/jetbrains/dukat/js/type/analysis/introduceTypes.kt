@@ -86,7 +86,7 @@ fun BlockDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
 }
 
 fun VariableDeclaration.addTo(owner: PropertyOwner) {
-    owner[name] = initializer.calculateConstraints(owner)
+    owner[name] = initializer?.calculateConstraints(owner) ?: VoidTypeConstraint
 }
 
 fun ExpressionStatementDeclaration.calculateConstraints(owner: PropertyOwner) {
@@ -94,7 +94,7 @@ fun ExpressionStatementDeclaration.calculateConstraints(owner: PropertyOwner) {
 }
 
 fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint {
-    return expression.calculateConstraints(owner)
+    return expression?.calculateConstraints(owner) ?: VoidTypeConstraint
 }
 
 fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner) : Constraint? {
