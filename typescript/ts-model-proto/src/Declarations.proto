@@ -171,6 +171,18 @@ message ReferenceEntityProto {
     string uid = 1;
 }
 
+message ObjectPropertyDeclarationProto {
+    string name = 1;
+    ExpressionDeclarationProto initializer = 2;
+}
+
+message ObjectMemberDeclarationProto {
+    oneof type {
+        ObjectPropertyDeclarationProto objectProperty = 1;
+        FunctionDeclarationProto functionDeclaration = 2;
+    }
+}
+
 message StringLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -187,6 +199,10 @@ message BigIntLiteralExpressionDeclarationProto {
     string value = 1;
 }
 
+message ObjectLiteralExpressionDeclarationProto {
+    repeated ObjectMemberDeclarationProto members = 1;
+}
+
 message RegExLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -197,7 +213,8 @@ message LiteralExpressionDeclarationProto {
         BooleanLiteralExpressionDeclarationProto booleanLiteral = 2;
         NumericLiteralExpressionDeclarationProto numericLiteral = 3;
         BigIntLiteralExpressionDeclarationProto bigIntLiteral = 4;
-        RegExLiteralExpressionDeclarationProto regExLiteral = 5;
+        ObjectLiteralExpressionDeclarationProto objectLiteral = 5;
+        RegExLiteralExpressionDeclarationProto regExLiteral = 6;
     }
 }
 

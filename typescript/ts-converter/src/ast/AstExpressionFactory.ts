@@ -1,7 +1,16 @@
 import * as declarations from "declarations";
 import {
-    Expression, IdentifierEntity,
-    LiteralExpression, NameEntity
+    Block,
+    Expression,
+    IdentifierEntity,
+    LiteralExpression,
+    MemberDeclaration,
+    ModifierDeclaration,
+    NameEntity,
+    ObjectMember,
+    ParameterDeclaration,
+    ParameterValue, ProtoMessage,
+    TypeParameter
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -148,6 +157,15 @@ export class AstExpressionFactory {
         return this.asExpression(literalExpression);
     }
 
+    static createObjectLiteralDeclarationAsExpression(members: Array<ObjectMember>): Expression {
+        let objectLiteral = new declarations.ObjectLiteralDeclarationProto();
+        objectLiteral.setMembersList(members);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setObjectliteral(objectLiteral);
+        return this.asExpression(literalExpression);
+    }
+
     static createRegExLiteralDeclarationAsExpression(value: string): Expression {
         let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
         regExLiteralExpression.setValue(value);
@@ -155,5 +173,34 @@ export class AstExpressionFactory {
         let literalExpression = new declarations.LiteralExpressionDeclarationProto();
         literalExpression.setRegexliteral(regExLiteralExpression);
         return this.asExpression(literalExpression);
+    }
+
+    static createObjectProperty(name: string, initializer: Expression | null): ObjectMember {
+        let objectProperty = new declarations.ObjectPropertyDeclarationProto();
+        objectProperty.setName(name);
+        if(initializer) {
+            objectProperty.setInitializer(initializer);
+        }
+
+        let objectMember = new declarations.ObjectMemberDeclarationProto();
+        objectMember.setObjectproperty(objectProperty);
+        return objectMember;
+    }
+
+    static createObjectMethod(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): ObjectMember {
+        let functionDeclaration = new declarations.FunctionDeclarationProto();
+        functionDeclaration.setName(name);
+        functionDeclaration.setParametersList(parameters);
+        functionDeclaration.setType(type);
+        functionDeclaration.setTypeparametersList(typeParams);
+        functionDeclaration.setModifiersList(modifiers);
+        if (body) {
+            functionDeclaration.setBody(body);
+        }
+        functionDeclaration.setUid("__NO_UID__");
+
+        let objectMember = new declarations.ObjectMemberDeclarationProto();
+        objectMember.setFunctiondeclaration(functionDeclaration);
+        return objectMember;
     }
 }
