@@ -47,11 +47,9 @@ import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectMemberDeclaration
-import org.jetbrains.dukat.tsmodel.expression.literal.obj.ObjectPropertyDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -383,23 +381,6 @@ fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclar
         name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
         name.hasQualifier() -> QualifierExpressionDeclaration(qualifier = name.qualifier.convert())
         else -> throw Exception("unknown nameExpression: ${this}")
-    }
-}
-
-private fun Declarations.ObjectPropertyDeclarationProto.convert(): ObjectPropertyDeclaration {
-    return ObjectPropertyDeclaration(
-            name = name,
-            initializer = if (hasInitializer()) {
-                initializer.convert()
-            } else null
-    )
-}
-
-private fun Declarations.ObjectMemberDeclarationProto.convert(): ObjectMemberDeclaration {
-    return when {
-        hasFunctionDeclaration() -> functionDeclaration.convert()
-        hasObjectProperty() -> objectProperty.convert()
-        else -> throw Exception("unknown object member: $this")
     }
 }
 

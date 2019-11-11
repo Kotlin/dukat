@@ -167,6 +167,7 @@ export class AstConverter {
         if (name != null) {
             return this.astFactory.declareProperty(
               name,
+              null,
               this.convertType(nativePropertyDeclaration.type),
               [],
               false,
@@ -337,8 +338,8 @@ export class AstConverter {
         return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
     }
 
-    private createProperty(value: string, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
-        return this.astFactory.declareProperty(value, type, typeParams, optional, []);
+    createProperty(value: string, initializer: Expression | null, type: ParameterValue, typeParams: Array<TypeParameter> = [], optional: boolean): PropertyDeclaration {
+        return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, []);
     }
 
 
@@ -509,7 +510,7 @@ export class AstConverter {
         let name = this.convertName(node.name);
 
         if (name !== null) {
-            return this.createProperty(name, this.convertType(node.type), [], !!node.questionToken);
+            return this.createProperty(name, null, this.convertType(node.type), [], !!node.questionToken);
         }
 
         return null;

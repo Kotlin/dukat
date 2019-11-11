@@ -123,8 +123,6 @@ export declare class ExpressionStatement implements Declaration {
     serializeBinary(): Int8Array;
 }
 
-export declare interface ObjectMember {}
-
 export declare interface ParameterValue extends Declaration {}
 
 export declare class ParameterDeclaration extends Declaration {

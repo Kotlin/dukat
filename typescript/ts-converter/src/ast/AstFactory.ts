@@ -445,9 +445,12 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  declareProperty(name: string, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration {
+  declareProperty(name: string, initializer: Expression | null, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration {
     let propertyDeclaration = new declarations.PropertyDeclarationProto();
     propertyDeclaration.setName(name);
+    if(initializer) {
+      propertyDeclaration.setInitializer(initializer);
+    }
     propertyDeclaration.setType(type);
     propertyDeclaration.setTypeparametersList(typeParams);
     propertyDeclaration.setOptional(optional);
