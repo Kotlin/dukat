@@ -23,6 +23,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -106,7 +107,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun findClassInStdlib(typeModel: TypeValueModel): ClassDescriptor? {
         val packageNames = context.registeredImports.map { FqName(it) }
         val stdlibModule = context.config.moduleDescriptors.first { it.name == Name.special("<kotlin>") }
-        return packageNames.map { packageName ->
+        return (packageNames + FqName("kotlin") + FqName("kotlin.collections")).map { packageName ->
             val packageDescriptor = stdlibModule.getPackage(packageName)
             packageDescriptor.fragments.mapNotNull { fragment ->
                 fragment.getMemberScope().getContributedClassifier(
@@ -199,6 +200,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun translateType(typeModel: TypeModel, shouldExpand: Boolean = true): KotlinType {
+        if (typeModel is TypeParameterReferenceModel) {
+            return context.getTypeParameter(typeModel.name)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)!!
+        }
         if (typeModel is TypeValueModel) {
             val typeProjectionTypes = typeModel.params.map {
                 if (it.type is TypeValueModel && (it.type as TypeValueModel).value == IdentifierEntity("*")) {
