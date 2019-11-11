@@ -230,7 +230,7 @@ private class OverrideResolver(val context: ModelContext) {
     }
 }
 
-private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
+private fun ModuleModel.updateContext(context: ModelContext) {
     for (declaration in declarations) {
         if (declaration is InterfaceModel) {
             context.registerInterface(declaration)
@@ -241,21 +241,20 @@ private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
     }
 
     submodules.forEach { declaration -> declaration.updateContext(context) }
-
-    return this
 }
 
-private fun SourceSetModel.updateContext(astContext: ModelContext) = transform { it.updateContext(astContext) }
+private fun SourceSetModel.updateContext(astContext: ModelContext) {
+    sources.map { source -> source.root.updateContext(astContext) }
+}
 
 fun SourceSetModel.lowerOverrides(stdlib: SourceSetModel?): SourceSetModel {
     val astContext = ModelContext()
 
     stdlib?.updateContext(astContext)
-
-    val registeredSourceSet = updateContext(astContext)
+    updateContext(astContext)
 
     val overrideResolver = OverrideResolver(astContext)
-    return registeredSourceSet.transform {
+    return transform {
         overrideResolver.lowerOverrides(it)
     }
 }
