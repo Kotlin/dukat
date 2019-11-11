@@ -123,24 +123,6 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun findClass(typeModel: TypeValueModel): ClassDescriptor? {
         return context.getDescriptor(typeModel.value) ?: when (translateName(typeModel.value)) {
             "@@None" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
-            "Any" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.any.toSafe())
-            "Array" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.array.toSafe())
-            "Boolean" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._boolean.toSafe())
-            "Byte" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._byte.toSafe())
-            "Char" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._char.toSafe())
-            "Double" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._double.toSafe())
-            "Enum" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._enum.toSafe())
-            "Float" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._float.toSafe())
-            "Function" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.functionSupertype.toSafe())
-            "Int" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._int.toSafe())
-            "Long" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._long.toSafe())
-            "List" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.list)
-            "Nothing" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.nothing.toSafe())
-            "Number" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.number.toSafe())
-            "Short" -> builtIns.getBuiltInClassByFqName(FQ_NAMES._short.toSafe())
-            "String" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.string.toSafe())
-            "Suppress" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.suppress)
-            "Unit" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
             else -> findClassInStdlib(typeModel)
         }
     }
