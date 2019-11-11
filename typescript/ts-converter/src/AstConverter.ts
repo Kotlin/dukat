@@ -37,18 +37,13 @@ import {ExportContext} from "./ExportContext";
 export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
-    private exportContext: ExportContext = new ExportContext(this.libChecker);
-
-    private libVisitor = new LibraryDeclarationsVisitor(
-      this.typeChecker,
-      this.libChecker
-    );
 
     constructor(
       private rootPackageName: NameEntity,
-      private resources,
+      private resources: ResourceFetcher,
+      private libVisitor: LibraryDeclarationsVisitor,
+      private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
-      private libChecker: (node: ts.Node) => boolean,
       private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
     ) {
@@ -87,39 +82,13 @@ export class AstConverter {
             sources.push(source);
         });
 
-
-      let libRootUid = "<LIBROOT>";
-      this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
-          let declarations: Array<Declaration> = [];
-
-          for (let libDeclaration of libDeclarations) {
-                let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
-
-                statements.forEach((statement, index) => {
-                    declarations.push(statement);
-                });
-            }
-
-          sources.push(this.astFactory.createSourceFileDeclaration(
-            resourceName, this.astFactory.createModuleDeclaration(
-              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-              declarations,
-              [],
-              [],
-              libRootUid,
-              fileName,
-              true
-            ), []
-          ));
-        });
-
         return this.astFactory.createSourceSet(fileName, sources);
     }
 
     printDiagnostics() {
         this.log.debug("following declarations has been skipped: ");
         this.unsupportedDeclarations.forEach(id => {
-           this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
+            this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
         });
     }
 
@@ -530,15 +499,15 @@ export class AstConverter {
             }
         } else if (ts.isIndexSignatureDeclaration(member)) {
             this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
-                this.registerDeclaration(member, res)
+              this.registerDeclaration(member, res)
             );
         } else if (ts.isCallSignatureDeclaration(member)) {
             this.registerDeclaration(
-                this.astFactory.createCallSignatureDeclaration(
-                    this.convertParameterDeclarations(member.parameters),
-                    member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
-                    this.convertTypeParams(member.typeParameters)
-                ), res
+              this.astFactory.createCallSignatureDeclaration(
+                this.convertParameterDeclarations(member.parameters),
+                member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+                this.convertTypeParams(member.typeParameters)
+              ), res
             );
         }
 
@@ -762,7 +731,7 @@ export class AstConverter {
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
-          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration , statement.name) : [],
+          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
           this.exportContext.getUID(statement)
         );
 

@@ -4,10 +4,12 @@ import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
-import {SourceBundle, SourceSet} from "./ast/ast";
+import {Declaration, SourceBundle, SourceFileDeclaration, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {ResourceFetcher} from "./ast/ResourceFetcher";
+import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
+import {ExportContext} from "./ExportContext";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -31,7 +33,7 @@ class DocumentCache {
 
 let cache = new DocumentCache();
 
-function createSourceSet(fileName: string, stdlib: string, packageNameString: string): SourceSet {
+function createSourceSet(fileName: string, stdlib: string, packageNameString: string, libDeclarations: Map<string, Array<ts.Node>>): SourceSet {
     let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
     host.register(fileName);
 
@@ -47,11 +49,18 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
 
     let astFactory = createAstFactory();
     let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
+    let libChecker = (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile());
     let astConverter: AstConverter = new AstConverter(
       packageName,
       new ResourceFetcher(fileName, (fileName: string) => program.getSourceFile(fileName)),
+      new LibraryDeclarationsVisitor(
+        libDeclarations,
+        program.getTypeChecker(),
+        libChecker,
+        (node: ts.Node) => astConverter.convertTopLevelStatement(node)
+      ),
+      new ExportContext(libChecker),
       program.getTypeChecker(),
-      (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile()),
       new DeclarationResolver(program),
       astFactory
     );
@@ -62,15 +71,38 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
 }
 
 export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
-    let sourceSets = files.map(fileName => createSourceSet(fileName, stdlib, packageName));
+    let libDeclarations = new Map<string, Array<Declaration>>();
+    let sourceSets = files.map(fileName => createSourceSet(fileName, stdlib, packageName, libDeclarations));
+
     let sourceSetBundle = new declarations.SourceSetBundleProto();
+
+    let astFactory = createAstFactory();
+    let libRootUid = "<LIBROOT>";
+
+    let libFiles: Array<SourceFileDeclaration> = [];
+    libDeclarations.forEach((declarations, resourceName) => {
+            libFiles.push(astFactory.createSourceFileDeclaration(
+              resourceName, astFactory.createModuleDeclaration(
+                astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+                declarations,
+                [],
+                [],
+                libRootUid,
+                libRootUid,
+                true
+              ), []
+            ));
+    });
+
+    sourceSets.push(astFactory.createSourceSet(libRootUid, libFiles));
+
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
 }
 
 
-function createBundle(lib: string, packageName:string, files: Array<string>) {
-    let sourceSetBundle = translate(lib, packageName, files);
+function createBundle(stdlib: string, packageName:string, files: Array<string>) {
+    let sourceSetBundle = translate(stdlib, packageName, files);
     return sourceSetBundle;
 }
 

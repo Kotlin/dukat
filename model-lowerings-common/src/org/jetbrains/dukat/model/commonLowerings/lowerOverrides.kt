@@ -247,10 +247,15 @@ private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
 
 private fun SourceSetModel.updateContext(astContext: ModelContext) = transform { it.updateContext(astContext) }
 
-fun SourceSetModel.lowerOverrides(): SourceSetModel {
+fun SourceSetModel.lowerOverrides(stdlib: SourceSetModel?): SourceSetModel {
     val astContext = ModelContext()
+
+    stdlib?.updateContext(astContext)
+
+    val registeredSourceSet = updateContext(astContext)
+
     val overrideResolver = OverrideResolver(astContext)
-    return updateContext(astContext).transform {
+    return registeredSourceSet.transform {
         overrideResolver.lowerOverrides(it)
     }
 }

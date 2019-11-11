@@ -1,20 +1,24 @@
 import * as ts from "typescript-services-api";
+import {Declaration} from "./ast";
 
 export class LibraryDeclarationsVisitor {
   private processed = new Set<ts.Node>();
-  private libDeclarations = new Map<string, Array<ts.Node>>();
   private skipTypes = new Set([
     "Array",
     "Boolean",
     "Error",
+    "Function",
     "Number",
+    "RegExp",
     "ReadonlyArray",
     "String"
   ]);
 
   constructor(
+    private libDeclarations: Map<string, Array<Declaration>>,
     private typeChecker: ts.TypeChecker,
-    private libChecker: (node: ts.Node) => boolean
+    private libChecker: (node: ts.Node) => boolean,
+    private createDeclarations: (node: ts.Node) => Array<Declaration>
   ) {
   }
 
@@ -25,7 +29,9 @@ export class LibraryDeclarationsVisitor {
       this.libDeclarations.set(sourceName, []);
     }
 
-    this.libDeclarations.get(sourceName)!.push(declaration);
+    this.createDeclarations(declaration).forEach(declaration => {
+      this.libDeclarations.get(sourceName)!.push(declaration);
+    });
   }
 
   private checkLibReferences(entity: ts.Node) {
