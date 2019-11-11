@@ -46,36 +46,15 @@ private class OverrideResolver(val context: ModelContext) {
         }
     }
 
-    private fun InterfaceModel.allParentMethods(): List<MethodModel> {
+    private fun ClassLikeModel.allParentMethods(): List<MethodModel> {
         return getKnownParents().flatMap { parentEntity ->
             parentEntity.members.filterIsInstance(MethodModel::class.java)
         }
     }
 
-    private fun InterfaceModel.allParentProperties(): List<PropertyModel> {
+    private fun ClassLikeModel.allParentProperties(): List<PropertyModel> {
         return getKnownParents().flatMap { parentEntity ->
             parentEntity.members.filterIsInstance(PropertyModel::class.java)
-        }
-    }
-
-
-    private fun ClassModel.allParentMethods(): List<MethodModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            when (parentEntity) {
-                is InterfaceModel -> parentEntity.members.filterIsInstance(MethodModel::class.java)
-                is ClassModel -> parentEntity.members.filterIsInstance(MethodModel::class.java)
-                else -> raiseConcern("unknown ClassLikeDeclaration $parentEntity") { emptyList<MethodModel>() }
-            }
-        }
-    }
-
-    private fun ClassModel.allParentProperties(): List<PropertyModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            when (parentEntity) {
-                is InterfaceModel -> parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
-                is ClassModel -> parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
-                else -> raiseConcern("unknown ClassLikeDeclaration $parentEntity") { emptyList<PropertyModel>() }
-            }
         }
     }
 
