@@ -225,6 +225,9 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
 fun Declarations.PropertyDeclarationProto.convert(): PropertyDeclaration {
     return PropertyDeclaration(
             name,
+            if (hasInitializer()) {
+                initializer.convert()
+            } else null,
             type.convert(),
             typeParametersList.map { it.convert() },
             optional,
