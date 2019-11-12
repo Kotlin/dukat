@@ -18,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
@@ -193,6 +194,22 @@ fun Declarations.ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration
     return ImportEqualsDeclaration(name, moduleReference.convert(), uid)
 }
 
+fun List<Declarations.TopLevelEntityProto>.convert(): TopLevelDeclaration? {
+    return when {
+        this.isEmpty() -> null
+        this.size == 1 -> this[0].convert()
+        else -> BlockDeclaration( this.map { it.convert() } )
+    }
+}
+
+fun Declarations.IfStatementDeclarationProto.convert(): IfStatementDeclaration {
+    return IfStatementDeclaration(
+            condition = condition.convert(),
+            thenStatement = thenStatementList.convert() ?: BlockDeclaration(emptyList()),
+            elseStatement = elseStatementList.convert()
+    )
+}
+
 fun Declarations.ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaration {
     return ExpressionStatementDeclaration(expression.convert())
 }
@@ -216,6 +233,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
         hasModuleDeclaration() -> moduleDeclaration.convert()
         hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
+        hasIfStatement() -> ifStatement.convert()
         hasExpressionStatement() -> expressionStatement.convert()
         hasReturnStatement() -> returnStatement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")

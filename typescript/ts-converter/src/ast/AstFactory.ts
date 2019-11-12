@@ -16,6 +16,7 @@ import {
   FunctionTypeDeclaration,
   HeritageClauseDeclaration,
   IdentifierEntity,
+  IfStatement,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
   InterfaceDeclaration,
@@ -33,6 +34,7 @@ import {
   ProtoMessage,
   QualifierEntity,
   ReferenceEntity,
+  ReturnStatement,
   SourceFileDeclaration,
   SourceSet,
   StringLiteralDeclaration,
@@ -129,7 +131,20 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
-  createReturnStatement(expression: Expression | null): ExpressionStatement {
+  createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): IfStatement {
+    let ifStatement = new declarations.IfStatementDeclarationProto();
+    ifStatement.setCondition(condition);
+    ifStatement.setThenstatementList(thenStatement);
+    if (elseStatement) {
+      ifStatement.setElsestatementList(elseStatement);
+    }
+
+    let topLevelEntity = new declarations.TopLevelEntityProto();
+    topLevelEntity.setIfstatement(ifStatement);
+    return topLevelEntity;
+  }
+
+  createReturnStatement(expression: Expression | null): ReturnStatement {
     let returnStatement = new declarations.ReturnStatementDeclarationProto();
     if (expression) {
       returnStatement.setExpression(expression);

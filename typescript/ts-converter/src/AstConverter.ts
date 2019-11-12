@@ -822,6 +822,12 @@ export class AstConverter {
             res.push(this.astFactory.createExpressionStatement(
                 this.astExpressionConverter.convertExpression(statement.expression)
             ));
+        } else if (ts.isIfStatement(statement)) {
+            res.push(this.astFactory.createIfStatement(
+                this.astExpressionConverter.convertExpression(statement.expression),
+                this.convertTopLevelStatement(statement.thenStatement),
+                this.convertTopLevelStatement(statement.elseStatement)
+            ))
         } else if (ts.isReturnStatement(statement)) {
             let expression : Expression | null = null;
             if (statement.expression) {

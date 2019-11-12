@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-class ReturnStatementDeclaration(
+data class ReturnStatementDeclaration(
         val expression: ExpressionDeclaration?
 ) : TopLevelDeclaration
