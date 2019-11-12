@@ -264,6 +264,12 @@ message ExpressionStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message IfStatementDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    repeated TopLevelEntityProto thenStatement = 2;
+    repeated TopLevelEntityProto elseStatement = 3;
+}
+
 message ReturnStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
@@ -336,6 +342,7 @@ message TopLevelEntityProto {
         ImportEqualsDeclarationProto importEquals = 9;
         ExpressionStatementDeclarationProto expressionStatement = 10;
         ReturnStatementDeclarationProto returnStatement = 11;
+        IfStatementDeclarationProto ifStatement = 12;
     }
 }
 

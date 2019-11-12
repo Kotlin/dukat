@@ -123,6 +123,18 @@ export declare class ExpressionStatement implements Declaration {
     serializeBinary(): Int8Array;
 }
 
+export declare class IfStatement implements Declaration {
+    condition: Expression;
+    thenStatement: Declaration;
+    elseStatement?: Declaration;
+    serializeBinary(): Int8Array;
+}
+
+export declare class ReturnStatement implements Declaration {
+    expression: Expression;
+    serializeBinary(): Int8Array;
+}
+
 export declare interface ParameterValue extends Declaration {}
 
 export declare class ParameterDeclaration extends Declaration {
@@ -158,7 +170,7 @@ export declare class TypeDeclaration implements ParameterValue {
 }
 
 export declare class Block implements Declaration {
-    statements: Array<Declaration>
+    statements: Array<Declaration>;
     serializeBinary(): Int8Array;
 }
 
