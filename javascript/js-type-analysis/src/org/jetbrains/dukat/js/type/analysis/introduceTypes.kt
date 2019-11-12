@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
@@ -18,6 +19,7 @@ import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -43,7 +45,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) {
                 parameters[i].name to parameterConstraint
             }
 
-            val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker)
+            val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
             versions.add(FunctionConstraint(
                     returnConstraints = returnTypeConstraints,
@@ -98,12 +100,21 @@ fun ClassDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
     }
 }
 
-fun BlockDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
+fun BlockDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
     return statements.calculateConstraints(owner, path)
 }
 
 fun VariableDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
     owner[name] = initializer?.calculateConstraints(owner, path) ?: VoidTypeConstraint
+}
+
+fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
+    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+
+    return when (path.getNextDirection()) {
+        PathWalker.Direction.First -> thenStatement.calculateConstraints(owner, path)
+        PathWalker.Direction.Second -> elseStatement?.calculateConstraints(owner, path)
+    }
 }
 
 fun ExpressionStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) {
@@ -121,6 +132,7 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWal
         is FunctionDeclaration -> this.addTo(owner)
         is ClassDeclaration -> this.addTo(owner, path)
         is VariableDeclaration -> this.addTo(owner, path)
+        is IfStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
         is ExpressionStatementDeclaration -> this.calculateConstraints(owner, path)
         is BlockDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
         is ReturnStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
@@ -132,19 +144,16 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWal
     return returnTypeConstraints
 }
 
-fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
-    var returnTypeConstraints: Constraint = VoidTypeConstraint
-
-    for(statement in this) {
+fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
+    this.forEach { statement ->
         val statementReturnTypeConstraints = statement.calculateConstraints(owner, path)
 
         if(statementReturnTypeConstraints != null) {
-            // This should only happen once per code block
-            returnTypeConstraints = statementReturnTypeConstraints
+            return statementReturnTypeConstraints
         }
     }
 
-    return returnTypeConstraints
+    return null
 }
 
 fun ModuleDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) = declarations.calculateConstraints(owner, path)
