@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.js.type.property_owner
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.js.type.analysis.PathWalker
+import org.jetbrains.dukat.js.type.analysis.calculateConstraints
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
@@ -20,18 +22,18 @@ interface PropertyOwner {
         this[identifierExpression.identifier] = data
     }
 
-    operator fun set(propertyAccessExpression: PropertyAccessExpressionDeclaration, data: Constraint) {
-        val base = this[propertyAccessExpression.expression]
+    operator fun set(propertyAccessExpression: PropertyAccessExpressionDeclaration, path: PathWalker, data: Constraint) {
+        val base = propertyAccessExpression.expression.calculateConstraints(this, path)
 
         if (base is PropertyOwner) {
             base[propertyAccessExpression.name] = data
         }
     }
 
-    operator fun set(expression: ExpressionDeclaration, data: Constraint) {
+    operator fun set(expression: ExpressionDeclaration, path: PathWalker, data: Constraint) {
         when (expression) {
             is IdentifierExpressionDeclaration -> this[expression] = data
-            is PropertyAccessExpressionDeclaration -> this[expression] = data
+            is PropertyAccessExpressionDeclaration -> this[expression, path] = data
             else -> raiseConcern("Cannot set variable described by expression of type <${expression::class}>") {  }
         }
     }
@@ -68,8 +70,8 @@ interface PropertyOwner {
         return this[identifierExpression.identifier]
     }
 
-    operator fun get(propertyAccessExpression: PropertyAccessExpressionDeclaration) : Constraint? {
-        val base = this[propertyAccessExpression.expression]
+    operator fun get(propertyAccessExpression: PropertyAccessExpressionDeclaration, path: PathWalker) : Constraint? {
+        val base = propertyAccessExpression.expression.calculateConstraints(this, path)
 
         return if (base is PropertyOwner) {
             base[propertyAccessExpression.name]
@@ -78,10 +80,10 @@ interface PropertyOwner {
         }
     }
 
-    operator fun get(expression: ExpressionDeclaration) : Constraint? {
+    operator fun get(expression: ExpressionDeclaration, path: PathWalker) : Constraint? {
         return when (expression) {
             is IdentifierExpressionDeclaration -> this[expression]
-            is PropertyAccessExpressionDeclaration -> this[expression]
+            is PropertyAccessExpressionDeclaration -> this[expression, path]
             else -> raiseConcern("Cannot get variable described by expression of type <${expression::class}>") { null }
         }
     }

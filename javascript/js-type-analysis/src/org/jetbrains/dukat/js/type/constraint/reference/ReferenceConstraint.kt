@@ -25,6 +25,7 @@ open class ReferenceConstraint(
             owner
         }
 
+        println(identifier.value)
         val dereferencedConstraint = referenceOwner[identifier]
 
         return if (dereferencedConstraint != null && dereferencedConstraint !is ReferenceConstraint) {

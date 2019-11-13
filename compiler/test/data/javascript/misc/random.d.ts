@@ -1,78 +1,79 @@
-class TestSet {
-    isElement(obj) {
-        return !!(obj && obj.nodeType === 1);
+class _ {
+    // ???
+    // Retrieve the values of an object's properties.
+    // Array<any>
+    static values(obj) {
+        var keys = _.keys(obj);
+        var length = keys.length;
+        var values = Array(length);
+        for (var i = 0; i < length; i++) {
+            values[i] = obj[keys[i]];
+        }
+        return values;
     }
 
-    isObject(obj) {
+    // Retrieve the names of an object's own properties.
+    // Delegates to **ECMAScript 5**'s native Object.keys.
+    static keys(obj) {
+        if (!_.isObject(obj)) return [];
+        if (nativeKeys) return nativeKeys(obj);
+        var keys = [];
+        for (var key in obj) if (has(obj, key)) keys.push(key);
+        // Ahem, IE < 9.
+        if (hasEnumBug) collectNonEnumProps(obj, keys);
+        return keys;
+    };
+
+    static negate(predicate) {
+        return !predicate.apply(this, arguments);
+    };
+
+    // Is a given value an array?
+    // Delegates to ECMA5's native Array.isArray
+    static isArray(obj) {
+        return toString.call(obj) === '[object Array]';
+    }
+
+    // Is a given variable an object?
+    static isObject(obj) {
         var type = typeof obj;
         return type === 'function' || type === 'object' && !!obj;
     }
 
-    isArray(obj) {
-        return toString.call(obj) === '[object Array]';
+    // Is a given value a DOM element?
+    static isElement(obj) {
+        return !!(obj && obj.nodeType === 1);
     }
 
-    isArrayLike(collection) {
-        var length = getLength(collection);
-        return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+    // Is a given array, string, or object empty?
+    // An "empty" object has no enumerable own-properties.
+    static isEmpty(obj) {
+        if (obj == null) return true;
+        if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+        return _.keys(obj).length === 0;
     }
 
-    keyInObj(key, obj) {
-        return key in obj;
-    }
-
-    //Originally returns a function (this was skipped for testing)
-    negate(predicate) {
-        return !predicate.apply(this, arguments);
-    }
 }
 
-/*
-// ???
-// Retrieve the values of an object's properties.
-// Array<any>
-export _.values = function(obj) {
-    var keys = _.keys(obj);
-    var length = keys.length;
-    var values = Array(length);
-    for (var i = 0; i < length; i++) {
-        values[i] = obj[keys[i]];
-    }
-    return values;
-};
-// Retrieve the names of an object's own properties.
-// Delegates to **ECMAScript 5**'s native Object.keys.
-_.keys = function(obj) {
-    if (!_.isObject(obj)) return [];
-    if (nativeKeys) return nativeKeys(obj);
-    var keys = [];
-    for (var key in obj) if (has(obj, key)) keys.push(key);
-    // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
-    return keys;
-};
+
+
+// Internal pick helper function to determine if obj has key key.
+function keyInObj(value, key, obj) {
+    return key in obj;
+}
+
 // Generator function to create the findIndex and findLastIndex functions.
-var createPredicateIndexFinder = function(dir) {
-    return function(array, predicate, context) {
-        predicate = cb(predicate, context);
-        var length = getLength(array);
-        var index = dir > 0 ? 0 : length - 1;
-        for (; index >= 0 && index < length; index += dir) {
-            if (predicate(array[index], index, array)) return index;
-        }
-        return -1;
-    };
-};
-_.negate = function(predicate) {
-    return function() {
-        return !predicate.apply(this, arguments);
-    };
-};
-// Is a given array, string, or object empty?
-// An "empty" object has no enumerable own-properties.
-_.isEmpty = function(obj) {
-    if (obj == null) return true; isEmpty1 => boolean
-    if (isArrayLike(obj) && (.isArray(obj) || .isString(obj) || _.isArguments(obj))) return obj.length === 0; isEmpty2 => boolean
-    return _.keys(obj).length === 0; isEmpty3 => boolean
-};
-*/
+function createPredicateIndexFinder(array, predicate, context, dir) {
+    predicate = cb(predicate, context);
+    var length = getLength(array);
+    var index = dir > 0 ? 0 : length - 1;
+    for (; index >= 0 && index < length; index += dir) {
+        if (predicate(array[index], index, array)) return index;
+    }
+    return -1;
+}
+
+function isArrayLike(collection) {
+    var length = getLength(collection);
+    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+}

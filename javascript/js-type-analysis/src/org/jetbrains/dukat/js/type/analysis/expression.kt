@@ -28,40 +28,50 @@ import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
 fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
-    val rightConstraints = right.calculateConstraints(owner, path)
-    val leftConstraints = left.calculateConstraints(owner, path)
-
     return when (operator) {
         // Assignments
         "=" -> {
-            owner[left] = rightConstraints
+            val rightConstraints = right.calculateConstraints(owner, path)
+            owner[left, path] = rightConstraints
             rightConstraints
         }
         "-=", "*=", "/=", "%=", "**=", "&=", "^=", "|=", "<<=", ">>=", ">>>=" -> {
-            owner[left] = NumberTypeConstraint
+            right.calculateConstraints(owner, path)
+            owner[left, path] = NumberTypeConstraint
             NumberTypeConstraint
         }
 
         // Non-assignments
         "&&", "||" -> {
-            //TODO only calculate the constraints of the chosen path with this operator
             when (path.getNextDirection()) {
-                PathWalker.Direction.First -> leftConstraints
-                PathWalker.Direction.Second -> rightConstraints
+                PathWalker.Direction.First -> {
+                    left.calculateConstraints(owner, path)
+                    //right isn't be evaluated
+                }
+                PathWalker.Direction.Second -> {
+                    left.calculateConstraints(owner, path)
+                    right.calculateConstraints(owner, path)
+                }
             }
         }
         "-", "*", "/", "**", "%", "++", "--" -> {
-            rightConstraints += NumberTypeConstraint
-            leftConstraints += NumberTypeConstraint
+            left.calculateConstraints(owner, path) += NumberTypeConstraint
+            right.calculateConstraints(owner, path) += NumberTypeConstraint
             NumberTypeConstraint
         }
         "&", "|", "^", "<<", ">>", ">>>" -> {
+            left.calculateConstraints(owner, path)
+            right.calculateConstraints(owner, path)
             NumberTypeConstraint
         }
         "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in", "instanceof" -> {
+            left.calculateConstraints(owner, path)
+            right.calculateConstraints(owner, path)
             BooleanTypeConstraint
         }
         else -> {
+            left.calculateConstraints(owner, path)
+            right.calculateConstraints(owner, path)
             CompositeConstraint(NoTypeConstraint)
         }
     }
@@ -73,7 +83,7 @@ fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: 
     return when (operator) {
         "--", "++", "~" -> {
             operandConstraints += NumberTypeConstraint
-            owner[operand] = NumberTypeConstraint
+            owner[operand, path] = NumberTypeConstraint
             NumberTypeConstraint
         }
         "-", "+" -> {
@@ -130,7 +140,7 @@ fun LiteralExpressionDeclaration.calculateConstraints(path: PathWalker) : Constr
 fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (this) {
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier)
-        is PropertyAccessExpressionDeclaration -> owner[this] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
+        is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
