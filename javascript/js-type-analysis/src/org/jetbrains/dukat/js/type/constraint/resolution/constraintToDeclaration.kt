@@ -26,9 +26,9 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
@@ -109,6 +109,13 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     )
 }
 
+fun FunctionConstraint.toType() : FunctionTypeDeclaration {
+    return FunctionTypeDeclaration(
+            parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+            type = returnConstraints.toType()
+    )
+}
+
 fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
     return UnionTypeDeclaration(
             params = types.map { it.toType() }
@@ -133,6 +140,7 @@ fun Constraint.toType() : ParameterValueDeclaration {
         is VoidTypeConstraint -> voidType
         is UnionTypeConstraint -> this.toType()
         is ObjectConstraint -> this.toType()
+        is FunctionConstraint -> this.toType()
         else -> anyNullableType
     }
 }
