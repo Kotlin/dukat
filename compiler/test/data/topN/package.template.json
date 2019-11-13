@@ -1,0 +1,33 @@
+{
+  "name": "dukat-test-topN",
+  "version": "1.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kotlin/dukat.git"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@types/async": "^3.0.3",
+    "@types/bluebird": "^3.5.29",
+    "@types/body-parser": "^1.17.1",
+    "@types/commander": "^2.12.2",
+    "@types/express": "^4.17.2",
+    "@types/fs-extra": "^8.0.1",
+    "@types/lodash": "^4.14.146",
+    "@types/moment": "^2.13.0",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "@types/request": "^2.48.3",
+    "@types/underscore": "^1.9.3",
+    "@types/webpack": "^4.39.8",
+    "@types/yargs": "^13.0.3",
+    "axios": "^0.19.0",
+    "chalk": "^3.0.0",
+    "commander": "^4.0.1",
+    "rxjs": "^6.5.3",
+    "tslib": "^1.10.0",
+    "vue": "^2.6.10"
+  }
+}

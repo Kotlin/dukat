@@ -30,7 +30,6 @@ task prepareNpmPackage(type: Copy) {
 }
 
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
 task copyTypescriptDeclarations(type: Copy) {
   dependsOn = ["yarn"]
