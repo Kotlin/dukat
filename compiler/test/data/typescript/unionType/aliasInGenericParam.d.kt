@@ -32,4 +32,4 @@ external interface OurObject {
     operator fun set(x: String, value: OurListArray)
 }
 
-external interface OurListArray : Array<dynamic /* String | Number | Boolean | Date | OurObject | OurListArray */>
+external interface OurListArray : ArrayList<dynamic /* String | Number | Boolean | Date | OurObject | OurListArray */>

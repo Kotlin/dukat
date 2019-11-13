@@ -40,20 +40,14 @@ export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
-    private resources = new ResourceFetcher(this.sourceFileFetcher, this.sourceName);
-
     private astExpressionConverter = new AstExpressionConverter(this);
 
-    private libVisitor = new LibraryDeclarationsVisitor(
-      this.typeChecker
-    );
-
     constructor(
-      private sourceName: string,
       private rootPackageName: NameEntity,
+      private resources: ResourceFetcher,
+      private libVisitor: LibraryDeclarationsVisitor,
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
-      private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined,
       private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
     ) {
@@ -64,13 +58,11 @@ export class AstConverter {
     }
 
     createSourceFileDeclaration(sourceFileName: string): SourceFileDeclaration {
-        const sourceFile = this.sourceFileFetcher(sourceFileName);
+        const sourceFile = this.resources.getSourceFile(sourceFileName);
 
         if (sourceFile == null) {
             throw new Error(`failed to resolve source file ${sourceFileName}`)
         }
-
-        this.libVisitor.visit(sourceFile);
 
         let resourceName = this.rootPackageName;
 
@@ -94,40 +86,13 @@ export class AstConverter {
             sources.push(source);
         });
 
-
-      let libRootUid = "<LIBROOT>";
-      this.libVisitor.forEachLibDeclaration((libDeclarations, resourceName) => {
-          let declarations: Array<Declaration> = [];
-
-
-          for (let libDeclaration of libDeclarations) {
-                let statements: Array<Declaration> = this.convertTopLevelStatement(libDeclaration);
-
-                statements.forEach((statement, index) => {
-                    declarations.push(statement);
-                });
-            }
-
-          sources.push(this.astFactory.createSourceFileDeclaration(
-            resourceName, this.astFactory.createModuleDeclaration(
-              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-              declarations,
-              [],
-              [],
-              libRootUid,
-              fileName,
-              true
-            ), []
-          ));
-        });
-
         return this.astFactory.createSourceSet(fileName, sources);
     }
 
     printDiagnostics() {
         this.log.debug("following declarations has been skipped: ");
         this.unsupportedDeclarations.forEach(id => {
-           this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
+            this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
         });
     }
 
@@ -376,6 +341,9 @@ export class AstConverter {
             if (ts.isIdentifier(type)) {
                 return this.astFactory.createIdentifierDeclarationAsNameEntity(type.text)
             }
+
+            this.libVisitor.process(type);
+
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
             } else if (ts.isArrayTypeNode(type)) {
@@ -550,15 +518,15 @@ export class AstConverter {
             }
         } else if (ts.isIndexSignatureDeclaration(member)) {
             this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
-                this.registerDeclaration(member, res)
+              this.registerDeclaration(member, res)
             );
         } else if (ts.isCallSignatureDeclaration(member)) {
             this.registerDeclaration(
-                this.astFactory.createCallSignatureDeclaration(
-                    this.convertParameterDeclarations(member.parameters),
-                    member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
-                    this.convertTypeParams(member.typeParameters)
-                ), res
+              this.astFactory.createCallSignatureDeclaration(
+                this.convertParameterDeclarations(member.parameters),
+                member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+                this.convertTypeParams(member.typeParameters)
+              ), res
             );
         }
 
@@ -686,14 +654,9 @@ export class AstConverter {
         return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
     }
 
-    private convertValue(entity: ts.TypeNode | ts.Identifier): NameEntity {
+    private convertValue(entity: ts.TypeNode): NameEntity {
         let convertedEntity = this.convertType(entity) as any;
-
-        // TODO: getValue() we get in Graal, .value in Nashorn and J2V8 - I need to create a minimal example and report it
-        let value = typeof convertedEntity.getValue == "function" ?
-          (convertedEntity).getValue() : convertedEntity.value;
-
-        return value as NameEntity;
+        return convertedEntity.getValue() as NameEntity;
     }
 
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
@@ -787,7 +750,7 @@ export class AstConverter {
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses),
-          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration , statement.name) : [],
+          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
           this.exportContext.getUID(statement)
         );
 

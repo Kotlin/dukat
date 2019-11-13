@@ -47,17 +47,20 @@ where possible options include:
 
 # Recent Changes
 
+### [0.0.23] - 07'November, 2019
+ - equals should have "override" modifier only when param is Any?
+ - Resolve file names from namespaced nodejs packages.
+ - Correct override resolving for methods with return type.
+ - Resolve overrides when return type is generic.
+ - Replace ReadonlyArray from ts stdlib with just Array.
+ - Preserve TypeParams in unaliased entities in cases when they were lost.
+ - Replace entity inherited from a final class (in a Kotlin stdlib sense with alias.
+
 ### [0.0.22] - 31'October, 2019
  - Better support for Partial. Whenever this class is defined in this particular declaration source set,
    new class is generated which mimicks Partial behaviour.
  - Resolving relative module names (see [#110](https://github.com/Kotlin/dukat/issues/110) - Inconsistent naming while translating @types/lodash)
  - Support type references in typescript declarations. 
-
-### [0.0.21] - 22'October, 2019
- - [#133](https://github.com/Kotlin/dukat/issues/133) Lack of type params in generated interfaces
- - [#136](https://github.com/Kotlin/dukat/issues/136) Convert nested nullable unions correctly
- - [#141](https://github.com/Kotlin/dukat/issues/141) ThisTypeDeclaration leak in inline functions generated from merged interfaces
- - Default ts library is switched to lib.es6.d.ts.
 
 [see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 

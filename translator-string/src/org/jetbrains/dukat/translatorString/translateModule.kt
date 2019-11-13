@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
@@ -46,18 +47,24 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
                 else -> sourceFileName
             }
 
+    var addModuleName = true
 
     var name = packageName.process {
         if (it == ROOT_PACKAGENAME.value) {
+            ktFileNamePrefix
+        } else if (it == LIB_PACKAGENAME.value) {
+            addModuleName = false
             ktFileNamePrefix
         } else {
             unescape(it)
         }
     }
 
-    CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
-        val moduleNameFlattened = moduleName.replace("/", "_")
-        name = name.appendLeft(IdentifierEntity("module_$moduleNameFlattened"))
+    if (addModuleName) {
+        CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
+            val moduleNameFlattened = moduleName.replace("/", "_")
+            name = name.appendLeft(IdentifierEntity("module_$moduleNameFlattened"))
+        }
     }
 
     if (this.name != null) {

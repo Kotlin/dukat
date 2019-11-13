@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -10,10 +11,11 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.KotlinType
 
-class CustomClassDescriptor(
+open class CustomClassDescriptor(
     parent: DeclarationDescriptor,
     name: NameEntity,
     modality: Modality,
@@ -39,6 +41,11 @@ class CustomClassDescriptor(
         isTopLevel,
         LockBasedStorageManager.NO_LOCKS
     ) {
+
+    var staticEnumScope: MemberScope? = null
+
+    override fun getStaticScope(): MemberScope = staticEnumScope ?: SimpleMemberScope(listOf())
+
     override fun isCompanionObject(): Boolean {
         return isCompanion
     }

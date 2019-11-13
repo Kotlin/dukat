@@ -15,6 +15,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface I {
     companion object : I by definedExternally
 }

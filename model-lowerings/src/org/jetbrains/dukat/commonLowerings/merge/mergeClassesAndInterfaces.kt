@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -38,13 +39,18 @@ private fun ClassLikeModel.createKey(): ClassLikeKey? {
     }
 }
 
+private fun mergeParentEntities(parentEntitiesA: List<HeritageModel>, parentEntitiesB: List<HeritageModel>): List<HeritageModel> {
+    val parentSet = parentEntitiesA.toSet()
+    return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }
+}
+
 private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
     return copy(
             name = name,
             typeParameters = typeParameters,
             members = members + otherClass.members,
             companionObject = companionObject.mergeWith(otherClass.companionObject),
-            parentEntities = parentEntities + otherClass.parentEntities
+            parentEntities = mergeParentEntities(parentEntities, otherClass.parentEntities)
     )
 }
 
@@ -72,7 +78,7 @@ private fun ClassModel.mergeWithInterface(otherInterface: InterfaceModel): Class
             typeParameters = typeParameters,
             members = members + openInterfaceMembers,
             companionObject = companionObject.mergeWith(otherInterface.companionObject),
-            parentEntities = parentEntities + otherInterface.parentEntities
+            parentEntities = mergeParentEntities(parentEntities, otherInterface.parentEntities)
     )
 }
 
@@ -82,7 +88,7 @@ private fun InterfaceModel.mergeWithInterface(otherInterface: InterfaceModel): I
             typeParameters = typeParameters,
             members = members + otherInterface.members,
             companionObject = companionObject.mergeWith(otherInterface.companionObject),
-            parentEntities = parentEntities + otherInterface.parentEntities
+            parentEntities = mergeParentEntities(parentEntities, otherInterface.parentEntities)
     )
 }
 

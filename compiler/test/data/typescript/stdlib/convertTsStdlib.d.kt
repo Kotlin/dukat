@@ -17,6 +17,12 @@ import org.w3c.xhr.*
 
 external fun frequencies(a: Array<String>): Array<Number>
 
+typealias NumArray = Array<Number>
+
+typealias SmartArray<T> = Array<T>
+
+typealias MyVerySpecificException = Error
+
 external interface `T$0` {
     @nativeGetter
     operator fun get(shortName: String): dynamic /* String | Array<String> */
@@ -30,4 +36,7 @@ external interface Processor<T> {
     fun process(arg: T)
     fun process(arg: Array<T>)
     fun alias(aliases: `T$0`)
+    fun shape(input: SmartArray<String>): NumArray
+    fun convertToSmartArray(input: NumArray): SmartArray<T>
+    fun onError(handler: (error: MyVerySpecificException) -> Unit)
 }
