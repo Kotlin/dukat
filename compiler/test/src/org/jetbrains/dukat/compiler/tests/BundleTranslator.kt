@@ -6,9 +6,7 @@ import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
 import java.io.File
 
 
-private data class BundleTranslatorInit(
-        val sourceMap: Map<String, SourceSetModel>
-)
+typealias BundleSourceMap = Map<String, SourceSetModel>
 
 class BundleTranslator(private val inputName: String) {
 
@@ -16,23 +14,16 @@ class BundleTranslator(private val inputName: String) {
         val byteTranslator = createJsByteArrayTranslator(ConstNameResolver())
     }
 
-    private val myInitData = build()
+    private val bundleSourceMap = build()
 
-    private fun build(): BundleTranslatorInit {
-        val bundleMap = mutableMapOf<String, SourceSetModel>()
-
+    private fun build(): BundleSourceMap {
         val inputStream = File(inputName).inputStream()
         val bundle = byteTranslator.lower(byteTranslator.parse(inputStream.readBytes()))
 
-        bundle.sources.forEach { sourceSet ->
-            bundleMap[sourceSet.sourceName] = sourceSet
-        }
-
-        return BundleTranslatorInit(bundleMap)
+        return bundle.sources.associateBy { source -> source.sourceName }
     }
 
     fun translate(fileName: String): SourceSetModel {
-        val (sourceMap) = myInitData
-        return sourceMap[fileName]!!
+        return bundleSourceMap[fileName]!!
     }
 }
