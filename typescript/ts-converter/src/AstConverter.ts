@@ -796,10 +796,18 @@ export class AstConverter {
                 this.astExpressionConverter.convertExpression(statement.expression)
             ));
         } else if (ts.isIfStatement(statement)) {
+            let elseStatement;
+
+            if (statement.elseStatement) {
+                elseStatement = this.convertTopLevelStatement(statement.elseStatement)
+            } else {
+                elseStatement = null
+            }
+
             res.push(this.astFactory.createIfStatement(
                 this.astExpressionConverter.convertExpression(statement.expression),
                 this.convertTopLevelStatement(statement.thenStatement),
-                this.convertTopLevelStatement(statement.elseStatement)
+                elseStatement
             ))
         } else if (ts.isBlock(statement)) {
             let block = this.convertBlockStatement(statement);
