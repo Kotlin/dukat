@@ -12,4 +12,4 @@ data class InterfaceNode(
 
         val generated: Boolean,
         override val uid: String
-) : ClassLikeNode, UniqueNode
+) : ClassLikeNode

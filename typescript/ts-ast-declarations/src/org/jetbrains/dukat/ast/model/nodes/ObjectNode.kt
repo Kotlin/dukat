@@ -7,5 +7,5 @@ data class ObjectNode(
         val members: List<MemberNode>,
 
         val parentEntities: List<HeritageNode>,
-        val uid: String
+        override val uid: String
 ) : ClassLikeNode
