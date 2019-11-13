@@ -161,6 +161,14 @@ export class AstFactory implements AstFactory {
     return block
   }
 
+  createBlockStatementDeclaration(statements: Array<Declaration>): Block {
+    let block = this.createBlockDeclaration(statements);
+
+    let topLevelEntity = new declarations.TopLevelEntityProto();
+    topLevelEntity.setBlockstatement(block);
+    return topLevelEntity;
+  }
+
   private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): ProtoMessage {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
     functionDeclaration.setName(name);

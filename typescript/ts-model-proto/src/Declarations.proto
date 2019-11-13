@@ -343,6 +343,7 @@ message TopLevelEntityProto {
         ExpressionStatementDeclarationProto expressionStatement = 10;
         ReturnStatementDeclarationProto returnStatement = 11;
         IfStatementDeclarationProto ifStatement = 12;
+        BlockDeclarationProto blockStatement = 13;
     }
 }
 
