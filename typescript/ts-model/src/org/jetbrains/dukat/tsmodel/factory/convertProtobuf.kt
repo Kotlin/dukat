@@ -236,6 +236,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
         hasIfStatement() -> ifStatement.convert()
         hasExpressionStatement() -> expressionStatement.convert()
         hasReturnStatement() -> returnStatement.convert()
+        hasBlockStatement() -> blockStatement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
 }

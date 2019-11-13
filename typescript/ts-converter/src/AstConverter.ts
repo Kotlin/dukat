@@ -171,20 +171,30 @@ export class AstConverter {
         return typeParameterDeclarations;
     }
 
-    convertBlock(block: ts.Block): Block | null {
-        if (block) {
-            const statements: Declaration[] = [];
+    private getStatementsFromBlock(block: ts.Block): Array<Declaration> {
+        let statements: Declaration[] = [];
 
-            for (let statement of block.statements) {
-                for (let decl of this.convertTopLevelStatement(statement)) {
-                    this.registerDeclaration(decl, statements)
-                }
+        for (let statement of block.statements) {
+            for (let decl of this.convertTopLevelStatement(statement)) {
+                this.registerDeclaration(decl, statements)
             }
+        }
 
+        return statements;
+    }
+
+    convertBlock(block: ts.Block | null): Block | null {
+        if (block) {
+            let statements = this.getStatementsFromBlock(block);
             return this.astFactory.createBlockDeclaration(statements);
         } else {
             return null;
         }
+    }
+
+    convertBlockStatement(block: ts.Block): Block {
+        let statements = this.getStatementsFromBlock(block);
+        return this.astFactory.createBlockStatementDeclaration(statements);
     }
 
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration): FunctionDeclaration | null {
@@ -791,6 +801,11 @@ export class AstConverter {
                 this.convertTopLevelStatement(statement.thenStatement),
                 this.convertTopLevelStatement(statement.elseStatement)
             ))
+        } else if (ts.isBlock(statement)) {
+            let block = this.convertBlockStatement(statement);
+            if (block) {
+                res.push(block)
+            }
         } else if (ts.isReturnStatement(statement)) {
             let expression : Expression | null = null;
             if (statement.expression) {
