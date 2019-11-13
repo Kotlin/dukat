@@ -19,7 +19,3 @@ export class ExportContext {
     return this.exportTable.get(node) || "";
   }
 }
-
-export function createExportContext(isLibNode: (node: ts.Node) => boolean): ExportContext {
-  return new ExportContext(isLibNode);
-}

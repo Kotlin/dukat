@@ -17,8 +17,8 @@ class JsRuntimeByteArrayTranslator(
 
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 
-    fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
-        return lowerer.lower(sourceSet)
+    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?): SourceSetModel {
+        return lowerer.lower(sourceSet, stdLibSourceSet)
     }
 
     private fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {

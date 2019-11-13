@@ -10,7 +10,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
-import org.jetbrains.dukat.model.commonLowerings.generateStdLib
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
@@ -43,12 +42,15 @@ import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 import substituteTsStdLibEntities
 
+fun SourceSetDeclaration.isStdLib(): Boolean {
+    return sourceName == "<LIBROOT>"
+}
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver
 ) : ECMAScriptLowerer {
-    override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
-        return sourceSet
+    override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?): SourceSetModel {
+        val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
@@ -57,7 +59,8 @@ open class TypescriptLowerer(
                 .eliminateStringType()
                 .desugarArrayDeclarations()
                 .lowerPartialOfT()
-                .introduceNodes(moduleNameResolver)
+
+        val nodes = declarations.introduceNodes(moduleNameResolver)
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .resolveModuleAnnotations()
@@ -72,6 +75,8 @@ open class TypescriptLowerer(
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
                 .moveTypeAliasesOutside()
+
+        val models = nodes
                 .introduceModels()
                 .escapeIdentificators()
                 .mergeModules()
@@ -80,14 +85,27 @@ open class TypescriptLowerer(
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
-                .lowerOverrides()
+                .lowerOverrides(stdLibSourceSet)
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addStandardImportsAndAnnotations()
-                .generateStdLib()
+
+        return models
     }
 
     override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        return SourceBundleModel(sourceBundle.sources.map { source -> lower(source) })
+        var stdLib: SourceSetModel? = null
+        val sources = mutableListOf<SourceSetDeclaration>()
+
+        sourceBundle.sources.forEach { source ->
+            if ((source.isStdLib()) && (stdLib == null)) {
+                stdLib = lower(source, null)
+            } else {
+                sources.add(source)
+            }
+        }
+
+        val loweredSources = sources.map { source -> lower(source, stdLib) }
+        return SourceBundleModel(loweredSources)
     }
 }

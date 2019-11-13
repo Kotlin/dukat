@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":translator"))
     implementation(project(":translator-string"))
 
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$gradle.kotlinVersion")
     implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable:$gradle.kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-test:$gradle.kotlinVersion"
 }

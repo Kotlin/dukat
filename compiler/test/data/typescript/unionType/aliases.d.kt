@@ -37,3 +37,7 @@ external interface Parent {
     @nativeInvoke
     operator fun invoke(vararg children: Number): Foo
 }
+
+external interface Argv<T> {
+    fun <O> command(handler: ((args: Array<O> /* Array<O> & `T$0` */) -> Unit)? = definedExternally): Argv<T>
+}

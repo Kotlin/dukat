@@ -7,9 +7,11 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver) {
-    override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
-        return super.lower(sourceSet
-                .introduceTypes()
+    override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?): SourceSetModel {
+        return super.lower(
+                sourceSet
+                        .introduceTypes(),
+                stdLibSourceSet
         )
     }
 }
