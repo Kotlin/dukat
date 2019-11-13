@@ -15,11 +15,32 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class TestSet {
-    open fun isElement(obj: Any?): Boolean
-    open fun isObject(obj: Any?): dynamic /* Boolean */
-    open fun isArray(obj: Any?): Boolean
-    open fun isArrayLike(collection: Any?): dynamic /* Boolean */
-    open fun keyInObj(key: Any?, obj: Any?): Boolean
-    open fun negate(predicate: Any?): Boolean
+external object _ {
+    fun values(obj: Any?)
+    fun keys(obj: dynamic /* Any? */): dynamic /* Any? */
+    fun negate(predicate: Any?): Boolean
+    fun isArray(obj: Any?): Boolean
+    fun isObject(obj: dynamic /* Any? */): dynamic /* Boolean */
+    fun isElement(obj: Any?): Boolean
+    fun isEmpty(obj: dynamic /* Any? */): dynamic /* Boolean */
 }
+
+external fun values(obj: Any?)
+
+external fun keys(obj: Any?): dynamic /* Any? | Unit */
+
+external fun negate(predicate: Any?): Boolean
+
+external fun isArray(obj: Any?): Boolean
+
+external fun isObject(obj: Any?): dynamic /* Boolean */
+
+external fun isElement(obj: Any?): Boolean
+
+external fun isEmpty(obj: Any?): dynamic /* Boolean */
+
+external fun keyInObj(value: Any?, key: Any?, obj: Any?): Boolean
+
+external fun createPredicateIndexFinder(array: Any?, predicate: Any?, context: Any?, dir: Any?): Number
+
+external fun isArrayLike(collection: Any?): dynamic /* Boolean */
