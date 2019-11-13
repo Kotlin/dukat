@@ -15,6 +15,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun max(a: Any?, b: Any?): Any?
+external fun max(a: Any?, b: Any?): dynamic /* Any? */
 
-external fun negate(a: Number): Number
+external fun negate(a: Number): dynamic /* Number | Boolean */
+
+external fun negate(a: Any?): dynamic /* Number | Boolean */

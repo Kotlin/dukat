@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
@@ -53,9 +54,26 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) {
             ))
         } while (pathWalker.startNextPath())
 
-        //TODO unify versions of function
+        owner[name] = if (versions.size == 1) {
+            versions[0]
+        } else {
+            val parameters = mutableListOf<Pair<String, MutableList<Constraint>>>()
 
-        owner[name] = versions[0]
+            versions.forEach {
+                it.parameterConstraints.forEachIndexed { index, (name, constraint) ->
+                    if (parameters.size <= index) {
+                        parameters.add(index, name to mutableListOf())
+                    }
+
+                    parameters[index].second.add(constraint)
+                }
+            }
+
+            FunctionConstraint(
+                    returnConstraints = UnionTypeConstraint(versions.map { it.returnConstraints }),
+                    parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
+            )
+        }
     }
 }
 

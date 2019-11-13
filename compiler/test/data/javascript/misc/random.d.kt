@@ -17,9 +17,9 @@ import org.w3c.xhr.*
 
 external open class TestSet {
     open fun isElement(obj: Any?): Boolean
-    open fun isObject(obj: Any?): Boolean
+    open fun isObject(obj: Any?): dynamic /* Boolean */
     open fun isArray(obj: Any?): Boolean
-    open fun isArrayLike(collection: Any?): Boolean
+    open fun isArrayLike(collection: Any?): dynamic /* Boolean */
     open fun keyInObj(key: Any?, obj: Any?): Boolean
     open fun negate(predicate: Any?): Boolean
 }

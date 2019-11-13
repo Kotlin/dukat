@@ -3,6 +3,7 @@ package org.jetbrains.dukat.js.type.constraint.resolution
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
@@ -28,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
 val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
@@ -51,7 +53,7 @@ fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStat
 
 fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
         name = name,
-        type = this.toType() ?: anyNullableType,
+        type = this.toType(),
         initializer = null,
         vararg = false,
         optional = false
@@ -60,7 +62,7 @@ fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
 fun FunctionConstraint.toDeclaration(name: String) = FunctionDeclaration(
         name = name,
         parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-        type = returnConstraints.toType() ?: voidType,
+        type = returnConstraints.toType(),
         typeParameters = emptyList(),
         modifiers = EXPORT_MODIFIERS,
         body = null,
@@ -78,7 +80,7 @@ fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : Me
 fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : MemberDeclaration? {
     return when (this) {
         is FunctionConstraint -> this.toMemberDeclaration(name, isStatic)
-        else -> this.toType()?.let { type -> getPropertyDeclaration(name, type, isStatic) }
+        else -> getPropertyDeclaration(name, this.toType(), isStatic)
     }
 }
 
@@ -107,7 +109,13 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     )
 }
 
-fun ObjectConstraint.toType() : ObjectLiteralDeclaration? {
+fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
+    return UnionTypeDeclaration(
+            params = types.map { it.toType() }
+    )
+}
+
+fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
             members = propertyNames.mapNotNull { memberName ->
                 this[memberName]?.toMemberDeclaration(name = memberName)
@@ -116,13 +124,14 @@ fun ObjectConstraint.toType() : ObjectLiteralDeclaration? {
     )
 }
 
-fun Constraint.toType() : ParameterValueDeclaration? {
+fun Constraint.toType() : ParameterValueDeclaration {
     return when (this) {
         is NumberTypeConstraint -> numberType
         is BigIntTypeConstraint -> numberType
         is BooleanTypeConstraint -> booleanType
         is StringTypeConstraint -> stringType
         is VoidTypeConstraint -> voidType
+        is UnionTypeConstraint -> this.toType()
         is ObjectConstraint -> this.toType()
         else -> anyNullableType
     }
@@ -133,6 +142,6 @@ fun Constraint.toDeclaration(name: String) : TopLevelDeclaration? {
         is ClassConstraint -> this.toDeclaration(name)
         is FunctionConstraint -> this.toDeclaration(name)
         is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { null }
-        else -> this.toType()?.let { type -> getVariableDeclaration(name, type) }
+        else -> getVariableDeclaration(name, this.toType())
     }
 }

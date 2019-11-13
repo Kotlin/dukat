@@ -9,8 +9,6 @@ function max(a, b) {
 function negate(a) {
     if(isNum(a))
         return -a
-    else if(isBool(a))
-        return !a
     else
-        return null
+        return !a
 }
