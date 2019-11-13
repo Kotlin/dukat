@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.js.type.analysis
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
-import org.jetbrains.dukat.js.type.constraint.composite.ReferenceConstraint
+import org.jetbrains.dukat.js.type.constraint.reference.ReferenceConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
@@ -9,8 +9,8 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeCons
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.immutable.call.CallArgumentConstraint
-import org.jetbrains.dukat.js.type.constraint.immutable.call.CallResultConstraint
+import org.jetbrains.dukat.js.type.constraint.reference.call.CallArgumentConstraint
+import org.jetbrains.dukat.js.type.constraint.reference.call.CallResultConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
@@ -101,14 +101,12 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
     argumentConstraints.forEachIndexed { argumentNumber, arg ->
         arg += CallArgumentConstraint(
                 callTargetConstraints,
-                argumentConstraints,
                 argumentNumber
         )
     }
 
     return CallResultConstraint(
-            callTargetConstraints,
-            argumentConstraints
+            callTargetConstraints
     )
 }
 
