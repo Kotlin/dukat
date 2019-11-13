@@ -212,17 +212,23 @@ private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
 
 private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
     return when (this) {
-        is UnionTypeNode -> TypeValueModel(
-                IdentifierEntity("dynamic"),
-                emptyList(),
-                params.map { unionMember ->
-                    if (unionMember.meta is StringLiteralDeclaration) {
-                        (unionMember.meta as StringLiteralDeclaration).token
-                    } else {
-                        unionMember.process().translate()
-                    }
-                }.joinToString(" | ")
-        )
+        is UnionTypeNode -> {
+            if (params.size == 1) {
+                params[0].process(context)
+            } else {
+                TypeValueModel(
+                        IdentifierEntity("dynamic"),
+                        emptyList(),
+                        params.map { unionMember ->
+                            if (unionMember.meta is StringLiteralDeclaration) {
+                                (unionMember.meta as StringLiteralDeclaration).token
+                            } else {
+                                unionMember.process().translate()
+                            }
+                        }.joinToString(" | ")
+                )
+            }
+        }
         is TupleTypeNode -> TypeValueModel(
                 IdentifierEntity("dynamic"),
                 emptyList(),

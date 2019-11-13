@@ -17,12 +17,12 @@ import org.w3c.xhr.*
 
 external object _ {
     fun values(obj: Any?)
-    fun keys(obj: dynamic /* Any? */): dynamic /* Any? */
+    fun keys(obj: Any?): dynamic /* Any? | Unit */
     fun negate(predicate: Any?): Boolean
     fun isArray(obj: Any?): Boolean
-    fun isObject(obj: dynamic /* Any? */): dynamic /* Boolean */
+    fun isObject(obj: Any?): Boolean
     fun isElement(obj: Any?): Boolean
-    fun isEmpty(obj: dynamic /* Any? */): dynamic /* Boolean */
+    fun isEmpty(obj: Any?): Boolean
 }
 
 external fun values(obj: Any?)
@@ -33,14 +33,14 @@ external fun negate(predicate: Any?): Boolean
 
 external fun isArray(obj: Any?): Boolean
 
-external fun isObject(obj: Any?): dynamic /* Boolean */
+external fun isObject(obj: Any?): Boolean
 
 external fun isElement(obj: Any?): Boolean
 
-external fun isEmpty(obj: Any?): dynamic /* Boolean */
+external fun isEmpty(obj: Any?): Boolean
 
 external fun keyInObj(value: Any?, key: Any?, obj: Any?): Boolean
 
 external fun createPredicateIndexFinder(array: Any?, predicate: Any?, context: Any?, dir: Any?): Number
 
-external fun isArrayLike(collection: Any?): dynamic /* Boolean */
+external fun isArrayLike(collection: Any?): Boolean
