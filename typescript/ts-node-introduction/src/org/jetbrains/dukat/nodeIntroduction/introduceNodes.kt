@@ -473,7 +473,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 val objectNode = ObjectNode(
                         IdentifierEntity(declaration.name),
                         type.members.flatMap { member -> lowerMemberDeclaration(member) },
-                        emptyList()
+                        emptyList(),
+                        declaration.uid
                 )
 
                 objectNode.copy(members = objectNode.members.map {
