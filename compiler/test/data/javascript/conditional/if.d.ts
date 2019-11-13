@@ -7,8 +7,9 @@ function max(a, b) {
 }
 
 function negate(a) {
-    if(isNum(a))
+    if(isNum(a)) {
         return -a
-    else
+    } else {
         return !a
+    }
 }
