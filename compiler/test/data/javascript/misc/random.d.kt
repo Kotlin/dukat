@@ -16,8 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external object _ {
-    fun values(obj: Any?)
-    fun keys(obj: Any?): dynamic /* Any? | Unit */
+    fun values(obj: Any?): Any?
+    fun keys(obj: Any?): Any?
     fun negate(predicate: Any?): Boolean
     fun isArray(obj: Any?): Boolean
     fun isObject(obj: Any?): Boolean
@@ -25,9 +25,9 @@ external object _ {
     fun isEmpty(obj: Any?): Boolean
 }
 
-external fun values(obj: Any?)
+external fun values(obj: Any?): Any?
 
-external fun keys(obj: Any?): dynamic /* Any? | Unit */
+external fun keys(obj: Any?): Any?
 
 external fun negate(predicate: Any?): Boolean
 

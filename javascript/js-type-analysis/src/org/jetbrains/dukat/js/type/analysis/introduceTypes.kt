@@ -6,6 +6,7 @@ import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
@@ -86,7 +87,7 @@ fun InterfaceDeclaration.addTo(owner: PropertyOwner)
 */
 
 fun PropertyDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
-    owner[name] = initializer?.calculateConstraints(owner, path) ?: VoidTypeConstraint
+    owner[name] = initializer?.calculateConstraints(owner, path) ?: NoTypeConstraint
 }
 
 fun MemberDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
@@ -123,7 +124,7 @@ fun BlockDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker
 }
 
 fun VariableDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
-    owner[name] = initializer?.calculateConstraints(owner, path) ?: VoidTypeConstraint
+    owner[name] = initializer?.calculateConstraints(owner, path) ?: NoTypeConstraint
 }
 
 fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
