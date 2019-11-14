@@ -4,7 +4,7 @@ let _ = {}
 // Retrieve the values of an object's properties.
 // Array<any>
 function values(obj) {
-    var keys = keys(obj);
+    var keys = _.keys(obj);
     var length = keys.length;
     var values = Array(length);
     for (var i = 0; i < length; i++) {
@@ -17,7 +17,7 @@ _.values = values
 // Retrieve the names of an object's own properties.
 // Delegates to **ECMAScript 5**'s native Object.keys.
 function keys(obj) {
-    if (!isObject(obj)) return [];
+    if (!_.isObject(obj)) return [];
     if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (has(obj, key)) keys.push(key);
@@ -56,8 +56,8 @@ _.isElement = isElement
 // An "empty" object has no enumerable own-properties.
 function isEmpty(obj) {
     if (obj == null) return true;
-    if (isArrayLike(obj) && (isArray(obj) || isString(obj) || isArguments(obj))) return obj.length === 0;
-    return keys(obj).length === 0;
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+    return _.keys(obj).length === 0;
 }
 _.isEmpty = isEmpty
 
