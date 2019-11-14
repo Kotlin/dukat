@@ -69,6 +69,16 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
+    static createNewExpressionDeclarationAsExpression(expression: Expression, args: Array<Expression>): Expression {
+        let newExpression = new declarations.NewExpressionDeclarationProto();
+        newExpression.setExpression(expression);
+        newExpression.setArgumentsList(args);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setNewexpression(newExpression);
+        return expressionProto;
+    }
+
     static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
         let qualifier = new declarations.QualifierEntityProto();
         qualifier.setLeft(left);
