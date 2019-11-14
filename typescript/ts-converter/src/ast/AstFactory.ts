@@ -144,6 +144,16 @@ export class AstFactory implements AstFactory {
     return topLevelEntity;
   }
 
+  createWhileStatement(condition: Expression, statement: Array<Declaration>): IfStatement {
+    let whileStatement = new declarations.WhileStatementDeclarationProto();
+    whileStatement.setCondition(condition);
+    whileStatement.setStatementList(statement);
+
+    let topLevelEntity = new declarations.TopLevelEntityProto();
+    topLevelEntity.setWhilestatement(whileStatement);
+    return topLevelEntity;
+  }
+
   createReturnStatement(expression: Expression | null): ReturnStatement {
     let returnStatement = new declarations.ReturnStatementDeclarationProto();
     if (expression) {
