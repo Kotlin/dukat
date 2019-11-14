@@ -10,8 +10,6 @@ import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaratio
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
 interface PropertyOwner {
-    val propertyNames: Set<String>
-
     operator fun set(name: String, data: Constraint)
 
     operator fun set(identifier: IdentifierEntity, data: Constraint) {

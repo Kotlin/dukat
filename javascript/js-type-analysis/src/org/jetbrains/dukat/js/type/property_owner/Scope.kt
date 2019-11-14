@@ -5,7 +5,7 @@ import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.reference.ReferenceConstraint
 
 class Scope : PropertyOwner {
-    override val propertyNames: Set<String>
+    val propertyNames: Set<String>
         get() = properties.keys
 
     private val properties = LinkedHashMap<String, Constraint>()

@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaratio
 class ObjectConstraint(
         private val instantiatedClass: ClassConstraint? = null
 ) : PropertyOwnerConstraint {
-    override val propertyNames: Set<String>
+    val propertyNames: Set<String>
         get() {
             val names = mutableSetOf<String>()
             names.addAll(properties.keys)

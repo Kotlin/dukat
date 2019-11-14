@@ -4,7 +4,7 @@ import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class ClassConstraint(val prototype: ObjectConstraint = ObjectConstraint()) : PropertyOwnerConstraint {
-    override val propertyNames: Set<String>
+    val propertyNames: Set<String>
         get() = staticMembers.keys
 
     private val staticMembers = LinkedHashMap<String, Constraint>()

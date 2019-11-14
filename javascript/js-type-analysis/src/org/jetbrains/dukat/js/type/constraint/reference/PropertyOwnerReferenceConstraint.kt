@@ -7,10 +7,7 @@ import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 abstract class PropertyOwnerReferenceConstraint : PropertyOwnerConstraint {
-    override val propertyNames: Set<String>
-        get() = raiseConcern("Properties of a reference should never be listed.") { emptySet() }
-
-    protected val modifiedProperties = LinkedHashMap<String, Constraint>()
+    private val modifiedProperties = LinkedHashMap<String, Constraint>()
 
     override fun set(name: String, data: Constraint) {
         modifiedProperties[name] = data
