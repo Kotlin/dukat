@@ -128,8 +128,15 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
-        return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())))
+        val paramName = if (declaration.name == "this") {
+            "self"
+        } else {
+            declaration.name.escape()
+        }
+
+        return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
+
 
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node

@@ -32,7 +32,7 @@ external interface This {
     var `typeof`: Number
     fun `in`(`object`: Foo)
     fun `return`(): Any
-    fun `return`(value: Number): Number
+    fun `return`(self: This): Number
 
     companion object {
         var `$foo`: Boolean

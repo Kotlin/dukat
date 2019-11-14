@@ -11,7 +11,7 @@ interface This {
     typeof: number;
     in(object: Foo);
     return(): Any;
-    return(value: Number): Number;
+    return(this: This): Number;
 }
 declare class is<interface> {
     as: number;
