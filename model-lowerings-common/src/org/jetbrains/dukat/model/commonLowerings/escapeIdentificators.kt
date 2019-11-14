@@ -43,6 +43,11 @@ private val RESERVED_WORDS = setOf(
         "when"
 )
 
+private val RENAME_PARAM_MAP = mapOf(
+    Pair("this", "self"),
+    Pair("object", "obj")
+)
+
 private fun String.shouldEscape(): Boolean {
     val isReservedWord = RESERVED_WORDS.contains(this)
     val containsDollarSign = this.contains("$")
@@ -129,12 +134,8 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
-        val paramName = if (declaration.name == "this") {
-            "self"
-        } else {
-            declaration.name.escape()
-        }
 
+        val paramName = RENAME_PARAM_MAP[declaration.name] ?: declaration.name.escape()
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
 

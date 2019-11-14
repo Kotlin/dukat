@@ -30,7 +30,7 @@ external interface This {
     var `when`: String
     var `typealias`: Number
     var `typeof`: Number
-    fun `in`(`object`: Foo)
+    fun `in`(obj: Foo)
     fun `return`(): Any
     fun `return`(self: This): Number
     fun `throw`(reason: Error)

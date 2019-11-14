@@ -10,7 +10,7 @@ interface This {
     typealias: number;
     typeof: number;
     in(object: Foo);
-    return(): Any;
+    return(): any;
     return(this: This): Number;
     throw(reason: Error);
 }

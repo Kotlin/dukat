@@ -19,7 +19,7 @@ import org.w3c.xhr.*
 
 external interface IMixinStatic {
     fun includeInto(constructor: Any)
-    fun extend(`object`: Any)
+    fun extend(obj: Any)
 }
 
 // ------------------------------------------------------------------------------------------
