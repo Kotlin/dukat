@@ -43,7 +43,7 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/yargs",
                     "axios",
                     "chalk",
-                    "commander",
+                    "commander/typings",
                     "rxjs",
                     "tslib",
                     "vue/types"
