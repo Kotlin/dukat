@@ -242,6 +242,11 @@ message ElementAccessExpressionDeclarationProto {
     ExpressionDeclarationProto argumentExpression = 2;
 }
 
+message NewExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    repeated ExpressionDeclarationProto arguments = 2;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -256,7 +261,8 @@ message ExpressionDeclarationProto {
         LiteralExpressionDeclarationProto literalExpression = 6;
         PropertyAccessExpressionDeclarationProto propertyAccessExpression = 7;
         ElementAccessExpressionDeclarationProto elementAccessExpression = 8;
-        UnknownExpressionDeclarationProto unknownExpression = 9;
+        NewExpressionDeclarationProto newExpression = 9;
+        UnknownExpressionDeclarationProto unknownExpression = 10;
     }
 }
 

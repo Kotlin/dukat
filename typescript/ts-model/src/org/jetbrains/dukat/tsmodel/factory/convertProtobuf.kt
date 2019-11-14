@@ -40,6 +40,7 @@ import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
@@ -448,6 +449,13 @@ fun Declarations.ElementAccessExpressionDeclarationProto.convert() : ElementAcce
     )
 }
 
+fun Declarations.NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
+    return NewExpressionDeclaration(
+            expression = expression.convert(),
+            arguments = argumentsList.map { it.convert() }
+    )
+}
+
 fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
@@ -464,6 +472,7 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
         hasLiteralExpression() -> literalExpression.convert()
         hasPropertyAccessExpression() -> propertyAccessExpression.convert()
         hasElementAccessExpression() -> elementAccessExpression.convert()
+        hasNewExpression() -> newExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

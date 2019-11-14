@@ -41,6 +41,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createElementAccessExpressionDeclarationAsExpression(expression, argumentExpression);
     }
 
+    createNewExpression(expression: Expression, args: Array<Expression>) {
+        return AstExpressionFactory.createNewExpressionDeclarationAsExpression(expression, args);
+    }
+
     createNameExpression(name: NameEntity): Expression {
         return AstExpressionFactory.createNameExpressionDeclarationAsExpression(name)
     }
@@ -122,6 +126,13 @@ export class AstExpressionConverter {
         return this.createElementAccessExpression(
             this.convertExpression(expression.expression),
             this.convertExpression(expression.argumentExpression)
+        )
+    }
+
+    convertNewExpression(expression: ts.NewExpression): Expression {
+        return this.createNewExpression(
+            this.convertExpression(expression.expression),
+            expression.arguments.map(arg => this.convertExpression(arg))
         )
     }
 
@@ -265,6 +276,8 @@ export class AstExpressionConverter {
             return this.convertPropertyAccessExpression(expression)
         } else if (ts.isElementAccessExpression(expression)) {
             return this.convertElementAccessExpression(expression)
+        } else if (ts.isNewExpression(expression)) {
+            return this.convertNewExpression(expression)
         } else if (ts.isIdentifier(expression) || ts.isQualifiedName(expression)) {
             return this.convertNameExpression(expression);
         } else if (ts.isLiteralExpression(expression)) {
