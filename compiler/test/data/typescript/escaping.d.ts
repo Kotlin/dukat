@@ -12,6 +12,7 @@ interface This {
     in(object: Foo);
     return(): Any;
     return(this: This): Number;
+    throw(reason: Error);
 }
 declare class is<interface> {
     as: number;

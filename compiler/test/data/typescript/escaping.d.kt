@@ -33,6 +33,7 @@ external interface This {
     fun `in`(`object`: Foo)
     fun `return`(): Any
     fun `return`(self: This): Number
+    fun `throw`(reason: Error)
 
     companion object {
         var `$foo`: Boolean
