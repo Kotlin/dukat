@@ -10,6 +10,8 @@ interface This {
     typealias: number;
     typeof: number;
     in(object: Foo);
+    return(): Any;
+    return(value: Number): Number;
 }
 declare class is<interface> {
     as: number;

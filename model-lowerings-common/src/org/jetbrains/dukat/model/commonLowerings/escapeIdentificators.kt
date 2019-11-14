@@ -34,6 +34,7 @@ private val RESERVED_WORDS = setOf(
         "is",
         "object",
         "package",
+        "return",
         "typealias",
         "typeof",
         "val",

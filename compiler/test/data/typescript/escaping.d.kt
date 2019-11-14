@@ -31,6 +31,8 @@ external interface This {
     var `typealias`: Number
     var `typeof`: Number
     fun `in`(`object`: Foo)
+    fun `return`(): Any
+    fun `return`(value: Number): Number
 
     companion object {
         var `$foo`: Boolean
