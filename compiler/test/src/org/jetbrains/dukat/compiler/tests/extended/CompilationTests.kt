@@ -52,7 +52,7 @@ abstract class CompilationTests {
             descriptor: String,
             sourcePath: String
     ) {
-
+        println("file:///${sourcePath}")
         val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
         val targetDir = File(targetPath)
 

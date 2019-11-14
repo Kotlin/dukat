@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import java.io.File
 
 class TopNCompilationTests : CompilationTests() {
 
@@ -29,7 +30,6 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/async",
                     "@types/bluebird",
                     "@types/body-parser",
-                    "@types/commander",
                     "@types/express",
                     "@types/fs-extra",
                     "@types/lodash",
@@ -50,7 +50,7 @@ class TopNCompilationTests : CompilationTests() {
             ).map { descriptor ->
                 arrayOf(
                         descriptor,
-                        "$TOPN_DIR/node_modules/$descriptor/index.d.ts"
+                        File("$TOPN_DIR/node_modules/$descriptor/index.d.ts").normalize().absolutePath
                 )
             }.toTypedArray()
 
