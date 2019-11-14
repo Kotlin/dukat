@@ -5,6 +5,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConst
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import javax.lang.model.type.NoType
@@ -39,6 +40,7 @@ class CompositeConstraint(private val constraints: MutableSet<Constraint>) : Con
             resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
             resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
             resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
+            resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
             else -> NoTypeConstraint
         }
     }
