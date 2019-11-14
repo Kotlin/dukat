@@ -29,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 
 fun FunctionDeclaration.addTo(owner: PropertyOwner) {
     if (this.body != null) {
@@ -136,6 +137,15 @@ fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: Path
     }
 }
 
+fun WhileStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
+    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+
+    return when (path.getNextDirection()) {
+        PathWalker.Direction.First -> statement.calculateConstraints(owner, path)
+        PathWalker.Direction.Second -> null
+    }
+}
+
 fun ExpressionStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) {
     expression.calculateConstraints(owner, path)
 }
@@ -152,6 +162,7 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWal
         is ClassDeclaration -> this.addTo(owner, path)
         is VariableDeclaration -> this.addTo(owner, path)
         is IfStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
+        is WhileStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
         is ExpressionStatementDeclaration -> this.calculateConstraints(owner, path)
         is BlockDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
         is ReturnStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
