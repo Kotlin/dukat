@@ -13,3 +13,11 @@ function get3DVector() {
 
     return v2D
 }
+
+var obj = {
+    a: "text"
+}
+
+function modObj() {
+    obj.b = "text"
+}

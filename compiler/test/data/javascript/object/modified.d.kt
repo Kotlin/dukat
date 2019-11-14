@@ -35,3 +35,9 @@ external interface `T$1` {
 }
 
 external fun get3DVector(): `T$1`
+
+external object obj {
+    var a: String
+}
+
+external fun modObj()

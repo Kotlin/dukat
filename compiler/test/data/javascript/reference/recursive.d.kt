@@ -15,6 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun fibonacci(num: Any?): dynamic /* Number | Any? */
-
-external fun fibonacci(num: Number): dynamic /* Number | Any? */
+external fun fibonacci(num: Number): Number

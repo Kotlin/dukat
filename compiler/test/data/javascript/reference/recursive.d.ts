@@ -3,5 +3,6 @@
 function fibonacci(num) {
     if (num <= 1) return 1;
 
-    return fibonacci(num - 1) + fibonacci(num - 2);
+    //Using double minus here, to show that this is a number (for plus this isn't possible)
+    return fibonacci(num - 1) - -fibonacci(num - 2);
 }

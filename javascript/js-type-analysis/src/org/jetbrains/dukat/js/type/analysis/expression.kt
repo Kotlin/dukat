@@ -46,7 +46,7 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path:
             when (path.getNextDirection()) {
                 PathWalker.Direction.First -> {
                     left.calculateConstraints(owner, path)
-                    //right isn't be evaluated
+                    //right isn't being evaluated
                 }
                 PathWalker.Direction.Second -> {
                     left.calculateConstraints(owner, path)
@@ -64,9 +64,14 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path:
             right.calculateConstraints(owner, path)
             NumberTypeConstraint
         }
-        "==", "===", "!=", "!==", ">", "<", ">=", "<=", "in", "instanceof" -> {
+        "==", "===", "!=", "!==", "in", "instanceof" -> {
             left.calculateConstraints(owner, path)
             right.calculateConstraints(owner, path)
+            BooleanTypeConstraint
+        }
+        ">", "<", ">=", "<=" -> {
+            left.calculateConstraints(owner, path) += NumberTypeConstraint
+            right.calculateConstraints(owner, path) += NumberTypeConstraint
             BooleanTypeConstraint
         }
         else -> {
