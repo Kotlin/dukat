@@ -270,6 +270,11 @@ message IfStatementDeclarationProto {
     repeated TopLevelEntityProto elseStatement = 3;
 }
 
+message WhileStatementDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    repeated TopLevelEntityProto statement = 2;
+}
+
 message ReturnStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
@@ -342,8 +347,9 @@ message TopLevelEntityProto {
         ImportEqualsDeclarationProto importEquals = 9;
         ExpressionStatementDeclarationProto expressionStatement = 10;
         ReturnStatementDeclarationProto returnStatement = 11;
-        IfStatementDeclarationProto ifStatement = 12;
-        BlockDeclarationProto blockStatement = 13;
+        BlockDeclarationProto blockStatement = 12;
+        IfStatementDeclarationProto ifStatement = 13;
+        WhileStatementDeclarationProto whileStatement = 14;
     }
 }
 

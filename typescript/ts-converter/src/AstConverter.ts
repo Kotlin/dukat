@@ -767,6 +767,21 @@ export class AstConverter {
         return interfaceDeclaration;
     }
 
+    convertIterationStatement(statement: ts.Node): Declaration | null {
+        let decl: Declaration | null = null;
+
+        let body = this.convertTopLevelStatement(statement.statement);
+
+        if (ts.isWhileStatement(statement)) {
+            decl = this.astFactory.createWhileStatement(
+                this.astExpressionConverter.convertExpression(statement.expression),
+                body
+            )
+        }
+
+        return decl
+    }
+
     convertTopLevelStatement(statement: ts.Node): Array<Declaration> {
         let res: Array<Declaration> = [];
 
@@ -809,6 +824,12 @@ export class AstConverter {
                 this.convertTopLevelStatement(statement.thenStatement),
                 elseStatement
             ))
+        } else if (ts.isIterationStatement(statement)) {
+            let iterationStatement = this.convertIterationStatement(statement);
+
+            if (iterationStatement) {
+                res.push(iterationStatement)
+            }
         } else if (ts.isBlock(statement)) {
             let block = this.convertBlockStatement(statement);
             if (block) {

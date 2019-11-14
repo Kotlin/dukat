@@ -36,6 +36,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
@@ -210,6 +211,13 @@ fun Declarations.IfStatementDeclarationProto.convert(): IfStatementDeclaration {
     )
 }
 
+fun Declarations.WhileStatementDeclarationProto.convert(): WhileStatementDeclaration {
+    return WhileStatementDeclaration(
+            condition = condition.convert(),
+            statement = statementList.convert() ?: BlockDeclaration(emptyList())
+    )
+}
+
 fun Declarations.ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaration {
     return ExpressionStatementDeclaration(expression.convert())
 }
@@ -234,6 +242,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
         hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
         hasIfStatement() -> ifStatement.convert()
+        hasWhileStatement() -> whileStatement.convert()
         hasExpressionStatement() -> expressionStatement.convert()
         hasReturnStatement() -> returnStatement.convert()
         hasBlockStatement() -> blockStatement.convert()
