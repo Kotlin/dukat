@@ -10,6 +10,7 @@ interface This {
     typealias: number;
     typeof: number;
     in(object: Foo);
+    is(value: any): Boolean;
     return(): any;
     return(this: This): Number;
     throw(reason: Error);

@@ -31,6 +31,7 @@ external interface This {
     var `typealias`: Number
     var `typeof`: Number
     fun `in`(obj: Foo)
+    fun `is`(value: Any): Boolean
     fun `return`(): Any
     fun `return`(self: This): Number
     fun `throw`(reason: Error)

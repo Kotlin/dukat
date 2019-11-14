@@ -31,6 +31,7 @@ private val RESERVED_WORDS = setOf(
         "fun",
         "in",
         "interface",
+        "in",
         "is",
         "object",
         "package",
