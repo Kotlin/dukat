@@ -14,6 +14,7 @@ interface This {
     return(): any;
     return(this: This): Number;
     throw(reason: Error);
+    try(fn: () => any);
 }
 declare class is<interface> {
     as: number;
