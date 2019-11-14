@@ -19,6 +19,13 @@ interface This {
 declare class is<interface> {
     as: number;
     package(a): boolean;
+
+    static in(object: Foo);
+    static is(value: any): Boolean;
+    static return(): any;
+    static return(this: This): Number;
+    static throw(reason: Error);
+    static try(fn: () => any);
 }
 
 declare module "This" {
