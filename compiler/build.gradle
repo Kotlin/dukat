@@ -26,6 +26,10 @@ compileTestKotlin {
 
 def DEF_TYPE_CHANGESET = '31929c09c7b4490f87766206b412da4a6a581dc3'
 def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/DefinitelyTyped-${DEF_TYPE_CHANGESET}/types"
+
+def TOPN_DIR = "${project.projectDir}/test/data/topN"
+def TOPN_TARGET_DIR = "${project.buildDir}/tests/topN"
+
 def DEFAULT_LIB_PATH = "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib/lib.es6.d.ts"
 
 
@@ -33,6 +37,8 @@ node {
     workDir = gradle.nodeWorkingDir
     // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
     version = gradle.nodeVersion
+
+    nodeModulesDir = file(TOPN_TARGET_DIR)
 
     download = true
 }
@@ -179,6 +185,20 @@ task extractKoltinJsLibs(type: Copy) {
 
 generateBinary.dependsOn = [":ts-converter:webpack"]
 
+task prepareTopNPackage(type: Copy) {
+    from "${TOPN_DIR}/package.template.json"
+    into TOPN_TARGET_DIR
+    rename { String fileName -> fileName.replace(".template", "") }
+
+    from "${TOPN_DIR}/yarn.lock"
+    into TOPN_TARGET_DIR
+}
+
+task installTopN(type: YarnTask) {
+    dependsOn = [prepareTopNPackage]
+    args = ["install"]
+}
+
 
 //TODO: having download and downloadDist is a shame
 test.dependsOn = [
@@ -212,6 +232,7 @@ test {
     }
 
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
+    systemProperty("dukat.test.resources.topN", TOPN_TARGET_DIR)
 
     /*
         execute top-level classes in sequentially but their methods in parallel

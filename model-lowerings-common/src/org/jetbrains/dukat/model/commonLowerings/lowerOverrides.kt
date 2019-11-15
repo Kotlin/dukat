@@ -197,29 +197,25 @@ private class OverrideResolver(val context: ModelContext) {
         }
     }
 
+    private fun ClassLikeModel.lowerOverrides(): ClassLikeModel {
+        val allParentMethods = allParentMethods()
+        val allParentProperties = allParentProperties()
+
+        val membersLowered = members.map {  member ->
+            member.lowerOverrides(allParentMethods, allParentProperties)
+        }
+
+        return when (this) {
+            is InterfaceModel -> copy(members = membersLowered)
+            is ClassModel -> copy(members = membersLowered)
+            else -> this
+        }
+    }
+
     fun lowerOverrides(moduleModel: ModuleModel): ModuleModel {
         val loweredDeclarations = moduleModel.declarations.map { declaration ->
             when (declaration) {
-                is InterfaceModel -> {
-                    val allParentMethods = declaration.allParentMethods()
-                    val allParentProperties = declaration.allParentProperties()
-
-                    declaration.copy(
-                            members = declaration.members.map { member ->
-                                member.lowerOverrides(allParentMethods, allParentProperties)
-                            }
-                    )
-                }
-                is ClassModel -> {
-                    val allParentMethods = declaration.allParentMethods()
-                    val allParentProperties = declaration.allParentProperties()
-
-                    declaration.copy(
-                            members = declaration.members.map { member ->
-                                member.lowerOverrides(allParentMethods, allParentProperties)
-                            }
-                    )
-                }
+                is ClassLikeModel -> declaration.lowerOverrides()
                 else -> {
                     declaration
                 }

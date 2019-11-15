@@ -12,4 +12,4 @@ data class ClassNode(
 
         override val uid: String,
         var exportQualifier: ExportQualifier?
-) : ClassLikeNode, UniqueNode
+) : ClassLikeNode

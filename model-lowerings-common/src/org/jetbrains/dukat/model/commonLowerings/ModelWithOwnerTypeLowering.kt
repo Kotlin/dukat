@@ -128,7 +128,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
-                }
+                },
+                companionObject = declaration.companionObject?.let { lowerObjectModel(ownerContext.wrap(it)) }
         )
     }
 }
