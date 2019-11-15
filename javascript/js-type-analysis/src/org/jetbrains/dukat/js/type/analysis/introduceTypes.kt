@@ -101,7 +101,17 @@ fun MemberDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
 
 fun MemberDeclaration.addToClass(owner: ClassConstraint, path: PathWalker) {
     when (this) {
-        is FunctionDeclaration -> if (this.modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)) { this.addTo(owner) } else { this.addTo(owner.prototype) }
+        is FunctionDeclaration -> if (this.modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)) {
+            this.addTo(owner)
+        } else {
+            val ownerPrototype = owner["prototype"]
+
+            if (ownerPrototype is PropertyOwner) {
+                this.addTo(ownerPrototype)
+            } else {
+                raiseConcern("Class prototype corrupt! Cannot add members.") {  }
+            }
+        }
         is PropertyDeclaration -> this.addTo(owner, path)
         else -> raiseConcern("Unexpected member entity type <${this::class}>") { this }
     }

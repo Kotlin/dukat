@@ -9,6 +9,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeCons
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallArgumentConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallResultConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
@@ -16,6 +17,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
@@ -125,6 +127,17 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
     )
 }
 
+fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
+    val classConstraints = expression.calculateConstraints(owner, path)
+
+    //TODO add constraints for constructor call
+    arguments.map { it.calculateConstraints(owner, path) }
+
+    return ObjectConstraint(
+            instantiatedClass = classConstraints as ClassConstraint
+    )
+}
+
 fun ObjectLiteralExpressionDeclaration.calculateConstraints(path: PathWalker) : ObjectConstraint {
     val obj = ObjectConstraint()
     members.forEach { it.addTo(obj, path) }
@@ -150,6 +163,7 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
         is CallExpressionDeclaration -> this.calculateConstraints(owner, path)
+        is NewExpressionDeclaration -> this.calculateConstraints(owner, path)
         is LiteralExpressionDeclaration -> this.calculateConstraints(path)
         else -> CompositeConstraint(NoTypeConstraint)
     }

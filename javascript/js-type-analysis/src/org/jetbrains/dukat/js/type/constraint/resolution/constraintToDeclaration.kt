@@ -12,6 +12,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstra
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.type.anyNullableType
 import org.jetbrains.dukat.js.type.type.booleanType
 import org.jetbrains.dukat.js.type.type.numberType
@@ -87,15 +88,26 @@ fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : Me
 fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     val members = mutableListOf<MemberDeclaration>()
 
-    members.addAll(
-            prototype.propertyNames.mapNotNull { memberName ->
-                prototype[memberName]?.toMemberDeclaration(name = memberName, isStatic = false)
-            }
-    )
+    val prototype = this["prototype"]
+
+    if (prototype is ObjectConstraint) {
+        members.addAll(
+                prototype.propertyNames.mapNotNull { memberName ->
+                    prototype[memberName]?.toMemberDeclaration(name = memberName, isStatic = false)
+                }
+        )
+    } else {
+        raiseConcern("Class prototype is no object. Conversion might be erroneous!") {  }
+    }
 
     members.addAll(
             propertyNames.mapNotNull { memberName ->
-                this[memberName]?.toMemberDeclaration(name = memberName, isStatic = true)
+                //Don't output the prototype object
+                if (memberName != "prototype") {
+                    this[memberName]?.toMemberDeclaration(name = memberName, isStatic = true)
+                } else {
+                    null
+                }
             }
     )
 
@@ -122,11 +134,28 @@ fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
     )
 }
 
+fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
+    val members = mutableListOf<MemberDeclaration>()
+
+    members.addAll(
+            propertyNames.mapNotNull { memberName ->
+                this[memberName]?.toMemberDeclaration(name = memberName)
+            }
+    )
+
+    if (instantiatedClass is PropertyOwner) {
+        val classPrototype = instantiatedClass["prototype"]
+
+        if (classPrototype is ObjectConstraint)
+            members.addAll(classPrototype.mapMembers())
+    }
+
+    return members
+}
+
 fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
-            members = propertyNames.mapNotNull { memberName ->
-                this[memberName]?.toMemberDeclaration(name = memberName)
-            },
+            members = mapMembers(),
             nullable = true
     )
 }
