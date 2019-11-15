@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ts.translator
 
-import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
+import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
@@ -30,7 +30,7 @@ class JsRuntimeFileTranslator(
     }
 
     private fun translateFile(fileName: String): SourceBundleDeclaration {
-        val proto = Declarations.SourceSetBundleProto.parseFrom(translateAsInputStream(fileName))
+        val proto = SourceBundleDeclarationProto.parseFrom(translateAsInputStream(fileName))
         logger.debug("${proto}")
         return proto.convert()
     }

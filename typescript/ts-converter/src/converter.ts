@@ -74,7 +74,7 @@ export function translate(stdlib: string, packageName: string, files: Array<stri
     let libDeclarations = new Map<string, Array<Declaration>>();
     let sourceSets = files.map(fileName => createSourceSet(fileName, stdlib, packageName, libDeclarations));
 
-    let sourceSetBundle = new declarations.SourceSetBundleProto();
+    let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
     let astFactory = createAstFactory();
     let libRootUid = "<LIBROOT>";

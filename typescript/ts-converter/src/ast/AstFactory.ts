@@ -58,7 +58,7 @@ export class AstFactory implements AstFactory {
     callSignature.setType(type);
     callSignature.setTypeparametersList(typeParams);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setCallsignature(callSignature);
     return memberProto;
   }
@@ -72,9 +72,9 @@ export class AstFactory implements AstFactory {
     classDeclaration.setTypeparametersList(typeParams);
     classDeclaration.setParententitiesList(parentEntities);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setClassdeclaration(classDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setClassdeclaration(classDeclaration);
+    return topLevelDeclaration;
   }
 
   createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration {
@@ -84,7 +84,7 @@ export class AstFactory implements AstFactory {
     constuctorDeclaration.setTypeparametersList(typeParams);
     constuctorDeclaration.setModifiersList(modifiers);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setConstructordeclaration(constuctorDeclaration);
     return memberProto;
   }
@@ -96,17 +96,17 @@ export class AstFactory implements AstFactory {
   }
 
   createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>): EnumDeclaration {
-    let enumDeclaration = new declarations.EnumDeclaration();
+    let enumDeclaration = new declarations.EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setEnumdeclaration(enumDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setEnumdeclaration(enumDeclaration);
+    return topLevelDeclaration;
   }
 
   createEnumTokenDeclaration(value: string, meta: string): EnumTokenDeclaration {
-    let enumToken = new declarations.EnumTokenDeclaration();
+    let enumToken = new declarations.EnumTokenDeclarationProto();
     enumToken.setValue(value);
     enumToken.setMeta(meta);
     return enumToken;
@@ -117,18 +117,18 @@ export class AstFactory implements AstFactory {
     exportAssignment.setName(name);
     exportAssignment.setIsexportequals(isExportEquals);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setExportassignment(exportAssignment);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setExportassignment(exportAssignment);
+    return topLevelDeclaration;
   }
 
   createExpressionStatement(expression: Expression): ExpressionStatement {
     let expressionStatement = new declarations.ExpressionStatementDeclarationProto();
     expressionStatement.setExpression(expression);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setExpressionstatement(expressionStatement);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setExpressionstatement(expressionStatement);
+    return topLevelDeclaration;
   }
 
   createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): IfStatement {
@@ -139,9 +139,9 @@ export class AstFactory implements AstFactory {
       ifStatement.setElsestatementList(elseStatement);
     }
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setIfstatement(ifStatement);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setIfstatement(ifStatement);
+    return topLevelDeclaration;
   }
 
   createWhileStatement(condition: Expression, statement: Array<Declaration>): IfStatement {
@@ -149,9 +149,9 @@ export class AstFactory implements AstFactory {
     whileStatement.setCondition(condition);
     whileStatement.setStatementList(statement);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setWhilestatement(whileStatement);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setWhilestatement(whileStatement);
+    return topLevelDeclaration;
   }
 
   createReturnStatement(expression: Expression | null): ReturnStatement {
@@ -160,9 +160,9 @@ export class AstFactory implements AstFactory {
       returnStatement.setExpression(expression);
     }
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setReturnstatement(returnStatement);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setReturnstatement(returnStatement);
+    return topLevelDeclaration;
   }
 
   createBlockDeclaration(statements: Array<Declaration>): Block {
@@ -174,9 +174,9 @@ export class AstFactory implements AstFactory {
   createBlockStatementDeclaration(statements: Array<Declaration>): Block {
     let block = this.createBlockDeclaration(statements);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setBlockstatement(block);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setBlockstatement(block);
+    return topLevelDeclaration;
   }
 
   private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): ProtoMessage {
@@ -196,7 +196,7 @@ export class AstFactory implements AstFactory {
   createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setFunctiondeclaration(functionDeclaration);
     return memberProto;
   }
@@ -204,9 +204,9 @@ export class AstFactory implements AstFactory {
   createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setFunctiondeclaration(functionDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setFunctiondeclaration(functionDeclaration);
+    return topLevelDeclaration;
   }
 
   createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration {
@@ -234,15 +234,15 @@ export class AstFactory implements AstFactory {
   }
 
   createIdentifierDeclarationAsNameEntity(value: string): IdentifierEntity {
-    let identifierProto = new declarations.IdentifierEntityProto();
+    let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
-    let nameEntity = new declarations.NameEntityProto();
-    nameEntity.setIdentifier(identifierProto);
-    return nameEntity;
+    let nameDeclaration = new declarations.NameDeclarationProto();
+    nameDeclaration.setIdentifier(identifierProto);
+    return nameDeclaration;
   }
 
   createIdentifierDeclaration(value: string): IdentifierEntity {
-    let identifierProto = new declarations.IdentifierEntityProto();
+    let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
     return identifierProto;
   }
@@ -253,9 +253,9 @@ export class AstFactory implements AstFactory {
     importEqualsDeclaration.setModulereference(moduleReference);
     importEqualsDeclaration.setUid(uid);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setImportequals(importEqualsDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setImportequals(importEqualsDeclaration);
+    return topLevelDeclaration;
   }
 
   createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration {
@@ -263,9 +263,9 @@ export class AstFactory implements AstFactory {
     indexSignatureDeclaration.setIndextypesList(indexTypes);
     indexSignatureDeclaration.setReturntype(returnType);
 
-    let memberEntity = new declarations.MemberEntityProto();
-    memberEntity.setIndexsignature(indexSignatureDeclaration);
-    return memberEntity;
+    let memberDeclaration = new declarations.MemberDeclarationProto();
+    memberDeclaration.setIndexsignature(indexSignatureDeclaration);
+    return memberDeclaration;
   }
 
   createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration {
@@ -277,9 +277,9 @@ export class AstFactory implements AstFactory {
     interfaceDeclaration.setTypeparametersList(typeParams);
     interfaceDeclaration.setParententitiesList(parentEntities);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setInterfacedeclaration(interfaceDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setInterfacedeclaration(interfaceDeclaration);
+    return topLevelDeclaration;
   }
 
   createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration {
@@ -298,7 +298,7 @@ export class AstFactory implements AstFactory {
     methodDeclaration.setType(type);
     methodDeclaration.setTypeparamsList(typeParams);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setFunctionDeclarataion(memberProto);
     return memberProto;
   }
@@ -312,7 +312,7 @@ export class AstFactory implements AstFactory {
     methodSignature.setOptional(optional);
     methodSignature.setModifiersList(modifiers);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setMethodsignature(methodSignature);
     return memberProto;
   }
@@ -338,9 +338,9 @@ export class AstFactory implements AstFactory {
   createModuleDeclarationAsTopLevel(packageName: NameEntity, toplevels: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
     let module = this.createModuleDeclaration(packageName, toplevels, modifiers, definitionsInfo, uid, resourceName, root);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setModuledeclaration(module);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setModuledeclaration(module);
+    return topLevelDeclaration;
   }
 
   createObjectLiteral(members: Array<MemberDeclaration>): ObjectLiteral {
@@ -365,17 +365,17 @@ export class AstFactory implements AstFactory {
   }
 
   createQualifiedNameDeclaration(left: NameEntity, right: IdentifierEntity): QualifierEntity {
-    let qualifier = new declarations.QualifierEntityProto();
+    let qualifier = new declarations.QualifierDeclarationProto();
     qualifier.setLeft(left);
     qualifier.setRight(right);
     
-    let nameEntity = new declarations.NameEntityProto();
-    nameEntity.setQualifier(qualifier);
-    return nameEntity;
+    let nameDeclaration = new declarations.NameDeclarationProto();
+    nameDeclaration.setQualifier(qualifier);
+    return nameDeclaration;
   }
 
   createReferenceEntity<T extends Declaration>(uid: string): ReferenceEntity {
-    let reference = new declarations.ReferenceEntityProto();
+    let reference = new declarations.ReferenceDeclarationProto();
     reference.setUid(uid);
     return reference;
   }
@@ -426,9 +426,9 @@ export class AstFactory implements AstFactory {
     typeAlias.setTypereference(typeReference);
     typeAlias.setUid(uid);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setAliasdeclaration(typeAlias);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setAliasdeclaration(typeAlias);
+    return topLevelDeclaration;
   }
 
   createTypeReferenceDeclaration(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null = null): TypeDeclaration {
@@ -489,7 +489,7 @@ export class AstFactory implements AstFactory {
     propertyDeclaration.setOptional(optional);
     propertyDeclaration.setModifiersList(modifiers);
 
-    let memberProto = new declarations.MemberEntityProto();
+    let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setProperty(propertyDeclaration);
     return memberProto;
   }
@@ -504,9 +504,9 @@ export class AstFactory implements AstFactory {
     }
     variableDeclaration.setUid(uid);
 
-    let topLevelEntity = new declarations.TopLevelEntityProto();
-    topLevelEntity.setVariabledeclaration(variableDeclaration);
-    return topLevelEntity;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setVariabledeclaration(variableDeclaration);
+    return topLevelDeclaration;
   }
 
 }

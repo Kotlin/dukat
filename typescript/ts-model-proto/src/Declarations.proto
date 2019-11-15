@@ -1,43 +1,32 @@
 syntax = "proto3";
-package dukat.ast.proto;
+package org.jetbrains.dukat.tsmodelproto;
 
-option java_outer_classname = "Declarations";
+option java_multiple_files = true;
+
+message NameDeclarationProto {
+    oneof type {
+        IdentifierDeclarationProto identifier = 1;
+        QualifierDeclarationProto qualifier = 2;
+    }
+}
+
+message IdentifierDeclarationProto {
+    string value = 1;
+}
+
+message QualifierDeclarationProto {
+    NameDeclarationProto left = 1;
+    IdentifierDeclarationProto right = 3;
+}
 
 message DefinitionInfoDeclarationProto {
     string fileName = 1;
-}
-
-message EnumTokenDeclaration {
-    string value = 1;
-    string meta = 2;
-}
-
-message EnumDeclaration {
-    string name = 1;
-    repeated EnumTokenDeclaration values = 2;
 }
 
 message ExportAssignmentDeclarationProto {
     string name = 1;
     bool isExportEquals = 2;
 }
-
-message NameEntityProto {
-    oneof type {
-        IdentifierEntityProto identifier = 1;
-        QualifierEntityProto qualifier = 2;
-    }
-}
-
-message IdentifierEntityProto {
-    string value = 1;
-}
-
-message QualifierEntityProto {
-    NameEntityProto left = 1;
-    IdentifierEntityProto right = 3;
-}
-
 
 message ParameterValueDeclarationProto {
     oneof type {
@@ -62,7 +51,7 @@ message ThisTypeDeclarationProto {
 
 message ImportEqualsDeclarationProto {
     string name = 1;
-    NameEntityProto moduleReference = 2;
+    NameDeclarationProto moduleReference = 2;
     string uid = 3;
 }
 
@@ -72,7 +61,7 @@ message FunctionTypeDeclarationProto {
 }
 
 message TypeParameterDeclarationProto {
-    NameEntityProto name = 1;
+    NameDeclarationProto name = 1;
     repeated ParameterValueDeclarationProto constraints = 2;
     ParameterValueDeclarationProto defaultValue = 3;
 }
@@ -90,13 +79,13 @@ message UnionTypeDeclarationProto {
 }
 
 message TypeReferenceDeclarationProto {
-    NameEntityProto value = 1;
+    NameDeclarationProto value = 1;
     repeated ParameterValueDeclarationProto params = 2;
-    ReferenceEntityProto typeReference = 3;
+    ReferenceDeclarationProto typeReference = 3;
 }
 
 message TypeParamReferenceDeclarationProto {
-    NameEntityProto value = 1;
+    NameDeclarationProto value = 1;
 }
 
 message CallSignatureDeclarationProto {
@@ -112,7 +101,7 @@ message ConstructorDeclarationProto {
 }
 
 message BlockDeclarationProto {
-    repeated TopLevelEntityProto statements = 1;
+    repeated TopLevelDeclarationProto statements = 1;
 }
 
 message FunctionDeclarationProto {
@@ -153,10 +142,10 @@ message ModifierDeclarationProto {
 }
 
 message ObjectLiteralDeclarationProto {
-    repeated MemberEntityProto members = 1;
+    repeated MemberDeclarationProto members = 1;
 }
 
-message MemberEntityProto {
+message MemberDeclarationProto {
     oneof type {
         CallSignatureDeclarationProto callSignature = 1;
         ConstructorDeclarationProto constructorDeclaration = 2;
@@ -168,7 +157,7 @@ message MemberEntityProto {
     }
 }
 
-message ReferenceEntityProto {
+message ReferenceDeclarationProto {
     string uid = 1;
 }
 
@@ -189,7 +178,7 @@ message BigIntLiteralExpressionDeclarationProto {
 }
 
 message ObjectLiteralExpressionDeclarationProto {
-    repeated MemberEntityProto members = 1;
+    repeated MemberDeclarationProto members = 1;
 }
 
 message RegExLiteralExpressionDeclarationProto {
@@ -208,7 +197,7 @@ message LiteralExpressionDeclarationProto {
 }
 
 message NameExpressionDeclarationProto {
-    NameEntityProto name = 1;
+    NameDeclarationProto name = 1;
 }
 
 message BinaryExpressionDeclarationProto {
@@ -234,7 +223,7 @@ message CallExpressionDeclarationProto {
 
 message PropertyAccessExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
-    IdentifierEntityProto name = 2;
+    IdentifierDeclarationProto name = 2;
 }
 
 message ElementAccessExpressionDeclarationProto {
@@ -272,13 +261,13 @@ message ExpressionStatementDeclarationProto {
 
 message IfStatementDeclarationProto {
     ExpressionDeclarationProto condition = 1;
-    repeated TopLevelEntityProto thenStatement = 2;
-    repeated TopLevelEntityProto elseStatement = 3;
+    repeated TopLevelDeclarationProto thenStatement = 2;
+    repeated TopLevelDeclarationProto elseStatement = 3;
 }
 
 message WhileStatementDeclarationProto {
     ExpressionDeclarationProto condition = 1;
-    repeated TopLevelEntityProto statement = 2;
+    repeated TopLevelDeclarationProto statement = 2;
 }
 
 message ReturnStatementDeclarationProto {
@@ -302,52 +291,55 @@ message VariableDeclarationProto {
 }
 
 message TypeAliasDeclarationProto {
-    NameEntityProto aliasName = 1;
-    repeated IdentifierEntityProto typeParameters = 2;
+    NameDeclarationProto aliasName = 1;
+    repeated IdentifierDeclarationProto typeParameters = 2;
     ParameterValueDeclarationProto typeReference = 3;
     string uid = 4;
 }
 
 message HeritageClauseDeclarationProto {
-    NameEntityProto name = 1;
+    NameDeclarationProto name = 1;
     repeated ParameterValueDeclarationProto typeArguments = 2;
     bool extending = 3;
-    ReferenceEntityProto typeReference = 4;
+    ReferenceDeclarationProto typeReference = 4;
 }
 
-message SourceFileDeclarationProto {
-    string fileName = 1;
-    ModuleDeclarationProto root = 2;
-    repeated IdentifierEntityProto referencedFiles = 3;
+message EnumTokenDeclarationProto {
+    string value = 1;
+    string meta = 2;
 }
 
-message SourceSetDeclarationProto {
-    string sourceName = 1;
-    repeated SourceFileDeclarationProto sources = 2;
+message EnumDeclarationProto {
+    string name = 1;
+    repeated EnumTokenDeclarationProto values = 2;
 }
 
-message SourceSetBundleProto {
-    repeated SourceSetDeclarationProto sources = 1;
+message ClassDeclarationProto {
+    NameDeclarationProto name = 1;
+    repeated MemberDeclarationProto members = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+    repeated HeritageClauseDeclarationProto parentEntities = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+    string uid = 6;
 }
 
-message ModuleDeclarationProto {
-    NameEntityProto packageName = 1;
-    repeated TopLevelEntityProto declarations = 2;
-    repeated ModifierDeclarationProto modifiers = 3;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 4;
-    string uid = 5;
-    string resourceName = 6;
-    bool root = 7;
+message InterfaceDeclarationProto {
+    NameDeclarationProto name = 1;
+    repeated MemberDeclarationProto members = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+    repeated HeritageClauseDeclarationProto parentEntities = 4;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
+    string uid = 6;
 }
 
-message TopLevelEntityProto {
+message TopLevelDeclarationProto {
     oneof type {
         ClassDeclarationProto classDeclaration = 1;
         InterfaceDeclarationProto interfaceDeclaration = 2;
         VariableDeclarationProto variableDeclaration = 3;
         FunctionDeclarationProto functionDeclaration = 4;
         TypeAliasDeclarationProto aliasDeclaration = 5;
-        EnumDeclaration enumDeclaration = 6;
+        EnumDeclarationProto enumDeclaration = 6;
         ModuleDeclarationProto moduleDeclaration = 7;
         ExportAssignmentDeclarationProto exportAssignment = 8;
         ImportEqualsDeclarationProto importEquals = 9;
@@ -359,21 +351,27 @@ message TopLevelEntityProto {
     }
 }
 
-message ClassDeclarationProto {
-    NameEntityProto name = 1;
-    repeated MemberEntityProto members = 2;
-    repeated TypeParameterDeclarationProto typeParameters = 3;
-    repeated HeritageClauseDeclarationProto parentEntities = 4;
-    repeated ModifierDeclarationProto modifiers = 5;
-    string uid = 6;
+message ModuleDeclarationProto {
+    NameDeclarationProto packageName = 1;
+    repeated TopLevelDeclarationProto declarations = 2;
+    repeated ModifierDeclarationProto modifiers = 3;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 4;
+    string uid = 5;
+    string resourceName = 6;
+    bool root = 7;
 }
 
+message SourceFileDeclarationProto {
+    string fileName = 1;
+    ModuleDeclarationProto root = 2;
+    repeated IdentifierDeclarationProto referencedFiles = 3;
+}
 
-message InterfaceDeclarationProto {
-    NameEntityProto name = 1;
-    repeated MemberEntityProto members = 2;
-    repeated TypeParameterDeclarationProto typeParameters = 3;
-    repeated HeritageClauseDeclarationProto parentEntities = 4;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
-    string uid = 6;
+message SourceSetDeclarationProto {
+    string sourceName = 1;
+    repeated SourceFileDeclarationProto sources = 2;
+}
+
+message SourceBundleDeclarationProto {
+    repeated SourceSetDeclarationProto sources = 1;
 }
