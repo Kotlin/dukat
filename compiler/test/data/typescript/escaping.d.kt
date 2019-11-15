@@ -25,6 +25,7 @@ external fun `fun`()
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
+    var this_one_shouldnt_be_escaped: Boolean
     var `string-literal`: Boolean
     var `another-string-literal`: String
     var `when`: String

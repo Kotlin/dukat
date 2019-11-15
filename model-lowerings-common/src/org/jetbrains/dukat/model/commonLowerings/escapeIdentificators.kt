@@ -3,6 +3,7 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -46,17 +47,18 @@ private val RESERVED_WORDS = setOf(
 )
 
 private val RENAME_PARAM_MAP = mapOf(
-    Pair("this", "self"),
-    Pair("object", "obj")
+        Pair("this", "self"),
+        Pair("object", "obj")
 )
 
 private fun String.shouldEscape(): Boolean {
     val isReservedWord = RESERVED_WORDS.contains(this)
     val containsDollarSign = this.contains("$")
+    val containsMinusSign = this.contains("-")
     val containsOnlyUnderscores = CONTAINS_ONLY_UNDERSCORES.matches(this)
     val isEscapedAlready = this.startsWith("`")
 
-    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores)
+    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign)
 }
 
 private fun String.escape(): String {

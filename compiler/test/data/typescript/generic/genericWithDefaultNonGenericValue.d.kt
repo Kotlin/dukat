@@ -24,7 +24,7 @@ typealias EventHandler<TCurrentTarget, TData> = EventHandlerBase<TCurrentTarget,
 external var yargs: yargs.Argv<Any>
 
 external interface `T$0` {
-    var `x`: String
+    var x: String
 }
 
 external var yarrrrgs: yargs.Arrrrgv<`T$0`>

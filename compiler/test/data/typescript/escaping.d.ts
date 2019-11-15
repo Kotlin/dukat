@@ -4,6 +4,7 @@ declare var $foo: boolean;
 declare function bar$(ba$z: number);
 declare function fun();
 interface This {
+    "this_one_shouldnt_be_escaped": boolean,
     "string-literal": boolean,
     'another-string-literal': string,
     when: string;

@@ -115,7 +115,8 @@ export class AstConverter {
         if (ts.isNumericLiteral(name)) {
             return "`" + name.getText() + "`";
         } else if (ts.isStringLiteral(name)) {
-            return "`" + name.getText().replace(/^["']/, "").replace(/["']$/, "") + "`";
+            let text = name.getText();
+            return text.substring(1, text.length - 1);
         } else if (ts.isIdentifier(name)) {
             return name.getText();
         }
