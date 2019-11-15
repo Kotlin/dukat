@@ -3,6 +3,7 @@ package org.jetbrains.dukat.ts.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
+import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdEntities
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -106,6 +107,9 @@ open class TypescriptLowerer(
         }
 
         val loweredSources = sources.map { source -> lower(source, stdLib) }
+
+        stdLib?.filterOutKotlinStdEntities()
+
         return SourceBundleModel(loweredSources)
     }
 }

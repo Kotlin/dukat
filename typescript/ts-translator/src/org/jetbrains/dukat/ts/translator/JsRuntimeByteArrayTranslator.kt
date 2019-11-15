@@ -21,7 +21,7 @@ class JsRuntimeByteArrayTranslator(
         return lowerer.lower(sourceSet, stdLibSourceSet)
     }
 
-    private fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
         return lowerer.lower(sourceBundle)
     }
 

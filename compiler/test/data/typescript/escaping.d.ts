@@ -10,10 +10,22 @@ interface This {
     typealias: number;
     typeof: number;
     in(object: Foo);
+    is(value: any): Boolean;
+    return(): any;
+    return(this: This): Number;
+    throw(reason: Error);
+    try(fn: () => any);
 }
 declare class is<interface> {
     as: number;
     package(a): boolean;
+
+    static in(object: Foo);
+    static is(value: any): Boolean;
+    static return(): any;
+    static return(this: This): Number;
+    static throw(reason: Error);
+    static try(fn: () => any);
 }
 
 declare module "This" {

@@ -1,6 +1,6 @@
-@file:JsQualifier("Mixto")
+@file:JsModule("child_process")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package Mixto
+package child_process
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -17,14 +17,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface IMixinStatic {
-    fun includeInto(constructor: Any)
-    fun extend(obj: Any)
-}
+external interface PromiseWithChild<T> : Promise<T>
 
 // ------------------------------------------------------------------------------------------
+@file:JsQualifier("child_process.exec")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package mixto
+package child_process.exec
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -41,5 +39,9 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@JsModule("mixto")
-external val mixto: Mixto.IMixinStatic
+external interface `T$0` {
+    var stdout: String
+    var stderr: String
+}
+
+external fun __promisify__(command: String): child_process.PromiseWithChild<`T$0`>

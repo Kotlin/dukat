@@ -30,7 +30,12 @@ external interface This {
     var `when`: String
     var `typealias`: Number
     var `typeof`: Number
-    fun `in`(`object`: Foo)
+    fun `in`(obj: Foo)
+    fun `is`(value: Any): Boolean
+    fun `return`(): Any
+    fun `return`(self: This): Number
+    fun `throw`(reason: Error)
+    fun `try`(fn: () -> Any)
 
     companion object {
         var `$foo`: Boolean
@@ -43,6 +48,15 @@ external interface This {
 external open class `is`<`interface`> {
     open var `as`: Number
     open fun `package`(a: Any): Boolean
+
+    companion object {
+        fun `in`(obj: Foo)
+        fun `is`(value: Any): Boolean
+        fun `return`(): Any
+        fun `return`(self: This): Number
+        fun `throw`(reason: Error)
+        fun `try`(fn: () -> Any)
+    }
 }
 
 external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>

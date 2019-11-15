@@ -58,12 +58,11 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
-                            return TypeValueModel(qualifiedNode, emptyList(), null)
+                            return TypeValueModel(qualifiedNode, declaration.params, null)
                         }
                     }
                 }
             } else if (declarationValue is QualifierEntity) {
-
                 // TODO: Double check deeply nested qualifiedNames
                 val qualifiedPath = qualifiedName.appendLeft(declarationValue).shiftRight()
 
@@ -76,7 +75,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                             val supposedModule = variableModel.name.appendRight(qualifiedName)
 
                             declarationResolver.resolveStrict(pathShifted, supposedModule.process(::unescape))?.let {
-                                return TypeValueModel(supposedModule.appendRight(pathShifted), emptyList(), null)
+                                return TypeValueModel(supposedModule.appendRight(pathShifted), declaration.params, null)
                             }
                         }
                     }
