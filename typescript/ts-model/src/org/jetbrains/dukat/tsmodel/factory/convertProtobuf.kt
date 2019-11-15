@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsmodel.factory
 
-import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -65,8 +64,60 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.BlockDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.BooleanLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.CallExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.CallSignatureDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.DefinitionInfoDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ElementAccessExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.EnumDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ExportAssignmentDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ExpressionStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.FunctionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.HeritageClauseDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.IdentifierDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.IfStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ImportEqualsDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.IndexSignatureDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.InterfaceDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.LiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.MemberDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.MethodSignatureDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ModifierDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ModuleDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NameDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NameExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NewExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NumericLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ObjectLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ParameterDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ParameterValueDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.PropertyAccessExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.PropertyDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ReferenceDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.RegExLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TypeAliasDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TypeOfExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TypeParameterDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TypeReferenceDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.VariableDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.WhileStatementDeclarationProto
 
-fun Declarations.NameEntityProto.convert(): NameEntity {
+fun NameDeclarationProto.convert(): NameEntity {
     return when {
         hasIdentifier() -> identifier.convert()
         hasQualifier() -> qualifier.convert()
@@ -74,11 +125,11 @@ fun Declarations.NameEntityProto.convert(): NameEntity {
     }
 }
 
-fun Declarations.IdentifierEntityProto.convert(): IdentifierEntity {
+fun IdentifierDeclarationProto.convert(): IdentifierEntity {
     return IdentifierEntity(value)
 }
 
-fun Declarations.QualifierEntityProto.convert(): QualifierEntity {
+fun QualifierDeclarationProto.convert(): QualifierEntity {
     val rightProto = right
     left.hasIdentifier()
     val left = if (left.hasIdentifier()) {
@@ -90,15 +141,15 @@ fun Declarations.QualifierEntityProto.convert(): QualifierEntity {
     return QualifierEntity(left, IdentifierEntity(rightProto.value))
 }
 
-fun Declarations.ModifierDeclarationProto.convert(): ModifierDeclaration {
+fun ModifierDeclarationProto.convert(): ModifierDeclaration {
     return ModifierDeclaration(token)
 }
 
-fun <T : Entity> Declarations.ReferenceEntityProto.convert(): ReferenceEntity<T> {
+fun <T : Entity> ReferenceDeclarationProto.convert(): ReferenceEntity<T> {
     return ReferenceEntity(uid)
 }
 
-fun Declarations.HeritageClauseDeclarationProto.convert(): HeritageClauseDeclaration {
+fun HeritageClauseDeclarationProto.convert(): HeritageClauseDeclaration {
     return HeritageClauseDeclaration(
             name.convert(),
             typeArgumentsList.map { it.convert() },
@@ -107,7 +158,7 @@ fun Declarations.HeritageClauseDeclarationProto.convert(): HeritageClauseDeclara
     )
 }
 
-fun Declarations.ClassDeclarationProto.convert(): ClassDeclaration {
+fun ClassDeclarationProto.convert(): ClassDeclaration {
     return ClassDeclaration(
             name.convert(),
             membersList.map { it.convert() },
@@ -118,7 +169,7 @@ fun Declarations.ClassDeclarationProto.convert(): ClassDeclaration {
     )
 }
 
-fun Declarations.InterfaceDeclarationProto.convert(): InterfaceDeclaration {
+fun InterfaceDeclarationProto.convert(): InterfaceDeclaration {
     return InterfaceDeclaration(
             name.convert(),
             membersList.map { it.convert() },
@@ -129,13 +180,13 @@ fun Declarations.InterfaceDeclarationProto.convert(): InterfaceDeclaration {
     )
 }
 
-fun Declarations.BlockDeclarationProto.convert() : BlockDeclaration {
+fun BlockDeclarationProto.convert() : BlockDeclaration {
     return BlockDeclaration(
             statements = statementsList.map { it.convert() }
     )
 }
 
-fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
+fun FunctionDeclarationProto.convert(): FunctionDeclaration {
     return FunctionDeclaration(
             name,
             parametersList.map { it.convert() },
@@ -149,7 +200,7 @@ fun Declarations.FunctionDeclarationProto.convert(): FunctionDeclaration {
     )
 }
 
-fun Declarations.TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
+fun TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
     return TypeAliasDeclaration(
             aliasName.convert(),
             typeParametersList.map { it.convert() },
@@ -158,7 +209,7 @@ fun Declarations.TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
     )
 }
 
-fun Declarations.VariableDeclarationProto.convert(): VariableDeclaration {
+fun VariableDeclarationProto.convert(): VariableDeclaration {
     return VariableDeclaration(
             name,
             type.convert(),
@@ -170,15 +221,15 @@ fun Declarations.VariableDeclarationProto.convert(): VariableDeclaration {
     )
 }
 
-fun Declarations.EnumDeclaration.convert(): EnumDeclaration {
+fun EnumDeclarationProto.convert(): EnumDeclaration {
     return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) })
 }
 
-private fun Declarations.DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {
+private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {
     return DefinitionInfoDeclaration(fileName)
 }
 
-fun Declarations.ModuleDeclarationProto.convert(): ModuleDeclaration {
+fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     return ModuleDeclaration(packageName.convert(),
             declarationsList.map { it.convert() },
             modifiersList.map { it.convert() },
@@ -188,15 +239,15 @@ fun Declarations.ModuleDeclarationProto.convert(): ModuleDeclaration {
             root)
 }
 
-fun Declarations.ExportAssignmentDeclarationProto.convert(): ExportAssignmentDeclaration {
+fun ExportAssignmentDeclarationProto.convert(): ExportAssignmentDeclaration {
     return ExportAssignmentDeclaration(name, isExportEquals)
 }
 
-fun Declarations.ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration {
+fun ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration {
     return ImportEqualsDeclaration(name, moduleReference.convert(), uid)
 }
 
-fun List<Declarations.TopLevelEntityProto>.convert(): TopLevelDeclaration? {
+fun List<TopLevelDeclarationProto>.convert(): TopLevelDeclaration? {
     return when {
         this.isEmpty() -> null
         this.size == 1 -> this[0].convert()
@@ -204,7 +255,7 @@ fun List<Declarations.TopLevelEntityProto>.convert(): TopLevelDeclaration? {
     }
 }
 
-fun Declarations.IfStatementDeclarationProto.convert(): IfStatementDeclaration {
+fun IfStatementDeclarationProto.convert(): IfStatementDeclaration {
     return IfStatementDeclaration(
             condition = condition.convert(),
             thenStatement = thenStatementList.convert() ?: BlockDeclaration(emptyList()),
@@ -212,18 +263,18 @@ fun Declarations.IfStatementDeclarationProto.convert(): IfStatementDeclaration {
     )
 }
 
-fun Declarations.WhileStatementDeclarationProto.convert(): WhileStatementDeclaration {
+fun WhileStatementDeclarationProto.convert(): WhileStatementDeclaration {
     return WhileStatementDeclaration(
             condition = condition.convert(),
             statement = statementList.convert() ?: BlockDeclaration(emptyList())
     )
 }
 
-fun Declarations.ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaration {
+fun ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaration {
     return ExpressionStatementDeclaration(expression.convert())
 }
 
-fun Declarations.ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
+fun ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
     return ReturnStatementDeclaration(
             if(hasExpression()) {
                 expression.convert()
@@ -231,7 +282,7 @@ fun Declarations.ReturnStatementDeclarationProto.convert(): ReturnStatementDecla
     )
 }
 
-fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
+fun TopLevelDeclarationProto.convert(): TopLevelDeclaration {
     return when {
         hasClassDeclaration() -> classDeclaration.convert()
         hasInterfaceDeclaration() -> interfaceDeclaration.convert()
@@ -251,7 +302,7 @@ fun Declarations.TopLevelEntityProto.convert(): TopLevelDeclaration {
     }
 }
 
-fun Declarations.PropertyDeclarationProto.convert(): PropertyDeclaration {
+fun PropertyDeclarationProto.convert(): PropertyDeclaration {
     return PropertyDeclaration(
             name,
             if (hasInitializer()) {
@@ -264,14 +315,14 @@ fun Declarations.PropertyDeclarationProto.convert(): PropertyDeclaration {
     )
 }
 
-fun Declarations.IndexSignatureDeclarationProto.convert(): IndexSignatureDeclaration {
+fun IndexSignatureDeclarationProto.convert(): IndexSignatureDeclaration {
     return IndexSignatureDeclaration(
             indexTypesList.map { it.convert() },
             returnType.convert()
     )
 }
 
-fun Declarations.CallSignatureDeclarationProto.convert(): CallSignatureDeclaration {
+fun CallSignatureDeclarationProto.convert(): CallSignatureDeclaration {
     return CallSignatureDeclaration(
             parametersList.map { it.convert() },
             type.convert(),
@@ -279,7 +330,7 @@ fun Declarations.CallSignatureDeclarationProto.convert(): CallSignatureDeclarati
     )
 }
 
-fun Declarations.MemberEntityProto.convert(): MemberDeclaration {
+fun MemberDeclarationProto.convert(): MemberDeclaration {
     return when {
         hasConstructorDeclaration() -> constructorDeclaration.convert()
         hasMethodSignature() -> methodSignature.convert()
@@ -291,7 +342,7 @@ fun Declarations.MemberEntityProto.convert(): MemberDeclaration {
     }
 }
 
-fun Declarations.ConstructorDeclarationProto.convert(): ConstructorDeclaration {
+fun ConstructorDeclarationProto.convert(): ConstructorDeclaration {
     return ConstructorDeclaration(
             parametersList.map { it.convert() },
             typeParametersList.map { it.convert() },
@@ -299,7 +350,7 @@ fun Declarations.ConstructorDeclarationProto.convert(): ConstructorDeclaration {
     )
 }
 
-fun Declarations.MethodSignatureDeclarationProto.convert(): MethodSignatureDeclaration {
+fun MethodSignatureDeclarationProto.convert(): MethodSignatureDeclaration {
     return MethodSignatureDeclaration(
             name,
             parametersList.map { it.convert() },
@@ -310,7 +361,7 @@ fun Declarations.MethodSignatureDeclarationProto.convert(): MethodSignatureDecla
     )
 }
 
-private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterDeclaration {
+private fun TypeParameterDeclarationProto.convert(): TypeParameterDeclaration {
     return TypeParameterDeclaration(
             name.convert(),
             constraintsList.map { constraintProto -> constraintProto.convert() },
@@ -323,7 +374,7 @@ private fun Declarations.TypeParameterDeclarationProto.convert(): TypeParameterD
 }
 
 
-private fun Declarations.TypeReferenceDeclarationProto.convert(): TypeDeclaration {
+private fun TypeReferenceDeclarationProto.convert(): TypeDeclaration {
     return TypeDeclaration(
             value.convert(),
             paramsList.map { it.convert() },
@@ -333,7 +384,7 @@ private fun Declarations.TypeReferenceDeclarationProto.convert(): TypeDeclaratio
     )
 }
 
-private fun Declarations.ParameterDeclarationProto.convert(): ParameterDeclaration {
+private fun ParameterDeclarationProto.convert(): ParameterDeclaration {
     return ParameterDeclaration(
             name,
             type.convert(),
@@ -345,7 +396,7 @@ private fun Declarations.ParameterDeclarationProto.convert(): ParameterDeclarati
     )
 }
 
-private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValueDeclaration {
+private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration {
     return when {
         hasStringLiteral() -> StringLiteralDeclaration(stringLiteral.token)
         hasThisType() -> ThisTypeDeclaration()
@@ -379,7 +430,7 @@ private fun Declarations.ParameterValueDeclarationProto.convert(): ParameterValu
 }
 
 
-fun Declarations.BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
+fun BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
     return BinaryExpressionDeclaration(
             left = left.convert(),
             operator = operator,
@@ -387,7 +438,7 @@ fun Declarations.BinaryExpressionDeclarationProto.convert() : BinaryExpressionDe
     )
 }
 
-fun Declarations.UnaryExpressionDeclarationProto.convert() : UnaryExpressionDeclaration {
+fun UnaryExpressionDeclarationProto.convert() : UnaryExpressionDeclaration {
     return UnaryExpressionDeclaration(
             operand = operand.convert(),
             operator = operator,
@@ -395,20 +446,20 @@ fun Declarations.UnaryExpressionDeclarationProto.convert() : UnaryExpressionDecl
     )
 }
 
-fun Declarations.TypeOfExpressionDeclarationProto.convert(): TypeOfExpressionDeclaration {
+fun TypeOfExpressionDeclarationProto.convert(): TypeOfExpressionDeclaration {
     return TypeOfExpressionDeclaration(
             expression = expression.convert()
     )
 }
 
-fun Declarations.CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
+fun CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
     return CallExpressionDeclaration(
             expression = expression.convert(),
             arguments = argumentsList.map { it.convert() }
     )
 }
 
-fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
+fun NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
     return when {
         name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
         name.hasQualifier() -> QualifierExpressionDeclaration(qualifier = name.qualifier.convert())
@@ -416,14 +467,14 @@ fun Declarations.NameExpressionDeclarationProto.convert() : NameExpressionDeclar
     }
 }
 
-fun Declarations.NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
-fun Declarations.BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
-fun Declarations.StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
-fun Declarations.BooleanLiteralExpressionDeclarationProto.convert() = BooleanLiteralExpressionDeclaration(value)
-fun Declarations.RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
-fun Declarations.ObjectLiteralExpressionDeclarationProto.convert() = ObjectLiteralExpressionDeclaration(membersList.map { it.convert() })
+fun NumericLiteralExpressionDeclarationProto.convert() = NumericLiteralExpressionDeclaration(value)
+fun BigIntLiteralExpressionDeclarationProto.convert() = BigIntLiteralExpressionDeclaration(value)
+fun StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionDeclaration(value)
+fun BooleanLiteralExpressionDeclarationProto.convert() = BooleanLiteralExpressionDeclaration(value)
+fun RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
+fun ObjectLiteralExpressionDeclarationProto.convert() = ObjectLiteralExpressionDeclaration(membersList.map { it.convert() })
 
-fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
+fun LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
     return when {
         hasNumericLiteral() -> numericLiteral.convert()
         hasBigIntLiteral() -> bigIntLiteral.convert()
@@ -435,34 +486,34 @@ fun Declarations.LiteralExpressionDeclarationProto.convert() : LiteralExpression
     }
 }
 
-fun Declarations.PropertyAccessExpressionDeclarationProto.convert() : PropertyAccessExpressionDeclaration {
+fun PropertyAccessExpressionDeclarationProto.convert() : PropertyAccessExpressionDeclaration {
     return PropertyAccessExpressionDeclaration(
             expression = expression.convert(),
             name = name.convert()
     )
 }
 
-fun Declarations.ElementAccessExpressionDeclarationProto.convert() : ElementAccessExpressionDeclaration {
+fun ElementAccessExpressionDeclarationProto.convert() : ElementAccessExpressionDeclaration {
     return ElementAccessExpressionDeclaration(
             expression = expression.convert(),
             argumentExpression = argumentExpression.convert()
     )
 }
 
-fun Declarations.NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
+fun NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
     return NewExpressionDeclaration(
             expression = expression.convert(),
             arguments = argumentsList.map { it.convert() }
     )
 }
 
-fun Declarations.UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
+fun UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
     )
 }
 
-fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
+fun ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()
@@ -478,7 +529,7 @@ fun Declarations.ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     }
 }
 
-fun Declarations.SourceFileDeclarationProto.convert(): SourceFileDeclaration {
+fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
     return SourceFileDeclaration(
             fileName,
             root.convert(),
@@ -486,10 +537,10 @@ fun Declarations.SourceFileDeclarationProto.convert(): SourceFileDeclaration {
     )
 }
 
-fun Declarations.SourceSetDeclarationProto.convert(): SourceSetDeclaration {
+fun SourceSetDeclarationProto.convert(): SourceSetDeclaration {
     return SourceSetDeclaration(sourceName, sourcesList.map { it.convert() })
 }
 
-fun Declarations.SourceSetBundleProto.convert(): SourceBundleDeclaration {
+fun SourceBundleDeclarationProto.convert(): SourceBundleDeclaration {
     return SourceBundleDeclaration(sourcesList.map { it.convert() })
 }

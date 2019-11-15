@@ -80,25 +80,25 @@ export class AstExpressionFactory {
     }
 
     static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
-        let qualifier = new declarations.QualifierEntityProto();
+        let qualifier = new declarations.QualifierDeclarationProto();
         qualifier.setLeft(left);
         qualifier.setRight(right);
 
-        let nameEntity = new declarations.NameEntityProto();
-        nameEntity.setQualifier(qualifier);
-        return nameEntity;
+        let name = new declarations.NameDeclarationProto();
+        name.setQualifier(qualifier);
+        return name;
     }
 
     static createIdentifier(value: string): IdentifierEntity {
-        let identifierProto = new declarations.IdentifierEntityProto();
-        identifierProto.setValue(value);
-        return identifierProto;
+        let identifier = new declarations.IdentifierDeclarationProto();
+        identifier.setValue(value);
+        return identifier;
     }
 
     static createIdentifierAsNameEntity(value: string): NameEntity {
-        let nameEntity = new declarations.NameEntityProto();
-        nameEntity.setIdentifier(this.createIdentifier(value));
-        return nameEntity;
+        let name = new declarations.NameDeclarationProto();
+        name.setIdentifier(this.createIdentifier(value));
+        return name;
     }
 
     static createNameExpressionDeclarationAsExpression(name: NameEntity): Expression {
