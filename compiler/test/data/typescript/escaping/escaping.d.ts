@@ -4,9 +4,12 @@ declare var $foo: boolean;
 declare function bar$(ba$z: number);
 declare function fun();
 interface This {
-    "this_one_shouldnt_be_escaped": boolean,
-    "string-literal": boolean,
-    'another-string-literal': string,
+    "string-literal": boolean;
+    'another-string-literal': string;
+    "this_one_shouldnt_be_escaped": boolean;
+    '3х': string;
+    200: string;
+    300?: number;
     when: string;
     typealias: number;
     typeof: number;

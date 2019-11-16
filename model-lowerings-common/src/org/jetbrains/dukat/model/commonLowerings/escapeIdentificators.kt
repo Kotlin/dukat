@@ -26,6 +26,7 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
+private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 
 private val RESERVED_WORDS = setOf(
         "as",
@@ -56,9 +57,10 @@ private fun String.shouldEscape(): Boolean {
     val containsDollarSign = this.contains("$")
     val containsMinusSign = this.contains("-")
     val containsOnlyUnderscores = CONTAINS_ONLY_UNDERSCORES.matches(this)
+    val startsWithNumber = this.contains(STARTS_WITH_NUMBER)
     val isEscapedAlready = this.startsWith("`")
 
-    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign)
+    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber)
 }
 
 private fun String.escape(): String {
