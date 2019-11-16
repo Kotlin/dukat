@@ -61,9 +61,11 @@ external open class `is`<`interface`> {
     }
 }
 
-external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>
+external fun <T, U> When(value: `when`.Promise<T>, transform: (param_val: T) -> U): `fun`.Promise<U>
 
 external var `_`: `__`.`___`
+
+typealias WatchHandler<T> = (param_val: T, oldVal: T) -> Unit
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("when")
@@ -87,7 +89,7 @@ import org.w3c.xhr.*
 
 external var `$`: Boolean
 
-external fun `package`(`as`: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
+external fun `package`(param_as: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
 
 external interface Promise<T>
 

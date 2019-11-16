@@ -64,3 +64,5 @@ declare namespace __ {
     interface _OK_ {
     }
 }
+
+type WatchHandler<T> = (val: T, oldVal: T) => void;

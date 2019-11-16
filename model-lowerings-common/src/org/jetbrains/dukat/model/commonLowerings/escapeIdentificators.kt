@@ -3,7 +3,6 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -50,7 +49,22 @@ private val RESERVED_WORDS = setOf(
 
 private val RENAME_PARAM_MAP = mapOf(
         Pair("this", "self"),
-        Pair("object", "obj")
+
+        Pair("as", "param_as"),
+        Pair("class", "param_class"),
+        Pair("fun", "param_fun"),
+        Pair("in", "param_in"),
+        Pair("interface", "param_interface"),
+        Pair("in", "param_in"),
+        Pair("is", "param_is"),
+        Pair("object", "obj"),
+        Pair("package", "param_package"),
+        Pair("return", "param_return"),
+        Pair("throw", "param_throw"),
+        Pair("try", "param_try"),
+        Pair("typealias", "param_typealias"),
+        Pair("val", "param_val"),
+        Pair("when", "param_when")
 )
 
 private fun String.shouldEscape(): Boolean {
