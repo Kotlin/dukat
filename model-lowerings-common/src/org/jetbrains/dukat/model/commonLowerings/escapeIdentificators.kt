@@ -67,6 +67,10 @@ private val RENAME_PARAM_MAP = mapOf(
         Pair("when", "param_when")
 )
 
+private fun String.renameAsParameter(): String {
+    return RENAME_PARAM_MAP[this] ?: this.escape()
+}
+
 private fun String.shouldEscape(): Boolean {
     val isReservedWord = RESERVED_WORDS.contains(this)
     val containsDollarSign = this.contains("$")
@@ -110,7 +114,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     private fun StatementCallModel.escape(): StatementCallModel {
         return copy(
                 value = value.escape(),
-                params = params?.map { it.escape() },
+                params = params?.map { it.copy(value = it.value.renameAsParameter().escape()) },
                 typeParameters = typeParameters.map { it.escape() }
         )
     }
@@ -156,7 +160,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
 
-        val paramName = RENAME_PARAM_MAP[declaration.name] ?: declaration.name.escape()
+        val paramName = declaration.name.renameAsParameter()
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
 
