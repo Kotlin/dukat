@@ -51,6 +51,7 @@ external open class `is`<`interface`> {
     open fun `package`(a: Any): Boolean
 
     companion object {
+        fun `class`(): This
         fun `in`(obj: Foo)
         fun `is`(value: Any): Boolean
         fun `return`(): Any

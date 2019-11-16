@@ -24,6 +24,7 @@ declare class is<interface> {
     as: number;
     package(a): boolean;
 
+    static class(): This
     static in(object: Foo);
     static is(value: any): Boolean;
     static return(): any;
