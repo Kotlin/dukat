@@ -12,6 +12,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -105,6 +106,13 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel {
+        val declaration = ownerContext.node
+        return declaration.copy(
+            typeReference = lowerTypeModel(ownerContext.wrap(declaration.typeReference)),
+            typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) }
+        )
+    }
 
     fun lowerConstructorModel(ownerContext: NodeOwner<ConstructorModel>): ConstructorModel {
         val declaration = ownerContext.node

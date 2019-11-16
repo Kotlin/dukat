@@ -25,6 +25,7 @@ interface ModelWithOwnerLowering {
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel
     fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel
     fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
+    fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel
 
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
     fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel
@@ -68,7 +69,7 @@ interface ModelWithOwnerLowering {
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
-            is TypeAliasModel -> declaration
+            is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext))
             else -> raiseConcern("unknown TopeLevelDeclaration ${declaration}") { declaration }
         }
     }
