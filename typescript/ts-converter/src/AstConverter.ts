@@ -674,6 +674,7 @@ export class AstConverter {
 
                     if (symbol) {
                         if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
+                            this.libVisitor.process(symbol.declarations[0]);
                             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
                         }
                     }
