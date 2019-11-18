@@ -71,6 +71,13 @@ private fun String.renameAsParameter(): String {
     return RENAME_PARAM_MAP[this] ?: this.escape()
 }
 
+private fun NameEntity.renameAsParameter(): NameEntity {
+    return when(this) {
+        is IdentifierEntity -> copy(value = value.renameAsParameter())
+        is QualifierEntity -> this
+    }
+}
+
 private fun String.shouldEscape(): Boolean {
     val isReservedWord = RESERVED_WORDS.contains(this)
     val containsDollarSign = this.contains("$")
@@ -113,8 +120,8 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     private fun StatementCallModel.escape(): StatementCallModel {
         return copy(
-                value = value.escape(),
-                params = params?.map { it.copy(value = it.value.renameAsParameter().escape()) },
+                value = value.renameAsParameter(),
+                params = params?.map { it.copy(value = it.value.renameAsParameter()) },
                 typeParameters = typeParameters.map { it.escape() }
         )
     }
