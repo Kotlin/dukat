@@ -26,6 +26,26 @@ declare module "This" {
 declare module when {
     export var $: boolean;
     export function package(as: bar.string.interface, b: $boo.typealias): $tring;
+    interface interface {
+
+    }
+    interface $foo {
+
+    }
+}
+
+declare module bar {
+    module string {
+        interface interface {
+
+        }
+    }
+}
+
+declare module $boo {
+    interface typealias {
+
+    }
 }
 
 declare function When<T, U>(value: when.Promise<T>, transform: (val: T) => U): fun.Promise<U>;
@@ -46,4 +66,12 @@ declare namespace __ {
 
     interface _OK_ {
     }
+}
+
+declare class $tring {
+
+}
+
+declare class Foo {
+
 }

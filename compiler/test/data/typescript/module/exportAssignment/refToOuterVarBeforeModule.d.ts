@@ -6,6 +6,10 @@ interface SinonStatic {
     restore(object: any): void;
 }
 
+interface SinonStub {
+
+}
+
 declare var sinon: SinonStatic;
 
 declare module "sinon" {

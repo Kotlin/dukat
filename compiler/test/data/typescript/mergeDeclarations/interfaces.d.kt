@@ -26,3 +26,7 @@ external interface LoDashStatic {
     fun <T> compact(array: Array<T>): Array<T>
     fun <T> compact(array: List<T>): Array<T>
 }
+
+external interface LoDashWrapper<T>
+
+external interface LoDashArrayWrapper<T>

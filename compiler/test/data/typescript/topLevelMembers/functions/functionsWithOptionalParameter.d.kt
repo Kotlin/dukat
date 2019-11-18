@@ -22,3 +22,5 @@ external fun withOneString(s: String? = definedExternally): String
 external fun withManyArguments(s: String? = definedExternally, settings: JQueryAjaxSettings? = definedExternally): Boolean
 
 external fun withOptionalQualified(opts: ping.Options? = definedExternally)
+
+external interface JQueryAjaxSettings

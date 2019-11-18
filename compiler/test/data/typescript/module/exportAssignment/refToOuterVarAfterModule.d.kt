@@ -22,3 +22,7 @@ external interface JQueryStatic {
 
 @JsModule("jquery")
 external val `$`: JQueryStatic
+
+external interface JQueryAjaxSettings
+
+external interface JQueryXHR

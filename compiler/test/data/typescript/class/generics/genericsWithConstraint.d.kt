@@ -20,5 +20,9 @@ external open class Foo<T : Bar> {
     open fun withoutArgumentsReturnsT(): T
     open fun withOneT(a: T): T
     open fun <B : Baz> returnsB(a: Any): B
-    open fun <A : T, B : B> withManyArguments(a: A, b: B): T
+    open fun <A : T, B : A> withManyArguments(a: A, b: B): T
 }
+
+external interface Bar
+
+external interface Baz

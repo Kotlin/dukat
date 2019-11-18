@@ -26,3 +26,5 @@ external fun withManyArguments(n: Number, vararg s: String): Boolean
 external fun withVarargWithGenericArrayOfNumber(vararg numbers: Number): String
 
 external fun withVarargWithGenericArrayOfFoo(vararg foos: Foo): String
+
+external interface Foo

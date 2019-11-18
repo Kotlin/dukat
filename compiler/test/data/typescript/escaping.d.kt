@@ -49,6 +49,10 @@ external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): 
 
 external var `_`: `__`.`___`
 
+external open class `$tring`
+
+external open class Foo
+
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("when")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
@@ -73,7 +77,55 @@ external var `$`: Boolean
 
 external fun `package`(`as`: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
 
+external interface `interface`
+
+external interface `$foo`
+
 external interface Promise<T>
+
+// ------------------------------------------------------------------------------------------
+@file:JsQualifier("bar.string")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+package bar.string
+
+import kotlin.js.*
+import kotlin.js.Json
+import org.khronos.webgl.*
+import org.w3c.dom.*
+import org.w3c.dom.events.*
+import org.w3c.dom.parsing.*
+import org.w3c.dom.svg.*
+import org.w3c.dom.url.*
+import org.w3c.fetch.*
+import org.w3c.files.*
+import org.w3c.notifications.*
+import org.w3c.performance.*
+import org.w3c.workers.*
+import org.w3c.xhr.*
+
+external interface `interface`
+
+// ------------------------------------------------------------------------------------------
+@file:JsQualifier("$boo")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+package `$boo`
+
+import kotlin.js.*
+import kotlin.js.Json
+import org.khronos.webgl.*
+import org.w3c.dom.*
+import org.w3c.dom.events.*
+import org.w3c.dom.parsing.*
+import org.w3c.dom.svg.*
+import org.w3c.dom.url.*
+import org.w3c.fetch.*
+import org.w3c.files.*
+import org.w3c.notifications.*
+import org.w3c.performance.*
+import org.w3c.workers.*
+import org.w3c.xhr.*
+
+external interface `typealias`
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("__")

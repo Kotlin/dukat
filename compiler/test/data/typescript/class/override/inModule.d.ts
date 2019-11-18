@@ -5,4 +5,10 @@ declare module TypeScript.Syntax {
     class NormalModeFactory implements IFactory {
         public sourceUnit(moduleElements: ISyntaxList, endOfFileToken: ISyntaxToken): SourceUnitSyntax;
     }
+    interface ISyntaxList {
+
+    }
+    interface ISyntaxToken {
+
+    }
 }
