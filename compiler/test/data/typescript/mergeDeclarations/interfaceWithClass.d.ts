@@ -13,7 +13,7 @@ declare namespace React {
     class Bar {
 
     }
-    class ComponentLifecycle<T, U> {
+    interface ComponentLifecycle<T, U> {
 
     }
 }

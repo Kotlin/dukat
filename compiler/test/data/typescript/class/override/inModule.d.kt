@@ -28,3 +28,5 @@ external open class NormalModeFactory : IFactory {
 external interface ISyntaxList
 
 external interface ISyntaxToken
+
+external interface SourceUnitSyntax

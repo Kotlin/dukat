@@ -19,3 +19,7 @@ external open class JQueryXHR : JQueryPromise<Any>, MyXMLHttpRequest {
     open fun overrideMimeType(mimeType: String): Any
     open fun abort(statusText: String? = definedExternally)
 }
+
+external open class JQueryPromise<T>
+
+external interface MyXMLHttpRequest

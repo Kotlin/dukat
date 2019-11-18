@@ -11,4 +11,7 @@ declare module TypeScript.Syntax {
     interface ISyntaxToken {
 
     }
+    interface SourceUnitSyntax {
+
+    }
 }
