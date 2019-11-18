@@ -56,7 +56,7 @@ task webpack(type: NodeTask) {
   def scriptName = "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
 
   inputs.file(scriptName)
-  inputs.file("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js/Declarations_pb.js")
+  inputs.dir("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js")
   inputs.dir("${project.buildDir}/ts")
   inputs.dir("${project.buildDir}/package/node_modules")
 
