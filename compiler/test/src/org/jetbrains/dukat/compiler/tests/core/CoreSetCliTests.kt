@@ -60,6 +60,7 @@ class CoreSetCliTests {
         val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
 
         var translated = reportJson.outputs.mapNotNull { output ->
+            println("OUTPUT ${output}")
             val targetFile = File(dirName, output)
 
             //TODO: unify with OutputTests.SKIPPED_DECLARATIONS
@@ -75,6 +76,8 @@ class CoreSetCliTests {
                     "ref.ref.kt"
             )
             if (skippedDeclarations.contains(targetFile.name)) {
+                null
+            } else if (output.startsWith("lib.")) {
                 null
             } else {
                 targetFile.readText()
