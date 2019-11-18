@@ -1,7 +1,6 @@
-package org.jetbrains.dukat.model.commonLowerings
+package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-
 
 val KotlinStdlibEntities = setOf(
         IdentifierEntity("AbstractWorker"),

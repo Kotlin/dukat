@@ -38,3 +38,22 @@ declare module _ {
 
     }
 }
+
+declare interface SomeNode {}
+declare interface Assignable {}
+
+declare interface SomeElement extends SomeNode, Assignable {
+    ping(): boolean;
+}
+
+declare interface SomeElement extends Assignable, SomeNode {
+    pong(): boolean;
+}
+
+declare interface SomeElement extends SomeNode {
+    bing(): boolean;
+}
+
+declare interface SomeElement extends Assignable {
+    bong(): boolean;
+}

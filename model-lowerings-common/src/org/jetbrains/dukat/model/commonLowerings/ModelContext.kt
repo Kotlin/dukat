@@ -26,4 +26,8 @@ class ModelContext {
     fun resolve(name: NameEntity): ClassLikeModel? {
         return resolveClass(name) ?: resolveInterface(name)
     }
+
+    fun stats() {
+        println("DETECTED: INTERFACES[${myInterfaces.size}] CLASSES[${myClassNodes.size}]")
+    }
 }

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.model.commonLowerings
+package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -19,13 +19,13 @@ private fun TopLevelModel.isInKotlinStdLib(): Boolean {
 }
 
 private fun ModuleModel.generateStdLib(): ModuleModel {
-    return copy(declarations = declarations.filterNot { it.isInKotlinStdLib() }, name = IdentifierEntity("<ROOT>"))
+    return copy(declarations = declarations.filterNot { it.isInKotlinStdLib() })
 }
 
-fun SourceSetModel.generateStdLib(): SourceSetModel {
-    val sourcesResolved = sources.mapNotNull { source ->
+fun SourceSetModel.filterOutKotlinStdEntities(): SourceSetModel {
+    val sourcesResolved = sources.map { source ->
         if (source.root.isLib()) {
-            null
+            source.copy(root = source.root.generateStdLib())
         } else {
             source
         }

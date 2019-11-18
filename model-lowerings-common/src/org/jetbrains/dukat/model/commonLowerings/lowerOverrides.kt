@@ -32,52 +32,29 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun InterfaceModel.getKnownParents(): List<InterfaceModel> {
         return parentEntities.flatMap { heritageModel ->
-            val interfaceNode = context.resolveInterface(heritageModel.value.value)
-            if (interfaceNode == null) {
-                emptyList()
-            } else {
-                listOf(interfaceNode) + interfaceNode.getKnownParents()
-            }
+            context.resolveInterface(heritageModel.value.value)?.let { parentInterface ->
+                listOf(parentInterface) + parentInterface.getKnownParents()
+            } ?: emptyList()
         }
     }
 
     private fun ClassModel.getKnownParents(): List<ClassLikeModel> {
         return parentEntities.flatMap {
-            listOf(context.resolveInterface(it.value.value),
-                    context.resolveClass(it.value.value))
-        }.filterNotNull()
-    }
-
-    private fun InterfaceModel.allParentMethods(): List<MethodModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
+            (context.resolveInterface(it.value.value) ?: context.resolveClass(it.value.value))?.let { parentModel ->
+                listOf(parentModel) + parentModel.getKnownParents()
+            } ?: emptyList()
         }
     }
 
-    private fun InterfaceModel.allParentProperties(): List<PropertyModel> {
+    private fun ClassLikeModel.allParentMethods(): List<MethodModel> {
         return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
+            parentEntity.members.filterIsInstance(MethodModel::class.java)
         }
     }
 
-
-    private fun ClassModel.allParentMethods(): List<MethodModel> {
+    private fun ClassLikeModel.allParentProperties(): List<PropertyModel> {
         return getKnownParents().flatMap { parentEntity ->
-            when (parentEntity) {
-                is InterfaceModel -> parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
-                is ClassModel -> parentEntity.members.filterIsInstance(MethodModel::class.java) + parentEntity.allParentMethods()
-                else -> raiseConcern("unknown ClassLikeDeclaration $parentEntity") { emptyList<MethodModel>() }
-            }
-        }
-    }
-
-    private fun ClassModel.allParentProperties(): List<PropertyModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            when (parentEntity) {
-                is InterfaceModel -> parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
-                is ClassModel -> parentEntity.members.filterIsInstance(PropertyModel::class.java) + parentEntity.allParentProperties()
-                else -> raiseConcern("unknown ClassLikeDeclaration $parentEntity") { emptyList<PropertyModel>() }
-            }
+            parentEntity.members.filterIsInstance(PropertyModel::class.java)
         }
     }
 
@@ -220,29 +197,25 @@ private class OverrideResolver(val context: ModelContext) {
         }
     }
 
+    private fun ClassLikeModel.lowerOverrides(): ClassLikeModel {
+        val allParentMethods = allParentMethods()
+        val allParentProperties = allParentProperties()
+
+        val membersLowered = members.map {  member ->
+            member.lowerOverrides(allParentMethods, allParentProperties)
+        }
+
+        return when (this) {
+            is InterfaceModel -> copy(members = membersLowered)
+            is ClassModel -> copy(members = membersLowered)
+            else -> this
+        }
+    }
+
     fun lowerOverrides(moduleModel: ModuleModel): ModuleModel {
         val loweredDeclarations = moduleModel.declarations.map { declaration ->
             when (declaration) {
-                is InterfaceModel -> {
-                    val allParentMethods = declaration.allParentMethods()
-                    val allParentProperties = declaration.allParentProperties()
-
-                    declaration.copy(
-                            members = declaration.members.map { member ->
-                                member.lowerOverrides(allParentMethods, allParentProperties)
-                            }
-                    )
-                }
-                is ClassModel -> {
-                    val allParentMethods = declaration.allParentMethods()
-                    val allParentProperties = declaration.allParentProperties()
-
-                    declaration.copy(
-                            members = declaration.members.map { member ->
-                                member.lowerOverrides(allParentMethods, allParentProperties)
-                            }
-                    )
-                }
+                is ClassLikeModel -> declaration.lowerOverrides()
                 else -> {
                     declaration
                 }
@@ -253,7 +226,7 @@ private class OverrideResolver(val context: ModelContext) {
     }
 }
 
-private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
+private fun ModuleModel.updateContext(context: ModelContext) {
     for (declaration in declarations) {
         if (declaration is InterfaceModel) {
             context.registerInterface(declaration)
@@ -264,16 +237,20 @@ private fun ModuleModel.updateContext(context: ModelContext): ModuleModel {
     }
 
     submodules.forEach { declaration -> declaration.updateContext(context) }
-
-    return this
 }
 
-private fun SourceSetModel.updateContext(astContext: ModelContext) = transform { it.updateContext(astContext) }
+private fun SourceSetModel.updateContext(astContext: ModelContext) {
+    sources.map { source -> source.root.updateContext(astContext) }
+}
 
-fun SourceSetModel.lowerOverrides(): SourceSetModel {
+fun SourceSetModel.lowerOverrides(stdlib: SourceSetModel?): SourceSetModel {
     val astContext = ModelContext()
+
+    stdlib?.updateContext(astContext)
+    updateContext(astContext)
+
     val overrideResolver = OverrideResolver(astContext)
-    return updateContext(astContext).transform {
+    return transform {
         overrideResolver.lowerOverrides(it)
     }
 }

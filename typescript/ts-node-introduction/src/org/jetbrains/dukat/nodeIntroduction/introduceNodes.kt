@@ -473,7 +473,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 val objectNode = ObjectNode(
                         IdentifierEntity(declaration.name),
                         type.members.flatMap { member -> lowerMemberDeclaration(member) },
-                        emptyList()
+                        emptyList(),
+                        declaration.uid
                 )
 
                 objectNode.copy(members = objectNode.members.map {
@@ -529,12 +530,9 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     private fun resolveExternalSource(definitionsInfo: List<DefinitionInfoDeclaration>): String? {
-        return if (definitionsInfo.isEmpty()) {
-            null
-        } else {
-            val definitionInfo = definitionsInfo[0].fileName.replace("/", File.separator)
-            if (definitionInfo != fileName) {
-                definitionInfo.split(File.separator).last()
+        return definitionsInfo.firstOrNull()?.fileName?.replace("/", File.separator)?.let {
+            if (it != fileName) {
+                it.split(File.separator).last()
             } else null
         }
     }

@@ -43,8 +43,10 @@ fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
     visitTopLevelModel { topLevelModel ->
         when (topLevelModel) {
             is InterfaceModel -> {
-                if (topLevelModel.companionObject != null && topLevelModel.companionObject!!.members.isNotEmpty()) {
-                    topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+                topLevelModel.companionObject?.let { companionObject ->
+                    if (companionObject.members.isNotEmpty() || companionObject.parentEntities.isNotEmpty()) {
+                        topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+                    }
                 }
             }
             is ModuleModel -> {

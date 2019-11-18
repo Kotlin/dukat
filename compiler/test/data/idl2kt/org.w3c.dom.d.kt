@@ -4905,7 +4905,7 @@ public external open class Document : Node, GlobalEventHandlers, DocumentAndElem
     fun adoptNode(node: Node): Node
     fun createAttribute(localName: String): Attr
     fun createAttributeNS(namespace: String?, qualifiedName: String): Attr
-    fun createEvent(`interface`: String): Event
+    fun createEvent(param_interface: String): Event
     fun createRange(): Range
     fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: NodeFilter? = definedExternally): NodeIterator
     fun createNodeIterator(root: Node, whatToShow: Int = definedExternally, filter: ((Node) -> Short)? = definedExternally): NodeIterator
@@ -4999,9 +4999,9 @@ public external interface ElementCreationOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun ElementCreationOptions(`is`: String? = undefined): ElementCreationOptions {
+public inline fun ElementCreationOptions(param_is: String? = undefined): ElementCreationOptions {
     val o = js("({})")
-    o["is"] = `is`
+    o["is"] = param_is
     return o
 }
 

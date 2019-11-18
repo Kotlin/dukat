@@ -9,7 +9,7 @@ import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -38,6 +38,7 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
@@ -632,7 +633,7 @@ class StringTranslator : ModelVisitor {
         if (containsSomethingExceptDocRoot) {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
-            if (moduleModel.name != ROOT_PACKAGENAME) {
+            if ((moduleModel.name != ROOT_PACKAGENAME) && (moduleModel.name != LIB_PACKAGENAME)) {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {

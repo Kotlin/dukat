@@ -3,6 +3,7 @@ package org.jetbrains.dukat.ts.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
+import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdEntities
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -10,7 +11,7 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
-import org.jetbrains.dukat.model.commonLowerings.generateStdLib
+import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
@@ -43,12 +44,15 @@ import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 import substituteTsStdLibEntities
 
+fun SourceSetDeclaration.isStdLib(): Boolean {
+    return sourceName == "<LIBROOT>"
+}
 
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
     val moduleNameResolver: ModuleNameResolver
 
-    fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
-        return sourceSet
+    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?): SourceSetModel {
+        val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
@@ -57,7 +61,8 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .eliminateStringType()
                 .desugarArrayDeclarations()
                 .lowerPartialOfT()
-                .introduceNodes(moduleNameResolver)
+
+        val nodes = declarations.introduceNodes(moduleNameResolver)
                 .introduceTypeNodes()
                 .introduceQualifiedNode()
                 .resolveModuleAnnotations()
@@ -72,22 +77,41 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
                 .moveTypeAliasesOutside()
+
+        val models = nodes
                 .introduceModels()
                 .escapeIdentificators()
+                .removeUnsupportedJsNames()
                 .mergeModules()
                 .mergeWithNameSpace()
                 .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
-                .lowerOverrides()
+                .lowerOverrides(stdLibSourceSet)
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addStandardImportsAndAnnotations()
-                .generateStdLib()
+
+        return models
     }
 
     fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        return SourceBundleModel(sourceBundle.sources.map { source -> lower(source) })
+        var stdLib: SourceSetModel? = null
+        val sources = mutableListOf<SourceSetDeclaration>()
+
+        sourceBundle.sources.forEach { source ->
+            if ((source.isStdLib()) && (stdLib == null)) {
+                stdLib = lower(source, null)
+            } else {
+                sources.add(source)
+            }
+        }
+
+        val loweredSources = sources.map { source -> lower(source, stdLib) }
+
+        stdLib?.filterOutKotlinStdEntities()
+
+        return SourceBundleModel(loweredSources)
     }
 }

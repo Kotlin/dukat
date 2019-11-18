@@ -24,59 +24,104 @@ import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private fun escapeIdentificator(identificator: String): String {
-    val reservedWords = setOf(
-            "as",
-            "fun",
-            "in",
-            "interface",
-            "is",
-            "object",
-            "package",
-            "typealias",
-            "typeof",
-            "val",
-            "var",
-            "when"
-    )
+private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
+private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 
-    val isReservedWord = reservedWords.contains(identificator)
-    val containsDollarSign = identificator.contains("$")
-    val containsOnlyUnderscores = "^_+$".toRegex().containsMatchIn(identificator)
-    val isEscapedAlready = "^`.*`$".toRegex().containsMatchIn(identificator)
+private val RESERVED_WORDS = setOf(
+        "as",
+        "class",
+        "fun",
+        "in",
+        "interface",
+        "in",
+        "is",
+        "object",
+        "package",
+        "return",
+        "throw",
+        "try",
+        "typealias",
+        "typeof",
+        "val",
+        "var",
+        "when"
+)
 
-    return if (!isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores)) {
-        "`${identificator}`"
-    } else {
-        identificator
+private val RENAME_PARAM_MAP = mapOf(
+        Pair("this", "self"),
+
+        Pair("as", "param_as"),
+        Pair("class", "param_class"),
+        Pair("fun", "param_fun"),
+        Pair("in", "param_in"),
+        Pair("interface", "param_interface"),
+        Pair("in", "param_in"),
+        Pair("is", "param_is"),
+        Pair("object", "obj"),
+        Pair("package", "param_package"),
+        Pair("return", "param_return"),
+        Pair("throw", "param_throw"),
+        Pair("try", "param_try"),
+        Pair("typealias", "param_typealias"),
+        Pair("val", "param_val"),
+        Pair("when", "param_when")
+)
+
+private fun String.renameAsParameter(): String {
+    return RENAME_PARAM_MAP[this] ?: this.escape()
+}
+
+private fun NameEntity.renameAsParameter(): NameEntity {
+    return when(this) {
+        is IdentifierEntity -> copy(value = value.renameAsParameter())
+        is QualifierEntity -> this
     }
 }
 
+private fun String.shouldEscape(): Boolean {
+    val isReservedWord = RESERVED_WORDS.contains(this)
+    val containsDollarSign = this.contains("$")
+    val containsMinusSign = this.contains("-")
+    val containsOnlyUnderscores = CONTAINS_ONLY_UNDERSCORES.matches(this)
+    val startsWithNumber = this.contains(STARTS_WITH_NUMBER)
+    val isEscapedAlready = this.startsWith("`")
+
+    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber)
+}
+
+private fun String.escape(): String {
+    return if (shouldEscape()) {
+        "`${this}`"
+    } else {
+        this
+    }
+}
+
+private fun IdentifierEntity.escape(): IdentifierEntity {
+    return if (value.shouldEscape()) {
+        copy(value = value.escape())
+    } else {
+        this
+    }
+}
+
+private fun QualifierEntity.escape(): QualifierEntity {
+    return QualifierEntity(left.escape(), right.escape())
+}
+
+private fun NameEntity.escape(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> escape()
+        is QualifierEntity -> escape()
+    }
+}
 
 private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
-    private fun IdentifierEntity.escape(): IdentifierEntity {
-        return copy(value = escapeIdentificator(value))
-    }
-
-    private fun QualifierEntity.escape(): QualifierEntity {
-        return when (val nodeLeft = left) {
-            is IdentifierEntity -> QualifierEntity(nodeLeft.escape(), right.escape())
-            is QualifierEntity -> nodeLeft.copy(left = nodeLeft.escape(), right = right.escape())
-        }
-    }
-
-    private fun NameEntity.escape(): NameEntity {
-        return when (this) {
-            is IdentifierEntity -> escape()
-            is QualifierEntity -> escape()
-        }
-    }
-
     private fun StatementCallModel.escape(): StatementCallModel {
         return copy(
-                value = value.escape(),
-                params = params?.map { it.escape() },
+                value = value.renameAsParameter(),
+                params = params?.map { it.copy(value = it.value.renameAsParameter()) },
                 typeParameters = typeParameters.map { it.escape() }
         )
     }
@@ -121,8 +166,11 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
-        return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = escapeIdentificator(declaration.name))))
+
+        val paramName = declaration.name.renameAsParameter()
+        return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
+
 
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
@@ -142,7 +190,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
         return when (val declaration = ownerContext.node) {
-            is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = escapeIdentificator(value.value)) })
+            is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = value.value.escape()) })
             else -> super.lowerTopLevelModel(ownerContext)
         }
     }

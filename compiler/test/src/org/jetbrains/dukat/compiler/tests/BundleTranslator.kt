@@ -3,8 +3,10 @@ package org.jetbrains.dukat.compiler.tests
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import java.io.File
+
+
+typealias BundleSourceMap = Map<String, SourceSetModel>
 
 class BundleTranslator(private val inputName: String) {
 
@@ -12,22 +14,16 @@ class BundleTranslator(private val inputName: String) {
         val byteTranslator = createJsByteArrayTranslator(ConstNameResolver())
     }
 
-    private val myMap = build()
+    private val bundleSourceMap = build()
 
-    private fun build(): Map<String, SourceSetDeclaration> {
-        val bundleMap = mutableMapOf<String, SourceSetDeclaration>()
-
+    private fun build(): BundleSourceMap {
         val inputStream = File(inputName).inputStream()
-        val bundle = byteTranslator.parse(inputStream.readBytes())
-        bundle.sources.forEach { sourceSet ->
-            bundleMap.set(sourceSet.sourceName, sourceSet)
-        }
+        val bundle = byteTranslator.lower(byteTranslator.parse(inputStream.readBytes()))
 
-        return bundleMap
+        return bundle.sources.associateBy { source -> source.sourceName }
     }
 
     fun translate(fileName: String): SourceSetModel {
-        val sourceSet = myMap[fileName]!!
-        return byteTranslator.lower(sourceSet)
+        return bundleSourceMap[fileName]!!
     }
 }

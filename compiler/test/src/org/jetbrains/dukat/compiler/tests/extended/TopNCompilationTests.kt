@@ -1,10 +1,12 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
+import org.jetbrains.dukat.compiler.tests.core.TestConfig.TOPN_DIR
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import java.io.File
 
 class TopNCompilationTests : CompilationTests() {
 
@@ -25,23 +27,30 @@ class TopNCompilationTests : CompilationTests() {
         fun extendedSet(): Array<Array<String>> {
 
             return listOf(
-                    "lodash",
-                    "request",
-                    "react",
-                    "express",
-                    "prop-types",
-                    "react-dom",
-                    "async",
-                    "fs-extra",
-                    "bluebird",
-                    "underscore",
-                    "webpack",
-                    "yargs",
-                    "body-parser"
+                    "@types/async",
+                    "@types/bluebird",
+                    "@types/body-parser",
+                    "@types/express",
+                    "@types/fs-extra",
+                    "@types/lodash",
+                    "@types/moment",
+                    "@types/prop-types",
+                    "@types/react",
+                    "@types/react-dom",
+                    "@types/request",
+                    "@types/underscore",
+                    "@types/webpack",
+                    "@types/yargs",
+                    "axios",
+                    "chalk",
+                    "commander/typings",
+                    "rxjs",
+                    "tslib",
+                    "vue/types"
             ).map { descriptor ->
                 arrayOf(
                         descriptor,
-                        "$DEFINITELY_TYPED_DIR/$descriptor/index.d.ts"
+                        File("$TOPN_DIR/node_modules/$descriptor/index.d.ts").normalize().absolutePath
                 )
             }.toTypedArray()
 
