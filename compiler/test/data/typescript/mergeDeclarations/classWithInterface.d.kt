@@ -28,4 +28,4 @@ external interface Foo
 
 external open class Bar
 
-external open class ComponentLifecycle<T, U>
+external interface ComponentLifecycle<T, U>
