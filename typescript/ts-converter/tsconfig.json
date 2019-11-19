@@ -16,7 +16,8 @@
     ],
     "paths": {
       "typescript-services-api": ["./build/package/node_modules/typescript/lib/typescriptServices.js"],
-      "declarations": ["../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb.js"]
+      "declarations": ["../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb"],
+      "google-protobuf": ["./build/package/node_modules/google-protobuf"]
     }
   },  
   "include": [
