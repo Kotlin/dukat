@@ -221,12 +221,14 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
                     } else {
                         unionMember.process().translate()
                     }
-                }.joinToString(" | ")
+                }.joinToString(" | "),
+                null
         )
         is TupleTypeNode -> TypeValueModel(
                 IdentifierEntity("dynamic"),
                 emptyList(),
-                "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
+                "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
+                 null
         )
         is TypeParameterNode -> {
             TypeParameterReferenceModel(
@@ -237,12 +239,13 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         }
         is TypeValueNode -> {
             if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token)
+                TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, null)
             } else {
                 TypeValueModel(
                         value,
                         params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
                         meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                        null,
                         nullable
                 )
             }
@@ -260,9 +263,10 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
         is GeneratedInterfaceReferenceNode -> {
             TypeValueModel(
                     name,
-                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) }
+                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, null) }
                             .map { TypeParameterModel(it, listOf()) },
                     meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
+                    null,
                     nullable
             )
 
@@ -271,6 +275,7 @@ private fun ParameterValueDeclaration.process(context: TranslationContext = Tran
             TypeValueModel(
                     IdentifierEntity("dynamic"),
                     emptyList(),
+                    null,
                     null,
                     false
             )
@@ -300,7 +305,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
                         parameters = constructor.parameters.map { param -> param.process() },
                         typeParameters = constructor.typeParameters.map { typeParam ->
                             TypeParameterModel(
-                                    type = TypeValueModel(typeParam.value, listOf(), null),
+                                    type = TypeValueModel(typeParam.value, listOf(), null, null),
                                     constraints = typeParam.params.map { param -> param.process() }
                             )
                         },
@@ -309,7 +314,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
             },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        type = TypeValueModel(typeParam.value, listOf(), null),
+                        type = TypeValueModel(typeParam.value, listOf(), null, null),
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
@@ -323,7 +328,7 @@ private fun ClassNode.convertToClassModel(): TopLevelModel {
 }
 
 private fun NameEntity.toTypeValueModel(): TypeValueModel {
-    return TypeValueModel(this, emptyList(), null)
+    return TypeValueModel(this, emptyList(), null, null)
 }
 
 private fun HeritageNode.convertToModel(): HeritageModel {
@@ -353,7 +358,7 @@ private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
             },
             typeParameters = typeParameters.map { typeParam ->
                 TypeParameterModel(
-                        type = TypeValueModel(typeParam.value, listOf(), null),
+                        type = TypeValueModel(typeParam.value, listOf(), null, null),
                         constraints = typeParam.params.map { param -> param.process() }
                 )
             },
@@ -452,7 +457,7 @@ private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
 private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {
     return typeParameters.map { typeParam ->
         TypeParameterModel(
-                type = TypeValueModel(typeParam.value, listOf(), null),
+                type = TypeValueModel(typeParam.value, listOf(), null, null),
                 constraints = typeParam.params.map { param -> param.process() }
         )
     }
@@ -509,7 +514,7 @@ fun TopLevelEntity.convertToModel(): TopLevelModel? {
         is TypeAliasNode -> TypeAliasModel(
                 name = name,
                 typeReference = typeReference.process(),
-                typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
+                typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null
         )

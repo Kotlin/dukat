@@ -363,7 +363,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             val typeModel = TypeValueModel(
                 value = IdentifierEntity(annotationModel.name),
                 params = listOf(),
-                metaDescription = null
+                metaDescription = null,
+                fqName = null
             )
             val annotationClassDescriptor = findClass(typeModel)
             val primaryConstructor = annotationClassDescriptor?.constructors?.first()
@@ -397,7 +398,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         listOf()
                     )
                 },
-                metaDescription = null
+                metaDescription = null,
+                fqName = null
             )
         )
         return if (type.isError) null else type
@@ -793,11 +795,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                 TypeValueModel(
                                     value = enumModel.name,
                                     params = listOf(),
-                                    metaDescription = null
+                                    metaDescription = null,
+                                    fqName = null
                                 ), constraints = listOf(), variance = org.jetbrains.dukat.astModel.Variance.INVARIANT
                             )
                         ),
-                        metaDescription = null
+                        metaDescription = null,
+                        fqName = null
                     )
                 )
             ),

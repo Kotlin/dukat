@@ -60,7 +60,7 @@ private fun resolveCommonType(members: List<MemberModel>): TypeModel {
         if (members.all { member -> member.getType() == firstMemberType }) {
             firstType
         } else null
-    } ?: TypeValueModel(IdentifierEntity("Any"), emptyList(), null, true)
+    } ?: TypeValueModel(IdentifierEntity("Any"), emptyList(), null, null, true)
 }
 
 private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
@@ -85,7 +85,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     name = IdentifierEntity("get"),
                     parameters = listOf(ParameterModel(
                             name = "key",
-                            type = TypeValueModel(IdentifierEntity("String"), emptyList(), null),
+                            type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
                             initializer = null,
                             vararg = false
                     )),
@@ -102,7 +102,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     name = IdentifierEntity("set"),
                     parameters = listOf(ParameterModel(
                             name = "key",
-                            type = TypeValueModel(IdentifierEntity("String"), emptyList(), null),
+                            type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
                             initializer = null,
                             vararg = false
                     ), ParameterModel(
@@ -111,7 +111,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                             initializer = null,
                             vararg = false
                     )),
-                    type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null),
+                    type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
                     typeParameters = emptyList(),
                     static = false,
                     override = false,

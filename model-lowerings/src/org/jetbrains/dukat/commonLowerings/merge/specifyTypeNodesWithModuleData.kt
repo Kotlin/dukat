@@ -58,7 +58,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
-                            return TypeValueModel(qualifiedNode, declaration.params, null)
+                            return TypeValueModel(qualifiedNode, declaration.params, null, null)
                         }
                     }
                 }
@@ -75,7 +75,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                             val supposedModule = variableModel.name.appendRight(qualifiedName)
 
                             declarationResolver.resolveStrict(pathShifted, supposedModule.process(::unescape))?.let {
-                                return TypeValueModel(supposedModule.appendRight(pathShifted), declaration.params, null)
+                                return TypeValueModel(supposedModule.appendRight(pathShifted), declaration.params, null, null)
                             }
                         }
                     }
@@ -89,7 +89,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                         val qualifiedNode = qualifiedPath?.shiftLeft()?.appendLeft(declarationValue.right)
                                 ?: declarationValue.right
 
-                        return TypeValueModel(qualifiedNode, declaration.params, null)
+                        return TypeValueModel(qualifiedNode, declaration.params, null, null)
                     }
                 }
 
@@ -108,7 +108,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                 val declarationQualifiedName = declarationOwnerContext.getQualifiedName()
                 if (declarationQualifiedName != ownerContext.getQualifiedName()) {
                     val qualifiedNode = name.appendRight(declarationQualifiedName.shiftLeft())
-                    return heritageClause.copy(value = TypeValueModel(qualifiedNode, emptyList(), null))
+                    return heritageClause.copy(value = TypeValueModel(qualifiedNode, emptyList(), null, null))
                 }
             }
         }
