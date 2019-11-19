@@ -3,6 +3,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsLowerings.DeclarationTypeLowering
+import org.jetbrains.dukat.tsLowerings.getUID
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -65,13 +66,14 @@ private class SubstituteLowering : DeclarationTypeLowering {
                 parentEntity.isLibReference() and stdLibFinalEntities.contains(parentEntity.name)
             }
             if (forbiddenParent == null) {
-                declaration
+                null
             } else {
                 declaration.convertToTypeAlias(forbiddenParent)
             }
         } else {
-            declaration
-        }
+            null
+        } ?: declaration
+
         return super.lowerTopLevelDeclaration(declarationResolved, owner)
     }
 
@@ -80,11 +82,36 @@ private class SubstituteLowering : DeclarationTypeLowering {
     }
 }
 
+private class TopLevelVisitor(private val visitor: (TopLevelDeclaration) -> Unit) : DeclarationTypeLowering {
 
-private fun ModuleDeclaration.substituteTsStdLibEntities(): ModuleDeclaration {
-    return SubstituteLowering().lowerDocumentRoot(this)
+    override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<ModuleDeclaration>): TopLevelDeclaration {
+        visitor.invoke(declaration)
+        return super.lowerTopLevelDeclaration(declaration, owner)
+    }
+
+    fun visit(module: ModuleDeclaration) {
+        lowerDocumentRoot(module)
+    }
 }
 
-private fun SourceFileDeclaration.substituteTsStdLibEntities() = copy(root = root.substituteTsStdLibEntities())
 
-fun SourceSetDeclaration.substituteTsStdLibEntities() = copy(sources = sources.map(SourceFileDeclaration::substituteTsStdLibEntities))
+private fun ModuleDeclaration.substituteTsStdLibEntities(): ModuleDeclaration {
+    val moduleResolved = SubstituteLowering().lowerDocumentRoot(this)
+
+    val m = mutableMapOf<String, NameEntity>()
+    TopLevelVisitor {
+        if (it is ClassLikeDeclaration) {
+            m[it.uid] = it.name
+        }
+    }.visit(moduleResolved)
+
+    return moduleResolved
+}
+
+private fun SourceFileDeclaration.substituteTsStdLibEntities(): SourceFileDeclaration {
+    return copy(root = root.substituteTsStdLibEntities())
+}
+
+fun SourceSetDeclaration.substituteTsStdLibEntities(): SourceSetDeclaration {
+    return copy(sources = sources.map(SourceFileDeclaration::substituteTsStdLibEntities))
+}

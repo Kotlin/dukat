@@ -25,8 +25,9 @@ external fun `fun`()
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
-    var `string-literal`: Boolean
-    var `another-string-literal`: String
+    operator fun get(key: String): Any?
+    operator fun set(key: String, value: Any?)
+    var this_one_shouldnt_be_escaped: Boolean
     var `when`: String
     var `typealias`: Number
     var `typeof`: Number
@@ -50,6 +51,7 @@ external open class `is`<`interface`> {
     open fun `package`(a: Any): Boolean
 
     companion object {
+        fun `class`(): This
         fun `in`(obj: Foo)
         fun `is`(value: Any): Boolean
         fun `return`(): Any
@@ -59,9 +61,11 @@ external open class `is`<`interface`> {
     }
 }
 
-external fun <T, U> When(value: `when`.Promise<T>, transform: (`val`: T) -> U): `fun`.Promise<U>
+external fun <T, U> When(value: `when`.Promise<T>, transform: (param_val: T) -> U): `fun`.Promise<U>
 
 external var `_`: `__`.`___`
+
+typealias WatchHandler<T> = (param_val: T, oldVal: T) -> Unit
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("when")
@@ -85,7 +89,7 @@ import org.w3c.xhr.*
 
 external var `$`: Boolean
 
-external fun `package`(`as`: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
+external fun `package`(param_as: bar.string.`interface`, b: `$boo`.`typealias`): `$tring`
 
 external interface Promise<T>
 

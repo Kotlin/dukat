@@ -15,14 +15,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface IBar
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
+external interface ArrayType<T> {
+    var type: T
 
-external interface IFoo {
-    var `200`: String
-    var `300`: Number?
-        get() = definedExternally
-        set(value) = definedExternally
-    var `400`: IBar?
-        get() = definedExternally
-        set(value) = definedExternally
+    companion object {
+        var BYTES: Number
+    }
 }
