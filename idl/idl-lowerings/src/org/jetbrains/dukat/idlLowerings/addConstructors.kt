@@ -121,6 +121,7 @@ private class ConstructorLowering : IDLLowering {
                             parents = listOf(
                                     IDLSingleTypeDeclaration(it.interfaceName, null, false)
                             ),
+                            unions = listOf(),
                             extendedAttributes = listOf(),
                             getters = listOf(),
                             setters = listOf(),
