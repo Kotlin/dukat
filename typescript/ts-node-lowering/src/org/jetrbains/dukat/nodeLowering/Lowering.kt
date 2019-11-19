@@ -33,7 +33,7 @@ interface Lowering<T : TypeEntity> {
     fun lowerFunctionNode(declaration: FunctionTypeNode): T
     fun lowerUnionTypeNode(declaration: UnionTypeNode): T
 
-    fun lowerClassLikeNode(declaration: ClassLikeNode): ClassLikeNode {
+    fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
         return when (declaration) {
             is InterfaceNode -> lowerInterfaceNode(declaration)
             is ClassNode -> lowerClassNode(declaration)
@@ -42,26 +42,26 @@ interface Lowering<T : TypeEntity> {
         }
     }
 
-    fun lowerTopLevelEntity(declaration: TopLevelEntity): TopLevelEntity {
+    fun lowerTopLevelEntity(declaration: TopLevelEntity, owner: DocumentRootNode): TopLevelEntity {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
-            is ClassLikeNode -> lowerClassLikeNode(declaration)
+            is ClassLikeNode -> lowerClassLikeNode(declaration, owner)
             is DocumentRootNode -> lowerDocumentRoot(declaration)
             is TypeAliasNode -> lowerTypeAliasNode(declaration)
             else -> declaration.duplicate()
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
         return declarations.map { declaration ->
-            lowerTopLevelEntity(declaration)
+            lowerTopLevelEntity(declaration, owner)
         }
     }
 
     fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
         return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations)
+                declarations = lowerTopLevelDeclarations(documentRoot.declarations, documentRoot)
         )
     }
 }
