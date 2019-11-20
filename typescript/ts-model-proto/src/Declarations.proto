@@ -302,6 +302,7 @@ message EnumTokenDeclarationProto {
 message EnumDeclarationProto {
     string name = 1;
     repeated EnumTokenDeclarationProto values = 2;
+    string uid = 3;
 }
 
 message ClassDeclarationProto {

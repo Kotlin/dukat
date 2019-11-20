@@ -752,8 +752,9 @@ export class AstConverter {
 
             res.push(this.astFactory.createEnumDeclaration(
               statement.name.getText(),
-              enumTokens
-            ))
+              enumTokens,
+              this.exportContext.getUID(statement)
+            ));
         } else if (ts.isVariableStatement(statement)) {
             for (let declaration of statement.declarationList.declarations) {
                 res.push(this.astFactory.declareVariable(

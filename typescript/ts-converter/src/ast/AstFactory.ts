@@ -90,10 +90,11 @@ export class AstFactory implements AstFactory {
     return definition;
   }
 
-  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>): EnumDeclaration {
+  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): EnumDeclaration {
     let enumDeclaration = new declarations.EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
+    enumDeclaration.setUid(uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setEnumdeclaration(enumDeclaration);
