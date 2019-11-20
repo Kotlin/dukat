@@ -5,8 +5,9 @@ import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 class ObjectConstraint(
+        owner: PropertyOwner,
         val instantiatedClass: PropertyOwnerConstraint? = null
-) : PropertyOwnerConstraint {
+) : PropertyOwnerConstraint(owner) {
     val propertyNames: Set<String>
         get() = properties.keys
 
@@ -35,21 +36,21 @@ class ObjectConstraint(
         }
     }
 
-    override fun resolve(owner: PropertyOwner): ObjectConstraint {
+    override fun resolve(): ObjectConstraint {
         val resolvedConstraint = if (instantiatedClass == null) {
-            ObjectConstraint()
+            ObjectConstraint(owner)
         } else {
-            val resolvedClass = instantiatedClass.resolve(owner)
+            val resolvedClass = instantiatedClass.resolve()
 
             if (resolvedClass is PropertyOwnerConstraint) {
-                ObjectConstraint(resolvedClass)
+                ObjectConstraint(owner, resolvedClass)
             } else {
-                raiseConcern("Instantiating constraint which cannot be instantiated!") { ObjectConstraint() }
+                raiseConcern("Instantiating constraint which cannot be instantiated!") { ObjectConstraint(owner) }
             }
         }
 
         propertyNames.forEach {
-            resolvedConstraint[it] = this[it]!!.resolve(owner)
+            resolvedConstraint[it] = this[it]!!.resolve()
         }
 
         return resolvedConstraint

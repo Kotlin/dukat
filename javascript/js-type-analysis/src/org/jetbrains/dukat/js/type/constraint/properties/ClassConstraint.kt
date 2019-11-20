@@ -3,7 +3,7 @@ package org.jetbrains.dukat.js.type.constraint.properties
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
-class ClassConstraint(prototype: ObjectConstraint = ObjectConstraint()) : PropertyOwnerConstraint {
+class ClassConstraint(parent: PropertyOwner, prototype: ObjectConstraint = ObjectConstraint(parent)) : PropertyOwnerConstraint(parent) {
     val propertyNames: Set<String>
         get() = staticMembers.keys
 
@@ -21,11 +21,11 @@ class ClassConstraint(prototype: ObjectConstraint = ObjectConstraint()) : Proper
         return staticMembers[name]
     }
 
-    override fun resolve(owner: PropertyOwner): ClassConstraint {
-        val resolvedConstraint = ClassConstraint()
+    override fun resolve(): ClassConstraint {
+        val resolvedConstraint = ClassConstraint(owner)
 
         propertyNames.forEach {
-            resolvedConstraint[it] = this[it]!!.resolve(owner)
+            resolvedConstraint[it] = this[it]!!.resolve()
         }
 
         return resolvedConstraint

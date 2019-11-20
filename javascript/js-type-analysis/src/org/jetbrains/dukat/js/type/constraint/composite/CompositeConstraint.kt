@@ -7,8 +7,6 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstrain
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
-import javax.lang.model.type.NoType
 
 class CompositeConstraint(private val constraints: MutableSet<Constraint>) : Constraint {
     constructor(vararg constraints: Constraint) : this(mutableSetOf(*constraints))
@@ -32,8 +30,8 @@ class CompositeConstraint(private val constraints: MutableSet<Constraint>) : Con
         }
     }
 
-    override fun resolve(owner: PropertyOwner): Constraint {
-        val resolvedConstraints = getFlatConstraints().map { it.resolve(owner) }
+    override fun resolve(): Constraint {
+        val resolvedConstraints = getFlatConstraints().map { it.resolve() }
 
         return when {
             resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint

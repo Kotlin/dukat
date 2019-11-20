@@ -123,6 +123,7 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
     }
 
     return CallResultConstraint(
+            owner,
             callTargetConstraints
     )
 }
@@ -134,37 +135,38 @@ fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: Pa
     arguments.map { it.calculateConstraints(owner, path) }
 
     return ObjectConstraint(
+            owner = owner,
             instantiatedClass = classConstraints as ClassConstraint
     )
 }
 
-fun ObjectLiteralExpressionDeclaration.calculateConstraints(path: PathWalker) : ObjectConstraint {
-    val obj = ObjectConstraint()
+fun ObjectLiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : ObjectConstraint {
+    val obj = ObjectConstraint(owner)
     members.forEach { it.addTo(obj, path) }
     return obj
 }
 
-fun LiteralExpressionDeclaration.calculateConstraints(path: PathWalker) : Constraint {
+fun LiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (this) {
         is StringLiteralExpressionDeclaration -> StringTypeConstraint
         is NumericLiteralExpressionDeclaration -> NumberTypeConstraint
         is BigIntLiteralExpressionDeclaration -> BigIntTypeConstraint
         is BooleanLiteralExpressionDeclaration -> BooleanTypeConstraint
-        is ObjectLiteralExpressionDeclaration -> this.calculateConstraints(path)
+        is ObjectLiteralExpressionDeclaration -> this.calculateConstraints(owner, path)
         else -> raiseConcern("Unexpected literal expression type <${this::class}>") { CompositeConstraint(NoTypeConstraint) }
     }
 }
 
 fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (this) {
-        is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier)
+        is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
         is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
         is CallExpressionDeclaration -> this.calculateConstraints(owner, path)
         is NewExpressionDeclaration -> this.calculateConstraints(owner, path)
-        is LiteralExpressionDeclaration -> this.calculateConstraints(path)
+        is LiteralExpressionDeclaration -> this.calculateConstraints(owner, path)
         else -> CompositeConstraint(NoTypeConstraint)
     }
 }

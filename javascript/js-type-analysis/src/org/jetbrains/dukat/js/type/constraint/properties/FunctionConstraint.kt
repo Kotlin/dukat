@@ -12,17 +12,17 @@ class FunctionConstraint(
 ) : ImmutableConstraint { //TODO make property owner (since functions technically are, in javascript)
     private var isResolving = false
 
-    override fun resolve(owner: PropertyOwner): FunctionConstraint {
-        if (!isResolving) {
+    override fun resolve(): FunctionConstraint {
+        return if (!isResolving) {
             isResolving = true
             val resolvedConstraint = FunctionConstraint(
-                    returnConstraints.resolve(owner),
-                    parameterConstraints.map { (name, constraint) -> name to constraint.resolve(owner) }
+                    returnConstraints.resolve(),
+                    parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
             )
             isResolving = false
-            return resolvedConstraint
+            resolvedConstraint
         } else {
-            return FunctionConstraint(
+            FunctionConstraint(
                     RecursiveConstraint,
                     parameterConstraints.map { (name, _) -> name to NoTypeConstraint }
             )

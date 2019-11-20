@@ -3,34 +3,44 @@ package org.jetbrains.dukat.js.type.constraint.reference
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
-import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 open class ReferenceConstraint(
         private val identifier: IdentifierEntity,
-        private val parent: PropertyOwnerConstraint? = null
-) : PropertyOwnerReferenceConstraint() {
-    override fun resolve(owner: PropertyOwner): Constraint {
-        val referenceOwner = if (parent != null) {
-            val resolvedParent = parent.resolve(owner)
+        owner: PropertyOwner
+) : PropertyOwnerReferenceConstraint(owner) {
+    private tailrec fun resolveInOwner(owner: PropertyOwner): Constraint? {
+        val resolvedOwner = if(owner is Constraint) {
+            val resolvedConstraint = owner.resolve()
 
-            if(resolvedParent is PropertyOwner) {
-                resolvedParent
+            if (resolvedConstraint is PropertyOwner) {
+                resolvedConstraint
             } else {
-                raiseConcern("Accessing property of non-property-owner") {  }
-                return CompositeConstraint()
+                raiseConcern("Accessing property of non-property-owner") { null }
             }
         } else {
             owner
         }
 
-        val dereferencedConstraint = referenceOwner[identifier]
+        return if(resolvedOwner != null) {
+            val dereferencedConstraint = resolvedOwner[identifier]
 
-        return if (dereferencedConstraint != null && dereferencedConstraint !is ReferenceConstraint) {
-            dereferencedConstraint.resolveWithProperties(referenceOwner)
+            if (dereferencedConstraint != null && dereferencedConstraint !is ReferenceConstraint) {
+                dereferencedConstraint.resolveWithProperties()
+            } else {
+                if (resolvedOwner.owner != null) {
+                    resolveInOwner(resolvedOwner.owner!!)
+                } else {
+                    null
+                }
+            }
         } else {
-            this
+            null
         }
+    }
+
+    override fun resolve(): Constraint {
+        return resolveInOwner(owner) ?: CompositeConstraint()
     }
 }

@@ -9,8 +9,8 @@ import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 class UnionTypeConstraint(
         val types: List<Constraint>
 ) : ImmutableConstraint {
-    override fun resolve(owner: PropertyOwner): Constraint {
-        val resolvedTypes = types.map { it.resolve(owner) }.filter { it != RecursiveConstraint }
+    override fun resolve(): Constraint {
+        val resolvedTypes = types.map { it.resolve() }.filter { it != RecursiveConstraint }
 
         return when (resolvedTypes.size) {
             0 -> NoTypeConstraint

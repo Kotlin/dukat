@@ -10,6 +10,8 @@ import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaratio
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
 interface PropertyOwner {
+    val owner: PropertyOwner?
+
     operator fun set(name: String, data: Constraint)
 
     operator fun set(identifier: IdentifierEntity, data: Constraint) {
@@ -36,27 +38,6 @@ interface PropertyOwner {
         }
     }
 
-    /*
-    fun has(name: String) : Boolean
-
-    fun has(identifier: IdentifierEntity) : Boolean {
-        return has(identifier.value)
-    }
-
-    fun has(identifierExpression: IdentifierExpressionDeclaration) : Boolean {
-        return has(identifierExpression.identifier)
-    }
-
-    fun has(propertyAccessExpression: PropertyAccessExpressionDeclaration) : Boolean
-
-    fun has(expression: ExpressionDeclaration) : Boolean {
-        return when (expression) {
-            is IdentifierExpressionDeclaration -> has(expression)
-            is PropertyAccessExpressionDeclaration -> has(expression)
-            else -> raiseConcern("Cannot get variable described by expression of type <${expression::class}>") { false }
-        }
-    }
-    */
 
     operator fun get(name: String) : Constraint?
 

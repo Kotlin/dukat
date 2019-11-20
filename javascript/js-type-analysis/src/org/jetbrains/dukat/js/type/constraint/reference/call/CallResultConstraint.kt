@@ -6,15 +6,16 @@ import org.jetbrains.dukat.js.type.constraint.reference.PropertyOwnerReferenceCo
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class CallResultConstraint(
+        owner: PropertyOwner,
         private val callTarget: Constraint
-) : PropertyOwnerReferenceConstraint() {
-    override fun resolve(owner: PropertyOwner): Constraint {
-        val functionConstraint = callTarget.resolve(owner)
+) : PropertyOwnerReferenceConstraint(owner) {
+    override fun resolve(): Constraint {
+        val functionConstraint = callTarget.resolve()
 
         return if (functionConstraint is FunctionConstraint) {
-            functionConstraint.returnConstraints.resolveWithProperties(owner)
+            functionConstraint.returnConstraints.resolveWithProperties()
         } else {
-            CallResultConstraint(functionConstraint)
+            CallResultConstraint(owner, functionConstraint)
         }
     }
 }

@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.js.type.constraint
 
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
-
 interface Constraint {
     operator fun plusAssign(other: Constraint)
 
@@ -11,5 +9,5 @@ interface Constraint {
         }
     }
 
-    fun resolve(owner: PropertyOwner) : Constraint
+    fun resolve() : Constraint
 }

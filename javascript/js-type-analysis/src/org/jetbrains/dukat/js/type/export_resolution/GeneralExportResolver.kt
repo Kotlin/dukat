@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 class GeneralExportResolver : ExportResolver {
     override fun resolve(scope: Scope) : List<TopLevelDeclaration> {
         return scope.propertyNames.mapNotNull { propertyName ->
-            val resolvedConstraint = scope[propertyName].resolve(scope)
+            val resolvedConstraint = scope[propertyName].resolve()
             resolvedConstraint.toDeclaration(propertyName)
         }
     }

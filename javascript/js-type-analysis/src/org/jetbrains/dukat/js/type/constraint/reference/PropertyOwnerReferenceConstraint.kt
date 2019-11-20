@@ -6,7 +6,7 @@ import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
-abstract class PropertyOwnerReferenceConstraint : PropertyOwnerConstraint {
+abstract class PropertyOwnerReferenceConstraint(parent: PropertyOwner) : PropertyOwnerConstraint(parent) {
     private val modifiedProperties = LinkedHashMap<String, Constraint>()
 
     override fun set(name: String, data: Constraint) {
@@ -21,7 +21,7 @@ abstract class PropertyOwnerReferenceConstraint : PropertyOwnerConstraint {
      * Called at resolving stage,
      * to apply properties to the resolved reference.
      */
-    protected fun Constraint.resolveWithProperties(owner: PropertyOwner) : Constraint {
+    protected fun Constraint.resolveWithProperties() : Constraint {
         if(this is PropertyOwner) {
             modifiedProperties.forEach { (name, constraint) ->
                 //TODO take composite constraints into account here
@@ -29,6 +29,6 @@ abstract class PropertyOwnerReferenceConstraint : PropertyOwnerConstraint {
             }
         }
 
-        return this.resolve(owner)
+        return this.resolve()
     }
 }

@@ -31,6 +31,29 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 
+fun List<FunctionConstraint>.pack() : FunctionConstraint {
+    return if (size == 1) {
+        this[0]
+    } else {
+        val parameters = mutableListOf<Pair<String, MutableList<Constraint>>>()
+
+        forEach {
+            it.parameterConstraints.forEachIndexed { index, (name, constraint) ->
+                if (parameters.size <= index) {
+                    parameters.add(index, name to mutableListOf())
+                }
+
+                parameters[index].second.add(constraint)
+            }
+        }
+
+        FunctionConstraint(
+                returnConstraints = UnionTypeConstraint(map { it.returnConstraints }),
+                parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
+        )
+    }
+}
+
 fun FunctionDeclaration.addTo(owner: PropertyOwner) {
     if (this.body != null) {
         val pathWalker = PathWalker()
@@ -38,7 +61,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) {
         val versions = mutableListOf<FunctionConstraint>()
 
         do {
-            val functionScope = Scope()
+            val functionScope = Scope(owner)
 
             val parameterConstraints = MutableList(parameters.size) { i ->
                 // Store constraints of parameters in scope,
@@ -56,26 +79,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) {
             ))
         } while (pathWalker.startNextPath())
 
-        owner[name] = if (versions.size == 1) {
-            versions[0]
-        } else {
-            val parameters = mutableListOf<Pair<String, MutableList<Constraint>>>()
-
-            versions.forEach {
-                it.parameterConstraints.forEachIndexed { index, (name, constraint) ->
-                    if (parameters.size <= index) {
-                        parameters.add(index, name to mutableListOf())
-                    }
-
-                    parameters[index].second.add(constraint)
-                }
-            }
-
-            FunctionConstraint(
-                    returnConstraints = UnionTypeConstraint(versions.map { it.returnConstraints }),
-                    parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
-            )
-        }
+        owner[name] = versions.pack()
     }
 }
 
@@ -120,7 +124,7 @@ fun MemberDeclaration.addToClass(owner: ClassConstraint, path: PathWalker) {
 fun ClassDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
     val className = name // Needed for smart cast
     if(className is IdentifierEntity) {
-        val classConstraint = ClassConstraint()
+        val classConstraint = ClassConstraint(owner)
 
         members.forEach { it.addToClass(classConstraint, path) }
 
@@ -165,23 +169,21 @@ fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: 
 }
 
 fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
-    var returnTypeConstraints: Constraint? = null
-
     when (this) {
         is FunctionDeclaration -> this.addTo(owner)
         is ClassDeclaration -> this.addTo(owner, path)
         is VariableDeclaration -> this.addTo(owner, path)
-        is IfStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
-        is WhileStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
+        is IfStatementDeclaration -> return this.calculateConstraints(owner, path)
+        is WhileStatementDeclaration -> return this.calculateConstraints(owner, path)
         is ExpressionStatementDeclaration -> this.calculateConstraints(owner, path)
-        is BlockDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
-        is ReturnStatementDeclaration -> returnTypeConstraints = this.calculateConstraints(owner, path)
+        is BlockDeclaration -> return this.calculateConstraints(owner, path)
+        is ReturnStatementDeclaration -> return this.calculateConstraints(owner, path)
         is InterfaceDeclaration,
         is ModuleDeclaration -> { /* These statements aren't supported in JS (ignore them) */ }
         else -> raiseConcern("Unexpected top level entity type <${this::class}>") {  }
     }
 
-    return returnTypeConstraints
+    return null
 }
 
 fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
@@ -199,10 +201,15 @@ fun List<TopLevelDeclaration>.calculateConstraints(owner: PropertyOwner, path: P
 fun ModuleDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) = declarations.calculateConstraints(owner, path)
 
 fun ModuleDeclaration.introduceTypes(exportResolver: ExportResolver) : ModuleDeclaration {
-    val scope = Scope()
+    val scope = Scope(null)
     val pathWalker = PathWalker()
     calculateConstraints(scope, pathWalker)
-    //TODO check other paths
+
+    if (pathWalker.startNextPath()) {
+        //TODO check other paths
+        raiseConcern("Conditional at top level not allowed!") {  }
+    }
+
     val declarations = exportResolver.resolve(scope)
     return copy(declarations = declarations)
 }
