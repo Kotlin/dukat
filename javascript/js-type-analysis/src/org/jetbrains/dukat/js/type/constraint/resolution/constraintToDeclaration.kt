@@ -49,7 +49,7 @@ fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStat
         type = type,
         typeParameters = emptyList(),
         optional = false,
-        modifiers = if (isStatic) emptyList() else STATIC_MODIFIERS
+        modifiers = if (isStatic) STATIC_MODIFIERS else emptyList()
 )
 
 fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(

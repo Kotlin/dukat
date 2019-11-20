@@ -15,23 +15,17 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface `T$0` {
-    companion object {
-        var x: Number
-        var y: Number
-    }
+    var x: Number
+    var y: Number
 }
 
 external fun get2DVector(): `T$0`
 
-@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface `T$1` {
-    companion object {
-        var x: Number
-        var y: Number
-        var z: Number
-    }
+    var x: Number
+    var y: Number
+    var z: Number
 }
 
 external fun get3DVector(): `T$1`
