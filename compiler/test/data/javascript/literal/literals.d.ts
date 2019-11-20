@@ -1,5 +1,5 @@
-var num, bool, str;
-
-num = 3;
-bool = true;
-str = "text";
+module.exports = {
+    num: 3,
+    bool: true,
+    str: "text"
+}

@@ -17,8 +17,4 @@ import org.w3c.xhr.*
 
 external fun numFun(): Number
 
-external var value: String
-
-external fun bar(): String
-
 external fun strFun(): String

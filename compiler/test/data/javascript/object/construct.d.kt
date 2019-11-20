@@ -31,5 +31,3 @@ external object v {
     fun negate(x: Any?, y: Any?, z: Any?): `T$0`
     var double: `T$0`
 }
-
-external fun negate(x: Any?, y: Any?, z: Any?): `T$0`

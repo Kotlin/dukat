@@ -13,3 +13,7 @@ function boolReferenceFun() {
 function stringReferenceFun() {
     return str
 }
+
+module.exports.numReferenceFun = numReferenceFun
+module.exports.boolReferenceFun = boolReferenceFun
+module.exports.stringReferenceFun = stringReferenceFun

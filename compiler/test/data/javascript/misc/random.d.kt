@@ -25,20 +25,6 @@ external object _ {
     fun isEmpty(obj: Any?): Boolean
 }
 
-external fun values(obj: Any?): Any?
-
-external fun keys(obj: Any?): Any?
-
-external fun negate(predicate: Any?): Boolean
-
-external fun isArray(obj: Any?): Boolean
-
-external fun isObject(obj: Any?): Boolean
-
-external fun isElement(obj: Any?): Boolean
-
-external fun isEmpty(obj: Any?): Boolean
-
 external fun keyInObj(value: Any?, key: Any?, obj: Any?): Boolean
 
 external fun createPredicateIndexFinder(array: Any?, predicate: Any?, context: Any?, dir: Any?): Number

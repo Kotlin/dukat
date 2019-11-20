@@ -12,3 +12,5 @@ class Literals {
         return false
     }
 }
+
+module.exports.Literals = Literals

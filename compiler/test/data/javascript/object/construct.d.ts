@@ -1,4 +1,3 @@
-
 var v = {};
 
 v.x = 5;
@@ -22,3 +21,5 @@ v.double = {}
 v.double.x = 2*v.x;
 v.double.y = 2*v.y;
 v.double.z = 2*v.z;
+
+module.exports.v = v

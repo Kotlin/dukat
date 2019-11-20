@@ -15,12 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external var num: Number
-
-external var bool: Boolean
-
-external var str: String
-
 external fun numReferenceFun(): Number
 
 external fun boolReferenceFun(): Boolean

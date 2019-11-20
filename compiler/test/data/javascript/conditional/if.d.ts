@@ -1,15 +1,21 @@
 
-function max(a, b) {
-    if (a > b)
-        return a
-
-    return b
+function isNum(x) {
+    return typeof x == "number"
 }
 
-function negate(a) {
-    if(isNum(a)) {
-        return -a
-    } else {
-        return !a
+module.exports = {
+    max(a, b) {
+        if (a > b)
+            return a
+
+        return b
+    },
+
+    negate(a) {
+        if(isNum(a)) {
+            return -a
+        } else {
+            return !a
+        }
     }
 }

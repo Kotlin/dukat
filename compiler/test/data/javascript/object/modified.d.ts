@@ -21,3 +21,9 @@ var obj = {
 function modObj() {
     obj.b = "text"
 }
+
+
+module.exports.get2DVector = get2DVector
+module.exports.get3DVector = get3DVector
+module.exports.obj = obj
+module.exports.modObj = modObj

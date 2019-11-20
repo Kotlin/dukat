@@ -81,3 +81,9 @@ function isArrayLike(collection) {
     var length = getLength(collection);
     return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
 }
+
+
+module.exports._ = _
+module.exports.keyInObj = keyInObj
+module.exports.createPredicateIndexFinder = createPredicateIndexFinder
+module.exports.isArrayLike = isArrayLike

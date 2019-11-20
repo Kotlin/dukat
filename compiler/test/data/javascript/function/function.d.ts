@@ -1,21 +1,24 @@
-function numBinaryFun(a, b) {
-    return a - b
-}
 
-function numUnaryFun(a) {
-    var b = a
-    a = "text"
-    return b++
-}
+module.exports = {
+    numBinaryFun(a, b) {
+        return a - b
+    },
 
-function boolBinaryFun(a, b) {
-    return a == b
-}
+    numUnaryFun(a) {
+        var b = a
+        a = "text"
+        return b++
+    },
 
-function boolUnaryFun(a) {
-    return !a
-}
+    boolBinaryFun(a, b) {
+        return a == b
+    },
 
-function anyFun(a, b) {
-    return a + b
+    boolUnaryFun(a) {
+        return !a
+    },
+
+    anyFun(a, b) {
+        return a + b
+    }
 }

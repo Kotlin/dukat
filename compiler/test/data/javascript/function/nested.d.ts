@@ -21,3 +21,6 @@ function strFun() {
 
     return bar()
 }
+
+exports.numFun = numFun
+exports.strFun = strFun

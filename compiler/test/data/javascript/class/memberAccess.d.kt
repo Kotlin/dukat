@@ -15,14 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class Literals {
-    companion object {
-        fun getStringLiteral(): String
-        fun getNumberLiteral(): Number
-        fun getBooleanLiteral(): Boolean
-    }
-}
-
 external var str: String
 
 external var num: Number
