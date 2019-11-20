@@ -144,7 +144,7 @@ private class IntroduceMissedOverloads : NodeTypeLowering {
         val nodesDataMap = documentRoot.createDataMap()
 
         return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations) + nodesDataMap.generateFunctions()
+                declarations = lowerTopLevelDeclarations(documentRoot.declarations, documentRoot) + nodesDataMap.generateFunctions()
         )
     }
 }

@@ -4,8 +4,12 @@ declare var $foo: boolean;
 declare function bar$(ba$z: number);
 declare function fun();
 interface This {
-    "string-literal": boolean,
-    'another-string-literal': string,
+    "string-literal": boolean;
+    'another-string-literal': string;
+    "this_one_shouldnt_be_escaped": boolean;
+    '3х': string;
+    200: string;
+    300?: number;
     when: string;
     typealias: number;
     typeof: number;
@@ -20,6 +24,7 @@ declare class is<interface> {
     as: number;
     package(a): boolean;
 
+    static class(): This
     static in(object: Foo);
     static is(value: any): Boolean;
     static return(): any;
@@ -59,3 +64,5 @@ declare namespace __ {
     interface _OK_ {
     }
 }
+
+type WatchHandler<T> = (val: T, oldVal: T) => void;

@@ -254,7 +254,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     private fun EnumDeclaration.convert(): EnumNode {
         return EnumNode(
                 name = IdentifierEntity(name),
-                values = values.map { value -> EnumTokenNode(value.value, value.meta) }
+                values = values.map { value -> EnumTokenNode(value.value, value.meta) },
+                uid = uid
         )
     }
 

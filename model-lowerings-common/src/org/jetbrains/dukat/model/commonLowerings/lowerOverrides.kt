@@ -30,17 +30,29 @@ private class OverrideResolver(val context: ModelContext) {
         }
     }
 
+    private fun TypeValueModel.resolveInterface(): InterfaceModel? {
+        return context.resolveInterface(this.fqName)
+    }
+
+    private fun TypeValueModel.resolveClass(): ClassModel? {
+        return context.resolveClass(this.fqName)
+    }
+
+    private fun TypeValueModel.resolveClassLike(): ClassLikeModel? {
+        return resolveInterface() ?: resolveClass()
+     }
+
     private fun InterfaceModel.getKnownParents(): List<InterfaceModel> {
         return parentEntities.flatMap { heritageModel ->
-            context.resolveInterface(heritageModel.value.value)?.let { parentInterface ->
+            heritageModel.value.resolveInterface()?.let { parentInterface ->
                 listOf(parentInterface) + parentInterface.getKnownParents()
             } ?: emptyList()
         }
     }
 
     private fun ClassModel.getKnownParents(): List<ClassLikeModel> {
-        return parentEntities.flatMap {
-            (context.resolveInterface(it.value.value) ?: context.resolveClass(it.value.value))?.let { parentModel ->
+        return parentEntities.flatMap { heritageModel ->
+            (heritageModel.value.resolveInterface() ?: heritageModel.value.resolveClass())?.let { parentModel ->
                 listOf(parentModel) + parentModel.getKnownParents()
             } ?: emptyList()
         }
@@ -147,8 +159,8 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            val classLike: ClassLikeModel? = context.resolve(value)
-            val otherClassLike: ClassLikeModel? = context.resolve(otherParameterType.value)
+            val classLike: ClassLikeModel? = resolveClassLike()
+            val otherClassLike: ClassLikeModel? = otherParameterType.resolveClassLike()
 
 
             val isSameClass = classLike != null && classLike === otherClassLike
@@ -229,10 +241,10 @@ private class OverrideResolver(val context: ModelContext) {
 private fun ModuleModel.updateContext(context: ModelContext) {
     for (declaration in declarations) {
         if (declaration is InterfaceModel) {
-            context.registerInterface(declaration)
+            context.registerInterface(declaration, this)
         }
         if (declaration is ClassModel) {
-            context.registerClass(declaration)
+            context.registerClass(declaration, this)
         }
     }
 

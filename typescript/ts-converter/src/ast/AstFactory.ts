@@ -95,10 +95,11 @@ export class AstFactory implements AstFactory {
     return definition;
   }
 
-  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>): EnumDeclaration {
+  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): EnumDeclaration {
     let enumDeclaration = new declarations.EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
+    enumDeclaration.setUid(uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setEnumdeclaration(enumDeclaration);
@@ -236,6 +237,7 @@ export class AstFactory implements AstFactory {
   createIdentifierDeclarationAsNameEntity(value: string): IdentifierEntity {
     let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
+
     let nameDeclaration = new declarations.NameDeclarationProto();
     nameDeclaration.setIdentifier(identifierProto);
     return nameDeclaration;
@@ -263,9 +265,9 @@ export class AstFactory implements AstFactory {
     indexSignatureDeclaration.setIndextypesList(indexTypes);
     indexSignatureDeclaration.setReturntype(returnType);
 
-    let memberDeclaration = new declarations.MemberDeclarationProto();
-    memberDeclaration.setIndexsignature(indexSignatureDeclaration);
-    return memberDeclaration;
+    let memberEntity = new declarations.MemberDeclarationProto();
+    memberEntity.setIndexsignature(indexSignatureDeclaration);
+    return memberEntity;
   }
 
   createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration {
@@ -368,7 +370,7 @@ export class AstFactory implements AstFactory {
     let qualifier = new declarations.QualifierDeclarationProto();
     qualifier.setLeft(left);
     qualifier.setRight(right);
-    
+
     let nameDeclaration = new declarations.NameDeclarationProto();
     nameDeclaration.setQualifier(qualifier);
     return nameDeclaration;

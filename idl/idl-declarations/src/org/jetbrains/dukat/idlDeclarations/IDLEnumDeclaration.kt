@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.idlDeclarations
 
 data class IDLEnumDeclaration(
-        val name: String,
+        override val name: String,
         val members: List<String>,
+        val unions: List<IDLSingleTypeDeclaration>,
         val partial: Boolean = false
-) : IDLTopLevelDeclaration
+) : IDLClassLikeDeclaration
 
 private fun String.addUnderscoreIfStartsWithNumber(): String {
     return if (matches(Regex("^[0-9].*$"))) {

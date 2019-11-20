@@ -53,6 +53,7 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.impl.EnumEntrySyntheticClassDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDependenciesImpl
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
@@ -363,7 +364,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             val typeModel = TypeValueModel(
                 value = IdentifierEntity(annotationModel.name),
                 params = listOf(),
-                metaDescription = null
+                metaDescription = null,
+                fqName = null
             )
             val annotationClassDescriptor = findClass(typeModel)
             val primaryConstructor = annotationClassDescriptor?.constructors?.first()
@@ -397,7 +399,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         listOf()
                     )
                 },
-                metaDescription = null
+                metaDescription = null,
+                fqName = null
             )
         )
         return if (type.isError) null else type
@@ -793,11 +796,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                 TypeValueModel(
                                     value = enumModel.name,
                                     params = listOf(),
-                                    metaDescription = null
+                                    metaDescription = null,
+                                    fqName = null
                                 ), constraints = listOf(), variance = org.jetbrains.dukat.astModel.Variance.INVARIANT
                             )
                         ),
-                        metaDescription = null
+                        metaDescription = null,
+                        fqName = null
                     )
                 )
             ),
@@ -880,6 +885,16 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 }
 
+private fun computeAllParents(name: FqName): List<FqName> {
+    val allNames = mutableListOf<FqName>(FqName.ROOT)
+    var parent = name
+    while (parent != FqName.ROOT) {
+        allNames.add(parent)
+        parent = parent.parent()
+    }
+    return allNames
+}
+
 fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
 
     val moduleDescriptor = ModuleDescriptorImpl(
@@ -890,12 +905,18 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
 
     val translator = DescriptorTranslator(DescriptorContext(generateJSConfig()))
 
-    val provider = PackageFragmentProviderImpl(sources.map {
+    val fragments = sources.map {
         translator.translateModule(
             it.root,
             moduleDescriptor
         )
-    })
+    }
+
+    val namesToAdd = fragments.flatMap { computeAllParents(it.fqName) }.distinct() - fragments.map { it.fqName }
+
+    val provider =
+        PackageFragmentProviderImpl(fragments + namesToAdd.map { EmptyPackageFragmentDescriptor(moduleDescriptor, it) })
+
     moduleDescriptor.setDependencies(
         ModuleDependenciesImpl(
             listOf(moduleDescriptor) + builtIns.builtInsModule,

@@ -119,7 +119,8 @@ export class AstConverter {
         if (ts.isNumericLiteral(name)) {
             return "`" + name.getText() + "`";
         } else if (ts.isStringLiteral(name)) {
-            return "`" + name.getText().replace(/^["']/, "").replace(/["']$/, "") + "`";
+            let text = name.getText();
+            return text.substring(1, text.length - 1);
         } else if (ts.isIdentifier(name)) {
             return name.getText();
         }
@@ -702,6 +703,7 @@ export class AstConverter {
 
                     if (symbol) {
                         if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
+                            this.libVisitor.process(symbol.declarations[0]);
                             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
                         }
                     }
@@ -794,8 +796,9 @@ export class AstConverter {
 
             res.push(this.astFactory.createEnumDeclaration(
               statement.name.getText(),
-              enumTokens
-            ))
+              enumTokens,
+              this.exportContext.getUID(statement)
+            ));
         } else if (ts.isVariableStatement(statement)) {
             for (let declaration of statement.declarationList.declarations) {
                 res.push(this.astFactory.declareVariable(

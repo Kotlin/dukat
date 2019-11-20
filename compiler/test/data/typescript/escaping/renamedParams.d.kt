@@ -15,24 +15,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget>
-
-external interface EventHandlerBase<TContext, T>
-
-typealias EventHandler<TCurrentTarget, TData> = EventHandlerBase<TCurrentTarget, TriggeredEvent<TCurrentTarget, TData, Any, Any>>
-
-external var yargs: yargs.Argv<Any>
-
-external interface `T$0` {
-    var x: String
-}
-
-external var yarrrrgs: yargs.Arrrrgv<`T$0`>
+/* extending interface from _referenced.d.ts */
+inline fun SomeInterface.ping(obj: Any) { this.asDynamic().ping(obj) }
 
 // ------------------------------------------------------------------------------------------
-@file:JsQualifier("yargs")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package yargs
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -49,10 +36,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface Argv<T> {
-    fun ping(): T
-}
-
-external interface Arrrrgv<T> {
-    fun ping(): T
-}
+external interface SomeInterface

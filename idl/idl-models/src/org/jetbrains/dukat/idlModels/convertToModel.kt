@@ -56,6 +56,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.processEnumMember
@@ -107,7 +108,8 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
                             it
                         }
                     },
-            metaDescription = comment
+            metaDescription = comment,
+            fqName = null
     )
     return typeModel.copy(
             nullable = when (typeModel.value) {
@@ -121,7 +123,7 @@ fun IDLSingleTypeDeclaration.process(): TypeValueModel {
 fun IDLFunctionTypeDeclaration.process(): FunctionTypeModel {
 
     val returnTypeModel = if (returnType.name == "any") {
-        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null)
+        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null, null)
     } else {
         returnType.process()
     }
@@ -139,7 +141,7 @@ fun IDLTypeDeclaration.process(): TypeModel {
         is IDLSingleTypeDeclaration -> process()
         is IDLFunctionTypeDeclaration -> process()
         //there shouldn't be any UnionTypeDeclarations at this stage
-        else -> raiseConcern("unprocessed type declaration: ${this}") { TypeValueModel(IdentifierEntity("IMPOSSIBLE"), listOf(), null) }
+        else -> raiseConcern("unprocessed type declaration: ${this}") { TypeValueModel(IdentifierEntity("IMPOSSIBLE"), listOf(), null, null) }
     }
 }
 
@@ -166,7 +168,8 @@ fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel
             type = TypeValueModel(
                     value = IdentifierEntity("Unit"),
                     params = listOf(),
-                    metaDescription = null
+                    metaDescription = null,
+                    fqName = null
             ),
             typeParameters = listOf(),
             annotations = mutableListOf(AnnotationModel(
@@ -260,7 +263,7 @@ fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
         null
     }
 
-    val parentModels = parents.map {
+    val parentModels = (parents + unions).map {
         HeritageModel(
                 it.process(),
                 listOf(),
@@ -373,7 +376,7 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             members = members.filterNot { it.inherited }.mapNotNull { it.process() },
             companionObject = null,
             typeParameters = listOf(),
-            parentEntities = parents.map {
+            parentEntities = (parents + unions).map {
                 HeritageModel(
                         it.process(),
                         listOf(),
@@ -391,7 +394,8 @@ fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
             type = TypeValueModel(
                     value = IdentifierEntity(name),
                     params = listOf(),
-                    metaDescription = null
+                    metaDescription = null,
+                    fqName = null
             ),
             typeParameters = listOf(),
             annotations = mutableListOf(AnnotationModel(
@@ -421,7 +425,13 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                     comment = null
             ),
             typeParameters = listOf(),
-            parentEntities = listOf(),
+            parentEntities = unions.map {
+                HeritageModel(
+                        it.process(),
+                        listOf(),
+                        null
+                )
+            },
             comment = SimpleCommentEntity(
                     "please, don't implement this interface!"
             ),
@@ -440,7 +450,8 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
                 type = TypeValueModel(
                         value = declaration.name,
                         params = listOf(),
-                        metaDescription = null
+                        metaDescription = null,
+                        fqName = null
                 ),
                 annotations = mutableListOf(),
                 immutable = true,
@@ -476,7 +487,7 @@ fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
     return listOf(declaration) + generatedVariables
 }
 
-fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
+fun IDLNamespaceDeclaration.convertToModel(): TopLevelModel {
     return ObjectModel(
             name = IdentifierEntity(name),
             members = attributes.mapNotNull { it.process() } +
@@ -484,6 +495,26 @@ fun IDLNamespaceDeclaration.convertToModel() : TopLevelModel {
             parentEntities = listOf(),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
             comment = null
+    )
+}
+
+fun IDLUnionDeclaration.convertToModel(): TopLevelModel {
+    return InterfaceModel(
+            name = IdentifierEntity(name),
+            members = listOf(),
+            companionObject = null,
+            typeParameters = listOf(),
+            parentEntities = unions.map {
+                HeritageModel(
+                        it.process(),
+                        listOf(),
+                        null
+                )
+            },
+            comment = null,
+            annotations = mutableListOf(),
+            external = true,
+            visibilityModifier = VisibilityModifierModel.DEFAULT
     )
 }
 
@@ -496,6 +527,7 @@ fun IDLTopLevelDeclaration.convertToModel(): List<TopLevelModel>? {
         is IDLTypedefDeclaration -> null
         is IDLImplementsStatementDeclaration -> null
         is IDLIncludesStatementDeclaration -> null
+        is IDLUnionDeclaration -> listOf(convertToModel())
         else -> raiseConcern("unprocessed top level declaration: ${this}") { null }
     }
 }
@@ -557,7 +589,8 @@ fun IDLMemberDeclaration.process(): MemberModel? {
                 type = TypeValueModel(
                         value = IdentifierEntity("Unit"),
                         params = listOf(),
-                        metaDescription = null
+                        metaDescription = null,
+                        fqName = null
                 ),
                 typeParameters = listOf(),
                 static = false,
