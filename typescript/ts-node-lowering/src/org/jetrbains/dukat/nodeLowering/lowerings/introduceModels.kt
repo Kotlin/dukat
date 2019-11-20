@@ -592,10 +592,15 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 }
 
-private class ReferenceVisitor(private val visit: (ClassLikeNode, DocumentRootNode) -> Unit): NodeTypeLowering{
+private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit): NodeTypeLowering{
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
-        visit(declaration, owner)
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
         return super.lowerClassLikeNode(declaration, owner)
+    }
+
+    override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        return super.lowerEnumNode(declaration, owner)
     }
 
     fun process(sourceSet: SourceSetNode) {
@@ -604,8 +609,8 @@ private class ReferenceVisitor(private val visit: (ClassLikeNode, DocumentRootNo
 }
 
 fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
-    ReferenceVisitor { classLike, owner ->
-       uidToFqNameMapper[classLike.uid] = owner.qualifiedPackageName.appendLeft(classLike.name)
+    ReferenceVisitor { uid, fqName ->
+       uidToFqNameMapper[uid] = fqName
     }.process(this)
 
     return NodeConverter(uidToFqNameMapper).convert(this)
