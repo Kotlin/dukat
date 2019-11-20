@@ -13,6 +13,7 @@ import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallArgumentConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallResultConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
@@ -129,14 +130,14 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
 }
 
 fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
-    val classConstraints = expression.calculateConstraints(owner, path)
+    val classConstraints = expression.calculateConstraints(owner, path) as PropertyOwnerConstraint
 
     //TODO add constraints for constructor call
     arguments.map { it.calculateConstraints(owner, path) }
 
     return ObjectConstraint(
             owner = owner,
-            instantiatedClass = classConstraints as ClassConstraint
+            instantiatedClass = classConstraints
     )
 }
 

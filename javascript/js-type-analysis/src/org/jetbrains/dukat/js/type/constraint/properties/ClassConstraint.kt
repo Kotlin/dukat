@@ -3,7 +3,7 @@ package org.jetbrains.dukat.js.type.constraint.properties
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
-class ClassConstraint(parent: PropertyOwner, prototype: ObjectConstraint = ObjectConstraint(parent)) : PropertyOwnerConstraint(parent) {
+class ClassConstraint(owner: PropertyOwner, prototype: ObjectConstraint = ObjectConstraint(owner)) : PropertyOwnerConstraint(owner) {
     val propertyNames: Set<String>
         get() = staticMembers.keys
 
