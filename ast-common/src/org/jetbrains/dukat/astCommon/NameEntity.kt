@@ -96,13 +96,14 @@ private fun escapeName(name: String): String {
             .replace("^interface$".toRegex(), "`interface`")
 }
 
-private fun unquote(name: String): String {
-    return name.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
+//TODO: it actually hardly belongs here
+private fun String.unquote(): String {
+    return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
 }
 
 fun NameEntity.unquote(): NameEntity {
     return when (this) {
-        is IdentifierEntity -> copy(value = escapeName(unquote(value)))
+        is IdentifierEntity -> copy(value = escapeName(value.unquote()))
         else -> this
     }
 }

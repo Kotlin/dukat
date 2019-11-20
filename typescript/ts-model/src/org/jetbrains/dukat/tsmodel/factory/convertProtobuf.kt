@@ -222,7 +222,7 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
 }
 
 fun EnumDeclarationProto.convert(): EnumDeclaration {
-    return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) })
+    return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) }, uid)
 }
 
 private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {

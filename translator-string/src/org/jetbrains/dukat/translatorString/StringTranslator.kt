@@ -9,7 +9,7 @@ import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel

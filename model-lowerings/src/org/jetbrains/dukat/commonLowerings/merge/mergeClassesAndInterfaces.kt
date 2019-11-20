@@ -57,7 +57,7 @@ private fun ClassModel.mergeWithClass(otherClass: ClassModel): ClassModel {
 private fun TypeModel.substituteUnit(): TypeModel {
     val returnsUnit = this is TypeValueModel && value == IdentifierEntity("Unit")
     return if (returnsUnit) {
-        TypeValueModel(IdentifierEntity("@@None"), emptyList(), null)
+        TypeValueModel(IdentifierEntity("@@None"), emptyList(), null, null)
     } else this
 }
 

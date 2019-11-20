@@ -1,8 +1,9 @@
 package org.jetbrains.dukat.idlDeclarations
 
 data class IDLDictionaryDeclaration(
-        val name: String,
+        override val name: String,
         val members: List<IDLDictionaryMemberDeclaration>,
         val parents: List<IDLSingleTypeDeclaration>,
+        val unions: List<IDLSingleTypeDeclaration>,
         val partial: Boolean
 ) : IDLClassLikeDeclaration

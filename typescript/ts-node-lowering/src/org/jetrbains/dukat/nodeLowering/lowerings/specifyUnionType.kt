@@ -132,7 +132,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         }
     }
 
-    override fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>): List<TopLevelEntity> {
+    override fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
         return declarations.flatMap { declaration ->
             lowerTopLevelDeclarationList(declaration)
         }

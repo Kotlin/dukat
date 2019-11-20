@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
@@ -37,6 +38,10 @@ private class ModifyVisibility(private val visibility: VisibilityModifierModel) 
     }
 
     override fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>): EnumModel {
+        return ownerContext.node.copy(visibilityModifier = visibility)
+    }
+
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 

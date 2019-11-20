@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.TypeParameterNode
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
@@ -37,6 +38,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
@@ -74,6 +76,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -100,481 +103,510 @@ private data class Members(
         val static: List<MemberModel>
 )
 
-private fun split(members: List<MemberNode>): Members {
-    val staticMembers = mutableListOf<MemberModel>()
-    val ownMembers = mutableListOf<MemberModel>()
+private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>) {
 
-    members.forEach { member ->
-        val memberProcessed = member.process()
-        if (memberProcessed != null) {
-            if (member.isStatic()) {
-                staticMembers.add(memberProcessed)
-            } else ownMembers.add(memberProcessed)
+    private fun split(members: List<MemberNode>): Members {
+        val staticMembers = mutableListOf<MemberModel>()
+        val ownMembers = mutableListOf<MemberModel>()
+
+        members.forEach { member ->
+            val memberProcessed = member.process()
+            if (memberProcessed != null) {
+                if (member.isStatic()) {
+                    staticMembers.add(memberProcessed)
+                } else ownMembers.add(memberProcessed)
+            }
+        }
+
+        return Members(ownMembers, staticMembers)
+    }
+
+    private fun MethodNode.resolveAnnotations(): List<AnnotationModel> {
+        if (operator) {
+            return when (name) {
+                "get" -> listOf(AnnotationModel("nativeGetter", emptyList()))
+                "set" -> listOf(AnnotationModel("nativeSetter", emptyList()))
+                "invoke" -> listOf(AnnotationModel("nativeInvoke", emptyList()))
+                else -> emptyList()
+            }
+        }
+
+        return emptyList()
+    }
+
+    private fun MemberNode.process(): MemberModel? {
+        // TODO: how ClassModel end up here?
+        return when (this) {
+            is ConstructorNode -> ConstructorModel(
+                    parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
+                    typeParameters = convertTypeParams(typeParameters),
+                    generated = generated
+            )
+            is MethodNode -> MethodModel(
+                    name = IdentifierEntity(name),
+                    parameters = parameters.map { param -> param.process() },
+                    type = type.process(),
+                    typeParameters = convertTypeParams(typeParameters),
+
+                    static = static,
+
+                    override = override,
+                    operator = operator,
+                    annotations = resolveAnnotations(),
+
+                    open = open
+            )
+            is PropertyNode -> PropertyModel(
+                    name = IdentifierEntity(name),
+                    type = type.process(TranslationContext.IRRELEVANT),
+                    typeParameters = convertTypeParams(typeParameters),
+                    static = static,
+                    override = override,
+                    immutable = getter && !setter,
+                    getter = false,
+                    setter = false,
+                    open = open
+            )
+            else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
         }
     }
 
-    return Members(ownMembers, staticMembers)
-}
+    private fun ParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+        return ParameterModel(
+                type = type.process(context),
+                name = name,
+                initializer = if (context == TranslationContext.CONSTRUCTOR) {
+                    null
+                } else {
+                    when {
+                        initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
+                        optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                        else -> null
+                    }
+                },
+                vararg = vararg
+        )
+    }
 
-private fun MethodNode.resolveAnnotations(): List<AnnotationModel> {
-    if (operator) {
-        return when (name) {
-            "get" -> listOf(AnnotationModel("nativeGetter", emptyList()))
-            "set" -> listOf(AnnotationModel("nativeSetter", emptyList()))
-            "invoke" -> listOf(AnnotationModel("nativeInvoke", emptyList()))
+    private fun ParameterValueDeclaration?.processMeta(ownerIsNullable: Boolean, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
+        return when (this) {
+            is ThisTypeInGeneratedInterfaceMetaData -> "this"
+            is IntersectionMetadata -> params.map {
+                it.process().translate()
+            }.joinToString(" & ")
+            else -> {
+                if (!metadataOptions.contains(MetaDataOptions.SKIP_NULLS)) {
+                    val skipNullableAnnotation = this is MuteMetadata
+                    if (ownerIsNullable && !skipNullableAnnotation) {
+                        //TODO: consider rethinking this restriction
+                        return "= null"
+                    } else null
+                } else null
+            }
+        }
+    }
+
+    private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
+        return if (this == TranslationContext.FUNCTION_TYPE) {
+            setOf()
+        } else {
+            setOf(MetaDataOptions.SKIP_NULLS)
+        }
+    }
+
+
+    private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
+        return when (this) {
+            is UnionTypeNode -> TypeValueModel(
+                    IdentifierEntity("dynamic"),
+                    emptyList(),
+                    params.map { unionMember ->
+                        if (unionMember.meta is StringLiteralDeclaration) {
+                            (unionMember.meta as StringLiteralDeclaration).token
+                        } else {
+                            unionMember.process().translate()
+                        }
+                    }.joinToString(" | "),
+                    null
+            )
+            is TupleTypeNode -> TypeValueModel(
+                    IdentifierEntity("dynamic"),
+                    emptyList(),
+                    "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
+                    null
+            )
+            is TypeParameterNode -> {
+                TypeParameterReferenceModel(
+                        name = name,
+                        metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                        nullable = nullable
+                )
+            }
+            is TypeValueNode -> {
+                if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
+                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, null)
+                } else {
+                    TypeValueModel(
+                            value,
+                            params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
+                            meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                            getFqName(),
+                            nullable
+                    )
+                }
+            }
+            is FunctionTypeNode -> {
+                FunctionTypeModel(
+                        parameters = (parameters.map { param ->
+                            param.process(TranslationContext.FUNCTION_TYPE)
+                        }),
+                        type = type.process(TranslationContext.FUNCTION_TYPE),
+                        metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                        nullable = nullable
+                )
+            }
+            is GeneratedInterfaceReferenceNode -> {
+                TypeValueModel(
+                        name,
+                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, uidToNameMapper[reference?.uid]) }
+                                .map { TypeParameterModel(it, listOf()) },
+                        meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
+                        uidToNameMapper[reference?.uid],
+                        nullable
+                )
+
+            }
+            else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
+                TypeValueModel(
+                        IdentifierEntity("dynamic"),
+                        emptyList(),
+                        null,
+                        null,
+                        false
+                )
+            }
+        }
+    }
+
+    private fun ClassNode.convertToClassModel(): TopLevelModel {
+        val membersSplitted = split(members)
+
+        return ClassModel(
+                name = name,
+                members = membersSplitted.dynamic,
+                companionObject = if (membersSplitted.static.isNotEmpty()) {
+                    ObjectModel(
+                            IdentifierEntity(""),
+                            membersSplitted.static,
+                            emptyList(),
+                            VisibilityModifierModel.DEFAULT,
+                            null
+                    )
+                } else {
+                    null
+                },
+                primaryConstructor = primaryConstructor?.let { constructor ->
+                    ConstructorModel(
+                            parameters = constructor.parameters.map { param -> param.process() },
+                            typeParameters = constructor.typeParameters.map { typeParam ->
+                                TypeParameterModel(
+                                        type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
+                                        constraints = typeParam.params.map { param -> param.process() }
+                                )
+                            },
+                            generated = constructor.generated
+                    )
+                },
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
+                            constraints = typeParam.params.map { param -> param.process() }
+                    )
+                },
+                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                annotations = exportQualifier.toAnnotation(),
+                comment = null,
+                external = true,
+                abstract = false,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
+        )
+    }
+
+    private fun HeritageNode.convertToModel(): HeritageModel {
+        return HeritageModel(
+                value = TypeValueModel(name, emptyList(), null, uidToNameMapper[reference?.uid]),
+                typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
+                delegateTo = null
+        )
+    }
+
+    private fun TypeValueNode.getFqName(): NameEntity? {
+        return uidToNameMapper[typeReference?.uid]
+    }
+
+    private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
+        val membersSplitted = split(members)
+
+        return InterfaceModel(
+                name = name,
+                members = membersSplitted.dynamic,
+                companionObject = if (membersSplitted.static.isNotEmpty()) {
+                    ObjectModel(
+                            IdentifierEntity(""),
+                            membersSplitted.static,
+                            emptyList(),
+                            VisibilityModifierModel.DEFAULT,
+                            null
+                    )
+                } else {
+                    null
+                },
+                typeParameters = typeParameters.map { typeParam ->
+                    TypeParameterModel(
+                            type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
+                            constraints = typeParam.params.map { param -> param.process() }
+                    )
+                },
+                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                annotations = exportQualifier.toAnnotation(),
+                comment = null,
+                external = true,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
+        )
+    }
+
+    private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
+        return when (this) {
+            is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name)))
+            is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
+            else -> mutableListOf()
+        }
+    }
+
+    private fun VariableNode.resolveGetter(): StatementModel? {
+        return if (inline) {
+            ChainCallModel(
+                    StatementCallModel(
+                            QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
+                    ),
+                    StatementCallModel(name.rightMost(), null)
+            )
+        } else null
+    }
+
+    private fun VariableNode.resolveSetter(): StatementModel? {
+        return if (inline) {
+            AssignmentStatementModel(
+                    ChainCallModel(
+                            StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                            StatementCallModel(name.rightMost(), null)
+                    ),
+                    StatementCallModel(IdentifierEntity("value"), null)
+            )
+        } else null
+    }
+
+    private fun FunctionNode.resolveBody(): List<StatementModel> {
+        return when (val nodeContext = this.context) {
+            is IndexSignatureGetter -> listOf(
+                    ReturnStatementModel(
+                            ChainCallModel(
+                                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                                    StatementCallModel(IdentifierEntity("get"), listOf(
+                                            IdentifierEntity(nodeContext.name)
+                                    ))
+                            )
+                    )
+            )
+
+            is IndexSignatureSetter -> listOf(ChainCallModel(
+                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                    StatementCallModel(IdentifierEntity("set"), listOf(
+                            IdentifierEntity(nodeContext.name),
+                            IdentifierEntity("value")
+                    )))
+            )
+
+            is FunctionFromCallSignature -> listOf(ChainCallModel(
+                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                    StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
+            )
+
+            is FunctionFromMethodSignatureDeclaration -> {
+                val bodyStatement = ChainCallModel(
+                        StatementCallModel(
+                                QualifierEntity(
+                                        IdentifierEntity("this"),
+                                        IdentifierEntity("asDynamic")
+                                )
+                                , emptyList()),
+                        StatementCallModel(IdentifierEntity(nodeContext.name), nodeContext.params)
+                )
+
+                listOf(if (type.isUnit()) {
+                    bodyStatement
+                } else {
+                    ReturnStatementModel(bodyStatement)
+                })
+            }
             else -> emptyList()
         }
     }
 
-    return emptyList()
-}
-
-private fun MemberNode.process(): MemberModel? {
-    // TODO: how ClassModel end up here?
-    return when (this) {
-        is ConstructorNode -> ConstructorModel(
-                parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
-                typeParameters = convertTypeParams(typeParameters),
-                generated = generated
-        )
-        is MethodNode -> MethodModel(
-                name = IdentifierEntity(name),
-                parameters = parameters.map { param -> param.process() },
-                type = type.process(),
-                typeParameters = convertTypeParams(typeParameters),
-
-                static = static,
-
-                override = override,
-                operator = operator,
-                annotations = resolveAnnotations(),
-
-                open = open
-        )
-        is PropertyNode -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.process(),
-                typeParameters = convertTypeParams(typeParameters),
-                static = static,
-                override = override,
-                immutable = getter && !setter,
-                getter = false,
-                setter = false,
-                open = open
-        )
-        else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
-    }
-}
-
-private fun ParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
-    return ParameterModel(
-            type = type.process(context),
-            name = name,
-            initializer = if (context == TranslationContext.CONSTRUCTOR) {
-                null
-            } else {
-                when {
-                    initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
-                    optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
-                    else -> null
-                }
-            },
-            vararg = vararg
-    )
-}
-
-private fun ParameterValueDeclaration?.processMeta(ownerIsNullable: Boolean, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
-    return when (this) {
-        is ThisTypeInGeneratedInterfaceMetaData -> "this"
-        is IntersectionMetadata -> params.map {
-            it.process().translate()
-        }.joinToString(" & ")
-        else -> {
-            if (!metadataOptions.contains(MetaDataOptions.SKIP_NULLS)) {
-                val skipNullableAnnotation = this is MuteMetadata
-                if (ownerIsNullable && !skipNullableAnnotation) {
-                    //TODO: consider rethinking this restriction
-                    return "= null"
-                } else null
-            } else null
+    private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
+        return this?.let { extendNode ->
+            ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
         }
     }
-}
 
-private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
-    return if (this == TranslationContext.FUNCTION_TYPE) {
-        setOf()
-    } else {
-        setOf(MetaDataOptions.SKIP_NULLS)
-    }
-}
-
-
-private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
-    return when (this) {
-        is UnionTypeNode -> TypeValueModel(
-                IdentifierEntity("dynamic"),
-                emptyList(),
-                params.map { unionMember ->
-                    if (unionMember.meta is StringLiteralDeclaration) {
-                        (unionMember.meta as StringLiteralDeclaration).token
-                    } else {
-                        unionMember.process().translate()
-                    }
-                }.joinToString(" | ")
-        )
-        is TupleTypeNode -> TypeValueModel(
-                IdentifierEntity("dynamic"),
-                emptyList(),
-                "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>"
-        )
-        is TypeParameterNode -> {
-            TypeParameterReferenceModel(
-                    name = name,
-                    metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
-                    nullable = nullable
+    private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {
+        return typeParameters.map { typeParam ->
+            TypeParameterModel(
+                    type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
+                    constraints = typeParam.params.map { param -> param.process() }
             )
         }
-        is TypeValueNode -> {
-            if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token)
-            } else {
-                TypeValueModel(
-                        value,
-                        params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
-                        meta.processMeta(nullable, context.resolveAsMetaOptions()),
-                        nullable
+    }
+
+    fun TopLevelEntity.convertToModel(): TopLevelModel? {
+        return when (this) {
+            is ClassNode -> convertToClassModel()
+            is InterfaceNode -> convertToInterfaceModel()
+            is EnumNode -> {
+                EnumModel(
+                        name = name,
+                        values = values.map { token -> EnumTokenModel(token.value, token.meta) },
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = null
                 )
             }
-        }
-        is FunctionTypeNode -> {
-            FunctionTypeModel(
-                    parameters = (parameters.map { param ->
-                        param.process(TranslationContext.FUNCTION_TYPE)
-                    }),
-                    type = type.process(TranslationContext.FUNCTION_TYPE),
-                    metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
-                    nullable = nullable
-            )
-        }
-        is GeneratedInterfaceReferenceNode -> {
-            TypeValueModel(
-                    name,
-                    typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null) }
-                            .map { TypeParameterModel(it, listOf()) },
-                    meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
-                    nullable
-            )
-
-        }
-        else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
-            TypeValueModel(
-                    IdentifierEntity("dynamic"),
-                    emptyList(),
-                    null,
-                    false
-            )
-        }
-    }
-}
-
-private fun ClassNode.convertToClassModel(): TopLevelModel {
-    val membersSplitted = split(members)
-
-    return ClassModel(
-            name = name,
-            members = membersSplitted.dynamic,
-            companionObject = if (membersSplitted.static.isNotEmpty()) {
-                ObjectModel(
-                        IdentifierEntity(""),
-                        membersSplitted.static,
-                        emptyList(),
-                        VisibilityModifierModel.DEFAULT,
-                        null
-                )
-            } else {
-                null
-            },
-            primaryConstructor = primaryConstructor?.let { constructor ->
-                ConstructorModel(
-                        parameters = constructor.parameters.map { param -> param.process() },
-                        typeParameters = constructor.typeParameters.map { typeParam ->
-                            TypeParameterModel(
-                                    type = TypeValueModel(typeParam.value, listOf(), null),
-                                    constraints = typeParam.params.map { param -> param.process() }
-                            )
-                        },
-                        generated = constructor.generated
-                )
-            },
-            typeParameters = typeParameters.map { typeParam ->
-                TypeParameterModel(
-                        type = TypeValueModel(typeParam.value, listOf(), null),
-                        constraints = typeParam.params.map { param -> param.process() }
-                )
-            },
-            parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-            annotations = exportQualifier.toAnnotation(),
-            comment = null,
-            external = true,
-            abstract = false,
-            visibilityModifier = VisibilityModifierModel.DEFAULT
-    )
-}
-
-private fun NameEntity.toTypeValueModel(): TypeValueModel {
-    return TypeValueModel(this, emptyList(), null)
-}
-
-private fun HeritageNode.convertToModel(): HeritageModel {
-    return HeritageModel(
-            value = name.toTypeValueModel(),
-            typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
-            delegateTo = null
-    )
-}
-
-private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
-    val membersSplitted = split(members)
-
-    return InterfaceModel(
-            name = name,
-            members = membersSplitted.dynamic,
-            companionObject = if (membersSplitted.static.isNotEmpty()) {
-                ObjectModel(
-                        IdentifierEntity(""),
-                        membersSplitted.static,
-                        emptyList(),
-                        VisibilityModifierModel.DEFAULT,
-                        null
-                )
-            } else {
-                null
-            },
-            typeParameters = typeParameters.map { typeParam ->
-                TypeParameterModel(
-                        type = TypeValueModel(typeParam.value, listOf(), null),
-                        constraints = typeParam.params.map { param -> param.process() }
-                )
-            },
-            parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-            annotations = exportQualifier.toAnnotation(),
-            comment = null,
-            external = true,
-            visibilityModifier = VisibilityModifierModel.DEFAULT
-    )
-}
-
-private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
-    return when (this) {
-        is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name)))
-        is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
-        else -> mutableListOf()
-    }
-}
-
-private fun VariableNode.resolveGetter(): StatementModel? {
-    return if (inline) {
-        ChainCallModel(
-                StatementCallModel(
-                        QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
-                ),
-                StatementCallModel(name.rightMost(), null)
-        )
-    } else null
-}
-
-private fun VariableNode.resolveSetter(): StatementModel? {
-    return if (inline) {
-        AssignmentStatementModel(
-                ChainCallModel(
-                        StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                        StatementCallModel(name.rightMost(), null)
-                ),
-                StatementCallModel(IdentifierEntity("value"), null)
-        )
-    } else null
-}
-
-private fun FunctionNode.resolveBody(): List<StatementModel> {
-    return when (val nodeContext = this.context) {
-        is IndexSignatureGetter -> listOf(
-                ReturnStatementModel(
-                        ChainCallModel(
-                                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                StatementCallModel(IdentifierEntity("get"), listOf(
-                                        IdentifierEntity(nodeContext.name)
-                                ))
-                        )
-                )
-        )
-
-        is IndexSignatureSetter -> listOf(ChainCallModel(
-                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                StatementCallModel(IdentifierEntity("set"), listOf(
-                        IdentifierEntity(nodeContext.name),
-                        IdentifierEntity("value")
-                )))
-        )
-
-        is FunctionFromCallSignature -> listOf(ChainCallModel(
-                StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
-        )
-
-        is FunctionFromMethodSignatureDeclaration -> {
-            val bodyStatement = ChainCallModel(
-                    StatementCallModel(
-                            QualifierEntity(
-                                    IdentifierEntity("this"),
-                                    IdentifierEntity("asDynamic")
-                            )
-                            , emptyList()),
-                    StatementCallModel(IdentifierEntity(nodeContext.name), nodeContext.params)
-            )
-
-            listOf(if (type.isUnit()) {
-                bodyStatement
-            } else {
-                ReturnStatementModel(bodyStatement)
-            })
-        }
-        else -> emptyList()
-    }
-}
-
-private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
-    return this?.let { extendNode ->
-        ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
-    }
-}
-
-private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {
-    return typeParameters.map { typeParam ->
-        TypeParameterModel(
-                type = TypeValueModel(typeParam.value, listOf(), null),
-                constraints = typeParam.params.map { param -> param.process() }
-        )
-    }
-}
-
-fun TopLevelEntity.convertToModel(): TopLevelModel? {
-    return when (this) {
-        is ClassNode -> convertToClassModel()
-        is InterfaceNode -> convertToInterfaceModel()
-        is EnumNode -> {
-            EnumModel(
+            is FunctionNode -> FunctionModel(
                     name = name,
-                    values = values.map { token -> EnumTokenModel(token.value, token.meta) },
+                    parameters = parameters.map { param -> param.process() },
+                    type = type.process(),
+
+                    typeParameters = convertTypeParams(typeParameters),
+                    annotations = exportQualifier.toAnnotation(),
+                    export = export,
+                    inline = inline,
+                    operator = operator,
+                    extend = extend.convert(),
+                    body = resolveBody(),
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = comment
+            )
+            is VariableNode -> VariableModel(
+                    name = name,
+                    type = type.process(),
+                    annotations = exportQualifier.toAnnotation(),
+                    immutable = immutable,
+                    inline = inline,
+                    initializer = null,
+                    get = resolveGetter(),
+                    set = resolveSetter(),
+                    typeParameters = convertTypeParams(typeParameters),
+                    extend = extend.convert(),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null
             )
+            is ObjectNode -> ObjectModel(
+                    name = name,
+                    members = members.mapNotNull { member -> member.process() },
+                    parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
+            )
+            is TypeAliasNode -> TypeAliasModel(
+                    name = name,
+                    typeReference = typeReference.process(),
+                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
+            )
+            else -> {
+                logger.debug("skipping ${this}")
+                null
+            }
         }
-        is FunctionNode -> FunctionModel(
-                name = name,
-                parameters = parameters.map { param -> param.process() },
-                type = type.process(),
+    }
 
-                typeParameters = convertTypeParams(typeParameters),
-                annotations = exportQualifier.toAnnotation(),
-                export = export,
-                inline = inline,
-                operator = operator,
-                extend = extend.convert(),
-                body = resolveBody(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = comment
-        )
-        is VariableNode -> VariableModel(
-                name = name,
-                type = type.process(),
-                annotations = exportQualifier.toAnnotation(),
-                immutable = immutable,
-                inline = inline,
-                initializer = null,
-                get = resolveGetter(),
-                set = resolveSetter(),
-                typeParameters = convertTypeParams(typeParameters),
-                extend = extend.convert(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
-        )
-        is ObjectNode -> ObjectModel(
-                name = name,
-                members = members.mapNotNull { member -> member.process() },
-                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
-        )
-        is TypeAliasNode -> TypeAliasModel(
-                name = name,
-                typeReference = typeReference.process(),
-                typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null), emptyList()) },
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
-        )
-        else -> {
-            logger.debug("skipping ${this}")
-            null
+    @Suppress("UNCHECKED_CAST")
+    fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
+        val (roots, topDeclarations) = declarations.partition { it is DocumentRootNode }
+
+        val declarationsMapped = (roots as List<DocumentRootNode>).map { it.introduceModels(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+            declaration.convertToModel()
         }
+
+        val declarationsFiltered = mutableListOf<TopLevelModel>()
+        val submodules = mutableListOf<ModuleModel>()
+        declarationsMapped.forEach { declaration ->
+            if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)
+        }
+
+        val annotations = mutableListOf<AnnotationModel>()
+
+        jsModule?.let {
+            annotations.add(AnnotationModel("file:JsModule", listOf(it)))
+        }
+
+        jsQualifier?.let {
+            annotations.add(AnnotationModel("file:JsQualifier", listOf(it)))
+        }
+
+        val module = ModuleModel(
+                name = qualifiedPackageName,
+                shortName = qualifiedPackageName.rightMost(),
+                declarations = declarationsFiltered,
+                annotations = annotations,
+                submodules = submodules,
+                imports = mutableListOf(),
+                comment = null
+        )
+
+        return module
+    }
+
+    fun convert(node: SourceSetNode): SourceSetModel {
+        return SourceSetModel(
+                sourceName = node.sourceName,
+                sources = node.sources.flatMap { source ->
+                    val rootFile = File(source.fileName)
+                    val fileName = rootFile.normalize().absolutePath
+
+                    val generated = mutableListOf<SourceFileModel>()
+                    val root = source.root.introduceModels(source.fileName, generated)
+
+                    val module = SourceFileModel(
+                            name = source.name,
+                            fileName = fileName,
+                            root = root,
+                            referencedFiles = source.referencedFiles.map { referenceFile ->
+                                val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
+                                absolutePath
+                            })
+
+                    generated + listOf(module)
+                }
+        )
     }
 }
 
-@Suppress("UNCHECKED_CAST")
-fun DocumentRootNode.introduceModels(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-    val (roots, topDeclarations) = declarations.partition { it is DocumentRootNode }
-
-    val declarationsMapped = (roots as List<DocumentRootNode>).map { it.introduceModels(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
-        declaration.convertToModel()
+private class ReferenceVisitor(private val visit: (ClassLikeNode, DocumentRootNode) -> Unit): NodeTypeLowering{
+    override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
+        visit(declaration, owner)
+        return super.lowerClassLikeNode(declaration, owner)
     }
 
-    val declarationsFiltered = mutableListOf<TopLevelModel>()
-    val submodules = mutableListOf<ModuleModel>()
-    declarationsMapped.forEach { declaration ->
-        if (declaration is ModuleModel) submodules.add(declaration) else declarationsFiltered.add(declaration)
+    fun process(sourceSet: SourceSetNode) {
+        sourceSet.sources.forEach { source -> lowerDocumentRoot(source.root) }
     }
-
-    val annotations = mutableListOf<AnnotationModel>()
-
-    jsModule?.let {
-        annotations.add(AnnotationModel("file:JsModule", listOf(it)))
-    }
-
-    jsQualifier?.let {
-        annotations.add(AnnotationModel("file:JsQualifier", listOf(it)))
-    }
-
-    val module = ModuleModel(
-            name = qualifiedPackageName,
-            shortName = qualifiedPackageName.rightMost(),
-            declarations = declarationsFiltered,
-            annotations = annotations,
-            submodules = submodules,
-            imports = mutableListOf(),
-            comment = null
-    )
-
-    return module
 }
 
-fun SourceSetNode.introduceModels() = SourceSetModel(
-        sourceName = sourceName,
-        sources = sources.flatMap { source ->
-            val rootFile = File(source.fileName)
-            val fileName = rootFile.normalize().absolutePath
+fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
+    ReferenceVisitor { classLike, owner ->
+       uidToFqNameMapper[classLike.uid] = owner.qualifiedPackageName.appendLeft(classLike.name)
+    }.process(this)
 
-            val generated = mutableListOf<SourceFileModel>()
-            val root = source.root.introduceModels(source.fileName, generated)
-
-            val module = SourceFileModel(
-                    name = source.name,
-                    fileName = fileName,
-                    root = root,
-                    referencedFiles = source.referencedFiles.map { referenceFile ->
-                        val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
-                        absolutePath
-                    })
-
-            generated + listOf(module)
-        }
-)
+    return NodeConverter(uidToFqNameMapper).convert(this)
+}
