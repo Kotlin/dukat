@@ -98,6 +98,7 @@ message ConstructorDeclarationProto {
     repeated ParameterDeclarationProto parameters = 1;
     repeated TypeParameterDeclarationProto typeParameters = 2;
     repeated ModifierDeclarationProto modifiers = 3;
+    BlockDeclarationProto body = 6;
 }
 
 message BlockDeclarationProto {

@@ -615,10 +615,14 @@ export class AstConverter {
             this.registerDeclaration(this.convertParameterDeclaration(parameter, count), params);
         });
 
-        this.registerDeclaration(this.astFactory.createConstructorDeclaration(
-          params,
-          this.convertTypeParams(constructorDeclaration.typeParameters), this.convertModifiers(constructorDeclaration.modifiers)),
-          res
+        this.registerDeclaration(
+            this.astFactory.createConstructorDeclaration(
+                params,
+                this.convertTypeParams(constructorDeclaration.typeParameters),
+                this.convertModifiers(constructorDeclaration.modifiers),
+                this.convertBlock(constructorDeclaration.body)
+            ),
+            res
         );
 
         return res;
