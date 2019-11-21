@@ -1,8 +1,9 @@
 import * as ts from "typescript-services-api";
 import {
+    Declaration,
     Expression,
     FunctionDeclaration,
-    IdentifierEntity,
+    IdentifierDeclaration,
     MemberDeclaration,
     NameEntity,
     PropertyDeclaration
@@ -33,7 +34,7 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createCallExpressionDeclarationAsExpression(expression, args);
     }
 
-    createPropertyAccessExpression(expression: Expression, name: IdentifierEntity) {
+    createPropertyAccessExpression(expression: Expression, name: IdentifierDeclaration) {
         return AstExpressionFactory.createPropertyAccessExpressionDeclarationAsExpression(expression, name);
     }
 
@@ -146,7 +147,7 @@ export class AstExpressionConverter {
         if (ts.isQualifiedName(entityName)) {
             return AstExpressionFactory.createQualifierAsNameEntity(
                 this.convertEntityName(entityName.left),
-                this.convertEntityName(entityName.right).getIdentifier()
+                this.convertEntityName(entityName.right).getIdentifier()!
             )
         } else {
             return AstExpressionFactory.createIdentifierAsNameEntity(
@@ -167,7 +168,7 @@ export class AstExpressionConverter {
         return this.createStringLiteralExpression(literal.getText())
     }
 
-    private convertObjectProperty(name: ts.PropertyName, initializer: ts.Expression, optional: boolean): PropertyDeclaration | null {
+    private convertObjectProperty(name: ts.PropertyName, initializer: ts.Expression, optional: boolean): MemberDeclaration | null {
         let convertedName = this.astConverter.convertName(name);
 
         if (convertedName) {
@@ -183,7 +184,7 @@ export class AstExpressionConverter {
         }
     }
 
-    private convertObjectMethod(method: ts.MethodDeclaration): FunctionDeclaration | null {
+    private convertObjectMethod(method: ts.MethodDeclaration): MemberDeclaration | null {
         let convertedName = this.astConverter.convertName(method.name);
 
         if (convertedName) {

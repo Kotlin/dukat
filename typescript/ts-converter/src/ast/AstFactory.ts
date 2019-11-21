@@ -3,47 +3,33 @@ import {
   Block,
   CallSignatureDeclaration,
   ClassDeclaration,
-  ClassLikeDeclaration,
   ConstructorDeclaration,
-  Declaration,
   DefinitionInfoDeclaration,
   EnumDeclaration,
   EnumTokenDeclaration,
-  ExportAssignmentDeclaration,
   Expression,
-  ExpressionStatement,
   FunctionDeclaration,
-  FunctionTypeDeclaration,
   HeritageClauseDeclaration,
-  IdentifierEntity,
-  IfStatement,
+  IdentifierDeclaration,
   ImportEqualsDeclaration,
   IndexSignatureDeclaration,
   InterfaceDeclaration,
-  IntersectionTypeDeclaration,
   MemberDeclaration,
-  MethodSignatureDeclaration,
   ModifierDeclaration,
   ModuleDeclaration,
-  ModuleReferenceDeclaration,
   NameEntity,
-  ObjectLiteral,
   ParameterDeclaration,
-  ParameterValue,
+  TypeDeclaration,
   PropertyDeclaration,
-  ProtoMessage,
-  QualifierEntity,
   ReferenceEntity,
-  ReturnStatement,
+  SourceBundle,
   SourceFileDeclaration,
   SourceSet,
-  StringLiteralDeclaration,
-  ThisTypeDeclaration,
-  TupleDeclaration,
+  Declaration,
   TypeAliasDeclaration,
-  TypeDeclaration,
   TypeParameter,
-  UnionTypeDeclatation,
+  TypeParamReferenceDeclaration,
+  TypeReferenceDeclaration,
   VariableDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
@@ -52,7 +38,7 @@ export class AstFactory implements AstFactory {
 
   private log = createLogger("AstFactory");
 
-  createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): CallSignatureDeclaration {
+  createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
     let callSignature = new declarations.CallSignatureDeclarationProto();
     callSignature.setParametersList(parameters);
     callSignature.setType(type);
@@ -63,7 +49,7 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<ClassLikeDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration {
+  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
     let classDeclaration = new declarations.ClassDeclarationProto();
     classDeclaration.setName(name);
     classDeclaration.setModifiersList(modifiers);
@@ -77,15 +63,15 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): ConstructorDeclaration {
-    let constuctorDeclaration = new declarations.ConstructorDeclarationProto();
+  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+    let constructorDeclaration = new declarations.ConstructorDeclarationProto();
 
-    constuctorDeclaration.setParametersList(parameters);
-    constuctorDeclaration.setTypeparametersList(typeParams);
-    constuctorDeclaration.setModifiersList(modifiers);
+    constructorDeclaration.setParametersList(parameters);
+    constructorDeclaration.setTypeparametersList(typeParams);
+    constructorDeclaration.setModifiersList(modifiers);
 
     let memberProto = new declarations.MemberDeclarationProto();
-    memberProto.setConstructordeclaration(constuctorDeclaration);
+    memberProto.setConstructordeclaration(constructorDeclaration);
     return memberProto;
   }
 
@@ -95,7 +81,7 @@ export class AstFactory implements AstFactory {
     return definition;
   }
 
-  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): EnumDeclaration {
+  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): Declaration {
     let enumDeclaration = new declarations.EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
@@ -113,7 +99,7 @@ export class AstFactory implements AstFactory {
     return enumToken;
   }
 
-  createExportAssignmentDeclaration(name: string, isExportEquals: boolean): ExportAssignmentDeclaration {
+  createExportAssignmentDeclaration(name: string, isExportEquals: boolean): Declaration {
     let exportAssignment = new declarations.ExportAssignmentDeclarationProto();
     exportAssignment.setName(name);
     exportAssignment.setIsexportequals(isExportEquals);
@@ -123,7 +109,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createExpressionStatement(expression: Expression): ExpressionStatement {
+  createExpressionStatement(expression: Expression): Declaration {
     let expressionStatement = new declarations.ExpressionStatementDeclarationProto();
     expressionStatement.setExpression(expression);
 
@@ -132,7 +118,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): IfStatement {
+  createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): Declaration {
     let ifStatement = new declarations.IfStatementDeclarationProto();
     ifStatement.setCondition(condition);
     ifStatement.setThenstatementList(thenStatement);
@@ -145,7 +131,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createWhileStatement(condition: Expression, statement: Array<Declaration>): IfStatement {
+  createWhileStatement(condition: Expression, statement: Array<Declaration>): Declaration {
     let whileStatement = new declarations.WhileStatementDeclarationProto();
     whileStatement.setCondition(condition);
     whileStatement.setStatementList(statement);
@@ -155,7 +141,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createReturnStatement(expression: Expression | null): ReturnStatement {
+  createReturnStatement(expression: Expression | null): Declaration {
     let returnStatement = new declarations.ReturnStatementDeclarationProto();
     if (expression) {
       returnStatement.setExpression(expression);
@@ -172,7 +158,7 @@ export class AstFactory implements AstFactory {
     return block
   }
 
-  createBlockStatementDeclaration(statements: Array<Declaration>): Block {
+  createBlockStatementDeclaration(statements: Array<Declaration>): Declaration {
     let block = this.createBlockDeclaration(statements);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
@@ -180,7 +166,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): ProtoMessage {
+  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
     functionDeclaration.setName(name);
     functionDeclaration.setParametersList(parameters);
@@ -194,7 +180,7 @@ export class AstFactory implements AstFactory {
     return functionDeclaration
   }
 
-  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
+  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): MemberDeclaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let memberProto = new declarations.MemberDeclarationProto();
@@ -202,7 +188,7 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: String): FunctionDeclaration {
+  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): Declaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
@@ -210,7 +196,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: ParameterValue): FunctionTypeDeclaration {
+  createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration): TypeDeclaration {
     let functionType = new declarations.FunctionDeclarationProto();
     functionType.setParametersList(parameters);
     functionType.setType(type);
@@ -220,7 +206,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createHeritageClauseDeclaration(name: NameEntity, typeArguments: Array<ParameterValue>, extending: boolean, typeReference: ReferenceEntity | null): HeritageClauseDeclaration {
+  createHeritageClauseDeclaration(name: NameEntity, typeArguments: Array<TypeDeclaration>, extending: boolean, typeReference: ReferenceEntity | null): HeritageClauseDeclaration {
     let heritageClauseDeclaration = new declarations.HeritageClauseDeclarationProto();
 
     heritageClauseDeclaration.setName(name);
@@ -234,7 +220,7 @@ export class AstFactory implements AstFactory {
     return heritageClauseDeclaration;
   }
 
-  createIdentifierDeclarationAsNameEntity(value: string): IdentifierEntity {
+  createIdentifierDeclarationAsNameEntity(value: string): NameEntity {
     let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
 
@@ -243,13 +229,13 @@ export class AstFactory implements AstFactory {
     return nameDeclaration;
   }
 
-  createIdentifierDeclaration(value: string): IdentifierEntity {
+  createIdentifierDeclaration(value: string): IdentifierDeclaration {
     let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
     return identifierProto;
   }
 
-  createImportEqualsDeclaration(name: string, moduleReference: ModuleReferenceDeclaration, uid: string): ImportEqualsDeclaration {
+  createImportEqualsDeclaration(name: string, moduleReference: NameEntity, uid: string): Declaration {
     let importEqualsDeclaration = new declarations.ImportEqualsDeclarationProto();
     importEqualsDeclaration.setName(name);
     importEqualsDeclaration.setModulereference(moduleReference);
@@ -260,7 +246,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: ParameterValue): IndexSignatureDeclaration {
+  createIndexSignatureDeclaration(indexTypes: Array<ParameterDeclaration>, returnType: TypeDeclaration): MemberDeclaration {
     let indexSignatureDeclaration = new declarations.IndexSignatureDeclarationProto();
     indexSignatureDeclaration.setIndextypesList(indexTypes);
     indexSignatureDeclaration.setReturntype(returnType);
@@ -270,7 +256,7 @@ export class AstFactory implements AstFactory {
     return memberEntity;
   }
 
-  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<InterfaceDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: String): InterfaceDeclaration {
+  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
     let interfaceDeclaration = new declarations.InterfaceDeclarationProto();
     interfaceDeclaration.setName(name);
     interfaceDeclaration.setUid(uid);
@@ -284,7 +270,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createIntersectionTypeDeclaration(params: Array<ParameterValue>): IntersectionTypeDeclaration {
+  createIntersectionTypeDeclaration(params: Array<TypeDeclaration>): TypeDeclaration {
     let intersection = new declarations.IntersectionTypeDeclarationProto();
     intersection.setParamsList(params);
 
@@ -293,19 +279,19 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>): FunctionDeclaration {
+  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
     let methodDeclaration = new declarations.FunctionDeclarationProto();
-    methodDeclaration.seetName(name);
+    methodDeclaration.setName(name);
     methodDeclaration.setParametersList(parameters);
     methodDeclaration.setType(type);
-    methodDeclaration.setTypeparamsList(typeParams);
+    methodDeclaration.setTypeparametersList(typeParams);
 
     let memberProto = new declarations.MemberDeclarationProto();
-    memberProto.setFunctionDeclarataion(memberProto);
+    memberProto.setFunctiondeclaration(methodDeclaration);
     return memberProto;
   }
 
-  createMethodSignatureDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MethodSignatureDeclaration {
+  createMethodSignatureDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
     let methodSignature = new declarations.MethodSignatureDeclarationProto();
     methodSignature.setName(name);
     methodSignature.setParametersList(parameters);
@@ -337,15 +323,15 @@ export class AstFactory implements AstFactory {
     return moduleDeclaration;
   }
 
-  createModuleDeclarationAsTopLevel(packageName: NameEntity, toplevels: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
-    let module = this.createModuleDeclaration(packageName, toplevels, modifiers, definitionsInfo, uid, resourceName, root);
+  createModuleDeclarationAsTopLevel(packageName: NameEntity, topLevels: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+    let module = this.createModuleDeclaration(packageName, topLevels, modifiers, definitionsInfo, uid, resourceName, root);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setModuledeclaration(module);
     return topLevelDeclaration;
   }
 
-  createObjectLiteral(members: Array<MemberDeclaration>): ObjectLiteral {
+  createObjectLiteral(members: Array<MemberDeclaration>): TypeDeclaration {
     let objectLiteral = new declarations.ObjectLiteralDeclarationProto();
     objectLiteral.setMembersList(members);
 
@@ -354,7 +340,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createParameterDeclaration(name: string, type: ParameterValue, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
     let parameterDeclaration = new declarations.ParameterDeclarationProto();
     parameterDeclaration.setName(name);
     parameterDeclaration.setType(type);
@@ -366,7 +352,7 @@ export class AstFactory implements AstFactory {
     return parameterDeclaration;
   }
 
-  createQualifiedNameDeclaration(left: NameEntity, right: IdentifierEntity): QualifierEntity {
+  createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): NameEntity {
     let qualifier = new declarations.QualifierDeclarationProto();
     qualifier.setLeft(left);
     qualifier.setRight(right);
@@ -382,11 +368,13 @@ export class AstFactory implements AstFactory {
     return reference;
   }
 
-  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<IdentifierEntity>): SourceFileDeclaration {
+  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration {
     let sourceFile = new declarations.SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
     sourceFile.setReferencedfilesList([]);
-    sourceFile.setRoot(root);
+    if (root) {
+      sourceFile.setRoot(root);
+    }
     return sourceFile;
   }
 
@@ -397,7 +385,7 @@ export class AstFactory implements AstFactory {
     return sourceSet;
   }
 
-  createStringLiteralDeclaration(token: string): StringLiteralDeclaration {
+  createStringLiteralDeclaration(token: string): TypeDeclaration {
     let stringLiteral = new declarations.StringLiteralDeclarationProto();
     stringLiteral.setToken(token);
 
@@ -406,13 +394,13 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createThisTypeDeclaration(): ThisTypeDeclaration {
+  createThisTypeDeclaration(): TypeDeclaration {
     let parameterValueDeclaration = new declarations.ParameterValueDeclarationProto();
     parameterValueDeclaration.setThistype(new declarations.ThisTypeDeclarationProto());
     return parameterValueDeclaration;
   }
 
-  createTupleDeclaration(params: Array<ParameterValue>): TupleDeclaration {
+  createTupleDeclaration(params: Array<TypeDeclaration>): TypeDeclaration {
     let tupleDeclaration = new declarations.TupleDeclarationProto();
     tupleDeclaration.setParamsList(params);
 
@@ -421,7 +409,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<IdentifierEntity>, typeReference: ParameterValue, uid: String): TypeAliasDeclaration {
+  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<IdentifierDeclaration>, typeReference: TypeDeclaration, uid: string): Declaration {
     let typeAlias = new declarations.TypeAliasDeclarationProto();
     typeAlias.setAliasname(aliasName);
     typeAlias.setTypeparametersList(typeParams);
@@ -433,7 +421,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createTypeReferenceDeclaration(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null = null): TypeDeclaration {
+  createTypeReferenceDeclaration(value: NameEntity, params: Array<TypeDeclaration>, typeReference: ReferenceEntity | null = null): TypeReferenceDeclaration {
     let typeDeclaration = new declarations.TypeReferenceDeclarationProto();
     typeDeclaration.setValue(value);
     typeDeclaration.setParamsList(params);
@@ -445,7 +433,7 @@ export class AstFactory implements AstFactory {
     return typeDeclaration;
   }
 
-  createTypeParamReferenceDeclaration(value: NameEntity): TypeDeclaration {
+  createTypeParamReferenceDeclaration(value: NameEntity): TypeParamReferenceDeclaration {
     let typeDeclaration = new declarations.TypeParamReferenceDeclarationProto();
     typeDeclaration.setValue(value);
     return typeDeclaration;
@@ -457,21 +445,23 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeReferenceDeclarationAsParamValue(value: NameEntity, params: Array<ParameterValue>, typeReference: ReferenceEntity | null): ParameterValue {
+  createTypeReferenceDeclarationAsParamValue(value: NameEntity, params: Array<TypeDeclaration>, typeReference: ReferenceEntity | null): TypeDeclaration {
     let paramValueDeclaration = new declarations.ParameterValueDeclarationProto();
     paramValueDeclaration.setTypereferencedeclaration(this.createTypeReferenceDeclaration(value, params, typeReference));
     return paramValueDeclaration;
   }
 
-  createTypeParam(name: NameEntity, constraints: Array<ParameterValue>, defaultValue: ParameterValue | null): TypeParameter {
+  createTypeParam(name: NameEntity, constraints: Array<TypeDeclaration>, defaultValue: TypeDeclaration | null): TypeParameter {
     let typeParam = new declarations.TypeParameterDeclarationProto();
     typeParam.setName(name);
     typeParam.setConstraintsList(constraints);
-    typeParam.setDefaultvalue(defaultValue);
+    if (defaultValue) {
+      typeParam.setDefaultvalue(defaultValue);
+    }
     return typeParam;
   }
 
-  createUnionTypeDeclaration(params: Array<ParameterValue>): UnionTypeDeclatation {
+  createUnionTypeDeclaration(params: Array<TypeDeclaration>): TypeDeclaration {
     let unionTypeDeclaration = new declarations.UnionTypeDeclarationProto();
     unionTypeDeclaration.setParamsList(params);
 
@@ -480,7 +470,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  declareProperty(name: string, initializer: Expression | null, type: ParameterValue, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): PropertyDeclaration {
+  declareProperty(name: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
     let propertyDeclaration = new declarations.PropertyDeclarationProto();
     propertyDeclaration.setName(name);
     if(initializer) {
@@ -496,7 +486,7 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  declareVariable(name: string, type: ParameterValue, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: String): VariableDeclaration {
+  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: string): Declaration {
     let variableDeclaration = new declarations.VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
