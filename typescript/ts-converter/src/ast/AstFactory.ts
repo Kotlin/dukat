@@ -49,7 +49,7 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
+  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration {
     let classDeclaration = new declarations.ClassDeclarationProto();
     classDeclaration.setName(name);
     classDeclaration.setModifiersList(modifiers);
@@ -57,6 +57,11 @@ export class AstFactory implements AstFactory {
     classDeclaration.setMembersList(members);
     classDeclaration.setTypeparametersList(typeParams);
     classDeclaration.setParententitiesList(parentEntities);
+    return classDeclaration
+  }
+
+  createClassDeclarationAsTopLevel(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
+    let classDeclaration = this.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setClassdeclaration(classDeclaration);
@@ -166,7 +171,7 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
+  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
     functionDeclaration.setName(name);
     functionDeclaration.setParametersList(parameters);

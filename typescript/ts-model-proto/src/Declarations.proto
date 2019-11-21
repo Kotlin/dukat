@@ -244,14 +244,16 @@ message ExpressionDeclarationProto {
     oneof type {
         BinaryExpressionDeclarationProto binaryExpression = 1;
         UnaryExpressionDeclarationProto unaryExpression = 2;
-        TypeOfExpressionDeclarationProto typeOfExpression = 3;
-        CallExpressionDeclarationProto callExpression = 4;
-        NameExpressionDeclarationProto nameExpression = 5;
-        LiteralExpressionDeclarationProto literalExpression = 6;
-        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 7;
-        ElementAccessExpressionDeclarationProto elementAccessExpression = 8;
-        NewExpressionDeclarationProto newExpression = 9;
-        UnknownExpressionDeclarationProto unknownExpression = 10;
+        FunctionDeclarationProto functionExpression = 3;
+        ClassDeclarationProto classExpression = 4;
+        TypeOfExpressionDeclarationProto typeOfExpression = 5;
+        CallExpressionDeclarationProto callExpression = 6;
+        NameExpressionDeclarationProto nameExpression = 7;
+        LiteralExpressionDeclarationProto literalExpression = 8;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 9;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 10;
+        NewExpressionDeclarationProto newExpression = 11;
+        UnknownExpressionDeclarationProto unknownExpression = 12;
     }
 }
 

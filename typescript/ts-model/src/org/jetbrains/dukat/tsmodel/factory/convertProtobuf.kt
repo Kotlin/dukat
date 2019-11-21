@@ -517,6 +517,8 @@ fun ExpressionDeclarationProto.convert() : ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()
+        hasFunctionExpression() -> functionExpression.convert()
+        hasClassExpression() -> classExpression.convert()
         hasTypeOfExpression() -> typeOfExpression.convert()
         hasCallExpression() -> callExpression.convert()
         hasNameExpression() -> nameExpression.convert()

@@ -5,7 +5,6 @@ import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {
     Block,
-    ClassDeclaration,
     Declaration,
     DefinitionInfoDeclaration,
     Expression,
@@ -31,8 +30,6 @@ export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
-    private astExpressionConverter = new AstExpressionConverter(this);
-
     constructor(
       private rootPackageName: NameEntity,
       private resources: ResourceFetcher,
@@ -43,6 +40,9 @@ export class AstConverter {
       private astFactory: AstFactory
     ) {
     }
+
+    private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
+
 
     private registerDeclaration<T>(declaration: T, collection: Array<T>) {
         collection.push(declaration);
@@ -710,7 +710,7 @@ export class AstConverter {
             return null;
         }
 
-        return this.astFactory.createClassDeclaration(
+        return this.astFactory.createClassDeclarationAsTopLevel(
           this.astFactory.createIdentifierDeclarationAsNameEntity(statement.name.getText()),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
