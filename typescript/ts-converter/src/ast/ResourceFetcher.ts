@@ -8,10 +8,9 @@ export class ResourceFetcher {
     private fileName: string,
     private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined
   ) {
-    this.build(fileName);
   }
 
-  private build(fileName: string) {
+  private * references(fileName: string): IterableIterator<string> {
     if (this.resourceSet.has(fileName)) {
       return;
     }
@@ -22,48 +21,37 @@ export class ResourceFetcher {
       return;
     }
 
+    yield sourceFile.fileName;
+
     let tsInternals = ((ts as any) as TsInternals);
     let curDir = tsInternals.getDirectoryPath(fileName) + "/";
 
-    let referencedFiles = sourceFile.referencedFiles.map(
-      referencedFile => tsInternals.normalizePath(curDir + referencedFile.fileName)
-    );
-
-    let referencedTypeFiles: Array<string> = [];
-
-    if (sourceFile.resolvedTypeReferenceDirectiveNames) {
-      sourceFile.resolvedTypeReferenceDirectiveNames.forEach(
-        referenceDirective => {
-          if (referenceDirective && (typeof referenceDirective.resolvedFileName == "string")) {
-            referencedTypeFiles.push(tsInternals.normalizePath(referenceDirective.resolvedFileName))
-          }
-        }
-      );
+    for (let referencedFile of sourceFile.referencedFiles) {
+      yield tsInternals.normalizePath(curDir + referencedFile.fileName);
     }
 
-    let libReferences = sourceFile.libReferenceDirectives.map(libReference => {
-      let libName = libReference.fileName.toLocaleLowerCase();
-      return tsInternals.libMap.get(libName);
-    });
+    if (sourceFile.resolvedTypeReferenceDirectiveNames) {
+      for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
+        if (referenceDirective && (typeof referenceDirective.resolvedFileName == "string")) {
+          yield tsInternals.normalizePath(referenceDirective.resolvedFileName);
+        }
+      }
+    }
 
-    let importFiles: Array<string> = [];
-    sourceFile.imports.forEach(importDeclaration => {
+    for (let importDeclaration of sourceFile.imports) {
       const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
       if (module && (typeof module.resolvedFileName == "string")) {
-        importFiles.push(tsInternals.normalizePath(module.resolvedFileName))
+        yield tsInternals.normalizePath(module.resolvedFileName);
       }
-    });
+    }
 
-    let references = referencedFiles
-      .concat(referencedTypeFiles)
-      .concat(libReferences)
-      .concat(importFiles);
-
-    references.forEach(reference => this.build(reference));
   }
 
-  forEachReference(handler: (resourceName: string) => void) {
-    this.resourceSet.forEach(handler);
+  * resources(fileName: string): IterableIterator<string> {
+    for (let reference of this.references(fileName)) {
+      yield reference;
+      yield* this.resources(reference);
+    }
   }
 
   getSourceFile(fileName: string): ts.SourceFile {

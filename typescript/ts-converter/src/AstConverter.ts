@@ -96,9 +96,9 @@ export abstract class AstConverter {
     createSourceSet(fileName: string): SourceSet {
         let sources: Array<SourceFileDeclaration> = [];
 
-        this.resources.forEachReference(resource => {
-            sources.push(this.createSourceFileDeclaration(resource))
-        });
+        for (let resource of this.resources.resources(fileName)) {
+          sources.push(this.createSourceFileDeclaration(resource));
+        }
 
         return this.convertSourceSet(fileName, sources);
     }
