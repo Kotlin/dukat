@@ -5,7 +5,7 @@ import org.jetbrains.dukat.js.type.property_owner.Scope
 
 class CommonJSEnvironmentProvider : EnvironmentProvider {
     override fun getEnvironment(): Scope {
-        val env = Scope(null)
+        val env = DefaultEnvironmentProvider().getEnvironment()
 
         val moduleObject = ObjectConstraint(env)
         val exportsObject = ObjectConstraint(env)
