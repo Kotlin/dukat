@@ -1,21 +1,32 @@
 package org.jetbrains.dukat.js.type.analysis
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.reference.ReferenceConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallArgumentConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.call.CallResultConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
+import org.jetbrains.dukat.js.type.property_owner.Scope
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
@@ -29,6 +40,84 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+
+fun List<FunctionConstraint>.pack() : FunctionConstraint {
+    return if (size == 1) {
+        this[0]
+    } else {
+        val parameters = mutableListOf<Pair<String, MutableList<Constraint>>>()
+
+        forEach {
+            it.parameterConstraints.forEachIndexed { index, (name, constraint) ->
+                if (parameters.size <= index) {
+                    parameters.add(index, name to mutableListOf())
+                }
+
+                parameters[index].second.add(constraint)
+            }
+        }
+
+        FunctionConstraint(
+                returnConstraints = UnionTypeConstraint(map { it.returnConstraints }),
+                parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
+        )
+    }
+}
+
+fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
+    return if (this.body != null) {
+        val pathWalker = PathWalker()
+
+        val versions = mutableListOf<FunctionConstraint>()
+
+        do {
+            val functionScope = Scope(owner)
+
+            val parameterConstraints = MutableList(parameters.size) { i ->
+                // Store constraints of parameters in scope,
+                // and in parameter list (in case the variable is replaced)
+                val parameterConstraint = CompositeConstraint()
+                functionScope[parameters[i].name] = parameterConstraint
+                parameters[i].name to parameterConstraint
+            }
+
+            val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
+
+            versions.add(FunctionConstraint(
+                    returnConstraints = returnTypeConstraints,
+                    parameterConstraints = parameterConstraints
+            ))
+        } while (pathWalker.startNextPath())
+
+        val functionConstraint = versions.pack()
+
+        if (name != "") {
+            owner[name] = functionConstraint
+        }
+
+        functionConstraint
+    } else {
+        null
+    }
+}
+
+fun ClassDeclaration.addTo(owner: PropertyOwner, path: PathWalker) : ClassConstraint? {
+    val className = name // Needed for smart cast
+    return if(className is IdentifierEntity) {
+        val classConstraint = ClassConstraint(owner)
+
+        members.forEach { it.addToClass(classConstraint, path) }
+
+        if (className.value != "") {
+            owner[className.value] = classConstraint
+        }
+
+        classConstraint
+    } else {
+        raiseConcern("Cannot convert class with name of type <${className::class}>.") { null }
+    }
+}
+
 
 fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (operator) {
@@ -160,6 +249,8 @@ fun LiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path
 
 fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (this) {
+        is FunctionDeclaration -> this.addTo(owner) ?: NoTypeConstraint
+        is ClassDeclaration -> this.addTo(owner, path) ?: NoTypeConstraint
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
         is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
