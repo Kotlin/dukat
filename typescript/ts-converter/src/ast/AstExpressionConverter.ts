@@ -171,7 +171,8 @@ export class AstExpressionConverter {
     convertNewExpression(expression: ts.NewExpression): Expression {
         return this.createNewExpression(
             this.convertExpression(expression.expression),
-            expression.arguments.map(arg => this.convertExpression(arg))
+            expression.arguments ?
+                expression.arguments.map(arg => this.convertExpression(arg)) : []
         )
     }
 
