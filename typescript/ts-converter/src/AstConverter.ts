@@ -34,20 +34,21 @@ import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
 
-export class AstConverter {
+export abstract class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
     constructor(
       private rootPackageName: NameEntity,
       private resources: ResourceFetcher,
-      private libVisitor: LibraryDeclarationsVisitor,
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private declarationResolver: DeclarationResolver,
       private astFactory: AstFactory
     ) {
     }
+
+    abstract visitType(type: ts.TypeNode): void;
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
         collection.push(declaration);
@@ -320,7 +321,7 @@ export class AstConverter {
                 return this.astFactory.createIdentifierDeclarationAsNameEntity(type.text)
             }
 
-            this.libVisitor.process(type);
+            this.visitType(type);
 
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
@@ -674,7 +675,7 @@ export class AstConverter {
 
                     if (symbol) {
                         if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
-                            this.libVisitor.process(symbol.declarations[0]);
+                            this.visitType(symbol.declarations[0]);
                             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
                         }
                     }

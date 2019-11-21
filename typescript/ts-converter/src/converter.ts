@@ -50,15 +50,20 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
     let astFactory = createAstFactory();
     let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
     let libChecker = (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile());
-    let astConverter: AstConverter = new AstConverter(
+    let libVisitor = new LibraryDeclarationsVisitor(
+      libDeclarations,
+      program.getTypeChecker(),
+      libChecker,
+      (node: ts.Node) => astConverter.convertTopLevelStatement(node)
+    );
+
+    let astConverter: AstConverter = new class extends AstConverter {
+        visitType(type: ts.TypeNode): void {
+            libVisitor.process(type);
+        }
+    }(
       packageName,
       new ResourceFetcher(fileName, (fileName: string) => program.getSourceFile(fileName)),
-      new LibraryDeclarationsVisitor(
-        libDeclarations,
-        program.getTypeChecker(),
-        libChecker,
-        (node: ts.Node) => astConverter.convertTopLevelStatement(node)
-      ),
       new ExportContext(libChecker),
       program.getTypeChecker(),
       new DeclarationResolver(program),
