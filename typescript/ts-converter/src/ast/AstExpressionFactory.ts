@@ -1,7 +1,7 @@
 import * as declarations from "declarations";
 import {
     Expression,
-    IdentifierEntity,
+    IdentifierDeclaration,
     LiteralExpression,
     MemberDeclaration,
     NameEntity
@@ -49,7 +49,7 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
-    static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierEntity): Expression {
+    static createPropertyAccessExpressionDeclarationAsExpression(expression: Expression, name: IdentifierDeclaration): Expression {
         let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
         propertyAccessExpression.setExpression(expression);
         propertyAccessExpression.setName(name);
@@ -79,7 +79,7 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
-    static createQualifierAsNameEntity(left: NameEntity, right: IdentifierEntity): NameEntity {
+    static createQualifierAsNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
         let qualifier = new declarations.QualifierDeclarationProto();
         qualifier.setLeft(left);
         qualifier.setRight(right);
@@ -89,7 +89,7 @@ export class AstExpressionFactory {
         return name;
     }
 
-    static createIdentifier(value: string): IdentifierEntity {
+    static createIdentifier(value: string): IdentifierDeclaration {
         let identifier = new declarations.IdentifierDeclarationProto();
         identifier.setValue(value);
         return identifier;
