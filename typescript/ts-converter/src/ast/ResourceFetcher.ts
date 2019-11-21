@@ -5,7 +5,6 @@ export class ResourceFetcher {
   private resourceSet = new Set<string>();
 
   constructor(
-    private fileName: string,
     private sourceFileFetcher: (fileName: string) => ts.SourceFile | undefined
   ) {
   }
@@ -49,7 +48,7 @@ export class ResourceFetcher {
 
   * resources(fileName: string): IterableIterator<string> {
     for (let reference of this.references(fileName)) {
-      yield reference;
+      yield this.getSourceFile(reference);
       yield* this.resources(reference);
     }
   }

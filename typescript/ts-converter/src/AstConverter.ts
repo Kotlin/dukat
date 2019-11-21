@@ -40,7 +40,6 @@ export abstract class AstConverter {
 
     constructor(
       private rootPackageName: NameEntity,
-      private resources: ResourceFetcher,
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private declarationResolver: DeclarationResolver,
@@ -54,13 +53,7 @@ export abstract class AstConverter {
         collection.push(declaration);
     }
 
-    createSourceFileDeclaration(sourceFileName: string): SourceFileDeclaration {
-        const sourceFile = this.resources.getSourceFile(sourceFileName);
-
-        if (sourceFile == null) {
-            throw new Error(`failed to resolve source file ${sourceFileName}`)
-        }
-
+    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
         let resourceName = this.rootPackageName;
 
         let packageNameFragments = sourceFile.fileName.split("/");
@@ -70,20 +63,10 @@ export abstract class AstConverter {
 
         let packageDeclaration = this.createModuleDeclaration(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
         return this.astFactory.createSourceFileDeclaration(
-          sourceFileName,
+          sourceFile.fileName,
           packageDeclaration,
           sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
         );
-    }
-
-    convertSourceSet(fileName: string, sourceSet: Array<SourceFileDeclaration>): SourceSet {
-        let sources: Array<SourceFileDeclaration> = [];
-
-        sourceSet.forEach(source => {
-            sources.push(source);
-        });
-
-        return this.astFactory.createSourceSet(fileName, sources);
     }
 
     printDiagnostics() {
@@ -91,16 +74,6 @@ export abstract class AstConverter {
         this.unsupportedDeclarations.forEach(id => {
             this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
         });
-    }
-
-    createSourceSet(fileName: string): SourceSet {
-        let sources: Array<SourceFileDeclaration> = [];
-
-        for (let resource of this.resources.resources(fileName)) {
-          sources.push(this.createSourceFileDeclaration(resource));
-        }
-
-        return this.convertSourceSet(fileName, sources);
     }
 
     createModuleDeclaration(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {

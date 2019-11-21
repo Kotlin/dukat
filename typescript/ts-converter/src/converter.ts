@@ -57,22 +57,25 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
       (node: ts.Node) => astConverter.convertTopLevelStatement(node)
     );
 
-    let astConverter: AstConverter = new class extends AstConverter {
+  let resourceFetcher = new ResourceFetcher((fileName: string) => program.getSourceFile(fileName));
+  let astConverter: AstConverter = new class extends AstConverter {
         visitType(type: ts.TypeNode): void {
             libVisitor.process(type);
         }
     }(
       packageName,
-      new ResourceFetcher(fileName, (fileName: string) => program.getSourceFile(fileName)),
       new ExportContext(libChecker),
       program.getTypeChecker(),
       new DeclarationResolver(program),
       astFactory
     );
 
-    let sourceSet = astConverter.createSourceSet(fileName);
-    astConverter.printDiagnostics();
-    return sourceSet;
+    return astFactory.createSourceSet(
+      fileName,
+      Array
+        .from(resourceFetcher.resources(fileName))
+        .map(resource => astConverter.createSourceFileDeclaration(resource))
+    );
 }
 
 export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
