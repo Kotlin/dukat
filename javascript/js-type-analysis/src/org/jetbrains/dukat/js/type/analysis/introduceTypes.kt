@@ -2,9 +2,7 @@ package org.jetbrains.dukat.js.type.analysis
 
 import org.jetbrains.dukat.js.type.export_resolution.CommonJSEnvironmentProvider
 import org.jetbrains.dukat.js.type.export_resolution.CommonJSExportResolver
-import org.jetbrains.dukat.js.type.export_resolution.EmptyEnvironmentProvider
 import org.jetbrains.dukat.js.type.export_resolution.EnvironmentProvider
-import org.jetbrains.dukat.js.type.export_resolution.GeneralExportResolver
 import org.jetbrains.dukat.js.type.export_resolution.ExportResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
