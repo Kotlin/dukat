@@ -1,20 +1,19 @@
 import * as ts from "typescript-services-api";
 import {
-    Declaration,
-    Expression,
-    FunctionDeclaration,
+    Block,
+    Expression, HeritageClauseDeclaration,
     IdentifierDeclaration,
-    MemberDeclaration,
-    NameEntity,
-    PropertyDeclaration
+    MemberDeclaration, ModifierDeclaration,
+    NameEntity, ParameterDeclaration, TypeDeclaration, TypeParameter,
 } from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
-import {ObjectLiteralElementLike} from "../../.tsdeclarations/typescript";
+import {AstFactory} from "./AstFactory";
 
 export class AstExpressionConverter {
     constructor(
-        private astConverter: AstConverter
+        private astConverter: AstConverter,
+        private astFactory: AstFactory
     ) {
     }
 
@@ -24,6 +23,14 @@ export class AstExpressionConverter {
 
     createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
+    }
+
+    createFunctionExpression(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null) {
+        return AstExpressionFactory.convertFunctionDeclarationToExpression(this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, "__NO_UID__"));
+    }
+
+    createClassExpression(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>) {
+        return AstExpressionFactory.convertClassDeclarationToExpression(this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, "__NO_UID__"));
     }
 
     createTypeOfExpression(expression: Expression) {
@@ -101,6 +108,37 @@ export class AstExpressionConverter {
             ts.tokenToString(expression.operator),
             false
         )
+    }
+
+    convertFunctionExpression(expression: ts.FunctionExpression): Expression {
+        let name = expression.name ? expression.name.getText() : "";
+
+        let parameterDeclarations = expression.parameters.map(
+            (param, count) => this.astConverter.convertParameterDeclaration(param, count)
+        );
+
+        let returnType = expression.type ? this.astConverter.convertType(expression.type) : this.astConverter.createTypeDeclaration("Unit");
+
+        let typeParameterDeclarations = this.astConverter.convertTypeParams(expression.typeParameters);
+
+        return this.createFunctionExpression(
+            name,
+            parameterDeclarations,
+            returnType,
+            typeParameterDeclarations,
+            this.astConverter.convertModifiers(expression.modifiers),
+            this.astConverter.convertBlock(expression.body)
+        )
+    }
+
+    convertClassExpression(expression: ts.ClassExpression): Expression {
+        return this.createClassExpression(
+            this.astFactory.createIdentifierDeclarationAsNameEntity(""),
+            this.astConverter.convertClassElementsToMembers(expression.members),
+            this.astConverter.convertTypeParams(expression.typeParameters),
+            this.astConverter.convertHeritageClauses(expression.heritageClauses),
+            this.astConverter.convertModifiers(expression.modifiers)
+        );
     }
 
     convertTypeOfExpression(expression: ts.TypeOfExpression): Expression {
@@ -269,6 +307,10 @@ export class AstExpressionConverter {
             return this.convertPrefixUnaryExpression(expression)
         } else if (ts.isPostfixUnaryExpression(expression)) {
             return this.convertPostfixUnaryExpression(expression)
+        } else if (ts.isFunctionExpression(expression)) {
+            return this.convertFunctionExpression(expression)
+        } else if (ts.isClassExpression(expression)) {
+            return this.convertClassExpression(expression)
         } else if (ts.isTypeOfExpression(expression)) {
             return this.convertTypeOfExpression(expression);
         } else if (ts.isCallExpression(expression)) {

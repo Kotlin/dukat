@@ -1,6 +1,7 @@
 import * as declarations from "declarations";
 import {
-    Expression,
+    ClassDeclaration,
+    Expression, FunctionDeclaration,
     IdentifierDeclaration,
     LiteralExpression,
     MemberDeclaration,
@@ -122,6 +123,18 @@ export class AstExpressionFactory {
     private static asExpression(literalExpression: LiteralExpression): Expression {
         let expression = new declarations.ExpressionDeclarationProto();
         expression.setLiteralexpression(literalExpression);
+        return expression;
+    }
+
+    static convertFunctionDeclarationToExpression(functionExpression: FunctionDeclaration): Expression {
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setFunctionexpression(functionExpression);
+        return expression;
+    }
+
+    static convertClassDeclarationToExpression(classExpression: ClassDeclaration): Expression {
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setClassexpression(classExpression);
         return expression;
     }
 
