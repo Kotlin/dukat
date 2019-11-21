@@ -346,7 +346,10 @@ fun ConstructorDeclarationProto.convert(): ConstructorDeclaration {
     return ConstructorDeclaration(
             parametersList.map { it.convert() },
             typeParametersList.map { it.convert() },
-            modifiersList.map { it.convert() }
+            modifiersList.map { it.convert() },
+            if (hasBody()) {
+                body.convert()
+            } else null
     )
 }
 

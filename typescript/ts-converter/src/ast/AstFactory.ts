@@ -68,12 +68,15 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
     let constructorDeclaration = new declarations.ConstructorDeclarationProto();
 
     constructorDeclaration.setParametersList(parameters);
     constructorDeclaration.setTypeparametersList(typeParams);
     constructorDeclaration.setModifiersList(modifiers);
+    if (body) {
+      constructorDeclaration.setBody(body)
+    }
 
     let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setConstructordeclaration(constructorDeclaration);
