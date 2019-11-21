@@ -13,7 +13,7 @@ class CallArgumentConstraint(
         val functionConstraint = callTarget.resolve()
 
         return if (functionConstraint is FunctionConstraint) {
-            if (functionConstraint.parameterConstraints.size >= argumentNum) {
+            if (functionConstraint.parameterConstraints.size > argumentNum) {
                 functionConstraint.parameterConstraints[argumentNum].second
             } else {
                 CompositeConstraint()
