@@ -28,6 +28,5 @@ fun SourceFileDeclaration.introduceTypes(environmentProvider: EnvironmentProvide
 }
 
 fun SourceSetDeclaration.introduceTypes(environmentProvider: EnvironmentProvider = CommonJSEnvironmentProvider(), exportResolver: ExportResolver = CommonJSExportResolver()): SourceSetDeclaration {
-//fun SourceSetDeclaration.introduceTypes(environmentProvider: EnvironmentProvider = EmptyEnvironmentProvider(), exportResolver: ExportResolver = GeneralExportResolver()): SourceSetDeclaration {
     return copy(sources = sources.map { it.introduceTypes(environmentProvider, exportResolver) })
 }
