@@ -3,6 +3,7 @@ package org.jetbrains.dukat.js.type.constraint.reference
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
+import org.jetbrains.dukat.js.type.constraint.resolution.ResolutionState
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
@@ -10,6 +11,9 @@ open class ReferenceConstraint(
         private val identifier: IdentifierEntity,
         owner: PropertyOwner
 ) : PropertyOwnerReferenceConstraint(owner) {
+    private var resolutionState = ResolutionState.UNRESOLVED
+    private var resolvedConstraint: Constraint? = null
+
     private tailrec fun resolveInOwner(owner: PropertyOwner): Constraint? {
         val resolvedOwner = if(owner is Constraint) {
             val resolvedConstraint = owner.resolve()
@@ -41,6 +45,20 @@ open class ReferenceConstraint(
     }
 
     override fun resolve(): Constraint {
-        return resolveInOwner(owner) ?: CompositeConstraint()
+        return when (resolutionState) {
+            ResolutionState.UNRESOLVED -> {
+                resolvedConstraint = resolveInOwner(owner) ?: CompositeConstraint()
+                resolutionState = ResolutionState.RESOLVED
+                return resolvedConstraint!!
+            }
+
+            ResolutionState.RESOLVING -> {
+                raiseConcern("Invalid converter state!") { CompositeConstraint() }
+            }
+
+            ResolutionState.RESOLVED -> {
+                resolvedConstraint!!
+            }
+        }
     }
 }
