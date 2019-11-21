@@ -58,6 +58,7 @@ fun List<FunctionConstraint>.pack() : FunctionConstraint {
         }
 
         FunctionConstraint(
+                this[0].owner,
                 returnConstraints = UnionTypeConstraint(map { it.returnConstraints }),
                 parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
         )
@@ -84,6 +85,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
             val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
             versions.add(FunctionConstraint(
+                    owner,
                     returnConstraints = returnTypeConstraints,
                     parameterConstraints = parameterConstraints
             ))
