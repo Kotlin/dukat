@@ -34,6 +34,7 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/fs-extra",
                     "@types/lodash",
                     "@types/moment",
+                    "@types/node",
                     "@types/prop-types",
                     "@types/react",
                     "@types/react-dom",
