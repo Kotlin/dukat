@@ -7,6 +7,8 @@ class ClassConstraint(owner: PropertyOwner, prototype: ObjectConstraint = Object
     val propertyNames: Set<String>
         get() = staticMembers.keys
 
+    var constructorConstraint: Constraint? = null
+
     private val staticMembers = LinkedHashMap<String, Constraint>()
 
     init {
@@ -22,12 +24,15 @@ class ClassConstraint(owner: PropertyOwner, prototype: ObjectConstraint = Object
     }
 
     override fun resolve(): ClassConstraint {
-        val resolvedConstraint = ClassConstraint(owner)
-
-        propertyNames.forEach {
-            resolvedConstraint[it] = this[it]!!.resolve()
+        val constructorConstraint = constructorConstraint
+        if (constructorConstraint != null) {
+            this.constructorConstraint = constructorConstraint.resolve()
         }
 
-        return resolvedConstraint
+        propertyNames.forEach {
+            this[it] = this[it]!!.resolve()
+        }
+
+        return this
     }
 }

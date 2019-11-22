@@ -19,7 +19,9 @@ import org.jetbrains.dukat.js.type.type.numberType
 import org.jetbrains.dukat.js.type.type.stringType
 import org.jetbrains.dukat.js.type.type.voidType
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -70,6 +72,19 @@ fun FunctionConstraint.toDeclaration(name: String) = FunctionDeclaration(
         uid = getUID()
 )
 
+fun FunctionConstraint.toConstructor() = ConstructorDeclaration(
+        parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+        typeParameters = emptyList(),
+        modifiers = EXPORT_MODIFIERS,
+        body = null
+)
+
+fun FunctionConstraint.toCallSignature() = CallSignatureDeclaration(
+        parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+        type = returnConstraints.toType(),
+        typeParameters = emptyList()
+)
+
 fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
     return this.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
 }
@@ -87,6 +102,11 @@ fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : Me
 
 fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
     val members = mutableListOf<MemberDeclaration>()
+
+    val constructorConstraint = constructorConstraint
+    if (constructorConstraint is FunctionConstraint) {
+        members.add(constructorConstraint.toConstructor())
+    }
 
     val prototype = this["prototype"]
 
@@ -137,6 +157,11 @@ fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
 fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
     val members = mutableListOf<MemberDeclaration>()
 
+    val callSignatureConstraint = callSignatureConstraint
+    if (callSignatureConstraint is FunctionConstraint) {
+        members.add(callSignatureConstraint.toCallSignature())
+    }
+
     members.addAll(
             propertyNames.mapNotNull { memberName ->
                 this[memberName]?.toMemberDeclaration(name = memberName)
@@ -146,8 +171,9 @@ fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
     if (instantiatedClass is PropertyOwner) {
         val classPrototype = instantiatedClass["prototype"]
 
-        if (classPrototype is ObjectConstraint)
+        if (classPrototype is ObjectConstraint) {
             members.addAll(classPrototype.mapMembers())
+        }
     }
 
     return members

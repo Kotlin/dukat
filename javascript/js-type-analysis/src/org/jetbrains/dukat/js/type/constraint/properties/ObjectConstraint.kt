@@ -13,6 +13,8 @@ class ObjectConstraint(
 
     private val properties = LinkedHashMap<String, Constraint>()
 
+    var callSignatureConstraint: Constraint? = null
+
     override fun set(name: String, data: Constraint) {
         properties[name] = data
     }
@@ -47,6 +49,11 @@ class ObjectConstraint(
             } else {
                 raiseConcern("Instantiating constraint which cannot be instantiated!") { ObjectConstraint(owner) }
             }
+        }
+
+        val callSignatureConstraint = callSignatureConstraint
+        if (callSignatureConstraint != null) {
+            resolvedConstraint.callSignatureConstraint = callSignatureConstraint.resolve()
         }
 
         propertyNames.forEach {

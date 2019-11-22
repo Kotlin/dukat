@@ -25,11 +25,29 @@ class FunctionConstraint(
     private var resolutionState = ResolutionState.UNRESOLVED
     private var resolvedConstraint: Constraint? = null
 
-    private fun isPrototypeFunction() : Boolean {
-        val onlyHasPrototype = classRepresentation.propertyNames.size == 1 && classRepresentation.propertyNames.contains("prototype")
+    private fun hasMembers() : Boolean {
+        return if (classRepresentation.propertyNames.isNotEmpty()) {
+            if (classRepresentation.propertyNames == setOf("prototype")) {
+                val resolvedPrototype = classRepresentation["prototype"]!!.resolve()
 
-        return if (onlyHasPrototype) {
-            val resolvedPrototype = classRepresentation["prototype"]!!.resolve()
+                if (resolvedPrototype is ObjectConstraint) {
+                    resolvedPrototype.propertyNames.isNotEmpty()
+                } else {
+                    false
+                }
+            } else {
+                true
+            }
+        } else {
+            false
+        }
+    }
+
+    private fun hasNonStaticMembers() : Boolean {
+        val prototype = classRepresentation["prototype"]
+
+        return if (prototype != null) {
+            val resolvedPrototype = prototype.resolve()
 
             if (resolvedPrototype is ObjectConstraint) {
                 resolvedPrototype.propertyNames.isNotEmpty()
@@ -37,20 +55,43 @@ class FunctionConstraint(
                 false
             }
         } else {
-            true
+            false
         }
     }
 
     private fun doResolve(): Constraint {
-        return if (!isPrototypeFunction()) {
+        return if (!hasMembers()) {
             FunctionConstraint(
                     owner,
                     returnConstraints.resolve(),
                     parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
             )
         } else {
-            //TODO add function as constructor, and invocable
-            return classRepresentation.resolve()
+            if (hasNonStaticMembers()) {
+                classRepresentation.constructorConstraint = FunctionConstraint(
+                        owner,
+                        returnConstraints.resolve(),
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
+                )
+
+                classRepresentation.resolve()
+            } else {
+                val objectRepresentation = ObjectConstraint(owner)
+
+                val propertyNames = classRepresentation.propertyNames.filter { it != "prototype" }
+
+                propertyNames.forEach {
+                    objectRepresentation[it] = classRepresentation[it]!!
+                }
+
+                objectRepresentation.callSignatureConstraint = FunctionConstraint(
+                        owner,
+                        returnConstraints.resolve(),
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
+                )
+
+                objectRepresentation.resolve()
+            }
         }
     }
 

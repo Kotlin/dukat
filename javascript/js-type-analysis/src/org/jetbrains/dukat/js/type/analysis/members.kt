@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.js.type.analysis
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
@@ -9,10 +10,21 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-@Suppress("UNUSED")
-fun ConstructorDeclaration.addTo(@Suppress("UNUSED_PARAMETER") owner: PropertyOwner) {
-    raiseConcern("Cannot create header for constructor.") {  } //TODO add constructor body to AST
+fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
+    owner.constructorConstraint = FunctionDeclaration(
+            name = "",
+            parameters = parameters,
+            type = TypeDeclaration(
+                    value = IdentifierEntity("Unit"),
+                    params = emptyList()
+            ),
+            typeParameters = typeParameters,
+            modifiers = modifiers,
+            body = body,
+            uid = "__NO_UID__"
+    ).addTo(owner)
 }
 
 fun PropertyDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
