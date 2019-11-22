@@ -46,7 +46,7 @@ export class ResourceFetcher {
 
   }
 
-  * resources(fileName: string): IterableIterator<string> {
+  * resources(fileName: string): IterableIterator<ts.SourceFile> {
     for (let reference of this.references(fileName)) {
       yield this.getSourceFile(reference);
     }
