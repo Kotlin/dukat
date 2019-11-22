@@ -26,13 +26,13 @@ export class ResourceFetcher {
     let curDir = tsInternals.getDirectoryPath(fileName) + "/";
 
     for (let referencedFile of sourceFile.referencedFiles) {
-      yield tsInternals.normalizePath(curDir + referencedFile.fileName);
+      yield* this.references(tsInternals.normalizePath(curDir + referencedFile.fileName));
     }
 
     if (sourceFile.resolvedTypeReferenceDirectiveNames) {
       for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
         if (referenceDirective && (typeof referenceDirective.resolvedFileName == "string")) {
-          yield tsInternals.normalizePath(referenceDirective.resolvedFileName);
+          yield* this.references(tsInternals.normalizePath(referenceDirective.resolvedFileName));
         }
       }
     }
@@ -40,7 +40,7 @@ export class ResourceFetcher {
     for (let importDeclaration of sourceFile.imports) {
       const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
       if (module && (typeof module.resolvedFileName == "string")) {
-        yield tsInternals.normalizePath(module.resolvedFileName);
+        yield* this.references(tsInternals.normalizePath(module.resolvedFileName));
       }
     }
 
@@ -49,7 +49,6 @@ export class ResourceFetcher {
   * resources(fileName: string): IterableIterator<string> {
     for (let reference of this.references(fileName)) {
       yield this.getSourceFile(reference);
-      yield* this.resources(reference);
     }
   }
 
