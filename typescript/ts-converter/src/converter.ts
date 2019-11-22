@@ -7,7 +7,6 @@ import {AstFactory} from "./ast/AstFactory";
 import {Declaration, SourceBundle, SourceFileDeclaration, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {ResourceFetcher} from "./ast/ResourceFetcher";
 import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
@@ -33,13 +32,13 @@ let cache = new DocumentCache();
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private libDeclarations = new Map<string, Array<Declaration>>();
-  private sourceDeclarationCache = new Map<string, SourceFileDeclaration>();
+  private fileDeclarationCache = new Map<string, SourceFileDeclaration>();
 
   constructor(
     private stdLib: string
   ) {}
 
-  createSourceSet(fileName: string, packageNameString: string): SourceSet {
+  private createSourceSet(fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
     let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
     host.register(fileName);
 
@@ -62,7 +61,6 @@ class SourceBundleBuilder {
       (node: ts.Node) => astConverter.convertTopLevelStatement(node)
     );
 
-    let resourceFetcher = new ResourceFetcher((fileName: string) => program.getSourceFile(fileName));
     let astConverter: AstConverter = new AstConverter(
       packageName,
       new ExportContext(libChecker),
@@ -76,21 +74,28 @@ class SourceBundleBuilder {
       }
     );
 
-    let sources = Array.from(resourceFetcher.resources(fileName))
-      .filter(resource => {
-        return !this.sourceDeclarationCache[fileName];
-      })
-      .map(resource => {
-        let sourceFileDeclaration = astConverter.createSourceFileDeclaration(resource);
-        this.sourceDeclarationCache[resource.fileName] = sourceFileDeclaration;
-        return sourceFileDeclaration;
+    return this.createFileDeclarations(fileName, astConverter, program);
+  }
+
+  createFileDeclarations(fileName: string, astConverter: AstConverter, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
+    if (result.has(fileName)) {
+      return  [];
+    }
+    let fileDeclaration = astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
+    result.set(fileName, fileDeclaration);
+    fileDeclaration
+      .getReferencedfilesList()
+      .forEach(resourceFileName => {
+        this.createFileDeclarations(resourceFileName, astConverter, program, result);
       });
 
-    return this.astFactory.createSourceSet(fileName, sources);
+    return Array.from(result.values());
   }
 
   createBundle(packageName: string, files: Array<string>): declarations.SourceBundleDeclarationProto {
-      let sourceSets = files.map(fileName => this.createSourceSet(fileName, packageName));
+      let sourceSets = files.map(fileName => {
+        return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName, packageName));
+      });
 
       let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 

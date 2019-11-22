@@ -31,6 +31,7 @@ import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
+import {tsInternals} from "./TsInternals";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
@@ -58,11 +59,38 @@ export class AstConverter {
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName);
 
+        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
+
         let packageDeclaration = this.createModuleDeclaration(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
+        let referencedFiles = new Set<string>();
+        sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
+
+        if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
+          for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
+            referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+          }
+        }
+
+        sourceFile.forEachChild(node => {
+            if (ts.isImportDeclaration(node)) {
+              let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
+              if (symbol && symbol.valueDeclaration) {
+                referencedFiles.add(tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName));
+              }
+            }
+        });
+
+        for (let importDeclaration of sourceFile.imports) {
+          const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
+          if (module && (typeof module.resolvedFileName == "string")) {
+            referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
+          }
+        }
+
         return this.astFactory.createSourceFileDeclaration(
-          sourceFile.fileName,
-          packageDeclaration,
-          sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
+            sourceFile.fileName,
+            packageDeclaration,
+            Array.from(referencedFiles)
         );
     }
 

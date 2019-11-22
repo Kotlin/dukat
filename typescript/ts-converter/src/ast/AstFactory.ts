@@ -325,10 +325,10 @@ export class AstFactory implements AstFactory {
     return reference;
   }
 
-  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<IdentifierEntity>): SourceFileDeclaration {
+  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<string>): SourceFileDeclaration {
     let sourceFile = new declarations.SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
-    sourceFile.setReferencedfilesList([]);
+    sourceFile.setReferencedfilesList(referencedFiles);
     sourceFile.setRoot(root);
     return sourceFile;
   }

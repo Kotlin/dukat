@@ -1,7 +1,7 @@
 import * as ts from "typescript-services-api";
 
 //Declarations that declared inside namespace marked as internal and not exist inside typescriptServices.d.ts and typescript.d.ts, but available at runtime
-export interface TsInternals {
+interface TsInternals {
   normalizePath(path: string): string;
 
   getDirectoryPath(path: string): string;
