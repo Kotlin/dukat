@@ -328,7 +328,7 @@ fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
     return SourceFileDeclaration(
             fileName,
             root.convert(),
-            referencedFilesList.map { IdentifierEntity(it.value) }
+            referencedFilesList.map { it.value }
     )
 }
 

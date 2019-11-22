@@ -595,7 +595,7 @@ fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver)
     return SourceFileNode(
             fileNameNormalized,
             root.introduceNodes(fileNameNormalized, moduleNameResolver),
-            referencedFiles.map { referencedFile -> IdentifierEntity(referencedFile.value) },
+            referencedFiles.map { referencedFile -> referencedFile },
             null
     )
 }

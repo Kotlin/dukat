@@ -578,7 +578,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                             fileName = fileName,
                             root = root,
                             referencedFiles = source.referencedFiles.map { referenceFile ->
-                                val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
+                                val absolutePath = rootFile.resolveSibling(referenceFile).normalize().absolutePath
                                 absolutePath
                             })
 
