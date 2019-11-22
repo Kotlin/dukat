@@ -10,6 +10,7 @@ import {DeclarationResolver} from "./DeclarationResolver";
 import {ResourceFetcher} from "./ast/ResourceFetcher";
 import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
+import {AstVisitor} from "./AstVisitor";
 
 function createAstFactory(): AstFactory {
     return new AstFactory();
@@ -58,16 +59,17 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
     );
 
   let resourceFetcher = new ResourceFetcher((fileName: string) => program.getSourceFile(fileName));
-  let astConverter: AstConverter = new class extends AstConverter {
-        visitType(type: ts.TypeNode): void {
-            libVisitor.process(type);
-        }
-    }(
+  let astConverter: AstConverter = new AstConverter(
       packageName,
       new ExportContext(libChecker),
       program.getTypeChecker(),
       new DeclarationResolver(program),
-      astFactory
+      astFactory,
+      new class implements AstVisitor {
+        visitType(type: ts.TypeNode): void {
+          libVisitor.process(type);
+        }
+      }
     );
 
     return astFactory.createSourceSet(

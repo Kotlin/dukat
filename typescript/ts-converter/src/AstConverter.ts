@@ -1,5 +1,3 @@
-import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
-import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
@@ -25,7 +23,6 @@ import {
     QualifierEntity,
     ReferenceEntity,
     SourceFileDeclaration,
-    SourceSet,
     TypeAliasDeclaration,
     TypeDeclaration,
     TypeParameter
@@ -33,8 +30,9 @@ import {
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
+import {AstVisitor} from "./AstVisitor";
 
-export abstract class AstConverter {
+export class AstConverter {
     private log = createLogger("AstConverter");
     private unsupportedDeclarations = new Set<Number>();
 
@@ -43,11 +41,10 @@ export abstract class AstConverter {
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private declarationResolver: DeclarationResolver,
-      private astFactory: AstFactory
+      private astFactory: AstFactory,
+      private astVisitor: AstVisitor
     ) {
     }
-
-    abstract visitType(type: ts.TypeNode): void;
 
     private registerDeclaration(declaration: Declaration, collection: Array<Declaration>) {
         collection.push(declaration);
@@ -294,7 +291,7 @@ export abstract class AstConverter {
                 return this.astFactory.createIdentifierDeclarationAsNameEntity(type.text)
             }
 
-            this.visitType(type);
+            this.astVisitor.visitType(type);
 
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
@@ -648,7 +645,7 @@ export abstract class AstConverter {
 
                     if (symbol) {
                         if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
-                            this.visitType(symbol.declarations[0]);
+                            this.astVisitor.visitType(symbol.declarations[0]);
                             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
                         }
                     }
