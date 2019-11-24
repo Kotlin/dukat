@@ -574,7 +574,8 @@ export class AstConverter {
 
     convertTypeLiteralToObjectLiteralDeclaration(typeLiteral: ts.TypeLiteralNode): ObjectLiteral {
         return this.astFactory.createObjectLiteral(
-          this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members)
+          this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
+          this.exportContext.getUID(typeLiteral)
         );
     }
 
