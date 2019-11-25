@@ -138,7 +138,14 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     }
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
-        return super.lowerTypeValueModel(ownerContext.copy(node = ownerContext.node.copy(value = ownerContext.node.value.escape())))
+        return super.lowerTypeValueModel(
+            ownerContext.copy(
+                node = ownerContext.node.copy(
+                    value = ownerContext.node.value.escape(),
+                    fqName = ownerContext.node.fqName?.escape()
+                )
+            )
+        )
     }
 
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
