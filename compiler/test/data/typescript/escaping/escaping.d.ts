@@ -94,3 +94,9 @@ declare class $tring {
 declare class Foo {
 
 }
+
+declare namespace fun {
+    interface Promise<T> {
+
+    }
+}

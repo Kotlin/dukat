@@ -53,7 +53,7 @@ import org.w3c.xhr.*
 
 external open class EmptySyntaxList : TypeScript.ISyntaxList {
     override fun kind(): TypeScript.SyntaxKind
-    open fun childAt(index: Number): TypeScript.ISyntaxNodeOrToken
+    override fun childAt(index: Number): TypeScript.ISyntaxNodeOrToken
     override fun toArray(): Array<TypeScript.ISyntaxNodeOrToken>
     override fun insertChildrenInto(array: Array<TypeScript.ISyntaxElement>, index: Number)
 }
