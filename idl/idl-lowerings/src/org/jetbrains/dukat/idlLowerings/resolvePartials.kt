@@ -16,22 +16,22 @@ private class PartialContext : IDLLowering {
 
     private val alreadyResolvedPartials: MutableList<String> = mutableListOf()
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         interfaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         dictionaries.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
-    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration, owner: IDLFileDeclaration): IDLEnumDeclaration {
         enums.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
 
-    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration): IDLNamespaceDeclaration {
+    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration, owner: IDLFileDeclaration): IDLNamespaceDeclaration {
         namespaces.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
         return declaration
     }
@@ -63,7 +63,7 @@ private class PartialContext : IDLLowering {
 
 private class PartialResolver(val context: PartialContext) : IDLLowering {
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
             return declaration.copy(
                     partial = true
@@ -92,7 +92,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         )
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
             return declaration.copy(
                     partial = true
@@ -110,7 +110,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         )
     }
 
-    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration, owner: IDLFileDeclaration): IDLEnumDeclaration {
         if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
             return declaration.copy(
                     partial = true
@@ -127,7 +127,7 @@ private class PartialResolver(val context: PartialContext) : IDLLowering {
         )
     }
 
-    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration): IDLNamespaceDeclaration {
+    override fun lowerNamespaceDeclaration(declaration: IDLNamespaceDeclaration, owner: IDLFileDeclaration): IDLNamespaceDeclaration {
         if (declaration.partial || context.isAlreadyResolved(declaration.name)) {
             return declaration.copy(
                     partial = true
