@@ -93,6 +93,7 @@ private fun MemberNode.isStatic() = when (this) {
 
 
 private enum class TranslationContext {
+    TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
     CONSTRUCTOR
@@ -104,6 +105,10 @@ private data class Members(
 )
 
 private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>) {
+
+    companion object {
+        val IMPOSSIBLE_CONSTRAINT = IdentifierEntity("<IMPOSSIBLE-CONSTRAINT>")
+    }
 
     private fun split(members: List<MemberNode>): Members {
         val staticMembers = mutableListOf<MemberModel>()
@@ -216,9 +221,13 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
 
     private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
+        val dynamicName = when (context) {
+            TranslationContext.TYPE_CONSTRAINT -> IMPOSSIBLE_CONSTRAINT
+            else -> IdentifierEntity("dynamic")
+        }
         return when (this) {
             is UnionTypeNode -> TypeValueModel(
-                    IdentifierEntity("dynamic"),
+                    dynamicName,
                     emptyList(),
                     params.map { unionMember ->
                         if (unionMember.meta is StringLiteralDeclaration) {
@@ -230,7 +239,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     null
             )
             is TupleTypeNode -> TypeValueModel(
-                    IdentifierEntity("dynamic"),
+                    dynamicName,
                     emptyList(),
                     "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
                     null
@@ -308,21 +317,11 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                 primaryConstructor = primaryConstructor?.let { constructor ->
                     ConstructorModel(
                             parameters = constructor.parameters.map { param -> param.process() },
-                            typeParameters = constructor.typeParameters.map { typeParam ->
-                                TypeParameterModel(
-                                        type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
-                                        constraints = typeParam.params.map { param -> param.process() }
-                                )
-                            },
+                            typeParameters = convertTypeParams(constructor.typeParameters),
                             generated = constructor.generated
                     )
                 },
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
@@ -361,12 +360,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                 } else {
                     null
                 },
-                typeParameters = typeParameters.map { typeParam ->
-                    TypeParameterModel(
-                            type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
-                            constraints = typeParam.params.map { param -> param.process() }
-                    )
-                },
+                typeParameters = convertTypeParams(typeParameters),
                 parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
@@ -463,7 +457,9 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         return typeParameters.map { typeParam ->
             TypeParameterModel(
                     type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
-                    constraints = typeParam.params.map { param -> param.process() }
+                    constraints = typeParam.params
+                            .map { param -> param.process(TranslationContext.TYPE_CONSTRAINT) }
+                            .filterNot { (it is TypeValueModel) && (it.value == IMPOSSIBLE_CONSTRAINT) }
             )
         }
     }
@@ -582,7 +578,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                             fileName = fileName,
                             root = root,
                             referencedFiles = source.referencedFiles.map { referenceFile ->
-                                val absolutePath = rootFile.resolveSibling(referenceFile.value).normalize().absolutePath
+                                val absolutePath = rootFile.resolveSibling(referenceFile).normalize().absolutePath
                                 absolutePath
                             })
 
@@ -592,10 +588,15 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 }
 
-private class ReferenceVisitor(private val visit: (ClassLikeNode, DocumentRootNode) -> Unit): NodeTypeLowering{
+private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit): NodeTypeLowering{
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
-        visit(declaration, owner)
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
         return super.lowerClassLikeNode(declaration, owner)
+    }
+
+    override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        return super.lowerEnumNode(declaration, owner)
     }
 
     fun process(sourceSet: SourceSetNode) {
@@ -604,8 +605,8 @@ private class ReferenceVisitor(private val visit: (ClassLikeNode, DocumentRootNo
 }
 
 fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
-    ReferenceVisitor { classLike, owner ->
-       uidToFqNameMapper[classLike.uid] = owner.qualifiedPackageName.appendLeft(classLike.name)
+    ReferenceVisitor { uid, fqName ->
+       uidToFqNameMapper[uid] = fqName
     }.process(this)
 
     return NodeConverter(uidToFqNameMapper).convert(this)

@@ -22,22 +22,7 @@ private data class ClassLikeKey(
         val name: NameEntity,
         val typeParameters: List<TypeParameterModel>
 )
-
-private fun ClassModel.createKey(): ClassLikeKey {
-    return ClassLikeKey(name, typeParameters)
-}
-
-private fun InterfaceModel.createKey(): ClassLikeKey {
-    return ClassLikeKey(name, typeParameters)
-}
-
-private fun ClassLikeModel.createKey(): ClassLikeKey? {
-    return when (this) {
-        is ClassModel -> createKey()
-        is InterfaceModel -> createKey()
-        else -> null
-    }
-}
+private fun ClassLikeModel.createKey() = ClassLikeKey(name, typeParameters)
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageModel>, parentEntitiesB: List<HeritageModel>): List<HeritageModel> {
     val parentSet = parentEntitiesA.toSet()
@@ -110,32 +95,20 @@ private fun ClassLikeModel.merge(otherClassLike: ClassLikeModel): ClassLikeModel
 
 fun ModuleModel.mergeClassesAndInterfaces(): ModuleModel {
 
-    val classlikeBuckets = mutableMapOf<ClassLikeKey, MutableList<ClassLikeModel>>()
+    val classlikeBuckets =
+            declarations
+                    .filterIsInstance(ClassLikeModel::class.java)
+                    .groupBy { it.createKey() }
+                    .mapValues { entry -> entry.value.reduceRight { classLikeModel, acc -> classLikeModel.merge(acc) }}
+                    .toMutableMap()
 
-    declarations.forEach { declaration ->
+    val declarationResolved = declarations.mapNotNull { declaration ->
         if (declaration is ClassLikeModel) {
-            declaration.createKey()?.let { key ->
-                classlikeBuckets.getOrPut(key) { mutableListOf() }.add(declaration)
-            }
+            classlikeBuckets.remove(declaration.createKey())
+        } else {
+            declaration
         }
     }
-
-
-    val classlikeBucketsMerged = classlikeBuckets
-            .mapValues { entry ->
-                entry.value.reduceRight { classLikeModel, acc -> classLikeModel.merge(acc) }
-            }.toMutableMap()
-
-    val declarationResolved = mutableListOf<TopLevelModel>()
-    declarations.forEach { declaration ->
-        if (declaration is ClassLikeModel) {
-            val classLikeModel = classlikeBucketsMerged.remove(declaration.createKey())
-            if (classLikeModel != null) {
-                declarationResolved.add(classLikeModel)
-            }
-        } else declarationResolved.add(declaration)
-    }
-
 
     val submodulesResolved = submodules.map { submodule -> submodule.mergeClassesAndInterfaces() }
 

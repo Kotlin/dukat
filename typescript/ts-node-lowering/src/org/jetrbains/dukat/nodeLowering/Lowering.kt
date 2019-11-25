@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -22,6 +23,7 @@ interface Lowering<T : TypeEntity> {
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
     fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
+    fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode = declaration
 
     fun lowerParameterNode(declaration: ParameterNode): ParameterNode
     fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode
@@ -49,6 +51,7 @@ interface Lowering<T : TypeEntity> {
             is ClassLikeNode -> lowerClassLikeNode(declaration, owner)
             is DocumentRootNode -> lowerDocumentRoot(declaration)
             is TypeAliasNode -> lowerTypeAliasNode(declaration)
+            is EnumNode -> lowerEnumNode(declaration, owner)
             else -> declaration.duplicate()
         }
     }

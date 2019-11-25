@@ -18,7 +18,7 @@ private fun ModuleModel.addStandardImportsAndAnnotations() {
             "EXTERNAL_DELEGATION"
     ).map { it.toNameEntity() }))
 
-    imports.addAll(
+    imports.addAll(0,
             listOf(
                     "kotlin.js.*",
                     "kotlin.js.Json",

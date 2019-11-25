@@ -368,7 +368,7 @@ message ModuleDeclarationProto {
 message SourceFileDeclarationProto {
     string fileName = 1;
     ModuleDeclarationProto root = 2;
-    repeated IdentifierDeclarationProto referencedFiles = 3;
+    repeated string referencedFiles = 3;
 }
 
 message SourceSetDeclarationProto {
