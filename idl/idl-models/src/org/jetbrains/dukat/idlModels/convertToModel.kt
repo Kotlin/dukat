@@ -82,17 +82,6 @@ private fun IDLDeclaration.resolveName(): String? {
     }
 }
 
-private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        if (leftMost() == ROOT_PACKAGENAME) {
-            shiftLeft()!!.translate()
-        } else {
-            "${left.translate()}.${right.translate()}"
-        }
-    }
-}
-
 
 private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration, private val typeMap: Map<String, NameEntity?>) {
 
@@ -306,14 +295,6 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration, 
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null
         )
-    }
-
-    private fun MemberModel.getName(): String? {
-        return when (this) {
-            is PropertyModel -> name.translate()
-            is MethodModel -> name.translate()
-            else -> null
-        }
     }
 
     private fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
@@ -733,7 +714,9 @@ fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
 
     val typeMap = mutableMapOf<String, NameEntity?>()
     IDLReferenceVisitor { declaration, packageName ->
-        declaration.resolveName()?.let { typeMap[it]  = packageName }
+        declaration.resolveName()?.let {
+            typeMap[it]  = packageName ?: ROOT_PACKAGENAME
+        }
     }.lowerSourceSetDeclaration(this)
 
     return SourceSetModel(
