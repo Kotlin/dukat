@@ -201,7 +201,7 @@ private class OverrideResolver(val context: ModelContext) {
                 if (overriden != null) {
                     copy(override = overriden, parameters = parameters.map { param -> param.copy(initializer = null) })
                 } else {
-                    copy()
+                    this
                 }
             }
             is PropertyModel -> {
