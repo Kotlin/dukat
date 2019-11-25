@@ -27,9 +27,15 @@ private fun ReferenceEntity<*>?.isLibReference(): Boolean {
 }
 
 private fun TypeDeclaration.resolveAsSubstitution(): TypeDeclaration {
+    val isLibReference = isLibReference()
     if (value == IdentifierEntity("ReadonlyArray")) {
-        if (isLibReference()) {
+        if (isLibReference) {
             return copy(value = IdentifierEntity("Array"))
+        }
+    }
+    else if (value == IdentifierEntity("TemplateStringsArray")) {
+        if (isLibReference) {
+            return copy(value = IdentifierEntity("Array"), params = listOf(TypeDeclaration(IdentifierEntity("String"), emptyList())))
         }
     }
 
@@ -56,7 +62,8 @@ private class SubstituteLowering : DeclarationTypeLowering {
 
     private val stdLibFinalEntities = setOf<NameEntity>(
             IdentifierEntity("Array"),
-            IdentifierEntity("Error")
+            IdentifierEntity("Error"),
+            IdentifierEntity("String")
     )
 
     override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<ModuleDeclaration>): TopLevelDeclaration {
@@ -65,13 +72,14 @@ private class SubstituteLowering : DeclarationTypeLowering {
                 parentEntity.isLibReference() and stdLibFinalEntities.contains(parentEntity.name)
             }
             if (forbiddenParent == null) {
-                declaration
+                null
             } else {
                 declaration.convertToTypeAlias(forbiddenParent)
             }
         } else {
-            declaration
-        }
+            null
+        } ?: declaration
+
         return super.lowerTopLevelDeclaration(declarationResolved, owner)
     }
 
@@ -80,11 +88,36 @@ private class SubstituteLowering : DeclarationTypeLowering {
     }
 }
 
+private class TopLevelVisitor(private val visitor: (TopLevelDeclaration) -> Unit) : DeclarationTypeLowering {
 
-private fun ModuleDeclaration.substituteTsStdLibEntities(): ModuleDeclaration {
-    return SubstituteLowering().lowerDocumentRoot(this)
+    override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<ModuleDeclaration>): TopLevelDeclaration {
+        visitor.invoke(declaration)
+        return super.lowerTopLevelDeclaration(declaration, owner)
+    }
+
+    fun visit(module: ModuleDeclaration) {
+        lowerDocumentRoot(module)
+    }
 }
 
-private fun SourceFileDeclaration.substituteTsStdLibEntities() = copy(root = root.substituteTsStdLibEntities())
 
-fun SourceSetDeclaration.substituteTsStdLibEntities() = copy(sources = sources.map(SourceFileDeclaration::substituteTsStdLibEntities))
+private fun ModuleDeclaration.substituteTsStdLibEntities(): ModuleDeclaration {
+    val moduleResolved = SubstituteLowering().lowerDocumentRoot(this)
+
+    val m = mutableMapOf<String, NameEntity>()
+    TopLevelVisitor {
+        if (it is ClassLikeDeclaration) {
+            m[it.uid] = it.name
+        }
+    }.visit(moduleResolved)
+
+    return moduleResolved
+}
+
+private fun SourceFileDeclaration.substituteTsStdLibEntities(): SourceFileDeclaration {
+    return copy(root = root.substituteTsStdLibEntities())
+}
+
+fun SourceSetDeclaration.substituteTsStdLibEntities(): SourceSetDeclaration {
+    return copy(sources = sources.map(SourceFileDeclaration::substituteTsStdLibEntities))
+}

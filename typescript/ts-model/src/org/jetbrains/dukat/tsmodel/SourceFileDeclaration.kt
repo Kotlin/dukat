@@ -6,5 +6,5 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 data class SourceFileDeclaration(
         val fileName: String,
         val root: ModuleDeclaration,
-        val referencedFiles: List<IdentifierEntity>
+        val referencedFiles: List<String>
 ) : Entity

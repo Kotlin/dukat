@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ts.translator
 
-import dukat.ast.proto.Declarations
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
+import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 
 class JsRuntimeByteArrayTranslator(
         override val moduleNameResolver: ModuleNameResolver
@@ -14,7 +14,7 @@ class JsRuntimeByteArrayTranslator(
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 
     fun parse(data: ByteArray): SourceBundleDeclaration {
-        return Declarations.SourceSetBundleProto.parseFrom(data).convert()
+        return SourceBundleDeclarationProto.parseFrom(data).convert()
     }
 
     override fun translate(data: ByteArray): SourceBundleModel {

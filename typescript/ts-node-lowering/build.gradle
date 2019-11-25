@@ -12,5 +12,5 @@ dependencies {
     implementation(project(":panic"))
     implementation(project(":translator-string"))
     implementation(project(":ts-model"))
-    compile "org.jetbrains.kotlin:kotlin-reflect:1.3.41"
+    compile "org.jetbrains.kotlin:kotlin-reflect:${gradle.kotlinVersion}"
 }

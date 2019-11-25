@@ -1,4 +1,4 @@
-import {translate} from "./converter";
+import {createBundle} from "./converter";
 import * as fs from "fs";
 
 function runtime() {
@@ -11,7 +11,7 @@ function runtime() {
 
     let outputName = args.shift();
 
-    let sourceSetBundle = translate(libName || "", "<ROOT>", args);
+    let sourceSetBundle = createBundle(libName || "", "<ROOT>", args);
 
     let writeStream = (outputName == "--std-out") ? process.stdout : fs.createWriteStream(outputName!!);
     writeStream.write(sourceSetBundle.serializeBinary() as any)

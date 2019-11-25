@@ -69,32 +69,19 @@ class DescriptorTests : OutputTests() {
         val expectedModuleDescriptor =
             generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
 
-        val packageNames =
-            flattenedSourceSet.sources.map { translatePackageName(it.root.name) }.sortedBy { it.asString() }.distinct()
-                .ifEmpty {
-                    listOf(FqName.ROOT)
-                }
-        val output = mutableListOf<String>()
-        val expectedOutput = mutableListOf<String>()
-        packageNames.forEach { packageName ->
-            if (packageNames.none { packageName.isChildOf(it) }) {
-                validate(
-                    DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
-                        packageName
-                    )
-                )
-                output +=
-                    RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                        .serializeRecursively(
-                            outputModuleDescriptor.getPackage(packageName)
-                        )
-                expectedOutput += RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
-                    .serializeRecursively(expectedModuleDescriptor.getPackage(packageName))
-            }
-        }
+        validate(
+            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
+                FqName.ROOT
+            )
+        )
+
         assertEquals(
-            output.joinToString(separator = SEPARATOR),
-            expectedOutput.joinToString(separator = SEPARATOR)
+            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                .serializeRecursively(
+                    outputModuleDescriptor.getPackage(FqName.ROOT)
+                ),
+            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
+                .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
         )
     }
 

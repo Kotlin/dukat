@@ -133,7 +133,8 @@ export declare class ModuleDeclaration implements Declaration {
 }
 
 export declare class SourceFileDeclaration implements AstNode {
-    declarations: Declaration[]
+    declarations: Declaration[];
+    getReferencedfilesList(): Array<string>;
 }
 
 export declare class SourceSet implements Declaration {

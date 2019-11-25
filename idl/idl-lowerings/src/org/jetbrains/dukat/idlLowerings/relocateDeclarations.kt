@@ -1,11 +1,7 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
-import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
 private data class Relocation(val name: NameEntity, val from: NameEntity, val to: NameEntity)

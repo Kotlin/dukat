@@ -8,7 +8,7 @@ data class InterfaceModel(
         override val name: NameEntity,
         override val members: List<MemberModel>,
         override val companionObject: ObjectModel?,
-        val typeParameters: List<TypeParameterModel>,
+        override val typeParameters: List<TypeParameterModel>,
         override val parentEntities: List<HeritageModel>,
         override val annotations: MutableList<AnnotationModel>,
         override val comment: CommentEntity?,
