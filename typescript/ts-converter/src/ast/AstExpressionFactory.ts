@@ -183,6 +183,15 @@ export class AstExpressionFactory {
         return this.asExpression(literalExpression);
     }
 
+    static createArrayLiteralDeclarationAsExpression(elements: Array<Expression>): Expression {
+        let arrayLiteral = new declarations.ArrayLiteralExpressionDeclarationProto();
+        arrayLiteral.setElementsList(elements);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setArrayliteral(arrayLiteral);
+        return this.asExpression(literalExpression);
+    }
+
     static createRegExLiteralDeclarationAsExpression(value: string): Expression {
         let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
         regExLiteralExpression.setValue(value);
