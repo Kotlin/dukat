@@ -55,6 +55,7 @@ abstract class CompilationTests {
         println("file:///${sourcePath}")
         val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
         val targetDir = File(targetPath)
+        println("file:///${targetDir.normalize().absolutePath }")
 
         targetDir.deleteRecursively()
         getTranslator().translate(sourcePath, targetPath)

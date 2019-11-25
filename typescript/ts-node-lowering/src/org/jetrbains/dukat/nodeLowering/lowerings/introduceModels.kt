@@ -590,12 +590,16 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
 private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit): NodeTypeLowering{
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
-        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        if (!declaration.uid.endsWith("_GENERATED")) {
+            visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        }
         return super.lowerClassLikeNode(declaration, owner)
     }
 
     override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
-        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        if (!declaration.uid.endsWith("_GENERATED")) {
+            visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        }
         return super.lowerEnumNode(declaration, owner)
     }
 

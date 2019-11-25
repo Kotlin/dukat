@@ -1,6 +1,4 @@
-@file:JsQualifier("lib1")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package lib1
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -16,15 +14,16 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import _transformable.internalApi.TransformOptions
 
-external interface I {
-    var x: String
-}
+external interface Cipher
+
+external fun createCipher(algorithm: String, options: TransformOptions? = definedExternally): Cipher
 
 // ------------------------------------------------------------------------------------------
-@file:JsQualifier("lib2")
+@file:JsModule("_transformable")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package lib2
+package _transformable.internalApi
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -40,6 +39,5 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
-import lib1.I
 
-external fun foo(): I
+external interface TransformOptions
