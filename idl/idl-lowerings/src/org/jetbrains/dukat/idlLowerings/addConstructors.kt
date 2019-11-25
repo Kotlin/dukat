@@ -86,7 +86,7 @@ private class ConstructorLowering : IDLLowering {
         }
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         val ordinaryConstructors = processOptionalConstructors(declaration.extendedAttributes.mapNotNull { it.convertToOrdinaryConstructor() })
         addNamedConstructors(declaration)
         return when {

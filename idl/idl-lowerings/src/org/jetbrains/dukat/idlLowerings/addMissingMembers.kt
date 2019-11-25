@@ -2,6 +2,7 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
@@ -15,7 +16,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
 
     val helper = OverrideHelper(context)
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         val allParents = helper.getAllInterfaceParents(declaration)
         val newAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val newOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
@@ -116,7 +117,7 @@ private class MissingMemberResolver(val context: MissingMemberContext) : IDLLowe
         )
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         val newMembers = helper.getAllDictionaryParents(declaration)
                 .flatMap { it.members }.filter { parentMember ->
                     declaration.members.none { helper.isOverriding(it, parentMember) }
@@ -129,7 +130,7 @@ private class DuplicateRemover(val context: MissingMemberContext) : IDLLowering 
 
     val helper = OverrideHelper(context)
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         val allParents = helper.getAllInterfaceParents(declaration)
         val duplicatedAttributes: MutableList<IDLAttributeDeclaration> = mutableListOf()
         val duplicatedOperations: MutableList<IDLOperationDeclaration> = mutableListOf()
