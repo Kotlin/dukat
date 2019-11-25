@@ -7,4 +7,13 @@ declare namespace React {
     class Component<P, S> extends Bar implements Foo {
         boo(p: P, s: S)
     }
+    interface Foo {
+
+    }
+    class Bar {
+
+    }
+    interface ComponentLifecycle<T, U> {
+
+    }
 }

@@ -23,3 +23,9 @@ external open class Component<P, S> : Bar, Foo, ComponentLifecycle<P, S> {
     fun bar(): Number
     fun baz(a: Any)
 }
+
+external interface Foo
+
+external open class Bar
+
+external interface ComponentLifecycle<T, U>

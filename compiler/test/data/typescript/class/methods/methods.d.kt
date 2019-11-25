@@ -20,3 +20,5 @@ external open class Foo {
     open fun methodWithString(s: String): String
     open fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }
+
+external interface Bar

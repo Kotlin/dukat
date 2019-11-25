@@ -49,3 +49,5 @@ external open class Foo {
     open operator fun set(s: String, value: Array<String>)
     open var props: `T$1`
 }
+
+external open class Bar

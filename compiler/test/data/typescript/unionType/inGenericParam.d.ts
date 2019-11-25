@@ -4,4 +4,8 @@ export namespace My.Deeply.Nested.Response {
         token: Box<string>;
         expirationToken: Box<string>;
     }
+
+    export interface Box<T> {
+
+    }
 }

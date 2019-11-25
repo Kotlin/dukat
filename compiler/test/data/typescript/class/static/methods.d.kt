@@ -22,3 +22,5 @@ external open class Foo {
         fun methodWithManyArgs(n: Number, settings: Bar): Boolean
     }
 }
+
+external open class Bar

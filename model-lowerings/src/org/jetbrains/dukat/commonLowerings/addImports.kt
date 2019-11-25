@@ -12,15 +12,8 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.model.commonLowerings.escape
 import org.jetbrains.dukat.ownerContext.NodeOwner
-
-
-private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        "${left.translate()}.${right.translate()}"
-    }
-}
 
 private class TypeVisitor(private val visit: (TypeValueModel) -> Unit) : ModelWithOwnerTypeLowering {
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {

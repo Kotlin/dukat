@@ -3,5 +3,13 @@ declare class Foo<T extends Bar> {
     withoutArgumentsReturnsT(): T;
     withOneT(a: T): T;
     returnsB<B extends Baz>(a: any): B;
-    withManyArguments<A extends T, B extends B>(a: A, b: B): T;
+    withManyArguments<A extends T, B extends A>(a: A, b: B): T;
+}
+
+interface Bar {
+
+}
+
+interface Baz {
+
 }

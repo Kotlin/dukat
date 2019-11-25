@@ -26,3 +26,5 @@ external var varAsBoolean: Boolean
 external var varAsString: String
 
 external var varAsFoo: Foo
+
+external interface Foo

@@ -27,7 +27,7 @@ external open class B {
 
 external var c: Number
 
-external fun d(a: Boolean, b: Any, c: SomeType)
+external fun d(a: Boolean, b: Any, c: Foo.Bar.SomeType)
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("Foo.Bar")
@@ -60,3 +60,5 @@ external open class B {
 external var c: Number
 
 external fun d(a: Boolean, b: Any, c: SomeType)
+
+external interface SomeType

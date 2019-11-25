@@ -27,6 +27,10 @@ external interface ISyntaxList : ISyntaxElement {
     fun insertChildrenInto(array: Array<ISyntaxElement>, index: Number)
 }
 
+external interface ISyntaxNodeOrToken
+
+external interface SyntaxKind
+
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("TypeScript.Syntax")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
@@ -46,7 +50,11 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import TypeScript.ISyntaxNodeOrToken
 
 external open class EmptySyntaxList : TypeScript.ISyntaxList {
-    override fun kind(): SyntaxKind
+    override fun kind(): TypeScript.SyntaxKind
+    override fun childAt(index: Number): ISyntaxNodeOrToken
+    override fun toArray(): Array<TypeScript.ISyntaxNodeOrToken>
+    override fun insertChildrenInto(array: Array<TypeScript.ISyntaxElement>, index: Number)
 }

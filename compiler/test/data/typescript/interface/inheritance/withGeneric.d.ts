@@ -5,3 +5,9 @@ interface JQueryXHR extends MyXMLHttpRequest, JQueryPromise<any> {
 
 interface Property<T>{}
 interface PropertySpec extends Property<"ping" | "pong">  {}
+interface MyXMLHttpRequest {
+
+}
+interface JQueryPromise<T> {
+
+}

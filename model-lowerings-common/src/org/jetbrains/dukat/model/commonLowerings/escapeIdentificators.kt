@@ -109,7 +109,7 @@ private fun QualifierEntity.escape(): QualifierEntity {
     return QualifierEntity(left.escape(), right.escape())
 }
 
-private fun NameEntity.escape(): NameEntity {
+fun NameEntity.escape(): NameEntity {
     return when (this) {
         is IdentifierEntity -> escape()
         is QualifierEntity -> escape()

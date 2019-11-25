@@ -7,3 +7,6 @@ declare class Foo {
         [someName: string]: { [someValue: string]: number };
     };
 }
+declare class Bar {
+
+}

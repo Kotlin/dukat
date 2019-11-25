@@ -23,3 +23,5 @@ external interface Foo {
     val methodWithManyArgs: ((n: Number, settings: Bar) -> Boolean)?
         get() = definedExternally
 }
+
+external interface Bar

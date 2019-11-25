@@ -7,4 +7,13 @@ declare namespace React {
         bar(): number
         baz(a: any)
     }
+    interface Foo {
+
+    }
+    class Bar {
+
+    }
+    interface ComponentLifecycle<T, U> {
+
+    }
 }
