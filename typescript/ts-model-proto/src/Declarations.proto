@@ -182,6 +182,10 @@ message ObjectLiteralExpressionDeclarationProto {
     repeated MemberDeclarationProto members = 1;
 }
 
+message ArrayLiteralExpressionDeclarationProto {
+    repeated ExpressionDeclarationProto elements = 1;
+}
+
 message RegExLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -193,7 +197,8 @@ message LiteralExpressionDeclarationProto {
         NumericLiteralExpressionDeclarationProto numericLiteral = 3;
         BigIntLiteralExpressionDeclarationProto bigIntLiteral = 4;
         ObjectLiteralExpressionDeclarationProto objectLiteral = 5;
-        RegExLiteralExpressionDeclarationProto regExLiteral = 6;
+        ArrayLiteralExpressionDeclarationProto arrayLiteral = 6;
+        RegExLiteralExpressionDeclarationProto regExLiteral = 7;
     }
 }
 

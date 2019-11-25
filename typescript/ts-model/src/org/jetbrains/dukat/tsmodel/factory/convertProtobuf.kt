@@ -45,6 +45,7 @@ import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
@@ -64,6 +65,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodelproto.ArrayLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BlockDeclarationProto
@@ -476,6 +478,7 @@ fun StringLiteralExpressionDeclarationProto.convert() = StringLiteralExpressionD
 fun BooleanLiteralExpressionDeclarationProto.convert() = BooleanLiteralExpressionDeclaration(value)
 fun RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDeclaration(value)
 fun ObjectLiteralExpressionDeclarationProto.convert() = ObjectLiteralExpressionDeclaration(membersList.map { it.convert() })
+fun ArrayLiteralExpressionDeclarationProto.convert() = ArrayLiteralExpressionDeclaration(elementsList.map { it.convert() })
 
 fun LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
     return when {
@@ -484,6 +487,7 @@ fun LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
         hasStringLiteral() -> stringLiteral.convert()
         hasBooleanLiteral() -> booleanLiteral.convert()
         hasObjectLiteral() -> objectLiteral.convert()
+        hasArrayLiteral() -> arrayLiteral.convert()
         hasRegExLiteral() -> regExLiteral.convert()
         else -> throw Exception("unknown literalExpression: ${this}")
     }

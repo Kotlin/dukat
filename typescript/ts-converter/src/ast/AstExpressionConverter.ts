@@ -77,6 +77,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createObjectLiteralDeclarationAsExpression(members);
     }
 
+    createArrayLiteralExpression(elements: Array<Expression>): Expression {
+        return AstExpressionFactory.createArrayLiteralDeclarationAsExpression(elements);
+    }
+
     createRegExLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
     }
@@ -266,6 +270,10 @@ export class AstExpressionConverter {
         return this.createObjectLiteralExpression(members)
     }
 
+    convertArrayLiteralExpression(literal: ts.ArrayLiteralExpression): Expression {
+        return this.createArrayLiteralExpression(literal.elements.map((element) => this.convertExpression(element)))
+    }
+
     convertRegExLiteralExpression(literal: ts.RegularExpressionLiteral): Expression {
         return this.createRegExLiteralExpression(literal.getText())
     }
@@ -328,6 +336,8 @@ export class AstExpressionConverter {
             return this.convertLiteralExpression(expression);
         } else if (ts.isObjectLiteralExpression(expression)) {
             return this.convertObjectLiteralExpression(expression);
+        } else if (ts.isArrayLiteralExpression(expression)) {
+            return this.convertArrayLiteralExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
         } else {
