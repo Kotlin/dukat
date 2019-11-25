@@ -21,7 +21,7 @@ import org.jetbrains.dukat.idlLowerings.resolveTypedefs
 import org.jetbrains.dukat.idlLowerings.resolveTypes
 import org.jetbrains.dukat.idlLowerings.specifyDefaultValues
 import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
-import org.jetbrains.dukat.idlModels.process
+import org.jetbrains.dukat.idlModels.convertToModel
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
 import org.jetbrains.dukat.model.commonLowerings.VisibilityModifierResolver
@@ -49,7 +49,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .markAbstractOrOpen()
                 .addMissingMembers()
                 .addOverloadsForCallbacks()
-                .process()
+                .convertToModel()
                 .lowerOverrides(null)
                 .escapeIdentificators()
                 .addExplicitGettersAndSetters()

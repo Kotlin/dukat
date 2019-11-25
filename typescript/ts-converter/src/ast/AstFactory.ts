@@ -1,36 +1,26 @@
 import * as declarations from "declarations";
 import {
   Block,
-  CallSignatureDeclaration,
   ClassDeclaration,
-  ConstructorDeclaration,
   DefinitionInfoDeclaration,
-  EnumDeclaration,
   EnumTokenDeclaration,
   Expression,
   FunctionDeclaration,
   HeritageClauseDeclaration,
   IdentifierDeclaration,
-  ImportEqualsDeclaration,
-  IndexSignatureDeclaration,
-  InterfaceDeclaration,
   MemberDeclaration,
   ModifierDeclaration,
   ModuleDeclaration,
   NameEntity,
   ParameterDeclaration,
   TypeDeclaration,
-  PropertyDeclaration,
   ReferenceEntity,
-  SourceBundle,
   SourceFileDeclaration,
   SourceSet,
   Declaration,
-  TypeAliasDeclaration,
   TypeParameter,
   TypeParamReferenceDeclaration,
-  TypeReferenceDeclaration,
-  VariableDeclaration
+  TypeReferenceDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
 
@@ -376,13 +366,13 @@ export class AstFactory implements AstFactory {
     return reference;
   }
 
-  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration {
+  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<string>): SourceFileDeclaration {
     let sourceFile = new declarations.SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
-    sourceFile.setReferencedfilesList([]);
-    if (root) {
-      sourceFile.setRoot(root);
-    }
+    sourceFile.setReferencedfilesList(referencedFiles);
+      if (root) {
+        sourceFile.setRoot(root);
+      }
     return sourceFile;
   }
 

@@ -37,10 +37,10 @@ node {
     workDir = gradle.nodeWorkingDir
     // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
     version = gradle.nodeVersion
-
-    nodeModulesDir = file(TOPN_TARGET_DIR)
+    yarnVersion = gradle.yarnVersion
 
     download = true
+    nodeModulesDir = file(TOPN_TARGET_DIR)
 }
 
 
@@ -228,6 +228,8 @@ task installTopN(type: YarnTask) {
     dependsOn = [prepareTopNPackage]
     args = ["install"]
 }
+
+yarn.dependsOn = [yarnSetup, prepareTopNPackage]
 
 
 //TODO: having download and downloadDist is a shame

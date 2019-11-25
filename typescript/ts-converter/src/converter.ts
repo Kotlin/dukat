@@ -7,13 +7,9 @@ import {AstFactory} from "./ast/AstFactory";
 import {Declaration, SourceBundle, SourceFileDeclaration, SourceSet} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {ResourceFetcher} from "./ast/ResourceFetcher";
 import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
-
-function createAstFactory(): AstFactory {
-    return new AstFactory();
-}
+import {AstVisitor} from "./AstVisitor";
 
 function createFileResolver(): FileResolver {
     return new FileResolver();
@@ -33,8 +29,17 @@ class DocumentCache {
 
 let cache = new DocumentCache();
 
-function createSourceSet(fileName: string, stdlib: string, packageNameString: string, libDeclarations: Map<string, Array<ts.Node>>): SourceSet {
-    let host = new DukatLanguageServiceHost(createFileResolver(), stdlib);
+class SourceBundleBuilder {
+  private astFactory = new AstFactory();
+  private libDeclarations = new Map<string, Array<Declaration>>();
+  private fileDeclarationCache = new Map<string, SourceFileDeclaration>();
+
+  constructor(
+    private stdLib: string
+  ) {}
+
+  private createSourceSet(fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
+    let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
     host.register(fileName);
 
     let logger = createLogger("converter");
@@ -44,66 +49,82 @@ function createSourceSet(fileName: string, stdlib: string, packageNameString: st
     const program = languageService.getProgram();
 
     if (program == null) {
-        throw new Error(`failed to create languageService ${fileName}`)
+      throw new Error(`failed to create languageService ${fileName}`)
     }
 
-    let astFactory = createAstFactory();
-    let packageName = astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
+    let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
     let libChecker = (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile());
+    let libVisitor = new LibraryDeclarationsVisitor(
+      this.libDeclarations,
+      program.getTypeChecker(),
+      libChecker,
+      (node: ts.Node) => astConverter.convertTopLevelStatement(node)
+    );
+
     let astConverter: AstConverter = new AstConverter(
       packageName,
-      new ResourceFetcher(fileName, (fileName: string) => program.getSourceFile(fileName)),
-      new LibraryDeclarationsVisitor(
-        libDeclarations,
-        program.getTypeChecker(),
-        libChecker,
-        (node: ts.Node) => astConverter.convertTopLevelStatement(node)
-      ),
       new ExportContext(libChecker),
       program.getTypeChecker(),
       new DeclarationResolver(program),
-      astFactory
+      this.astFactory,
+      new class implements AstVisitor {
+        visitType(type: ts.TypeNode): void {
+          libVisitor.process(type);
+        }
+      }
     );
 
-    let sourceSet = astConverter.createSourceSet(fileName);
-    astConverter.printDiagnostics();
-    return sourceSet;
+    return this.createFileDeclarations(fileName, astConverter, program);
+  }
+
+  createFileDeclarations(fileName: string, astConverter: AstConverter, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
+    if (result.has(fileName)) {
+      return  [];
+    }
+    let fileDeclaration = astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
+    result.set(fileName, fileDeclaration);
+    fileDeclaration
+      .getReferencedfilesList()
+      .forEach(resourceFileName => {
+        this.createFileDeclarations(resourceFileName, astConverter, program, result);
+      });
+
+    return Array.from(result.values());
+  }
+
+  createBundle(packageName: string, files: Array<string>): declarations.SourceBundleDeclarationProto {
+      let sourceSets = files.map(fileName => {
+        return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName, packageName));
+      });
+
+      let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
+
+      let libRootUid = "<LIBROOT>";
+
+      let libFiles: Array<SourceFileDeclaration> = [];
+      this.libDeclarations.forEach((declarations, resourceName) => {
+        libFiles.push(this.astFactory.createSourceFileDeclaration(
+          resourceName, this.astFactory.createModuleDeclaration(
+            this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+            declarations,
+            [],
+            [],
+            libRootUid,
+            libRootUid,
+            true
+          ), []
+        ));
+      });
+
+      sourceSets.push(this.astFactory.createSourceSet(libRootUid, libFiles));
+
+      sourceSetBundle.setSourcesList(sourceSets);
+      return sourceSetBundle;
+  }
 }
 
-export function translate(stdlib: string, packageName: string, files: Array<string>): SourceBundle {
-    let libDeclarations = new Map<string, Array<Declaration>>();
-    let sourceSets = files.map(fileName => createSourceSet(fileName, stdlib, packageName, libDeclarations));
-
-    let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
-
-    let astFactory = createAstFactory();
-    let libRootUid = "<LIBROOT>";
-
-    let libFiles: Array<SourceFileDeclaration> = [];
-    libDeclarations.forEach((declarations, resourceName) => {
-            libFiles.push(astFactory.createSourceFileDeclaration(
-              resourceName, astFactory.createModuleDeclaration(
-                astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-                declarations,
-                [],
-                [],
-                libRootUid,
-                libRootUid,
-                true
-              ), []
-            ));
-    });
-
-    sourceSets.push(astFactory.createSourceSet(libRootUid, libFiles));
-
-    sourceSetBundle.setSourcesList(sourceSets);
-    return sourceSetBundle;
-}
-
-
-function createBundle(stdlib: string, packageName:string, files: Array<string>) {
-    let sourceSetBundle = translate(stdlib, packageName, files);
-    return sourceSetBundle;
+export function createBundle(stdlib: string, packageName:string, files: Array<string>) {
+    return new SourceBundleBuilder(stdlib).createBundle(packageName, files);
 }
 
 (global as any).createBundle = createBundle;
