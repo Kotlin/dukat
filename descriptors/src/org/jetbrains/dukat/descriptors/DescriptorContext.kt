@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.descriptors
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -9,13 +11,14 @@ import org.jetbrains.kotlin.types.TypeConstructor
 
 class DescriptorContext(val config: JsConfig) {
 
+    var currentPackageName: NameEntity = IdentifierEntity("")
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
     private val registeredTypeAliases: MutableMap<NameEntity, TypeAliasDescriptor> = mutableMapOf()
     private val typeParameters: MutableMap<NameEntity, TypeParameterDescriptor> = mutableMapOf()
     val registeredImports: MutableList<String> = mutableListOf()
 
     fun registerDescriptor(name: NameEntity, descriptor: ClassDescriptor) {
-        registeredDescriptors[name] = descriptor
+        registeredDescriptors[currentPackageName.appendLeft(name)] = descriptor
     }
 
     fun registerTypeAlias(name: NameEntity, descriptor: TypeAliasDescriptor) {

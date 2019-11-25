@@ -2,6 +2,7 @@ package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -74,6 +75,7 @@ import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
+import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.StaticScopeForKotlinEnum
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.NotNullLazyValue
@@ -122,10 +124,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun findClass(typeModel: TypeValueModel): ClassDescriptor? {
-        return context.getDescriptor(typeModel.value) ?: when (translateName(typeModel.value)) {
-            "@@None" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
-            else -> findClassInStdlib(typeModel)
-        }
+        return context.getDescriptor(typeModel.fqName ?: IdentifierEntity("<ROOT>").appendLeft(typeModel.value))
+            ?: when (translateName(typeModel.value)) {
+                "@@None" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
+                else -> findClassInStdlib(typeModel)
+            }
     }
 
     private fun translateVariance(variance: org.jetbrains.dukat.astModel.Variance): Variance {
@@ -208,9 +211,13 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                             typeParameters
                         )
                         if (shouldExpand) {
-                            expandTypeAlias(typeAlias.defaultType, typeParameters, newTypeArguments).type
+                            (expandTypeAlias(
+                                typeAlias.defaultType,
+                                typeParameters,
+                                newTypeArguments
+                            ).type as SimpleType).makeNullableAsSpecified(typeModel.nullable)
                         } else {
-                            typeAlias.defaultType.replace(newTypeArguments)
+                            typeAlias.defaultType.replace(newTypeArguments).makeNullableAsSpecified(typeModel.nullable)
                         }
                     } else {
                         val classDescriptor = findClass(typeModel)
@@ -400,7 +407,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     )
                 },
                 metaDescription = null,
-                fqName = null
+                fqName = heritageModel.value.fqName
             )
         )
         return if (type.isError) null else type
@@ -693,6 +700,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             annotations = translateAnnotations(classLikeModel.annotations)
         )
         context.registerDescriptor(classLikeModel.name, classDescriptor)
+        context.currentPackageName = context.currentPackageName.appendLeft(classLikeModel.name)
+
 
         var primaryConstructorDescriptor: ClassConstructorDescriptor? = null
         var constructorDescriptors: Set<ClassConstructorDescriptor> = setOf()
@@ -738,6 +747,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         typeParameters.forEach {
             context.removeTypeParameter(IdentifierEntity(it.name.identifier))
         }
+
+        context.currentPackageName = context.currentPackageName.shiftRight()!!
 
         return classDescriptor
     }
@@ -873,14 +884,16 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         moduleModel: ModuleModel,
         moduleDescriptor: ModuleDescriptorImpl
     ): PackageFragmentDescriptor {
-        context.registeredImports.clear()
-        context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
 
         return object : PackageFragmentDescriptorImpl(
             moduleDescriptor, translatePackageName(moduleModel.name)
         ) {
-            override fun getMemberScope() =
-                SimpleMemberScope(moduleModel.declarations.mapNotNull { translateTopLevelModel(it, this) })
+            override fun getMemberScope(): MemberScope {
+                context.registeredImports.clear()
+                context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
+                context.currentPackageName = moduleModel.name
+                return SimpleMemberScope(moduleModel.declarations.mapNotNull { translateTopLevelModel(it, this) })
+            }
         }
     }
 }
