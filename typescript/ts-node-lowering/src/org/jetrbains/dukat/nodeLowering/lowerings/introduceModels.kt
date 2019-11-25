@@ -37,6 +37,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
@@ -229,13 +230,13 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             is UnionTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),
-                    params.map { unionMember ->
+                    params.joinToString(" | ") { unionMember ->
                         if (unionMember.meta is StringLiteralDeclaration) {
                             (unionMember.meta as StringLiteralDeclaration).token
                         } else {
                             unionMember.process().translate()
                         }
-                    }.joinToString(" | "),
+                    },
                     null
             )
             is TupleTypeNode -> TypeValueModel(
@@ -253,7 +254,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             }
             is TypeValueNode -> {
                 if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, null)
+                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, typeReference?.getFqName(value))
                 } else {
                     TypeValueModel(
                             value,
@@ -277,10 +278,10 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             is GeneratedInterfaceReferenceNode -> {
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, uidToNameMapper[reference?.uid]) }
+                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, reference?.getFqName(typeParam.name)) }
                                 .map { TypeParameterModel(it, listOf()) },
                         meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
-                        uidToNameMapper[reference?.uid],
+                        reference?.getFqName(name),
                         nullable
                 )
 
@@ -333,14 +334,28 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
     private fun HeritageNode.convertToModel(): HeritageModel {
         return HeritageModel(
-                value = TypeValueModel(name, emptyList(), null, uidToNameMapper[reference?.uid]),
+                value = TypeValueModel(name, emptyList(), null, reference?.getFqName(name)),
                 typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
                 delegateTo = null
         )
     }
 
+    private fun ReferenceEntity<*>.getFqName(ownerName: NameEntity): NameEntity? {
+        val res = if (uid.startsWith("lib-")) {
+            IdentifierEntity("<LIBROOT>").appendLeft(ownerName)
+        } else {
+            uidToNameMapper[uid]
+        }
+
+        return res;
+    }
+
     private fun TypeValueNode.getFqName(): NameEntity? {
-        return uidToNameMapper[typeReference?.uid]
+        return if (KotlinStdlibEntities.contains(value)) {
+            IdentifierEntity("<LIBROOT>").appendLeft(value)
+        } else {
+            typeReference?.getFqName(value)
+        }
     }
 
     private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
@@ -588,7 +603,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 }
 
-private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit): NodeTypeLowering{
+private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) : NodeTypeLowering {
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
         if (!declaration.uid.endsWith("_GENERATED")) {
             visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
@@ -610,7 +625,7 @@ private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit):
 
 fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
     ReferenceVisitor { uid, fqName ->
-       uidToFqNameMapper[uid] = fqName
+        uidToFqNameMapper[uid] = fqName
     }.process(this)
 
     return NodeConverter(uidToFqNameMapper).convert(this)

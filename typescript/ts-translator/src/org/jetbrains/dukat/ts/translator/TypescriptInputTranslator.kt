@@ -2,12 +2,10 @@ package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
-import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdEntities
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -17,6 +15,7 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.splitIntoSeparateEntities
+import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
@@ -50,7 +49,6 @@ import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
-import substituteTsStdLibEntities
 
 fun SourceSetDeclaration.isStdLib(): Boolean {
     return sourceName == "<LIBROOT>"
@@ -63,7 +61,6 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
-                .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
@@ -89,6 +86,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
+                .substituteTsStdLibEntities()
                 .escapeIdentificators()
                 .removeUnsupportedJsNames()
                 .mergeModules()
@@ -129,11 +127,10 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         }.toMutableList()
 
         stdLib = stdLib
-                //?.filterOutKotlinStdEntities()
                 ?.whiteList(setOf(
-                    IdentifierEntity("TsStdLib_Iterator"),
-                    IdentifierEntity("IteratorResult"),
-                    IdentifierEntity("IterableIterator")
+                        IdentifierEntity("TsStdLib_Iterator"),
+                        IdentifierEntity("IteratorResult"),
+                        IdentifierEntity("IterableIterator")
                 ))
                 ?.splitIntoSeparateEntities()
 

@@ -17,6 +17,8 @@ import org.w3c.xhr.*
 
 external fun frequencies(a: Array<String>): Array<Number>
 
+external fun processTemplate(a: Array<String>): Array<String>
+
 typealias NumArray = Array<Number>
 
 typealias SmartArray<T> = Array<T>
@@ -25,7 +27,7 @@ typealias MyVerySpecificException = Error
 
 external interface `T$0` {
     @nativeGetter
-    operator fun get(shortName: String): dynamic /* String | Array<String> */
+    operator fun get(shortName: String): dynamic /* String | ReadonlyArray<String> */
     @nativeSetter
     operator fun set(shortName: String, value: String)
     @nativeSetter
