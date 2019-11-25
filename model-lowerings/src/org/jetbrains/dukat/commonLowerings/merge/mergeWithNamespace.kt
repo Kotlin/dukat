@@ -43,7 +43,7 @@ private fun VariableModel.convertToPropertyModel(): PropertyModel {
             type = type,
             typeParameters = typeParameters,
             static = false,
-            override = false,
+            override = null,
             immutable = immutable,
             getter = false,
             setter = false,
@@ -58,7 +58,7 @@ private fun FunctionModel.convertToMethodModel(): MethodModel {
             type = type,
             typeParameters = typeParameters,
             static = false,
-            override = false,
+            override = null,
             operator = false,
             annotations = emptyList(),
             open = false

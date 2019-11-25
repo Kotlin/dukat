@@ -282,7 +282,7 @@ private fun MethodModel.translate(): List<String> {
     val annotations = annotations.map { "@${it.name}" }
 
     val open = !static && open
-    val overrideClause = if (override) "override " else if (open) "open " else ""
+    val overrideClause = if (override != null) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
     return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause")
@@ -338,7 +338,7 @@ private fun EnumModel.translate(): String {
 
 private fun PropertyModel.translate(): String {
     val open = !static && open
-    val modifier = if (override) "override " else if (open) "open " else ""
+    val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
 
     return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
@@ -357,7 +357,7 @@ private fun MemberModel.translate(): List<String> {
 
 private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (immutable) "val" else "var"
-    val overrideClause = if (override) "override " else ""
+    val overrideClause = if (override != null) "override " else ""
 
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -388,7 +388,7 @@ private fun MethodModel.translateSignature(): List<String> {
 
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
-    val overrideClause = if (override) "override " else ""
+    val overrideClause = if (override != null) "override " else ""
 
     val metaClause = type.translateMeta()
     val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"

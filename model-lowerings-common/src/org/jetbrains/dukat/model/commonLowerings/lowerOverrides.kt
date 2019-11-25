@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -20,53 +21,58 @@ private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
 }
 
+private data class ParentMembers(val fqName: NameEntity, val methods: List<MethodModel>, val properties: List<PropertyModel>)
+
 private class OverrideResolver(val context: ModelContext) {
 
-    private fun ClassLikeModel.getKnownParents(): List<ClassLikeModel> {
+    private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return when (this) {
             is InterfaceModel -> getKnownParents()
             is ClassModel -> getKnownParents()
-            else -> raiseConcern("unknown ClassLikeDeclaration ${this}") { emptyList<ClassLikeModel>() }
+            else -> raiseConcern("unknown ClassLikeDeclaration ${this}") { emptyList<ResolvedClassLike<ClassLikeModel>>() }
         }
     }
 
-    private fun TypeValueModel.resolveInterface(): InterfaceModel? {
+    private fun InterfaceModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
+        return parentEntities.flatMap { heritageModel ->
+            heritageModel.value.resolveInterface()?.let { resolvedClassLike ->
+                listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
+            } ?: emptyList()
+        }
+    }
+
+    private fun ClassModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
+        return parentEntities.flatMap { heritageModel ->
+            (heritageModel.value.resolveInterface() ?: heritageModel.value.resolveClass())?.let { resolvedClassLike ->
+                listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
+            } ?: emptyList()
+        }
+    }
+
+    private fun TypeValueModel.resolveInterface(): ResolvedClassLike<InterfaceModel>? {
         return context.resolveInterface(this.fqName)
     }
 
-    private fun TypeValueModel.resolveClass(): ClassModel? {
+    private fun TypeValueModel.resolveClass(): ResolvedClassLike<ClassModel>? {
         return context.resolveClass(this.fqName)
     }
 
-    private fun TypeValueModel.resolveClassLike(): ClassLikeModel? {
-        return resolveInterface() ?: resolveClass()
+    @Suppress("UNCHECKED_CAST")
+    private fun TypeValueModel.resolveClassLike(): ResolvedClassLike<ClassLikeModel>? {
+        return (resolveInterface() ?: resolveClass()) as ResolvedClassLike<ClassLikeModel>?
      }
 
-    private fun InterfaceModel.getKnownParents(): List<InterfaceModel> {
-        return parentEntities.flatMap { heritageModel ->
-            heritageModel.value.resolveInterface()?.let { parentInterface ->
-                listOf(parentInterface) + parentInterface.getKnownParents()
-            } ?: emptyList()
-        }
-    }
-
-    private fun ClassModel.getKnownParents(): List<ClassLikeModel> {
-        return parentEntities.flatMap { heritageModel ->
-            (heritageModel.value.resolveInterface() ?: heritageModel.value.resolveClass())?.let { parentModel ->
-                listOf(parentModel) + parentModel.getKnownParents()
-            } ?: emptyList()
-        }
-    }
-
-    private fun ClassLikeModel.allParentMethods(): List<MethodModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(MethodModel::class.java)
-        }
-    }
-
-    private fun ClassLikeModel.allParentProperties(): List<PropertyModel> {
-        return getKnownParents().flatMap { parentEntity ->
-            parentEntity.members.filterIsInstance(PropertyModel::class.java)
+    private fun ClassLikeModel.allParentMembers(): List<ParentMembers> {
+        return getKnownParents().map { resolvedClassLike ->
+            val methods = mutableListOf<MethodModel>()
+            val properties = mutableListOf<PropertyModel>()
+            resolvedClassLike.classLike.members.forEach {
+                when (it) {
+                    is MethodModel -> methods.add(it)
+                    is PropertyModel -> properties.add(it)
+                }
+            }
+            ParentMembers(resolvedClassLike.fqName(), methods, properties)
         }
     }
 
@@ -159,21 +165,21 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            val classLike: ClassLikeModel? = resolveClassLike()
-            val otherClassLike: ClassLikeModel? = otherParameterType.resolveClassLike()
+            resolveClassLike()?.let { (classLike, _) ->
+                otherParameterType.resolveClassLike()?.let { (otherClassLike, _) ->
+                    val isSameClass = classLike === otherClassLike
+                    val isParentClass = classLike.getKnownParents().map { it.classLike }.contains(otherClassLike)
 
-
-            val isSameClass = classLike != null && classLike === otherClassLike
-            val isParentClass = classLike?.getKnownParents()?.contains(otherClassLike) == true
-
-            if (params.isEmpty() && otherParameterType.params.isEmpty()) {
-                if (isSameClass || isParentClass) {
-                    return true
-                }
-            } else if (params.size == otherParameterType.params.size) {
-                if (isSameClass) {
-                    return params.zip(otherParameterType.params).all { (paramA, paramB) ->
-                        paramA.type.isOverriding(paramB.type, true)
+                    if (params.isEmpty() && otherParameterType.params.isEmpty()) {
+                        if (isSameClass || isParentClass) {
+                            return true
+                        }
+                    } else if (params.size == otherParameterType.params.size) {
+                        if (isSameClass) {
+                            return params.zip(otherParameterType.params).all { (paramA, paramB) ->
+                                paramA.type.isOverriding(paramB.type, true)
+                            }
+                        }
                     }
                 }
             }
@@ -183,38 +189,37 @@ private class OverrideResolver(val context: ModelContext) {
     }
 
     private fun MemberModel.lowerOverrides(
-            allSuperDeclarations: List<MethodModel>,
-            allSuperProperties: List<PropertyModel>
+            allSuperDeclarations: List<ParentMembers>
     ): MemberModel {
         return when (this) {
             is MethodModel -> {
-                val override =
-                        allSuperDeclarations.any { superMethod ->
-                            isOverriding(superMethod)
-                        } || isSpecialCase()
+                val overriden =
+                        allSuperDeclarations.firstOrNull { (_, methods, _) ->
+                            methods.any { method -> isOverriding(method) }
+                        }?.fqName ?: if (isSpecialCase()) { IdentifierEntity("<SPECIAL-CASE>") } else null
 
-                if (override) {
-                    copy(override = override, parameters = parameters.map { param -> param.copy(initializer = null) })
+                if (overriden != null) {
+                    copy(override = overriden, parameters = parameters.map { param -> param.copy(initializer = null) })
                 } else {
-                    copy(override = override)
+                    copy()
                 }
             }
             is PropertyModel -> {
-                val override = allSuperProperties.any { superMethod ->
-                    isOverriding(superMethod)
-                }
-                copy(override = override)
+                val overriden = allSuperDeclarations.firstOrNull { (_, _, properties) ->
+                  properties.any { prop -> isOverriding(prop) }
+                }?.fqName
+                copy(override = overriden)
             }
             else -> this
         }
     }
 
+
     private fun ClassLikeModel.lowerOverrides(): ClassLikeModel {
-        val allParentMethods = allParentMethods()
-        val allParentProperties = allParentProperties()
+        val parentMembers = allParentMembers()
 
         val membersLowered = members.map {  member ->
-            member.lowerOverrides(allParentMethods, allParentProperties)
+            member.lowerOverrides(parentMembers)
         }
 
         return when (this) {

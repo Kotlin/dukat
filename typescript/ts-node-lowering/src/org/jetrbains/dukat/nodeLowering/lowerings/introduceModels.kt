@@ -155,7 +155,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
                     static = static,
 
-                    override = override,
+                    override = null,
                     operator = operator,
                     annotations = resolveAnnotations(),
 
@@ -166,7 +166,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     type = type.process(TranslationContext.IRRELEVANT),
                     typeParameters = convertTypeParams(typeParameters),
                     static = static,
-                    override = override,
+                    override = null,
                     immutable = getter && !setter,
                     getter = false,
                     setter = false,

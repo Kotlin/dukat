@@ -92,7 +92,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     type = commonType,
                     typeParameters = emptyList(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = true,
                     annotations = emptyList(),
                     open = false
@@ -114,7 +114,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
                     typeParameters = emptyList(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = true,
                     annotations = emptyList(),
                     open = false

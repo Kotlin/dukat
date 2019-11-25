@@ -7,6 +7,15 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 
+data class ResolvedClassLike<T : ClassLikeModel>(
+    val classLike: T,
+    val ownerName: NameEntity?
+) {
+    fun fqName(): NameEntity {
+        return ownerName?.appendLeft(classLike.name) ?: classLike.name
+    }
+}
+
 class ModelContext {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
@@ -21,9 +30,15 @@ class ModelContext {
         myClassNodes[name] = classDeclaration
     }
 
-    fun resolveInterface(name: NameEntity?): InterfaceModel? = myInterfaces[name]
+    fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {
+        return myInterfaces[name]?.let {
+            ResolvedClassLike(it, name)
+        }
+    }
 
-    fun resolveClass(name: NameEntity?): ClassModel? {
-        return myClassNodes[name]
+    fun resolveClass(name: NameEntity?): ResolvedClassLike<ClassModel>? {
+        return myClassNodes[name]?.let {
+            ResolvedClassLike(it, name)
+        }
     }
 }
