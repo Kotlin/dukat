@@ -7,7 +7,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 data class SourceFileNode(
         val fileName: String,
         val root: DocumentRootNode,
-        val referencedFiles: List<IdentifierEntity>,
+        val referencedFiles: List<String>,
         val name: NameEntity?
 ) : Entity
 

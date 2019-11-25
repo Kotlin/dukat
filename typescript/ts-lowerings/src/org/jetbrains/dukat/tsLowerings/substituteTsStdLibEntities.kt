@@ -3,7 +3,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsLowerings.DeclarationTypeLowering
-import org.jetbrains.dukat.tsLowerings.getUID
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -28,9 +27,15 @@ private fun ReferenceEntity<*>?.isLibReference(): Boolean {
 }
 
 private fun TypeDeclaration.resolveAsSubstitution(): TypeDeclaration {
+    val isLibReference = isLibReference()
     if (value == IdentifierEntity("ReadonlyArray")) {
-        if (isLibReference()) {
+        if (isLibReference) {
             return copy(value = IdentifierEntity("Array"))
+        }
+    }
+    else if (value == IdentifierEntity("TemplateStringsArray")) {
+        if (isLibReference) {
+            return copy(value = IdentifierEntity("Array"), params = listOf(TypeDeclaration(IdentifierEntity("String"), emptyList())))
         }
     }
 
@@ -57,7 +62,8 @@ private class SubstituteLowering : DeclarationTypeLowering {
 
     private val stdLibFinalEntities = setOf<NameEntity>(
             IdentifierEntity("Array"),
-            IdentifierEntity("Error")
+            IdentifierEntity("Error"),
+            IdentifierEntity("String")
     )
 
     override fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<ModuleDeclaration>): TopLevelDeclaration {

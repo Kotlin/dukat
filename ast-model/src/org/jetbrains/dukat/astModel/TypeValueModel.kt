@@ -8,6 +8,7 @@ data class TypeValueModel(
         val params: List<TypeParameterModel>,
 
         val metaDescription: String?,
+        val fqName: NameEntity?,
         override val nullable: Boolean = false
 ) : Entity, TypeModel
 

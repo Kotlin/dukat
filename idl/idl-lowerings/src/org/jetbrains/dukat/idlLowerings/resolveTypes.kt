@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.idlDeclarations.IDLClassLikeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
@@ -8,6 +10,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.isKnown
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
@@ -24,8 +27,9 @@ private class TypeResolver : IDLLowering {
     private val dependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
 
     private var sourceSet: IDLSourceSetDeclaration = IDLSourceSetDeclaration(listOf())
+    private var currentFile: IDLFileDeclaration = IDLFileDeclaration("", listOf(), listOf(), null)
 
-    fun getDependencies(declaration: IDLInterfaceDeclaration): List<IDLSingleTypeDeclaration> {
+    fun getDependencies(declaration: IDLClassLikeDeclaration): List<IDLSingleTypeDeclaration> {
         return dependenciesToAdd[declaration.name]?.toList() ?: listOf()
     }
 
@@ -97,6 +101,7 @@ private class TypeResolver : IDLLowering {
         }
         if (declaration is IDLSingleTypeDeclaration) {
             return if (!declaration.isKnown() && !sourceSet.containsType(declaration.name)) {
+                logger.warn("Unknown type ${declaration.name} in file ${currentFile.fileName}")
                 IDLSingleTypeDeclaration(
                         name = "\$dynamic",
                         typeParameter = null,
@@ -116,49 +121,36 @@ private class TypeResolver : IDLLowering {
         return declaration
     }
 
-    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration, ownerName: String): IDLSingleTypeDeclaration? {
+    private fun resolveInheritance(inheritance: IDLSingleTypeDeclaration): IDLSingleTypeDeclaration? {
         return if (sourceSet.containsType(inheritance.name)) {
             inheritance
         } else {
-            logger.warn("Failed to find parent of ${ownerName}: ${inheritance.name}").let { null }
+            null
         }
     }
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         val newDeclaration = super.lowerInterfaceDeclaration(declaration)
         return newDeclaration.copy(
-                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+                parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
     }
 
     override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
         val newDeclaration = super.lowerDictionaryDeclaration(declaration)
         return newDeclaration.copy(
-                parents = declaration.parents.mapNotNull { resolveInheritance(it, declaration.name) }
+                parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
     }
 
     override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
+        currentFile = fileDeclaration
         var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         newFileDeclaration = newFileDeclaration.copy(
                 declarations = newFileDeclaration.declarations + resolvedUnionTypes.map {
-                    IDLInterfaceDeclaration(
+                    IDLUnionDeclaration(
                             name = it,
-                            attributes = listOf(),
-                            operations = listOf(),
-                            primaryConstructor = null,
-                            constructors = listOf(),
-                            parents = listOf(),
-                            extendedAttributes = listOf(
-                                    IDLSimpleExtendedAttributeDeclaration("NoInterfaceObject")
-                            ),
-                            getters = listOf(),
-                            setters = listOf(),
-                            callback = false,
-                            generated = true,
-                            partial = false,
-                            mixin = false,
-                            kind = InterfaceKind.INTERFACE
+                            unions = listOf()
                     )
                 }
         )
@@ -176,7 +168,25 @@ private class DependencyResolver(val typeResolver: TypeResolver) : IDLLowering {
 
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
-                parents = declaration.parents + typeResolver.getDependencies(declaration)
+                unions = declaration.unions + typeResolver.getDependencies(declaration)
+        )
+    }
+
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+        return declaration.copy(
+                unions = declaration.unions + typeResolver.getDependencies(declaration)
+        )
+    }
+
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+        return declaration.copy(
+                unions = declaration.unions + typeResolver.getDependencies(declaration)
+        )
+    }
+
+    override fun lowerUnionDeclaration(declaration: IDLUnionDeclaration): IDLUnionDeclaration {
+        return declaration.copy(
+                unions = declaration.unions + typeResolver.getDependencies(declaration)
         )
     }
 }

@@ -5,5 +5,6 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class EnumNode(
         val name: NameEntity,
-        val values: List<EnumTokenNode>
-) : TopLevelEntity
+        val values: List<EnumTokenNode>,
+        override val uid: String
+) : TopLevelEntity, UniqueNode

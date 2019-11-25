@@ -71,10 +71,11 @@ export class AstFactory implements AstFactory {
     return definition;
   }
 
-  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>): Declaration {
+  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): Declaration {
     let enumDeclaration = new declarations.EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
+    enumDeclaration.setUid(uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setEnumdeclaration(enumDeclaration);
@@ -105,7 +106,6 @@ export class AstFactory implements AstFactory {
 
     return expression;
   }
-
 
   private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: string): FunctionDeclaration {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
@@ -305,10 +305,10 @@ export class AstFactory implements AstFactory {
     return reference;
   }
 
-  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<IdentifierDeclaration>): SourceFileDeclaration {
+  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<string>): SourceFileDeclaration {
     let sourceFile = new declarations.SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
-    sourceFile.setReferencedfilesList([]);
+    sourceFile.setReferencedfilesList(referencedFiles);
     if (root) {
       sourceFile.setRoot(root);
     }

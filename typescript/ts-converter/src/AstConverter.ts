@@ -1,5 +1,3 @@
-import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
-import {ResourceFetcher} from "./ast/ResourceFetcher";
 import * as ts from "typescript-services-api";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
@@ -15,7 +13,6 @@ import {
     ParameterDeclaration,
     ReferenceEntity,
     SourceFileDeclaration,
-    SourceSet,
     Declaration,
     TypeDeclaration,
     TypeParameter
@@ -23,6 +20,8 @@ import {
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
+import {AstVisitor} from "./AstVisitor";
+import {tsInternals} from "./TsInternals";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
@@ -30,12 +29,11 @@ export class AstConverter {
 
     constructor(
       private rootPackageName: NameEntity,
-      private resources: ResourceFetcher,
-      private libVisitor: LibraryDeclarationsVisitor,
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private declarationResolver: DeclarationResolver,
-      private astFactory: AstFactory
+      private astFactory: AstFactory,
+      private astVisitor: AstVisitor
     ) {
     }
 
@@ -43,13 +41,7 @@ export class AstConverter {
         collection.push(declaration);
     }
 
-    createSourceFileDeclaration(sourceFileName: string): SourceFileDeclaration {
-        const sourceFile = this.resources.getSourceFile(sourceFileName);
-
-        if (sourceFile == null) {
-            throw new Error(`failed to resolve source file ${sourceFileName}`)
-        }
-
+    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
         let resourceName = this.rootPackageName;
 
         let packageNameFragments = sourceFile.fileName.split("/");
@@ -57,22 +49,39 @@ export class AstConverter {
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName);
 
+        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
+
         let packageDeclaration = this.createModuleDeclaration(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
-        return this.astFactory.createSourceFileDeclaration(
-          sourceFileName,
-          packageDeclaration,
-          sourceFile.referencedFiles.map(referencedFile => this.astFactory.createIdentifierDeclaration(referencedFile.fileName))
-        );
-    }
+        let referencedFiles = new Set<string>();
+        sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
 
-    convertSourceSet(fileName: string, sourceSet: Array<SourceFileDeclaration>): SourceSet {
-        let sources: Array<SourceFileDeclaration> = [];
+        if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
+          for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
+            referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+          }
+        }
 
-        sourceSet.forEach(source => {
-            sources.push(source);
+        sourceFile.forEachChild(node => {
+            if (ts.isImportDeclaration(node)) {
+              let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
+              if (symbol && symbol.valueDeclaration) {
+                referencedFiles.add(tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName));
+              }
+            }
         });
 
-        return this.astFactory.createSourceSet(fileName, sources);
+        for (let importDeclaration of sourceFile.imports) {
+          const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
+          if (module && (typeof module.resolvedFileName == "string")) {
+            referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
+          }
+        }
+
+        return this.astFactory.createSourceFileDeclaration(
+            sourceFile.fileName,
+            packageDeclaration,
+            Array.from(referencedFiles)
+        );
     }
 
     printDiagnostics() {
@@ -80,16 +89,6 @@ export class AstConverter {
         this.unsupportedDeclarations.forEach(id => {
             this.log.debug(`SKIPPED ${ts.SyntaxKind[id]} (${id})`);
         });
-    }
-
-    createSourceSet(fileName: string): SourceSet {
-        let sources: Array<SourceFileDeclaration> = [];
-
-        this.resources.forEachReference(resource => {
-            sources.push(this.createSourceFileDeclaration(resource))
-        });
-
-        return this.convertSourceSet(fileName, sources);
     }
 
     createModuleDeclaration(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
@@ -306,7 +305,7 @@ export class AstConverter {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
-            this.libVisitor.process(type);
+            this.astVisitor.visitType(type);
 
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
@@ -652,7 +651,7 @@ export class AstConverter {
 
                     if (symbol) {
                         if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
-                            this.libVisitor.process(symbol.declarations[0]);
+                            this.astVisitor.visitType(symbol.declarations[0]);
                             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
                         }
                     }
@@ -726,8 +725,9 @@ export class AstConverter {
 
             res.push(this.astFactory.createEnumDeclaration(
               statement.name.getText(),
-              enumTokens
-            ))
+              enumTokens,
+              this.exportContext.getUID(statement)
+            ));
         } else if (ts.isVariableStatement(statement)) {
             for (let declaration of statement.declarationList.declarations) {
                 res.push(this.astFactory.declareVariable(

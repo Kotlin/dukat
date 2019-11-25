@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
+import org.jetbrains.dukat.commonLowerings.addImports
 import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdEntities
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
@@ -58,7 +59,7 @@ fun SourceSetDeclaration.isStdLib(): Boolean {
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
     val moduleNameResolver: ModuleNameResolver
 
-    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>): SourceSetModel {
+    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
@@ -87,7 +88,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .moveTypeAliasesOutside()
 
         val models = nodes
-                .introduceModels()
+                .introduceModels(uidToFqNameMapper)
                 .escapeIdentificators()
                 .removeUnsupportedJsNames()
                 .mergeModules()
@@ -99,6 +100,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .lowerOverrides(stdLibSourceSet)
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
+                .addImports()
                 .addStandardImportsAndAnnotations()
 
         return models
@@ -109,19 +111,22 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         val sources = mutableListOf<SourceSetDeclaration>()
 
         val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
+        val uidToFqNameMapper: MutableMap<String, NameEntity> = mutableMapOf()
 
         sourceBundle.sources.forEach { source ->
             if ((source.isStdLib()) && (stdLib == null)) {
                 val stdSourceSet = source.renameStdLibEntities() { uid, newName ->
                     renameMap[uid] = newName
                 }
-                stdLib = lower(stdSourceSet, null, renameMap)
+                stdLib = lower(stdSourceSet, null, renameMap, uidToFqNameMapper)
             } else {
                 sources.add(source)
             }
         }
 
-        val loweredSources = sources.map { source -> lower(source, stdLib, renameMap) }.toMutableList()
+        val loweredSources = sources.map { source ->
+            lower(source, stdLib, renameMap, uidToFqNameMapper.toMutableMap())
+        }.toMutableList()
 
         stdLib = stdLib
                 //?.filterOutKotlinStdEntities()

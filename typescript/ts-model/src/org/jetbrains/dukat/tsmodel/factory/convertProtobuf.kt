@@ -160,7 +160,7 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
 }
 
 fun EnumDeclarationProto.convert(): EnumDeclaration {
-    return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) })
+    return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) }, uid)
 }
 
 private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {
@@ -328,7 +328,7 @@ fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
     return SourceFileDeclaration(
             fileName,
             root.convert(),
-            referencedFilesList.map { IdentifierEntity(it.value) }
+            referencedFilesList
     )
 }
 

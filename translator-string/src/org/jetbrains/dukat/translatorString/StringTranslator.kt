@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
+import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -620,7 +621,9 @@ class StringTranslator : ModelVisitor {
     }
 
     fun visitImport(import: NameEntity) {
-        addOutput("import ${import.translate()}")
+        if (import.leftMost() != LIB_PACKAGENAME) {
+            addOutput("import ${import.translate()}")
+        }
     }
 
     override fun visitModule(moduleModel: ModuleModel) {

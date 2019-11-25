@@ -39,6 +39,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Fiber
 
 @JsModule("fibers")
 external fun Fiber(fn: Function<*>): Fiber
@@ -62,6 +63,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Fiber
 
 external var current: Fiber
 
