@@ -72,7 +72,7 @@ private class OverrideResolver(val context: ModelContext) {
                     is PropertyModel -> properties.add(it)
                 }
             }
-            ParentMembers(resolvedClassLike.fqName(), methods, properties)
+            ParentMembers(resolvedClassLike.resolveFqName(), methods, properties)
         }
     }
 

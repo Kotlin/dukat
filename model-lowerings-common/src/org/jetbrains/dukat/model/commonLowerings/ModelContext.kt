@@ -9,10 +9,10 @@ import org.jetbrains.dukat.astModel.ModuleModel
 
 data class ResolvedClassLike<T : ClassLikeModel>(
     val classLike: T,
-    val ownerName: NameEntity?
+    val fqName: NameEntity?
 ) {
-    fun fqName(): NameEntity {
-        return ownerName?.appendLeft(classLike.name) ?: classLike.name
+    fun resolveFqName(): NameEntity {
+        return fqName ?: classLike.name
     }
 }
 
