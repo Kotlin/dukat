@@ -527,13 +527,23 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null
             )
-            is TypeAliasNode -> TypeAliasModel(
-                    name = name,
-                    typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null
-            )
+            is TypeAliasNode -> {
+//                val typeReference = typeReference.process().let {
+//                    if (it is TypeValueModel) {
+//                        it.copy(fqName = uidToNameMapper[uid])
+//                    } else {
+//                        it
+//                    }
+//                }
+
+                TypeAliasModel(
+                        name = name,
+                        typeReference = typeReference.process(),
+                        typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = null
+                )
+            }
             else -> {
                 logger.debug("skipping ${this}")
                 null

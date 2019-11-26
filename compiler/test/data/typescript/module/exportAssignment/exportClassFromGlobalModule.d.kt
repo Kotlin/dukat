@@ -14,9 +14,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import _atom.ScrollView
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external open class SampleView : _atom.ScrollView {
+external open class SampleView : ScrollView {
     open var foo: String
 }
 

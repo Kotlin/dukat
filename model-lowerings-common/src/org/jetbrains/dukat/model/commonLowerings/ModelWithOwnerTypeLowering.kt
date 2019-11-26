@@ -85,12 +85,15 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
-    fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
+    fun lowerHeritageModel(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
         val typeParams = heritageClause.typeParams.map {
             lowerTypeModel(ownerContext.wrap(it))
         }
-        return heritageClause.copy(typeParams = typeParams)
+        return heritageClause.copy(
+            value = lowerTypeValueModel(ownerContext.wrap(heritageClause.value)),
+            typeParams = typeParams
+        )
     }
 
 
@@ -100,7 +103,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
                 members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
+                    lowerHeritageModel(NodeOwner(heritageClause, ownerContext))
                 }
         )
     }
@@ -134,7 +137,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
                 members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext)) },
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
-                    lowerHeritageNode(NodeOwner(heritageClause, ownerContext))
+                    lowerHeritageModel(NodeOwner(heritageClause, ownerContext))
                 },
                 companionObject = declaration.companionObject?.let { lowerObjectModel(ownerContext.wrap(it)) }
         )

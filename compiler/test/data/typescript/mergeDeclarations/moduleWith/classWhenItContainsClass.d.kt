@@ -15,9 +15,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import events.EventEmitter
 
 @JsModule("ws")
-external open class WebSocket(address: String) : events.EventEmitter {
+external open class WebSocket(address: String) : EventEmitter {
     open fun connect(): Boolean
     open class Server {
         open fun start()

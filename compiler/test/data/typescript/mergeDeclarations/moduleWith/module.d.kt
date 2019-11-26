@@ -16,8 +16,14 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Ext.util.IPositionable
+import Ext.util.IObservable
+import Ext.util.IAnimate
+import Ext.util.IElementContainer
+import Ext.util.IRenderable
+import Ext.state.IStateful
 
-external interface IAbstractComponent : Ext.IBase, Ext.util.IPositionable, Ext.util.IObservable, Ext.util.IAnimate, Ext.util.IElementContainer, Ext.util.IRenderable, Ext.state.IStateful {
+external interface IAbstractComponent : IBase, IPositionable, IObservable, IAnimate, IElementContainer, IRenderable, IStateful {
     var autoEl: Any
     var autoLoad: Any?
         get() = definedExternally
@@ -29,7 +35,7 @@ external var num: Number
 
 external fun foo()
 
-external interface IAbstractPlugin : Ext.IBase {
+external interface IAbstractPlugin : IBase {
     var pluginId: String?
         get() = definedExternally
         set(value) = definedExternally

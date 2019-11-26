@@ -15,9 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 import ChildComponent.Props
+import Factory.Component
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external open class ChildComponent : Factory.Component<Props> {
+external open class ChildComponent : Component<Props> {
     interface Props
 }
 
