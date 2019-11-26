@@ -36,7 +36,8 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun InterfaceModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return parentEntities.flatMap { heritageModel ->
-            heritageModel.value.resolveInterface()?.let { resolvedClassLike ->
+            val value = context.unalias(heritageModel.value)
+            value.resolveInterface()?.let { resolvedClassLike ->
                 listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
             } ?: emptyList()
         }
@@ -44,7 +45,8 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun ClassModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return parentEntities.flatMap { heritageModel ->
-            (heritageModel.value.resolveInterface() ?: heritageModel.value.resolveClass())?.let { resolvedClassLike ->
+            val value = context.unalias(heritageModel.value)
+            (value.resolveInterface() ?: value.resolveClass())?.let { resolvedClassLike ->
                 listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
             } ?: emptyList()
         }

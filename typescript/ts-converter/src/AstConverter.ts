@@ -669,13 +669,15 @@ export class AstConverter {
                     }
 
                     let typeReference: ReferenceEntity | null = null;
-                    let typeResolved = this.typeChecker.getTypeFromTypeNode(type) as ts.InterfaceType;
-                    let symbol = typeResolved.symbol;
 
+                    let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
                     if (symbol) {
-                        if (Array.isArray(symbol.declarations) && (symbol.declarations[0])) {
-                            this.astVisitor.visitType(symbol.declarations[0]);
-                            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(symbol.declarations[0]))
+                        if (Array.isArray(symbol.declarations)) {
+                            let declaration = symbol.declarations[0];
+                            if (declaration) {
+                                this.astVisitor.visitType(declaration);
+                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration))
+                            }
                         }
                     }
 
