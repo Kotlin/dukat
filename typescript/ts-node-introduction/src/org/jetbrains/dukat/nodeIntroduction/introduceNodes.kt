@@ -88,7 +88,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 convertTypeParameters(declaration.typeParameters),
 
                 declaration.isStatic(),
-                false,
                 declaration.optional,
                 declaration.optional,  // TODO: it's actually wrong
 
@@ -121,7 +120,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     ),
                     convertTypeParameters(declaration.typeParameters),
                     false,
-                    false,
                     true,
                     false,
                     true
@@ -132,7 +130,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     convertParameters(declaration.parameters),
                     declaration.type,
                     convertTypeParameters(declaration.typeParameters),
-                    false, //TODO: remove static, we don't need it for MethodSignatures
                     false,
                     false,
                     true
@@ -149,7 +146,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         declaration.returnType.makeNullable(),
                         emptyList(),
                         false,
-                        false,
                         true,
                         true
                 ),
@@ -158,7 +154,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
                         TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
-                        false,
                         false,
                         true,
                         true
@@ -173,7 +168,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 convertParameters(parameters),
                 type,
                 convertTypeParameters(typeParameters),
-                false,
                 false,
                 true,
                 true
@@ -440,7 +434,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     declaration.type,
                     convertTypeParameters(declaration.typeParameters),
                     declaration.isStatic(),
-                    false,
                     false,
                     true
             ))
