@@ -414,14 +414,22 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun translateMethod(methodModel: MethodModel, parent: ClassDescriptor): FunctionDescriptor {
-        val functionDescriptor = SimpleFunctionDescriptorImpl.create(
+        val functionDescriptor = object : SimpleFunctionDescriptorImpl(
             parent,
+            null,
             translateAnnotations(methodModel.annotations),
             Name.identifier(translateName(methodModel.name)),
             CallableMemberDescriptor.Kind.DECLARATION,
             SourceElement.NO_SOURCE
-        )
-
+        ) {
+            override fun getOverriddenDescriptors(): MutableCollection<out FunctionDescriptor> {
+                if (methodModel.override != null) {
+                    return listOfNotNull(context.resolveMethod(methodModel.override as NameEntity, methodModel.name)).toMutableList()
+                }
+                return super.getOverriddenDescriptors()
+            }
+        }
+        context.registerMethod(context.currentPackageName.appendLeft(methodModel.name), functionDescriptor)
         val typeParameters = translateTypeParameters(methodModel.typeParameters, functionDescriptor)
         functionDescriptor.initialize(
             null,
@@ -496,8 +504,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun translateProperty(propertyModel: PropertyModel, parent: ClassDescriptor): PropertyDescriptor {
-        val propertyDescriptor = PropertyDescriptorImpl.create(
+        val propertyDescriptor = object : PropertyDescriptorImpl(
             parent,
+            null,
             Annotations.EMPTY,
             when {
                 propertyModel.getter || propertyModel.setter -> Modality.OPEN
@@ -517,7 +526,15 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             false,
             false,
             false
-        )
+        ) {
+            override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> {
+                if (propertyModel.override != null) {
+                    return listOfNotNull(context.resolveProperty(propertyModel.override as NameEntity, propertyModel.name)).toMutableList()
+                }
+                return super.getOverriddenDescriptors()
+            }
+        }
+        context.registerProperty(context.currentPackageName.appendLeft(propertyModel.name), propertyDescriptor)
         val typeParameters = translateTypeParameters(propertyModel.typeParameters, propertyDescriptor)
         propertyDescriptor.setType(
             translateType(propertyModel.type),
