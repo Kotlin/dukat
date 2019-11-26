@@ -28,7 +28,7 @@ interface Lowering<T : TypeEntity> {
     fun lowerParameterNode(declaration: ParameterNode): ParameterNode
     fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode
     fun lowerMemberNode(declaration: MemberNode): MemberNode
-    fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode
+    fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
     fun lowerTypeNode(declaration: TypeValueNode): T
@@ -50,7 +50,7 @@ interface Lowering<T : TypeEntity> {
             is FunctionNode -> lowerFunctionNode(declaration)
             is ClassLikeNode -> lowerClassLikeNode(declaration, owner)
             is DocumentRootNode -> lowerDocumentRoot(declaration)
-            is TypeAliasNode -> lowerTypeAliasNode(declaration)
+            is TypeAliasNode -> lowerTypeAliasNode(declaration, owner)
             is EnumNode -> lowerEnumNode(declaration, owner)
             else -> declaration.duplicate()
         }

@@ -26,7 +26,6 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return ownerContext.node
     }
 
-
     fun lowerMethodModel(ownerContext: NodeOwner<MethodModel>): MethodModel {
         val declaration = ownerContext.node
         return declaration.copy(

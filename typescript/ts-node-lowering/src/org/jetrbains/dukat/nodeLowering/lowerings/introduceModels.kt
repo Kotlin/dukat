@@ -611,10 +611,13 @@ private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) 
         return super.lowerClassLikeNode(declaration, owner)
     }
 
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode {
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        return super.lowerTypeAliasNode(declaration, owner)
+    }
+
     override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
-        if (!declaration.uid.endsWith("_GENERATED")) {
-            visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
-        }
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
         return super.lowerEnumNode(declaration, owner)
     }
 

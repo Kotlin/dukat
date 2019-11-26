@@ -6,6 +6,10 @@ import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import java.lang.reflect.Type
 
 data class ResolvedClassLike<T : ClassLikeModel>(
     val classLike: T,
@@ -19,6 +23,7 @@ data class ResolvedClassLike<T : ClassLikeModel>(
 class ModelContext {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
+    private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
 
     fun registerInterface(interfaceDeclaration: InterfaceModel, owner: ModuleModel) {
         val name = owner.name.appendLeft(interfaceDeclaration.name)
@@ -28,6 +33,28 @@ class ModelContext {
     fun registerClass(classDeclaration: ClassModel, owner: ModuleModel) {
         val name = owner.name.appendLeft(classDeclaration.name)
         myClassNodes[name] = classDeclaration
+    }
+
+    fun registerAlias(typeAlias: TypeAliasModel, owner: ModuleModel) {
+        val name = owner.name.appendLeft(typeAlias.name)
+        myAliases[name] = typeAlias
+    }
+
+    fun unalias(typeModel: TypeValueModel): TypeValueModel {
+        val typeResolved = myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
+            if (typeReference is TypeValueModel) {
+                unalias(typeReference)
+            } else {
+                typeModel
+            }
+        } ?: typeModel
+
+        return typeResolved.copy(params = typeResolved.params.map { param -> param.copy(
+            type = when (param.type) {
+                is TypeValueModel -> unalias(param.type as TypeValueModel)
+                else -> param.type
+            }
+        )})
     }
 
     fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {

@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -140,9 +141,12 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            if (value == otherParameterType.value
-                && params == otherParameterType.params
-                && nullable == otherParameterType.nullable) {
+            val typeValueA  = context.unalias(this)
+            val typeValueB  = context.unalias(otherParameterType)
+
+            if (typeValueA.value == typeValueB.value
+                && typeValueA.params == typeValueB.params
+                && typeValueA.nullable == typeValueB.nullable) {
                 return true
             }
         }
@@ -245,11 +249,10 @@ private class OverrideResolver(val context: ModelContext) {
 
 private fun ModuleModel.updateContext(context: ModelContext) {
     for (declaration in declarations) {
-        if (declaration is InterfaceModel) {
-            context.registerInterface(declaration, this)
-        }
-        if (declaration is ClassModel) {
-            context.registerClass(declaration, this)
+        when (declaration) {
+            is InterfaceModel -> context.registerInterface(declaration, this)
+            is ClassModel -> context.registerClass(declaration, this)
+            is TypeAliasModel -> context.registerAlias(declaration, this)
         }
     }
 
