@@ -2,10 +2,9 @@ package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
-import org.jetbrains.dukat.astCommon.shiftLeft
+import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -27,7 +26,7 @@ private class TypeAliasRegistrator : ModelWithOwnerTypeLowering {
     fun getAliasFiles(): List<SourceFileModel> {
         return aliasBucket.map { (name, aliases) ->
             val fileName = name.rightMost().value
-            val packageName = name.shiftLeft()!!
+            val packageName = name.shiftRight()!!
             SourceFileModel(
                     fileName = fileName,
                     root = ModuleModel(
