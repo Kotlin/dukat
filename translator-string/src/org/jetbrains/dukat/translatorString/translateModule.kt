@@ -36,6 +36,15 @@ fun NameEntity.translate(): String = when (this) {
     }
 }
 
+private fun NameEntity.normalize(): NameEntity? {
+    return if (leftMost() == ROOT_PACKAGENAME) {
+        this.shiftLeft()
+    } else {
+        this
+    }
+}
+
+
 private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMap: MutableMap<String, Int>): NameEntity {
     val sourceFile = File(fileName)
     val sourceFileName = sourceFile.name
@@ -68,7 +77,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     }
 
     if (this.name != null) {
-        name = name.appendLeft(this.name!!)
+        name = name.appendLeft(this.name?.normalize()!!)
     }
 
     val nameString = name.toString().toLowerCase()

@@ -39,7 +39,7 @@ private class TypeVisitor(private val visit: (TypeValueModel) -> Unit) : ModelWi
 }
 
 private fun NameEntity.normalize(): NameEntity? {
-    // TODO: we need this only because some packages generated from type aliases has no <ROOT> prefix - I need to investigate why
+    // TODO: we need this only because some packages generated from type aliases have no <ROOT> prefix - I need to investigate why
     return if (leftMost() == IdentifierEntity("<ROOT>")) {
         this.shiftLeft()
     } else {
