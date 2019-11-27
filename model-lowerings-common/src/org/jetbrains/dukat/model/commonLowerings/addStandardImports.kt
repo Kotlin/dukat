@@ -3,6 +3,7 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -38,15 +39,21 @@ private fun ModuleModel.addStandardImportsAndAnnotations() {
     )
 }
 
+fun InterfaceModel.hasNestedEntity(): Boolean {
+    if ((companionObject?.members?.isNotEmpty() == true) || (companionObject?.parentEntities?.isNotEmpty() == true)) {
+        return true
+    }
+
+    return members.any { (it is ClassLikeModel) }
+}
+
 fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
 
     visitTopLevelModel { topLevelModel ->
         when (topLevelModel) {
             is InterfaceModel -> {
-                topLevelModel.companionObject?.let { companionObject ->
-                    if (companionObject.members.isNotEmpty() || companionObject.parentEntities.isNotEmpty()) {
-                        topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
-                    }
+                if (topLevelModel.hasNestedEntity()) {
+                    topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
                 }
             }
             is ModuleModel -> {
