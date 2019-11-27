@@ -195,10 +195,10 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         )))
     }
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
         return when (val declaration = ownerContext.node) {
             is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = value.value.escape()) })
-            else -> super.lowerTopLevelModel(ownerContext)
+            else -> super.lowerTopLevelModel(ownerContext, moduleModel)
         }
     }
 
@@ -206,7 +206,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return moduleModel.copy(
                 name = moduleModel.name.escape(),
                 shortName = moduleModel.shortName.escape(),
-                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext),
+                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
                 submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, ownerContext.wrap(submodule)) }
         )
     }

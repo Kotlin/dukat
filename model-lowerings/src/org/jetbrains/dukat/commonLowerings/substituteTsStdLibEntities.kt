@@ -90,7 +90,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             IdentifierEntity("String")
     )
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
         val declaration = ownerContext.node
         val declarationResolved = if (declaration is ClassLikeModel) {
             declaration.parentEntities.firstOrNull { parentEntity ->
@@ -102,7 +102,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             null
         } ?: declaration
 
-        return super.lowerTopLevelModel(ownerContext.copy(node = declarationResolved))
+        return super.lowerTopLevelModel(ownerContext.copy(node = declarationResolved), moduleModel)
     }
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {

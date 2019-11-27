@@ -9,6 +9,7 @@ import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
@@ -108,7 +109,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel {
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
         val declaration = ownerContext.node
         return declaration.copy(
             typeReference = lowerTypeModel(ownerContext.wrap(declaration.typeReference)),

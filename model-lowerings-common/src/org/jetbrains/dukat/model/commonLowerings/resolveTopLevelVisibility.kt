@@ -41,7 +41,7 @@ private class ModifyVisibility(private val visibility: VisibilityModifierModel) 
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel {
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 

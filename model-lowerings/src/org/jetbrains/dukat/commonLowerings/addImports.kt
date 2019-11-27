@@ -29,7 +29,7 @@ private class TypeVisitor(private val visit: (TypeValueModel) -> Unit) : ModelWi
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         return moduleModel.copy(
-                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext)
+                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel)
         )
     }
 
@@ -38,11 +38,20 @@ private class TypeVisitor(private val visit: (TypeValueModel) -> Unit) : ModelWi
     }
 }
 
+private fun NameEntity.normalize(): NameEntity? {
+    // TODO: we need this only because some packages generated from type aliases has no <ROOT> prefix - I need to investigate why
+    return if (leftMost() == IdentifierEntity("<ROOT>")) {
+        this.shiftLeft()
+    } else {
+        this
+    }
+}
+
 private fun ModuleModel.addImports(): ModuleModel {
     val resolveImports = linkedSetOf<NameEntity>()
     val moduleWithFqName = TypeVisitor { typeModel ->
-        typeModel.fqName?.shiftRight()?.let { fqNameNormalized ->
-            if (fqNameNormalized != name) {
+        typeModel.fqName?.shiftRight()?.let { moduleName ->
+            if (moduleName.normalize() != name.normalize()) {
                 resolveImports.add(typeModel.fqName!!)
             }
         }

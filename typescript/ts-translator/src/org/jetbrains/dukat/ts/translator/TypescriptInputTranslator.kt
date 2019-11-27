@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
+import org.jetbrains.dukat.commonLowerings.extractTypeAliases
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -44,7 +45,6 @@ import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
-import org.jetrbains.dukat.nodeLowering.lowerings.moveTypeAliasesOutside
 import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
@@ -82,7 +82,6 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .removeUnusedGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
-                .moveTypeAliasesOutside()
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
@@ -95,6 +94,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
+                .extractTypeAliases()
                 .lowerOverrides(stdLibSourceSet)
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()

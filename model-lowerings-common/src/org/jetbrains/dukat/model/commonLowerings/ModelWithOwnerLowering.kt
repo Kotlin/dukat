@@ -25,7 +25,7 @@ interface ModelWithOwnerLowering {
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel
     fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel
     fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
-    fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>): TypeAliasModel
+    fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel
 
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
     fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel
@@ -62,27 +62,27 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
+    fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
         return when (val declaration = ownerContext.node) {
             is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
             is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
             is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
-            is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext))
+            is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext), moduleModel)
             else -> raiseConcern("unknown TopeLevelDeclaration ${declaration}") { declaration }
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelModel>, ownerContext: NodeOwner<ModuleModel>): List<TopLevelModel> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelModel>, ownerContext: NodeOwner<ModuleModel>, moduleModel: ModuleModel): List<TopLevelModel> {
         return declarations.map { declaration ->
-            lowerTopLevelModel(NodeOwner(declaration, ownerContext))
+            lowerTopLevelModel(NodeOwner(declaration, ownerContext), moduleModel)
         }
     }
 
     fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         return moduleModel.copy(
-                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext),
+                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
                 submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, NodeOwner(submodule, ownerContext)) }
         )
     }
