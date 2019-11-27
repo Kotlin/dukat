@@ -7,8 +7,8 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
 import org.jetbrains.dukat.commonLowerings.extractTypeAliases
+import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
 import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
@@ -88,9 +88,9 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .substituteTsStdLibEntities()
                 .escapeIdentificators()
                 .removeUnsupportedJsNames()
+                .mergeClassLikes()
                 .mergeModules()
                 .mergeWithNameSpace()
-                .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()

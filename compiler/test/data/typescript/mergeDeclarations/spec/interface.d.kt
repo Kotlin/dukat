@@ -1,6 +1,4 @@
-@file:JsQualifier("React")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
-package React
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -17,15 +15,22 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class Component<P, S> : Bar, Foo, ComponentLifecycle<P, S> {
-    open var foo: String
-    open fun bar(): Number
-    open fun baz(a: Any)
-    open fun boo(p: P, s: S)
+external interface Dog
+
+external interface Cat
+
+external interface Sheep
+
+external interface Animal
+
+external interface Cloner {
+    fun clone(animal: Dog): Dog
+    fun clone(animal: Cat): Cat
+    fun clone(animal: Sheep): Sheep
+    fun clone(animal: Animal): Animal
 }
 
-external interface Foo
-
-external open class Bar
-
-external interface ComponentLifecycle<T, U>
+external interface CompletelyIrrelevantInterface {
+    fun clone(animal: Dog): Dog
+    fun clone(animal: Cat): Cat
+}
