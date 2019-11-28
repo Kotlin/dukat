@@ -1,29 +1,23 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.unquote
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
-import org.jetbrains.dukat.astModel.MergeableModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.mergeWith
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.astModel.transform
-
-
-private fun ModuleModel.canBeMerged(): Boolean {
-    return declarations.any { declaration -> declaration is MemberEntity }
-}
+import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
+import org.jetbrains.dukat.commonLowerings.merge.processing.fetchModules
 
 private fun VariableModel.convert(): MemberModel {
     return PropertyModel(
@@ -54,102 +48,71 @@ private fun FunctionModel.convert(): MemberModel {
     )
 }
 
-private fun MergeableModel.convert(): MemberModel {
+private fun TopLevelModel.convert(): MemberModel? {
     return when (this) {
         is FunctionModel -> convert()
         is VariableModel -> convert()
-        else -> throw Error("can not convert unknown MergableNode ${this}")
+        else -> null
     }
 }
 
-private fun ObjectModel?.merge(ownerName: NameEntity, modulesToBeMerged: Map<NameEntity, MutableList<ModuleModel>>): ObjectModel? {
-    val members = this?.members.orEmpty().toMutableList()
-    modulesToBeMerged.getOrDefault(ownerName, mutableListOf()).forEach { module ->
-        val submoduleDecls = module.declarations
-                .filterIsInstance(MergeableModel::class.java)
-                .map { it.convert() }
-        members.addAll(submoduleDecls)
-    }
+private fun ObjectModel?.merge(module: ModuleModel): ObjectModel? {
+    val staticMembers = module.declarations
+            .mapNotNull { it.convert() }
 
-    return this?.copy(members = members) ?: if (members.isEmpty()) {
+    return this?.copy(members = members + staticMembers) ?: if (staticMembers.isEmpty()) {
         null
     } else {
-        ObjectModel(IdentifierEntity(""), members, listOf(), VisibilityModifierModel.DEFAULT, null)
+        ObjectModel(IdentifierEntity(""), staticMembers, listOf(), VisibilityModifierModel.DEFAULT, null)
     }
 }
 
-private fun collectModelsToBeMerged(submodules: List<ModuleModel>, context: Map<NameEntity, ClassLikeModel>, modulesToBeMerged: MutableMap<NameEntity, MutableList<ModuleModel>>): List<ModuleModel> {
-    return submodules.map { subModule ->
-        val moduleKey = subModule.shortName.unquote()
-        if ((context.containsKey(moduleKey)) && (subModule.canBeMerged())) {
-            val bucket = modulesToBeMerged.getOrPut(moduleKey) { mutableListOf() }
-            bucket.add(subModule)
-            emptyList()
-        } else listOf(subModule)
-    }.flatten()
+private fun ModuleModel.mergeClassLikesAndModuleDeclarations(classLikes: Map<NameEntity, ClassLikeModel>): ModuleModel {
+    val declarationLowered = declarations.map { declaration ->
+        classLikes[name.appendLeft(declaration.name)] ?: declaration
+    }
+    val submodulesLowered = submodules.filter {
+        !classLikes.containsKey(it.mergeClassLikesAndModuleDeclarations(classLikes).name)
+    }.map { it.mergeClassLikesAndModuleDeclarations(classLikes) }
 
+    return copy(declarations = declarationLowered, submodules = submodulesLowered)
 }
 
-fun InterfaceModel.merge(interfaceModel: InterfaceModel): InterfaceModel {
+private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
+    return when (this) {
+        is InterfaceModel -> this + b
+        is ClassModel -> this + b
+        else -> this
+    }
+}
+
+private operator fun InterfaceModel.plus(moduleModel: ModuleModel): InterfaceModel {
+    val classLikes = moduleModel.declarations.filterIsInstance(ClassLikeModel::class.java)
     return copy(
-            members = members + interfaceModel.members,
-            companionObject = companionObject.mergeWith(interfaceModel.companionObject)
+            members = members + classLikes,
+            companionObject = companionObject.merge(moduleModel)
     )
 }
 
-
-fun ModuleModel.mergeClassLikesAndModuleDeclarations(): ModuleModel {
-    val interfacesInBucket = mutableMapOf<NameEntity, MutableList<InterfaceModel>>()
-
-    val classes = mutableMapOf<NameEntity, ClassModel>()
-
-    declarations.forEach { declaration ->
-        if (declaration is InterfaceModel) {
-            interfacesInBucket.getOrPut(declaration.name) { mutableListOf() }.add(declaration)
-        } else if (declaration is ClassModel) {
-            classes[declaration.name] = declaration
-        }
-    }
-
-
-    val interfaces = interfacesInBucket.mapValues { entry -> entry.value.reduceRight { interfaceModel, acc -> interfaceModel.merge(acc) } }.toMutableMap()
-
-    val modulesToBeMergedWithInterfaces = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
-    val modulesToBeMergedWithClasses = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
-
-    var resolvedSubmodules = collectModelsToBeMerged(submodules, interfaces, modulesToBeMergedWithInterfaces)
-    resolvedSubmodules = collectModelsToBeMerged(resolvedSubmodules, classes, modulesToBeMergedWithClasses)
-            .map { moduleModel -> moduleModel.mergeClassLikesAndModuleDeclarations() }
-
-    val mergedDeclarations = declarations
-            .map { declaration ->
-                when (declaration) {
-                    is InterfaceModel -> {
-                        val element = interfaces.remove(declaration.name)
-                        if (element != null) listOf(element) else emptyList()
-                    }
-                    else -> listOf(declaration)
-                }
-            }
-            .flatten()
-            .map { declaration ->
-                when (declaration) {
-                    is InterfaceModel -> {
-                        declaration.copy(
-                                companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithInterfaces)
-                        )
-                    }
-                    is ClassModel -> {
-                        declaration.copy(
-                                companionObject = declaration.companionObject.merge(declaration.name, modulesToBeMergedWithClasses)
-                        )
-                    }
-                    else -> declaration
-                }
-            }
-
-
-    return copy(declarations = mergedDeclarations, submodules = resolvedSubmodules)
+private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
+    val classLikes = moduleModel.declarations.filterIsInstance(ClassLikeModel::class.java)
+    return copy(
+            members = members + classLikes,
+            companionObject = companionObject.merge(moduleModel)
+    )
 }
 
-fun SourceSetModel.mergeClassLikesAndModuleDeclarations() = transform { it.mergeClassLikesAndModuleDeclarations() }
+fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
+    val modules = sources
+            .flatMap { source -> source.root.fetchModules() }
+            .groupBy { it.ownerName }
+            .mapValues { (_, v) -> v[0].model }
+
+    val classLikes = sources
+            .flatMap { source -> source.root.fetchClassLikes() }
+            .groupBy { it.ownerName }
+            .filterKeys { name -> modules.containsKey(name) }
+            .mapValues { (name, v) -> v[0].model + modules[name]!! }
+
+    return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikesAndModuleDeclarations(classLikes)) })
+}

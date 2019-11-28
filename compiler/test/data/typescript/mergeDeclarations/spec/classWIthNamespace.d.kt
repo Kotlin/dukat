@@ -18,5 +18,15 @@ import Album.AlbumLabel
 
 external open class Album {
     open var label: AlbumLabel
-    open class AlbumLabel
+    open class AlbumLabel {
+        open fun songsCount(): Number
+
+        companion object {
+            var defaultLabel: AlbumLabel
+        }
+    }
+
+    companion object {
+        fun play(album: Album)
+    }
 }

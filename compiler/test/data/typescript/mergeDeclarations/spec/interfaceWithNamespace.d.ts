@@ -3,5 +3,9 @@ declare interface Album {
 }
 
 declare namespace Album {
-  export class AlbumLabel { }
+  function play(album: Album);
+  export class AlbumLabel {
+    static defaultLabel: AlbumLabel;
+    songsCount(): number;
+  }
 }

@@ -1,3 +1,3 @@
 package org.jetbrains.dukat.astModel
 
-interface MergeableModel
+interface MergeableModel : TopLevelModel

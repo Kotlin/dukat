@@ -19,5 +19,15 @@ import Album.AlbumLabel
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface Album {
     var label: AlbumLabel
-    open class AlbumLabel
+    open class AlbumLabel {
+        open fun songsCount(): Number
+
+        companion object {
+            var defaultLabel: AlbumLabel
+        }
+    }
+
+    companion object {
+        fun play(album: Album)
+    }
 }

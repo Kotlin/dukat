@@ -11,18 +11,13 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
+import org.jetbrains.dukat.commonLowerings.merge.processing.ModelWithOwnerName
+import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
 import org.jetbrains.dukat.panic.raiseConcern
-
-private data class FQInterface(val model: ClassLikeModel, val ownerName: NameEntity)
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageModel>, parentEntitiesB: List<HeritageModel>): List<HeritageModel> {
     val parentSet = parentEntitiesA.toSet()
     return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }
-}
-
-private fun ModuleModel.fetchInterfaces(): List<FQInterface> {
-    return declarations.filterIsInstance(ClassLikeModel::class.java).map { FQInterface(it, name.appendLeft(it.name)) } +
-            submodules.flatMap { submodule -> submodule.fetchInterfaces() }
 }
 
 private operator fun ObjectModel?.plus(otherModel: ObjectModel?): ObjectModel? {
@@ -79,7 +74,7 @@ private operator fun ClassLikeModel.plus(b: ClassLikeModel): ClassLikeModel {
     }
 }
 
-private operator fun FQInterface.plus(b: FQInterface): FQInterface {
+private operator fun ModelWithOwnerName<ClassLikeModel>.plus(b: ModelWithOwnerName<ClassLikeModel>): ModelWithOwnerName<ClassLikeModel> {
     return copy(model = model + b.model)
 }
 
@@ -104,7 +99,7 @@ private fun ModuleModel.mergeClassLikes(bucket: Map<NameEntity, ClassLikeModel>,
 }
 
 fun SourceSetModel.mergeClassLikes(): SourceSetModel {
-    val interfaces = sources.flatMap { source -> source.root.fetchInterfaces() }
+    val interfaces = sources.flatMap { source -> source.root.fetchClassLikes() }
     val bucket = interfaces
             .groupBy { it.ownerName }
             .mapValues { (_, items) -> items.reduce { a, b -> a + b }.model }
