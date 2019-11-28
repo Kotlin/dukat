@@ -49,6 +49,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
+            is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext))
+            is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext))
             else -> {
                 logger.trace("skipping $declaration")
                 declaration

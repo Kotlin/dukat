@@ -25,19 +25,16 @@ class ModelContext {
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
 
-    fun registerInterface(interfaceDeclaration: InterfaceModel, owner: ModuleModel) {
-        val name = owner.name.appendLeft(interfaceDeclaration.name)
-        myInterfaces[name] = interfaceDeclaration
+    fun registerInterface(interfaceDeclaration: InterfaceModel, ownerName: NameEntity) {
+        myInterfaces[ownerName.appendLeft(interfaceDeclaration.name)] = interfaceDeclaration
     }
 
-    fun registerClass(classDeclaration: ClassModel, owner: ModuleModel) {
-        val name = owner.name.appendLeft(classDeclaration.name)
-        myClassNodes[name] = classDeclaration
+    fun registerClass(classDeclaration: ClassModel, ownerName: NameEntity) {
+        myClassNodes[ownerName.appendLeft(classDeclaration.name)] = classDeclaration
     }
 
-    fun registerAlias(typeAlias: TypeAliasModel, owner: ModuleModel) {
-        val name = owner.name.appendLeft(typeAlias.name)
-        myAliases[name] = typeAlias
+    fun registerAlias(typeAlias: TypeAliasModel, ownerName: NameEntity) {
+        myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
     }
 
     fun unalias(typeModel: TypeValueModel): TypeValueModel {

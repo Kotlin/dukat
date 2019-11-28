@@ -2,6 +2,7 @@ package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
@@ -27,23 +29,6 @@ private data class ParentMembers(val fqName: NameEntity, val methods: List<Metho
 private class OverrideResolver(val context: ModelContext) {
 
     private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
-        return when (this) {
-            is InterfaceModel -> getKnownParents()
-            is ClassModel -> getKnownParents()
-            else -> raiseConcern("unknown ClassLikeDeclaration ${this}") { emptyList<ResolvedClassLike<ClassLikeModel>>() }
-        }
-    }
-
-    private fun InterfaceModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
-        return parentEntities.flatMap { heritageModel ->
-            val value = context.unalias(heritageModel.value)
-            value.resolveInterface()?.let { resolvedClassLike ->
-                listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
-            } ?: emptyList()
-        }
-    }
-
-    private fun ClassModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return parentEntities.flatMap { heritageModel ->
             val value = context.unalias(heritageModel.value)
             (value.resolveInterface() ?: value.resolveClass())?.let { resolvedClassLike ->
@@ -216,6 +201,8 @@ private class OverrideResolver(val context: ModelContext) {
                 }?.fqName
                 copy(override = overriden)
             }
+            is ClassModel -> lowerOverrides()
+            is InterfaceModel -> lowerOverrides()
             else -> this
         }
     }
@@ -249,13 +236,33 @@ private class OverrideResolver(val context: ModelContext) {
     }
 }
 
+private fun TopLevelModel.updateContext(context: ModelContext, ownerName: NameEntity) {
+    when (this) {
+        is InterfaceModel -> {
+            members.filterIsInstance(InterfaceModel::class.java).forEach {
+                context.registerInterface(it, ownerName.appendLeft(name))
+            }
+            members.filterIsInstance(ClassModel::class.java).forEach {
+                context.registerClass(it, ownerName.appendLeft(name))
+            }
+            context.registerInterface(this, ownerName)
+        }
+        is ClassModel -> {
+            members.filterIsInstance(InterfaceModel::class.java).forEach {
+                context.registerInterface(it, ownerName.appendLeft(name))
+            }
+            members.filterIsInstance(ClassModel::class.java).forEach {
+                context.registerClass(it, ownerName.appendLeft(name))
+            }
+            context.registerClass(this, ownerName)
+        }
+        is TypeAliasModel -> context.registerAlias(this, ownerName)
+    }
+}
+
 private fun ModuleModel.updateContext(context: ModelContext) {
     for (declaration in declarations) {
-        when (declaration) {
-            is InterfaceModel -> context.registerInterface(declaration, this)
-            is ClassModel -> context.registerClass(declaration, this)
-            is TypeAliasModel -> context.registerAlias(declaration, this)
-        }
+        declaration.updateContext(context, name)
     }
 
     submodules.forEach { declaration -> declaration.updateContext(context) }
