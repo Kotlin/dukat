@@ -907,7 +907,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         ) {
             override fun getMemberScope(): MemberScope {
                 context.registeredImports.clear()
-                context.registeredImports.addAll(moduleModel.imports.map { translateName(it.shiftRight()!!) })
+                context.registeredImports.addAll(moduleModel.imports.map { translateName(it.name.shiftRight()!!) })
                 context.currentPackageName = moduleModel.name
                 return SimpleMemberScope(moduleModel.declarations.mapNotNull { translateTopLevelModel(it, this) })
             }

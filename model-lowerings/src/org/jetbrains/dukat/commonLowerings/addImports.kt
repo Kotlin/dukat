@@ -7,21 +7,57 @@ import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.shiftRight
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
-import org.jetbrains.dukat.model.commonLowerings.escape
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private class TypeVisitor(private val visit: (TypeValueModel) -> Unit) : ModelWithOwnerTypeLowering {
+private fun NameEntity.translate(): String = when (this) {
+    is IdentifierEntity -> value
+    is QualifierEntity -> {
+        "${left.translate()}.${right.translate()}"
+    }
+}
+
+private fun NameEntity.itTopLevelImport(): Boolean {
+    if (this is QualifierEntity) {
+        return left == IdentifierEntity("<ROOT>")
+    }
+
+    return false
+}
+
+
+private class TypeVisitor(private val name: NameEntity, private val importContext: MutableMap<NameEntity, NameEntity>) : ModelWithOwnerTypeLowering {
+    val resolvedImports = linkedSetOf<ImportModel>()
+
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         val node = ownerContext.node
-        visit(node)
 
         val ownerContextResolved = node.fqName?.let { fqName ->
-            ownerContext.copy(node = node.copy(value = fqName.rightMost()))
+            val moduleName = fqName.shiftRight()
+            val shortName = fqName.rightMost()
+
+            if (!importContext.containsKey(shortName)) {
+                if (moduleName != null) {
+                    if (moduleName.normalize() != name.normalize()) {
+                        importContext[shortName] = moduleName
+                        resolvedImports.add(ImportModel(fqName))
+                    }
+                }
+                ownerContext.copy(node = node.copy(value = shortName))
+            } else if (importContext[shortName] == moduleName) {
+                ownerContext.copy(node = node.copy(value = shortName))
+            } else {
+                if ((name == importContext[shortName]) && (fqName.itTopLevelImport())) {
+                    val alias = shortName.copy(shortName.value + "FromRoot")
+                    resolvedImports.add(ImportModel(fqName, alias.value))
+                    ownerContext.copy(node = node.copy(value = alias))
+                } else null
+            }
         } ?: ownerContext
 
         return super.lowerTypeValueModel(ownerContextResolved)
@@ -48,18 +84,15 @@ private fun NameEntity.normalize(): NameEntity? {
 }
 
 private fun ModuleModel.addImports(): ModuleModel {
-    val resolveImports = linkedSetOf<NameEntity>()
-    val moduleWithFqName = TypeVisitor { typeModel ->
-        typeModel.fqName?.shiftRight()?.let { moduleName ->
-            if (moduleName.normalize() != name.normalize()) {
-                resolveImports.add(typeModel.fqName!!)
-            }
-        }
-    }.lowerRoot(this, NodeOwner(this, null))
+    val importContext = mutableMapOf<NameEntity, NameEntity>()
+    declarations.map { importContext[it.name] = name }
 
-    return moduleWithFqName.copy(
-            imports = (resolveImports + moduleWithFqName.imports).toMutableList(),
-            submodules = moduleWithFqName.submodules.map { submodule -> submodule.addImports() }
+    val typeVisitor = TypeVisitor(name, importContext)
+    val moduleWithFqNames = typeVisitor.lowerRoot(this, NodeOwner(this, null))
+
+    return moduleWithFqNames.copy(
+            imports = (typeVisitor.resolvedImports + moduleWithFqNames.imports).toMutableList(),
+            submodules = moduleWithFqNames.submodules.map { submodule -> submodule.addImports() }
     )
 }
 

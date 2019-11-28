@@ -16,6 +16,7 @@ import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -355,6 +356,10 @@ private fun MemberModel.translate(): List<String> {
     }
 }
 
+private fun ImportModel.translate(): String {
+    return name.translate() + (asAlias?.let{ " as ${it}" } ?: "")
+}
+
 private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (immutable) "val" else "var"
     val overrideClause = if (override != null) "override " else ""
@@ -620,8 +625,8 @@ class StringTranslator : ModelVisitor {
         classModel.translate(0, ::addOutput)
     }
 
-    fun visitImport(import: NameEntity) {
-        if (import.leftMost() != LIB_PACKAGENAME) {
+    fun visitImport(import: ImportModel) {
+        if (import.name.leftMost() != LIB_PACKAGENAME) {
             addOutput("import ${import.translate()}")
         }
     }

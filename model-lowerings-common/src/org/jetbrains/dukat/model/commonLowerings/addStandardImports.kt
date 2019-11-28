@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -35,7 +36,7 @@ private fun ModuleModel.addStandardImportsAndAnnotations() {
                     "org.w3c.performance.*",
                     "org.w3c.workers.*",
                     "org.w3c.xhr.*"
-            ).map { it.toNameEntity() }
+            ).map { ImportModel(it.toNameEntity()) }
     )
 }
 

@@ -90,13 +90,12 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
-import bar.string.`interface`
 import `$boo`.`typealias`
 import `$tring`
 
 external var `$`: Boolean
 
-external fun `package`(param_as: `interface`, b: `typealias`): `$tring`
+external fun `package`(param_as: bar.string.`interface`, b: `typealias`): `$tring`
 
 external interface `interface`
 

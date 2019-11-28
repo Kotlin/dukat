@@ -16,6 +16,7 @@ import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -689,7 +690,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration, 
                 declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
                 annotations = mutableListOf(),
                 submodules = listOf(),
-                imports = mutableListOf("kotlin.js.*".toNameEntity()),
+                imports = mutableListOf(ImportModel("kotlin.js.*".toNameEntity())),
                 comment = null
         )
 
