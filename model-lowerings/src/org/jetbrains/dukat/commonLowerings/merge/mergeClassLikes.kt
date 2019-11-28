@@ -83,7 +83,7 @@ private operator fun FQInterface.plus(b: FQInterface): FQInterface {
     return copy(model = model + b.model)
 }
 
-private fun ModuleModel.mergeClassLikes(bucket: MutableMap<NameEntity, ClassLikeModel>, alreadyMerged: MutableSet<NameEntity> = mutableSetOf()): ModuleModel {
+private fun ModuleModel.mergeClassLikes(bucket: Map<NameEntity, ClassLikeModel>, alreadyMerged: MutableSet<NameEntity> = mutableSetOf()): ModuleModel {
     val declarationsMerged = declarations.mapNotNull {
         if (it is ClassLikeModel) {
             val key = name.appendLeft(it.name)
@@ -91,7 +91,7 @@ private fun ModuleModel.mergeClassLikes(bucket: MutableMap<NameEntity, ClassLike
                 null
             } else if (bucket.containsKey(key)) {
                 alreadyMerged.add(key)
-                bucket.remove(key)
+                bucket[key]
             } else {
                 it
             }
@@ -109,5 +109,5 @@ fun SourceSetModel.mergeClassLikes(): SourceSetModel {
             .groupBy { it.ownerName }
             .mapValues { (_, items) -> items.reduce { a, b -> a + b }.model }
 
-    return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikes(bucket.toMutableMap())) })
+    return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikes(bucket)) })
 }
