@@ -86,18 +86,26 @@ private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
     }
 }
 
+private fun ModuleModel.fetchDeclarations(): List<ClassLikeModel> {
+    return declarations.filterIsInstance(ClassLikeModel::class.java).map {
+        when (it) {
+            is ClassModel -> it.copy(external = false)
+            is InterfaceModel -> it.copy(external = false)
+            else -> it
+        }
+    }
+}
+
 private operator fun InterfaceModel.plus(moduleModel: ModuleModel): InterfaceModel {
-    val classLikes = moduleModel.declarations.filterIsInstance(ClassLikeModel::class.java)
     return copy(
-            members = members + classLikes,
+            members = members + moduleModel.fetchDeclarations(),
             companionObject = companionObject.merge(moduleModel)
     )
 }
 
 private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
-    val classLikes = moduleModel.declarations.filterIsInstance(ClassLikeModel::class.java)
     return copy(
-            members = members + classLikes,
+            members = members + moduleModel.fetchDeclarations(),
             companionObject = companionObject.merge(moduleModel)
     )
 }
