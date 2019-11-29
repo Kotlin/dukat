@@ -22,7 +22,7 @@ private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
 }
 
-private data class ParentMembers(val fqName: NameEntity, val methods: List<MethodModel>, val properties: List<PropertyModel>)
+private data class ParentMembers(val fqName: NameEntity, val methods: Map<NameEntity, List<MethodModel>>, val properties: Map<NameEntity, List<PropertyModel>>)
 
 private class OverrideResolver(val context: ModelContext) {
 
@@ -49,7 +49,12 @@ private class OverrideResolver(val context: ModelContext) {
                     is PropertyModel -> properties.add(it)
                 }
             }
-            ParentMembers(resolvedClassLike.resolveFqName(), methods, properties)
+
+            ParentMembers(
+                resolvedClassLike.resolveFqName(),
+                methods.groupBy { it.name },
+                properties.groupBy { it.name }
+            )
         }
     }
 
@@ -175,7 +180,7 @@ private class OverrideResolver(val context: ModelContext) {
             is MethodModel -> {
                 val overriden =
                         allSuperDeclarations.firstOrNull { (_, methods, _) ->
-                            methods.any { method -> isOverriding(method) }
+                            methods[name]?.any { method -> isOverriding(method) } == true
                         }?.fqName ?: if (isSpecialCase()) {
                             IdentifierEntity("<SPECIAL-CASE>")
                         } else null
@@ -188,7 +193,7 @@ private class OverrideResolver(val context: ModelContext) {
             }
             is PropertyModel -> {
                 val overriden = allSuperDeclarations.firstOrNull { (_, _, properties) ->
-                    properties.any { prop -> isOverriding(prop) }
+                    properties[name]?.any { prop -> isOverriding(prop) } == true
                 }?.fqName
                 copy(override = overriden)
             }
