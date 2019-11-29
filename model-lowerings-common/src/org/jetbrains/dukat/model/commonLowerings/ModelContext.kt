@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -25,16 +26,24 @@ class ModelContext {
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
 
-    fun registerInterface(interfaceDeclaration: InterfaceModel, ownerName: NameEntity) {
+    private fun registerInterface(interfaceDeclaration: InterfaceModel, ownerName: NameEntity) {
         myInterfaces[ownerName.appendLeft(interfaceDeclaration.name)] = interfaceDeclaration
     }
 
-    fun registerClass(classDeclaration: ClassModel, ownerName: NameEntity) {
+    private fun registerClass(classDeclaration: ClassModel, ownerName: NameEntity) {
         myClassNodes[ownerName.appendLeft(classDeclaration.name)] = classDeclaration
     }
 
-    fun registerAlias(typeAlias: TypeAliasModel, ownerName: NameEntity) {
+    private fun registerAlias(typeAlias: TypeAliasModel, ownerName: NameEntity) {
         myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
+    }
+
+    fun register(topLevelModel: TopLevelModel, ownerName: NameEntity) {
+        when (topLevelModel) {
+            is ClassModel -> registerClass(topLevelModel, ownerName)
+            is InterfaceModel -> registerInterface(topLevelModel, ownerName)
+            is TypeAliasModel -> registerAlias(topLevelModel, ownerName)
+        }
     }
 
     fun unalias(typeModel: TypeValueModel): TypeValueModel {
@@ -54,15 +63,19 @@ class ModelContext {
         )})
     }
 
-    fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {
+    private fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {
         return myInterfaces[name]?.let {
             ResolvedClassLike(it, name)
         }
     }
 
-    fun resolveClass(name: NameEntity?): ResolvedClassLike<ClassModel>? {
+    private fun resolveClass(name: NameEntity?): ResolvedClassLike<ClassModel>? {
         return myClassNodes[name]?.let {
             ResolvedClassLike(it, name)
         }
+    }
+
+    fun resolve(name: NameEntity?): ResolvedClassLike<out ClassLikeModel>? {
+        return resolveInterface(name) ?: resolveClass(name)
     }
 }
