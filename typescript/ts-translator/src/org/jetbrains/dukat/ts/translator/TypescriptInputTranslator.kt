@@ -35,6 +35,7 @@ import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
+import org.jetrbains.dukat.nodeLowering.lowerings.removeConflictingOverloads
 import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
@@ -82,6 +83,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .removeUnusedGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
+                .removeConflictingOverloads()
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
