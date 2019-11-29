@@ -10,6 +10,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
@@ -20,19 +21,19 @@ private fun InterfaceNode.convertToTypeSignature(): TypeValueNode? {
     return if (generated) {
         null
     } else {
-        TypeValueNode(name, typeParameters, null, false, ThisTypeInGeneratedInterfaceMetaData())
+        TypeValueNode(name, typeParameters, ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     }
 }
 
 private fun ClassNode.convertToTypeSignature(): TypeValueNode {
-    return TypeValueNode(name, typeParameters, null, false, ThisTypeInGeneratedInterfaceMetaData())
+    return TypeValueNode(name, typeParameters, ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
 }
 
 private fun FunctionNode.convertToTypeSignature(): TypeValueNode {
     val anyNode = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
     val extendReference = extend
     return if (extendReference != null) {
-        TypeValueNode(extendReference.name, emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
+        TypeValueNode(extendReference.name, emptyList(), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     } else {
         anyNode
     }
