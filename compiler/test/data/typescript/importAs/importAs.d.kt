@@ -14,14 +14,19 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import _computable.Pipable
 import _transformable.internalApi.TransformOptions
 import _computable.Computable
 
-external interface Cipher
+external interface Cipher {
+    fun getPipable(): Pipable
+}
 
 external fun createCipher(algorithm: String, options: TransformOptions? = definedExternally): Cipher
 
 external fun createComputable(): Computable
+
+external fun createPipable(): Pipable
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("_transformable")
@@ -68,3 +73,5 @@ import org.w3c.xhr.*
 external open class Computable {
     open fun compute()
 }
+
+external interface Pipable

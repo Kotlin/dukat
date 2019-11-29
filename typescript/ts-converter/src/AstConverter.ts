@@ -356,7 +356,7 @@ export class AstConverter {
                             }
 
                             if (ts.isImportSpecifier(declaration)) {
-                                let type = this.typeChecker.getTypeAtLocation(declaration);
+                                let type = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
                                 if (type && type.symbol && Array.isArray(type.symbol.declarations)) {
                                     typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(type.symbol.declarations[0]));
                                 }
