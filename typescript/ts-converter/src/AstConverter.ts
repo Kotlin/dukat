@@ -355,7 +355,15 @@ export class AstConverter {
                                 return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
                             }
 
-                            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+                            if (ts.isImportSpecifier(declaration)) {
+                                let type = this.typeChecker.getTypeAtLocation(declaration);
+                                if (type && type.symbol && Array.isArray(type.symbol.declarations)) {
+                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(type.symbol.declarations[0]));
+                                }
+                            } else {
+                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+                            }
+
                         }
                     }
                 }

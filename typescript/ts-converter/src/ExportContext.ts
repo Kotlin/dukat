@@ -1,8 +1,10 @@
 import {uid} from "./uid";
 import * as ts from "typescript-services-api";
+import {createLogger} from "./Logger";
 
 export class ExportContext {
   private exportTable: Map<ts.Node, string> = new Map();
+  private log = createLogger("ExportContext");
 
   constructor(private isLibNode: (node: ts.Node) => boolean){}
 

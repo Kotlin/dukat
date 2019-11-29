@@ -341,13 +341,11 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 
     private fun ReferenceEntity<*>.getFqName(ownerName: NameEntity): NameEntity? {
-        val res = if (uid.startsWith("lib-")) {
+        return if (uid.startsWith("lib-")) {
             IdentifierEntity("<LIBROOT>").appendLeft(ownerName)
         } else {
             uidToNameMapper[uid]
         }
-
-        return res;
     }
 
     private fun TypeValueNode.getFqName(): NameEntity? {
@@ -635,6 +633,14 @@ private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) 
         sourceSet.sources.forEach { source -> lowerDocumentRoot(source.root) }
     }
 }
+
+private fun NameEntity.translate(): String = when (this) {
+    is IdentifierEntity -> value
+    is QualifierEntity -> {
+        "${left.translate()}.${right.translate()}"
+    }
+}
+
 
 fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
     ReferenceVisitor { uid, fqName ->
