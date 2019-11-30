@@ -187,7 +187,11 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                         null
                     }
                     TranslationContext.INLINE_EXTENSION -> {
-                        null
+                        if (optional) {
+                            StatementCallModel(IdentifierEntity("null"), null, emptyList(), meta)
+                        } else {
+                            null
+                        }
                     }
                     else -> {
                         when {
