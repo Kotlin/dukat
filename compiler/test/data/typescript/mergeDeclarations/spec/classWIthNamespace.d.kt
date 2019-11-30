@@ -16,6 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 import Album.AlbumLabel
 
+typealias Playlist = (id: String, data: Any?) -> Unit
+
 external open class Album {
     open var label: AlbumLabel
     open class AlbumLabel {
@@ -27,6 +29,6 @@ external open class Album {
     }
 
     companion object {
-        fun play(album: Album)
+        fun play(album: Album, playlist: Playlist?)
     }
 }

@@ -16,6 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 import Album.AlbumLabel
 
+typealias Playlist = (id: String, data: Any?) -> Unit
+
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface Album {
     var label: AlbumLabel
@@ -28,6 +30,6 @@ external interface Album {
     }
 
     companion object {
-        fun play(album: Album)
+        fun play(album: Album, playlist: Playlist?)
     }
 }

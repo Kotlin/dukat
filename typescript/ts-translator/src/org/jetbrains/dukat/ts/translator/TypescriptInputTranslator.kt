@@ -12,7 +12,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclara
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
 import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
-import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.splitIntoSeparateEntities
@@ -92,7 +91,6 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .removeUnsupportedJsNames()
                 .mergeClassLikes()
                 .mergeModules()
-                .mergeWithNameSpace()
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()

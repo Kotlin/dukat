@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
@@ -67,15 +68,20 @@ private fun ObjectModel?.merge(module: ModuleModel): ObjectModel? {
     }
 }
 
-private fun ModuleModel.mergeClassLikesAndModuleDeclarations(classLikes: Map<NameEntity, ClassLikeModel>): ModuleModel {
+private fun ModuleModel.mergeClassLikesAndModuleDeclarations(classLikes: Map<NameEntity, MergeClassLikeData>): ModuleModel {
+    val extractedTypeAliases = mutableListOf<TypeAliasModel>()
+
     val declarationLowered = declarations.map { declaration ->
-        classLikes[name.appendLeft(declaration.name)] ?: declaration
+        classLikes[name.appendLeft(declaration.name)]?.let {
+            extractedTypeAliases.addAll(it.extractedTypeAliases)
+            it.model
+        } ?: declaration
     }
     val submodulesLowered = submodules.filter {
         !classLikes.containsKey(it.mergeClassLikesAndModuleDeclarations(classLikes).name)
     }.map { it.mergeClassLikesAndModuleDeclarations(classLikes) }
 
-    return copy(declarations = declarationLowered, submodules = submodulesLowered)
+    return copy(declarations = extractedTypeAliases + declarationLowered, submodules = submodulesLowered)
 }
 
 private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
@@ -110,6 +116,8 @@ private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
     )
 }
 
+internal data class MergeClassLikeData(val model: ClassLikeModel, val extractedTypeAliases: List<TypeAliasModel>)
+
 fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
     val modules = sources
             .flatMap { source -> source.root.fetchModules() }
@@ -120,7 +128,13 @@ fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
             .flatMap { source -> source.root.fetchClassLikes() }
             .groupBy { it.ownerName }
             .filterKeys { name -> modules.containsKey(name) }
-            .mapValues { (name, v) -> v[0].model + modules[name]!! }
+            .mapValues { (name, v) ->
+                val moduleToMerge = modules[name]!!
+                MergeClassLikeData(
+                        v[0].model + moduleToMerge,
+                        moduleToMerge.declarations.filterIsInstance(TypeAliasModel::class.java)
+                )
+            }
 
     return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikesAndModuleDeclarations(classLikes)) })
 }
