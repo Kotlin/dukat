@@ -7,6 +7,7 @@ interface This {
     "string-literal": boolean;
     'another-string-literal': string;
     "this_one_shouldnt_be_escaped": boolean;
+    ":authority"?: string;
     '3х': string;
     200: string;
     300?: number;

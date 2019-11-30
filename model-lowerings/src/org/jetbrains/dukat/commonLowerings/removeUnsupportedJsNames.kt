@@ -41,7 +41,7 @@ private fun NameEntity.contains(str: String): Boolean {
 private val STARTS_WITH_NUMBER = "^`\\d+".toRegex()
 
 private fun NameEntity.isInvalidJsName(): Boolean {
-    return contains(STARTS_WITH_NUMBER) || contains("-")
+    return contains(STARTS_WITH_NUMBER) || contains("-") || startsWith("`:")
 }
 
 private fun MemberModel.getType(): TypeModel? {
