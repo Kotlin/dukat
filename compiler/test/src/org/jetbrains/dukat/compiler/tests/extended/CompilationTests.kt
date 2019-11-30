@@ -7,20 +7,45 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.extension.AfterAllCallback
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
 import kotlin.test.assertEquals
 
+
+private class TestsEnded() : AfterAllCallback {
+    override fun afterAll(context: ExtensionContext?) {
+        CompilationTests.report()
+    }
+}
+
+@ExtendWith(TestsEnded::class)
 abstract class CompilationTests {
 
     private fun getTranslator(): CliTranslator = createStandardCliTranslator()
+
+    companion object {
+        val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
+        val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
+        val START_TIMESTAMP = System.currentTimeMillis()
+
+        private val reportData: MutableMap<String, Int> = mutableMapOf()
+
+        fun report() {
+            println("ERRORS")
+            reportData.toList().sortedByDescending { it.second }.forEach { (key, value) ->
+                println("${key}: ${value} ")
+            }
+        }
+    }
 
     abstract fun runTests(
             descriptor: String,
             sourcePath: String
     )
 
-    protected fun compile(sources: List<String>, targetPath: String): ExitCode {
+    protected fun compile(descriptor: String, sources: List<String>, targetPath: String): ExitCode {
 
         val options =
                 K2JSCompilerArguments().apply {
@@ -35,17 +60,16 @@ abstract class CompilationTests {
 
         options.freeArgs = sources
 
+        reportData[descriptor] = 0
+        val messageCollector = CompileMessageCollector() { message, severity, location ->
+            reportData[descriptor] = reportData.getOrDefault(descriptor, 0) + 1
+        }
+
         return K2JSCompiler().exec(
-                CompileMessageCollector(),
+                messageCollector,
                 Services.EMPTY,
                 options
         )
-    }
-
-    companion object {
-        val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
-        val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
-        val START_TIMESTAMP = System.currentTimeMillis()
     }
 
     protected fun assertContentCompiles(
@@ -55,7 +79,7 @@ abstract class CompilationTests {
         println("file:///${sourcePath}")
         val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
         val targetDir = File(targetPath)
-        println("file:///${targetDir.normalize().absolutePath }")
+        println("file:///${targetDir.normalize().absolutePath}")
 
         targetDir.deleteRecursively()
         getTranslator().translate(sourcePath, targetPath)
@@ -70,6 +94,7 @@ abstract class CompilationTests {
         assertEquals(
                 ExitCode.OK,
                 compile(
+                        descriptor,
                         sources,
                         outSource
                 ), compilationErrorMessage
