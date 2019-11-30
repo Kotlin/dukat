@@ -97,6 +97,7 @@ private enum class TranslationContext {
     TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
+    INLINE_EXTENSION,
     CONSTRUCTOR
 }
 
@@ -181,13 +182,19 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         return ParameterModel(
                 type = type.process(context),
                 name = name,
-                initializer = if (context == TranslationContext.CONSTRUCTOR) {
-                    null
-                } else {
-                    when {
-                        initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
-                        optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
-                        else -> null
+                initializer = when (context) {
+                    TranslationContext.CONSTRUCTOR -> {
+                        null
+                    }
+                    TranslationContext.INLINE_EXTENSION -> {
+                        null
+                    }
+                    else -> {
+                        when {
+                            initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
+                            optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                            else -> null
+                        }
                     }
                 },
                 vararg = vararg
@@ -489,21 +496,28 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                         comment = null
                 )
             }
-            is FunctionNode -> FunctionModel(
-                    name = name,
-                    parameters = parameters.map { param -> param.process() },
-                    type = type.process(),
+            is FunctionNode -> {
+                val context = if (inline) {
+                    TranslationContext.INLINE_EXTENSION
+                } else {
+                    TranslationContext.IRRELEVANT
+                }
+                FunctionModel(
+                        name = name,
+                        parameters = parameters.map { param -> param.process(context) },
+                        type = type.process(),
 
-                    typeParameters = convertTypeParams(typeParameters),
-                    annotations = exportQualifier.toAnnotation(),
-                    export = export,
-                    inline = inline,
-                    operator = operator,
-                    extend = extend.convert(),
-                    body = resolveBody(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = comment
-            )
+                        typeParameters = convertTypeParams(typeParameters),
+                        annotations = exportQualifier.toAnnotation(),
+                        export = export,
+                        inline = inline,
+                        operator = operator,
+                        extend = extend.convert(),
+                        body = resolveBody(),
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = comment
+                )
+            }
             is VariableNode -> VariableModel(
                     name = name,
                     type = type.process(),
