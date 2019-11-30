@@ -14,7 +14,7 @@ import java.io.File
 import kotlin.test.assertEquals
 
 
-private class TestsEnded() : AfterAllCallback {
+private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
         CompilationTests.report()
     }
@@ -33,10 +33,13 @@ abstract class CompilationTests {
         private val reportData: MutableMap<String, Int> = mutableMapOf()
 
         fun report() {
+            var total = 0
             println("ERRORS")
             reportData.toList().sortedByDescending { it.second }.forEach { (key, value) ->
                 println("${key}: ${value} ")
+                total += value
             }
+            println("TOTAL: ${total}")
         }
     }
 
