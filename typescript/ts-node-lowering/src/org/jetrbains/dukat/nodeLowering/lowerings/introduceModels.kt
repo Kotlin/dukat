@@ -544,14 +544,6 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     comment = null
             )
             is TypeAliasNode -> {
-//                val typeReference = typeReference.process().let {
-//                    if (it is TypeValueModel) {
-//                        it.copy(fqName = uidToNameMapper[uid])
-//                    } else {
-//                        it
-//                    }
-//                }
-
                 TypeAliasModel(
                         name = name,
                         typeReference = typeReference.process(),
@@ -585,6 +577,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
         jsModule?.let {
             annotations.add(AnnotationModel("file:JsModule", listOf(it)))
+            annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
         }
 
         jsQualifier?.let {

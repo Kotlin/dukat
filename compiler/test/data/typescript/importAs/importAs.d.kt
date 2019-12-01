@@ -30,6 +30,7 @@ external fun createPipable(): Pipable
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("_transformable")
+@file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package _transformable.internalApi
 
@@ -52,6 +53,7 @@ external interface TransformOptions
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("_computable")
+@file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package _computable
 
