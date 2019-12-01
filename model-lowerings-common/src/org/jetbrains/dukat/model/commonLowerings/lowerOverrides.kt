@@ -114,7 +114,7 @@ private class OverrideResolver(val context: ModelContext) {
         val b = context.unalias(modelB)
 
         return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-            a.value == b.value && a.params == b.params && a.nullable == b.nullable
+            a.fqName == b.fqName && a.params == b.params && a.nullable == b.nullable
         } else {
             a.isEquivalent(b)
         }
