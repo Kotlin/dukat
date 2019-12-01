@@ -86,8 +86,10 @@ private fun String.shouldEscape(): Boolean {
     val startsWithNumber = this.contains(STARTS_WITH_NUMBER)
     val isEscapedAlready = this.startsWith("`")
     val isStartingWithColon = this.startsWith(":")
+    val isStartingWithDot = this.startsWith(".")
 
-    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber || isStartingWithColon)
+    return !isEscapedAlready &&
+            (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber || isStartingWithColon || isStartingWithDot)
 }
 
 private fun String.escape(): String {
