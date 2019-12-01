@@ -56,6 +56,7 @@ abstract class CompilationTests {
                     metaInfo = false
                     sourceMap = false
                     noStdlib = true
+                    moduleKind = "commonjs"
                     libraries = listOf(
                             "./build/kotlinHome/kotlin-stdlib-js.jar"
                     ).joinToString(File.pathSeparator)
