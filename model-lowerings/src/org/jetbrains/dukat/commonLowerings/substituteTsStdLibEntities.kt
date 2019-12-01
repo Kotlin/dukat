@@ -34,10 +34,23 @@ private fun String.fqLib(): NameEntity {
     return IdentifierEntity(this).fqLib()
 }
 
+private fun TypeValueModel.createStdType(name: String): TypeValueModel {
+    val nameEntity = IdentifierEntity(name)
+    return copy(
+        value = nameEntity,
+        params = emptyList(),
+        fqName = nameEntity.fqLib()
+    )
+}
+
 private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
     val isLibReference = isLibReference()
 
-    return if (value == IdentifierEntity("ReadonlyArray")) {
+    return if (value == IdentifierEntity("NonNullable") || value == IdentifierEntity("Exclude") || value == IdentifierEntity("Required")) {
+        if (isLibReference) {
+            createStdType("Any")
+        } else null
+    } else if (value == IdentifierEntity("ReadonlyArray")) {
         if (isLibReference) {
             val fqName = "Array".fqLib()
             copy(
