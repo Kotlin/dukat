@@ -26,3 +26,10 @@ external interface MyInterface {
     fun that(): MyInterface /* this */
     fun load(ids: String, handler: (self: MyInterface /* this */, args: Array<Any>) -> Unit)
 }
+
+external interface WeaklikeMaplike<K : Any?, V> {
+    fun delete(key: K): Boolean
+    fun get(key: K): V?
+    fun has(key: K): Boolean
+    fun set(key: K, value: V): WeaklikeMaplike<K, V> /* this */
+}

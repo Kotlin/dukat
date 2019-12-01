@@ -17,16 +17,20 @@ import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
+private fun processTypeParams(typeParams: List<TypeValueNode>): List<TypeValueNode> {
+    return typeParams.map { it.copy(params = emptyList()) }
+}
+
 private fun InterfaceNode.convertToTypeSignature(): TypeValueNode? {
     return if (generated) {
         null
     } else {
-        TypeValueNode(name, typeParameters, ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+        TypeValueNode(name, processTypeParams(typeParameters), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     }
 }
 
 private fun ClassNode.convertToTypeSignature(): TypeValueNode {
-    return TypeValueNode(name, typeParameters, ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+    return TypeValueNode(name, processTypeParams(typeParameters), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
 }
 
 private fun FunctionNode.convertToTypeSignature(): TypeValueNode {
