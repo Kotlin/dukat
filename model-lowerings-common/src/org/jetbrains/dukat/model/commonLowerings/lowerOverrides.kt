@@ -5,10 +5,12 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -64,20 +66,11 @@ private class OverrideResolver(val context: ModelContext) {
             return false
         }
 
-        if (parameters.size != otherMethodModel.parameters.size) {
-            return false
-        }
-
         if (typeParameters.size != otherMethodModel.typeParameters.size) {
             return false
         }
 
-        val parametersAreEquivalent = parameters
-                .zip(otherMethodModel.parameters) { a, b ->
-                    a.type.isEquivalent(b.type)
-                }
-                .all { it }
-
+        val parametersAreEquivalent = paramsAreEquivalent(parameters, otherMethodModel.parameters)
         return parametersAreEquivalent && type.isOverriding(otherMethodModel.type)
     }
 
@@ -112,6 +105,32 @@ private class OverrideResolver(val context: ModelContext) {
         return (this is TypeValueModel && value == IdentifierEntity("dynamic"))
     }
 
+    private fun TypeValueModel.isEquivalent(modelB: TypeValueModel): Boolean {
+        val a= context.unalias(this)
+        val b= context.unalias(modelB)
+
+        return (a.value == b.value
+            && a.params == b.params
+            && a.nullable == b.nullable)
+    }
+
+    private fun paramsAreEquivalent(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
+        if (paramsA.size != paramsB.size) {
+            return false
+        }
+
+        return paramsA
+                .zip(paramsB) { a, b ->
+                    a.type.isEquivalent(b.type)
+                }
+                .all { it }
+    }
+
+    private fun FunctionTypeModel.isEquivalent(modelB: FunctionTypeModel): Boolean {
+        val parametersAreEquivalent = paramsAreEquivalent(parameters, modelB.parameters)
+        return parametersAreEquivalent && type.isOverriding(modelB.type)
+    }
+
     private fun TypeModel.isEquivalent(otherParameterType: TypeModel): Boolean {
         if (this == otherParameterType) {
             return true
@@ -122,12 +141,13 @@ private class OverrideResolver(val context: ModelContext) {
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            val typeValueA = context.unalias(this)
-            val typeValueB = context.unalias(otherParameterType)
+            if (isEquivalent(otherParameterType)) {
+                return true
+            }
+        }
 
-            if (typeValueA.value == typeValueB.value
-                && typeValueA.params == typeValueB.params
-                && typeValueA.nullable == typeValueB.nullable) {
+        if ((this is FunctionTypeModel) && (otherParameterType is FunctionTypeModel)) {
+            if (isEquivalent(otherParameterType)) {
                 return true
             }
         }
