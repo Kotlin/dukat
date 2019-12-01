@@ -21,6 +21,7 @@ import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.removeConflictingOverloads
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
@@ -34,7 +35,6 @@ import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
-import org.jetrbains.dukat.nodeLowering.lowerings.removeConflictingOverloads
 import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
@@ -82,10 +82,10 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .removeUnusedGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
-                .removeConflictingOverloads()
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
+                .removeConflictingOverloads()
                 .substituteTsStdLibEntities()
                 .escapeIdentificators()
                 .removeUnsupportedJsNames()
