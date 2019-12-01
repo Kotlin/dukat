@@ -399,7 +399,12 @@ export class AstConverter {
             } else if (ts.isThisTypeNode(type)) {
                 return this.astFactory.createThisTypeDeclaration()
             } else if (ts.isLiteralTypeNode(type)) {
-                return this.astFactory.createStringLiteralDeclaration(type.literal.getText())
+                // TODO: we need to pass information on literal futher and convert it in some lowering
+                if ((type.literal.kind == ts.SyntaxKind.TrueKeyword) || (type.literal.kind == ts.SyntaxKind.FalseKeyword)) {
+                    return this.createTypeDeclaration("boolean");
+                } else {
+                    return this.astFactory.createStringLiteralDeclaration(type.literal.getText());
+                }
             } else if (ts.isTupleTypeNode(type)) {
                 return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
             } else if (ts.isTypePredicateNode(type)) {
