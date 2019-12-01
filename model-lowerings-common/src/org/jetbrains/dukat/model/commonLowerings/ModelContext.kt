@@ -5,16 +5,14 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import java.lang.reflect.Type
 
 data class ResolvedClassLike<T : ClassLikeModel>(
-    val classLike: T,
-    val fqName: NameEntity?
+        val classLike: T,
+        val fqName: NameEntity?
 ) {
     fun resolveFqName(): NameEntity {
         return fqName ?: classLike.name
@@ -46,21 +44,27 @@ class ModelContext {
         }
     }
 
-    fun unalias(typeModel: TypeValueModel): TypeValueModel {
+    fun unalias(typeModel: TypeValueModel): TypeModel {
         val typeResolved = myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
             if (typeReference is TypeValueModel) {
                 unalias(typeReference)
             } else {
-                typeModel
+                typeReference
             }
         } ?: typeModel
 
-        return typeResolved.copy(params = typeResolved.params.map { param -> param.copy(
-            type = when (param.type) {
-                is TypeValueModel -> unalias(param.type as TypeValueModel)
-                else -> param.type
-            }
-        )})
+        return if (typeResolved is TypeValueModel) {
+            typeResolved.copy(params = typeResolved.params.map { param ->
+                param.copy(
+                        type = when (param.type) {
+                            is TypeValueModel -> unalias(param.type as TypeValueModel)
+                            else -> param.type
+                        }
+                )
+            })
+        } else {
+            typeResolved
+        }
     }
 
     private fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {

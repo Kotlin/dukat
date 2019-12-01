@@ -19,8 +19,13 @@ external interface TLSSocket
 
 external open class Server {
     open fun once(event: String /* "secureConnection" */, listener: (tlsSocket: TLSSocket) -> Unit): Server /* this */
+    open fun listeners(event: String): Array<Function<*>>
+    open fun listeners(event: Any): Array<Function<*>>
 }
+
+typealias MessageListener = (message: Any, sendHandle: Any) -> Unit
 
 external open class HttpServer2 : Server {
     override fun once(event: String /* "unknownProtocol" */, listener: (socket: TLSSocket) -> Unit): HttpServer2 /* this */
+    override fun listeners(event: String /* "message" */): Array<MessageListener>
 }

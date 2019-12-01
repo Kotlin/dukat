@@ -31,9 +31,13 @@ private class OverrideResolver(val context: ModelContext) {
     private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return parentEntities.flatMap { heritageModel ->
             val value = context.unalias(heritageModel.value)
-            value.resolveClassLike()?.let { resolvedClassLike ->
-                listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
-            } ?: emptyList()
+            if (value is TypeValueModel) {
+                value.resolveClassLike()?.let { resolvedClassLike ->
+                    listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
+                } ?: emptyList()
+            } else {
+                emptyList()
+            }
         }
     }
 
@@ -106,12 +110,14 @@ private class OverrideResolver(val context: ModelContext) {
     }
 
     private fun TypeValueModel.isEquivalent(modelB: TypeValueModel): Boolean {
-        val a= context.unalias(this)
-        val b= context.unalias(modelB)
+        val a = context.unalias(this)
+        val b = context.unalias(modelB)
 
-        return (a.value == b.value
-            && a.params == b.params
-            && a.nullable == b.nullable)
+        return if ((a is TypeValueModel) && (b is TypeValueModel)) {
+            a.value == b.value && a.params == b.params && a.nullable == b.nullable
+        } else {
+            a.isEquivalent(b)
+        }
     }
 
     private fun paramsAreEquivalent(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
@@ -140,7 +146,9 @@ private class OverrideResolver(val context: ModelContext) {
             return true
         }
 
+
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
+
             if (isEquivalent(otherParameterType)) {
                 return true
             }
@@ -152,17 +160,25 @@ private class OverrideResolver(val context: ModelContext) {
             }
         }
 
+        if ((this is FunctionTypeModel) && (otherParameterType is TypeValueModel)) {
+            if (otherParameterType.value == IdentifierEntity("Function")) {
+                return true
+            }
+        }
+
         return false
     }
 
 
-    private fun TypeModel.isOverriding(otherParameterType: TypeModel, inBox: Boolean = false): Boolean {
-        if (isEquivalent(otherParameterType) && !inBox) {
+    private fun TypeModel.isOverriding(otherParameterType: TypeModel, box: TypeValueModel? = null): Boolean {
+        val inbox = (box == null || box.value == IdentifierEntity("Array"))
+
+        if (isEquivalent(otherParameterType) && inbox) {
             return true
         }
 
         if (otherParameterType.isAny()) {
-            return if (inBox) {
+            return if (!inbox) {
                 this is TypeParameterReferenceModel
             } else {
                 true
@@ -182,7 +198,7 @@ private class OverrideResolver(val context: ModelContext) {
                     } else if (params.size == otherParameterType.params.size) {
                         if (isSameClass) {
                             return params.zip(otherParameterType.params).all { (paramA, paramB) ->
-                                paramA.type.isOverriding(paramB.type, true)
+                                paramA.type.isOverriding(paramB.type, this)
                             }
                         }
                     }
