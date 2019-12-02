@@ -10,9 +10,11 @@ declare interface BaseEvent {
     transform<T extends Shape>(shape?: T): T;
     prop: any;
     queryByReturnType(query: string, parameters?: any[]): InvariantBox<any>;
+    thisIsNullable: String | null;
 }
 declare class BoxStringEvent implements BaseEvent {
     data: string;
+    thisIsNullable: String;
     getDelegateTarget(): Box;
     getElement(): HTMLElement;
     transform<T extends Shape>(shape?: T): T;

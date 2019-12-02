@@ -30,6 +30,9 @@ external interface BaseEvent {
     fun <T : Shape> transform(shape: T? = definedExternally): T
     var prop: Any
     fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): InvariantBox<Any>
+    var thisIsNullable: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 external open class BoxStringEvent : BaseEvent {

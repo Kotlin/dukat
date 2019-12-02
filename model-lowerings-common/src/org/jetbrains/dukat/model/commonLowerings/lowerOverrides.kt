@@ -83,6 +83,10 @@ private class OverrideResolver(val context: ModelContext) {
         return (name == otherPropertyModel.name) && type.isOverriding(otherPropertyModel.type)
     }
 
+    private fun PropertyModel.isImpossibleOverride(otherPropertyModel: PropertyModel?): Boolean {
+        return !type.nullable && otherPropertyModel?.type?.nullable == true
+    }
+
     private fun MethodModel.isSpecialCase(): Boolean {
 
         val returnType = type
@@ -228,7 +232,7 @@ private class OverrideResolver(val context: ModelContext) {
 
     private fun MemberModel.lowerOverrides(
             allSuperDeclarations: List<ParentMembers>
-    ): MemberModel {
+    ): MemberModel? {
         return when (this) {
             is MethodModel -> {
                 val overriden =
@@ -245,10 +249,16 @@ private class OverrideResolver(val context: ModelContext) {
                 }
             }
             is PropertyModel -> {
+                var overridenProp: PropertyModel? = null
                 val overriden = allSuperDeclarations.firstOrNull { (_, _, properties) ->
-                    properties[name]?.any { prop -> isOverriding(prop) } == true
-                }?.fqName
-                copy(override = overriden)
+                    overridenProp = properties[name]?.firstOrNull { prop -> isOverriding(prop) }
+                    overridenProp != null
+                }
+                if (isImpossibleOverride(overridenProp)) {
+                    null
+                } else {
+                    copy(override = overriden?.fqName)
+                }
             }
             is ClassModel -> lowerOverrides()
             is InterfaceModel -> lowerOverrides()
@@ -260,7 +270,7 @@ private class OverrideResolver(val context: ModelContext) {
     private fun ClassLikeModel.lowerOverrides(): ClassLikeModel {
         val parentMembers = allParentMembers()
 
-        val membersLowered = members.map { member ->
+        val membersLowered = members.mapNotNull { member ->
             member.lowerOverrides(parentMembers)
         }
 
