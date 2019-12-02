@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -43,6 +44,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
+import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 
 const val FORMAT_TAB = "    "
 
@@ -626,7 +628,8 @@ class StringTranslator : ModelVisitor {
     }
 
     fun visitImport(import: ImportModel) {
-        if (import.name.leftMost() != LIB_PACKAGENAME) {
+        val isLibImport = import.name.leftMost() == LIB_PACKAGENAME
+        if (!isLibImport || TS_STDLIB_WHITE_LIST.contains(import.name.shiftLeft())) {
             addOutput("import ${import.translate()}")
         }
     }

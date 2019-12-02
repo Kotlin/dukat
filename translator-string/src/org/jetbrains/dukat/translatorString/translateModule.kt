@@ -28,10 +28,10 @@ private fun unescape(name: String): String {
 fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
-        if (leftMost() == ROOT_PACKAGENAME) {
-            shiftLeft()!!.translate()
-        } else {
-            "${left.translate()}.${right.translate()}"
+        when (leftMost()) {
+            ROOT_PACKAGENAME -> shiftLeft()!!.translate()
+            LIB_PACKAGENAME -> shiftLeft()!!.translate()
+            else -> "${left.translate()}.${right.translate()}"
         }
     }
 }

@@ -29,6 +29,7 @@ import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
@@ -125,12 +126,9 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
             lower(source, stdLib, renameMap, uidToFqNameMapper.toMutableMap())
         }.toMutableList()
 
+
         stdLib = stdLib
-                ?.whiteList(setOf(
-                        IdentifierEntity("TsStdLib_Iterator"),
-                        IdentifierEntity("IteratorResult"),
-                        IdentifierEntity("IterableIterator")
-                ))
+                ?.whiteList(TS_STDLIB_WHITE_LIST)
         //?.splitIntoSeparateEntities()
 
         stdLib?.let { loweredSources.add(it) }

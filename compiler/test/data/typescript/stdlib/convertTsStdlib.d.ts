@@ -16,3 +16,7 @@ interface Processor<T> {
   convertToSmartArray(input: NumArray): SmartArray<T>
   onError(handler: (error: MyVerySpecificException) => void);
 }
+
+declare module "api" {
+  function createIterable(): IterableIterator<string>;
+}
