@@ -15,6 +15,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
@@ -114,10 +115,24 @@ private class OverrideResolver(val context: ModelContext) {
         val b = context.unalias(modelB)
 
         return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-            a.fqName == b.fqName && a.params == b.params && a.nullable == b.nullable
+            a.fqName == b.fqName && typeParamsAreEquilvalent(a.params, b.params) && a.nullable == b.nullable
         } else {
             a.isEquivalent(b)
         }
+    }
+
+    private fun typeParamsAreEquilvalent(paramsA: List<TypeParameterModel>, paramsB: List<TypeParameterModel>): Boolean {
+        if (paramsA.size != paramsB.size) {
+            return false
+        }
+
+        paramsA.forEachIndexed { index, a ->
+            if (!a.type.isEquivalent(paramsB[index].type)) {
+                return false
+            }
+        }
+
+        return true
     }
 
     private fun paramsAreEquivalent(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
@@ -125,11 +140,13 @@ private class OverrideResolver(val context: ModelContext) {
             return false
         }
 
-        return paramsA
-                .zip(paramsB) { a, b ->
-                    a.type.isEquivalent(b.type)
-                }
-                .all { it }
+        paramsA.forEachIndexed { index, a ->
+            if (!a.type.isEquivalent(paramsB[index].type)) {
+                return false
+            }
+        }
+
+        return true
     }
 
     private fun FunctionTypeModel.isEquivalent(modelB: FunctionTypeModel): Boolean {
