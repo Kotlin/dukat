@@ -287,23 +287,26 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
-            resolveClassLike()?.let { (classLike, _) ->
-                otherParameterType.resolveClassLike()?.let { (otherClassLike, _) ->
-                    val isSameClass = classLike === otherClassLike
-                    val isParentClass = classLike.getKnownParents().map { it.classLike }.contains(otherClassLike)
+            val classLikeA = resolveClassLike()?.classLike
+            val classLikeB = otherParameterType.resolveClassLike()?.classLike
 
-                    if (params.isEmpty() && otherParameterType.params.isEmpty()) {
-                        if (isSameClass || isParentClass) {
-                            return true
-                        }
-                    } else if (params.size == otherParameterType.params.size) {
-                        if (isSameClass) {
-                            return params.zip(otherParameterType.params).all { (paramA, paramB) ->
-                                paramA.type.isOverriding(paramB.type, this)
-                            }
+            if ((classLikeA != null) && (classLikeB != null)) {
+                val isSameClass = classLikeA === classLikeB
+                val isParentClass = classLikeA.getKnownParents().any { it.classLike == classLikeB }
+
+                if (params.isEmpty() && otherParameterType.params.isEmpty()) {
+                    if (isSameClass || isParentClass) {
+                        return true
+                    }
+                } else if (params.size == otherParameterType.params.size) {
+                    if (isSameClass) {
+                        return params.zip(otherParameterType.params).all { (paramA, paramB) ->
+                            paramA.type.isOverriding(paramB.type, this)
                         }
                     }
                 }
+            } else {
+                return fqName == otherParameterType.fqName
             }
         }
 
