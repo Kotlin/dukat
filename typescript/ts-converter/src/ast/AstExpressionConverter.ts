@@ -53,6 +53,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createNewExpressionDeclarationAsExpression(expression, args);
     }
 
+    createConditionalExpression(condition: Expression, whenTrue: Expression, whenFalse: Expression) {
+        return AstExpressionFactory.createConditionalExpressionDeclarationAsExpression(condition, whenTrue, whenFalse);
+    }
+
     createNameExpression(name: NameEntity): Expression {
         return AstExpressionFactory.createNameExpressionDeclarationAsExpression(name)
     }
@@ -177,6 +181,14 @@ export class AstExpressionConverter {
             this.convertExpression(expression.expression),
             expression.arguments ?
                 expression.arguments.map(arg => this.convertExpression(arg)) : []
+        )
+    }
+
+    convertConditionalExpression(expression: ts.ConditionalExpression): Expression {
+        return this.createConditionalExpression(
+            this.convertExpression(expression.condition),
+            this.convertExpression(expression.whenTrue),
+            this.convertExpression(expression.whenFalse)
         )
     }
 
@@ -338,6 +350,8 @@ export class AstExpressionConverter {
             return this.convertObjectLiteralExpression(expression);
         } else if (ts.isArrayLiteralExpression(expression)) {
             return this.convertArrayLiteralExpression(expression);
+        } else if (ts.isConditionalExpression(expression)) {
+            return this.convertConditionalExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
         } else {

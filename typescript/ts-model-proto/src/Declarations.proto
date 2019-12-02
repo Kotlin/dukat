@@ -242,6 +242,12 @@ message NewExpressionDeclarationProto {
     repeated ExpressionDeclarationProto arguments = 2;
 }
 
+message ConditionalExpressionDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    ExpressionDeclarationProto whenTrue = 2;
+    ExpressionDeclarationProto whenFalse = 3;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -259,7 +265,8 @@ message ExpressionDeclarationProto {
         PropertyAccessExpressionDeclarationProto propertyAccessExpression = 9;
         ElementAccessExpressionDeclarationProto elementAccessExpression = 10;
         NewExpressionDeclarationProto newExpression = 11;
-        UnknownExpressionDeclarationProto unknownExpression = 12;
+        ConditionalExpressionDeclarationProto conditionalExpression = 12;
+        UnknownExpressionDeclarationProto unknownExpression = 13;
     }
 }
 

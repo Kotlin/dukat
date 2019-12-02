@@ -38,6 +38,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
@@ -73,6 +74,7 @@ import org.jetbrains.dukat.tsmodelproto.BooleanLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.CallExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.CallSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ConditionalExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.DefinitionInfoDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ElementAccessExpressionDeclarationProto
@@ -514,6 +516,14 @@ fun NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
     )
 }
 
+fun ConditionalExpressionDeclarationProto.convert(): ConditionalExpressionDeclaration {
+    return ConditionalExpressionDeclaration(
+            condition = condition.convert(),
+            whenTrue = whenTrue.convert(),
+            whenFalse = whenFalse.convert()
+    )
+}
+
 fun UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
@@ -533,6 +543,7 @@ fun ExpressionDeclarationProto.convert() : ExpressionDeclaration {
         hasPropertyAccessExpression() -> propertyAccessExpression.convert()
         hasElementAccessExpression() -> elementAccessExpression.convert()
         hasNewExpression() -> newExpression.convert()
+        hasConditionalExpression() -> conditionalExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }
