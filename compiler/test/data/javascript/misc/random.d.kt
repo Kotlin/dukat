@@ -27,6 +27,6 @@ external object _ {
 
 external fun keyInObj(value: Any?, key: Any?, obj: Any?): Boolean
 
-external fun createPredicateIndexFinder(array: Any?, predicate: Any?, context: Any?, dir: Any?): Number
+external fun createPredicateIndexFinder(array: Any?, predicate: Any?, context: Any?, dir: Number): Number
 
 external fun isArrayLike(collection: Any?): Boolean
