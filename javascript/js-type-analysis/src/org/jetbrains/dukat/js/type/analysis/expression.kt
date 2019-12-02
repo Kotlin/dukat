@@ -29,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
@@ -232,6 +233,15 @@ fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: Pa
     )
 }
 
+fun ConditionalExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
+    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+
+    return when (path.getNextDirection()) {
+        PathWalker.Direction.First -> whenTrue.calculateConstraints(owner, path)
+        PathWalker.Direction.Second -> whenFalse.calculateConstraints(owner, path)
+    }
+}
+
 fun ObjectLiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : ObjectConstraint {
     val obj = ObjectConstraint(owner)
     members.forEach { it.addTo(obj, path) }
@@ -260,6 +270,7 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
         is CallExpressionDeclaration -> this.calculateConstraints(owner, path)
         is NewExpressionDeclaration -> this.calculateConstraints(owner, path)
+        is ConditionalExpressionDeclaration -> this.calculateConstraints(owner, path)
         is LiteralExpressionDeclaration -> this.calculateConstraints(owner, path)
         else -> CompositeConstraint(NoTypeConstraint)
     }
