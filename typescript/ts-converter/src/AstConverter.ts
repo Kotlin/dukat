@@ -653,9 +653,8 @@ export class AstConverter {
         return convertedEntity.getValue() as NameEntity;
     }
 
-    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined): Array<HeritageClauseDeclaration> {
+    convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined, parent: ts.Node): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
-
 
         if (heritageClauses) {
             for (let heritageClause of heritageClauses) {
@@ -680,7 +679,7 @@ export class AstConverter {
                         name = this.astFactory.createIdentifierDeclarationAsNameEntity(expression.getText());
                     }
 
-                    let typeReference: ReferenceEntity | null = null;
+                    let uid: string | null = null;
 
                     let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
                     if (symbol) {
@@ -688,21 +687,28 @@ export class AstConverter {
                             let declaration = symbol.declarations[0];
                             if (declaration) {
                                 this.astVisitor.visitType(declaration);
-                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration))
+                                uid = this.exportContext.getUID(declaration);
                             }
                         }
                     }
 
-                    if (name) {
-                        this.registerDeclaration(
-                          this.astFactory.createHeritageClauseDeclaration(
-                            name,
-                            typeArguments,
-                            extending,
-                            typeReference,
-                          ), parentEntities
-                        );
+                    let parentUid = this.exportContext.getUID(parent);
+
+                    if (parentUid != uid) {
+                        let typeReference = uid ? this.astFactory.createReferenceEntity(uid) : null;
+
+                        if (name) {
+                            this.registerDeclaration(
+                              this.astFactory.createHeritageClauseDeclaration(
+                                name,
+                                typeArguments,
+                                extending,
+                                typeReference,
+                              ), parentEntities
+                            );
+                        }
                     }
+
 
                 }
             }
@@ -720,7 +726,7 @@ export class AstConverter {
           this.astFactory.createIdentifierDeclarationAsNameEntity(statement.name.getText()),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
-          this.convertHeritageClauses(statement.heritageClauses),
+          this.convertHeritageClauses(statement.heritageClauses, statement),
           this.convertModifiers(statement.modifiers),
           this.exportContext.getUID(statement)
         );
@@ -746,7 +752,7 @@ export class AstConverter {
           this.astFactory.createIdentifierDeclarationAsNameEntity(statement.name.getText()),
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
-          this.convertHeritageClauses(statement.heritageClauses),
+          this.convertHeritageClauses(statement.heritageClauses, statement),
           computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
           this.exportContext.getUID(statement)
         );

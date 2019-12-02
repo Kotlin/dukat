@@ -1,12 +1,12 @@
 
-declare namespace webpack {
+declare namespace api {
 
   interface Watching {
     close(callback: () => void): void;
     invalidate(): void;
   }
 
-  namespace Compiler {
+  namespace Tooling {
 
     class Watching implements Watching {
 
@@ -22,7 +22,7 @@ declare namespace webpack {
   }
 }
 
-export = webpack;
+export = api;
 
 
 
