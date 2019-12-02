@@ -76,8 +76,9 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
         }
     }
 
-    if (this.name != null) {
-        name = name.appendLeft(this.name?.normalize()!!)
+
+    this.name?.let {
+        name = name.appendLeft(it.normalize() ?: IdentifierEntity("_"))
     }
 
     val nameString = name.toString().toLowerCase()
