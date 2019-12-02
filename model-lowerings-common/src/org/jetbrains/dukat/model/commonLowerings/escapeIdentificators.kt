@@ -30,6 +30,7 @@ private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 private val RESERVED_WORDS = setOf(
         "as",
         "class",
+        "for",
         "fun",
         "in",
         "interface",
