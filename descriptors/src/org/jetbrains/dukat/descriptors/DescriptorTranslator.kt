@@ -8,6 +8,7 @@ import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -47,6 +49,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -426,6 +429,34 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
     }
 
+    private fun translateExtensionReceiver(
+        extensionReceiver: ClassLikeReferenceModel,
+        callableDescriptor: CallableDescriptor
+    ): ReceiverParameterDescriptor? {
+        return DescriptorFactory.createExtensionReceiverParameterForCallable(
+            callableDescriptor,
+            translateType(
+                TypeValueModel(
+                    value = extensionReceiver.name,
+                    params = extensionReceiver.typeParameters.map {
+                        TypeParameterModel(
+                            type = TypeValueModel(
+                                value = it,
+                                params = listOf(),
+                                metaDescription = null,
+                                fqName = null
+                            ), constraints = listOf()
+                        )
+                    },
+                    metaDescription = null,
+                    fqName = null
+                )
+            ),
+            Annotations.EMPTY
+        )
+
+    }
+
     private fun translateMethod(methodModel: MethodModel, parent: ClassDescriptor): FunctionDescriptor {
         val functionDescriptor = object : SimpleFunctionDescriptorImpl(
             parent,
@@ -500,7 +531,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
         val typeParameters = translateTypeParameters(functionModel.typeParameters, functionDescriptor)
         functionDescriptor.initialize(
-            null,
+            functionModel.extend?.let {
+                translateExtensionReceiver(it, functionDescriptor)
+            },
             null,
             typeParameters,
             translateParameters(functionModel.parameters, functionDescriptor),
@@ -511,7 +544,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         typeParameters.forEach {
             context.removeTypeParameter(IdentifierEntity(it.name.identifier))
         }
-        functionDescriptor.isExternal = true
+        functionDescriptor.isInline = functionModel.inline
+        functionDescriptor.isExternal = !functionModel.inline
         return functionDescriptor
     }
 
@@ -680,7 +714,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             false,
             false,
             false,
-            true,
+            !variableModel.inline,
             false
         )
         val typeParameters = translateTypeParameters(variableModel.typeParameters, variableDescriptor)
@@ -688,18 +722,27 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             translateType(variableModel.type),
             typeParameters,
             null,
-            null
+            variableModel.extend?.let {
+                translateExtensionReceiver(it, variableDescriptor)
+            }
         )
-        val getter = DescriptorFactory.createDefaultGetter(
+        val getter = DescriptorFactory.createGetter(
             variableDescriptor,
-            Annotations.EMPTY
+            Annotations.EMPTY,
+            false,
+            false,
+            variableModel.inline
         )
         getter.initialize(variableDescriptor.type)
         val setter = if (!variableModel.immutable) {
-            DescriptorFactory.createDefaultSetter(
+            DescriptorFactory.createSetter(
                 variableDescriptor,
                 Annotations.EMPTY,
-                Annotations.EMPTY
+                Annotations.EMPTY,
+                false,
+                false,
+                variableModel.inline,
+                variableDescriptor.source
             )
         } else {
             null
