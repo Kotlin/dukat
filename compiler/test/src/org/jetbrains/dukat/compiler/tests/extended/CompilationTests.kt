@@ -65,7 +65,7 @@ abstract class CompilationTests {
         options.freeArgs = sources
 
         reportData[descriptor] = 0
-        val messageCollector = CompileMessageCollector() { message, severity, location ->
+        val messageCollector = CompileMessageCollector { _, _, _ ->
             reportData[descriptor] = reportData.getOrDefault(descriptor, 0) + 1
         }
 

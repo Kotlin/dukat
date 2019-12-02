@@ -235,7 +235,7 @@ private class OverrideResolver(val context: ModelContext) {
                         allSuperDeclarations.firstOrNull { (_, methods, _) ->
                             methods[name]?.any { method -> isOverriding(method) } == true
                         }?.fqName ?: if (isSpecialCase()) {
-                            IdentifierEntity("<SPECIAL-CASE>")
+                            IdentifierEntity("Any")
                         } else null
 
                 if (overriden != null) {

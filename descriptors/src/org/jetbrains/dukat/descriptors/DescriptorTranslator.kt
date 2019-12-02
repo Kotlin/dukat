@@ -3,6 +3,8 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -30,7 +32,6 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translate
-import org.jetbrains.kotlin.backend.common.SimpleMemberScope
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
@@ -67,16 +68,19 @@ import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices.builtIns
+import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.StaticScopeForKotlinEnum
+import org.jetbrains.kotlin.serialization.deserialization.ErrorReporter
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.NotNullLazyValue
 import org.jetbrains.kotlin.types.AbbreviatedType
@@ -89,8 +93,9 @@ import org.jetbrains.kotlin.types.StarProjectionImpl
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
 import org.jetbrains.kotlin.types.createDynamicType
-import org.jetbrains.kotlin.types.isError
 import org.jetbrains.kotlin.types.replace
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
@@ -268,12 +273,14 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     ): List<ValueParameterDescriptorImpl> {
         return parameterModels.mapIndexed { index, parameter ->
             val type = translateType(parameter.type)
-            val outType = if (parameter.vararg) {
-                builtIns.getPrimitiveArrayKotlinTypeByPrimitiveKotlinType(
+            val outType = LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
+                if (parameter.vararg) {
+                    builtIns.getPrimitiveArrayKotlinTypeByPrimitiveKotlinType(
+                        type
+                    ) ?: builtIns.getArrayType(Variance.OUT_VARIANCE, type)
+                } else {
                     type
-                ) ?: builtIns.getArrayType(Variance.OUT_VARIANCE, type)
-            } else {
-                type
+                }
             }
             val varargElementType = if (parameter.vararg) {
                 type
@@ -319,10 +326,17 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
         parametersDescriptors.zip(parameters).forEach { (descriptor, model) ->
             model.constraints.forEach {
-                descriptor.addUpperBound(translateType(it))
+                val type = translateType(it)
+                if (type is LazyWrappedType) {
+                    context.addConstraintInitialization(descriptor, type)
+                } else {
+                    descriptor.addUpperBound(type)
+                }
             }
-            descriptor.addDefaultUpperBound()
-            descriptor.setInitialized()
+            if (context.canBeInitialized(descriptor)) {
+                descriptor.addDefaultUpperBound()
+                descriptor.setInitialized()
+            }
         }
         return parametersDescriptors
     }
@@ -397,7 +411,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 
     private fun translateHeritage(heritageModel: HeritageModel): KotlinType? {
-        val type = translateType(
+        return translateType(
             TypeValueModel(
                 value = heritageModel.value.value,
                 params = heritageModel.typeParams.map {
@@ -410,7 +424,6 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 fqName = heritageModel.value.fqName
             )
         )
-        return if (type.isError) null else type
     }
 
     private fun translateMethod(methodModel: MethodModel, parent: ClassDescriptor): FunctionDescriptor {
@@ -424,7 +437,28 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         ) {
             override fun getOverriddenDescriptors(): MutableCollection<out FunctionDescriptor> {
                 if (methodModel.override != null) {
-                    return listOfNotNull(context.resolveMethod(methodModel.override as NameEntity, methodModel.name)).toMutableList()
+                    var overriddenMethod = context.resolveMethod(
+                        methodModel.override as NameEntity,
+                        methodModel.name
+                    )
+                    if (overriddenMethod == null) {
+                        var override = methodModel.override as NameEntity
+                        if (override.leftMost() == IdentifierEntity("<LIBROOT>")) {
+                            override = override.shiftLeft()!!
+                        }
+                        val classInStdLib = findClassInStdlib(
+                            TypeValueModel(
+                                value = override,
+                                params = listOf(),
+                                metaDescription = null,
+                                fqName = null
+                            )
+                        )
+                        overriddenMethod = classInStdLib?.unsubstitutedMemberScope?.getContributedFunctions(
+                            Name.identifier(translateName(methodModel.name)), NoLookupLocation.FROM_BUILTINS
+                        )?.single()
+                    }
+                    return listOfNotNull(overriddenMethod).toMutableList()
                 }
                 return super.getOverriddenDescriptors()
             }
@@ -529,7 +563,28 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         ) {
             override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> {
                 if (propertyModel.override != null) {
-                    return listOfNotNull(context.resolveProperty(propertyModel.override as NameEntity, propertyModel.name)).toMutableList()
+                    var overriddenProperty = context.resolveProperty(
+                        propertyModel.override as NameEntity,
+                        propertyModel.name
+                    ) as PropertyDescriptor?
+                    if (overriddenProperty == null) {
+                        var override = propertyModel.override as NameEntity
+                        if (override.leftMost() == IdentifierEntity("<LIBROOT>")) {
+                            override = override.shiftLeft()!!
+                        }
+                        val classInStdLib = findClassInStdlib(
+                            TypeValueModel(
+                                value = override,
+                                params = listOf(),
+                                metaDescription = null,
+                                fqName = null
+                            )
+                        )
+                        overriddenProperty = classInStdLib?.unsubstitutedMemberScope?.getContributedVariables(
+                            Name.identifier(translateName(propertyModel.name)), NoLookupLocation.FROM_BUILTINS
+                        )?.single()
+                    }
+                    return listOfNotNull(overriddenProperty).toMutableList()
                 }
                 return super.getOverriddenDescriptors()
             }
@@ -753,10 +808,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
 
         classDescriptor.initialize(
-            SimpleMemberScope((classLikeModel.members.mapNotNull
+            MutableMemberScope((classLikeModel.members.mapNotNull
             {
                 translateMember(it, classDescriptor)
-            } + companionDescriptor as DeclarationDescriptor?).filterNotNull()),
+            } + companionDescriptor as DeclarationDescriptor?).filterNotNull().toMutableList()),
             constructorDescriptors,
             primaryConstructorDescriptor
         )
@@ -799,9 +854,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
 
         objectDescriptor.initialize(
-            SimpleMemberScope(objectModel.members.mapNotNull {
+            MutableMemberScope(objectModel.members.mapNotNull {
                 translateMember(it, objectDescriptor)
-            }),
+            }.toMutableList()),
             setOf(privatePrimaryConstructor),
             privatePrimaryConstructor
         )
@@ -855,7 +910,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
         val enumMemberNames = enumModel.values.map { Name.identifier(translateName(IdentifierEntity(it.value))) }
         enumDescriptor.initialize(
-            SimpleMemberScope(enumMemberNames.map {
+            MutableMemberScope(enumMemberNames.map {
                 val constructor = EnumEntrySyntheticClassDescriptor::class.java.declaredConstructors[0]
                 constructor.isAccessible = true
                 constructor.newInstance(
@@ -871,7 +926,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     Annotations.EMPTY,
                     SourceElement.NO_SOURCE
                 ) as EnumEntrySyntheticClassDescriptor
-            }),
+            }.toMutableList()),
             setOf(privatePrimaryConstructor),
             privatePrimaryConstructor
         )
@@ -905,11 +960,21 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return object : PackageFragmentDescriptorImpl(
             moduleDescriptor, translatePackageName(moduleModel.name)
         ) {
+            var scope: MemberScope? = null
+
             override fun getMemberScope(): MemberScope {
-                context.registeredImports.clear()
-                context.registeredImports.addAll(moduleModel.imports.map { translateName(it.name.shiftRight()!!) })
-                context.currentPackageName = moduleModel.name
-                return SimpleMemberScope(moduleModel.declarations.mapNotNull { translateTopLevelModel(it, this) })
+                return scope ?: {
+                    context.registeredImports.clear()
+                    context.registeredImports.addAll(moduleModel.imports.map { translateName(it.name.shiftRight()!!) })
+                    context.currentPackageName = moduleModel.name
+                    scope = MutableMemberScope(moduleModel.declarations.mapNotNull {
+                        translateTopLevelModel(
+                            it,
+                            this
+                        )
+                    }.toMutableList())
+                    scope!!
+                }()
             }
         }
     }
@@ -925,6 +990,34 @@ private fun computeAllParents(name: FqName): List<FqName> {
     return allNames
 }
 
+private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassDescriptor) {
+    if (!context.shouldBeResolved(classDescriptor)) {
+        return
+    }
+    val parents = classDescriptor.typeConstructor.supertypes.map {
+        it.constructor.declarationDescriptor!!
+    }.toList()
+    for (parent in parents) {
+        if (context.shouldBeResolved(parent as ClassDescriptor)) {
+            addFakeOverrides(context, parent)
+        }
+    }
+    val fakeOverrides =
+        DescriptorResolverUtils.resolveOverridesForNonStaticMembers(
+            classDescriptor.name,
+            classDescriptor.typeConstructor.supertypes.flatMap {
+                DescriptorUtils.getAllDescriptors(it.memberScope)
+            }.filterIsInstance<CallableMemberDescriptor>(),
+            DescriptorUtils.getAllDescriptors(classDescriptor.unsubstitutedMemberScope)
+                .filterIsInstance<CallableMemberDescriptor>(),
+            classDescriptor,
+            ErrorReporter.DO_NOTHING,
+            (KotlinTypeChecker.DEFAULT as NewKotlinTypeChecker).overridingUtil
+        )
+    (classDescriptor.unsubstitutedMemberScope as MutableMemberScope).addMembers(fakeOverrides.toList())
+    context.addResolved(classDescriptor)
+}
+
 fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
 
     val moduleDescriptor = ModuleDescriptorImpl(
@@ -933,7 +1026,8 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
         DefaultBuiltIns.Instance
     )
 
-    val translator = DescriptorTranslator(DescriptorContext(generateJSConfig()))
+    val context = DescriptorContext(generateJSConfig())
+    val translator = DescriptorTranslator(context)
 
     val fragments = sources.map {
         translator.translateModule(
@@ -959,6 +1053,10 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
         moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
             .fragments.forEach { it.getMemberScope() }
     }
+
+    context.initializeConstraints()
+
+    context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
 
     return moduleDescriptor
 }
