@@ -80,6 +80,18 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
+    static createConditionalExpressionDeclarationAsExpression(condition: Expression, whenTrue: Expression, whenFalse: Expression) {
+        let conditionalExpression = new declarations.ConditionalExpressionDeclarationProto();
+
+        conditionalExpression.setCondition(condition);
+        conditionalExpression.setWhentrue(whenTrue);
+        conditionalExpression.setWhenfalse(whenFalse);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setConditionalexpression(conditionalExpression);
+        return expressionProto;
+    }
+
     static createQualifierAsNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
         let qualifier = new declarations.QualifierDeclarationProto();
         qualifier.setLeft(left);
