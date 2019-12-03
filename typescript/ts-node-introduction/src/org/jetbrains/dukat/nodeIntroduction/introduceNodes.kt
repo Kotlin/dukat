@@ -338,7 +338,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         true,
                         true,
                         false,
-                        ClassLikeReferenceNode(name, mergeTypeParameters.map { typeParam ->
+                        ClassLikeReferenceNode(interfaceDeclaration.uid, name, mergeTypeParameters.map { typeParam ->
                             typeParam.name
                         }),
                         FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
@@ -353,7 +353,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     false,
                     true,
                     convertTypeParameters(interfaceDeclaration.typeParameters),
-                    ClassLikeReferenceNode(name, interfaceDeclaration.typeParameters.map { typeParam ->
+                    ClassLikeReferenceNode(interfaceDeclaration.uid, name, interfaceDeclaration.typeParameters.map { typeParam ->
                         typeParam.name
                     }),
                     "",

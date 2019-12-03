@@ -471,7 +471,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
     private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
         return this?.let { extendNode ->
-            ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
+            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid] ?: extendNode.name, extendNode.typeParameters)
         }
     }
 
