@@ -118,6 +118,22 @@ export class AstExpressionConverter {
         )
     }
 
+    convertBody(body: ts.Node | null): Block | null {
+        if (body) {
+            if (ts.isBlock(body)) {
+                return this.astConverter.convertBlock(body)
+            } else {
+                return this.astFactory.createBlockDeclaration(
+                    [
+                        this.astFactory.createReturnStatement(this.convertExpression(body))
+                    ]
+                )
+            }
+        } else {
+            return null
+        }
+    }
+
     convertFunctionExpression(expression: ts.FunctionExpression): Expression {
         let name = expression.name ? expression.name.getText() : "";
 
@@ -135,8 +151,12 @@ export class AstExpressionConverter {
             returnType,
             typeParameterDeclarations,
             this.astConverter.convertModifiers(expression.modifiers),
-            this.astConverter.convertBlock(expression.body)
+            this.convertBody(expression.body)
         )
+    }
+
+    convertArrowFunctionExpression(expression: ts.ArrowFunction): Expression {
+        return this.convertFunctionExpression(expression)
     }
 
     convertClassExpression(expression: ts.ClassExpression): Expression {
@@ -330,6 +350,8 @@ export class AstExpressionConverter {
             return this.convertPostfixUnaryExpression(expression)
         } else if (ts.isFunctionExpression(expression)) {
             return this.convertFunctionExpression(expression)
+        } else if (ts.isArrowFunction(expression)) {
+            return this.convertArrowFunctionExpression(expression)
         } else if (ts.isClassExpression(expression)) {
             return this.convertClassExpression(expression)
         } else if (ts.isTypeOfExpression(expression)) {
