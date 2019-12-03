@@ -88,7 +88,6 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.NotNullLazyValue
 import org.jetbrains.kotlin.types.AbbreviatedType
 import org.jetbrains.kotlin.types.ErrorUtils
-import org.jetbrains.kotlin.types.IndexedParametersSubstitution
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.LazyWrappedType
@@ -96,12 +95,14 @@ import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.StarProjectionImpl
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.TypeSubstitution
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
 import org.jetbrains.kotlin.types.createDynamicType
 import org.jetbrains.kotlin.types.replace
+import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 internal fun translateName(name: NameEntity): String {
@@ -169,35 +170,6 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
     }
 
-    private fun expandTypeAlias(
-        key: KotlinType,
-        typeParameters: List<TypeParameterDescriptor>,
-        newTypeArguments: List<TypeProjection>
-    ): TypeProjection {
-        val otherAlias = context.getTypeAliasDescriptorByConstructor(key.constructor)
-        val replacement = key.arguments.map { keyArgument ->
-            val replacementProjection =
-                newTypeArguments.getOrNull(typeParameters.indexOfLast { it.defaultType.constructor == keyArgument.type.constructor })
-                    ?: expandTypeAlias(keyArgument.type, typeParameters, newTypeArguments)
-            TypeProjectionImpl(
-                replacementProjection.type.replaceAnnotations(keyArgument.type.annotations)
-            )
-        }
-        if (otherAlias != null) {
-            return TypeProjectionImpl(
-                AbbreviatedType(
-                    expandTypeAlias(
-                        otherAlias.underlyingType,
-                        typeParameters + otherAlias.defaultType.constructor.parameters,
-                        newTypeArguments + replacement
-                    ).type as SimpleType,
-                    otherAlias.defaultType.replace(replacement)
-                )
-            )
-        }
-        return TypeProjectionImpl(key.replace(replacement))
-    }
-
     private fun translateType(typeModel: TypeModel, shouldExpand: Boolean = true): KotlinType {
         if (typeModel is TypeParameterReferenceModel) {
             return context.getTypeParameter(typeModel.name)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)!!
@@ -222,6 +194,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         )
                         if (shouldExpand) {
                             (expandTypeAlias(
+                                context,
                                 typeAlias.defaultType,
                                 typeParameters,
                                 newTypeArguments
@@ -1031,6 +1004,43 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     }
 }
 
+private fun expandTypeAlias(
+    context: DescriptorContext,
+    key: KotlinType,
+    typeParameters: List<TypeParameterDescriptor>,
+    newTypeArguments: List<TypeProjection>
+): TypeProjection {
+    val otherAlias = context.getTypeAliasDescriptorByConstructor(key.constructor)
+    val replacement = key.arguments.map { keyArgument ->
+        if (keyArgument.isStarProjection) {
+            keyArgument
+        } else {
+            val replacementProjection =
+                newTypeArguments.getOrNull(typeParameters.indexOfLast { it.defaultType.constructor == keyArgument.type.constructor })
+                    ?: expandTypeAlias(context, keyArgument.type, typeParameters, newTypeArguments)
+
+            TypeProjectionImpl(
+                keyArgument.projectionKind,
+                replacementProjection.type.replaceAnnotations(keyArgument.type.annotations)
+            )
+        }
+    }
+    if (otherAlias != null) {
+        return TypeProjectionImpl(
+            AbbreviatedType(
+                expandTypeAlias(
+                    context,
+                    otherAlias.underlyingType,
+                    typeParameters + otherAlias.defaultType.constructor.parameters,
+                    newTypeArguments + replacement
+                ).type as SimpleType,
+                otherAlias.defaultType.replace(replacement)
+            )
+        )
+    }
+    return key.replace(replacement).asTypeProjection()
+}
+
 private fun computeAllParents(name: FqName): List<FqName> {
     val allNames = mutableListOf<FqName>(FqName.ROOT)
     var parent = name
@@ -1056,10 +1066,18 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
     val delegatedMembers =
         classDescriptor.typeConstructor.supertypes.filter { context.isDelegated(classDescriptor, it) }.flatMap {
             val substitutor = TypeSubstitutor.create(
-                IndexedParametersSubstitution(
-                    (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
-                    it.arguments
-                )
+                object : TypeSubstitution() {
+                    override fun get(key: KotlinType): TypeProjection? = if (it.arguments.isEmpty()) {
+                        null
+                    } else {
+                        expandTypeAlias(
+                            DescriptorContext(context.config),
+                            key,
+                            (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
+                            it.arguments
+                        )
+                    }
+                }
             )
             val members = DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
                 .map { member -> member.substitute(substitutor) as CallableMemberDescriptor }
@@ -1081,10 +1099,18 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
             classDescriptor.name,
             classDescriptor.typeConstructor.supertypes.flatMap {
                 val substitutor = TypeSubstitutor.create(
-                    IndexedParametersSubstitution(
-                        (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
-                        it.arguments
-                    )
+                    object : TypeSubstitution() {
+                        override fun get(key: KotlinType): TypeProjection? = if (it.arguments.isEmpty()) {
+                            null
+                        } else {
+                            expandTypeAlias(
+                                DescriptorContext(context.config),
+                                key,
+                                (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
+                                it.arguments
+                            )
+                        }
+                    }
                 )
                 DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
                     .map { member -> member.substitute(substitutor) }
