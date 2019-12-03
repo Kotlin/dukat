@@ -231,6 +231,20 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         }
     }
 
+    private fun NameEntity.addLibPrefix() = IdentifierEntity("<LIBROOT>").appendLeft(this)
+    private fun UnionTypeNode.canBeTranslatedAsString(): Boolean {
+        return params.all { (it is TypeValueNode) && (it.value == IdentifierEntity("String")) }
+    }
+
+    private fun UnionTypeNode.convertMeta(): String {
+        return params.joinToString(" | ") { unionMember ->
+            if (unionMember.meta is StringLiteralDeclaration) {
+                (unionMember.meta as StringLiteralDeclaration).token
+            } else {
+                unionMember.process().translate()
+            }
+        }
+    }
 
     private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = when (context) {
@@ -238,18 +252,22 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             else -> IdentifierEntity("dynamic")
         }
         return when (this) {
-            is UnionTypeNode -> TypeValueModel(
-                    dynamicName,
-                    emptyList(),
-                    params.joinToString(" | ") { unionMember ->
-                        if (unionMember.meta is StringLiteralDeclaration) {
-                            (unionMember.meta as StringLiteralDeclaration).token
-                        } else {
-                            unionMember.process().translate()
-                        }
-                    },
-                    null
-            )
+            is UnionTypeNode -> if (canBeTranslatedAsString()) {
+                val stringEntity = IdentifierEntity("String")
+                TypeValueModel(
+                        stringEntity,
+                        emptyList(),
+                        convertMeta(),
+                        stringEntity.addLibPrefix()
+                )
+            } else {
+                TypeValueModel(
+                        dynamicName,
+                        emptyList(),
+                        convertMeta(),
+                        null
+                )
+            }
             is TupleTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),

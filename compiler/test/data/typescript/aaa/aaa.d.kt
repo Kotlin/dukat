@@ -15,15 +15,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface JQueryXHR : MyXMLHttpRequest, JQueryPromise<Any> {
-    fun overrideMimeType(mimeType: String): Any
-    fun abort(statusText: String? = definedExternally)
+external interface RS {
+    fun unshift(chunk: String, encoding: String /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */ = definedExternally)
+    fun unshift(chunk: Array<String>, encoding: String /* "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" */ = definedExternally)
 }
 
-external interface Property<T>
-
-external interface PropertySpec : Property<String /* "ping" | "pong" */>
-
-external interface MyXMLHttpRequest
-
-external interface JQueryPromise<T>
+external open class R : RS {
+    fun unshift(chunk: Any, encoding: String = definedExternally)
+    open fun unshift(chunk: Any)
+}

@@ -42,12 +42,8 @@ import org.w3c.xhr.*
 external interface Status {
     var current: Number
     var total: Number
-    var type: dynamic /* "begin" | "end" | "unknown" */
-        get() = definedExternally
-        set(value) = definedExternally
-    var status: dynamic /* "ok" | "fail" */
-        get() = definedExternally
-        set(value) = definedExternally
+    var type: String /* "begin" | "end" | "unknown" */
+    var status: String /* "ok" | "fail" */
 }
 
 external interface EventEmitter {
