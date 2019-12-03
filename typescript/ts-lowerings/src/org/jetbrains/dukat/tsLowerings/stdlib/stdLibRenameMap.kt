@@ -5,7 +5,8 @@ import org.jetbrains.dukat.astCommon.NameEntity
 
 object stdLibRenameMap {
     private val renameMap = mapOf(
-        Pair(IdentifierEntity("Iterator"), IdentifierEntity("TsStdLib_Iterator"))
+        Pair(IdentifierEntity("Iterator"), IdentifierEntity("TsStdLib_Iterator")),
+        Pair(IdentifierEntity("Uint8Array"), IdentifierEntity("TsStdLib_Uint8Array"))
     )
 
     fun resolve(name: NameEntity): NameEntity? {
