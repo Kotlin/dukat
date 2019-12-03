@@ -47,13 +47,13 @@ open class ReferenceConstraint(
     override fun resolve(): Constraint {
         return when (resolutionState) {
             ResolutionState.UNRESOLVED -> {
-                resolvedConstraint = resolveInOwner(owner) ?: CompositeConstraint()
+                resolvedConstraint = resolveInOwner(owner) ?: CompositeConstraint(owner)
                 resolutionState = ResolutionState.RESOLVED
                 return resolvedConstraint!!
             }
 
             ResolutionState.RESOLVING -> {
-                raiseConcern("Invalid converter state!") { CompositeConstraint() }
+                raiseConcern("Invalid converter state!") { CompositeConstraint(owner) }
             }
 
             ResolutionState.RESOLVED -> {

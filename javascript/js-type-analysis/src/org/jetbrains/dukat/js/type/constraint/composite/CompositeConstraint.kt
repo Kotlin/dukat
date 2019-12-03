@@ -7,10 +7,34 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstrain
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
-class CompositeConstraint(private val constraints: MutableSet<Constraint>) : Constraint {
-    constructor(vararg constraints: Constraint) : this(mutableSetOf(*constraints))
-    constructor(constraints: List<Constraint>) : this(constraints.toMutableSet())
+class CompositeConstraint(
+        override val owner: PropertyOwner,
+        private val constraints: MutableSet<Constraint>
+) : PropertyOwner, Constraint {
+    constructor(owner: PropertyOwner, vararg constraints: Constraint) : this(owner, mutableSetOf(*constraints))
+    constructor(owner: PropertyOwner, constraints: List<Constraint>) : this(owner, constraints.toMutableSet())
+
+    private val properties = LinkedHashMap<String, Constraint>()
+
+    override fun set(name: String, data: Constraint) {
+        properties[name] = data
+    }
+
+    override fun get(name: String): Constraint? {
+        val constraint = properties[name]
+
+        return if (constraint != null) {
+            constraint
+        } else {
+            val newConstraint = CompositeConstraint(owner)
+            this[name] = newConstraint
+            newConstraint
+        }
+    }
 
     override operator fun plusAssign(other: Constraint) {
         constraints += other
@@ -31,15 +55,23 @@ class CompositeConstraint(private val constraints: MutableSet<Constraint>) : Con
     }
 
     override fun resolve(): Constraint {
-        val resolvedConstraints = getFlatConstraints().map { it.resolve() }
+        return if (properties.isNotEmpty()) {
+            ObjectConstraint(owner).apply {
+                properties.forEach { (name, value) ->
+                    this[name] = value.resolve()
+                }
+            }
+        } else {
+            val resolvedConstraints = getFlatConstraints().map { it.resolve() }
 
-        return when {
-            resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
-            resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
-            resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
-            resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
-            resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
-            else -> NoTypeConstraint
+            when {
+                resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
+                resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
+                resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
+                resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
+                resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
+                else -> NoTypeConstraint
+            }
         }
     }
 }

@@ -4,8 +4,10 @@ import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.immutable.ImmutableConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
+import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class CallArgumentConstraint(
+        private val owner: PropertyOwner,
         private val callTarget: Constraint,
         private val argumentNum: Int
 ) : ImmutableConstraint {
@@ -16,10 +18,10 @@ class CallArgumentConstraint(
             if (functionConstraint.parameterConstraints.size > argumentNum) {
                 functionConstraint.parameterConstraints[argumentNum].second
             } else {
-                CompositeConstraint()
+                CompositeConstraint(owner)
             }
         } else {
-            CallArgumentConstraint(functionConstraint, argumentNum)
+            CallArgumentConstraint(owner, functionConstraint, argumentNum)
         }
     }
 }

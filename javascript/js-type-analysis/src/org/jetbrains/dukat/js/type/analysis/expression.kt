@@ -78,7 +78,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
             val parameterConstraints = MutableList(parameters.size) { i ->
                 // Store constraints of parameters in scope,
                 // and in parameter list (in case the variable is replaced)
-                val parameterConstraint = CompositeConstraint()
+                val parameterConstraint = CompositeConstraint(owner)
                 functionScope[parameters[i].name] = parameterConstraint
                 parameters[i].name to parameterConstraint
             }
@@ -172,7 +172,7 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path:
         else -> {
             left.calculateConstraints(owner, path)
             right.calculateConstraints(owner, path)
-            CompositeConstraint(NoTypeConstraint)
+            CompositeConstraint(owner, NoTypeConstraint)
         }
     }
 }
@@ -194,7 +194,7 @@ fun UnaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: 
             BooleanTypeConstraint
         }
         else -> {
-            CompositeConstraint(NoTypeConstraint)
+            CompositeConstraint(owner, NoTypeConstraint)
         }
     }
 }
@@ -210,6 +210,7 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
 
     argumentConstraints.forEachIndexed { argumentNumber, arg ->
         arg += CallArgumentConstraint(
+                owner,
                 callTargetConstraints,
                 argumentNumber
         )
@@ -255,7 +256,7 @@ fun LiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path
         is BigIntLiteralExpressionDeclaration -> BigIntTypeConstraint
         is BooleanLiteralExpressionDeclaration -> BooleanTypeConstraint
         is ObjectLiteralExpressionDeclaration -> this.calculateConstraints(owner, path)
-        else -> raiseConcern("Unexpected literal expression type <${this::class}>") { CompositeConstraint(NoTypeConstraint) }
+        else -> raiseConcern("Unexpected literal expression type <${this::class}>") { CompositeConstraint(owner, NoTypeConstraint) }
     }
 }
 
@@ -264,7 +265,7 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is FunctionDeclaration -> this.addTo(owner) ?: NoTypeConstraint
         is ClassDeclaration -> this.addTo(owner, path) ?: NoTypeConstraint
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
-        is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint() //TODO replace this with a reference constraint (of some sort)
+        is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner) //TODO replace this with a reference constraint (of some sort)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
@@ -272,6 +273,6 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is NewExpressionDeclaration -> this.calculateConstraints(owner, path)
         is ConditionalExpressionDeclaration -> this.calculateConstraints(owner, path)
         is LiteralExpressionDeclaration -> this.calculateConstraints(owner, path)
-        else -> CompositeConstraint(NoTypeConstraint)
+        else -> CompositeConstraint(owner, NoTypeConstraint)
     }
 }
