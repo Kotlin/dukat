@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
@@ -97,7 +98,7 @@ private class EventHandlerSpecifier : IDLLowering {
 
     private var currentInterfaceName: String? = null
 
-    override fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration): IDLAttributeDeclaration {
+    override fun lowerAttributeDeclaration(declaration: IDLAttributeDeclaration, owner: IDLFileDeclaration): IDLAttributeDeclaration {
         if (declaration.type !is IDLFunctionTypeDeclaration || currentInterfaceName == null) {
             return declaration
         }
@@ -122,9 +123,9 @@ private class EventHandlerSpecifier : IDLLowering {
         return declaration
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         currentInterfaceName = declaration.name
-        val result = super.lowerInterfaceDeclaration(declaration)
+        val result = super.lowerInterfaceDeclaration(declaration, owner)
         currentInterfaceName = null
         return result
     }

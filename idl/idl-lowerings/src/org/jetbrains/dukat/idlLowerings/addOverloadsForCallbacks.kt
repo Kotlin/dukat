@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
@@ -47,7 +48,7 @@ private class CallbackOverloadResolver(val context: CallbackContext) : IDLLoweri
         }
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 operations = declaration.operations.flatMap { it.generateOverloads() }
         )
@@ -57,7 +58,7 @@ private class CallbackOverloadResolver(val context: CallbackContext) : IDLLoweri
 private class CallbackContext : IDLLowering {
     private val callbacks: MutableMap<String, IDLInterfaceDeclaration> = mutableMapOf()
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         if (declaration.callback) {
             callbacks[declaration.name] = declaration
         }

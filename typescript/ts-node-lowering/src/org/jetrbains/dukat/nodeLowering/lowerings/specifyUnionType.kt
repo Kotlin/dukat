@@ -120,21 +120,21 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         return declaration.copy(members = members)
     }
 
-    fun lowerTopLevelDeclarationList(declaration: TopLevelEntity): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarationList(declaration: TopLevelEntity, owner: DocumentRootNode): List<TopLevelEntity> {
         return when (declaration) {
             is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
             is DocumentRootNode -> listOf(lowerDocumentRoot(declaration))
-            is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration))
+            is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration, owner))
             else -> listOf(declaration)
         }
     }
 
     override fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
         return declarations.flatMap { declaration ->
-            lowerTopLevelDeclarationList(declaration)
+            lowerTopLevelDeclarationList(declaration, owner)
         }
     }
 

@@ -144,7 +144,7 @@ export class AstExpressionConverter {
             this.astFactory.createIdentifierDeclarationAsNameEntity(""),
             this.astConverter.convertClassElementsToMembers(expression.members),
             this.astConverter.convertTypeParams(expression.typeParameters),
-            this.astConverter.convertHeritageClauses(expression.heritageClauses),
+            this.astConverter.convertHeritageClauses(expression.heritageClauses, expression),
             this.astConverter.convertModifiers(expression.modifiers)
         );
     }

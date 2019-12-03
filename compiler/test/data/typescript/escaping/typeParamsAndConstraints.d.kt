@@ -40,10 +40,10 @@ import org.w3c.xhr.*
 
 external interface Result
 
-external interface ResultDerivation<T : `_`.Result>
+external interface ResultDerivation<T : Result>
 
 external interface StaticInstance {
-    fun fetch(param: String): Array<`_`.Result>
-    fun fetch(param: Number): Array<`_`.Result>
-    fun <T : `_`.ResultDerivation<T>> ping(): T
+    fun fetch(param: String): Array<Result>
+    fun fetch(param: Number): Array<Result>
+    fun <T : ResultDerivation<T>> ping(): T
 }

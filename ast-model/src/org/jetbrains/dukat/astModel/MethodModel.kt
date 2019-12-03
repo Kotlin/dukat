@@ -10,7 +10,7 @@ data class MethodModel(
         val typeParameters: List<TypeParameterModel>,
 
         val static: Boolean,
-        val override: Boolean,
+        val override: NameEntity?,
         val operator: Boolean,
         val annotations: List<AnnotationModel>,
 

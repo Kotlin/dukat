@@ -12,6 +12,6 @@ data class InterfaceModel(
         override val parentEntities: List<HeritageModel>,
         override val annotations: MutableList<AnnotationModel>,
         override val comment: CommentEntity?,
-        val external: Boolean,
+        override val external: Boolean,
         override val visibilityModifier: VisibilityModifierModel
 ) : ClassLikeModel

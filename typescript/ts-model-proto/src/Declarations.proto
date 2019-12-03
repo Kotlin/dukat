@@ -144,6 +144,7 @@ message ModifierDeclarationProto {
 
 message ObjectLiteralDeclarationProto {
     repeated MemberDeclarationProto members = 1;
+    string uid = 2;
 }
 
 message MemberDeclarationProto {
@@ -180,6 +181,7 @@ message BigIntLiteralExpressionDeclarationProto {
 
 message ObjectLiteralExpressionDeclarationProto {
     repeated MemberDeclarationProto members = 1;
+
 }
 
 message ArrayLiteralExpressionDeclarationProto {

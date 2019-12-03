@@ -22,4 +22,4 @@ data class FunctionModel(
         val body: List<StatementModel>,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?
-) : MemberEntity, MergeableModel, TopLevelModel
+) : MemberEntity, TopLevelModel

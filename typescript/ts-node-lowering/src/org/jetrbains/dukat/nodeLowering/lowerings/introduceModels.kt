@@ -37,6 +37,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
@@ -96,6 +97,7 @@ private enum class TranslationContext {
     TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
+    INLINE_EXTENSION,
     CONSTRUCTOR
 }
 
@@ -155,7 +157,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
                     static = static,
 
-                    override = override,
+                    override = null,
                     operator = operator,
                     annotations = resolveAnnotations(),
 
@@ -166,7 +168,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     type = type.process(TranslationContext.IRRELEVANT),
                     typeParameters = convertTypeParams(typeParameters),
                     static = static,
-                    override = override,
+                    override = null,
                     immutable = getter && !setter,
                     getter = false,
                     setter = false,
@@ -180,13 +182,23 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         return ParameterModel(
                 type = type.process(context),
                 name = name,
-                initializer = if (context == TranslationContext.CONSTRUCTOR) {
-                    null
-                } else {
-                    when {
-                        initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
-                        optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
-                        else -> null
+                initializer = when (context) {
+                    TranslationContext.CONSTRUCTOR -> {
+                        null
+                    }
+                    TranslationContext.INLINE_EXTENSION -> {
+                        if (optional) {
+                            StatementCallModel(IdentifierEntity("null"), null, emptyList(), meta)
+                        } else {
+                            null
+                        }
+                    }
+                    else -> {
+                        when {
+                            initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
+                            optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                            else -> null
+                        }
                     }
                 },
                 vararg = vararg
@@ -229,13 +241,13 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             is UnionTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),
-                    params.map { unionMember ->
+                    params.joinToString(" | ") { unionMember ->
                         if (unionMember.meta is StringLiteralDeclaration) {
                             (unionMember.meta as StringLiteralDeclaration).token
                         } else {
                             unionMember.process().translate()
                         }
-                    }.joinToString(" | "),
+                    },
                     null
             )
             is TupleTypeNode -> TypeValueModel(
@@ -253,7 +265,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             }
             is TypeValueNode -> {
                 if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, null)
+                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, typeReference?.getFqName(value))
                 } else {
                     TypeValueModel(
                             value,
@@ -277,10 +289,10 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             is GeneratedInterfaceReferenceNode -> {
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, uidToNameMapper[reference?.uid]) }
+                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, reference?.getFqName(typeParam.name)) }
                                 .map { TypeParameterModel(it, listOf()) },
                         meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
-                        uidToNameMapper[reference?.uid],
+                        reference?.getFqName(name),
                         nullable
                 )
 
@@ -333,14 +345,24 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
     private fun HeritageNode.convertToModel(): HeritageModel {
         return HeritageModel(
-                value = TypeValueModel(name, emptyList(), null, uidToNameMapper[reference?.uid]),
+                value = TypeValueModel(name, emptyList(), null, reference?.getFqName(name)),
                 typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
                 delegateTo = null
         )
     }
 
+    private fun ReferenceEntity<*>.getFqName(ownerName: NameEntity): NameEntity? {
+        return if (uid.startsWith("lib-")) {
+            IdentifierEntity("<LIBROOT>").appendLeft(ownerName)
+        } else {
+            uidToNameMapper[uid]
+        }
+    }
+
     private fun TypeValueNode.getFqName(): NameEntity? {
-        return uidToNameMapper[typeReference?.uid]
+        return typeReference?.getFqName(value) ?: if (KotlinStdlibEntities.contains(value)) {
+            IdentifierEntity("<LIBROOT>").appendLeft(value)
+        } else null
     }
 
     private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
@@ -449,7 +471,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
     private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
         return this?.let { extendNode ->
-            ClassLikeReferenceModel(extendNode.name, extendNode.typeParameters)
+            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid] ?: extendNode.name, extendNode.typeParameters)
         }
     }
 
@@ -476,21 +498,28 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                         comment = null
                 )
             }
-            is FunctionNode -> FunctionModel(
-                    name = name,
-                    parameters = parameters.map { param -> param.process() },
-                    type = type.process(),
+            is FunctionNode -> {
+                val context = if (inline) {
+                    TranslationContext.INLINE_EXTENSION
+                } else {
+                    TranslationContext.IRRELEVANT
+                }
+                FunctionModel(
+                        name = name,
+                        parameters = parameters.map { param -> param.process(context) },
+                        type = type.process(),
 
-                    typeParameters = convertTypeParams(typeParameters),
-                    annotations = exportQualifier.toAnnotation(),
-                    export = export,
-                    inline = inline,
-                    operator = operator,
-                    extend = extend.convert(),
-                    body = resolveBody(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = comment
-            )
+                        typeParameters = convertTypeParams(typeParameters),
+                        annotations = exportQualifier.toAnnotation(),
+                        export = export,
+                        inline = inline,
+                        operator = operator,
+                        extend = extend.convert(),
+                        body = resolveBody(),
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = comment
+                )
+            }
             is VariableNode -> VariableModel(
                     name = name,
                     type = type.process(),
@@ -512,13 +541,15 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null
             )
-            is TypeAliasNode -> TypeAliasModel(
-                    name = name,
-                    typeReference = typeReference.process(),
-                    typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null
-            )
+            is TypeAliasNode -> {
+                TypeAliasModel(
+                        name = name,
+                        typeReference = typeReference.process(),
+                        typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = null
+                )
+            }
             else -> {
                 logger.debug("skipping ${this}")
                 null
@@ -544,6 +575,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
         jsModule?.let {
             annotations.add(AnnotationModel("file:JsModule", listOf(it)))
+            annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
         }
 
         jsQualifier?.let {
@@ -588,10 +620,17 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 }
 
-private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit): NodeTypeLowering{
+private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) : NodeTypeLowering {
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
-        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        if (!declaration.uid.endsWith("_GENERATED")) {
+            visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        }
         return super.lowerClassLikeNode(declaration, owner)
+    }
+
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode {
+        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        return super.lowerTypeAliasNode(declaration, owner)
     }
 
     override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
@@ -604,9 +643,17 @@ private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit):
     }
 }
 
+private fun NameEntity.translate(): String = when (this) {
+    is IdentifierEntity -> value
+    is QualifierEntity -> {
+        "${left.translate()}.${right.translate()}"
+    }
+}
+
+
 fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
     ReferenceVisitor { uid, fqName ->
-       uidToFqNameMapper[uid] = fqName
+        uidToFqNameMapper[uid] = fqName
     }.process(this)
 
     return NodeConverter(uidToFqNameMapper).convert(this)

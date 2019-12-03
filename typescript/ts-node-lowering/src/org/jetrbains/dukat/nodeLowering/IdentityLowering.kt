@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -34,7 +35,7 @@ interface IdentityLowering : Lowering<ParameterValueDeclaration> {
 
     override fun lowerMemberNode(declaration: MemberNode): MemberNode = declaration
 
-    override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode = declaration
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode = declaration
 
     override fun lowerUnionTypeNode(declaration: UnionTypeNode) = declaration
 }

@@ -9,3 +9,7 @@ export class FooClass {
     methodWithString(s: string): string;
     methodWithManyArgs(n: number, settings: Bar): boolean;
 }
+
+export class Bar {
+
+}

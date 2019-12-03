@@ -21,3 +21,5 @@ external interface Response : Box<dynamic /* String | Box<String> */> {
     var token: Box<String>
     var expirationToken: Box<String>
 }
+
+external interface Box<T>

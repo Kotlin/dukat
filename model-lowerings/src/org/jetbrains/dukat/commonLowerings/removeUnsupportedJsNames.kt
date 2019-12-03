@@ -41,7 +41,7 @@ private fun NameEntity.contains(str: String): Boolean {
 private val STARTS_WITH_NUMBER = "^`\\d+".toRegex()
 
 private fun NameEntity.isInvalidJsName(): Boolean {
-    return contains(STARTS_WITH_NUMBER) || contains("-")
+    return contains(STARTS_WITH_NUMBER) || contains("-") || startsWith("`:") || startsWith("`.")
 }
 
 private fun MemberModel.getType(): TypeModel? {
@@ -92,7 +92,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     type = commonType,
                     typeParameters = emptyList(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = true,
                     annotations = emptyList(),
                     open = false
@@ -114,7 +114,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
                     typeParameters = emptyList(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = true,
                     annotations = emptyList(),
                     open = false

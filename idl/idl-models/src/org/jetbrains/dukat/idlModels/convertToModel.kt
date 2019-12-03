@@ -16,6 +16,7 @@ import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -41,6 +42,7 @@ import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
@@ -65,25 +67,28 @@ import org.jetbrains.dukat.idlDeclarations.changeComment
 import org.jetbrains.dukat.idlDeclarations.processEnumMember
 import org.jetbrains.dukat.idlDeclarations.toNullable
 import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
+import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
-private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        if (leftMost() == IdentifierEntity("<ROOT>")) {
-            shiftLeft()!!.translate()
-        } else {
-            "${left.translate()}.${right.translate()}"
-        }
+private fun IDLDeclaration.resolveName(): String? {
+    return when(this) {
+        is IDLDictionaryDeclaration -> name
+        is IDLEnumDeclaration -> name
+        is IDLInterfaceDeclaration -> name
+        is IDLTypedefDeclaration -> name
+        is IDLSingleTypeDeclaration -> name
+        else -> null
     }
 }
 
-private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) {
+
+private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration, private val typeMap: Map<String, NameEntity?>) {
 
     private companion object {
         val stdLibTypes = setOf(
+                "Any",
                 "Array",
                 "Boolean",
                 "String",
@@ -130,16 +135,27 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
         )
     }
 
-    private fun String.toFqName(): NameEntity? {
-        return if (stdLibTypes.contains(this)) {
-            QualifierEntity(IdentifierEntity("<LIBROOT>"), IdentifierEntity(this))
+    private fun String.stdFqName(): NameEntity? {
+        val name = toStdMap[this] ?: this
+        return if (stdLibTypes.contains(name)) {
+            QualifierEntity(IdentifierEntity("<LIBROOT>"), IdentifierEntity(name))
         } else {
-            fileDeclaration.packageName?.appendLeft(IdentifierEntity(this))
+            null
         }
+    }
+
+    private fun IDLDeclaration.toFqName(): NameEntity? {
+        val name = resolveName() ?: return null
+        return name.stdFqName() ?: typeMap[name]?.appendLeft(IdentifierEntity(name))
+    }
+
+    private fun String.toFqName(): NameEntity? {
+         return stdFqName() ?: fileDeclaration.packageName?.appendLeft(IdentifierEntity(this))
     }
 
     private fun IDLSingleTypeDeclaration.convertToModel(): TypeValueModel {
         val resolvedName = toStdMap[name] ?: name
+
         val typeModel = TypeValueModel(
                 value = IdentifierEntity(resolvedName),
                 params = listOfNotNull(typeParameter?.convertToModel())
@@ -152,7 +168,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                             }
                         },
                 metaDescription = comment,
-                fqName = resolvedName.toFqName()
+                fqName = toFqName()
         )
 
         return typeModel.copy(
@@ -213,7 +229,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                         value = IdentifierEntity("Unit"),
                         params = listOf(),
                         metaDescription = null,
-                        fqName = "Unit".toFqName()
+                        fqName = "Unit".stdFqName()
                 ),
                 typeParameters = listOf(),
                 annotations = mutableListOf(AnnotationModel(
@@ -280,25 +296,6 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null
         )
-    }
-
-    private fun NameEntity.translate(): String = when (this) {
-        is IdentifierEntity -> value
-        is QualifierEntity -> {
-            if (leftMost() == ROOT_PACKAGENAME) {
-                shiftLeft()!!.translate()
-            } else {
-                "${left.translate()}.${right.translate()}"
-            }
-        }
-    }
-
-    private fun MemberModel.getName(): String? {
-        return when (this) {
-            is PropertyModel -> name.translate()
-            is MethodModel -> name.translate()
-            else -> null
-        }
     }
 
     private fun IDLInterfaceDeclaration.convertToModel(): List<TopLevelModel> {
@@ -467,7 +464,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                         value = IdentifierEntity(name),
                         params = listOf(),
                         metaDescription = null,
-                        fqName = name.toFqName()
+                        fqName = toFqName()
                 ),
                 typeParameters = listOf(),
                 annotations = mutableListOf(AnnotationModel(
@@ -612,7 +609,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                     type = type.convertToModel(),
                     typeParameters = listOf(),
                     static = false,
-                    override = false,
+                    override = null,
                     immutable = readOnly,
                     getter = false,
                     setter = false,
@@ -624,7 +621,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                     type = returnType.convertToModel(),
                     typeParameters = listOf(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = false,
                     annotations = listOf(),
                     open = false
@@ -639,7 +636,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                     type = type.toNullable().convertToModel(),
                     typeParameters = listOf(),
                     static = false,
-                    override = false,
+                    override = null,
                     immutable = false,
                     getter = false,
                     setter = false,
@@ -651,7 +648,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                     type = valueType.convertToModel(),
                     typeParameters = listOf(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = false,
                     annotations = listOf(),
                     open = false
@@ -663,11 +660,11 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                             value = IdentifierEntity("Unit"),
                             params = listOf(),
                             metaDescription = null,
-                            fqName = "Unit".toFqName()
+                            fqName = "Unit".stdFqName()
                     ),
                     typeParameters = listOf(),
                     static = false,
-                    override = false,
+                    override = null,
                     operator = false,
                     annotations = listOf(),
                     open = false
@@ -693,7 +690,7 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
                 declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
                 annotations = mutableListOf(),
                 submodules = listOf(),
-                imports = mutableListOf("kotlin.js.*".toNameEntity()),
+                imports = mutableListOf(ImportModel("kotlin.js.*".toNameEntity())),
                 comment = null
         )
 
@@ -707,9 +704,24 @@ private class IdlFileConverter(private val fileDeclaration: IDLFileDeclaration) 
     }
 }
 
+private class IDLReferenceVisitor(private val visit: (IDLDeclaration, NameEntity?) -> Unit): IDLLowering {
+    override fun lowerTopLevelDeclaration(declaration: IDLTopLevelDeclaration, owner: IDLFileDeclaration): IDLTopLevelDeclaration {
+        visit(declaration, owner.packageName)
+        return super.lowerTopLevelDeclaration(declaration, owner)
+    }
+}
+
 fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
+
+    val typeMap = mutableMapOf<String, NameEntity?>()
+    IDLReferenceVisitor { declaration, packageName ->
+        declaration.resolveName()?.let {
+            typeMap[it]  = packageName ?: ROOT_PACKAGENAME
+        }
+    }.lowerSourceSetDeclaration(this)
+
     return SourceSetModel(
             "<IRRELEVANT>",
-            sources = files.map { IdlFileConverter(it).convert() }
+            sources = files.map { IdlFileConverter(it, typeMap).convert() }
     )
 }

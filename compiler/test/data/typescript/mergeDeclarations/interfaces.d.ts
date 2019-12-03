@@ -29,6 +29,14 @@ declare module _ {
          **/
         compact<T>(array: List<T>): T[];
     }
+
+    interface LoDashWrapper<T> {
+
+    }
+
+    interface LoDashArrayWrapper<T> {
+
+    }
 }
 
 declare interface SomeNode {}

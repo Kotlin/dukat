@@ -20,10 +20,10 @@ external interface SomeNode
 external interface Assignable
 
 external interface SomeElement : SomeNode, Assignable {
-    fun ping(): Boolean
-    fun pong(): Boolean
-    fun bing(): Boolean
     fun bong(): Boolean
+    fun bing(): Boolean
+    fun pong(): Boolean
+    fun ping(): Boolean
 }
 
 // ------------------------------------------------------------------------------------------
@@ -47,11 +47,15 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface LoDashStatic {
+    fun <T> compact(array: Array<T>): Array<T>
+    fun <T> compact(array: List<T>): Array<T>
     fun chain(value: Number): LoDashWrapper<Number>
     fun chain(value: String): LoDashWrapper<String>
     fun chain(value: Boolean): LoDashWrapper<Boolean>
     fun <T> chain(value: Array<T>): LoDashArrayWrapper<T>
     fun chain(value: Any): LoDashWrapper<Any>
-    fun <T> compact(array: Array<T>): Array<T>
-    fun <T> compact(array: List<T>): Array<T>
 }
+
+external interface LoDashWrapper<T>
+
+external interface LoDashArrayWrapper<T>
