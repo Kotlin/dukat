@@ -27,7 +27,7 @@ fun VariableDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
 }
 
 fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
-    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+    condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
         PathWalker.Direction.First -> thenStatement.calculateConstraints(owner, path)
@@ -36,7 +36,7 @@ fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: Path
 }
 
 fun WhileStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
-    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+    condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
         PathWalker.Direction.First -> statement.calculateConstraints(owner, path)

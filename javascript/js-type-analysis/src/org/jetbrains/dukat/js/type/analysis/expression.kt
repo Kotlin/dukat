@@ -235,7 +235,7 @@ fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: Pa
 }
 
 fun ConditionalExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
-    condition.calculateConstraints(owner, path) += BooleanTypeConstraint
+    condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
         PathWalker.Direction.First -> whenTrue.calculateConstraints(owner, path)
