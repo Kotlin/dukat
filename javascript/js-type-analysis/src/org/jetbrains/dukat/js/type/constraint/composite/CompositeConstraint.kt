@@ -7,6 +7,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstrain
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
@@ -68,11 +69,11 @@ class CompositeConstraint(
         }
     }
 
-    private fun resolveWithProperties(properties: Map<String, Constraint>) : Constraint {
+    private fun resolveWithProperties(properties: Map<String, Constraint>, resolveConstraint: (Constraint) -> Constraint) : Constraint {
         return if (properties.isNotEmpty()) {
             ObjectConstraint(owner).apply {
                 properties.forEach { (name, value) ->
-                    this[name] = value.resolve()
+                    this[name] = resolveConstraint(value)
                 }
             }
         } else {
@@ -80,7 +81,7 @@ class CompositeConstraint(
         }
     }
 
-    override fun resolve() = resolveWithProperties(allProperties)
+    override fun resolve() = resolveWithProperties(allProperties, Constraint::resolve)
 
-    override fun resolveAsInput() = resolveWithProperties(neededProperties)
+    override fun resolveAsInput() = resolveWithProperties(neededProperties, Constraint::resolveAsInput)
 }
