@@ -360,11 +360,9 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 
     private fun TypeValueNode.getFqName(): NameEntity? {
-        return if (KotlinStdlibEntities.contains(value)) {
+        return typeReference?.getFqName(value) ?: if (KotlinStdlibEntities.contains(value)) {
             IdentifierEntity("<LIBROOT>").appendLeft(value)
-        } else {
-            typeReference?.getFqName(value)
-        }
+        } else null
     }
 
     private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
