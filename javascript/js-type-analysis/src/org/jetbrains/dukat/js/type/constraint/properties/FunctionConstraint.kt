@@ -64,14 +64,14 @@ class FunctionConstraint(
             FunctionConstraint(
                     owner,
                     returnConstraints.resolve(),
-                    parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
+                    parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
             )
         } else {
             if (hasNonStaticMembers()) {
                 classRepresentation.constructorConstraint = FunctionConstraint(
                         owner,
                         returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
                 )
 
                 classRepresentation.resolve()
@@ -87,7 +87,7 @@ class FunctionConstraint(
                 objectRepresentation.callSignatureConstraint = FunctionConstraint(
                         owner,
                         returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve() }
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
                 )
 
                 objectRepresentation.resolve()

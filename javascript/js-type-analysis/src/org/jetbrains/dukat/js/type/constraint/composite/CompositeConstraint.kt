@@ -8,7 +8,6 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConst
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
-import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class CompositeConstraint(
@@ -18,20 +17,22 @@ class CompositeConstraint(
     constructor(owner: PropertyOwner, vararg constraints: Constraint) : this(owner, mutableSetOf(*constraints))
     constructor(owner: PropertyOwner, constraints: List<Constraint>) : this(owner, constraints.toMutableSet())
 
-    private val properties = LinkedHashMap<String, Constraint>()
+    private val neededProperties = LinkedHashMap<String, Constraint>()
+    private val allProperties = LinkedHashMap<String, Constraint>()
 
     override fun set(name: String, data: Constraint) {
-        properties[name] = data
+        allProperties[name] = data
     }
 
-    override fun get(name: String): Constraint? {
-        val constraint = properties[name]
+    override fun get(name: String) : Constraint? {
+        val constraint = allProperties[name]
 
         return if (constraint != null) {
             constraint
         } else {
             val newConstraint = CompositeConstraint(owner)
-            this[name] = newConstraint
+            neededProperties[name] = newConstraint
+            allProperties[name] = newConstraint
             newConstraint
         }
     }
@@ -44,7 +45,7 @@ class CompositeConstraint(
         constraints.addAll(others)
     }
 
-    fun getFlatConstraints() : List<Constraint> {
+    private fun getFlatConstraints() : List<Constraint> {
         return constraints.flatMap { constraint ->
             if(constraint is CompositeConstraint) {
                 constraint.getFlatConstraints()
@@ -54,7 +55,20 @@ class CompositeConstraint(
         }
     }
 
-    override fun resolve(): Constraint {
+    private fun resolveToBasicType() : Constraint {
+        val resolvedConstraints = getFlatConstraints().map { it.resolve() }
+
+        return when {
+            resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
+            resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
+            resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
+            resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
+            resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
+            else -> NoTypeConstraint
+        }
+    }
+
+    private fun resolveWithProperties(properties: Map<String, Constraint>) : Constraint {
         return if (properties.isNotEmpty()) {
             ObjectConstraint(owner).apply {
                 properties.forEach { (name, value) ->
@@ -62,16 +76,11 @@ class CompositeConstraint(
                 }
             }
         } else {
-            val resolvedConstraints = getFlatConstraints().map { it.resolve() }
-
-            when {
-                resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
-                resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
-                resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
-                resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
-                resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
-                else -> NoTypeConstraint
-            }
+            resolveToBasicType()
         }
     }
+
+    override fun resolve() = resolveWithProperties(allProperties)
+
+    override fun resolveAsInput() = resolveWithProperties(neededProperties)
 }
