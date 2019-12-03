@@ -88,6 +88,7 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.NotNullLazyValue
 import org.jetbrains.kotlin.types.AbbreviatedType
 import org.jetbrains.kotlin.types.ErrorUtils
+import org.jetbrains.kotlin.types.IndexedParametersSubstitution
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.LazyWrappedType
@@ -95,6 +96,7 @@ import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.StarProjectionImpl
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
@@ -1049,7 +1051,14 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
         DescriptorResolverUtils.resolveOverridesForNonStaticMembers(
             classDescriptor.name,
             classDescriptor.typeConstructor.supertypes.flatMap {
-                DescriptorUtils.getAllDescriptors(it.memberScope)
+                val substitutor = TypeSubstitutor.create(
+                    IndexedParametersSubstitution(
+                        (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
+                        it.arguments
+                    )
+                )
+                DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
+                    .map { member -> member.substitute(substitutor) }
             }.filterIsInstance<CallableMemberDescriptor>(),
             DescriptorUtils.getAllDescriptors(classDescriptor.unsubstitutedMemberScope)
                 .filterIsInstance<CallableMemberDescriptor>(),

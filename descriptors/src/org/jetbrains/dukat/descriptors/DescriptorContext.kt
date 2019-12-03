@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
+import java.util.*
 
 class DescriptorContext(val config: JsConfig) {
 
@@ -19,7 +20,7 @@ class DescriptorContext(val config: JsConfig) {
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
     private val setOfRegisteredDescriptors: MutableSet<ClassDescriptor> = mutableSetOf()
     private val registeredTypeAliases: MutableMap<NameEntity, TypeAliasDescriptor> = mutableMapOf()
-    private val typeParameters: MutableMap<NameEntity, TypeParameterDescriptor> = mutableMapOf()
+    private val typeParameters: MutableMap<NameEntity, Stack<TypeParameterDescriptor>> = mutableMapOf()
     val registeredImports: MutableList<String> = mutableListOf()
     private val registeredMethods: MutableMap<NameEntity, SimpleFunctionDescriptor> = mutableMapOf()
     private val registeredProperties: MutableMap<NameEntity, PropertyDescriptorImpl> = mutableMapOf()
@@ -66,15 +67,21 @@ class DescriptorContext(val config: JsConfig) {
     }
 
     fun registerTypeParameter(name: NameEntity, descriptor: TypeParameterDescriptor) {
-        typeParameters[name] = descriptor
+        if (typeParameters[name] == null) {
+            typeParameters[name] = Stack()
+        }
+        typeParameters[name]!!.push(descriptor)
     }
 
     fun getTypeParameter(name: NameEntity): TypeParameterDescriptor? {
-        return typeParameters[name]
+        if (typeParameters[name] == null || typeParameters[name]!!.isEmpty()) {
+            return null
+        }
+        return typeParameters[name]!!.peek()
     }
 
     fun removeTypeParameter(name: NameEntity) {
-        typeParameters.remove(name)
+        typeParameters[name]!!.pop()
     }
 
     fun getAllClassDescriptors(): List<ClassDescriptor> {
