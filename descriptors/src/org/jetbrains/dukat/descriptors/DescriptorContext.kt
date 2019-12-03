@@ -3,6 +3,7 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
@@ -19,6 +20,7 @@ class DescriptorContext(val config: JsConfig) {
     var currentPackageName: NameEntity = IdentifierEntity("")
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
     private val setOfRegisteredDescriptors: MutableSet<ClassDescriptor> = mutableSetOf()
+    private val delegatedParents: MutableList<Pair<ClassDescriptor, KotlinType>> = mutableListOf()
     private val registeredTypeAliases: MutableMap<NameEntity, TypeAliasDescriptor> = mutableMapOf()
     private val typeParameters: MutableMap<NameEntity, Stack<TypeParameterDescriptor>> = mutableMapOf()
     val registeredImports: MutableList<String> = mutableListOf()
@@ -47,6 +49,19 @@ class DescriptorContext(val config: JsConfig) {
     fun registerDescriptor(name: NameEntity, descriptor: ClassDescriptor) {
         registeredDescriptors[currentPackageName.appendLeft(name)] = descriptor
         setOfRegisteredDescriptors += descriptor
+    }
+
+    fun registerDelegations(classDescriptor: ClassDescriptor, parentTypes: List<KotlinType>, heritageModels: List<HeritageModel>) {
+        for ((model, type) in heritageModels.zip(parentTypes)) {
+            if (model.delegateTo != null) {
+                classDescriptor to type
+                delegatedParents.add(classDescriptor to type)
+            }
+        }
+    }
+
+    fun isDelegated(classDescriptor: ClassDescriptor, parent: KotlinType): Boolean {
+        return delegatedParents.contains(classDescriptor to parent)
     }
 
     fun registerTypeAlias(name: NameEntity, descriptor: TypeAliasDescriptor) {

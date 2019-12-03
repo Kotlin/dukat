@@ -794,6 +794,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         if (classLikeModel is InterfaceModel) {
             typeParameters = translateTypeParameters(classLikeModel.typeParameters, parent)
         }
+
+        val parentTypes = classLikeModel.parentEntities.mapNotNull {
+            translateHeritage(it)
+        }
+
         val classDescriptor = CustomClassDescriptor(
             parent = parent,
             name = classLikeModel.name,
@@ -807,9 +812,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 is InterfaceModel -> ClassKind.INTERFACE
                 else -> ClassKind.CLASS
             },
-            parentTypes = classLikeModel.parentEntities.mapNotNull {
-                translateHeritage(it)
-            },
+            parentTypes = parentTypes,
             isCompanion = false,
             isTopLevel = isTopLevel,
             companionObject = companionDescriptor,
@@ -818,6 +821,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
         context.registerDescriptor(classLikeModel.name, classDescriptor)
         context.currentPackageName = context.currentPackageName.appendLeft(classLikeModel.name)
+        context.registerDelegations(classDescriptor, parentTypes, classLikeModel.parentEntities)
 
 
         var primaryConstructorDescriptor: ClassConstructorDescriptor? = null
@@ -876,14 +880,15 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         isCompanion: Boolean,
         isTopLevel: Boolean
     ): ClassDescriptor {
+        val parentTypes = objectModel.parentEntities.mapNotNull {
+            translateHeritage(it)
+        }
         val objectDescriptor = CustomClassDescriptor(
             parent = parent,
             name = objectModel.name,
             modality = Modality.FINAL,
             classKind = ClassKind.OBJECT,
-            parentTypes = objectModel.parentEntities.mapNotNull {
-                translateHeritage(it)
-            },
+            parentTypes = parentTypes,
             isCompanion = isCompanion,
             isTopLevel = isTopLevel,
             companionObject = null,
@@ -891,6 +896,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             annotations = Annotations.EMPTY
         )
         context.registerDescriptor(objectModel.name, objectDescriptor)
+        context.registerDelegations(objectDescriptor, parentTypes, objectModel.parentEntities)
         val privatePrimaryConstructor = translateConstructor(
             ConstructorModel(listOf(), listOf()),
             objectDescriptor,
@@ -1047,6 +1053,29 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
             addFakeOverrides(context, parent)
         }
     }
+    val delegatedMembers =
+        classDescriptor.typeConstructor.supertypes.filter { context.isDelegated(classDescriptor, it) }.flatMap {
+            val substitutor = TypeSubstitutor.create(
+                IndexedParametersSubstitution(
+                    (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
+                    it.arguments
+                )
+            )
+            val members = DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
+                .map { member -> member.substitute(substitutor) as CallableMemberDescriptor }
+            members.filter { member -> member.overriddenDescriptors.isEmpty() }.map { member ->
+                val delegatedMember = member.newCopyBuilder()
+                    .setOwner(classDescriptor)
+                    .setDispatchReceiverParameter(classDescriptor.thisAsReceiverParameter)
+                    .setModality(if (member.modality == Modality.ABSTRACT) Modality.OPEN else member.modality)
+                    .setKind(CallableMemberDescriptor.Kind.DELEGATION)
+                    .setCopyOverrides(true)
+                    .build()!!
+                delegatedMember.overriddenDescriptors += member
+                delegatedMember
+            }
+        }
+    (classDescriptor.unsubstitutedMemberScope as MutableMemberScope).addMembers(delegatedMembers.toList())
     val fakeOverrides =
         DescriptorResolverUtils.resolveOverridesForNonStaticMembers(
             classDescriptor.name,
