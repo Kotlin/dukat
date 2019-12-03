@@ -9,7 +9,7 @@ class CommonJSExportResolver : ExportResolver {
     private val generalExportResolver = GeneralExportResolver()
 
     override fun resolve(scope: Scope): List<TopLevelDeclaration> {
-        val moduleObject = scope["module"]
+        val moduleObject = scope["module"].resolve()
 
         if (moduleObject is ObjectConstraint) {
             val exportsObject = moduleObject["exports"]
