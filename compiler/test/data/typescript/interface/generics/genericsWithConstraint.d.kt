@@ -20,5 +20,9 @@ external interface Foo<T : Bar> {
     fun withoutArgumentsReturnsT(): T
     fun withOneT(a: T): T
     fun <B : Baz> returnsB(a: Any): B
-    fun <A : T, B : B> withManyArguments(a: A, b: B): T
+    fun <A : T, B : A> withManyArguments(a: A, b: B): T
 }
+
+external interface Bar
+
+external interface Baz

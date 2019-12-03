@@ -62,9 +62,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import lib1.I
 
 external interface J {
-    var y: lib1.I
+    var y: I
 }
 
 // ------------------------------------------------------------------------------------------
@@ -86,5 +87,8 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import lib1.lib2.J
+import lib1.I
+import lib1.lib3.K
 
-external fun foo(x: lib1.lib2.J, y: lib1.I, z: lib1.lib3.K, v: lib1.lib3.K)
+external fun foo(x: J, y: I, z: K, v: K)

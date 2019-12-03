@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
@@ -8,7 +9,7 @@ import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 private class AbstractOrOpenContext : IDLLowering {
     private val interfaces: MutableMap<String, IDLInterfaceDeclaration> = mutableMapOf()
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         interfaces[declaration.name] = declaration
         return declaration
     }
@@ -42,7 +43,7 @@ private class AbstractOrOpenMarker(val context: AbstractOrOpenContext) : IDLLowe
         return !shouldBeConvertedToInterface() && !shouldBeConvertedToOpenClass()
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 kind = when {
                     declaration.shouldBeConvertedToInterface() -> InterfaceKind.INTERFACE

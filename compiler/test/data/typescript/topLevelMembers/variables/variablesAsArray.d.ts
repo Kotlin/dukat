@@ -6,3 +6,6 @@ declare var varAsArrayOfBoolean: boolean[];
 declare var varAsArrayOfString: string[];
 declare var varAsArrayOfFoo: Foo[];
 declare var varAsGenericArrayOfFoo: Array<Foo>;
+declare interface Foo {
+
+}

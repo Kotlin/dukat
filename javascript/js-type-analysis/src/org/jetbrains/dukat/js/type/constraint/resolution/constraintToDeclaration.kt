@@ -182,6 +182,7 @@ fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
 fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
             members = mapMembers(),
+            uid = getUID(),
             nullable = true
     )
 }

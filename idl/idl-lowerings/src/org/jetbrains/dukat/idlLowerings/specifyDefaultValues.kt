@@ -47,7 +47,7 @@ private class DefaultValueSpecifier(val sourceSet: IDLSourceSetDeclaration) : ID
         }
     }
 
-    override fun lowerDictionaryMemberDeclaration(declaration: IDLDictionaryMemberDeclaration): IDLDictionaryMemberDeclaration {
+    override fun lowerDictionaryMemberDeclaration(declaration: IDLDictionaryMemberDeclaration, owner: IDLFileDeclaration): IDLDictionaryMemberDeclaration {
         val specifiedDefaultValue = declaration.specifyDefaultValue()
         return declaration.copy(
                 defaultValue = specifiedDefaultValue,

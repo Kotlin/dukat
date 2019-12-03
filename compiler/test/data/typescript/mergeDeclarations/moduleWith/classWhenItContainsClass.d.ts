@@ -15,3 +15,8 @@ declare module "ws" {
 
     export = WebSocket;
 }
+declare module events {
+    class EventEmitter {
+
+    }
+}

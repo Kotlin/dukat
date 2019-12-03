@@ -28,4 +28,4 @@ inline var Event.someField: String get() = this.asDynamic().someField; set(value
 
 inline var Event.optionalField: Any? get() = this.asDynamic().optionalField; set(value) { this.asDynamic().optionalField = value }
 
-inline operator fun Event.invoke(resourceId: String, hash: Any? = definedExternally, callback: Function<*>? = definedExternally) { this.asDynamic().invoke(resourceId, hash, callback) }
+inline operator fun Event.invoke(resourceId: String, hash: Any? = null, callback: Function<*>? = null) { this.asDynamic().invoke(resourceId, hash, callback) }

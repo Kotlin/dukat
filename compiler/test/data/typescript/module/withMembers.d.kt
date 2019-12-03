@@ -28,3 +28,5 @@ external open class B {
 external var c: Number
 
 external fun d(a: Boolean, b: Any, c: SomeType)
+
+external interface SomeType

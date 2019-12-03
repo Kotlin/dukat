@@ -33,3 +33,5 @@ external interface KeyBinding {
 external interface Foo {
     fun foo(editor: Editor): Boolean
 }
+
+external interface Editor

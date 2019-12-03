@@ -10,41 +10,41 @@ import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 
 private class TypedefResolver(val context: TypedefContext) : IDLLowering {
 
-    override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration, owner: IDLFileDeclaration): IDLTypeDeclaration {
         return when (declaration) {
-            is IDLUnionTypeDeclaration -> declaration.copy(unionMembers = declaration.unionMembers.map { lowerTypeDeclaration(it) })
+            is IDLUnionTypeDeclaration -> declaration.copy(unionMembers = declaration.unionMembers.map { lowerTypeDeclaration(it, owner) })
             is IDLSingleTypeDeclaration -> {
                 var newType = context.resolveType(declaration)
                 if (newType is IDLSingleTypeDeclaration && newType != context.resolveType(newType)) {
-                    newType = lowerTypeDeclaration(newType)
+                    newType = lowerTypeDeclaration(newType, owner)
                 }
                 when (newType) {
                     is IDLSingleTypeDeclaration -> {
                         newType.copy(
-                                typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) }
-                                        ?: newType.typeParameter?.let { lowerTypeDeclaration(it) },
+                                typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it, owner) }
+                                        ?: newType.typeParameter?.let { lowerTypeDeclaration(it, owner) },
                                 nullable = declaration.nullable || newType.nullable,
                                 comment = declaration.comment
                         )
                     }
                     is IDLUnionTypeDeclaration -> newType.copy(
-                            unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it) },
+                            unionMembers = newType.unionMembers.map { lowerTypeDeclaration(it, owner) },
                             name = declaration.name,
                             nullable = declaration.nullable,
                             comment = declaration.comment
                     )
                     is IDLFunctionTypeDeclaration -> newType.copy(
                             nullable = declaration.nullable || newType.nullable,
-                            returnType = lowerTypeDeclaration(newType.returnType),
-                            arguments = newType.arguments.map { lowerArgumentDeclaration(it) },
+                            returnType = lowerTypeDeclaration(newType.returnType, owner),
+                            arguments = newType.arguments.map { lowerArgumentDeclaration(it, owner) },
                             comment = declaration.comment
                     )
                     else -> declaration
                 }
             }
             is IDLFunctionTypeDeclaration -> declaration.copy(
-                    returnType = lowerTypeDeclaration(declaration.returnType),
-                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it) }
+                    returnType = lowerTypeDeclaration(declaration.returnType, owner),
+                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it, owner) }
             )
             else -> declaration
         }
@@ -66,7 +66,7 @@ private class TypedefContext : IDLLowering {
         }
     }
 
-    override fun lowerTypedefDeclaration(declaration: IDLTypedefDeclaration): IDLTypedefDeclaration {
+    override fun lowerTypedefDeclaration(declaration: IDLTypedefDeclaration, owner: IDLFileDeclaration): IDLTypedefDeclaration {
         registerTypedef(declaration)
         return declaration
     }

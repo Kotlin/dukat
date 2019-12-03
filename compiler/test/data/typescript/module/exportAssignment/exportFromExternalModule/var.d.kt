@@ -40,6 +40,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Mixto.IMixinStatic
 
 @JsModule("mixto")
-external val mixto: Mixto.IMixinStatic
+external val mixto: IMixinStatic

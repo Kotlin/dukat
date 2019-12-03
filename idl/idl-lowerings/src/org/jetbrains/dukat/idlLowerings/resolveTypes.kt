@@ -77,11 +77,11 @@ private class TypeResolver : IDLLowering {
         }
     }
 
-    override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration): IDLTypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: IDLTypeDeclaration, owner: IDLFileDeclaration): IDLTypeDeclaration {
         if (declaration is IDLUnionTypeDeclaration) {
             if (declaration.name !in resolvedUnionTypes && declaration.name !in failedToResolveUnionTypes) {
                 processUnionType(declaration)
-                declaration.unionMembers.forEach { lowerTypeDeclaration(it) }
+                declaration.unionMembers.forEach { lowerTypeDeclaration(it, owner) }
             }
             return when (declaration.name) {
                 in resolvedUnionTypes -> IDLSingleTypeDeclaration(
@@ -109,13 +109,13 @@ private class TypeResolver : IDLLowering {
                         comment = declaration.comment
                 )
             } else {
-                declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it) })
+                declaration.copy(typeParameter = declaration.typeParameter?.let { lowerTypeDeclaration(it, owner) })
             }
         }
         if (declaration is IDLFunctionTypeDeclaration) {
             return declaration.copy(
-                    returnType = lowerTypeDeclaration(declaration.returnType),
-                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it) }
+                    returnType = lowerTypeDeclaration(declaration.returnType, owner),
+                    arguments = declaration.arguments.map { lowerArgumentDeclaration(it, owner) }
             )
         }
         return declaration
@@ -129,15 +129,15 @@ private class TypeResolver : IDLLowering {
         }
     }
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
-        val newDeclaration = super.lowerInterfaceDeclaration(declaration)
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
+        val newDeclaration = super.lowerInterfaceDeclaration(declaration, owner)
         return newDeclaration.copy(
                 parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
-        val newDeclaration = super.lowerDictionaryDeclaration(declaration)
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
+        val newDeclaration = super.lowerDictionaryDeclaration(declaration, owner)
         return newDeclaration.copy(
                 parents = declaration.parents.mapNotNull { resolveInheritance(it) }
         )
@@ -166,25 +166,25 @@ private class TypeResolver : IDLLowering {
 
 private class DependencyResolver(val typeResolver: TypeResolver) : IDLLowering {
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(
                 unions = declaration.unions + typeResolver.getDependencies(declaration)
         )
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         return declaration.copy(
                 unions = declaration.unions + typeResolver.getDependencies(declaration)
         )
     }
 
-    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration, owner: IDLFileDeclaration): IDLEnumDeclaration {
         return declaration.copy(
                 unions = declaration.unions + typeResolver.getDependencies(declaration)
         )
     }
 
-    override fun lowerUnionDeclaration(declaration: IDLUnionDeclaration): IDLUnionDeclaration {
+    override fun lowerUnionDeclaration(declaration: IDLUnionDeclaration, owner: IDLFileDeclaration): IDLUnionDeclaration {
         return declaration.copy(
                 unions = declaration.unions + typeResolver.getDependencies(declaration)
         )

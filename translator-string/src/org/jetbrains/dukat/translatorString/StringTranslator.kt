@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
@@ -16,6 +17,7 @@ import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -42,6 +44,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
+import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 
 const val FORMAT_TAB = "    "
 
@@ -282,7 +285,7 @@ private fun MethodModel.translate(): List<String> {
     val annotations = annotations.map { "@${it.name}" }
 
     val open = !static && open
-    val overrideClause = if (override) "override " else if (open) "open " else ""
+    val overrideClause = if (override != null) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
     return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause")
@@ -338,7 +341,7 @@ private fun EnumModel.translate(): String {
 
 private fun PropertyModel.translate(): String {
     val open = !static && open
-    val modifier = if (override) "override " else if (open) "open " else ""
+    val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
 
     return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
@@ -355,9 +358,13 @@ private fun MemberModel.translate(): List<String> {
     }
 }
 
+private fun ImportModel.translate(): String {
+    return name.translate() + (asAlias?.let{ " as ${it}" } ?: "")
+}
+
 private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (immutable) "val" else "var"
-    val overrideClause = if (override) "override " else ""
+    val overrideClause = if (override != null) "override " else ""
 
 
     var typeParams = translateTypeParameters(typeParameters)
@@ -388,7 +395,7 @@ private fun MethodModel.translateSignature(): List<String> {
 
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
-    val overrideClause = if (override) "override " else ""
+    val overrideClause = if (override != null) "override " else ""
 
     val metaClause = type.translateMeta()
     val methodNodeTranslation = "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
@@ -620,8 +627,9 @@ class StringTranslator : ModelVisitor {
         classModel.translate(0, ::addOutput)
     }
 
-    fun visitImport(import: NameEntity) {
-        if (import.leftMost() != LIB_PACKAGENAME) {
+    fun visitImport(import: ImportModel) {
+        val isLibImport = import.name.leftMost() == LIB_PACKAGENAME
+        if (!isLibImport || TS_STDLIB_WHITE_LIST.contains(import.name.shiftLeft())) {
             addOutput("import ${import.translate()}")
         }
     }

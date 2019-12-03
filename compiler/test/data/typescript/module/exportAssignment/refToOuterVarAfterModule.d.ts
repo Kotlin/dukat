@@ -8,3 +8,9 @@ declare module "jquery" {
     export = $;
 }
 declare var $: JQueryStatic;
+declare interface JQueryAjaxSettings {
+
+}
+declare interface JQueryXHR {
+
+}

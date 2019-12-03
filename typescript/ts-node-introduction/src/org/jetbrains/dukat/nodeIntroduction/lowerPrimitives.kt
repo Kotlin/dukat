@@ -50,6 +50,11 @@ private class PrimitiveClassLowering : ParameterValueLowering {
         return declaration.copy(
                 value = value,
                 params = declaration.params.map { lowerType(it) },
+                typeReference = if (value != declaration.value) {
+                    null
+                } else {
+                    declaration.typeReference
+                },
                 nullable = nullable,
                 meta = meta
         )

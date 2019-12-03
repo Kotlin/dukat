@@ -8,6 +8,9 @@ declare module Foo {
         }
         var c: number;
         export function d(a: boolean, b, c: SomeType);
+        export interface SomeType {
+
+        }
     }
     interface A {
         baz();
@@ -16,6 +19,6 @@ declare module Foo {
         boo();
     }
     var c: number;
-    function d(a: boolean, b, c: SomeType);
+    function d(a: boolean, b, c: Bar.SomeType);
 }
 

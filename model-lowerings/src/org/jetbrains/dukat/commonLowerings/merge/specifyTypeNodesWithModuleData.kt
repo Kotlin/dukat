@@ -58,7 +58,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                     if (declarationQualifiedName.size > 1) {
                         if (declarationQualifiedName != qualifiedName) {
                             val qualifiedNode = declarationValue.appendRight(declarationQualifiedName).shiftLeft()
-                            return TypeValueModel(qualifiedNode, declaration.params, null, null)
+                            return TypeValueModel(qualifiedNode, declaration.params, null, null, declaration.nullable)
                         }
                     }
                 }
@@ -75,7 +75,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                             val supposedModule = variableModel.name.appendRight(qualifiedName)
 
                             declarationResolver.resolveStrict(pathShifted, supposedModule.process(::unescape))?.let {
-                                return TypeValueModel(supposedModule.appendRight(pathShifted), declaration.params, null, null)
+                                return TypeValueModel(supposedModule.appendRight(pathShifted), declaration.params, null, null, declaration.nullable)
                             }
                         }
                     }
@@ -89,7 +89,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
                         val qualifiedNode = qualifiedPath?.shiftLeft()?.appendLeft(declarationValue.right)
                                 ?: declarationValue.right
 
-                        return TypeValueModel(qualifiedNode, declaration.params, null, null)
+                        return TypeValueModel(qualifiedNode, declaration.params, null, null, declaration.nullable)
                     }
                 }
 
@@ -98,7 +98,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
         return super.lowerTypeModel(ownerContext)
     }
 
-    override fun lowerHeritageNode(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
+    override fun lowerHeritageModel(ownerContext: NodeOwner<HeritageModel>): HeritageModel {
         val heritageClause = ownerContext.node
         val heritageClauseValue = heritageClause.value
 
@@ -113,7 +113,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
             }
         }
 
-        return super.lowerHeritageNode(ownerContext)
+        return super.lowerHeritageModel(ownerContext)
     }
 }
 

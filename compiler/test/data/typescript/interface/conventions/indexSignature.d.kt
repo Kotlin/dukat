@@ -25,3 +25,5 @@ external interface Foo {
     @nativeSetter
     operator fun set(s: String, value: String)
 }
+
+external interface Bar

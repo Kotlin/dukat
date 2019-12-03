@@ -2,6 +2,7 @@ package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 
@@ -12,21 +13,21 @@ private enum class TypeKind {
 private class TypeFinder(private val nameToFind: String): IDLLowering {
     var kind: TypeKind = TypeKind.NOT_FOUND
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         if (declaration.name == nameToFind) {
             kind = TypeKind.INTERFACE
         }
         return declaration
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         if (declaration.name == nameToFind) {
             kind = TypeKind.DICTIONARY
         }
         return declaration
     }
 
-    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration): IDLEnumDeclaration {
+    override fun lowerEnumDeclaration(declaration: IDLEnumDeclaration, owner: IDLFileDeclaration): IDLEnumDeclaration {
         if (declaration.name == nameToFind) {
             kind = TypeKind.ENUM
         }

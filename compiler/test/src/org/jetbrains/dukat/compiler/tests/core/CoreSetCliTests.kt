@@ -10,7 +10,6 @@ import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
@@ -22,7 +21,9 @@ private data class ReportJson(val outputs: List<String>)
 
 class CoreSetCliTests {
 
-    init { resolvePanicMode() }
+    init {
+        resolvePanicMode()
+    }
 
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")

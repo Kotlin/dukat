@@ -14,10 +14,11 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import SomeNamespace.Initializable
 
 external interface SomeStaticAPI {
     @nativeInvoke
-    operator fun invoke(ping: SomeNamespace.Initializable): Boolean
+    operator fun invoke(ping: Initializable): Boolean
 }
 
 // ------------------------------------------------------------------------------------------

@@ -3,3 +3,6 @@ declare class Foo {
     methodWithString(s: string): string;
     methodWithManyArgs(n: number, settings: Bar): boolean;
 }
+declare interface Bar {
+
+}

@@ -329,9 +329,10 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createObjectLiteral(members: Array<MemberDeclaration>): TypeDeclaration {
+  createObjectLiteral(members: Array<MemberDeclaration>, uid: string): TypeDeclaration {
     let objectLiteral = new declarations.ObjectLiteralDeclarationProto();
     objectLiteral.setMembersList(members);
+    objectLiteral.setUid(uid);
 
     let paramValueDeclaration = new declarations.ParameterValueDeclarationProto();
     paramValueDeclaration.setObjectliteral(objectLiteral);

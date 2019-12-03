@@ -2,6 +2,7 @@ package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
@@ -142,7 +143,7 @@ interface TypeLowering : Lowering<ParameterValueDeclaration> {
         )
     }
 
-    override fun lowerTypeAliasNode(declaration: TypeAliasNode): TypeAliasNode {
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode {
         return declaration.copy(typeReference = lowerType(declaration.typeReference))
     }
 

@@ -26,3 +26,5 @@ external open class FooClass {
     open fun methodWithString(s: String): String
     open fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }
+
+external open class Bar

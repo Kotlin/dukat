@@ -20,4 +20,4 @@ data class VariableModel(
         val extend: ClassLikeReferenceModel?,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?
-) : MergeableModel, TopLevelModel
+) : TopLevelModel

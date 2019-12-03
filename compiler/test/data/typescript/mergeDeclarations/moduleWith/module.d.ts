@@ -16,4 +16,31 @@ declare module Ext {
     }
     export var str: string;
     export function bar();
+    export interface IBase {
+
+    }
+}
+
+declare module Ext.util {
+    export interface IPositionable {
+
+    }
+    export interface IObservable {
+
+    }
+    export interface IAnimate {
+
+    }
+    export interface IElementContainer {
+
+    }
+    export interface IRenderable {
+
+    }
+}
+
+declare module Ext.state {
+    export interface IStateful {
+
+    }
 }

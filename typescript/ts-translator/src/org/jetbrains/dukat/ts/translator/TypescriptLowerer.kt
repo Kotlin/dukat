@@ -2,26 +2,25 @@ package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
-import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdEntities
+import org.jetbrains.dukat.commonLowerings.extractTypeAliases
+import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.commonLowerings.merge.mergeClassesAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
 import org.jetbrains.dukat.commonLowerings.merge.mergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
-import org.jetbrains.dukat.commonLowerings.merge.mergeWithNameSpace
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
-import org.jetbrains.dukat.commonLowerings.splitIntoSeparateEntities
+import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.removeConflictingOverloads
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
@@ -30,6 +29,7 @@ import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
@@ -45,12 +45,10 @@ import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
-import org.jetrbains.dukat.nodeLowering.lowerings.moveTypeAliasesOutside
 import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
-import substituteTsStdLibEntities
 
 fun SourceSetDeclaration.isStdLib(): Boolean {
     return sourceName == "<LIBROOT>"
@@ -63,7 +61,6 @@ open class TypescriptLowerer(
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
-                .substituteTsStdLibEntities()
                 .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
                 .generateInterfaceReferences()
@@ -85,18 +82,19 @@ open class TypescriptLowerer(
                 .removeUnusedGeneratedEntities()
                 .rearrangeConstructors()
                 .introduceMissedOverloads()
-                .moveTypeAliasesOutside()
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
+                .removeConflictingOverloads()
+                .substituteTsStdLibEntities()
                 .escapeIdentificators()
                 .removeUnsupportedJsNames()
+                .mergeClassLikes()
                 .mergeModules()
-                .mergeWithNameSpace()
-                .mergeClassesAndInterfaces()
                 .mergeClassLikesAndModuleDeclarations()
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
+                .extractTypeAliases()
                 .lowerOverrides(stdLibSourceSet)
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
@@ -128,14 +126,10 @@ open class TypescriptLowerer(
             lower(source, stdLib, renameMap, uidToFqNameMapper.toMutableMap())
         }.toMutableList()
 
+
         stdLib = stdLib
-                //?.filterOutKotlinStdEntities()
-                ?.whiteList(setOf(
-                    IdentifierEntity("TsStdLib_Iterator"),
-                    IdentifierEntity("IteratorResult"),
-                    IdentifierEntity("IterableIterator")
-                ))
-                ?.splitIntoSeparateEntities()
+                ?.whiteList(TS_STDLIB_WHITE_LIST)
+        //?.splitIntoSeparateEntities()
 
         stdLib?.let { loweredSources.add(it) }
 

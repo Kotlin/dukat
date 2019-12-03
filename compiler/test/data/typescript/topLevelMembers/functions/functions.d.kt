@@ -26,3 +26,5 @@ external fun withOneNumber(num: Number): Number
 external fun withOneBoolean(bool: Boolean): Boolean
 
 external fun withManyArguments(s: String, settings: JQueryAjaxSettings): Boolean
+
+external interface JQueryAjaxSettings
