@@ -574,14 +574,14 @@ export class AstConverter {
     }
 
 
-    convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): InterfaceDeclaration {
+    convertTypeLiteralToInterfaceDeclaration(uid: string, name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): InterfaceDeclaration {
         return this.astFactory.createInterfaceDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(name),
           this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
           this.convertTypeParams(typeParams),
           [],
           [],
-          this.exportContext.getUID(typeLiteral)
+          uid
         );
     }
 
@@ -787,6 +787,7 @@ export class AstConverter {
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
                 res.push(this.convertTypeLiteralToInterfaceDeclaration(
+                  this.exportContext.getUID(statement),
                   statement.name.getText(),
                   statement.type as ts.TypeLiteralNode,
                   statement.typeParameters
