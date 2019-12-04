@@ -135,7 +135,7 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
             name = IdentifierEntity(name),
             members = members,
             typeParameters = emptyList(),
-            parentEntities = emptyList(), //TODO support inheritance,
+            parentEntities = emptyList(),
             modifiers = EXPORT_MODIFIERS,
             uid = getUID()
     )

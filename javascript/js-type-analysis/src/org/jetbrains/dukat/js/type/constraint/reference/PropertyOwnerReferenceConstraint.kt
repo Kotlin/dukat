@@ -24,7 +24,6 @@ abstract class PropertyOwnerReferenceConstraint(parent: PropertyOwner) : Propert
     protected fun Constraint.resolveWithProperties() : Constraint {
         if(this is PropertyOwner) {
             modifiedProperties.forEach { (name, constraint) ->
-                //TODO take composite constraints into account here
                 this[name] = constraint
             }
         }
