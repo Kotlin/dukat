@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.js.type.analysis
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
-import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner

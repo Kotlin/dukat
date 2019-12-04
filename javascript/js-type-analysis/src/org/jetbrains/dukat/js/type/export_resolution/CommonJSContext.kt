@@ -5,17 +5,30 @@ import org.jetbrains.dukat.js.type.property_owner.Scope
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 
-class CommonJSExportResolver : ExportResolver {
-    private val generalExportResolver = GeneralExportResolver()
+class CommonJSContext : TypeAnalysisContext {
+    private val basicContext = BasicJSContext()
 
-    override fun resolve(scope: Scope): List<TopLevelDeclaration> {
-        val moduleObject = scope["module"].resolve()
+    override fun getEnvironment(): Scope {
+        val env = basicContext.getEnvironment()
+
+        val moduleObject = ObjectConstraint(env)
+        val exportsObject = ObjectConstraint(env)
+
+        moduleObject["exports"] = exportsObject
+        env["module"] = moduleObject
+        env["exports"] = exportsObject
+
+        return env
+    }
+
+    override fun getExportsFrom(environment: Scope): List<TopLevelDeclaration> {
+        val moduleObject = environment["module"]
 
         if (moduleObject is ObjectConstraint) {
             val exportsObject = moduleObject["exports"]
 
             if (exportsObject != null) {
-                return generalExportResolver.resolve(
+                return basicContext.getExportsFrom(
                         Scope(null).apply {
                             if (exportsObject is ObjectConstraint) {
                                 exportsObject.propertyNames.forEach {
