@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
+import org.jetbrains.dukat.commonLowerings.anyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.extractTypeAliases
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
@@ -99,6 +100,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addImports()
+                .anyfyUnresolvedTypes()
                 .addStandardImportsAndAnnotations()
 
         return models

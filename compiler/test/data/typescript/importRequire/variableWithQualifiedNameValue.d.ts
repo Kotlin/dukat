@@ -21,6 +21,6 @@ declare namespace somethingfy {
      */
     interface Options extends CustomOptions {
         // will be passed to insert-module-globals as the opts.vars parameter.
-        insertGlobalVars?: insertGlobals.VarsOption;
+        insertGlobalVars?: Any;
     }
 }

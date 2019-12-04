@@ -13,6 +13,8 @@ val KotlinStdlibEntities = setOf(
         IdentifierEntity("String"),
         IdentifierEntity("Unit"),
 
+        IdentifierEntity("dynamic"),
+
         IdentifierEntity("AbstractWorker"),
         IdentifierEntity("AddEventListenerOptions"),
         IdentifierEntity("ApplicationCache"),
