@@ -1,4 +1,4 @@
-package org.jetrbains.dukat.nodeLowering.lowerings
+package org.jetbrains.dukat.stdlib
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 

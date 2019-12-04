@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":ts-model"))
+    implementation(project(":stdlib"))
 }

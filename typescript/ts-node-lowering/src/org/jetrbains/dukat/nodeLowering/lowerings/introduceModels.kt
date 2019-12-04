@@ -75,6 +75,7 @@ import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
@@ -149,20 +150,20 @@ private class NodeConverter(private val uidToNameMapper: UidMapper) {
 
     private fun MethodNode.process(override: NameEntity? = null): MethodModel {
         // TODO: how ClassModel end up here?
-            return MethodModel(
-                    name = IdentifierEntity(name),
-                    parameters = parameters.map { param -> param.process() },
-                    type = type.process(),
-                    typeParameters = convertTypeParams(typeParameters),
+        return MethodModel(
+                name = IdentifierEntity(name),
+                parameters = parameters.map { param -> param.process() },
+                type = type.process(),
+                typeParameters = convertTypeParams(typeParameters),
 
-                    static = static,
+                static = static,
 
-                    override = override,
-                    operator = operator,
-                    annotations = resolveAnnotations(),
+                override = override,
+                operator = operator,
+                annotations = resolveAnnotations(),
 
-                    open = open
-            )
+                open = open
+        )
     }
 
 
@@ -518,7 +519,8 @@ private class NodeConverter(private val uidToNameMapper: UidMapper) {
 
     private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
         return this?.let { extendNode ->
-            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid]?.fqName ?: extendNode.name, extendNode.typeParameters)
+            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid]?.fqName
+                    ?: extendNode.name, extendNode.typeParameters)
         }
     }
 
