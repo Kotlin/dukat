@@ -23,15 +23,27 @@ private fun ParameterModel.withoutMeta(): ParameterModel {
     return copy(type = type.withoutMeta())
 }
 
+private fun MemberModel.normalize(): MemberModel {
+    return when (this) {
+        is MethodModel -> copy(
+            parameters = parameters.map { it.withoutMeta() },
+            override = null
+        )
+        else -> this
+    }
+}
+
 private fun MemberModel.withoutMeta(): MemberModel {
     return when (this) {
-        is MethodModel -> copy(parameters = parameters.map { it.withoutMeta() })
+        is MethodModel -> copy(
+                parameters = parameters.map { it.withoutMeta() }
+        )
         else -> this
     }
 }
 
 private fun filterOutConflictingOverloads(members: List<MemberModel>): List<MemberModel> {
-    return members.groupBy { it.withoutMeta() }.map { (_, bucketMembers) ->
+    return members.groupBy { it.normalize() }.map { (_, bucketMembers) ->
         if (bucketMembers.size > 1) {
             bucketMembers.first().withoutMeta()
         } else {
