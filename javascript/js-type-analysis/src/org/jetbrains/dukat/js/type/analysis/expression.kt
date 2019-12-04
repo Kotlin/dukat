@@ -265,7 +265,7 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is FunctionDeclaration -> this.addTo(owner) ?: NoTypeConstraint
         is ClassDeclaration -> this.addTo(owner, path) ?: NoTypeConstraint
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
-        is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner) //TODO replace this with a reference constraint (of some sort)
+        is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is TypeOfExpressionDeclaration -> this.calculateConstraints(owner, path)
