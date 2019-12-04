@@ -34,6 +34,7 @@ import org.jetbrains.dukat.ast.model.nodes.isUnit
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
+import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -106,7 +107,12 @@ private data class Members(
         val static: List<MemberModel>
 )
 
-private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>) {
+private typealias UidMapper = Map<String, FqNode>
+private typealias UidMutableMapper = MutableMap<String, FqNode>
+
+data class FqNode(val node: Entity, val fqName: NameEntity)
+
+private class NodeConverter(private val uidToNameMapper: UidMapper) {
 
     companion object {
         val IMPOSSIBLE_CONSTRAINT = IdentifierEntity("<IMPOSSIBLE-CONSTRAINT>")
@@ -141,6 +147,25 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         return emptyList()
     }
 
+    private fun MethodNode.process(override: NameEntity? = null): MethodModel {
+        // TODO: how ClassModel end up here?
+            return MethodModel(
+                    name = IdentifierEntity(name),
+                    parameters = parameters.map { param -> param.process() },
+                    type = type.process(),
+                    typeParameters = convertTypeParams(typeParameters),
+
+                    static = static,
+
+                    override = override,
+                    operator = operator,
+                    annotations = resolveAnnotations(),
+
+                    open = open
+            )
+    }
+
+
     private fun MemberNode.process(): MemberModel? {
         // TODO: how ClassModel end up here?
         return when (this) {
@@ -149,20 +174,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     typeParameters = convertTypeParams(typeParameters),
                     generated = generated
             )
-            is MethodNode -> MethodModel(
-                    name = IdentifierEntity(name),
-                    parameters = parameters.map { param -> param.process() },
-                    type = type.process(),
-                    typeParameters = convertTypeParams(typeParameters),
-
-                    static = static,
-
-                    override = null,
-                    operator = operator,
-                    annotations = resolveAnnotations(),
-
-                    open = open
-            )
+            is MethodNode -> process()
             is PropertyNode -> PropertyModel(
                     name = IdentifierEntity(name),
                     type = type.process(TranslationContext.IRRELEVANT),
@@ -327,12 +339,29 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         }
     }
 
+    private fun convertParentEntities(parentEntities: List<HeritageNode>, generatedMethodsHandler: ((methods: List<MethodModel>) -> Unit)? = null): List<HeritageModel> {
+        return parentEntities.map { parentEntity ->
+            val node = uidToNameMapper[parentEntity.reference?.uid]?.node
+            if (node is InterfaceNode) {
+                val generatedMethods = node.members.filterIsInstance(MethodNode::class.java).filter { it.meta?.generated == true }
+                if (!generatedMethods.isEmpty()) {
+                    generatedMethodsHandler?.invoke(generatedMethods.map { it.copy() }.map { it.process(uidToNameMapper[node.uid]?.fqName) })
+                }
+            }
+            parentEntity.convertToModel()
+        }
+    }
+
     private fun ClassNode.convertToClassModel(): TopLevelModel {
         val membersSplitted = split(members)
 
+        val generatedMethods = mutableListOf<MemberModel>()
+        val parentModelEntities = convertParentEntities(parentEntities) {
+            generatedMethods.addAll(it)
+        }
         return ClassModel(
                 name = name,
-                members = membersSplitted.dynamic,
+                members = membersSplitted.dynamic + generatedMethods,
                 companionObject = if (membersSplitted.static.isNotEmpty()) {
                     ObjectModel(
                             IdentifierEntity(""),
@@ -352,7 +381,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     )
                 },
                 typeParameters = convertTypeParams(typeParameters),
-                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                parentEntities = parentModelEntities,
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
                 external = true,
@@ -373,7 +402,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
         return if (uid.startsWith("lib-")) {
             IdentifierEntity("<LIBROOT>").appendLeft(ownerName)
         } else {
-            uidToNameMapper[uid]
+            uidToNameMapper[uid]?.fqName
         }
     }
 
@@ -401,7 +430,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
                     null
                 },
                 typeParameters = convertTypeParams(typeParameters),
-                parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                parentEntities = convertParentEntities(parentEntities),
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
                 external = true,
@@ -489,7 +518,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
 
     private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
         return this?.let { extendNode ->
-            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid] ?: extendNode.name, extendNode.typeParameters)
+            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid]?.fqName ?: extendNode.name, extendNode.typeParameters)
         }
     }
 
@@ -555,7 +584,7 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
             is ObjectNode -> ObjectModel(
                     name = name,
                     members = members.mapNotNull { member -> member.process() },
-                    parentEntities = parentEntities.map { parentEntity -> parentEntity.convertToModel() },
+                    parentEntities = convertParentEntities(parentEntities),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null
             )
@@ -638,21 +667,21 @@ private class NodeConverter(private val uidToNameMapper: Map<String, NameEntity>
     }
 }
 
-private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) : NodeTypeLowering {
+private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : NodeTypeLowering {
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
         if (!declaration.uid.endsWith("_GENERATED")) {
-            visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+            visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         }
         return super.lowerClassLikeNode(declaration, owner)
     }
 
     override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode {
-        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerTypeAliasNode(declaration, owner)
     }
 
     override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
-        visit(declaration.uid, owner.qualifiedPackageName.appendLeft(declaration.name))
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerEnumNode(declaration, owner)
     }
 
@@ -661,17 +690,9 @@ private class ReferenceVisitor(private val visit: (String, NameEntity) -> Unit) 
     }
 }
 
-private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        "${left.translate()}.${right.translate()}"
-    }
-}
-
-
-fun SourceSetNode.introduceModels(uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
-    ReferenceVisitor { uid, fqName ->
-        uidToFqNameMapper[uid] = fqName
+fun SourceSetNode.introduceModels(uidToFqNameMapper: UidMutableMapper): SourceSetModel {
+    ReferenceVisitor { uid, fqModel ->
+        uidToFqNameMapper[uid] = fqModel
     }.process(this)
 
     return NodeConverter(uidToFqNameMapper).convert(this)

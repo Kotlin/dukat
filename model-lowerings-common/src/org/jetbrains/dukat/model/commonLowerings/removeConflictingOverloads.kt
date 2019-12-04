@@ -45,7 +45,7 @@ private fun MemberModel.withoutMeta(): MemberModel {
 private fun filterOutConflictingOverloads(members: List<MemberModel>): List<MemberModel> {
     return members.groupBy { it.normalize() }.map { (_, bucketMembers) ->
         if (bucketMembers.size > 1) {
-            bucketMembers.first().withoutMeta()
+            bucketMembers.first().normalize()
         } else {
             bucketMembers.first()
         }

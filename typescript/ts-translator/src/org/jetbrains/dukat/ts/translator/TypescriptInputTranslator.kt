@@ -41,6 +41,7 @@ import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.syncTypeNames
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
@@ -57,7 +58,7 @@ fun SourceSetDeclaration.isStdLib(): Boolean {
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
     val moduleNameResolver: ModuleNameResolver
 
-    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
+    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
@@ -109,7 +110,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         val sources = mutableListOf<SourceSetDeclaration>()
 
         val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
-        val uidToFqNameMapper: MutableMap<String, NameEntity> = mutableMapOf()
+        val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
         sourceBundle.sources.forEach { source ->
             if ((source.isStdLib()) && (stdLib == null)) {

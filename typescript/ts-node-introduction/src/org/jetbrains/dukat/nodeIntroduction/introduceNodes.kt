@@ -132,7 +132,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     convertTypeParameters(declaration.typeParameters),
                     false,
                     false,
-                    true
+                    true,
+                    null
             )
         }
     }
@@ -147,7 +148,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         emptyList(),
                         false,
                         true,
-                        true
+                        true,
+                        null
                 ),
                 MethodNode(
                         "set",
@@ -156,7 +158,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         emptyList(),
                         false,
                         true,
-                        true
+                        true,
+                        null
                 )
         )
     }
@@ -170,7 +173,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 convertTypeParameters(typeParameters),
                 false,
                 true,
-                true
+                true,
+                null
         )
     }
 
@@ -435,7 +439,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     convertTypeParameters(declaration.typeParameters),
                     declaration.isStatic(),
                     false,
-                    true
+                    true,
+                    null
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
