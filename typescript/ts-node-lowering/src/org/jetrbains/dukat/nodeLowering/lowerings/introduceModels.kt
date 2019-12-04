@@ -320,8 +320,16 @@ private class NodeConverter(private val uidToNameMapper: UidMapper) {
             is GeneratedInterfaceReferenceNode -> {
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam -> TypeValueModel(typeParam.name, emptyList(), null, reference?.getFqName(typeParam.name)) }
-                                .map { TypeParameterModel(it, listOf()) },
+                        typeParameters.map { typeParam -> TypeValueModel(
+                                typeParam.name,
+                                emptyList(),
+                                null,
+                                if (reference?.uid?.endsWith("_GENERATED") == true) {
+                                    null
+                                } else {
+                                    reference?.getFqName(typeParam.name)
+                                })
+                        }.map { TypeParameterModel(it, listOf()) },
                         meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
                         reference?.getFqName(name),
                         nullable
@@ -671,9 +679,7 @@ private class NodeConverter(private val uidToNameMapper: UidMapper) {
 
 private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : NodeTypeLowering {
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
-        if (!declaration.uid.endsWith("_GENERATED")) {
-            visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
-        }
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerClassLikeNode(declaration, owner)
     }
 

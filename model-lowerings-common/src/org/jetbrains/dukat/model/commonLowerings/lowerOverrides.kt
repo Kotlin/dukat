@@ -45,13 +45,6 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return resolveAsTypeParam()?.constraints?.firstOrNull()
     }
 
-    private fun TypeModel.resolve(): TypeModel {
-        return when (this) {
-            is TypeParameterReferenceModel -> resolveAsTypeParamConstraint() ?: this
-            else -> this
-        }
-    }
-
     private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
         return parentEntities.flatMap { heritageModel ->
             val value = context.unalias(heritageModel.value)
