@@ -356,9 +356,13 @@ export class AstConverter {
                             }
 
                             if (ts.isImportSpecifier(declaration)) {
-                                let type = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
-                                if (type && type.symbol && Array.isArray(type.symbol.declarations)) {
-                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(type.symbol.declarations[0]));
+                                let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
+                                if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
+                                    let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
+                                    //TODO: encountered in @types/express, need to work on a separate test case
+                                    let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
+                                                            declarationFromSymbol.parent : declarationFromSymbol;
+                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
                                 }
                             } else {
                                 typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
