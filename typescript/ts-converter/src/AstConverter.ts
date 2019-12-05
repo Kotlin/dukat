@@ -67,7 +67,9 @@ export class AstConverter {
 
         if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
           for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
-            referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+            if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
+                referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+            }
           }
         }
 
