@@ -16,7 +16,7 @@ class CallArgumentConstraint(
 
         return if (functionConstraint is FunctionConstraint) {
             if (functionConstraint.parameterConstraints.size > argumentNum) {
-                functionConstraint.parameterConstraints[argumentNum].second
+                functionConstraint.parameterConstraints[argumentNum].second.resolveAsInput()
             } else {
                 CompositeConstraint(owner)
             }

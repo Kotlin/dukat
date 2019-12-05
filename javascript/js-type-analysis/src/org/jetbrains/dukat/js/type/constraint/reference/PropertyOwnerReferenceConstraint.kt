@@ -22,12 +22,14 @@ abstract class PropertyOwnerReferenceConstraint(parent: PropertyOwner) : Propert
      * to apply properties to the resolved reference.
      */
     protected fun Constraint.resolveWithProperties() : Constraint {
-        if(this is PropertyOwner) {
+        val copy = this.resolve()
+
+        if(copy is PropertyOwner) {
             modifiedProperties.forEach { (name, constraint) ->
-                this[name] = constraint
+                copy[name] = constraint
             }
         }
 
-        return this.resolve()
+        return copy.resolve()
     }
 }
