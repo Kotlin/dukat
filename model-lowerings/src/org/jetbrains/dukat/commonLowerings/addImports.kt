@@ -22,7 +22,7 @@ private fun NameEntity.translate(): String = when (this) {
     }
 }
 
-private fun NameEntity.itTopLevelImport(): Boolean {
+private fun NameEntity.isTopLevelImport(): Boolean {
     if (this is QualifierEntity) {
         return left == IdentifierEntity("<ROOT>")
     }
@@ -52,7 +52,8 @@ private class TypeVisitor(private val name: NameEntity, private val importContex
             } else if (importContext[shortName] == moduleName) {
                 ownerContext.copy(node = node.copy(value = shortName))
             } else {
-                if ((name == importContext[shortName]) && (fqName.itTopLevelImport())) {
+                val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != fqName) }
+                if ((conflictingImport != null) && (fqName.isTopLevelImport())) {
                     val alias = shortName.copy(shortName.value + "FromRoot")
                     resolvedImports.add(ImportModel(fqName, alias.value))
                     ownerContext.copy(node = node.copy(value = alias))

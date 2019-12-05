@@ -39,10 +39,9 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
-import Fiber as FiberFromRoot
 
 @JsModule("fibers")
-external fun Fiber(fn: Function<*>): FiberFromRoot
+external fun Fiber(fn: Function<*>): Fiber
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("fibers")
