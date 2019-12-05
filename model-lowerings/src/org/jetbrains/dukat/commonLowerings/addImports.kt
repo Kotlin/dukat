@@ -16,10 +16,12 @@ import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> {
-        "${left.translate()}.${right.translate()}"
+    is IdentifierEntity -> when(value) {
+        "<ROOT>" -> ""
+        "<LIBROOT>" -> ""
+        else -> value
     }
+    is QualifierEntity -> "${left.translate()}.${right.translate()}"
 }
 
 private fun NameEntity.isTopLevelImport(): Boolean {
@@ -29,7 +31,6 @@ private fun NameEntity.isTopLevelImport(): Boolean {
 
     return false
 }
-
 
 private class TypeVisitor(private val name: NameEntity, private val importContext: MutableMap<NameEntity, NameEntity>) : ModelWithOwnerTypeLowering {
     val resolvedImports = linkedSetOf<ImportModel>()
@@ -54,7 +55,7 @@ private class TypeVisitor(private val name: NameEntity, private val importContex
             } else {
                 val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != fqName) }
                 if ((conflictingImport != null) && (fqName.isTopLevelImport())) {
-                    val alias = shortName.copy(shortName.value + "FromRoot")
+                    val alias = IdentifierEntity(fqName.translate().replace(".", "_"))
                     resolvedImports.add(ImportModel(fqName, alias.value))
                     ownerContext.copy(node = node.copy(value = alias))
                 } else null
