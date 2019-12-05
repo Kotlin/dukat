@@ -1,9 +1,11 @@
 
 function get2DVector() {
-    return {
+    let v = {
         x: 1,
         y: 1
     }
+
+    return v
 }
 
 function get3DVector() {
@@ -14,16 +16,5 @@ function get3DVector() {
     return v2D
 }
 
-var obj = {
-    a: "text"
-}
-
-function modObj() {
-    obj.b = "text"
-}
-
-
 module.exports.get2DVector = get2DVector
 module.exports.get3DVector = get3DVector
-module.exports.obj = obj
-module.exports.modObj = modObj
