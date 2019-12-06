@@ -71,7 +71,7 @@ protobuf {
 
     generateProtoTasks {
         all().each { task ->
-            if(task.getName() == 'generateProto') {
+            if(task.name == 'generateProto') {
                 task.dependsOn(addProtocGenTs)
                 task.finalizedBy(moveGeneratedTS)
             }
