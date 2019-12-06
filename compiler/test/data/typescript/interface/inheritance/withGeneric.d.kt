@@ -22,4 +22,8 @@ external interface JQueryXHR : MyXMLHttpRequest, JQueryPromise<Any> {
 
 external interface Property<T>
 
-external interface PropertySpec : Property<dynamic /* "ping" | "pong" */>
+external interface PropertySpec : Property<String /* "ping" | "pong" */>
+
+external interface MyXMLHttpRequest
+
+external interface JQueryPromise<T>

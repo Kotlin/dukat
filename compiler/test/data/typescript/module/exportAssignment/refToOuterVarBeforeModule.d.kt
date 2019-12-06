@@ -22,5 +22,7 @@ external interface SinonStatic {
     fun restore(obj: Any)
 }
 
+external interface SinonStub
+
 @JsModule("sinon")
 external val sinon: SinonStatic

@@ -4,19 +4,13 @@ import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
-import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
@@ -105,33 +99,8 @@ private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : 
         }
     }
 
-
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
         return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll()))
-    }
-
-    override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
-
-        val parentEntitiesRemapped = declaration.parentEntities.map { parent ->
-            val resolved = typeAliasContext.resolveTypeAlias(parent)
-
-            if (resolved is TypeValueNode) {
-
-                when (val typeNodeValue = resolved.value) {
-                    is IdentifierEntity ->
-                        HeritageNode(
-                                IdentifierEntity(typeNodeValue.value),
-                                emptyList(),
-                                @Suppress("UNCHECKED_CAST") (resolved.typeReference as ReferenceEntity<ClassLikeDeclaration>?)
-                        )
-                    else -> raiseConcern("unknown NameEntity $typeNodeValue") { parent }
-                }
-            } else {
-                parent
-            }
-        }
-
-        return super.lowerInterfaceNode(declaration.copy(parentEntities = parentEntitiesRemapped))
     }
 }
 

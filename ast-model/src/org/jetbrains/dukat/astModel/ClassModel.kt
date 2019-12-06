@@ -13,7 +13,7 @@ data class ClassModel(
         val primaryConstructor: ConstructorModel?,
         override val annotations: MutableList<AnnotationModel>,
         override val comment: CommentEntity?,
-        val external: Boolean,
+        override val external: Boolean,
         val abstract: Boolean,
         override val visibilityModifier: VisibilityModifierModel
 ) : ClassLikeModel, DelegationModel, MemberModel

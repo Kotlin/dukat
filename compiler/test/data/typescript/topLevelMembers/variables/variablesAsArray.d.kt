@@ -30,3 +30,5 @@ external var varAsArrayOfString: Array<String>
 external var varAsArrayOfFoo: Array<Foo>
 
 external var varAsGenericArrayOfFoo: Array<Foo>
+
+external interface Foo

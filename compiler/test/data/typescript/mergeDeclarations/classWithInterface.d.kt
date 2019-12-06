@@ -18,8 +18,14 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Component<P, S> : Bar, Foo, ComponentLifecycle<P, S> {
+    open var foo: String
+    open fun bar(): Number
+    open fun baz(a: Any)
     open fun boo(p: P, s: S)
-    var foo: String
-    fun bar(): Number
-    fun baz(a: Any)
 }
+
+external interface Foo
+
+external open class Bar
+
+external interface ComponentLifecycle<T, U>

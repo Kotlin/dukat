@@ -3,6 +3,7 @@ package org.jetbrains.dukat.idlLowerings
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
@@ -118,12 +119,12 @@ internal class MissingMemberContext : IDLLowering {
     private val interfaces: MutableMap<String, IDLInterfaceDeclaration> = mutableMapOf()
     private val dictionaries: MutableMap<String, IDLDictionaryDeclaration> = mutableMapOf()
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         interfaces[declaration.name] = declaration
         return declaration
     }
 
-    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration): IDLDictionaryDeclaration {
+    override fun lowerDictionaryDeclaration(declaration: IDLDictionaryDeclaration, owner: IDLFileDeclaration): IDLDictionaryDeclaration {
         dictionaries[declaration.name] = declaration
         return declaration
     }

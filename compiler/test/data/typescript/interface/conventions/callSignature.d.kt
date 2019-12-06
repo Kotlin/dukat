@@ -23,3 +23,5 @@ external interface Foo {
     @nativeInvoke
     operator fun invoke(foo: Foo, s: String): Bar
 }
+
+external interface Bar

@@ -21,4 +21,8 @@ declare module AceAjax {
     export interface Foo {
         foo(editor: Editor): boolean;
     }
+
+    export interface Editor {
+
+    }
 }

@@ -80,7 +80,7 @@ class DescriptorTests : OutputTests() {
                 .serializeRecursively(
                     outputModuleDescriptor.getPackage(FqName.ROOT)
                 ),
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY)
+            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
                 .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
         )
     }

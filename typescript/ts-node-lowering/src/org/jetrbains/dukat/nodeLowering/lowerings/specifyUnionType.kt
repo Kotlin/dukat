@@ -9,6 +9,7 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.MethodNodeMeta
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
@@ -17,6 +18,8 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetrbains.dukat.nodeLowering.IdentityLowering
+
+const val COMPLEXITY_THRESHOLD = 15
 
 private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNode>> {
 
@@ -27,7 +30,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
         when (type) {
             is UnionTypeNode -> {
                 currentComplexity *= type.params.size
-                if (currentComplexity <= 15) {
+                if (currentComplexity <= COMPLEXITY_THRESHOLD) {
                     type.params.map { param ->
                         parameterDeclaration.copy(type = if (type.nullable) param.makeNullable() else param)
                     }
@@ -44,18 +47,27 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
 
 private class SpecifyUnionTypeLowering : IdentityLowering {
 
-    fun generateParams(params: List<ParameterNode>): List<List<ParameterNode>> {
+    fun generateParams(params: List<ParameterNode>): Pair<List<List<ParameterNode>>, Boolean> {
         val specifyParams = specifyArguments(params)
+        val hasUnrolledParams = specifyParams.any { it.size > 1 }
 
         return if (specifyParams.size == 1) {
-            specifyParams.first().map { param -> listOf(param) }
+            Pair(specifyParams.first().map { param -> listOf(param) }, hasUnrolledParams)
         } else {
-            cartesian(*specifyParams.toTypedArray())
+            Pair(cartesian(*specifyParams.toTypedArray()), hasUnrolledParams)
         }
     }
 
+    fun generateMethods(declaration: MethodNode): List<MethodNode> {
+        val generatedParams = generateParams(declaration.parameters)
+        return generatedParams.first.map { params ->
+            declaration.copy(parameters = params, meta = MethodNodeMeta(generated = generatedParams.second))
+        }
+    }
+
+
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
-        return generateParams(declaration.parameters).map { params ->
+        return generateParams(declaration.parameters).first.map { params ->
             declaration.copy(parameters = params)
         }.distinctBy { node ->
             node.copy(
@@ -75,7 +87,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
         val hasDynamic = declaration.parameters.any { (it.type is UnionTypeNode) }
 
-        return generateParams(declaration.parameters).map { params ->
+        return generateParams(declaration.parameters).first.map { params ->
             declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)
         }.distinctBy { node ->
             node.copy(
@@ -89,12 +101,6 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
                         paramCopy
                     }
             )
-        }
-    }
-
-    fun generateMethods(declaration: MethodNode): List<MethodNode> {
-        return generateParams(declaration.parameters).map { params ->
-            declaration.copy(parameters = params)
         }
     }
 
@@ -120,21 +126,21 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         return declaration.copy(members = members)
     }
 
-    fun lowerTopLevelDeclarationList(declaration: TopLevelEntity): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarationList(declaration: TopLevelEntity, owner: DocumentRootNode): List<TopLevelEntity> {
         return when (declaration) {
             is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
             is DocumentRootNode -> listOf(lowerDocumentRoot(declaration))
-            is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration))
+            is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration, owner))
             else -> listOf(declaration)
         }
     }
 
     override fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
         return declarations.flatMap { declaration ->
-            lowerTopLevelDeclarationList(declaration)
+            lowerTopLevelDeclarationList(declaration, owner)
         }
     }
 

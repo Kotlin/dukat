@@ -17,7 +17,7 @@ private class ItemArrayLikeLowering : IDLLowering {
 
     private var alreadyAddedClassesFromStdlib: Boolean = false
 
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         val lengthAttribute = declaration.attributes.find {
             it.name == "length" && it.type == IDLSingleTypeDeclaration("unsignedlong", null, false)
         }

@@ -30,6 +30,7 @@ private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 private val RESERVED_WORDS = setOf(
         "as",
         "class",
+        "for",
         "fun",
         "in",
         "interface",
@@ -38,6 +39,7 @@ private val RESERVED_WORDS = setOf(
         "object",
         "package",
         "return",
+        "this",
         "throw",
         "try",
         "typealias",
@@ -85,8 +87,11 @@ private fun String.shouldEscape(): Boolean {
     val containsOnlyUnderscores = CONTAINS_ONLY_UNDERSCORES.matches(this)
     val startsWithNumber = this.contains(STARTS_WITH_NUMBER)
     val isEscapedAlready = this.startsWith("`")
+    val isStartingWithColon = this.startsWith(":")
+    val isStartingWithDot = this.startsWith(".")
 
-    return !isEscapedAlready && (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber)
+    return !isEscapedAlready &&
+            (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber || isStartingWithColon || isStartingWithDot)
 }
 
 private fun String.escape(): String {
@@ -109,7 +114,7 @@ private fun QualifierEntity.escape(): QualifierEntity {
     return QualifierEntity(left.escape(), right.escape())
 }
 
-private fun NameEntity.escape(): NameEntity {
+fun NameEntity.escape(): NameEntity {
     return when (this) {
         is IdentifierEntity -> escape()
         is QualifierEntity -> escape()
@@ -138,7 +143,14 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     }
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
-        return super.lowerTypeValueModel(ownerContext.copy(node = ownerContext.node.copy(value = ownerContext.node.value.escape())))
+        return super.lowerTypeValueModel(
+            ownerContext.copy(
+                node = ownerContext.node.copy(
+                    value = ownerContext.node.value.escape(),
+                    fqName = ownerContext.node.fqName?.escape()
+                )
+            )
+        )
     }
 
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
@@ -166,7 +178,6 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
-
         val paramName = declaration.name.renameAsParameter()
         return super.lowerParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
@@ -174,7 +185,6 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
         val declaration = ownerContext.node
-
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape()
         )))
@@ -188,10 +198,10 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         )))
     }
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
         return when (val declaration = ownerContext.node) {
             is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = value.value.escape()) })
-            else -> super.lowerTopLevelModel(ownerContext)
+            else -> super.lowerTopLevelModel(ownerContext, moduleModel)
         }
     }
 
@@ -199,7 +209,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return moduleModel.copy(
                 name = moduleModel.name.escape(),
                 shortName = moduleModel.shortName.escape(),
-                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext),
+                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
                 submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, ownerContext.wrap(submodule)) }
         )
     }

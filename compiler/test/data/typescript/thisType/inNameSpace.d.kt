@@ -20,6 +20,7 @@ external fun app(): app.EventEmitter
 
 // ------------------------------------------------------------------------------------------
 @file:JsModule("<RESOLVED_MODULE_NAME>")
+@file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package app
 
@@ -41,12 +42,8 @@ import org.w3c.xhr.*
 external interface Status {
     var current: Number
     var total: Number
-    var type: dynamic /* "begin" | "end" | "unknown" */
-        get() = definedExternally
-        set(value) = definedExternally
-    var status: dynamic /* "ok" | "fail" */
-        get() = definedExternally
-        set(value) = definedExternally
+    var type: String /* "begin" | "end" | "unknown" */
+    var status: String /* "ok" | "fail" */
 }
 
 external interface EventEmitter {

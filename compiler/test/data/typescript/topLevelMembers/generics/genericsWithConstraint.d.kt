@@ -20,3 +20,7 @@ external fun <T : Foo> extendsFooT(a: T): T
 external fun <T : Any> extendsAny(a: T): T
 
 external fun <A : Bar, B : A> withManyExtends(a: A, b: B): Boolean
+
+external interface Foo
+
+external interface Bar

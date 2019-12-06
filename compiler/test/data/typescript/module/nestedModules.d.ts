@@ -8,6 +8,9 @@ declare module Foo {
         }
         export var c: number;
         export function d(a: boolean, b, c: SomeType);
+        export interface SomeType {
+
+        }
     }
 }
 

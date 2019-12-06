@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
-import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFINITELY_TYPED_DIR
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.TOPN_DIR
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -46,12 +45,17 @@ class TopNCompilationTests : CompilationTests() {
                     "chalk",
                     "commander/typings",
                     "rxjs",
-                    "tslib",
+                    "tslib/tslib.d.ts",
                     "vue/types"
             ).map { descriptor ->
+                val name = if (descriptor.endsWith("d.ts")) {
+                    descriptor
+                } else {
+                    "$descriptor/index.d.ts"
+                }
                 arrayOf(
                         descriptor,
-                        File("$TOPN_DIR/node_modules/$descriptor/index.d.ts").normalize().absolutePath
+                        File("$TOPN_DIR/node_modules/$name").normalize().absolutePath
                 )
             }.toTypedArray()
 

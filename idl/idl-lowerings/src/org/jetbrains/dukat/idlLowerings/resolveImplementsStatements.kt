@@ -19,14 +19,14 @@ private class ImplementsStatementContext : IDLLowering {
         return missingInheritances[declaration.name] ?: listOf()
     }
 
-    override fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration): IDLImplementsStatementDeclaration {
+    override fun lowerImplementStatementDeclaration(declaration: IDLImplementsStatementDeclaration, owner: IDLFileDeclaration): IDLImplementsStatementDeclaration {
         registerImplementsStatement(declaration)
         return declaration
     }
 }
 
 private class ImplementsStatementResolver(val context: ImplementsStatementContext) : IDLLowering {
-    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration): IDLInterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         return declaration.copy(parents = (declaration.parents + context.getMissingInheritances(declaration)).distinct())
     }
 }

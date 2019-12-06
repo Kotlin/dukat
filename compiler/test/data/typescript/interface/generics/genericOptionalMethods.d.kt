@@ -23,3 +23,5 @@ external interface Foo<T> {
     val <A : T, B> methodWithManyArgs: ((n: A, settings: Bar) -> B)?
         get() = definedExternally
 }
+
+external interface Bar

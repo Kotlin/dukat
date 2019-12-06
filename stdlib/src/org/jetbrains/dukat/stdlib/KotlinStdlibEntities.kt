@@ -1,8 +1,20 @@
-package org.jetbrains.dukat.commonLowerings
+package org.jetbrains.dukat.stdlib
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 val KotlinStdlibEntities = setOf(
+        IdentifierEntity("Array"),
+        IdentifierEntity("Boolean"),
+        IdentifierEntity("Error"),
+        IdentifierEntity("Function"),
+        IdentifierEntity("Number"),
+        IdentifierEntity("RegExp"),
+        IdentifierEntity("ReadonlyArray"),
+        IdentifierEntity("String"),
+        IdentifierEntity("Unit"),
+
+        IdentifierEntity("dynamic"),
+
         IdentifierEntity("AbstractWorker"),
         IdentifierEntity("AddEventListenerOptions"),
         IdentifierEntity("ApplicationCache"),

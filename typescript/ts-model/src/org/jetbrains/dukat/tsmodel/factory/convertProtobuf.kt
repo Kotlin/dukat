@@ -311,7 +311,8 @@ private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration 
         hasObjectLiteral() -> {
             val objectLiteral = objectLiteral
             ObjectLiteralDeclaration(
-                    objectLiteral.membersList.map { it.convert() }
+                    objectLiteral.membersList.map { it.convert() },
+                    objectLiteral.uid
             )
         }
         hasFunctionTypeDeclaration() -> with(functionTypeDeclaration) {

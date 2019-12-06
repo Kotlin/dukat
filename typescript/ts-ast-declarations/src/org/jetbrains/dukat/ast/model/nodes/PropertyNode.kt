@@ -8,7 +8,6 @@ data class PropertyNode(
         val typeParameters: List<TypeValueNode>,
 
         val static: Boolean,
-        val override: Boolean,
 
         val getter: Boolean,
         val setter: Boolean,

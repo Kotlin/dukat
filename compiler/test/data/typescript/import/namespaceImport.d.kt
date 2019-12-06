@@ -40,5 +40,6 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import lib1.I
 
-external fun foo(): lib1.I
+external fun foo(): I

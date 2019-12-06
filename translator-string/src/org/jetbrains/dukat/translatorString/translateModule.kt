@@ -28,13 +28,22 @@ private fun unescape(name: String): String {
 fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
-        if (leftMost() == ROOT_PACKAGENAME) {
-            shiftLeft()!!.translate()
-        } else {
-            "${left.translate()}.${right.translate()}"
+        when (leftMost()) {
+            ROOT_PACKAGENAME -> shiftLeft()!!.translate()
+            LIB_PACKAGENAME -> shiftLeft()!!.translate()
+            else -> "${left.translate()}.${right.translate()}"
         }
     }
 }
+
+private fun NameEntity.normalize(): NameEntity? {
+    return if (leftMost() == ROOT_PACKAGENAME) {
+        this.shiftLeft()
+    } else {
+        this
+    }
+}
+
 
 private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMap: MutableMap<String, Int>): NameEntity {
     val sourceFile = File(fileName)
@@ -67,8 +76,9 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
         }
     }
 
-    if (this.name != null) {
-        name = name.appendLeft(this.name!!)
+
+    this.name?.let {
+        name = name.appendLeft(it.normalize() ?: IdentifierEntity("_"))
     }
 
     val nameString = name.toString().toLowerCase()

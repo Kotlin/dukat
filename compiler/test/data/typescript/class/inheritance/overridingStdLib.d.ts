@@ -1,6 +1,6 @@
 interface AppEvent extends Event {
-    currentTarget: Element;
-    target: Element;
+    currentTarget: Element | null;
+    target: Element | undefined;
     preventDefault(): any;
 }
 

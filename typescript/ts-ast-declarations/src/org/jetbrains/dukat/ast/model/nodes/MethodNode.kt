@@ -9,7 +9,7 @@ data class MethodNode(
         val typeParameters: List<TypeValueNode>,
 
         val static: Boolean,
-        val override: Boolean,
         val operator: Boolean,
-        val open: Boolean
+        val open: Boolean,
+        val meta: MethodNodeMeta?
 ) : MemberNode
