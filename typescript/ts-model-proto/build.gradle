@@ -24,22 +24,6 @@ task addProtocGenTs(type: YarnTask) {
     args = ['add', 'ts-protoc-gen']
 }
 
-
-
-task moveGeneratedTs() {
-    doLast {
-        def tsDir = file("$targetMainDir/ts")
-
-        if (tsDir.exists() && tsDir.isDirectory()) {
-            tsDir.eachFile { file ->
-                file.renameTo("$targetMainDir/js/${file.getName()}")
-            }
-
-            tsDir.delete()
-        }
-    }
-}
-
 dependencies {
     implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
 }
@@ -75,7 +59,6 @@ protobuf {
         all().each { task ->
             if(task.name == 'generateProto') {
                 task.dependsOn(addProtocGenTs)
-                task.finalizedBy(moveGeneratedTs)
             }
 
             task.builtins {

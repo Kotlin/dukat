@@ -357,7 +357,7 @@ export class AstConverter {
                         }
                     }
                 }
-
+                
                 return this.astFactory.createTypeReferenceDeclarationAsParamValue(
                   entity,
                   params,

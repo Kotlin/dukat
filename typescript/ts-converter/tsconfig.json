@@ -12,6 +12,7 @@
     "baseUrl": "./",
     "noImplicitAny": false,
     "typeRoots": [
+      "../ts-model-proto/build/generated/source/proto/main/ts",
       "./build/package/node_modules/@types",
       "./.tsdeclarations"
     ],
