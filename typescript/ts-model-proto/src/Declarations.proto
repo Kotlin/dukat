@@ -291,6 +291,10 @@ message ReturnStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message ThrowStatementDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message ParameterDeclarationProto {
     string name = 1;
     ParameterValueDeclarationProto type = 2;
@@ -363,9 +367,10 @@ message TopLevelDeclarationProto {
         ImportEqualsDeclarationProto importEquals = 9;
         ExpressionStatementDeclarationProto expressionStatement = 10;
         ReturnStatementDeclarationProto returnStatement = 11;
-        BlockDeclarationProto blockStatement = 12;
-        IfStatementDeclarationProto ifStatement = 13;
-        WhileStatementDeclarationProto whileStatement = 14;
+        ThrowStatementDeclarationProto throwStatement = 12;
+        BlockDeclarationProto blockStatement = 13;
+        IfStatementDeclarationProto ifStatement = 14;
+        WhileStatementDeclarationProto whileStatement = 15;
     }
 }
 
