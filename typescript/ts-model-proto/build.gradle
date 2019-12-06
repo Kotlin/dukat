@@ -31,11 +31,7 @@ task prepareNpmPackage(type: Copy) {
     into nodeModulesPath
 }
 
-task installNpmPackageDependencies(type: YarnTask) {
-    dependsOn = ["prepareNpmPackage"]
-    outputs.dir(nodeModulesPath)
-    args = ["install"]
-}
+yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
 dependencies {
     implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
@@ -71,7 +67,7 @@ protobuf {
     generateProtoTasks {
         all().each { task ->
             if(task.name == 'generateProto') {
-                task.dependsOn = [installNpmPackageDependencies]
+                task.dependsOn = [yarn]
             }
 
             task.builtins {
