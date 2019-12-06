@@ -3,6 +3,7 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
@@ -12,14 +13,16 @@ import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
+import java.util.*
 
 class DescriptorContext(val config: JsConfig) {
 
     var currentPackageName: NameEntity = IdentifierEntity("")
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
     private val setOfRegisteredDescriptors: MutableSet<ClassDescriptor> = mutableSetOf()
+    private val delegatedParents: MutableList<Pair<ClassDescriptor, KotlinType>> = mutableListOf()
     private val registeredTypeAliases: MutableMap<NameEntity, TypeAliasDescriptor> = mutableMapOf()
-    private val typeParameters: MutableMap<NameEntity, TypeParameterDescriptor> = mutableMapOf()
+    private val typeParameters: MutableMap<NameEntity, Stack<TypeParameterDescriptor>> = mutableMapOf()
     val registeredImports: MutableList<String> = mutableListOf()
     private val registeredMethods: MutableMap<NameEntity, SimpleFunctionDescriptor> = mutableMapOf()
     private val registeredProperties: MutableMap<NameEntity, PropertyDescriptorImpl> = mutableMapOf()
@@ -48,6 +51,19 @@ class DescriptorContext(val config: JsConfig) {
         setOfRegisteredDescriptors += descriptor
     }
 
+    fun registerDelegations(classDescriptor: ClassDescriptor, parentTypes: List<KotlinType>, heritageModels: List<HeritageModel>) {
+        for ((model, type) in heritageModels.zip(parentTypes)) {
+            if (model.delegateTo != null) {
+                classDescriptor to type
+                delegatedParents.add(classDescriptor to type)
+            }
+        }
+    }
+
+    fun isDelegated(classDescriptor: ClassDescriptor, parent: KotlinType): Boolean {
+        return delegatedParents.contains(classDescriptor to parent)
+    }
+
     fun registerTypeAlias(name: NameEntity, descriptor: TypeAliasDescriptor) {
         registeredTypeAliases[name] = descriptor
     }
@@ -66,15 +82,21 @@ class DescriptorContext(val config: JsConfig) {
     }
 
     fun registerTypeParameter(name: NameEntity, descriptor: TypeParameterDescriptor) {
-        typeParameters[name] = descriptor
+        if (typeParameters[name] == null) {
+            typeParameters[name] = Stack()
+        }
+        typeParameters[name]!!.push(descriptor)
     }
 
     fun getTypeParameter(name: NameEntity): TypeParameterDescriptor? {
-        return typeParameters[name]
+        if (typeParameters[name] == null || typeParameters[name]!!.isEmpty()) {
+            return null
+        }
+        return typeParameters[name]!!.peek()
     }
 
     fun removeTypeParameter(name: NameEntity) {
-        typeParameters.remove(name)
+        typeParameters[name]!!.pop()
     }
 
     fun getAllClassDescriptors(): List<ClassDescriptor> {

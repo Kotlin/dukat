@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
+import org.jetbrains.dukat.commonLowerings.anyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.extractTypeAliases
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
@@ -28,8 +28,8 @@ import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
+import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
@@ -41,6 +41,7 @@ import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.syncTypeNames
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
@@ -57,7 +58,7 @@ fun SourceSetDeclaration.isStdLib(): Boolean {
 interface TypescriptInputTranslator<T> : InputTranslator<T> {
     val moduleNameResolver: ModuleNameResolver
 
-    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
+    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
@@ -99,6 +100,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addImports()
+                .anyfyUnresolvedTypes()
                 .addStandardImportsAndAnnotations()
 
         return models
@@ -109,7 +111,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         val sources = mutableListOf<SourceSetDeclaration>()
 
         val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
-        val uidToFqNameMapper: MutableMap<String, NameEntity> = mutableMapOf()
+        val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
         sourceBundle.sources.forEach { source ->
             if ((source.isStdLib()) && (stdLib == null)) {

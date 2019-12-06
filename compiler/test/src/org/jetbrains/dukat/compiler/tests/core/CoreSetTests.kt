@@ -57,10 +57,11 @@ class CoreSetTests : OutputTests() {
         val modules = translateModule(bundle.translate(tsPath))
         val translated = concatenate(tsPath, modules)
 
+        print("\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}")
+
         assertEquals(
                 translated,
-                File(ktPath).readText().trimEnd(),
-                "\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}"
+                File(ktPath).readText().trimEnd()
         )
 
         val outputDirectory = File("./build/tests/out")

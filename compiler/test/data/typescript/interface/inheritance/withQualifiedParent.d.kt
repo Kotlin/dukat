@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface SignStream : stream.Readable {
-    var payload: stream.Writable
+    var payload: Any
     var secret: Any
     var key: Any
     var privateKey: Any
