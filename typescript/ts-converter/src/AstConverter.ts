@@ -781,6 +781,8 @@ export class AstConverter {
             )
         }
 
+        //TODO convert other iteration statements than while statement
+
         return decl
     }
 
@@ -814,18 +816,10 @@ export class AstConverter {
                 this.astExpressionConverter.convertExpression(statement.expression)
             ));
         } else if (ts.isIfStatement(statement)) {
-            let elseStatement;
-
-            if (statement.elseStatement) {
-                elseStatement = this.convertTopLevelStatement(statement.elseStatement)
-            } else {
-                elseStatement = null
-            }
-
             res.push(this.astFactory.createIfStatement(
                 this.astExpressionConverter.convertExpression(statement.expression),
                 this.convertTopLevelStatement(statement.thenStatement),
-                elseStatement
+                statement.elseStatement ? this.convertTopLevelStatement(statement.elseStatement) : null
             ))
         } else if (ts.isIterationStatement(statement)) {
             let iterationStatement = this.convertIterationStatement(statement);
@@ -833,20 +827,19 @@ export class AstConverter {
             if (iterationStatement) {
                 res.push(iterationStatement)
             }
+        } else if (ts.isReturnStatement(statement)) {
+            res.push(this.astFactory.createReturnStatement(
+                statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+            ));
+        } else if (ts.isThrowStatement(statement)) {
+            res.push(this.astFactory.createThrowStatement(
+                statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+            ))
         } else if (ts.isBlock(statement)) {
             let block = this.convertBlockStatement(statement);
             if (block) {
                 res.push(block)
             }
-        } else if (ts.isReturnStatement(statement)) {
-            let expression : Expression | null = null;
-            if (statement.expression) {
-                expression = this.astExpressionConverter.convertExpression(statement.expression)
-            }
-
-            res.push(this.astFactory.createReturnStatement(
-                expression
-            ));
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
                 res.push(this.convertTypeLiteralToInterfaceDeclaration(

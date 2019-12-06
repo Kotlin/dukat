@@ -150,6 +150,17 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
+  createThrowStatement(expression: Expression | null): Declaration {
+    let throwStatement = new declarations.ThrowStatementDeclarationProto();
+    if (expression) {
+      throwStatement.setExpression(expression);
+    }
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setThrowstatement(throwStatement);
+    return topLevelDeclaration;
+  }
+
   createBlockDeclaration(statements: Array<Declaration>): Block {
     let block = new declarations.BlockDeclarationProto();
     block.setStatementsList(statements);

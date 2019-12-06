@@ -31,6 +31,7 @@ import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
+import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
@@ -111,6 +112,7 @@ import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ThrowStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeAliasDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeOfExpressionDeclarationProto
@@ -286,6 +288,14 @@ fun ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
     )
 }
 
+fun ThrowStatementDeclarationProto.convert(): ThrowStatementDeclaration {
+    return ThrowStatementDeclaration(
+            if(hasExpression()) {
+                expression.convert()
+            } else null
+    )
+}
+
 fun TopLevelDeclarationProto.convert(): TopLevelDeclaration {
     return when {
         hasClassDeclaration() -> classDeclaration.convert()
@@ -301,6 +311,7 @@ fun TopLevelDeclarationProto.convert(): TopLevelDeclaration {
         hasWhileStatement() -> whileStatement.convert()
         hasExpressionStatement() -> expressionStatement.convert()
         hasReturnStatement() -> returnStatement.convert()
+        hasThrowStatement() -> throwStatement.convert()
         hasBlockStatement() -> blockStatement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
