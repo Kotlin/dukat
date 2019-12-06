@@ -7,7 +7,6 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstrain
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
@@ -64,7 +63,6 @@ class CompositeConstraint(
             resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
             resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
             resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
-            resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
             else -> NoTypeConstraint
         }
     }

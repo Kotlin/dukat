@@ -2,6 +2,7 @@ package org.jetbrains.dukat.js.type.analysis
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.ThrowConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
@@ -13,6 +14,7 @@ import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
@@ -51,6 +53,11 @@ fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: 
     return expression?.calculateConstraints(owner, path) ?: VoidTypeConstraint
 }
 
+fun ThrowStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
+    expression?.calculateConstraints(owner, path)
+    return ThrowConstraint
+}
+
 fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint? {
     when (this) {
         is FunctionDeclaration -> this.addTo(owner)
@@ -61,6 +68,7 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWal
         is ExpressionStatementDeclaration -> this.calculateConstraints(owner, path)
         is BlockDeclaration -> return this.calculateConstraints(owner, path)
         is ReturnStatementDeclaration -> return this.calculateConstraints(owner, path)
+        is ThrowStatementDeclaration -> return this.calculateConstraints(owner, path)
         is InterfaceDeclaration,
         is ModuleDeclaration -> { /* These statements aren't supported in JS (ignore them) */ }
         else -> raiseConcern("Unexpected top level entity type <${this::class}>") {  }

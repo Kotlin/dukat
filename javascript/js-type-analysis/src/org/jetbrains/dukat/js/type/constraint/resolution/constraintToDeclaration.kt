@@ -8,6 +8,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConst
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.ThrowConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
@@ -15,6 +16,7 @@ import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.type.anyNullableType
 import org.jetbrains.dukat.js.type.type.booleanType
+import org.jetbrains.dukat.js.type.type.nothingType
 import org.jetbrains.dukat.js.type.type.numberType
 import org.jetbrains.dukat.js.type.type.stringType
 import org.jetbrains.dukat.js.type.type.voidType
@@ -194,6 +196,7 @@ fun Constraint.toType() : ParameterValueDeclaration {
         is BooleanTypeConstraint -> booleanType
         is StringTypeConstraint -> stringType
         is VoidTypeConstraint -> voidType
+        is ThrowConstraint -> nothingType
         is UnionTypeConstraint -> this.toType()
         is ObjectConstraint -> this.toType()
         is FunctionConstraint -> this.toType()
