@@ -1,6 +1,40 @@
+import org.gradle.internal.os.OperatingSystem;
+
 plugins {
     id "java"
     id "com.google.protobuf"
+    id "com.moowork.node"
+}
+
+def targetMainDir = "${project.buildDir}/generated/source/proto/main"
+
+def nodeModulesPath = "${project.buildDir}/ts-model-proto-npm"
+
+node {
+    workDir = gradle.nodeWorkingDir
+
+    version = gradle.nodeVersion
+    npmVersion = gradle.npmVersion
+    yarnVersion = gradle.yarnVersion
+
+    nodeModulesDir = file(nodeModulesPath)
+    download = true
+}
+
+
+task prepareNpmPackage(type: Copy) {
+    from "package.template.json"
+    into nodeModulesPath
+    rename { String fileName -> fileName.replace(".template", "") }
+
+    from "yarn.lock"
+    into nodeModulesPath
+}
+
+task installNpmPackageDependencies(type: YarnTask) {
+    dependsOn = ["prepareNpmPackage"]
+    outputs.dir(nodeModulesPath)
+    args = ["install"]
 }
 
 dependencies {
@@ -9,32 +43,52 @@ dependencies {
 
 sourceSets {
     generated {
-        java.srcDir("${project.buildDir}/generated/source/proto/main/java")
+        java.srcDir("$targetMainDir/java")
     }
 
     main {
         proto {
-            srcDirs = ['src']
+            srcDirs = ["src"]
         }
 
         java {
-            srcDirs = ["${project.buildDir}/generated/source/proto/main/java"]
+            srcDirs = ["$targetMainDir/java"]
         }
     }
 }
 
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${gradle.protobufImplementationVersion}"
+    plugins {
+        ts {
+            path = file("$nodeModulesPath/node_modules/ts-protoc-gen/bin/protoc-gen-ts")
+
+            if (OperatingSystem.current().isWindows()) {
+                path = path + ".cmd"
+            }
+        }
     }
+
     generateProtoTasks {
         all().each { task ->
+            if(task.name == 'generateProto') {
+                task.dependsOn = [installNpmPackageDependencies]
+            }
+
             task.builtins {
                 js {
                     option "import_style=commonjs"
                     option "binary"
                 }
             }
+
+            task.plugins {
+                ts { }
+            }
         }
     }
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:${gradle.protobufImplementationVersion}"
+    }
 }
+
