@@ -5,13 +5,15 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.js.type.analysis.introduceTypes
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
+import org.jetbrains.dukat.tsLowerings.mergeUnions
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver) {
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, NameEntity>): SourceSetModel {
         return super.lower(
                 sourceSet
-                        .introduceTypes(),
+                        .introduceTypes()
+                        .mergeUnions(),
                 stdLibSourceSet,
                 renameMap,
                 uidToFqNameMapper
