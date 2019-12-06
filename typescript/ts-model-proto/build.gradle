@@ -24,7 +24,9 @@ task addProtocGenTs(type: YarnTask) {
     args = ['add', 'ts-protoc-gen']
 }
 
-task moveGeneratedTS() {
+
+
+task moveGeneratedTs() {
     doLast {
         def tsDir = file("$targetMainDir/ts")
 
@@ -73,7 +75,7 @@ protobuf {
         all().each { task ->
             if(task.name == 'generateProto') {
                 task.dependsOn(addProtocGenTs)
-                task.finalizedBy(moveGeneratedTS)
+                task.finalizedBy(moveGeneratedTs)
             }
 
             task.builtins {
@@ -93,3 +95,4 @@ protobuf {
         artifact = "com.google.protobuf:protoc:${gradle.protobufImplementationVersion}"
     }
 }
+
