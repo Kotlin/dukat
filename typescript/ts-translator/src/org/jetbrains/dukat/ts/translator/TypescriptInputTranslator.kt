@@ -33,6 +33,7 @@ import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
+import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
 import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
@@ -67,6 +68,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
                 .generateInterfaceReferences()
                 .eliminateStringType()
                 .desugarArrayDeclarations()
+                .fixImpossibleInheritance()
                 .lowerPartialOfT()
 
         val nodes = declarations.introduceNodes(moduleNameResolver)
