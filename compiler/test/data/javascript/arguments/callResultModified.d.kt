@@ -15,4 +15,19 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun assertNotNull(value: Any?, message: Any?): Any?
+external interface `T$0` {
+    var x: Number
+    var y: Number
+    var z: Number
+}
+
+external interface `T$1` {
+    var x: Number
+    var y: Number
+    var z: Number
+    var negative: Any?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+external fun generateVector(vectorProvider: (`0`: Any? /* = null */, `1`: Any? /* = null */, `2`: Any? /* = null */) -> dynamic): `T$1`

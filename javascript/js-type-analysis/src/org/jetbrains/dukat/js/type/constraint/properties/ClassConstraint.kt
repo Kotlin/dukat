@@ -23,7 +23,7 @@ class ClassConstraint(owner: PropertyOwner, prototype: ObjectConstraint = Object
         return staticMembers[name]
     }
 
-    override fun resolve(): ClassConstraint {
+    override fun resolve(resolveAsInput: Boolean): ClassConstraint {
         val constructorConstraint = constructorConstraint
         if (constructorConstraint != null) {
             this.constructorConstraint = constructorConstraint.resolve()

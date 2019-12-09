@@ -4,8 +4,10 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.CallableConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.ThrowConstraint
@@ -87,6 +89,12 @@ fun FunctionConstraint.toCallSignature() = CallSignatureDeclaration(
         typeParameters = emptyList()
 )
 
+fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
+        parameters = List(parameterCount) { NoTypeConstraint.toParameterDeclaration("") },
+        type = returnConstraints.toType(),
+        typeParameters = emptyList()
+)
+
 fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
     return this.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
 }
@@ -159,9 +167,11 @@ fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
 fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
     val members = mutableListOf<MemberDeclaration>()
 
-    val callSignatureConstraint = callSignatureConstraint
-    if (callSignatureConstraint is FunctionConstraint) {
-        members.add(callSignatureConstraint.toCallSignature())
+    callSignatureConstraints.forEach {
+        when (it) {
+            is FunctionConstraint -> members.add(it.toCallSignature())
+            is CallableConstraint -> members.add(it.toCallSignature())
+        }
     }
 
     members.addAll(

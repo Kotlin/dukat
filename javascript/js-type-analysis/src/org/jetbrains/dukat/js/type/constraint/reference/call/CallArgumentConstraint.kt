@@ -11,17 +11,13 @@ class CallArgumentConstraint(
         private val callTarget: Constraint,
         private val argumentNum: Int
 ) : ImmutableConstraint {
-    override fun resolve(): Constraint {
+    override fun resolve(resolveAsInput: Boolean): Constraint {
         val functionConstraint = callTarget.resolve()
 
-        return if (functionConstraint is FunctionConstraint) {
-            if (functionConstraint.parameterConstraints.size > argumentNum) {
-                functionConstraint.parameterConstraints[argumentNum].second.resolveAsInput()
-            } else {
-                CompositeConstraint(owner)
-            }
+        return if (functionConstraint is FunctionConstraint && functionConstraint.parameterConstraints.size > argumentNum) {
+            functionConstraint.parameterConstraints[argumentNum].second.resolve(resolveAsInput = true)
         } else {
-            CallArgumentConstraint(owner, functionConstraint, argumentNum)
+            CompositeConstraint(owner)
         }
     }
 }

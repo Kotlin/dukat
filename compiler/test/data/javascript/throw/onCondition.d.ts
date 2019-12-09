@@ -1,7 +1,7 @@
 
-module.exports.assertNotNull = (value, lazyMessage) => {
+module.exports.assertNotNull = (value, message) => {
     if (value === void 0 || value === null) {
-        throw Error(lazyMessage())
+        throw new Error(message)
     }
 
     return value

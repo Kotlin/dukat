@@ -10,23 +10,14 @@ interface Constraint {
     }
 
     /**
-     * Same as [resolve], but called instead,
-     * when resolving a constraint to get a type
-     * that can be used in a manner this constraint can.
-     *
-     * (For example, when passing an object to a
-     * function, and adding an "x" property to it,
-     * this resolution will not contain it, but
-     * [resolve] will)
-     */
-    fun resolveAsInput() : Constraint
-
-    /**
      * Resolves all references and other constraints it contains,
      * to turn this constraint into one that represents a type.
      *
      * Should only be run after collecting all constraints,
      * and constraint should not be modified afterwards.
+     *
+     * When resolving as an input, resulting constraint
+     * won't contain properties added to this constraint.
      */
-    fun resolve() : Constraint
+    fun resolve(resolveAsInput: Boolean = false): Constraint
 }

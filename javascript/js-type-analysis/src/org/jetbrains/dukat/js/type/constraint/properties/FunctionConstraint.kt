@@ -64,14 +64,14 @@ class FunctionConstraint(
             FunctionConstraint(
                     owner,
                     returnConstraints.resolve(),
-                    parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
+                    parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
             )
         } else {
             if (hasNonStaticMembers()) {
                 classRepresentation.constructorConstraint = FunctionConstraint(
                         owner,
                         returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
                 )
 
                 classRepresentation.resolve()
@@ -84,18 +84,18 @@ class FunctionConstraint(
                     objectRepresentation[it] = classRepresentation[it]!!
                 }
 
-                objectRepresentation.callSignatureConstraint = FunctionConstraint(
+                objectRepresentation.callSignatureConstraints.add(FunctionConstraint(
                         owner,
                         returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolveAsInput() }
-                )
+                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
+                ))
 
                 objectRepresentation.resolve()
             }
         }
     }
 
-    override fun resolve(): Constraint {
+    override fun resolve(resolveAsInput: Boolean): Constraint {
         return when (resolutionState) {
             ResolutionState.UNRESOLVED -> {
                 resolutionState = ResolutionState.RESOLVING
