@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
+import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
@@ -38,14 +39,28 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
-    val translatedUnits = translateModule(System.`in`.readBytes(), translator)
-
-    compileUnits(translatedUnits, outDir, pathToReport)
+private fun compile(
+    outDir: String?,
+    translator: InputTranslator<ByteArray>,
+    pathToReport: String?,
+    generateDescriptors: Boolean
+) {
+    val data = System.`in`.readBytes()
+    if (!generateDescriptors) {
+        val translatedUnits = translateModule(data, translator)
+        compileUnits(translatedUnits, outDir, pathToReport)
+    } else {
+        writeDescriptorsToFile(translator, data, outDir ?: "./")
+    }
 }
 
-private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
-    val translatedUnits: List<TranslationUnitResult> =  filenames.flatMap { filename ->
+private fun compile(
+    filenames: List<String>,
+    outDir: String?,
+    translator: InputTranslator<String>,
+    pathToReport: String?
+) {
+    val translatedUnits: List<TranslationUnitResult> = filenames.flatMap { filename ->
         val sourceFile = File(filename)
 
         translateModule(sourceFile.absolutePath, translator)
@@ -118,7 +133,8 @@ fun Iterator<String>.readArg(): String? {
 }
 
 private fun printUsage(program: String) {
-    println("""
+    println(
+        """
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
@@ -126,17 +142,19 @@ where possible options include:
     -m  String                      use this value as @file:JsModule annotation value whenever such annotation occurs
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -v, -version                    print version
-""".trimIndent())
+""".trimIndent()
+    )
 }
 
 
 private data class CliOptions(
-        val sources: List<String>,
-        val outDir: String?,
-        val basePackageName: NameEntity,
-        val jsModuleName: String?,
-        val reportPath: String?,
-        val tsDefaultLib: String
+    val sources: List<String>,
+    val outDir: String?,
+    val basePackageName: NameEntity,
+    val jsModuleName: String?,
+    val reportPath: String?,
+    val tsDefaultLib: String,
+    val generateDescriptors: Boolean
 )
 
 
@@ -156,11 +174,16 @@ private fun process(args: List<String>): CliOptions? {
     var basePackageName: NameEntity = ROOT_PACKAGENAME
     var jsModuleName: String? = null
     var reportPath: String? = null
+    var generateDescriptors = false
+
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
         when (arg) {
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)
+            }
+            "--descriptors" -> {
+                generateDescriptors = true
             }
             "-d" -> {
                 val outDirArg = argsIterator.readArg()
@@ -213,11 +236,13 @@ private fun process(args: List<String>): CliOptions? {
                     sources.add(arg)
                 }
                 else -> {
-                    printError("""
+                    printError(
+                        """
 following file extensions are supported:
     *.d.ts - for TypeScript declarations
     *.idl, *.webidl - for Web IDL declarations                            
-                """.trimIndent())
+                """.trimIndent()
+                    )
                     return null
                 }
             }
@@ -226,7 +251,7 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath;
 
-    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
+    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors)
 }
 
 fun main(vararg args: String) {
@@ -252,26 +277,28 @@ fun main(vararg args: String) {
         }
 
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
-        val isIdlTranslation = options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
+        val isIdlTranslation =
+            options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
         when {
             isTsTranslation -> {
                 compile(
-                        options.outDir,
-                        createJsByteArrayTranslator(
-                                moduleResolver
-                        ),
-                        options.reportPath
+                    options.outDir,
+                    createJsByteArrayTranslator(
+                        moduleResolver
+                    ),
+                    options.reportPath,
+                    options.generateDescriptors
                 )
 
             }
 
-            isIdlTranslation-> {
+            isIdlTranslation -> {
                 compile(
-                        options.sources,
-                        options.outDir,
-                        IdlInputTranslator(DirectoryReferencesResolver()),
-                        options.reportPath
+                    options.sources,
+                    options.outDir,
+                    IdlInputTranslator(DirectoryReferencesResolver()),
+                    options.reportPath
                 )
             }
 

@@ -22,7 +22,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -1125,7 +1125,7 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
     context.addResolved(classDescriptor)
 }
 
-fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
+fun SourceBundleModel.translateToDescriptors(): ModuleDescriptor {
 
     val moduleDescriptor = ModuleDescriptorImpl(
         Name.special("<main>"),
@@ -1136,7 +1136,7 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
     val context = DescriptorContext(generateJSConfig())
     val translator = DescriptorTranslator(context)
 
-    val fragments = sources.map {
+    val fragments = sources.flatMap { it.sources }.map {
         translator.translateModule(
             it.root,
             moduleDescriptor
@@ -1156,7 +1156,7 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
         )
     )
     moduleDescriptor.initialize(provider)
-    sources.forEach { sourceFile ->
+    sources.flatMap { it.sources }.forEach { sourceFile ->
         moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
             .fragments.forEach { it.getMemberScope() }
     }
