@@ -29,7 +29,7 @@ external interface CustomOptions {
 }
 
 external interface Options : CustomOptions {
-    var insertGlobalVars: insertGlobals.VarsOption?
+    var insertGlobalVars: Any?
         get() = definedExternally
         set(value) = definedExternally
 }

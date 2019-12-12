@@ -15,6 +15,7 @@ interface This {
     when: string;
     typealias: number;
     typeof: number;
+    this: This;
     in(object: Foo);
     is(value: any): Boolean;
     return(): any;

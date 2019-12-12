@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":ast-model"))
     implementation(project(":js-type-analysis"))
     implementation(project(":ts-model"))
+    implementation(project(":ts-node-lowering"))
     implementation(project(":ts-translator"))
     implementation(project(":module-name-resolver"))
 }

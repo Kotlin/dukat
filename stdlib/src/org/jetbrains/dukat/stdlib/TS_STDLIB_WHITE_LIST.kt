@@ -1,5 +1,4 @@
-package org.jetbrains.dukat.translator
-
+package org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 val TS_STDLIB_WHITE_LIST = setOf(

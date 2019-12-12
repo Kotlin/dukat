@@ -8,4 +8,5 @@ dependencies {
     implementation(project(":model-lowerings-common"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
+    implementation(project(":stdlib"))
 }

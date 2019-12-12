@@ -62,7 +62,9 @@ export class AstConverter {
 
         if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
           for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
-            referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+            if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
+                referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+            }
           }
         }
 
@@ -374,9 +376,13 @@ export class AstConverter {
                             }
 
                             if (ts.isImportSpecifier(declaration)) {
-                                let type = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
-                                if (type && type.symbol && Array.isArray(type.symbol.declarations)) {
-                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(type.symbol.declarations[0]));
+                                let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
+                                if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
+                                    let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
+                                    //TODO: encountered in @types/express, need to work on a separate test case
+                                    let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
+                                                            declarationFromSymbol.parent : declarationFromSymbol;
+                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
                                 }
                             } else {
                                 typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
@@ -588,14 +594,14 @@ export class AstConverter {
     }
 
 
-    convertTypeLiteralToInterfaceDeclaration(name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): Declaration {
+    convertTypeLiteralToInterfaceDeclaration(uid: string, name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): Declaration {
         return this.astFactory.createInterfaceDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(name),
           this.convertMembersToInterfaceMemberDeclarations(typeLiteral.members),
           this.convertTypeParams(typeParams),
           [],
           [],
-          this.exportContext.getUID(typeLiteral)
+          uid
         );
     }
 
@@ -843,6 +849,7 @@ export class AstConverter {
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {
                 res.push(this.convertTypeLiteralToInterfaceDeclaration(
+                  this.exportContext.getUID(statement),
                   statement.name.getText(),
                   statement.type as ts.TypeLiteralNode,
                   statement.typeParameters

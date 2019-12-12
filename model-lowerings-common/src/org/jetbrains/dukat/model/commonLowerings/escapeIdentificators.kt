@@ -39,6 +39,7 @@ private val RESERVED_WORDS = setOf(
         "object",
         "package",
         "return",
+        "this",
         "throw",
         "try",
         "typealias",

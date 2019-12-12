@@ -2,7 +2,6 @@ package org.jetbrains.dukat.translatorString
 
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.shiftLeft
@@ -41,10 +40,10 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
-import org.jetbrains.dukat.translator.TS_STDLIB_WHITE_LIST
 
 const val FORMAT_TAB = "    "
 

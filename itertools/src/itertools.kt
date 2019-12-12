@@ -20,8 +20,7 @@ fun <T> cartesian(vararg lists: List<T>): List<List<T>> {
     return when(lists.size) {
         0 -> listOf(emptyList())
         1 -> {
-            val a = lists.first()
-            listOf(a)
+            listOf(lists[0])
         }
         2 -> {
             val (aList, bList) = lists

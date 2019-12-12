@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 
 data class InterfaceNode(
         override val name: NameEntity,
-        val members: List<MemberNode>,
+        override val members: List<MemberNode>,
         val typeParameters: List<TypeValueNode>,
         val parentEntities: List<HeritageNode>,
         var exportQualifier: ExportQualifier?,
