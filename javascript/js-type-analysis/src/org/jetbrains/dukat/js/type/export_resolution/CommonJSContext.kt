@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.js.type.export_resolution
 
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
+import org.jetbrains.dukat.js.type.constraint.resolution.asDefaultToDeclarations
 import org.jetbrains.dukat.js.type.property_owner.Scope
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
@@ -21,28 +22,28 @@ class CommonJSContext : TypeAnalysisContext {
         return env
     }
 
-    override fun getExportsFrom(environment: Scope): List<TopLevelDeclaration> {
+    override fun getExportsFrom(environment: Scope, defaultExportName: String): List<TopLevelDeclaration> {
         val moduleObject = environment["module"]
 
         if (moduleObject is ObjectConstraint) {
             val exportsObject = moduleObject["exports"]
 
             if (exportsObject != null) {
-                return basicContext.getExportsFrom(
-                        Scope(null).apply {
-                            if (exportsObject is ObjectConstraint) {
+                return if (exportsObject is ObjectConstraint) {
+                    basicContext.getExportsFrom(
+                            Scope(null).apply {
                                 exportsObject.propertyNames.forEach {
                                     this[it] = exportsObject[it]!!
                                 }
-                            } else {
-                                //TODO figure out what to do in this case
-                                this["default"] = exportsObject
-                            }
-                        }
-                )
+                            },
+                            defaultExportName
+                    )
+                } else {
+                    exportsObject.asDefaultToDeclarations(defaultExportName)
+                }
             }
         }
 
-        return raiseConcern("No exports found!") { emptyList<TopLevelDeclaration>() }
+        return raiseConcern("No exports found!") { emptyList() }
     }
 }

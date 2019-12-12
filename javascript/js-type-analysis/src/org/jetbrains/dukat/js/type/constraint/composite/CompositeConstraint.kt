@@ -1,14 +1,15 @@
 package org.jetbrains.dukat.js.type.constraint.composite
 
 import org.jetbrains.dukat.js.type.constraint.Constraint
+import org.jetbrains.dukat.js.type.constraint.immutable.CallableConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NumberTypeConstraint
-import org.jetbrains.dukat.js.type.constraint.immutable.resolved.RecursiveConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
+import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class CompositeConstraint(
@@ -56,32 +57,53 @@ class CompositeConstraint(
         }
     }
 
-    private fun resolveToBasicType() : Constraint {
-        val resolvedConstraints = getFlatConstraints().map { it.resolve() }
+    override fun resolve(resolveAsInput: Boolean) : Constraint {
+        val properties = if (resolveAsInput) neededProperties else allProperties
 
-        return when {
-            resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
-            resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
-            resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
-            resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
-            resolvedConstraints.contains(RecursiveConstraint) -> RecursiveConstraint
-            else -> NoTypeConstraint
-        }
-    }
+        val resolvedConstraints = getFlatConstraints().map { it.resolve(resolveAsInput) }
 
-    private fun resolveWithProperties(properties: Map<String, Constraint>, resolveConstraint: (Constraint) -> Constraint) : Constraint {
-        return if (properties.isNotEmpty()) {
-            ObjectConstraint(owner).apply {
-                properties.forEach { (name, value) ->
-                    this[name] = resolveConstraint(value)
+        val callableConstraints = resolvedConstraints.filterIsInstance<CallableConstraint>()
+
+        return if (properties.isNotEmpty() || callableConstraints.isNotEmpty()) {
+            var parameterCount = -1
+
+            val callsCanBeUnified = callableConstraints.all {
+                if (parameterCount < 0) {
+                    parameterCount = it.parameterCount
+                }
+
+                it.parameterCount == parameterCount
+            }
+
+            val resultConstraint: PropertyOwnerConstraint = if (callableConstraints.isNotEmpty() && callsCanBeUnified) {
+                FunctionConstraint(
+                        owner,
+                        UnionTypeConstraint(
+                                callableConstraints.map { it.returnConstraints }
+                        ),
+                        List(parameterCount) { "`$it`" to NoTypeConstraint }
+                )
+            } else {
+                ObjectConstraint(owner).apply {
+                    callableConstraints.forEach {
+                        callSignatureConstraints.add(it.resolve(resolveAsInput))
+                    }
                 }
             }
+
+            properties.forEach { (name, value) ->
+                resultConstraint[name] = value
+            }
+
+            resultConstraint.resolve(resolveAsInput)
         } else {
-            resolveToBasicType()
+            when {
+                resolvedConstraints.contains(NumberTypeConstraint) -> NumberTypeConstraint
+                resolvedConstraints.contains(BigIntTypeConstraint) -> BigIntTypeConstraint
+                resolvedConstraints.contains(BooleanTypeConstraint) -> BooleanTypeConstraint
+                resolvedConstraints.contains(StringTypeConstraint) -> StringTypeConstraint
+                else -> NoTypeConstraint
+            }
         }
     }
-
-    override fun resolve() = resolveWithProperties(allProperties, Constraint::resolve)
-
-    override fun resolveAsInput() = resolveWithProperties(neededProperties, Constraint::resolveAsInput)
 }

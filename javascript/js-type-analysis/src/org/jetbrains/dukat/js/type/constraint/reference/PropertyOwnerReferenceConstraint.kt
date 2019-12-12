@@ -4,7 +4,6 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
-import org.jetbrains.dukat.panic.raiseConcern
 
 abstract class PropertyOwnerReferenceConstraint(parent: PropertyOwner) : PropertyOwnerConstraint(parent) {
     private val modifiedProperties = LinkedHashMap<String, Constraint>()

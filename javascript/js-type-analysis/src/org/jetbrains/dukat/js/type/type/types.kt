@@ -9,6 +9,12 @@ val voidType = TypeDeclaration(
         nullable = false
 )
 
+val nothingType = TypeDeclaration(
+        value = IdentifierEntity("Nothing"),
+        params = emptyList(),
+        nullable = false
+)
+
 val anyNullableType = TypeDeclaration(
         value = IdentifierEntity("any"),
         params = emptyList(),

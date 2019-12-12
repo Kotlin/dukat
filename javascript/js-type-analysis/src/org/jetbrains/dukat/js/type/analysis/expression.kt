@@ -5,6 +5,7 @@ import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.reference.ReferenceConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
+import org.jetbrains.dukat.js.type.constraint.immutable.CallableConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BooleanTypeConstraint
@@ -21,12 +22,8 @@ import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.property_owner.Scope
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -206,6 +203,7 @@ fun TypeOfExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path:
 
 fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     val callTargetConstraints = expression.calculateConstraints(owner, path)
+    var callResultConstraint: Constraint = CallResultConstraint(owner, callTargetConstraints)
     val argumentConstraints = arguments.map { it.calculateConstraints(owner, path) }
 
     argumentConstraints.forEachIndexed { argumentNumber, arg ->
@@ -216,10 +214,14 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
         )
     }
 
-    return CallResultConstraint(
-            owner,
-            callTargetConstraints
-    )
+    if (callTargetConstraints is CompositeConstraint) {
+        callResultConstraint = CompositeConstraint(owner)
+
+        //TODO add arguments to CallableConstraint
+        callTargetConstraints += CallableConstraint(argumentConstraints.size, callResultConstraint)
+    }
+
+    return callResultConstraint
 }
 
 fun NewExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {

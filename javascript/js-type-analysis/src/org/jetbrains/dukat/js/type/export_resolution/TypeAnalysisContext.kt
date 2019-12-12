@@ -6,5 +6,5 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 interface TypeAnalysisContext {
     fun getEnvironment(): Scope
 
-    fun getExportsFrom(environment: Scope) : List<TopLevelDeclaration>
+    fun getExportsFrom(environment: Scope, defaultExportName: String) : List<TopLevelDeclaration>
 }

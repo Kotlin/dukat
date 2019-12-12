@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -49,8 +50,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
-            is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext))
-            is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext))
+            is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
             else -> {
                 logger.trace("skipping $declaration")
                 declaration

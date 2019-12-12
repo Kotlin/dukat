@@ -1,0 +1,14 @@
+{
+  "name": "ts-model-proto",
+  "private": true,
+  "version": "0.0.0",
+  "description": "This is non-public package the only purpose of which is to build ts-related part of dukat project",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "ts-protoc-gen": "0.12.0"
+  },
+  "license": "UNLICENSED"
+}

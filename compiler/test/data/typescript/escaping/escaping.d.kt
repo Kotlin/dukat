@@ -31,6 +31,7 @@ external interface This {
     var `when`: String
     var `typealias`: Number
     var `typeof`: Number
+    var `this`: This
     fun `in`(obj: Foo)
     fun `is`(value: Any): Boolean
     fun `return`(): Any

@@ -13,7 +13,7 @@ class ObjectConstraint(
 
     private val properties = LinkedHashMap<String, Constraint>()
 
-    var callSignatureConstraint: Constraint? = null
+    val callSignatureConstraints = mutableListOf<Constraint>()
 
     override fun set(name: String, data: Constraint) {
         properties[name] = data
@@ -32,13 +32,13 @@ class ObjectConstraint(
                         raiseConcern("Instantiating constraint which cannot be instantiated!") { null }
                     }
                 } else {
-                    null
+                    null //TODO make sure an unresolved class being instantiated works
                 }
             }
         }
     }
 
-    override fun resolve(): ObjectConstraint {
+    override fun resolve(resolveAsInput: Boolean): ObjectConstraint {
         val resolvedConstraint = if (instantiatedClass == null) {
             ObjectConstraint(owner)
         } else {
@@ -51,10 +51,9 @@ class ObjectConstraint(
             }
         }
 
-        val callSignatureConstraint = callSignatureConstraint
-        if (callSignatureConstraint != null) {
-            resolvedConstraint.callSignatureConstraint = callSignatureConstraint.resolve()
-        }
+        resolvedConstraint.callSignatureConstraints.addAll(
+                callSignatureConstraints.map { it.resolve() }
+        )
 
         propertyNames.forEach {
             resolvedConstraint[it] = this[it]!!.resolve()

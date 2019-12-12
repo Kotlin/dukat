@@ -249,11 +249,15 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     }
 }
 
-fun ModuleDeclaration.generateInterfaceReferences(): ModuleDeclaration {
-    val generateInterfaceReferences = GenerateInterfaceReferences()
+private fun ModuleDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferences): ModuleDeclaration {
     return generateInterfaceReferences.getContext().introduceGeneratedEntities(generateInterfaceReferences.lowerDocumentRoot(this, NodeOwner(this, null)))
 }
 
-fun SourceFileDeclaration.generateInterfaceReferences() = copy(root = root.generateInterfaceReferences())
+private fun SourceFileDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferences): SourceFileDeclaration {
+    return copy(root = root.generateInterfaceReferences(generateInterfaceReferences))
+}
 
-fun SourceSetDeclaration.generateInterfaceReferences() = copy(sources = sources.map(SourceFileDeclaration::generateInterfaceReferences))
+fun SourceSetDeclaration.generateInterfaceReferences(): SourceSetDeclaration {
+    val generateInterfaceReferences = GenerateInterfaceReferences()
+    return copy(sources = sources.map { it.generateInterfaceReferences(generateInterfaceReferences) })
+}

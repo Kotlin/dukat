@@ -14,28 +14,12 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Foo.`T$0`
+import Foo.`T$1`
 
-external interface `T$4` {
-    fun bar(a: Any): Number
-    var baz: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var boo: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var show: (overrideChecks: Boolean) -> Unit
-}
+external fun withObjectTypeParam(opt: `T$0`)
 
-external fun withObjectTypeParam(opt: `T$4`)
-
-external interface `T$5` {
-    var value: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var done: Boolean
-}
-
-external fun returnsObjectType(): `T$5`
+external fun returnsObjectType(): `T$1`
 
 external object foo {
     fun bar(a: Any): Number
@@ -108,28 +92,12 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Foo.`T$0`
+import Foo.`T$1`
 
-external interface `T$2` {
-    fun bar(a: Any): Number
-    var baz: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var boo: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var show: (overrideChecks: Boolean) -> Unit
-}
+external fun someFunction(opt: `T$0`)
 
-external fun someFunction(opt: `T$2`)
-
-external interface `T$3` {
-    var value: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-    var done: Boolean
-}
-
-external fun anotherReturnsObjectType(): `T$3`
+external fun anotherReturnsObjectType(): `T$1`
 
 external object foo {
     fun bar(a: Any): Number

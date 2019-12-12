@@ -51,7 +51,7 @@ fun NameEntity.leftMost(): NameEntity {
 fun NameEntity.rightMost(): IdentifierEntity {
     return when (this) {
         is IdentifierEntity -> this
-        is QualifierEntity -> right
+        is QualifierEntity -> right.rightMost()
     }
 }
 

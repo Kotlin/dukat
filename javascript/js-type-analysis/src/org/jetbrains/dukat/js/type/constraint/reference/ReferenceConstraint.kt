@@ -44,7 +44,7 @@ open class ReferenceConstraint(
         }
     }
 
-    override fun resolve(): Constraint {
+    override fun resolve(resolveAsInput: Boolean): Constraint {
         return when (resolutionState) {
             ResolutionState.UNRESOLVED -> {
                 resolvedConstraint = resolveInOwner(owner) ?: CompositeConstraint(owner)

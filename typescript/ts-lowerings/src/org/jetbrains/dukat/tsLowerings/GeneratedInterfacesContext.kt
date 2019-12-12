@@ -188,11 +188,6 @@ private fun MemberEntity.isIdenticalTo(memberDeclaration: MemberEntity): Boolean
 }
 
 private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: GeneratedInterfaceDeclaration): Boolean {
-
-    if (packageOwner != someInterface.packageOwner) {
-        return false
-    }
-
     if (!typeParameters.isIdenticalTo(someInterface.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
         return false
     }

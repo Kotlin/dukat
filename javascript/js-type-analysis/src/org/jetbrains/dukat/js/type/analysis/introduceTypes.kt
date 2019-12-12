@@ -27,7 +27,7 @@ fun ModuleDeclaration.introduceTypes(context: TypeAnalysisContext) : ModuleDecla
 
     environment.resolveConstraints()
 
-    val declarations = context.getExportsFrom(environment)
+    val declarations = context.getExportsFrom(environment, resourceName)
 
     return copy(declarations = declarations)
 }
