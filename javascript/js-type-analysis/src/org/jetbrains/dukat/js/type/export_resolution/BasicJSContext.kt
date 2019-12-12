@@ -9,7 +9,7 @@ class BasicJSContext : TypeAnalysisContext {
         return Scope(null)
     }
 
-    override fun getExportsFrom(environment: Scope) : List<TopLevelDeclaration> {
+    override fun getExportsFrom(environment: Scope, defaultExportName: String) : List<TopLevelDeclaration> {
         return environment.propertyNames.mapNotNull { propertyName ->
             val resolvedConstraint = environment[propertyName]
             resolvedConstraint.toDeclaration(propertyName)

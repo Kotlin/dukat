@@ -26,6 +26,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -33,23 +34,25 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
-val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
+private val DECLARE_MODIFIERS = listOf(ModifierDeclaration.DECLARE_KEYWORD)
+private val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
+private val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
 
-fun getVariableDeclaration(name: String, type: ParameterValueDeclaration) = VariableDeclaration(
+private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration, exportModifiers: List<ModifierDeclaration>) = VariableDeclaration(
         name = name,
         type = type,
-        modifiers = EXPORT_MODIFIERS,
+        modifiers = exportModifiers,
         initializer = null,
         uid = getUID()
 )
 
-fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStatic: Boolean) = PropertyDeclaration(
+private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStatic: Boolean) = PropertyDeclaration(
         name = name,
         initializer = null,
         type = type,
@@ -58,7 +61,7 @@ fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStat
         modifiers = if (isStatic) STATIC_MODIFIERS else emptyList()
 )
 
-fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
+private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
         name = name,
         type = this.toType(),
         initializer = null,
@@ -66,51 +69,51 @@ fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
         optional = false
 )
 
-fun FunctionConstraint.toDeclaration(name: String) = FunctionDeclaration(
+private fun FunctionConstraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) = FunctionDeclaration(
         name = name,
         parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
         type = returnConstraints.toType(),
         typeParameters = emptyList(),
-        modifiers = EXPORT_MODIFIERS,
+        modifiers = exportModifiers,
         body = null,
         uid = getUID()
 )
 
-fun FunctionConstraint.toConstructor() = ConstructorDeclaration(
+private fun FunctionConstraint.toConstructor() = ConstructorDeclaration(
         parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
         typeParameters = emptyList(),
-        modifiers = EXPORT_MODIFIERS,
+        modifiers = emptyList(),
         body = null
 )
 
-fun FunctionConstraint.toCallSignature() = CallSignatureDeclaration(
+private fun FunctionConstraint.toCallSignature() = CallSignatureDeclaration(
         parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
         type = returnConstraints.toType(),
         typeParameters = emptyList()
 )
 
-fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
+private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
         parameters = List(parameterCount) { NoTypeConstraint.toParameterDeclaration("") },
         type = returnConstraints.toType(),
         typeParameters = emptyList()
 )
 
-fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
+private fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
     return this.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
 }
 
-fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
-    return this.toDeclaration(name).withStaticModifier(isStatic)
+private fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
+    return this.toDeclaration(name, EXPORT_MODIFIERS).withStaticModifier(isStatic)
 }
 
-fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : MemberDeclaration? {
+private fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : MemberDeclaration? {
     return when (this) {
         is FunctionConstraint -> this.toMemberDeclaration(name, isStatic)
         else -> getPropertyDeclaration(name, this.toType(), isStatic)
     }
 }
 
-fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
+private fun ClassConstraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) : ClassDeclaration {
     val members = mutableListOf<MemberDeclaration>()
 
     val constructorConstraint = constructorConstraint
@@ -146,25 +149,25 @@ fun ClassConstraint.toDeclaration(name: String) : ClassDeclaration {
             members = members,
             typeParameters = emptyList(),
             parentEntities = emptyList(),
-            modifiers = EXPORT_MODIFIERS,
+            modifiers = exportModifiers,
             uid = getUID()
     )
 }
 
-fun FunctionConstraint.toType() : FunctionTypeDeclaration {
+private fun FunctionConstraint.toType() : FunctionTypeDeclaration {
     return FunctionTypeDeclaration(
             parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
             type = returnConstraints.toType()
     )
 }
 
-fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
+private fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
     return UnionTypeDeclaration(
             params = types.map { it.toType() }
     )
 }
 
-fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
+private fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
     val members = mutableListOf<MemberDeclaration>()
 
     callSignatureConstraints.forEach {
@@ -191,7 +194,7 @@ fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
     return members
 }
 
-fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
+private fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
             members = mapMembers(),
             uid = getUID(),
@@ -199,7 +202,7 @@ fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     )
 }
 
-fun Constraint.toType() : ParameterValueDeclaration {
+private fun Constraint.toType() : ParameterValueDeclaration {
     return when (this) {
         is NumberTypeConstraint -> numberType
         is BigIntTypeConstraint -> numberType
@@ -214,11 +217,29 @@ fun Constraint.toType() : ParameterValueDeclaration {
     }
 }
 
-fun Constraint.toDeclaration(name: String) : TopLevelDeclaration? {
+private fun Constraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) : TopLevelDeclaration? {
     return when (this) {
-        is ClassConstraint -> this.toDeclaration(name)
-        is FunctionConstraint -> this.toDeclaration(name)
+        is ClassConstraint -> this.toDeclaration(name, exportModifiers)
+        is FunctionConstraint -> this.toDeclaration(name, exportModifiers)
         is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { null }
-        else -> getVariableDeclaration(name, this.toType())
+        else -> getVariableDeclaration(name, this.toType(), exportModifiers)
     }
 }
+
+fun Constraint.toDeclaration(name: String) = toDeclaration(name, EXPORT_MODIFIERS)
+
+fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLevelDeclaration> {
+    val declaration = this.toDeclaration(defaultExportName, DECLARE_MODIFIERS)
+
+    return if (declaration is WithUidDeclaration) {
+        val exportEqualsDeclaration = ExportAssignmentDeclaration(
+                declaration.uid,
+                true
+        )
+
+        listOf(exportEqualsDeclaration, declaration)
+    } else {
+        emptyList()
+    }
+}
+
