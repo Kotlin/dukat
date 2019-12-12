@@ -382,9 +382,9 @@ export class AstFactory implements AstFactory {
     let sourceFile = new declarations.SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
     sourceFile.setReferencedfilesList(referencedFiles);
-      if (root) {
-        sourceFile.setRoot(root);
-      }
+    if (root) {
+      sourceFile.setRoot(root);
+    }
     return sourceFile;
   }
 

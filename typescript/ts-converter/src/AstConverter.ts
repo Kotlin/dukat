@@ -593,6 +593,7 @@ export class AstConverter {
         return members;
     }
 
+
     convertTypeLiteralToInterfaceDeclaration(uid: string, name: string, typeLiteral: ts.TypeLiteralNode, typeParams: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): Declaration {
         return this.astFactory.createInterfaceDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(name),
