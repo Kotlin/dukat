@@ -41,9 +41,6 @@ task moveGeneratedTS() {
             tsDir.eachFile { file ->
                 file.renameTo("$targetMainDir/js/${file.getName()}")
             }
-
-            // Cannot delete folder, since the 'compileJava' accesses it, for some reason
-            // tsDir.delete()
         }
     }
 }
