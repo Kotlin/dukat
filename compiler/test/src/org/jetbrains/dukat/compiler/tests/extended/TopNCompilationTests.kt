@@ -12,7 +12,7 @@ class TopNCompilationTests : CompilationTests() {
     @DisplayName("core test set compile")
     @ParameterizedTest(name = "{0}")
     @MethodSource("extendedSet")
-    @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
+    @EnabledIfSystemProperty(named = "dukat.test.extended.topn", matches = "true")
     override fun runTests(
             descriptor: String,
             sourcePath: String

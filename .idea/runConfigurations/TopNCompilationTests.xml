@@ -11,7 +11,7 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.TopNCompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended=true -Ddukat.test.resources.topN=./build/tests/topN" />
+    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended.topn=true -Ddukat.test.resources.topN=./build/tests/topN" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">
