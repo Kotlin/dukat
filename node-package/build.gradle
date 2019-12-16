@@ -6,6 +6,7 @@ plugins {
 def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
 def PROPERTY_REGISTRY = "dukat.npm.registry"
 def DISTRIB_PATH = "${project.buildDir}/distrib"
+def typescriptVersion = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 
 node {
     workDir = gradle.nodeWorkingDir
@@ -27,6 +28,7 @@ task prepareNpmPackage {
         copy {
             from "package.template.json"
             into DISTRIB_PATH
+            filter { String line -> line.replaceAll("__TS_VERSION__", typescriptVersion) }
             rename { String fileName -> fileName.replace(".template", "") }
         }
 
@@ -43,7 +45,6 @@ task buildDistrib {
     dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
 
     doLast {
-
         copy {
             from "${rootProject.projectDir}/README.md"
             into DISTRIB_PATH

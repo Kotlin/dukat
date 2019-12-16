@@ -13,12 +13,12 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb"),
-      "typescript": path.resolve("./build/package/node_modules/typescript/lib/typescript.js")
+      "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb")
     }
   },
   externals: {
-    "google-protobuf": "google-protobuf"
+    "google-protobuf": "google-protobuf",
+    "typescript": "typescript"
   },
   output: {
     path: path.resolve("build/bundle"),
