@@ -29,7 +29,7 @@ class CommonJSContext : TypeAnalysisContext {
             val exportsObject = moduleObject["exports"]
 
             if (exportsObject != null) {
-                return if (exportsObject is ObjectConstraint) {
+                return if (exportsObject is ObjectConstraint && exportsObject.callSignatureConstraints.isEmpty()) {
                     basicContext.getExportsFrom(
                             Scope(null).apply {
                                 exportsObject.propertyNames.forEach {
