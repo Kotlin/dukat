@@ -22,15 +22,27 @@ configurations {
     cliBinary
 }
 
-task buildDistrib {
-    dependsOn = [":ts-converter:webpack", ":command-line:build"]
-
+task prepareNpmPackage {
     doLast {
         copy {
             from "package.template.json"
             into DISTRIB_PATH
             rename { String fileName -> fileName.replace(".template", "") }
         }
+
+        copy {
+            from "yarn.lock"
+            into DISTRIB_PATH
+        }
+    }
+}
+
+yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+
+task buildDistrib {
+    dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
+
+    doLast {
 
         copy {
             from "${rootProject.projectDir}/README.md"

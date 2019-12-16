@@ -31,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/Kotlin/dukat/issues"
   },
-  "homepage": "https://github.com/Kotlin/dukat#readme"
+  "homepage": "https://github.com/Kotlin/dukat#readme",
+  "dependencies": {
+    "google-protobuf": "3.11.2"
+  }
 }

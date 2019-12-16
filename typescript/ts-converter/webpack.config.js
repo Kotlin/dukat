@@ -14,9 +14,11 @@ module.exports = {
   resolve: {
     alias: {
       "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb"),
-      "google-protobuf": path.resolve("./build/package/node_modules/google-protobuf"),
       "typescript": path.resolve("./build/package/node_modules/typescript/lib/typescript.js")
     }
+  },
+  externals: {
+    "google-protobuf": "google-protobuf"
   },
   output: {
     path: path.resolve("build/bundle"),
