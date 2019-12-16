@@ -9,6 +9,7 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -21,10 +22,6 @@ private data class ReportJson(val outputs: List<String>)
 
 class CoreSetCliTests {
 
-    init {
-        resolvePanicMode()
-    }
-
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
@@ -35,6 +32,11 @@ class CoreSetCliTests {
     fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object : FileFetcher() {
+        @JvmStatic
+        @BeforeAll
+        fun setup() {
+            resolvePanicMode()
+        }
 
         override val postfix = TS_DECLARATION_EXTENSION
 
@@ -43,7 +45,6 @@ class CoreSetCliTests {
             return fileSetWithDescriptors("./test/data/typescript")
         }
     }
-
 
     @UseExperimental(UnstableDefault::class)
     protected fun assertContentEqualsBinary(
