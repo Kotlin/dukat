@@ -14,6 +14,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun FunctionTypeDeclaration.removeParameterNames() = copy(
@@ -34,24 +35,31 @@ private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterV
 }
 
 private fun List<ObjectLiteralDeclaration>.mergeObjectTypes() : List<ParameterValueDeclaration> {
-    return this
+    return toSet().toList() //TODO check if this is enough
+}
+
+private fun List<TypeDeclaration>.mergeTypeDeclarations() : List<ParameterValueDeclaration> {
+    return toSet().toList()
 }
 
 private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     val types = mutableListOf<ParameterValueDeclaration>()
     val functionTypes = mutableListOf<FunctionTypeDeclaration>()
     val objectTypes = mutableListOf<ObjectLiteralDeclaration>()
+    val typeDeclarations = mutableListOf<TypeDeclaration>()
 
     params.forEach {
         when (it) {
-            is FunctionTypeDeclaration -> functionTypes.add(it)
-            is ObjectLiteralDeclaration -> objectTypes.add(it)
-            else -> types.add(it)
+            is FunctionTypeDeclaration -> functionTypes += it.mergeUnions()
+            is ObjectLiteralDeclaration -> objectTypes += it
+            is TypeDeclaration -> typeDeclarations += it
+            else -> types += it.mergeUnions()
         }
     }
 
     types.addAll(functionTypes.mergeFunctionTypes())
     types.addAll(objectTypes.mergeObjectTypes())
+    types.addAll(typeDeclarations.mergeTypeDeclarations())
 
     return when (types.size) {
         1 -> types[0]
