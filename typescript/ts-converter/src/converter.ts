@@ -1,6 +1,6 @@
 import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";

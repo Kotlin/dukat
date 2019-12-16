@@ -1,4 +1,4 @@
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 
 const MERGE_RESOLUTION_SYMBOLS = new Map([
   [ts.SyntaxKind.InterfaceDeclaration, new Set([
