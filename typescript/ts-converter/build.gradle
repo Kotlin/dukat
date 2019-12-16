@@ -4,7 +4,7 @@ plugins {
 }
 
 def packagePath = "${project.buildDir}/package"
-def typescriptVersion = hasProperty("tsVersion") ? tsVersion : "3.5.2"
+def typescriptVersion = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 def tsDeclarationsPath = ".tsdeclarations"
 
 node {
