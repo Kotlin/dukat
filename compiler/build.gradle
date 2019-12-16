@@ -141,6 +141,9 @@ task downloadDefinitelyTyped(type: Download) {
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
+    onlyIf {
+        project.hasProperty("dukat.test.extended")
+    }
     from zipTree(downloadDefinitelyTyped.dest)
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
