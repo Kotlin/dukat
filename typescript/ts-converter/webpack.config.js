@@ -17,10 +17,15 @@ module.exports = {
     }
   },
   externals: {
-    "google-protobuf": "google-protobuf",
-    "typescript": "typescript"
+    "google-protobuf": {
+      commonjs: 'google-protobuf'
+    },
+    "typescript": {
+      commonjs: 'typescript'
+    }
   },
   output: {
+    libraryTarget: "commonjs",
     path: path.resolve("build/bundle"),
     filename: "[name].js"
   }
