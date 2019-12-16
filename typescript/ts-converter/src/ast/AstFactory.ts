@@ -2,7 +2,6 @@ import * as declarations from "declarations";
 import {
   DefinitionInfoDeclaration,
   EnumTokenDeclaration,
-  Expression,
   FunctionDeclaration,
   HeritageClauseDeclaration,
   IdentifierDeclaration,
@@ -18,7 +17,8 @@ import {
   Declaration,
   TypeParamReferenceDeclaration,
   TypeParameter,
-  TypeReferenceDeclaration
+  TypeReferenceDeclaration,
+  ParameterInitializerExpression
 } from "./ast";
 import {createLogger} from "../Logger";
 import {TypeReferenceDeclarationProto} from "declarations";
@@ -99,8 +99,8 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createExpression(kind: TypeReferenceDeclarationProto, meta: string): Expression {
-    let expression = new declarations.ExpressionDeclarationProto();
+  createParameterInitializerExpression(kind: TypeReferenceDeclarationProto, meta: string): ParameterInitializerExpression {
+    let expression = new declarations.ParameterInitializerExpressionDeclarationProto();
     expression.setKind(kind);
     expression.setMeta(meta);
 
@@ -279,7 +279,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
     let parameterDeclaration = new declarations.ParameterDeclarationProto();
     parameterDeclaration.setName(name);
     parameterDeclaration.setType(type);
