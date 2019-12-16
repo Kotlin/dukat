@@ -62,6 +62,11 @@ task buildDistrib {
         }
 
         copy {
+            from "${project(":ts-converter").buildDir}/bundle/runtime.js"
+            into "${DISTRIB_PATH}/lib"
+        }
+
+        copy {
             from "bin"
             into "${DISTRIB_PATH}/bin"
         }
