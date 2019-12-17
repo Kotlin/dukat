@@ -8,9 +8,14 @@ import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class FunctionConstraint(
         owner: PropertyOwner,
+        val versions: List<Version>
+) : PropertyOwnerConstraint(owner) {
+
+    data class Version(
         val returnConstraints: Constraint,
         val parameterConstraints: List<Pair<String, Constraint>>
-) : PropertyOwnerConstraint(owner) {
+    )
+
     private val classRepresentation = ClassConstraint(owner)
 
     override fun set(name: String, data: Constraint) {
@@ -24,6 +29,20 @@ class FunctionConstraint(
 
     private var resolutionState = ResolutionState.UNRESOLVED
     private var resolvedConstraint: Constraint? = null
+
+    private fun getParameterNames() : List<String> {
+        val parameters = mutableListOf<String>()
+
+        versions.forEach {
+            it.parameterConstraints.forEachIndexed { index, (name, _) ->
+                if (parameters.size <= index) {
+                    parameters.add(index, name)
+                }
+            }
+        }
+
+        return parameters
+    }
 
     private fun hasMembers() : Boolean {
         return if (classRepresentation.propertyNames.isNotEmpty()) {
@@ -59,21 +78,22 @@ class FunctionConstraint(
         }
     }
 
+    private fun getResolvedCallable() = FunctionConstraint(
+            owner,
+            versions.map {
+                Version(
+                        it.returnConstraints.resolve(),
+                        it.parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
+                )
+            }
+    )
+
     private fun doResolve(): Constraint {
         return if (!hasMembers()) {
-            FunctionConstraint(
-                    owner,
-                    returnConstraints.resolve(),
-                    parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
-            )
+            getResolvedCallable()
         } else {
             if (hasNonStaticMembers()) {
-                classRepresentation.constructorConstraint = FunctionConstraint(
-                        owner,
-                        returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
-                )
-
+                classRepresentation.constructorConstraint = getResolvedCallable()
                 classRepresentation.resolve()
             } else {
                 val objectRepresentation = ObjectConstraint(owner)
@@ -84,11 +104,7 @@ class FunctionConstraint(
                     objectRepresentation[it] = classRepresentation[it]!!
                 }
 
-                objectRepresentation.callSignatureConstraints.add(FunctionConstraint(
-                        owner,
-                        returnConstraints.resolve(),
-                        parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
-                ))
+                objectRepresentation.callSignatureConstraints.add(getResolvedCallable())
 
                 objectRepresentation.resolve()
             }
@@ -108,8 +124,10 @@ class FunctionConstraint(
             ResolutionState.RESOLVING -> {
                 FunctionConstraint(
                         owner,
-                        RecursiveConstraint,
-                        parameterConstraints.map { (name, _) -> name to NoTypeConstraint }
+                        listOf(Version(
+                                returnConstraints = RecursiveConstraint,
+                                parameterConstraints = getParameterNames().map { it to NoTypeConstraint }
+                        ))
                 )
             }
 

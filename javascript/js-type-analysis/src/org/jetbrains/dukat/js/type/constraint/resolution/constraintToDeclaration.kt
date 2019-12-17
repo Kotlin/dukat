@@ -44,10 +44,10 @@ private val DECLARE_MODIFIERS = listOf(ModifierDeclaration.DECLARE_KEYWORD)
 private val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
 private val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
 
-private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration, exportModifiers: List<ModifierDeclaration>) = VariableDeclaration(
+private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>) = VariableDeclaration(
         name = name,
         type = type,
-        modifiers = exportModifiers,
+        modifiers = modifiers,
         initializer = null,
         uid = getUID()
 )
@@ -69,28 +69,34 @@ private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclarati
         optional = false
 )
 
-private fun FunctionConstraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) = FunctionDeclaration(
-        name = name,
-        parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-        type = returnConstraints.toType(),
-        typeParameters = emptyList(),
-        modifiers = exportModifiers,
-        body = null,
-        uid = getUID()
-)
+private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<ModifierDeclaration>) = versions.map {
+    FunctionDeclaration(
+            name = name,
+            parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+            type = it.returnConstraints.toType(),
+            typeParameters = emptyList(),
+            modifiers = modifiers,
+            body = null,
+            uid = getUID()
+    )
+}
 
-private fun FunctionConstraint.toConstructor() = ConstructorDeclaration(
-        parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-        typeParameters = emptyList(),
-        modifiers = emptyList(),
-        body = null
-)
+private fun FunctionConstraint.toConstructors() = versions.map {
+    ConstructorDeclaration(
+            parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+            typeParameters = emptyList(),
+            modifiers = emptyList(),
+            body = null
+    )
+}
 
-private fun FunctionConstraint.toCallSignature() = CallSignatureDeclaration(
-        parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-        type = returnConstraints.toType(),
-        typeParameters = emptyList()
-)
+private fun FunctionConstraint.toCallSignatures() = versions.map {
+    CallSignatureDeclaration(
+            parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+            type = it.returnConstraints.toType(),
+            typeParameters = emptyList()
+    )
+}
 
 private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
         parameters = List(parameterCount) { NoTypeConstraint.toParameterDeclaration("") },
@@ -98,35 +104,30 @@ private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
         typeParameters = emptyList()
 )
 
-private fun FunctionDeclaration.withStaticModifier(isStatic: Boolean) : FunctionDeclaration {
-    return this.copy(modifiers = if (isStatic) STATIC_MODIFIERS else emptyList())
-}
+private fun FunctionConstraint.toMemberDeclarations(name: String, isStatic: Boolean) =
+        this.toDeclarations(name, if (isStatic) STATIC_MODIFIERS else emptyList())
 
-private fun FunctionConstraint.toMemberDeclaration(name: String, isStatic: Boolean) : MemberDeclaration? {
-    return this.toDeclaration(name, EXPORT_MODIFIERS).withStaticModifier(isStatic)
-}
-
-private fun Constraint.toMemberDeclaration(name: String, isStatic: Boolean = false) : MemberDeclaration? {
+private fun Constraint.toMemberDeclarations(name: String, isStatic: Boolean = false) : List<MemberDeclaration> {
     return when (this) {
-        is FunctionConstraint -> this.toMemberDeclaration(name, isStatic)
-        else -> getPropertyDeclaration(name, this.toType(), isStatic)
+        is FunctionConstraint -> this.toMemberDeclarations(name, isStatic)
+        else -> listOf(getPropertyDeclaration(name, this.toType(), isStatic))
     }
 }
 
-private fun ClassConstraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) : ClassDeclaration {
+private fun ClassConstraint.toDeclaration(name: String, modifiers: List<ModifierDeclaration>) : ClassDeclaration {
     val members = mutableListOf<MemberDeclaration>()
 
     val constructorConstraint = constructorConstraint
     if (constructorConstraint is FunctionConstraint) {
-        members.add(constructorConstraint.toConstructor())
+        members.addAll(constructorConstraint.toConstructors())
     }
 
     val prototype = this["prototype"]
 
     if (prototype is ObjectConstraint) {
         members.addAll(
-                prototype.propertyNames.mapNotNull { memberName ->
-                    prototype[memberName]?.toMemberDeclaration(name = memberName, isStatic = false)
+                prototype.propertyNames.flatMap { memberName ->
+                    prototype[memberName]?.toMemberDeclarations(name = memberName, isStatic = false) ?: emptyList()
                 }
         )
     } else {
@@ -134,12 +135,12 @@ private fun ClassConstraint.toDeclaration(name: String, exportModifiers: List<Mo
     }
 
     members.addAll(
-            propertyNames.mapNotNull { memberName ->
+            propertyNames.flatMap { memberName ->
                 //Don't output the prototype object
                 if (memberName != "prototype") {
-                    this[memberName]?.toMemberDeclaration(name = memberName, isStatic = true)
+                    this[memberName]?.toMemberDeclarations(name = memberName, isStatic = true) ?: emptyList()
                 } else {
-                    null
+                    emptyList()
                 }
             }
     )
@@ -149,19 +150,23 @@ private fun ClassConstraint.toDeclaration(name: String, exportModifiers: List<Mo
             members = members,
             typeParameters = emptyList(),
             parentEntities = emptyList(),
-            modifiers = exportModifiers,
+            modifiers = modifiers,
             uid = getUID()
     )
 }
 
-private fun FunctionConstraint.toType() : FunctionTypeDeclaration {
-    return FunctionTypeDeclaration(
-            parameters = parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-            type = returnConstraints.toType()
+private fun FunctionConstraint.toType() : ParameterValueDeclaration {
+    return UnionTypeDeclaration(
+            params = versions.map {
+                FunctionTypeDeclaration(
+                        parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+                        type = it.returnConstraints.toType()
+                )
+            }
     )
 }
 
-private fun UnionTypeConstraint.toType() : UnionTypeDeclaration {
+private fun UnionTypeConstraint.toType() : ParameterValueDeclaration {
     return UnionTypeDeclaration(
             params = types.map { it.toType() }
     )
@@ -172,14 +177,14 @@ private fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
 
     callSignatureConstraints.forEach {
         when (it) {
-            is FunctionConstraint -> members.add(it.toCallSignature())
+            is FunctionConstraint -> members.addAll(it.toCallSignatures())
             is CallableConstraint -> members.add(it.toCallSignature())
         }
     }
 
     members.addAll(
-            propertyNames.mapNotNull { memberName ->
-                this[memberName]?.toMemberDeclaration(name = memberName)
+            propertyNames.flatMap { memberName ->
+                this[memberName]?.toMemberDeclarations(name = memberName) ?: emptyList()
             }
     )
 
@@ -217,19 +222,21 @@ private fun Constraint.toType() : ParameterValueDeclaration {
     }
 }
 
-private fun Constraint.toDeclaration(name: String, exportModifiers: List<ModifierDeclaration>) : TopLevelDeclaration? {
+private fun Constraint.toDeclarations(name: String, exportModifiers: List<ModifierDeclaration>) : List<TopLevelDeclaration> {
     return when (this) {
-        is ClassConstraint -> this.toDeclaration(name, exportModifiers)
-        is FunctionConstraint -> this.toDeclaration(name, exportModifiers)
-        is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { null }
-        else -> getVariableDeclaration(name, this.toType(), exportModifiers)
+        is ClassConstraint -> listOf(this.toDeclaration(name, exportModifiers))
+        is FunctionConstraint -> this.toDeclarations(name, exportModifiers)
+        is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { emptyList<TopLevelDeclaration>() }
+        else -> listOf(getVariableDeclaration(name, this.toType(), exportModifiers))
     }
 }
 
-fun Constraint.toDeclaration(name: String) = toDeclaration(name, EXPORT_MODIFIERS)
+fun Constraint.toDeclarations(name: String) = toDeclarations(name, EXPORT_MODIFIERS)
 
 fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLevelDeclaration> {
-    val declaration = this.toDeclaration(defaultExportName, DECLARE_MODIFIERS)
+    val declarations = this.toDeclarations(defaultExportName, DECLARE_MODIFIERS)
+
+    val declaration = declarations.firstOrNull { it is WithUidDeclaration }
 
     return if (declaration is WithUidDeclaration) {
         val exportEqualsDeclaration = ExportAssignmentDeclaration(
@@ -237,7 +244,9 @@ fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLeve
                 true
         )
 
-        listOf(exportEqualsDeclaration, declaration)
+        declarations.toMutableList().apply {
+            add(exportEqualsDeclaration)
+        }
     } else {
         emptyList()
     }

@@ -39,35 +39,11 @@ import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
-fun List<FunctionConstraint>.pack() : FunctionConstraint {
-    return if (size == 1) {
-        this[0]
-    } else {
-        val parameters = mutableListOf<Pair<String, MutableList<Constraint>>>()
-
-        forEach {
-            it.parameterConstraints.forEachIndexed { index, (name, constraint) ->
-                if (parameters.size <= index) {
-                    parameters.add(index, name to mutableListOf())
-                }
-
-                parameters[index].second.add(constraint)
-            }
-        }
-
-        FunctionConstraint(
-                this[0].owner,
-                returnConstraints = UnionTypeConstraint(map { it.returnConstraints }),
-                parameterConstraints = parameters.map { (name, constraints) -> name to UnionTypeConstraint(constraints) }
-        )
-    }
-}
-
 fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
     return if (this.body != null) {
         val pathWalker = PathWalker()
 
-        val versions = mutableListOf<FunctionConstraint>()
+        val versions = mutableListOf<FunctionConstraint.Version>()
 
         do {
             val functionScope = Scope(owner)
@@ -82,14 +58,13 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
 
             val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
-            versions.add(FunctionConstraint(
-                    owner,
+            versions.add(FunctionConstraint.Version(
                     returnConstraints = returnTypeConstraints,
                     parameterConstraints = parameterConstraints
             ))
         } while (pathWalker.startNextPath())
 
-        val functionConstraint = versions.pack()
+        val functionConstraint = FunctionConstraint(owner, versions)
 
         if (name != "") {
             owner[name] = functionConstraint

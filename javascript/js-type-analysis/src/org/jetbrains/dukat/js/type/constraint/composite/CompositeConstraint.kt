@@ -77,11 +77,13 @@ class CompositeConstraint(
 
             val resultConstraint: PropertyOwnerConstraint = if (callableConstraints.isNotEmpty() && callsCanBeUnified) {
                 FunctionConstraint(
-                        owner,
-                        UnionTypeConstraint(
-                                callableConstraints.map { it.returnConstraints }
-                        ),
-                        List(parameterCount) { "`$it`" to NoTypeConstraint }
+                        owner = owner,
+                        versions = callableConstraints.map { callable ->
+                            FunctionConstraint.Version(
+                                    callable.returnConstraints,
+                                    List(parameterCount) { i -> "`$i`" to NoTypeConstraint }
+                            )
+                        }
                 )
             } else {
                 ObjectConstraint(owner).apply {
