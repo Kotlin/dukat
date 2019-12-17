@@ -69,7 +69,7 @@ private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclarati
         optional = false
 )
 
-private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<ModifierDeclaration>) = versions.map {
+private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<ModifierDeclaration>) = overloads.map {
     FunctionDeclaration(
             name = name,
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
@@ -81,7 +81,7 @@ private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<Modi
     )
 }
 
-private fun FunctionConstraint.toConstructors() = versions.map {
+private fun FunctionConstraint.toConstructors() = overloads.map {
     ConstructorDeclaration(
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
             typeParameters = emptyList(),
@@ -90,7 +90,7 @@ private fun FunctionConstraint.toConstructors() = versions.map {
     )
 }
 
-private fun FunctionConstraint.toCallSignatures() = versions.map {
+private fun FunctionConstraint.toCallSignatures() = overloads.map {
     CallSignatureDeclaration(
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
             type = it.returnConstraints.toType(),
@@ -157,7 +157,7 @@ private fun ClassConstraint.toDeclaration(name: String, modifiers: List<Modifier
 
 private fun FunctionConstraint.toType() : ParameterValueDeclaration {
     return UnionTypeDeclaration(
-            params = versions.map {
+            params = overloads.map {
                 FunctionTypeDeclaration(
                         parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
                         type = it.returnConstraints.toType()

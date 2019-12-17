@@ -8,10 +8,10 @@ import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 
 class FunctionConstraint(
         owner: PropertyOwner,
-        val versions: List<Version>
+        val overloads: List<Overload>
 ) : PropertyOwnerConstraint(owner) {
 
-    data class Version(
+    data class Overload(
         val returnConstraints: Constraint,
         val parameterConstraints: List<Pair<String, Constraint>>
     )
@@ -33,7 +33,7 @@ class FunctionConstraint(
     private fun getParameterNames() : List<String> {
         val parameters = mutableListOf<String>()
 
-        versions.forEach {
+        overloads.forEach {
             it.parameterConstraints.forEachIndexed { index, (name, _) ->
                 if (parameters.size <= index) {
                     parameters.add(index, name)
@@ -80,8 +80,8 @@ class FunctionConstraint(
 
     private fun getResolvedCallable() = FunctionConstraint(
             owner,
-            versions.map {
-                Version(
+            overloads.map {
+                Overload(
                         it.returnConstraints.resolve(),
                         it.parameterConstraints.map { (name, constraint) -> name to constraint.resolve(resolveAsInput = true) }
                 )
@@ -124,7 +124,7 @@ class FunctionConstraint(
             ResolutionState.RESOLVING -> {
                 FunctionConstraint(
                         owner,
-                        listOf(Version(
+                        listOf(Overload(
                                 returnConstraints = RecursiveConstraint,
                                 parameterConstraints = getParameterNames().map { it to NoTypeConstraint }
                         ))

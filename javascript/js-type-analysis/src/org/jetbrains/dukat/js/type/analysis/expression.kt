@@ -4,7 +4,6 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.reference.ReferenceConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
-import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.CallableConstraint
 import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.BigIntTypeConstraint
@@ -43,7 +42,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
     return if (this.body != null) {
         val pathWalker = PathWalker()
 
-        val versions = mutableListOf<FunctionConstraint.Version>()
+        val versions = mutableListOf<FunctionConstraint.Overload>()
 
         do {
             val functionScope = Scope(owner)
@@ -58,7 +57,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
 
             val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
-            versions.add(FunctionConstraint.Version(
+            versions.add(FunctionConstraint.Overload(
                     returnConstraints = returnTypeConstraints,
                     parameterConstraints = parameterConstraints
             ))

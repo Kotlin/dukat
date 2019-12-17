@@ -15,11 +15,11 @@ class CallResultConstraint(
         val functionConstraint = callTarget.resolve()
 
         return if (functionConstraint is FunctionConstraint) {
-            if (functionConstraint.versions.size == 1) {
-                functionConstraint.versions[0].returnConstraints.resolveWithProperties()
+            if (functionConstraint.overloads.size == 1) {
+                functionConstraint.overloads[0].returnConstraints.resolveWithProperties()
             } else {
                 UnionTypeConstraint(
-                        functionConstraint.versions.map {
+                        functionConstraint.overloads.map {
                             it.returnConstraints.resolveWithProperties()
                         }
                 ).resolve()

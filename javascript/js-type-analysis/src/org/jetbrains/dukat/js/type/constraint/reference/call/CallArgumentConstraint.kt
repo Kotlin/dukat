@@ -16,15 +16,15 @@ class CallArgumentConstraint(
         val functionConstraint = callTarget.resolve()
 
         if (functionConstraint is FunctionConstraint) {
-            if (functionConstraint.versions.size == 1) {
-                val parameters = functionConstraint.versions[0].parameterConstraints
+            if (functionConstraint.overloads.size == 1) {
+                val parameters = functionConstraint.overloads[0].parameterConstraints
 
                 if (parameters.size > argumentNum) {
                     return parameters[argumentNum].second.resolve(resolveAsInput = true)
                 }
             } else {
                 return UnionTypeConstraint(
-                        functionConstraint.versions.mapNotNull {
+                        functionConstraint.overloads.mapNotNull {
                             if (it.parameterConstraints.size > argumentNum) {
                                 it.parameterConstraints[argumentNum].second.resolve(resolveAsInput = true)
                             } else null
