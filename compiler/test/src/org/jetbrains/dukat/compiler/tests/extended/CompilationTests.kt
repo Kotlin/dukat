@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
+import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -77,13 +78,12 @@ abstract class CompilationTests {
     }
 
     protected fun assertContentCompiles(
-            descriptor: String,
-            sourcePath: String
+            descriptor: String, sourcePath: String
     ) {
-        println("file:///${sourcePath}")
+        println(sourcePath.toFileUriScheme())
         val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
         val targetDir = File(targetPath)
-        println("file:///${targetDir.normalize().absolutePath}")
+        println(targetDir.normalize().absolutePath.toFileUriScheme())
 
         targetDir.deleteRecursively()
         getTranslator().translate(sourcePath, targetPath)
@@ -93,7 +93,7 @@ abstract class CompilationTests {
 
         assert(sources.isNotEmpty()) { "$FILE_NOT_FIND_ASSERTION: $targetPath" }
 
-        val compilationErrorMessage = "$COMPILATION_ERROR_ASSERTION:\n" + sources.joinToString("\n") { source -> "file:///${source}" }
+        val compilationErrorMessage = "$COMPILATION_ERROR_ASSERTION:\n" + sources.joinToString("\n") { source -> source.toFileUriScheme() }
 
         assertEquals(
                 ExitCode.OK,
