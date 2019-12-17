@@ -22,7 +22,9 @@ private fun FunctionTypeDeclaration.removeParameterNames() = copy(
 )
 
 private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterValueDeclaration> {
-    val groups = groupBy { it.removeParameterNames() }
+    val fixedFunctions = map { it.mergeDuplicates() }
+
+    val groups = fixedFunctions.groupBy { it.removeParameterNames() }
 
     return groups.map { (combination, functions) ->
         if (functions.size == 1) {
@@ -50,10 +52,10 @@ private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
 
     params.forEach {
         when (it) {
-            is FunctionTypeDeclaration -> functionTypes += it.mergeUnions()
+            is FunctionTypeDeclaration -> functionTypes += it
             is ObjectLiteralDeclaration -> objectTypes += it
             is TypeDeclaration -> typeDeclarations += it
-            else -> types += it.mergeUnions()
+            else -> types += it.mergeDuplicates()
         }
     }
 
@@ -67,70 +69,70 @@ private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     }
 }
 
-private fun ParameterValueDeclaration.mergeUnions() : ParameterValueDeclaration {
+private fun ParameterValueDeclaration.mergeDuplicates() : ParameterValueDeclaration {
     return when (this) {
-        is FunctionTypeDeclaration -> this.mergeUnions()
+        is FunctionTypeDeclaration -> this.mergeDuplicates()
         is UnionTypeDeclaration -> this.mergeUnion()
         else -> this
     }
 }
 
-private fun ParameterDeclaration.mergeUnions() = copy(
-        type = type.mergeUnions()
+private fun ParameterDeclaration.mergeDuplicates() = copy(
+        type = type.mergeDuplicates()
 )
 
-private fun ConstructorDeclaration.mergeUnions() = copy(
-        parameters = parameters.map { it.mergeUnions() }
+private fun ConstructorDeclaration.mergeDuplicates() = copy(
+        parameters = parameters.map { it.mergeDuplicates() }
 )
 
-private fun CallSignatureDeclaration.mergeUnions() = copy(
-        parameters = parameters.map { it.mergeUnions() }
+private fun CallSignatureDeclaration.mergeDuplicates() = copy(
+        parameters = parameters.map { it.mergeDuplicates() }
 )
 
-private fun MemberDeclaration.mergeUnions() : MemberDeclaration {
+private fun MemberDeclaration.mergeDuplicates() : MemberDeclaration {
     return when (this) {
-        is ConstructorDeclaration -> this.mergeUnions()
-        is FunctionDeclaration -> this.mergeUnions()
-        is CallSignatureDeclaration -> this.mergeUnions()
+        is ConstructorDeclaration -> this.mergeDuplicates()
+        is FunctionDeclaration -> this.mergeDuplicates()
+        is CallSignatureDeclaration -> this.mergeDuplicates()
         else -> this
     }
 }
 
-private fun ClassDeclaration.mergeUnions() = copy(
-        members = members.map { it.mergeUnions() }
+private fun ClassDeclaration.mergeDuplicates() = copy(
+        members = members.map { it.mergeDuplicates() }
 )
 
-private fun FunctionTypeDeclaration.mergeUnions() = copy(
-        parameters = parameters.map { it.mergeUnions() },
-        type = type.mergeUnions()
+private fun FunctionTypeDeclaration.mergeDuplicates() = copy(
+        parameters = parameters.map { it.mergeDuplicates() },
+        type = type.mergeDuplicates()
 )
 
-private fun FunctionDeclaration.mergeUnions() = copy(
-        parameters = parameters.map { it.mergeUnions() },
-        type = type.mergeUnions()
+private fun FunctionDeclaration.mergeDuplicates() = copy(
+        parameters = parameters.map { it.mergeDuplicates() },
+        type = type.mergeDuplicates()
 )
 
-private fun VariableDeclaration.mergeUnions() = copy(
-        type = type.mergeUnions()
+private fun VariableDeclaration.mergeDuplicates() = copy(
+        type = type.mergeDuplicates()
 )
 
-private fun TopLevelDeclaration.mergeUnions() : TopLevelDeclaration {
+private fun TopLevelDeclaration.mergeDuplicates() : TopLevelDeclaration {
     return when (this) {
-        is ClassDeclaration -> this.mergeUnions()
-        is FunctionDeclaration -> this.mergeUnions()
-        is VariableDeclaration -> this.mergeUnions()
+        is ClassDeclaration -> this.mergeDuplicates()
+        is FunctionDeclaration -> this.mergeDuplicates()
+        is VariableDeclaration -> this.mergeDuplicates()
         else -> this
     }
 }
 
-fun ModuleDeclaration.mergeUnions() = copy(
-        declarations = declarations.map { it.mergeUnions() }
+fun ModuleDeclaration.mergeDuplicates() = copy(
+        declarations = declarations.map { it.mergeDuplicates() }
 )
 
-fun SourceFileDeclaration.mergeUnions() = copy(
-        root = root.mergeUnions()
+fun SourceFileDeclaration.mergeDuplicates() = copy(
+        root = root.mergeDuplicates()
 )
 
-fun SourceSetDeclaration.mergeUnions() = copy(
-        sources = sources.map { it.mergeUnions() }
+fun SourceSetDeclaration.mergeDuplicates() = copy(
+        sources = sources.map { it.mergeDuplicates() }
 )
