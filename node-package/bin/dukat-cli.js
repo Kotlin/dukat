@@ -3,7 +3,8 @@
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var path = require('path');
-require("../lib/converter");
+
+var createBundle = require("../lib/converter").createBundle;
 var Readable = require('stream').Readable;
 var EventEmitter = require('events');
 
