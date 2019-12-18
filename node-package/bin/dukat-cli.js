@@ -8,10 +8,6 @@ var createBundle = require("../lib/converter").createBundle;
 var Readable = require('stream').Readable;
 var EventEmitter = require('events');
 
-function isWin() {
-    return process.platform == "win32";
-}
-
 var printError = function (errorMessage) {
     console.error("ERROR: " + errorMessage);
 };
