@@ -55,21 +55,6 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         return args.toTypedArray()
     }
 
-    fun translateBinary(
-            args: Array<String>
-    ): Process {
-        val proc = ProcessBuilder().inheritIO().command(*args).start()
-        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-//        println(proc.inputStream.bufferedReader().readText())
-
-//        if (proc.exitValue() > 0) {
-//            println("exited with value ${proc.exitValue()}")
-//            println(proc.errorStream.bufferedReader().readText())
-//        }
-
-        return proc
-    }
-
     fun translate(
             input: String,
             dirName: String,
@@ -78,6 +63,10 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             ): Int {
 
         val args = createCliArgs(input, false, dirName, reportPath, moduleName)
+        val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
+
+        val binProc = ProcessBuilder().inheritIO().command(*args).start()
+        binProc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         val proc= ProcessBuilder().inheritIO().command(*args).start()
 
