@@ -48,12 +48,16 @@ function processArgs(args) {
     var count = 0;
 
     var packageName = "<ROOT>";
+    var binaryOutput = false;
 
     while (count < args.length) {
         var arg = args[count];
         if (arg == "-p") {
             packageName = args[count + 1];
             count += 2;
+        } else if(arg == "-b") {
+            binaryOutput = true;
+            count += 1;
         } else if (skip_2args.has(arg)) {
             count += 2;
         } else {
@@ -69,6 +73,7 @@ function processArgs(args) {
     }
 
     return {
+        binaryOutput: binaryOutput,
         packageName: packageName,
         files: files
     }
@@ -107,6 +112,10 @@ function cliMode(args) {
         var inputStream = createReadable();
         inputStream.push(bundle.serializeBinary());
         inputStream.push(null);
+
+        if (argsProcessed.binaryOutput) {
+            return null;
+        }
 
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
