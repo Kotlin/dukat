@@ -26,7 +26,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             dirName: String? = null,
             reportPath: String? = null,
             moduleName: String? = null
-    ): List<String> {
+    ): Array<String> {
         val args = mutableListOf(
                 nodePath,
                 translatorPath
@@ -52,25 +52,20 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         }
 
         args.push(input)
-        return args
+        return args.toTypedArray()
     }
 
     fun translateBinary(
-            input: String,
-            reportPath: String? = null,
-            moduleName: String? = null
+            args: Array<String>
     ): Process {
-        val args = createCliArgs(input, true, null, reportPath, moduleName)
-
-        val proc = ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
+        val proc = ProcessBuilder().inheritIO().command(*args).start()
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+//        println(proc.inputStream.bufferedReader().readText())
 
-        println(proc.inputStream.bufferedReader().readText())
-
-        if (proc.exitValue() > 0) {
-            println("exited with value ${proc.exitValue()}")
-            println(proc.errorStream.bufferedReader().readText())
-        }
+//        if (proc.exitValue() > 0) {
+//            println("exited with value ${proc.exitValue()}")
+//            println(proc.errorStream.bufferedReader().readText())
+//        }
 
         return proc
     }
