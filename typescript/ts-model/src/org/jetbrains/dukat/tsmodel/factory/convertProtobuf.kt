@@ -284,7 +284,7 @@ private fun ParameterDeclarationProto.convert(): ParameterDeclaration {
             name,
             type.convert(),
             if (hasInitializer()) {
-                ExpressionDeclaration(initializer.kind.convert(), initializer.meta)
+                ExpressionDeclaration(initializer.meta)
             } else null,
             vararg,
             optional

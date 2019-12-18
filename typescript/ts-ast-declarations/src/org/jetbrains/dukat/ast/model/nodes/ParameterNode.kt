@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -18,8 +19,8 @@ data class ParameterNode(
 fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         name = name,
         type = type,
-        initializer = initializer?.kind?.let {
-            TypeValueNode(it.value, emptyList(), it.typeReference)
+        initializer = initializer?.let {
+            TypeValueNode(IdentifierEntity("definedExternally"), emptyList(), null)
         },
         meta = initializer?.meta,
         vararg = vararg,
