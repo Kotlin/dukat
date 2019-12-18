@@ -145,10 +145,6 @@ private fun printError(message: String) {
     System.err.println(message)
 }
 
-private fun printWarning(message: String) {
-    System.out.println("Warning: ${message}")
-}
-
 private fun process(args: List<String>): CliOptions? {
     val argsIterator = args.iterator()
 
