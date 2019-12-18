@@ -228,7 +228,7 @@ following file extensions are supported:
     return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
 }
 
-fun main(vararg args: String) {
+fun translate(input: ByteArray, vararg args: String) {
     if (args.isEmpty()) {
         printUsage("dukat")
         return
@@ -256,7 +256,7 @@ fun main(vararg args: String) {
         when {
             isTsTranslation -> {
                 compile(
-                        System.`in`.readBytes(),
+                        input,
                         options.outDir,
                         createJsByteArrayTranslator(
                                 moduleResolver
@@ -281,6 +281,10 @@ fun main(vararg args: String) {
             }
         }
     }
+}
+
+fun main(vararg args: String) {
+    translate(System.`in`.readBytes(), *args)
 }
 
 
