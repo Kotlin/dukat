@@ -5,6 +5,7 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.cli.translateBinaryBundle
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.kotlin.backend.common.push
 import java.io.File
 
@@ -64,7 +65,8 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
 
         val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
         val binProc = ProcessBuilder().command(*binArgs).start()
-        translateBinaryBundle(binProc.inputStream.readAllBytes(), dirName, CommonJsNameResolver(), reportPath)
+        val moduleNameResolver = if (moduleName == null) { CommonJsNameResolver() } else { ConstNameResolver(moduleName) }
+        translateBinaryBundle(binProc.inputStream.readAllBytes(), dirName, moduleNameResolver, reportPath)
     }
 }
 

@@ -57,8 +57,6 @@ class CoreSetCliTests {
         val dirName = "./build/tests/core/cli/${descriptor}"
         getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
 
-//        assertEquals(0, translationResult, "translation failed")
-
         val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
 
         var translated = reportJson.outputs.mapNotNull { output ->
