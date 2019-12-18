@@ -23,6 +23,7 @@ import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
 import java.io.File
+import java.io.PrintStream
 import kotlin.system.exitProcess
 
 
@@ -42,7 +43,7 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
 fun translateBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
     val translator = createJsByteArrayTranslator(moduleNameResolver)
     val translatedUnits = translateModule(input, translator)
-    compileUnits(translatedUnits, outDir, pathToReport)
+    compileUnits(translatedUnits, outDir, pathToReport, null)
 }
 
 private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
@@ -52,10 +53,10 @@ private fun compile(filenames: List<String>, outDir: String?, translator: InputT
         translateModule(sourceFile.absolutePath, translator)
     }
 
-    compileUnits(translatedUnits, outDir, pathToReport)
+    compileUnits(translatedUnits, outDir, pathToReport, System.out)
 }
 
-fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
+fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?, printStream: PrintStream?) {
     val dirFile = File(outDir ?: "./")
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()
@@ -71,7 +72,7 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
 
             val resolvedTarget = dirFile.resolve(targetName)
 
-            println(resolvedTarget.name)
+            printStream?.println(resolvedTarget.name)
 
             if (buildReport) {
                 output.add(resolvedTarget.name)
@@ -89,22 +90,22 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
     }
 
     if (buildReport) {
-        saveReport(pathToReport!!, Report(output))
+        saveReport(pathToReport!!, Report(output), printStream)
     }
 }
 
 @UseExperimental(kotlinx.serialization.UnstableDefault::class)
-private fun saveReport(reportPath: String, report: Report): Boolean {
+private fun saveReport(reportPath: String, report: Report, printStream: PrintStream?): Boolean {
     val reportFile = File(reportPath)
 
     val reportBody = Json.indented.stringify(Report.serializer(), report)
     try {
-        println("saving report to ${reportFile.absolutePath}")
+        printStream?.println("saving report to ${reportFile.absolutePath}")
         reportFile.absoluteFile.parentFile.mkdirs()
         reportFile.writeText(reportBody)
     } catch (e: Exception) {
         printError("Failed to save report with following exception:")
-        println(e)
+        printStream?.println(e)
         return false
     }
 
