@@ -20,16 +20,22 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         nodePath = envJson.NODE
     }
 
-    fun translateBinary(
+    fun createCliArgs(
             input: String,
+            binaryOutput: Boolean = false,
+            dirName: String? = null,
             reportPath: String? = null,
             moduleName: String? = null
-    ): Process {
-
+    ): List<String> {
         val args = mutableListOf(
                 nodePath,
                 translatorPath
         )
+
+        if (dirName != null) {
+            args.push("-d")
+            args.push(dirName)
+        }
 
         if (reportPath != null) {
             args.push("-r")
@@ -41,12 +47,22 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             args.push(moduleName)
         }
 
-        args.push("-b")
+        if (binaryOutput) {
+            args.push("-b")
+        }
 
         args.push(input)
+        return args
+    }
+
+    fun translateBinary(
+            input: String,
+            reportPath: String? = null,
+            moduleName: String? = null
+    ): Process {
+        val args = createCliArgs(input, true, null, reportPath, moduleName)
 
         val proc = ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
-
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         println(proc.inputStream.bufferedReader().readText())
@@ -66,23 +82,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             moduleName: String? = null
             ): Int {
 
-        val args = mutableListOf(
-                nodePath,
-                translatorPath,
-                "-d", dirName
-        )
-
-        if (reportPath != null) {
-            args.push("-r")
-            args.push(reportPath)
-        }
-
-        if (moduleName != null) {
-            args.push("-m")
-            args.push(moduleName)
-        }
-
-        args.push(input)
+        val args = createCliArgs(input, false, dirName, reportPath, moduleName)
 
         val proc= ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
 
