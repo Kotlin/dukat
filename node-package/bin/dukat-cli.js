@@ -72,11 +72,13 @@ function processArgs(args) {
         });
     }
 
-    return {
+    var res = {
         binaryOutput: binaryOutput,
         packageName: packageName,
         files: files
-    }
+    };
+
+    return res;
 }
 
 function endsWith(str, postfix) {

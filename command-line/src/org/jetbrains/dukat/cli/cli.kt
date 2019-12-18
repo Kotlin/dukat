@@ -38,7 +38,7 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(input: ByteArray, outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
+fun translateBinaryBundle(input: ByteArray, outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
     val translatedUnits = translateModule(input, translator)
     compileUnits(translatedUnits, outDir, pathToReport)
 }
@@ -228,7 +228,7 @@ following file extensions are supported:
     return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
 }
 
-fun translate(input: ByteArray, vararg args: String) {
+fun main(vararg args: String) {
     if (args.isEmpty()) {
         printUsage("dukat")
         return
@@ -255,15 +255,14 @@ fun translate(input: ByteArray, vararg args: String) {
 
         when {
             isTsTranslation -> {
-                compile(
-                        input,
+                translateBinaryBundle(
+                        System.`in`.readBytes(),
                         options.outDir,
                         createJsByteArrayTranslator(
                                 moduleResolver
                         ),
                         options.reportPath
                 )
-
             }
 
             isIdlTranslation-> {
@@ -281,10 +280,6 @@ fun translate(input: ByteArray, vararg args: String) {
             }
         }
     }
-}
-
-fun main(vararg args: String) {
-    translate(System.`in`.readBytes(), *args)
 }
 
 

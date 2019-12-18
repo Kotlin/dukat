@@ -3,6 +3,7 @@ package org.jetbrains.dukat.compiler.tests
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
+import org.jetbrains.dukat.cli.xxx
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.kotlin.backend.common.push
 import java.io.File
@@ -64,8 +65,11 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
 
         val args = createCliArgs(input, false, dirName, reportPath, moduleName)
         val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
+        val binProc = ProcessBuilder().command(*binArgs).start()
 
-        val binProc = ProcessBuilder().inheritIO().command(*args).start()
+        println("CLI TRANSLATOR BIN PROC ${binProc.inputStream.readAllBytes().size}")
+        //xxx(binProc.inputStream.readAllBytes(), *binArgs)
+
         binProc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         val proc= ProcessBuilder().inheritIO().command(*args).start()
