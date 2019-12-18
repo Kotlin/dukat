@@ -16,7 +16,7 @@ import {
     ModuleDeclarationProto,
     NameDeclarationProto,
     ParameterDeclarationProto,
-    ParameterInitializerExpressionDeclarationProto,
+    ParameterInitializerDeclarationProto,
     ParameterValueDeclarationProto,
     PropertyDeclarationProto,
     ReferenceDeclarationProto,
@@ -37,7 +37,7 @@ export type ConstructorDeclaration = ConstructorDeclarationProto;
 export type DefinitionInfoDeclaration = DefinitionInfoDeclarationProto;
 export type EnumDeclaration = EnumDeclarationProto;
 export type EnumTokenDeclaration = EnumTokenDeclarationProto;
-export type ParameterInitializerExpression = ParameterInitializerExpressionDeclarationProto;
+export type ParameterInitializer = ParameterInitializerDeclarationProto;
 export type FunctionDeclaration = FunctionDeclarationProto;
 export type HeritageClauseDeclaration = HeritageClauseDeclarationProto;
 export type IdentifierDeclaration = IdentifierDeclarationProto;

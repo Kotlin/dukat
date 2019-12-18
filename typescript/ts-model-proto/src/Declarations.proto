@@ -271,7 +271,7 @@ message ExpressionDeclarationProto {
     }
 }
 
-message ParameterInitializerExpressionDeclarationProto {
+message ParameterInitializerDeclarationProto {
     string meta = 2;
 }
 
@@ -301,7 +301,7 @@ message ThrowStatementDeclarationProto {
 message ParameterDeclarationProto {
     string name = 1;
     ParameterValueDeclarationProto type = 2;
-    ParameterInitializerExpressionDeclarationProto initializer = 3;
+    ParameterInitializerDeclarationProto initializer = 3;
     bool vararg = 4;
     bool optional = 5;
 }

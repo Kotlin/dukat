@@ -15,7 +15,7 @@ import {
     Declaration,
     TypeDeclaration,
     TypeParameter,
-    ParameterInitializerExpression
+    ParameterInitializer
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
@@ -268,7 +268,7 @@ export class AstConverter {
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
-    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializer | null, vararg: boolean, optional: boolean): ParameterDeclaration {
         return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
     }
 
@@ -418,10 +418,10 @@ export class AstConverter {
     }
 
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
-        let initializer: ParameterInitializerExpression | null = null;
+        let initializer: ParameterInitializer | null = null;
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
-            initializer = this.astFactory.createParameterInitializerExpression(
+            initializer = this.astFactory.createParameterInitializerDeclaration(
               param.initializer.getText()
             )
         }

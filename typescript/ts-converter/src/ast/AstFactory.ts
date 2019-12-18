@@ -18,7 +18,7 @@ import {
   TypeParamReferenceDeclaration,
   TypeParameter,
   TypeReferenceDeclaration,
-  ParameterInitializerExpression
+  ParameterInitializer
 } from "./ast";
 import {createLogger} from "../Logger";
 import {TypeReferenceDeclarationProto} from "declarations";
@@ -99,8 +99,8 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createParameterInitializerExpression(meta: string): ParameterInitializerExpression {
-    let expression = new declarations.ParameterInitializerExpressionDeclarationProto();
+  createParameterInitializerDeclaration(meta: string): ParameterInitializer {
+    let expression = new declarations.ParameterInitializerDeclarationProto();
     expression.setMeta(meta);
 
     return expression;
@@ -278,7 +278,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializer | null, vararg: boolean, optional: boolean): ParameterDeclaration {
     let parameterDeclaration = new declarations.ParameterDeclarationProto();
     parameterDeclaration.setName(name);
     parameterDeclaration.setType(type);
