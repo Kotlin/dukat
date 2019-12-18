@@ -99,9 +99,8 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createParameterInitializerExpression(kind: TypeReferenceDeclarationProto, meta: string): ParameterInitializerExpression {
+  createParameterInitializerExpression(meta: string): ParameterInitializerExpression {
     let expression = new declarations.ParameterInitializerExpressionDeclarationProto();
-    expression.setKind(kind);
     expression.setMeta(meta);
 
     return expression;

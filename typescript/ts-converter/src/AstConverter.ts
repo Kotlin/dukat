@@ -422,7 +422,6 @@ export class AstConverter {
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
             initializer = this.astFactory.createParameterInitializerExpression(
-              this.astFactory.createTypeReferenceDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
               param.initializer.getText()
             )
         }

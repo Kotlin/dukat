@@ -272,7 +272,6 @@ message ExpressionDeclarationProto {
 }
 
 message ParameterInitializerExpressionDeclarationProto {
-    TypeReferenceDeclarationProto kind = 1;
     string meta = 2;
 }
 
