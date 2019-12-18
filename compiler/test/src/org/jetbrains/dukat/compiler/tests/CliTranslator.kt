@@ -20,6 +20,45 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         nodePath = envJson.NODE
     }
 
+    fun translateBinary(
+            input: String,
+            reportPath: String? = null,
+            moduleName: String? = null
+    ): Process {
+
+        val args = mutableListOf(
+                nodePath,
+                translatorPath
+        )
+
+        if (reportPath != null) {
+            args.push("-r")
+            args.push(reportPath)
+        }
+
+        if (moduleName != null) {
+            args.push("-m")
+            args.push(moduleName)
+        }
+
+        args.push("-b")
+
+        args.push(input)
+
+        val proc = ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
+
+        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        println(proc.inputStream.bufferedReader().readText())
+
+        if (proc.exitValue() > 0) {
+            println("exited with value ${proc.exitValue()}")
+            println(proc.errorStream.bufferedReader().readText())
+        }
+
+        return proc
+    }
+
     fun translate(
             input: String,
             dirName: String,
