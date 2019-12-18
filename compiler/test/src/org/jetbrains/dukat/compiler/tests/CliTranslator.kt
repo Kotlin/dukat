@@ -4,10 +4,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.cli.translateBinaryBundle
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.kotlin.backend.common.push
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 @Serializable
 internal data class EnvJson(val NODE: String)
@@ -65,8 +67,11 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
 
         val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
         val binProc = ProcessBuilder().command(*binArgs).start()
+
+        binProc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
         val moduleNameResolver = if (moduleName == null) { CommonJsNameResolver() } else { ConstNameResolver(moduleName) }
-        translateBinaryBundle(binProc.inputStream.readAllBytes(), dirName, moduleNameResolver, reportPath)
+        translateBinaryBundle(binProc.errorStream.readAllBytes(), dirName, moduleNameResolver, reportPath)
     }
 }
 

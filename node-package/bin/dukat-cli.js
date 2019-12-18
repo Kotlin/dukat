@@ -116,7 +116,7 @@ function cliMode(args) {
         inputStream.push(null);
 
         if (argsProcessed.binaryOutput) {
-            inputStream.pipe(process.stdout);
+            inputStream.pipe(process.stderr);
             return null;
         }
 
