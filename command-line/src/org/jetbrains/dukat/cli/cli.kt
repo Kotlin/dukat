@@ -38,9 +38,8 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
-    val translatedUnits = translateModule(System.`in`.readBytes(), translator)
-
+private fun compile(input: ByteArray, outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
+    val translatedUnits = translateModule(input, translator)
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
@@ -257,6 +256,7 @@ fun main(vararg args: String) {
         when {
             isTsTranslation -> {
                 compile(
+                        System.`in`.readBytes(),
                         options.outDir,
                         createJsByteArrayTranslator(
                                 moduleResolver

@@ -79,7 +79,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
 
         val args = createCliArgs(input, false, dirName, reportPath, moduleName)
 
-        val proc= ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
+        val proc= ProcessBuilder().inheritIO().command(*args).start()
 
         proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
