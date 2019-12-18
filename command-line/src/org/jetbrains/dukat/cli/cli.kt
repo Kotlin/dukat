@@ -8,6 +8,7 @@ import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -38,7 +39,8 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-fun translateBinaryBundle(input: ByteArray, outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
+fun translateBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
+    val translator = createJsByteArrayTranslator(moduleNameResolver)
     val translatedUnits = translateModule(input, translator)
     compileUnits(translatedUnits, outDir, pathToReport)
 }
@@ -258,9 +260,7 @@ fun main(vararg args: String) {
                 translateBinaryBundle(
                         System.`in`.readBytes(),
                         options.outDir,
-                        createJsByteArrayTranslator(
-                                moduleResolver
-                        ),
+                        moduleResolver,
                         options.reportPath
                 )
             }

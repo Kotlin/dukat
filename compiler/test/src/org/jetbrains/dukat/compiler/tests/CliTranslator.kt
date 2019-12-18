@@ -3,8 +3,9 @@ package org.jetbrains.dukat.compiler.tests
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.cli.xxx
+import org.jetbrains.dukat.cli.translateBinaryBundle
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.kotlin.backend.common.push
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -61,29 +62,30 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             dirName: String,
             reportPath: String? = null,
             moduleName: String? = null
-            ): Int {
+            ) {
 
-        val args = createCliArgs(input, false, dirName, reportPath, moduleName)
+//        val args = createCliArgs(input, false, dirName, reportPath, moduleName)
         val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
         val binProc = ProcessBuilder().command(*binArgs).start()
+        translateBinaryBundle(binProc.inputStream.readAllBytes(), dirName, CommonJsNameResolver(), reportPath)
 
-        println("CLI TRANSLATOR BIN PROC ${binProc.inputStream.readAllBytes().size}")
-        //xxx(binProc.inputStream.readAllBytes(), *binArgs)
-
-        binProc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-
-        val proc= ProcessBuilder().inheritIO().command(*args).start()
-
-        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-
-        println(proc.inputStream.bufferedReader().readText())
-
-        if (proc.exitValue() > 0) {
-            println("exited with value ${proc.exitValue()}")
-            println(proc.errorStream.bufferedReader().readText())
-        }
-
-        return proc.exitValue()
+//        println("CLI TRANSLATOR BIN PROC ${binProc.inputStream.readAllBytes().size}")
+//        //xxx(binProc.inputStream.readAllBytes(), *binArgs)
+//
+//        binProc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+//
+//        val proc= ProcessBuilder().inheritIO().command(*args).start()
+//
+//        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+//
+//        println(proc.inputStream.bufferedReader().readText())
+//
+//        if (proc.exitValue() > 0) {
+//            println("exited with value ${proc.exitValue()}")
+//            println(proc.errorStream.bufferedReader().readText())
+//        }
+//
+//        return proc.exitValue()
     }
 }
 
