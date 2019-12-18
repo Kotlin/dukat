@@ -12,7 +12,7 @@ var printError = function (errorMessage) {
     console.error("ERROR: " + errorMessage);
 };
 
-var run = function (command, args) {
+function run(command, args) {
     var child = spawn(command, args);
     process.stdin.pipe(child.stdin);
 
@@ -20,7 +20,7 @@ var run = function (command, args) {
     child.stderr.pipe(process.stderr);
 
     return child;
-};
+}
 
 function printNoJava() {
     printError("It looks like you don't have java installed or it's just not reachable from command-line");
