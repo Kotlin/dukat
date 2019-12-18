@@ -85,7 +85,7 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
                 is TranslationErrorFileNotFound -> translationUnitResult.fileName
                 is ModuleTranslationUnit -> translationUnitResult.fileName
             }
-            println("ERROR: ${translationUnitResult.resolveAsError(fileName)}")
+            printStream?.println("ERROR: ${translationUnitResult.resolveAsError(fileName)}")
         }
     }
 
