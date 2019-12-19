@@ -24,7 +24,6 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
     private fun createCliArgs(
             input: String,
             binaryOutput: Boolean = false,
-            dirName: String? = null,
             reportPath: String? = null,
             moduleName: String? = null
     ): Array<String> {
@@ -32,11 +31,6 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
                 nodePath,
                 translatorPath
         )
-
-        if (dirName != null) {
-            args.push("-d")
-            args.push(dirName)
-        }
 
         if (reportPath != null) {
             args.push("-r")
@@ -63,9 +57,15 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             moduleName: String? = null
     ) {
 
-        val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
+        val binArgs = createCliArgs(input, true, reportPath, moduleName)
         val binProc = ProcessBuilder().command(*binArgs).start()
-        val moduleNameResolver = if (moduleName == null) { CommonJsNameResolver() } else { ConstNameResolver(moduleName) }
+
+        val moduleNameResolver = if (moduleName == null) {
+            CommonJsNameResolver()
+        } else {
+            ConstNameResolver(moduleName)
+        }
+
         translateBinaryBundle(binProc.errorStream.readBytes(), dirName, moduleNameResolver, reportPath)
     }
 }
