@@ -87,6 +87,7 @@ abstract class CompilationTests {
 
         targetDir.deleteRecursively()
         getTranslator().translate(sourcePath, targetPath)
+
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"
 
         val sources = targetDir.walk().map { it.normalize().absolutePath }.toList()

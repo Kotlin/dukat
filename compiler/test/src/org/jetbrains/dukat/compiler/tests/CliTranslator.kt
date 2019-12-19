@@ -3,10 +3,11 @@ package org.jetbrains.dukat.compiler.tests
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import org.jetbrains.dukat.compiler.tests.core.TestConfig
+import org.jetbrains.dukat.cli.translateBinaryBundle
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.kotlin.backend.common.push
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 @Serializable
 internal data class EnvJson(val NODE: String)
@@ -20,18 +21,22 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         nodePath = envJson.NODE
     }
 
-    fun translate(
+    private fun createCliArgs(
             input: String,
-            dirName: String,
+            binaryOutput: Boolean = false,
+            dirName: String? = null,
             reportPath: String? = null,
             moduleName: String? = null
-            ): Int {
-
+    ): Array<String> {
         val args = mutableListOf(
                 nodePath,
-                translatorPath,
-                "-d", dirName
+                translatorPath
         )
+
+        if (dirName != null) {
+            args.push("-d")
+            args.push(dirName)
+        }
 
         if (reportPath != null) {
             args.push("-r")
@@ -43,20 +48,25 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             args.push(moduleName)
         }
 
-        args.push(input)
-
-        val proc= ProcessBuilder().inheritIO().command(*args.toTypedArray()).start()
-
-        proc.waitFor(TestConfig.COMPILATION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-
-        println(proc.inputStream.bufferedReader().readText())
-
-        if (proc.exitValue() > 0) {
-            println("exited with value ${proc.exitValue()}")
-            println(proc.errorStream.bufferedReader().readText())
+        if (binaryOutput) {
+            args.push("-b")
         }
 
-        return proc.exitValue()
+        args.push(input)
+        return args.toTypedArray()
+    }
+
+    fun translate(
+            input: String,
+            dirName: String,
+            reportPath: String? = null,
+            moduleName: String? = null
+    ) {
+
+        val binArgs = createCliArgs(input, true, dirName, reportPath, moduleName)
+        val binProc = ProcessBuilder().command(*binArgs).start()
+        val moduleNameResolver = if (moduleName == null) { CommonJsNameResolver() } else { ConstNameResolver(moduleName) }
+        translateBinaryBundle(binProc.errorStream.readBytes(), dirName, moduleNameResolver, reportPath)
     }
 }
 

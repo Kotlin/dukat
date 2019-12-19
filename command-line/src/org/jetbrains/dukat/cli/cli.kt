@@ -8,6 +8,7 @@ import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -38,9 +39,9 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(outDir: String?, translator: InputTranslator<ByteArray>, pathToReport: String?) {
-    val translatedUnits = translateModule(System.`in`.readBytes(), translator)
-
+fun translateBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
+    val translator = createJsByteArrayTranslator(moduleNameResolver)
+    val translatedUnits = translateModule(input, translator)
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
@@ -142,10 +143,6 @@ private data class CliOptions(
 
 private fun printError(message: String) {
     System.err.println(message)
-}
-
-private fun printWarning(message: String) {
-    System.out.println("Warning: ${message}")
 }
 
 private fun process(args: List<String>): CliOptions? {
@@ -256,14 +253,12 @@ fun main(vararg args: String) {
 
         when {
             isTsTranslation -> {
-                compile(
+                translateBinaryBundle(
+                        System.`in`.readBytes(),
                         options.outDir,
-                        createJsByteArrayTranslator(
-                                moduleResolver
-                        ),
+                        moduleResolver,
                         options.reportPath
                 )
-
             }
 
             isIdlTranslation-> {
