@@ -5,39 +5,10 @@ import org.jetbrains.dukat.cli.translateBinaryBundle
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.kotlin.backend.common.push
 
 
 @UseExperimental(UnstableDefault::class)
 class CliTranslator(private val nodeResolver: NodeResolver, private val translatorPath: String) {
-    private fun createCliArgs(
-            input: String,
-            binaryOutput: Boolean = false,
-            reportPath: String? = null,
-            moduleName: String? = null
-    ): Array<String> {
-        val args = mutableListOf(
-                nodeResolver.nodePath,
-                translatorPath
-        )
-
-        if (reportPath != null) {
-            args.push("-r")
-            args.push(reportPath)
-        }
-
-        if (moduleName != null) {
-            args.push("-m")
-            args.push(moduleName)
-        }
-
-        if (binaryOutput) {
-            args.push("-b")
-        }
-
-        args.push(input)
-        return args.toTypedArray()
-    }
 
     fun translate(
             input: String,
