@@ -1,26 +1,15 @@
 package org.jetbrains.dukat.compiler.tests
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.cli.translateBinaryBundle
+import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.kotlin.backend.common.push
-import java.io.File
 
-@Serializable
-internal data class EnvJson(val NODE: String)
 
 @UseExperimental(UnstableDefault::class)
-class CliTranslator(val envDataPath: String, private val translatorPath: String) {
-    private val nodePath: String
-
-    init {
-        val envJson = Json.nonstrict.parse(EnvJson.serializer(), File(envDataPath).readText())
-        nodePath = envJson.NODE
-    }
-
+class CliTranslator(private val nodeResolver: NodeResolver, private val translatorPath: String) {
     private fun createCliArgs(
             input: String,
             binaryOutput: Boolean = false,
@@ -28,7 +17,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             moduleName: String? = null
     ): Array<String> {
         val args = mutableListOf(
-                nodePath,
+                nodeResolver.nodePath,
                 translatorPath
         )
 
@@ -56,9 +45,7 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             reportPath: String? = null,
             moduleName: String? = null
     ) {
-
-        val binArgs = createCliArgs(input, true, reportPath, moduleName)
-        val binProc = ProcessBuilder().command(*binArgs).start()
+        val binData = CliHttpClient("8090").translate(input)
 
         val moduleNameResolver = if (moduleName == null) {
             CommonJsNameResolver()
@@ -66,14 +53,14 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binProc.errorStream.readBytes(), dirName, moduleNameResolver, reportPath)
+        translateBinaryBundle(binData, dirName, moduleNameResolver, reportPath)
     }
 }
 
 
 fun createStandardCliTranslator(): CliTranslator {
     return CliTranslator(
-            "../node-package/build/env.json",
+            NodeResolver("../node-package/build/env.json"),
             "../node-package/build/distrib/bin/dukat-cli.js"
     )
 }

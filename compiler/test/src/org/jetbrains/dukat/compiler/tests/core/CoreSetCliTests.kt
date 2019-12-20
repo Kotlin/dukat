@@ -7,8 +7,11 @@ import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
+import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
+import org.jetbrains.dukat.compiler.tests.httpService.CliHttpService
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -32,10 +35,24 @@ class CoreSetCliTests {
     fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object : FileFetcher() {
+        var cliProcess: Process? = null
+        private val PORT = "8090"
+
         @JvmStatic
         @BeforeAll
         fun setup() {
             resolvePanicMode()
+            cliProcess = CliHttpService().startService(PORT)
+            CliHttpClient(PORT).waitForServer()
+
+            println("cli http process creation: ${cliProcess?.isAlive}")
+        }
+
+        @JvmStatic
+        @AfterAll
+        fun teardown() {
+            cliProcess?.destroy()
+            println("shutting down cli http process")
         }
 
         override val postfix = TS_DECLARATION_EXTENSION

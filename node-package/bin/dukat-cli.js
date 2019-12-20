@@ -85,6 +85,29 @@ function endsWith(str, postfix) {
     return str.lastIndexOf(postfix) == (str.length - postfix.length);
 }
 
+
+function createBinaryStream(packageName, files, onData, onEnd) {
+    var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
+    var stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
+
+    var bundle = createBundle(stdlib, packageName, files);
+
+    var readable = createReadable();
+
+    if (typeof onData == "function") {
+        readable.on("data", onData);
+    }
+
+    if (typeof onEnd == "function") {
+        readable.on("end", onEnd);
+    }
+
+    readable.push(bundle.serializeBinary());
+    readable.push(null);
+
+    return readable;
+}
+
 function cliMode(args) {
     var packageDir = path.resolve(__dirname, "..");
 
@@ -108,12 +131,7 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
-        var bundle = createBundle(path.resolve(packageDir, DEFAULT_LIB_PATH), argsProcessed.packageName, files);
-
-        var inputStream = createReadable();
-        inputStream.push(bundle.serializeBinary());
-        inputStream.push(null);
+        var inputStream = createBinaryStream(argsProcessed.packageName, files);
 
         if (argsProcessed.binaryOutput) {
             inputStream.pipe(process.stderr);
@@ -147,4 +165,9 @@ var main = function (args) {
     }
 };
 
-main(process.argv.slice(2));
+if (require.main === module) {
+    main(process.argv.slice(2));
+}
+
+exports.translate = main;
+exports.createBinaryStream = createBinaryStream;
