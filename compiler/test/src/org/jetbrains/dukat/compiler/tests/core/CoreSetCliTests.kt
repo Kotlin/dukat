@@ -7,12 +7,11 @@ import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
-import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
-import org.jetbrains.dukat.compiler.tests.httpService.CliHttpService
+import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
+import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -25,26 +24,13 @@ import kotlin.test.assertEquals
 @Serializable
 private data class ReportJson(val outputs: List<String>)
 
-private var CLI_PROCESS: Process? = null
-private val PORT = "8090"
-
-private class TestsStarted : BeforeAllCallback {
+class ResolvePanicMode : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
         resolvePanicMode()
-        CLI_PROCESS = CliHttpService().startService(PORT)
-        CliHttpClient(PORT).waitForServer()
-        println("cli http process creation: ${CLI_PROCESS?.isAlive}")
     }
 }
 
-private class TestsEnded : AfterAllCallback {
-    override fun afterAll(context: ExtensionContext?) {
-        CLI_PROCESS?.destroy()
-        println("shutting down cli http process")
-    }
-}
-
-@ExtendWith(TestsStarted::class, TestsEnded::class)
+@ExtendWith(ResolvePanicMode::class, CliTestsStarted::class, CliTestsEnded::class)
 class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")

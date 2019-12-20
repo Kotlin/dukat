@@ -35,6 +35,7 @@ function createServer(port) {
                 } catch (e) {
                     res.setHeader('Content-Type', 'text/plain');
                     res.statusCode = 500;
+                    console.log(e);
                     res.end(e.toString());
                 }
             });
