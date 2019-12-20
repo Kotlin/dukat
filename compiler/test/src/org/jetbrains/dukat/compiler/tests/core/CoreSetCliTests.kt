@@ -11,9 +11,11 @@ import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpService
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.extension.AfterAllCallback
+import org.junit.jupiter.api.extension.BeforeAllCallback
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
@@ -23,8 +25,27 @@ import kotlin.test.assertEquals
 @Serializable
 private data class ReportJson(val outputs: List<String>)
 
-class CoreSetCliTests {
+private var CLI_PROCESS: Process? = null
+private val PORT = "8090"
 
+private class TestsStarted : BeforeAllCallback {
+    override fun beforeAll(context: ExtensionContext?) {
+        resolvePanicMode()
+        CLI_PROCESS = CliHttpService().startService(PORT)
+        CliHttpClient(PORT).waitForServer()
+        println("cli http process creation: ${CLI_PROCESS?.isAlive}")
+    }
+}
+
+private class TestsEnded : AfterAllCallback {
+    override fun afterAll(context: ExtensionContext?) {
+        CLI_PROCESS?.destroy()
+        println("shutting down cli http process")
+    }
+}
+
+@ExtendWith(TestsStarted::class, TestsEnded::class)
+class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
@@ -35,26 +56,6 @@ class CoreSetCliTests {
     fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object : FileFetcher() {
-        var cliProcess: Process? = null
-        private val PORT = "8090"
-
-        @JvmStatic
-        @BeforeAll
-        fun setup() {
-            resolvePanicMode()
-            cliProcess = CliHttpService().startService(PORT)
-            CliHttpClient(PORT).waitForServer()
-
-            println("cli http process creation: ${cliProcess?.isAlive}")
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun teardown() {
-            cliProcess?.destroy()
-            println("shutting down cli http process")
-        }
-
         override val postfix = TS_DECLARATION_EXTENSION
 
         @JvmStatic
