@@ -41,7 +41,7 @@ gradle.ext {
   kotlinSerializationRuntimeVersion = "0.11.0"
   antlr4_version = "4.7.1"
   protobufGradlePluginVersion = "0.8.10"
-  protobufImplementationVersion = "3.9.0"
+  protobufImplementationVersion = "3.11.1"
 }
 
 include 'ast-common'
