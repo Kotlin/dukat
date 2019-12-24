@@ -7,6 +7,10 @@ Following third-party dependencies exist in Dukat:
 * graal-sdk:
     * The Universal Permissive License (UPL), Version 1.0: [graal-sdk.txt](graal-sdk.txt)
     * https://github.com/oracle/graal/blob/master/sdk/LICENSE.md
+    
+* protobuf:
+    * [protobuf.txt](protobuf.txt)
+    * https://github.com/protocolbuffers/protobuf/blob/master/LICENSE    
             
 * typescript:
     * Apache License 2.0: [typescript.txt](typescript.txt)
@@ -15,3 +19,4 @@ Following third-party dependencies exist in Dukat:
 * yarn:
     * BSD 2-Clause License [yarn.txt](yarn.txt)            
     * https://github.com/yarnpkg/yarn/blob/master/LICENSE
+    
