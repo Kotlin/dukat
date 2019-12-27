@@ -274,16 +274,12 @@ private class NodeConverter(private val uidToNameMapper: UidMapper) {
                         stringEntity.addLibPrefix()
                 )
             } else {
-                if (params.size == 1) {
-                    params[0].process(context)
-                } else {
-                    TypeValueModel(
-                            dynamicName,
-                            emptyList(),
-                            convertMeta(),
-                            null
-                    )
-                }
+                TypeValueModel(
+                        dynamicName,
+                        emptyList(),
+                        convertMeta(),
+                        null
+                )
             }
             is TupleTypeNode -> TypeValueModel(
                     dynamicName,

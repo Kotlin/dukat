@@ -25,6 +25,6 @@ external object v {
     var x: Number
     var y: Number
     var z: Number
-    fun negate(x: Any?, y: Any?, z: Any?): `T$0`
     var double: `T$0`
+    fun negate(x: Any?, y: Any?, z: Any?): `T$0`
 }

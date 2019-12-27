@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.js.type.analysis.introduceTypes
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
-import org.jetbrains.dukat.tsLowerings.mergeDuplicates
+import org.jetbrains.dukat.tsLowerings.mergeDuplicates.mergeDuplicates
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 

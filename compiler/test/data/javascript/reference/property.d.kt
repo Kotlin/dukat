@@ -15,10 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external fun wrapperFun(): String
+
 external open class PropertyOwner {
     companion object {
         fun property(): String
     }
 }
-
-external fun wrapperFun(): String

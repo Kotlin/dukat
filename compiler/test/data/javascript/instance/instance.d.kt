@@ -15,12 +15,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class C {
-    open fun foo(): String
-}
-
 external object o {
     fun foo(): String
 }
 
 external var str: String
+
+external open class C {
+    open fun foo(): String
+}

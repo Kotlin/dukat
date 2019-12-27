@@ -15,4 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun getOperation(operator: Any?): (Number, Number) -> Number
+external fun getOperation(operator: Any?): dynamic /* (Number, Number) -> Number | Nothing */

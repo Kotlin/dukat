@@ -23,7 +23,7 @@ fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
             typeParameters = typeParameters,
             modifiers = modifiers,
             body = body,
-            uid = "__NO_UID__"
+            uid = ""
     ).addTo(owner)
 }
 

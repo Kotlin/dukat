@@ -21,11 +21,11 @@ external interface `T$0` {
     var z: Number
 }
 
+external fun lengthOf(vector: `T$0`): Any?
+
 external interface `T$1` {
     var x: Number
     var y: Number
 }
-
-external fun lengthOf(vector: `T$0`): Any?
 
 external fun lengthOf(vector: `T$1`): Any?

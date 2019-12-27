@@ -17,6 +17,6 @@ import org.w3c.xhr.*
 
 external fun max(a: Number, b: Number): Number
 
-external fun negate(a: Number): dynamic /* Number | Boolean */
+external fun negate(a: Number): Number
 
-external fun negate(a: Any?): dynamic /* Number | Boolean */
+external fun negate(a: Any?): Boolean

@@ -202,8 +202,7 @@ private fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
 private fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
             members = mapMembers(),
-            uid = getUID(),
-            nullable = true
+            uid = getUID()
     )
 }
 
@@ -234,21 +233,14 @@ private fun Constraint.toDeclarations(name: String, exportModifiers: List<Modifi
 fun Constraint.toDeclarations(name: String) = toDeclarations(name, EXPORT_MODIFIERS)
 
 fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLevelDeclaration> {
-    val declarations = this.toDeclarations(defaultExportName, DECLARE_MODIFIERS)
+    val declarations = this.toDeclarations(defaultExportName, DECLARE_MODIFIERS).toMutableList()
 
-    val declaration = declarations.firstOrNull { it is WithUidDeclaration }
+    val uidOwner = declarations.firstOrNull { it is WithUidDeclaration }
 
-    return if (declaration is WithUidDeclaration) {
-        val exportEqualsDeclaration = ExportAssignmentDeclaration(
-                declaration.uid,
-                true
-        )
-
-        declarations.toMutableList().apply {
-            add(exportEqualsDeclaration)
-        }
-    } else {
-        emptyList()
+    if (uidOwner is WithUidDeclaration) {
+        declarations.add(ExportAssignmentDeclaration(uidOwner.uid, true))
     }
+
+    return declarations
 }
 

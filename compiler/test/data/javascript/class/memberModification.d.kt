@@ -15,6 +15,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external var falseStr: Number
+
+external var trueNum: Number
+
+external var falseBool: Number
+
 external open class ModifiedLiterals {
     companion object {
         fun getStringLiteral(): Number
@@ -22,9 +28,3 @@ external open class ModifiedLiterals {
         fun getBooleanLiteral(): Number
     }
 }
-
-external var falseStr: Number
-
-external var trueNum: Number
-
-external var falseBool: Number
