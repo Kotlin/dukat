@@ -403,15 +403,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             is CallSignatureDeclaration -> listOf(
                     FunctionNode(
                             QualifierEntity(name, IdentifierEntity("invoke")),
-                            convertParameters(declaration.parameters.map { param ->
-                                val initializer = if (param.initializer?.kind?.isSimpleType("definedExternally") == true) {
-                                    ExpressionDeclaration(TypeDeclaration(IdentifierEntity("null"), emptyList()), null)
-                                } else {
-                                    param.initializer
-                                }
-
-                                param.copy(initializer = initializer)
-                            }),
+                            convertParameters(declaration.parameters),
                             declaration.type,
                             emptyList(),
                             mutableListOf(),
