@@ -16,6 +16,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
@@ -54,6 +55,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is EnumDeclaration -> copy() as T
         is EnumNode -> copy() as T
         is ExportAssignmentDeclaration -> copy() as T
+        is ExpressionStatementDeclaration -> copy() as T
         is FunctionDeclaration -> copy() as T
         is FunctionNode -> copy() as T
         is FunctionTypeDeclaration -> copy() as T

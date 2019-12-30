@@ -2,7 +2,10 @@ import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {
+    Block,
+    Declaration,
     DefinitionInfoDeclaration,
+    Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
     MemberDeclaration,
@@ -12,13 +15,12 @@ import {
     ParameterDeclaration,
     ReferenceEntity,
     SourceFileDeclaration,
-    Declaration,
     TypeDeclaration,
-    TypeParameter,
-    ParameterInitializerExpression
+    TypeParameter
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
+import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {tsInternals} from "./TsInternals";
@@ -36,6 +38,9 @@ export class AstConverter {
       private astVisitor: AstVisitor
     ) {
     }
+
+    private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
+
 
     private registerDeclaration<T>(declaration: T, collection: Array<T>) {
         collection.push(declaration);
@@ -120,6 +125,7 @@ export class AstConverter {
         if (name != null) {
             return this.astFactory.declareProperty(
               name,
+              null,
               this.convertType(nativePropertyDeclaration.type),
               [],
               false,
@@ -158,6 +164,32 @@ export class AstConverter {
         return typeParameterDeclarations;
     }
 
+    private getStatementsFromBlock(block: ts.Block): Array<Declaration> {
+        let statements: Declaration[] = [];
+
+        for (let statement of block.statements) {
+            for (let decl of this.convertTopLevelStatement(statement)) {
+                this.registerDeclaration(decl, statements)
+            }
+        }
+
+        return statements;
+    }
+
+    convertBlock(block: ts.Block | null): Block | null {
+        if (block) {
+            let statements = this.getStatementsFromBlock(block);
+            return this.astFactory.createBlockDeclaration(statements);
+        } else {
+            return null;
+        }
+    }
+
+    convertBlockStatement(block: ts.Block): Declaration {
+        let statements = this.getStatementsFromBlock(block);
+        return this.astFactory.createBlockStatementDeclaration(statements);
+    }
+
     convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration): Declaration | null {
 
         let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
@@ -183,6 +215,7 @@ export class AstConverter {
               returnType,
               typeParameterDeclarations,
               this.convertModifiers(functionDeclaration.modifiers),
+              this.convertBlock(functionDeclaration.body),
               uid
             );
         }
@@ -251,7 +284,8 @@ export class AstConverter {
               declaration.type ?
                 this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
               typeParameterDeclarations,
-              this.convertModifiers(declaration.modifiers)
+              this.convertModifiers(declaration.modifiers),
+              this.convertBlock(declaration.body),
             );
         }
 
@@ -259,21 +293,21 @@ export class AstConverter {
     }
 
 
-    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+    createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
         // TODO: reintroduce method declaration
-        return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, "__NO_UID__");
+        return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__");
     }
 
-    private createTypeDeclaration(value: string, params: Array<TypeDeclaration> = [], typeReference: string | null = null): TypeDeclaration {
+    createTypeDeclaration(value: string, params: Array<TypeDeclaration> = [], typeReference: string | null = null): TypeDeclaration {
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
-    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
         return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
     }
 
-    private createProperty(value: string, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean): MemberDeclaration {
-        return this.astFactory.declareProperty(value, type, typeParams, optional, []);
+    createProperty(value: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean): MemberDeclaration {
+        return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, []);
     }
 
 
@@ -418,13 +452,10 @@ export class AstConverter {
     }
 
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
-        let initializer: ParameterInitializerExpression | null = null;
+        let initializer: Expression | null = null;
+
         if (param.initializer != null) {
-            // TODO: this never happens in tests and I should add one
-            initializer = this.astFactory.createParameterInitializerExpression(
-              this.astFactory.createTypeReferenceDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
-              param.initializer.getText()
-            )
+            initializer = this.astExpressionConverter.convertExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);
@@ -462,7 +493,7 @@ export class AstConverter {
         let name = this.convertName(node.name);
 
         if (name !== null) {
-            return this.createProperty(name, this.convertType(node.type), [], !!node.questionToken);
+            return this.createProperty(name, null, this.convertType(node.type), [], !!node.questionToken);
         }
 
         return null;
@@ -604,10 +635,14 @@ export class AstConverter {
             this.registerDeclaration(this.convertParameterDeclaration(parameter, count), params);
         });
 
-        this.registerDeclaration(this.astFactory.createConstructorDeclaration(
-          params,
-          this.convertTypeParams(constructorDeclaration.typeParameters), this.convertModifiers(constructorDeclaration.modifiers)),
-          res
+        this.registerDeclaration(
+            this.astFactory.createConstructorDeclaration(
+                params,
+                this.convertTypeParams(constructorDeclaration.typeParameters),
+                this.convertModifiers(constructorDeclaration.modifiers),
+                this.convertBlock(constructorDeclaration.body)
+            ),
+            res
         );
 
         return res;
@@ -707,7 +742,7 @@ export class AstConverter {
             return null;
         }
 
-        return this.astFactory.createClassDeclaration(
+        return this.astFactory.createClassDeclarationAsTopLevel(
           this.astFactory.createIdentifierDeclarationAsNameEntity(statement.name.getText()),
           this.convertClassElementsToMembers(statement.members),
           this.convertTypeParams(statement.typeParameters),
@@ -741,6 +776,23 @@ export class AstConverter {
         );
     }
 
+    convertIterationStatement(statement: ts.Node): Declaration | null {
+        let decl: Declaration | null = null;
+
+        let body = this.convertTopLevelStatement(statement.statement);
+
+        if (ts.isWhileStatement(statement)) {
+            decl = this.astFactory.createWhileStatement(
+                this.astExpressionConverter.convertExpression(statement.expression),
+                body
+            )
+        }
+
+        //TODO convert other iteration statements than while statement
+
+        return decl
+    }
+
     convertTopLevelStatement(statement: ts.Node): Array<Declaration> {
         let res: Array<Declaration> = [];
 
@@ -762,8 +814,38 @@ export class AstConverter {
                   declaration.name.getText(),
                   this.convertType(declaration.type),
                   this.convertModifiers(statement.modifiers),
+                  declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
                   this.exportContext.getUID(declaration)
                 ));
+            }
+        } else if (ts.isExpressionStatement(statement)) {
+            res.push(this.astFactory.createExpressionStatement(
+                this.astExpressionConverter.convertExpression(statement.expression)
+            ));
+        } else if (ts.isIfStatement(statement)) {
+            res.push(this.astFactory.createIfStatement(
+                this.astExpressionConverter.convertExpression(statement.expression),
+                this.convertTopLevelStatement(statement.thenStatement),
+                statement.elseStatement ? this.convertTopLevelStatement(statement.elseStatement) : null
+            ))
+        } else if (ts.isIterationStatement(statement)) {
+            let iterationStatement = this.convertIterationStatement(statement);
+
+            if (iterationStatement) {
+                res.push(iterationStatement)
+            }
+        } else if (ts.isReturnStatement(statement)) {
+            res.push(this.astFactory.createReturnStatement(
+                statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+            ));
+        } else if (ts.isThrowStatement(statement)) {
+            res.push(this.astFactory.createThrowStatement(
+                statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+            ))
+        } else if (ts.isBlock(statement)) {
+            let block = this.convertBlockStatement(statement);
+            if (block) {
+                res.push(block)
             }
         } else if (ts.isTypeAliasDeclaration(statement)) {
             if (ts.isTypeLiteralNode(statement.type)) {

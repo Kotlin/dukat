@@ -1,7 +1,10 @@
 import * as declarations from "declarations";
 import {
+  Block,
+  ClassDeclaration,
   DefinitionInfoDeclaration,
   EnumTokenDeclaration,
+  Expression,
   FunctionDeclaration,
   HeritageClauseDeclaration,
   IdentifierDeclaration,
@@ -15,14 +18,11 @@ import {
   SourceFileDeclaration,
   SourceSet,
   Declaration,
-  TypeParamReferenceDeclaration,
   TypeParameter,
-  TypeReferenceDeclaration,
-  ParameterInitializerExpression
+  TypeParamReferenceDeclaration,
+  TypeReferenceDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
-import {TypeReferenceDeclarationProto} from "declarations";
-import {HeritageClauseDeclarationProto} from "declarations";
 
 export class AstFactory implements AstFactory {
 
@@ -39,7 +39,7 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
+  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration {
     let classDeclaration = new declarations.ClassDeclarationProto();
     classDeclaration.setName(name);
     classDeclaration.setModifiersList(modifiers);
@@ -47,18 +47,26 @@ export class AstFactory implements AstFactory {
     classDeclaration.setMembersList(members);
     classDeclaration.setTypeparametersList(typeParams);
     classDeclaration.setParententitiesList(parentEntities);
+    return classDeclaration
+  }
+
+  createClassDeclarationAsTopLevel(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
+    let classDeclaration = this.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setClassdeclaration(classDeclaration);
     return topLevelDeclaration;
   }
 
-  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
     let constructorDeclaration = new declarations.ConstructorDeclarationProto();
 
     constructorDeclaration.setParametersList(parameters);
     constructorDeclaration.setTypeparametersList(typeParams);
     constructorDeclaration.setModifiersList(modifiers);
+    if (body) {
+      constructorDeclaration.setBody(body)
+    }
 
     let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setConstructordeclaration(constructorDeclaration);
@@ -99,35 +107,98 @@ export class AstFactory implements AstFactory {
     return topLevelDeclaration;
   }
 
-  createParameterInitializerExpression(kind: TypeReferenceDeclarationProto, meta: string): ParameterInitializerExpression {
-    let expression = new declarations.ParameterInitializerExpressionDeclarationProto();
-    expression.setKind(kind);
-    expression.setMeta(meta);
+  createExpressionStatement(expression: Expression): Declaration {
+    let expressionStatement = new declarations.ExpressionStatementDeclarationProto();
+    expressionStatement.setExpression(expression);
 
-    return expression;
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setExpressionstatement(expressionStatement);
+    return topLevelDeclaration;
   }
 
-  private createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: string): FunctionDeclaration {
+  createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): Declaration {
+    let ifStatement = new declarations.IfStatementDeclarationProto();
+    ifStatement.setCondition(condition);
+    ifStatement.setThenstatementList(thenStatement);
+    if (elseStatement) {
+      ifStatement.setElsestatementList(elseStatement);
+    }
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setIfstatement(ifStatement);
+    return topLevelDeclaration;
+  }
+
+  createWhileStatement(condition: Expression, statement: Array<Declaration>): Declaration {
+    let whileStatement = new declarations.WhileStatementDeclarationProto();
+    whileStatement.setCondition(condition);
+    whileStatement.setStatementList(statement);
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setWhilestatement(whileStatement);
+    return topLevelDeclaration;
+  }
+
+  createReturnStatement(expression: Expression | null): Declaration {
+    let returnStatement = new declarations.ReturnStatementDeclarationProto();
+    if (expression) {
+      returnStatement.setExpression(expression);
+    }
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setReturnstatement(returnStatement);
+    return topLevelDeclaration;
+  }
+
+  createThrowStatement(expression: Expression | null): Declaration {
+    let throwStatement = new declarations.ThrowStatementDeclarationProto();
+    if (expression) {
+      throwStatement.setExpression(expression);
+    }
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setThrowstatement(throwStatement);
+    return topLevelDeclaration;
+  }
+
+  createBlockDeclaration(statements: Array<Declaration>): Block {
+    let block = new declarations.BlockDeclarationProto();
+    block.setStatementsList(statements);
+    return block
+  }
+
+  createBlockStatementDeclaration(statements: Array<Declaration>): Declaration {
+    let block = this.createBlockDeclaration(statements);
+
+    let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
+    topLevelDeclaration.setBlockstatement(block);
+    return topLevelDeclaration;
+  }
+
+  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
     let functionDeclaration = new declarations.FunctionDeclarationProto();
     functionDeclaration.setName(name);
     functionDeclaration.setParametersList(parameters);
     functionDeclaration.setType(type);
     functionDeclaration.setTypeparametersList(typeParams);
     functionDeclaration.setModifiersList(modifiers);
+    if (body) {
+      functionDeclaration.setBody(body);
+    }
     functionDeclaration.setUid(uid);
     return functionDeclaration
   }
 
-  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: string): MemberDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, uid);
+  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): MemberDeclaration {
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let memberProto = new declarations.MemberDeclarationProto();
     memberProto.setFunctiondeclaration(functionDeclaration);
     return memberProto;
   }
 
-  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, uid);
+  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): Declaration {
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setFunctiondeclaration(functionDeclaration);
@@ -161,9 +232,10 @@ export class AstFactory implements AstFactory {
   createIdentifierDeclarationAsNameEntity(value: string): NameEntity {
     let identifierProto = new declarations.IdentifierDeclarationProto();
     identifierProto.setValue(value);
-    let nameEntity = new declarations.NameDeclarationProto();
-    nameEntity.setIdentifier(identifierProto);
-    return nameEntity;
+
+    let nameDeclaration = new declarations.NameDeclarationProto();
+    nameDeclaration.setIdentifier(identifierProto);
+    return nameDeclaration;
   }
 
   createIdentifierDeclaration(value: string): IdentifierDeclaration {
@@ -193,7 +265,7 @@ export class AstFactory implements AstFactory {
     return memberEntity;
   }
 
-  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclarationProto>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
+  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
     let interfaceDeclaration = new declarations.InterfaceDeclarationProto();
     interfaceDeclaration.setName(name);
     interfaceDeclaration.setUid(uid);
@@ -271,7 +343,6 @@ export class AstFactory implements AstFactory {
   createObjectLiteral(members: Array<MemberDeclaration>, uid: string): TypeDeclaration {
     let objectLiteral = new declarations.ObjectLiteralDeclarationProto();
     objectLiteral.setMembersList(members);
-
     objectLiteral.setUid(uid);
 
     let paramValueDeclaration = new declarations.ParameterValueDeclarationProto();
@@ -279,7 +350,7 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
     let parameterDeclaration = new declarations.ParameterDeclarationProto();
     parameterDeclaration.setName(name);
     parameterDeclaration.setType(type);
@@ -295,10 +366,10 @@ export class AstFactory implements AstFactory {
     let qualifier = new declarations.QualifierDeclarationProto();
     qualifier.setLeft(left);
     qualifier.setRight(right);
-    
-    let nameEntity = new declarations.NameDeclarationProto();
-    nameEntity.setQualifier(qualifier);
-    return nameEntity;
+
+    let nameDeclaration = new declarations.NameDeclarationProto();
+    nameDeclaration.setQualifier(qualifier);
+    return nameDeclaration;
   }
 
   createReferenceEntity<T extends Declaration>(uid: string): ReferenceEntity {
@@ -409,9 +480,12 @@ export class AstFactory implements AstFactory {
     return paramValueDeclaration;
   }
 
-  declareProperty(name: string, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+  declareProperty(name: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
     let propertyDeclaration = new declarations.PropertyDeclarationProto();
     propertyDeclaration.setName(name);
+    if(initializer) {
+      propertyDeclaration.setInitializer(initializer);
+    }
     propertyDeclaration.setType(type);
     propertyDeclaration.setTypeparametersList(typeParams);
     propertyDeclaration.setOptional(optional);
@@ -422,11 +496,14 @@ export class AstFactory implements AstFactory {
     return memberProto;
   }
 
-  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
+  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: string): Declaration {
     let variableDeclaration = new declarations.VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
     variableDeclaration.setModifiersList(modifiers);
+    if(initializer) {
+      variableDeclaration.setInitializer(initializer);
+    }
     variableDeclaration.setUid(uid);
 
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();

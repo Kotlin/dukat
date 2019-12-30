@@ -7,6 +7,7 @@ data class VariableDeclaration(
         val name: String,
         val type: ParameterValueDeclaration,
         val modifiers: List<ModifierDeclaration>,
+        val initializer: ExpressionDeclaration?,
 
         override val uid: String
 ) : TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration

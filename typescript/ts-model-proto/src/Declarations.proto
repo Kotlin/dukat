@@ -98,6 +98,7 @@ message ConstructorDeclarationProto {
     repeated ParameterDeclarationProto parameters = 1;
     repeated TypeParameterDeclarationProto typeParameters = 2;
     repeated ModifierDeclarationProto modifiers = 3;
+    BlockDeclarationProto body = 6;
 }
 
 message BlockDeclarationProto {
@@ -271,11 +272,6 @@ message ExpressionDeclarationProto {
     }
 }
 
-message ParameterInitializerExpressionDeclarationProto {
-    TypeReferenceDeclarationProto kind = 1;
-    string meta = 2;
-}
-
 message ExpressionStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
@@ -302,7 +298,7 @@ message ThrowStatementDeclarationProto {
 message ParameterDeclarationProto {
     string name = 1;
     ParameterValueDeclarationProto type = 2;
-    ParameterInitializerExpressionDeclarationProto initializer = 3;
+    ExpressionDeclarationProto initializer = 3;
     bool vararg = 4;
     bool optional = 5;
 }

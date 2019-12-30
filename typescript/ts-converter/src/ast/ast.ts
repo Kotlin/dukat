@@ -1,22 +1,24 @@
 import {
+    BlockDeclarationProto,
     CallSignatureDeclarationProto,
     ClassDeclarationProto,
     ConstructorDeclarationProto,
     DefinitionInfoDeclarationProto,
     EnumDeclarationProto,
     EnumTokenDeclarationProto,
+    ExpressionDeclarationProto,
     FunctionDeclarationProto,
     HeritageClauseDeclarationProto,
     IdentifierDeclarationProto,
     ImportEqualsDeclarationProto,
     IndexSignatureDeclarationProto,
     InterfaceDeclarationProto,
+    LiteralExpressionDeclarationProto,
     MemberDeclarationProto,
     ModifierDeclarationProto,
     ModuleDeclarationProto,
     NameDeclarationProto,
     ParameterDeclarationProto,
-    ParameterInitializerExpressionDeclarationProto,
     ParameterValueDeclarationProto,
     PropertyDeclarationProto,
     ReferenceDeclarationProto,
@@ -31,19 +33,21 @@ import {
     VariableDeclarationProto
 } from "declarations";
 
+export type Block = BlockDeclarationProto;
 export type CallSignatureDeclaration = CallSignatureDeclarationProto;
 export type ClassDeclaration = ClassDeclarationProto;
 export type ConstructorDeclaration = ConstructorDeclarationProto;
 export type DefinitionInfoDeclaration = DefinitionInfoDeclarationProto;
 export type EnumDeclaration = EnumDeclarationProto;
 export type EnumTokenDeclaration = EnumTokenDeclarationProto;
-export type ParameterInitializerExpression = ParameterInitializerExpressionDeclarationProto;
+export type Expression = ExpressionDeclarationProto;
 export type FunctionDeclaration = FunctionDeclarationProto;
 export type HeritageClauseDeclaration = HeritageClauseDeclarationProto;
 export type IdentifierDeclaration = IdentifierDeclarationProto;
 export type ImportEqualsDeclaration = ImportEqualsDeclarationProto;
 export type IndexSignatureDeclaration = IndexSignatureDeclarationProto;
 export type InterfaceDeclaration = InterfaceDeclarationProto;
+export type LiteralExpression = LiteralExpressionDeclarationProto;
 export type MemberDeclaration = MemberDeclarationProto;
 export type ModifierDeclaration = ModifierDeclarationProto;
 export type ModuleDeclaration = ModuleDeclarationProto;
