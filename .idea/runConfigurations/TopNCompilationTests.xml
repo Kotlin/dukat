@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TopNCompilationTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
-    <module name="compiler_test" />
+  <configuration default="false" name="TopNCompilationTests" type="JUnit" factoryName="JUnit" singleton="false" nameIsGenerated="true">
+    <module name="dukat.compiler.test" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.extended.*" />
@@ -11,9 +11,10 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.TopNCompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended=true -Ddukat.test.resources.topN=./build/tests/topN" />
+    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended.topn=true -Ddukat.test.resources.topN=./build/tests/topN -Djunit.jupiter.execution.parallel.enabled=false -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=same_thread" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <fork_mode value="method" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

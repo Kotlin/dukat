@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DescriptorTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
-    <module name="compiler_test" />
+    <module name="dukat.compiler.test" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.extended.*" />

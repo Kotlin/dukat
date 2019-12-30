@@ -31,16 +31,17 @@ pluginManagement {
 
 gradle.ext {
   kotlinVersion = "1.3.60"
-  jupiterVersion = "5.5.1"
+  jupiterVersion = "5.5.2"
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
-  nodeVersion = "10.16.2"
+  nodeVersion = "13.5.0"
   npmVersion = "6.9.0"
   yarnVersion = "1.17.3"
   nodePluginVersion = "1.3.1"
+  defaultTsVersion = "3.5.2"
   kotlinSerializationRuntimeVersion = "0.11.0"
   antlr4_version = "4.7.1"
   protobufGradlePluginVersion = "0.8.10"
-  protobufImplementationVersion = "3.9.0"
+  protobufImplementationVersion = "3.11.1"
 }
 
 include 'ast-common'

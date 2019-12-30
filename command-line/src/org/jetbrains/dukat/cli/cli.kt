@@ -9,6 +9,7 @@ import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -39,18 +40,18 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-private fun compile(
+fun translateBinaryBundle(
+    input: ByteArray,
     outDir: String?,
-    translator: InputTranslator<ByteArray>,
-    pathToReport: String?,
-    generateDescriptors: Boolean
+    moduleNameResolver: ModuleNameResolver,
+    pathToReport: String?
 ) {
-    val data = System.`in`.readBytes()
+    val translator = createJsByteArrayTranslator(moduleNameResolver)
     if (!generateDescriptors) {
-        val translatedUnits = translateModule(data, translator)
+        val translatedUnits = translateModule(input, translator)
         compileUnits(translatedUnits, outDir, pathToReport)
     } else {
-        writeDescriptorsToFile(translator, data, outDir ?: "./")
+        writeDescriptorsToFile(translator, input, outDir ?: "./")
     }
 }
 
@@ -160,10 +161,6 @@ private data class CliOptions(
 
 private fun printError(message: String) {
     System.err.println(message)
-}
-
-private fun printWarning(message: String) {
-    System.out.println("Warning: ${message}")
 }
 
 private fun process(args: List<String>): CliOptions? {
@@ -282,15 +279,15 @@ fun main(vararg args: String) {
 
         when {
             isTsTranslation -> {
-                compile(
+                translateBinaryBundle(
+                    System.`in`.readBytes(),
                     options.outDir,
-                    createJsByteArrayTranslator(
-                        moduleResolver
-                    ),
+
+                    moduleResolver
+                    ,
                     options.reportPath,
                     options.generateDescriptors
                 )
-
             }
 
             isIdlTranslation -> {

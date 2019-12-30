@@ -1,4 +1,4 @@
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {FileResolver} from "./FileResolver";
 import {createLogger} from "./Logger";
 

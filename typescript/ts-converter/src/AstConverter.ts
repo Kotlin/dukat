@@ -1,9 +1,8 @@
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {
     DefinitionInfoDeclaration,
-    Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
     MemberDeclaration,
@@ -15,7 +14,8 @@ import {
     SourceFileDeclaration,
     Declaration,
     TypeDeclaration,
-    TypeParameter
+    TypeParameter,
+    ParameterInitializerExpression
 } from "./ast/ast";
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
@@ -268,7 +268,7 @@ export class AstConverter {
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
-    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+    createParameterDeclaration(name: string, type: TypeDeclaration, initializer: ParameterInitializerExpression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
         return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
     }
 
@@ -418,10 +418,10 @@ export class AstConverter {
     }
 
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
-        let initializer: Expression | null = null;
+        let initializer: ParameterInitializerExpression | null = null;
         if (param.initializer != null) {
             // TODO: this never happens in tests and I should add one
-            initializer = this.astFactory.createExpression(
+            initializer = this.astFactory.createParameterInitializerExpression(
               this.astFactory.createTypeReferenceDeclaration(this.astFactory.createIdentifierDeclarationAsNameEntity("definedExternally"), []),
               param.initializer.getText()
             )

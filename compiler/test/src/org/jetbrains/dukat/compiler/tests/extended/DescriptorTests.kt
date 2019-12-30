@@ -45,10 +45,10 @@ class DescriptorTests : OutputTests() {
         val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
             sourceFile.root.flattenDeclarations().map {
                 SourceFileModel(
-                    sourceFile.name,
-                    sourceFile.fileName,
-                    it,
-                    sourceFile.referencedFiles
+                        sourceFile.name,
+                        sourceFile.fileName,
+                        it,
+                        sourceFile.referencedFiles
                 )
             }
         })
@@ -66,21 +66,21 @@ class DescriptorTests : OutputTests() {
 
         val outputModuleDescriptor = SourceBundleModel(listOf(flattenedSourceSet)).translateToDescriptors()
         val expectedModuleDescriptor =
-            generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
+                generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
 
         validate(
-            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
+                DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
                 FqName.ROOT
-            )
+        )
         )
 
         assertEquals(
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                .serializeRecursively(
-                    outputModuleDescriptor.getPackage(FqName.ROOT)
-                ),
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
+                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                        .serializeRecursively(
+                                outputModuleDescriptor.getPackage(FqName.ROOT)
+                        ),
+                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                        .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
         )
     }
 
@@ -97,10 +97,10 @@ class DescriptorTests : OutputTests() {
         }
 
         val translator: InputTranslator<String> = JsRuntimeFileTranslator(
-            ConstNameResolver(),
-            TestConfig.CONVERTER_SOURCE_PATH,
-            TestConfig.DEFAULT_LIB_PATH,
-            TestConfig.NODE_PATH
+                ConstNameResolver(),
+                TestConfig.CONVERTER_SOURCE_PATH,
+                TestConfig.DEFAULT_LIB_PATH,
+                TestConfig.NODE_PATH
         )
     }
 

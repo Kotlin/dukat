@@ -183,6 +183,10 @@ message ObjectLiteralExpressionDeclarationProto {
 
 }
 
+message ArrayLiteralExpressionDeclarationProto {
+    repeated ExpressionDeclarationProto elements = 1;
+}
+
 message RegExLiteralExpressionDeclarationProto {
     string value = 1;
 }
@@ -194,7 +198,8 @@ message LiteralExpressionDeclarationProto {
         NumericLiteralExpressionDeclarationProto numericLiteral = 3;
         BigIntLiteralExpressionDeclarationProto bigIntLiteral = 4;
         ObjectLiteralExpressionDeclarationProto objectLiteral = 5;
-        RegExLiteralExpressionDeclarationProto regExLiteral = 6;
+        ArrayLiteralExpressionDeclarationProto arrayLiteral = 6;
+        RegExLiteralExpressionDeclarationProto regExLiteral = 7;
     }
 }
 
@@ -238,11 +243,35 @@ message NewExpressionDeclarationProto {
     repeated ExpressionDeclarationProto arguments = 2;
 }
 
+message ConditionalExpressionDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    ExpressionDeclarationProto whenTrue = 2;
+    ExpressionDeclarationProto whenFalse = 3;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
 
 message ExpressionDeclarationProto {
+    oneof type {
+        BinaryExpressionDeclarationProto binaryExpression = 1;
+        UnaryExpressionDeclarationProto unaryExpression = 2;
+        FunctionDeclarationProto functionExpression = 3;
+        ClassDeclarationProto classExpression = 4;
+        TypeOfExpressionDeclarationProto typeOfExpression = 5;
+        CallExpressionDeclarationProto callExpression = 6;
+        NameExpressionDeclarationProto nameExpression = 7;
+        LiteralExpressionDeclarationProto literalExpression = 8;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 9;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 10;
+        NewExpressionDeclarationProto newExpression = 11;
+        ConditionalExpressionDeclarationProto conditionalExpression = 12;
+        UnknownExpressionDeclarationProto unknownExpression = 13;
+    }
+}
+
+message ParameterInitializerExpressionDeclarationProto {
     TypeReferenceDeclarationProto kind = 1;
     string meta = 2;
 }
@@ -266,10 +295,14 @@ message ReturnStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message ThrowStatementDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message ParameterDeclarationProto {
     string name = 1;
     ParameterValueDeclarationProto type = 2;
-    ExpressionDeclarationProto initializer = 3;
+    ParameterInitializerExpressionDeclarationProto initializer = 3;
     bool vararg = 4;
     bool optional = 5;
 }
@@ -338,9 +371,10 @@ message TopLevelDeclarationProto {
         ImportEqualsDeclarationProto importEquals = 9;
         ExpressionStatementDeclarationProto expressionStatement = 10;
         ReturnStatementDeclarationProto returnStatement = 11;
-        BlockDeclarationProto blockStatement = 12;
-        IfStatementDeclarationProto ifStatement = 13;
-        WhileStatementDeclarationProto whileStatement = 14;
+        ThrowStatementDeclarationProto throwStatement = 12;
+        BlockDeclarationProto blockStatement = 13;
+        IfStatementDeclarationProto ifStatement = 14;
+        WhileStatementDeclarationProto whileStatement = 15;
     }
 }
 
