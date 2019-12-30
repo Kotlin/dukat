@@ -56,8 +56,14 @@ class CliHttpClient(private val port: String) {
         val outputStream = DataOutputStream(connection.outputStream)
         outputStream.write(postBody)
         outputStream.flush()
+        outputStream.close()
 
-        return connection.inputStream.readBytes()
+        val result = connection.inputStream.readBytes()
+
+        connection.inputStream.close()
+        connection.disconnect()
+
+        return result
     }
 }
 

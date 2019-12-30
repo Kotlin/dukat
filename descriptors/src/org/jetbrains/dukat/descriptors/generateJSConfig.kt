@@ -33,7 +33,7 @@ class ConfigContext {
 
 
     private fun generateDefaultEnvironment(): KotlinCoreEnvironment {
-        return KotlinCoreEnvironment.createForTests(
+        return KotlinCoreEnvironment.createForProduction(
             disposable,
             generateCompilerConfiguration(),
             EnvironmentConfigFiles.JS_CONFIG_FILES
