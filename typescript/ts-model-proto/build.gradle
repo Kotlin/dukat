@@ -33,6 +33,11 @@ task prepareNpmPackage(type: Copy) {
 
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
+task copyGeneratedTs(type: Copy) {
+    from "$targetMainDir/ts"
+    into "$targetMainDir/js"
+}
+
 dependencies {
     implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
 }
@@ -68,6 +73,7 @@ protobuf {
         all().each { task ->
             if(task.name == 'generateProto') {
                 task.dependsOn = [yarn]
+                task.finalizedBy(copyGeneratedTs)
             }
 
             task.builtins {
