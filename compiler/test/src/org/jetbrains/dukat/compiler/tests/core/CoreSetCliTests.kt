@@ -56,6 +56,7 @@ class CoreSetCliTests {
             tsPath: String,
             ktPath: String
     ) {
+        print("\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}\n")
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
