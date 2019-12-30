@@ -31,5 +31,5 @@ external open class ExpectedNoOverrides {
     open fun equals(a: Number)
     open fun equals(a: String)
     open fun hashCode(a: String): Number
-    open fun toString(a: Number = definedExternally /* 1 */)
+    open fun toString(a: Number = definedExternally)
 }
