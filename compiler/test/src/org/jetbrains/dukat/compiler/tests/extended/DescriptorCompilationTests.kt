@@ -1,9 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
-import org.jetbrains.dukat.astModel.SourceFileModel
-import org.jetbrains.dukat.astModel.flattenDeclarations
-import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
-import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
@@ -17,20 +13,13 @@ class DescriptorCompilationTests : CompilationTests() {
     @MethodSource("descriptorCompilationSet")
     @EnabledIfSystemProperty(named = "dukat.test.descriptorCompilation", matches = "true")
     override fun runTests(descriptor: String, sourcePath: String) {
-        val sourceSet = createJsByteArrayTranslator(CommonJsNameResolver()).translate(
-            File(sourcePath).readBytes()
-        ).sources[0]
-        val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
-            sourceFile.root.flattenDeclarations().map {
-                SourceFileModel(
-                    sourceFile.name,
-                    sourceFile.fileName,
-                    it,
-                    sourceFile.referencedFiles
-                )
-            }
-        })
-        println(flattenedSourceSet)
+        println("file:///${sourcePath}")
+        val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
+        val targetDir = File(targetPath)
+        println("file:///${targetDir.normalize().absolutePath}")
+
+        targetDir.deleteRecursively()
+        getTranslator().translate(sourcePath, targetPath, withDescriptors = true)
     }
 
     companion object {

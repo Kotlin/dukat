@@ -24,7 +24,8 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
             input: String,
             dirName: String,
             reportPath: String? = null,
-            moduleName: String? = null
+            moduleName: String? = null,
+            withDescriptors: Boolean = false
             ): Int {
 
         val args = mutableListOf(
@@ -41,6 +42,10 @@ class CliTranslator(val envDataPath: String, private val translatorPath: String)
         if (moduleName != null) {
             args.push("-m")
             args.push(moduleName)
+        }
+
+        if (withDescriptors) {
+            args.push("--descriptors")
         }
 
         args.push(input)
