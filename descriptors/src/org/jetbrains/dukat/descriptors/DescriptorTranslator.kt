@@ -904,7 +904,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                     value = enumModel.name,
                                     params = listOf(),
                                     metaDescription = null,
-                                    fqName = null
+                                    fqName = context.currentPackageName.appendLeft(enumModel.name)
                                 ), constraints = listOf(), variance = org.jetbrains.dukat.astModel.Variance.INVARIANT
                             )
                         ),
