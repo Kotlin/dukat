@@ -13,12 +13,19 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb"),
-      "google-protobuf": path.resolve("./build/package/node_modules/google-protobuf"),
-      "typescript-services-api": path.resolve("./build/package/node_modules/typescript/lib/typescriptServices.js")
+      "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb")
+    }
+  },
+  externals: {
+    "google-protobuf": {
+      commonjs: 'google-protobuf'
+    },
+    "typescript": {
+      commonjs: 'typescript'
     }
   },
   output: {
+    libraryTarget: "commonjs",
     path: path.resolve("build/bundle"),
     filename: "[name].js"
   }

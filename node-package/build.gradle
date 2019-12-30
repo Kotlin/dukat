@@ -6,6 +6,7 @@ plugins {
 def PROPERTY_PACKAGE_VERSION = "dukat.npm.version"
 def PROPERTY_REGISTRY = "dukat.npm.registry"
 def DISTRIB_PATH = "${project.buildDir}/distrib"
+def typescriptVersion = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 
 node {
     workDir = gradle.nodeWorkingDir
@@ -22,16 +23,28 @@ configurations {
     cliBinary
 }
 
-task buildDistrib {
-    dependsOn = [":ts-converter:webpack", ":command-line:build"]
-
+task prepareNpmPackage {
     doLast {
         copy {
             from "package.template.json"
             into DISTRIB_PATH
+            filter { String line -> line.replaceAll("__TS_VERSION__", typescriptVersion) }
             rename { String fileName -> fileName.replace(".template", "") }
         }
 
+        copy {
+            from "yarn.lock"
+            into DISTRIB_PATH
+        }
+    }
+}
+
+yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+
+task buildDistrib {
+    dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
+
+    doLast {
         copy {
             from "${rootProject.projectDir}/README.md"
             into DISTRIB_PATH
@@ -45,6 +58,11 @@ task buildDistrib {
 
         copy {
             from "${project(":ts-converter").buildDir}/bundle/converter.js"
+            into "${DISTRIB_PATH}/lib"
+        }
+
+        copy {
+            from "${project(":ts-converter").buildDir}/bundle/runtime.js"
             into "${DISTRIB_PATH}/lib"
         }
 

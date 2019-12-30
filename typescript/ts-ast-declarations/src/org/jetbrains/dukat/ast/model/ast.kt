@@ -41,6 +41,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
         is FunctionTypeNode -> copy(nullable = true)
         is UnionTypeDeclaration -> copy(nullable = true)
         is UnionTypeNode -> copy(nullable = true)
+        is GeneratedInterfaceReferenceNode -> copy(nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)
         is ObjectLiteralDeclaration -> copy(nullable = true)
         else -> raiseConcern("makeNullable does not recognize type ${this}") { this }

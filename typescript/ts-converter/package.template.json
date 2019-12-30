@@ -9,7 +9,7 @@
   "author": "",
   "dependencies": {
     "typescript": "__TS_VERSION__",
-    "google-protobuf": "3.9.0",
+    "google-protobuf": "3.11.2",
     "webpack": "4.39.2",
     "webpack-cli": "3.3.6",
     "@types/node": "12.7.1"

@@ -28,7 +28,7 @@ external interface `T$0` {
 
 @JsModule("myStream")
 external open class internal {
-    open fun <T : WritableStream> pipe(destination: T, options: `T$0` = definedExternally): T
+    open fun <T : WritableStream> pipe(destination: T, options: `T$0`? = definedExternally): T
     open class Stream : internal
     open class Readable : Stream, ReadableStream {
         override fun unpipe(destination: WritableStream?): Readable /* this */
@@ -57,7 +57,7 @@ import org.w3c.xhr.*
 import myStream.`T$0`
 
 external interface ReadableStream {
-    fun <T : WritableStream> pipe(destination: T, options: `T$0` = definedExternally): T
+    fun <T : WritableStream> pipe(destination: T, options: `T$0`? = definedExternally): T
     fun unpipe(destination: WritableStream? = definedExternally): ReadableStream /* this */
 }
 

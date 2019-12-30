@@ -7,6 +7,7 @@ import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.translateModule
+import org.junit.jupiter.api.BeforeAll
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -14,9 +15,14 @@ import kotlin.test.assertEquals
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator<String>
 
-    init { resolvePanicMode() }
-
     companion object {
+
+        @JvmStatic
+        @BeforeAll
+        fun setup() {
+            resolvePanicMode()
+        }
+
         val SEPARATOR: String = """
 
 // ------------------------------------------------------------------------------------------
