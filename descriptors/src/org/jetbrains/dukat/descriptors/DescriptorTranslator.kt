@@ -1150,35 +1150,42 @@ fun SourceBundleModel.translateToDescriptors(): ModuleDescriptor {
     )
     val context = DescriptorContext()
     val translator = DescriptorTranslator(context)
+    try {
+        val fragments = sources.flatMap { it.sources }.map {
+            translator.translateModule(
+                it.root,
+                moduleDescriptor
+            )
+        }
 
-    val fragments = sources.flatMap { it.sources }.map {
-        translator.translateModule(
-            it.root,
-            moduleDescriptor
+        val namesToAdd = fragments.flatMap { computeAllParents(it.fqName) }.distinct() - fragments.map { it.fqName }
+
+        val provider =
+            PackageFragmentProviderImpl(fragments + namesToAdd.map {
+                EmptyPackageFragmentDescriptor(
+                    moduleDescriptor,
+                    it
+                )
+            })
+
+        moduleDescriptor.setDependencies(
+            ModuleDependenciesImpl(
+                listOf(moduleDescriptor) + DefaultBuiltIns.Instance.builtInsModule,
+                setOf(),
+                listOf()
+            )
         )
+        moduleDescriptor.initialize(provider)
+        sources.flatMap { it.sources }.forEach { sourceFile ->
+            moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
+                .fragments.forEach { it.getMemberScope() }
+        }
+
+        context.initializeConstraints()
+
+        context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
+    } finally {
+        context.destroyConfigContext()
     }
-
-    val namesToAdd = fragments.flatMap { computeAllParents(it.fqName) }.distinct() - fragments.map { it.fqName }
-
-    val provider =
-        PackageFragmentProviderImpl(fragments + namesToAdd.map { EmptyPackageFragmentDescriptor(moduleDescriptor, it) })
-
-    moduleDescriptor.setDependencies(
-        ModuleDependenciesImpl(
-            listOf(moduleDescriptor) + DefaultBuiltIns.Instance.builtInsModule,
-            setOf(),
-            listOf()
-        )
-    )
-    moduleDescriptor.initialize(provider)
-    sources.flatMap { it.sources }.forEach { sourceFile ->
-        moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
-            .fragments.forEach { it.getMemberScope() }
-    }
-
-    context.initializeConstraints()
-
-    context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
-
     return moduleDescriptor
 }

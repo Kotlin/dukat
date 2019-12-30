@@ -31,8 +31,17 @@ class DescriptorContext {
     private val constraintToInitialize: MutableMap<TypeParameterDescriptorImpl, MutableList<KotlinType>> =
         mutableMapOf()
 
+    private var configContext: ConfigContext? = null
+
+    fun destroyConfigContext() {
+        if (configContext != null) {
+            configContext!!.destroy()
+        }
+    }
+
     val stdlibModule: ModuleDescriptor by lazy {
-        deserializeStdlib()
+        configContext = ConfigContext()
+        configContext!!.stdlibModule
     }
 
     fun registerMethod(methodFqName: NameEntity, methodDescriptor: SimpleFunctionDescriptor) {
