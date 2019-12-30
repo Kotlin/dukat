@@ -32,7 +32,7 @@ class ObjectConstraint(
                         raiseConcern("Instantiating constraint which cannot be instantiated!") { null }
                     }
                 } else {
-                    null //TODO make sure an unresolved class being instantiated works
+                    null
                 }
             }
         }
