@@ -11,7 +11,6 @@ import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
 import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
-import org.jetbrains.dukat.descriptors.translatePackageName
 import org.jetbrains.dukat.descriptors.translateToDescriptors
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
@@ -19,7 +18,6 @@ import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.isChildOf
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
@@ -46,10 +44,10 @@ class DescriptorTests : OutputTests() {
         val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
             sourceFile.root.flattenDeclarations().map {
                 SourceFileModel(
-                    sourceFile.name,
-                    sourceFile.fileName,
-                    it,
-                    sourceFile.referencedFiles
+                        sourceFile.name,
+                        sourceFile.fileName,
+                        it,
+                        sourceFile.referencedFiles
                 )
             }
         })
@@ -67,21 +65,21 @@ class DescriptorTests : OutputTests() {
 
         val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
         val expectedModuleDescriptor =
-            generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
+                generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
 
         validate(
-            DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
+                DescriptorValidator.ValidationVisitor.errorTypesAllowed(), outputModuleDescriptor.getPackage(
                 FqName.ROOT
-            )
+        )
         )
 
         assertEquals(
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                .serializeRecursively(
-                    outputModuleDescriptor.getPackage(FqName.ROOT)
-                ),
-            RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
+                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                        .serializeRecursively(
+                                outputModuleDescriptor.getPackage(FqName.ROOT)
+                        ),
+                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+                        .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
         )
     }
 
@@ -98,10 +96,10 @@ class DescriptorTests : OutputTests() {
         }
 
         val translator: InputTranslator<String> = JsRuntimeFileTranslator(
-            ConstNameResolver(),
-            TestConfig.CONVERTER_SOURCE_PATH,
-            TestConfig.DEFAULT_LIB_PATH,
-            TestConfig.NODE_PATH
+                ConstNameResolver(),
+                TestConfig.CONVERTER_SOURCE_PATH,
+                TestConfig.DEFAULT_LIB_PATH,
+                TestConfig.NODE_PATH
         )
     }
 

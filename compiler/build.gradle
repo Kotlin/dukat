@@ -143,13 +143,16 @@ task downloadDefinitelyTyped(type: Download) {
 }
 
 task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
+    onlyIf {
+        project.hasProperty("dukat.test.extended")
+    }
     from zipTree(downloadDefinitelyTyped.dest)
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
 
 task generateBinary(type: NodeTask) {
-    def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
+    def scriptName = "${project(":node-package").buildDir}/distrib/lib/runtime.js"
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/typescript"
@@ -176,7 +179,7 @@ task generateBinary(type: NodeTask) {
 }
 
 task generateJSBinary(type: NodeTask) {
-    def scriptName = "${project(":ts-converter").buildDir}/bundle/runtime.js"
+    def scriptName = "${project(":node-package").buildDir}/distrib/lib/runtime.js"
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/javascript"
@@ -212,8 +215,8 @@ task extractKoltinJsLibs(type: Copy) {
     }
 }
 
-generateBinary.dependsOn = [":ts-converter:webpack"]
-generateJSBinary.dependsOn = [":ts-converter:webpack"]
+generateBinary.dependsOn = [":node-package:buildDistrib"]
+generateJSBinary.dependsOn = [":node-package:buildDistrib"]
 
 task prepareTopNPackage(type: Copy) {
     from "${TOPN_DIR}/package.template.json"
@@ -225,6 +228,9 @@ task prepareTopNPackage(type: Copy) {
 }
 
 task installTopN(type: YarnTask) {
+    onlyIf {
+        project.hasProperty("dukat.test.extended.topn")
+    }
     dependsOn = [prepareTopNPackage]
     args = ["install"]
 }
@@ -239,6 +245,7 @@ test.dependsOn = [
         generateBinary,
         generateJSBinary,
         fetchDefinitelyTyped,
+        installTopN,
         extractKoltinJsLibs,
         ":node-package:nodeEnv",
         ":node-package:buildDistrib"
@@ -247,6 +254,7 @@ test.dependsOn = [
 test {
     [
             "dukat.test.extended",
+            "dukat.test.extended.topn",
             "dukat.test.cli",
             "dukat.test.failure.always"
     ].forEach { String projectProperty ->

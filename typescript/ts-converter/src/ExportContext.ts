@@ -1,5 +1,5 @@
 import {uid} from "./uid";
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {createLogger} from "./Logger";
 
 export class ExportContext {

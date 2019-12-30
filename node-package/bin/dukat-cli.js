@@ -3,19 +3,16 @@
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var path = require('path');
-require("../lib/converter");
+
+var createBundle = require("../lib/converter").createBundle;
 var Readable = require('stream').Readable;
 var EventEmitter = require('events');
-
-function isWin() {
-    return process.platform == "win32";
-}
 
 var printError = function (errorMessage) {
     console.error("ERROR: " + errorMessage);
 };
 
-var run = function (command, args) {
+function run(command, args) {
     var child = spawn(command, args);
     process.stdin.pipe(child.stdin);
 
@@ -23,7 +20,7 @@ var run = function (command, args) {
     child.stderr.pipe(process.stderr);
 
     return child;
-};
+}
 
 function printNoJava() {
     printError("It looks like you don't have java installed or it's just not reachable from command-line");
@@ -51,12 +48,16 @@ function processArgs(args) {
     var count = 0;
 
     var packageName = "<ROOT>";
+    var binaryOutput = false;
 
     while (count < args.length) {
         var arg = args[count];
         if (arg == "-p") {
             packageName = args[count + 1];
             count += 2;
+        } else if(arg == "-b") {
+            binaryOutput = true;
+            count += 1;
         } else if (skip_2args.has(arg)) {
             count += 2;
         } else {
@@ -71,14 +72,40 @@ function processArgs(args) {
         });
     }
 
-    return {
+    var res = {
+        binaryOutput: binaryOutput,
         packageName: packageName,
         files: files
-    }
+    };
+
+    return res;
 }
 
 function endsWith(str, postfix) {
     return str.lastIndexOf(postfix) == (str.length - postfix.length);
+}
+
+
+function createBinaryStream(packageName, files, onData, onEnd) {
+    var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
+    var stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
+
+    var bundle = createBundle(stdlib, packageName, files);
+
+    var readable = createReadable();
+
+    if (typeof onData == "function") {
+        readable.on("data", onData);
+    }
+
+    if (typeof onEnd == "function") {
+        readable.on("end", onEnd);
+    }
+
+    readable.push(bundle.serializeBinary());
+    readable.push(null);
+
+    return readable;
 }
 
 function cliMode(args) {
@@ -104,12 +131,12 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
-        var bundle = createBundle(path.resolve(packageDir, DEFAULT_LIB_PATH), argsProcessed.packageName, files);
+        var inputStream = createBinaryStream(argsProcessed.packageName, files);
 
-        var inputStream = createReadable();
-        inputStream.push(bundle.serializeBinary());
-        inputStream.push(null);
+        if (argsProcessed.binaryOutput) {
+            inputStream.pipe(process.stderr);
+            return null;
+        }
 
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
@@ -138,4 +165,9 @@ var main = function (args) {
     }
 };
 
-main(process.argv.slice(2));
+if (require.main === module) {
+    main(process.argv.slice(2));
+}
+
+exports.translate = main;
+exports.createBinaryStream = createBinaryStream;

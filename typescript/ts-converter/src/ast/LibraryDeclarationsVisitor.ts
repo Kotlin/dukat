@@ -1,4 +1,4 @@
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {Declaration} from "./ast";
 
 export class LibraryDeclarationsVisitor {

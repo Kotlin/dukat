@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.core
 
+import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.compiler.tests.BundleTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -8,10 +9,13 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.panic.PanicMode
+import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -40,14 +44,21 @@ class JSTypeTests : OutputTests() {
         fun jsSet(): Array<Array<String>> {
             return fileSetWithDescriptors("./test/data/javascript")
         }
+
+        @JvmStatic
+        @BeforeAll
+        fun setup() {
+            setPanicMode(PanicMode.NEVER_FAIL)
+        }
     }
 
 
-    protected fun assertContentEqualsBinary(
+    private fun assertContentEqualsBinary(
             descriptor: String,
             tsPath: String,
             ktPath: String
     ) {
+        setPanicMode(PanicMode.NEVER_FAIL)
 
         val targetShortName = "${descriptor}.d.kt"
 

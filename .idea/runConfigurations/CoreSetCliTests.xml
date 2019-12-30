@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CoreSetCliTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
-    <module name="compiler_test" />
+    <module name="dukat.compiler.test" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.core.*" />
@@ -11,7 +11,7 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.CoreSetCliTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.cli=true -Ddukat.test.failure.always=true" />
+    <option name="VM_PARAMETERS" value="-ea -Ddukat.test.cli=true -Ddukat.test.failure.always=false -Djunit.jupiter.execution.parallel.enabled=false -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=same_thread" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <envs>

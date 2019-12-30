@@ -4,6 +4,10 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 
+internal fun String.toFileUriScheme(): String {
+    return "file:///${this.replace(System.getProperty("file.separator"), "/")}"
+}
+
 class CompileMessageCollector(private val onError: (message: String, severity: CompilerMessageSeverity, location: CompilerMessageLocation?) -> Unit) : MessageCollector {
     private var myHasErrors: Boolean = false
 
@@ -20,7 +24,8 @@ class CompileMessageCollector(private val onError: (message: String, severity: C
             myHasErrors = true
 
             onError(message, severity, location)
-            System.err.println("[failure] ${severity} ${message} file:///${location?.path}:${location?.line}:${location?.column}")
+            val source = "${location?.path}:${location?.line}:${location?.column}"
+            System.err.println("[failure] ${severity} ${message} ${source.toFileUriScheme()}")
         } else {
             println("[warning] ${severity} ${message} ${location}")
         }

@@ -1,4 +1,4 @@
-import * as ts from "typescript-services-api";
+import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {
@@ -453,8 +453,9 @@ export class AstConverter {
 
     convertParameterDeclaration(param: ts.ParameterDeclaration, index: number): ParameterDeclaration {
         let initializer: Expression | null = null;
+
         if (param.initializer != null) {
-            initializer = this.astExpressionConverter.convertUnknownExpression(param.initializer)
+            initializer = this.astExpressionConverter.convertExpression(param.initializer)
         }
 
         let paramType = this.convertType(param.type);

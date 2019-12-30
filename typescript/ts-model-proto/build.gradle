@@ -33,19 +33,9 @@ task prepareNpmPackage(type: Copy) {
 
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
-task moveGeneratedTS() {
-    doLast {
-        def tsDir = file("$targetMainDir/ts")
-
-        if (tsDir.exists() && tsDir.isDirectory()) {
-            tsDir.eachFile { file ->
-                file.renameTo("$targetMainDir/js/${file.getName()}")
-            }
-
-            // Cannot delete folder, since the 'compileJava' accesses it, for some reason
-            // tsDir.delete()
-        }
-    }
+task copyGeneratedTs(type: Copy) {
+    from "$targetMainDir/ts"
+    into "$targetMainDir/js"
 }
 
 dependencies {
@@ -83,7 +73,7 @@ protobuf {
         all().each { task ->
             if(task.name == 'generateProto') {
                 task.dependsOn = [yarn]
-                task.finalizedBy(moveGeneratedTS)
+                task.finalizedBy(copyGeneratedTs)
             }
 
             task.builtins {
