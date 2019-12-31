@@ -6,6 +6,7 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
+import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
@@ -57,7 +58,7 @@ class CoreSetTests : OutputTests() {
         val modules = translateModule(bundle.translate(tsPath))
         val translated = concatenate(tsPath, modules)
 
-        print("\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}")
+        print("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
 
         assertEquals(
                 translated,
