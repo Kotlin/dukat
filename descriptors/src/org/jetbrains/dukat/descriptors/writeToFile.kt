@@ -31,12 +31,20 @@ fun writeDescriptorsToFile(translator: InputTranslator<ByteArray>, data: ByteArr
 
     val moduleDescriptor = flattenedBundle.translateToDescriptors()
 
+    val name = File(flattenedBundle.sources.first().sourceName).nameWithoutExtension
+
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
-        JsModuleDescriptor("name", ModuleKind.COMMON_JS, listOf(), moduleDescriptor),
+        JsModuleDescriptor(
+            name,
+            ModuleKind.COMMON_JS,
+            listOf(),
+            moduleDescriptor
+        ),
         LanguageVersionSettingsImpl.DEFAULT,
         JsMetadataVersion.INSTANCE
     )
-    val outputFile = SimpleOutputFile(listOf(), "A.meta.js", metadata.asString())
+    val outputFile =
+        SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())
     FileUtil.writeToFile(File(outputDir, outputFile.relativePath), outputFile.asByteArray())
 }

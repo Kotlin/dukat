@@ -14,7 +14,7 @@ class DescriptorCompilationTests : CompilationTests() {
     @EnabledIfSystemProperty(named = "dukat.test.descriptorCompilation", matches = "true")
     override fun runTests(descriptor: String, sourcePath: String) {
         println("file:///${sourcePath}")
-        val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
+        val targetPath = "./build/tests/descriptors/$START_TIMESTAMP/$descriptor"
         val targetDir = File(targetPath)
         println("file:///${targetDir.normalize().absolutePath}")
 
