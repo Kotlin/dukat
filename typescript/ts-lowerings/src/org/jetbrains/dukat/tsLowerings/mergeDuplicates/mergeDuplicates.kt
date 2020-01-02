@@ -78,7 +78,7 @@ private fun FunctionDeclaration.addReturnTypeFrom(originals: List<FunctionDeclar
 )
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
-    val groups = this.groupBy { it.removeUnneededAndReturnType() }
+    val groups = this.groupBy { it.normalizeDeclaration() }
 
     return groups.map { (functionStub, functions) ->
         if (functions.size == 1) {
@@ -96,7 +96,7 @@ private fun CallSignatureDeclaration.addReturnTypeFrom(originals: List<CallSigna
 private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSignatureDeclaration> {
     val fixedCallSignatures = map { it.mergeDuplicates() }
 
-    val groups = fixedCallSignatures.groupBy { it.removeUnneededAndReturnType() }
+    val groups = fixedCallSignatures.groupBy { it.normalizeDeclaration() }
 
     return groups.map { (callSignatureStub, callSignatures) ->
         if (callSignatures.size == 1) {

@@ -15,7 +15,7 @@ internal fun ParameterDeclaration.removeUnneeded(name: String = "") = copy(
         type = type.removeUnneeded()
 )
 
-internal fun CallSignatureDeclaration.removeUnneededAndReturnType() = removeUnneeded().copy(
+internal fun CallSignatureDeclaration.normalizeDeclaration() = removeUnneeded().copy(
         type = UnionTypeDeclaration(emptyList()) //Dummy (invalid type)
 )
 
@@ -42,7 +42,7 @@ internal fun FunctionTypeDeclaration.removeUnneeded() = copy(
         type = type.removeUnneeded()
 )
 
-internal fun FunctionDeclaration.removeUnneededAndReturnType() = removeUnneeded().copy(
+internal fun FunctionDeclaration.normalizeDeclaration() = removeUnneeded().copy(
         type = UnionTypeDeclaration(emptyList()) //Dummy (invalid type)
 )
 
