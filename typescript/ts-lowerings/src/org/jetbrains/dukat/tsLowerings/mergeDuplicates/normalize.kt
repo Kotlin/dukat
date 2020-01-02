@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -14,9 +15,9 @@ const val IRRELEVANT_UID = "<IRRELEVANT>"
 
 private object IRRELEVANT_TYPE : ParameterValueDeclaration {
     override val nullable: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { false }
     override var meta: ParameterValueDeclaration?
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { null }
         set(_) {}
 }
 
