@@ -106,11 +106,11 @@ private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSign
 
     val groups = fixedCallSignatures.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
-    return groups.map { (callSignatureStub, callSignatures) ->
+    return groups.map { (_, callSignatures) ->
         if (callSignatures.size == 1) {
             callSignatures[0]
         } else {
-            callSignatureStub.addReturnTypeFrom(callSignatures).reintroduceUIDs()
+            callSignatures[0].addReturnTypeFrom(callSignatures)
         }
     }
 }
