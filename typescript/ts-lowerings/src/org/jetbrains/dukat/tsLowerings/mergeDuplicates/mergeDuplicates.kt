@@ -5,6 +5,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionLikeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -82,7 +83,7 @@ private fun ParameterValueDeclaration.mergeDuplicates() : ParameterValueDeclarat
     }
 }
 
-private fun List<FunctionDeclaration>.combinedReturnType(): ParameterValueDeclaration
+private fun List<FunctionLikeDeclaration>.combinedReturnType(): ParameterValueDeclaration
         = UnionTypeDeclaration(this.map { it.type }).mergeUnion()
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
@@ -97,10 +98,6 @@ private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaratio
     }
 }
 
-private fun CallSignatureDeclaration.addReturnTypeFrom(originals: List<CallSignatureDeclaration>) = copy(
-        type = UnionTypeDeclaration(originals.map { it.type }).mergeUnion()
-)
-
 private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSignatureDeclaration> {
     val fixedCallSignatures = map { it.mergeDuplicates() }
 
@@ -110,7 +107,7 @@ private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSign
         if (callSignatures.size == 1) {
             callSignatures[0]
         } else {
-            callSignatures[0].addReturnTypeFrom(callSignatures)
+            callSignatures[0].copy(type = callSignatures.combinedReturnType())
         }
     }
 }

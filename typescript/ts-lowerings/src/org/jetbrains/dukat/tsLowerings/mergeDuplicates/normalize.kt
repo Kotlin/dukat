@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
