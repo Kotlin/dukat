@@ -69,8 +69,6 @@ fun TopLevelDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWal
         is BlockDeclaration -> return this.calculateConstraints(owner, path)
         is ReturnStatementDeclaration -> return this.calculateConstraints(owner, path)
         is ThrowStatementDeclaration -> return this.calculateConstraints(owner, path)
-        is InterfaceDeclaration,
-        is ModuleDeclaration -> { /* These statements aren't supported in JS (ignore them) */ }
         else -> raiseConcern("Unexpected top level entity type <${this::class}>") {  }
     }
 
