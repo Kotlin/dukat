@@ -10,6 +10,8 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
+const val IRRELEVANT_UID = "<IRRELEVANT>"
+
 internal fun ParameterDeclaration.normalize(name: String = "") = copy(
         name = name,
         type = type.normalize()
@@ -50,7 +52,7 @@ internal fun FunctionDeclaration.normalize() = copy(
         parameters = parameters.map { parameter -> parameter.normalize(parameter.name) },
         type = type.normalize(),
         body = null,
-        uid = ""
+        uid = IRRELEVANT_UID
 )
 
 internal fun UnionTypeDeclaration.normalize() = copy(
@@ -59,7 +61,7 @@ internal fun UnionTypeDeclaration.normalize() = copy(
 
 internal fun ObjectLiteralDeclaration.normalize() = copy(
         members = members.map { it.normalize() },
-        uid = ""
+        uid = IRRELEVANT_UID
 )
 
 internal fun ParameterValueDeclaration.normalize() : ParameterValueDeclaration {
