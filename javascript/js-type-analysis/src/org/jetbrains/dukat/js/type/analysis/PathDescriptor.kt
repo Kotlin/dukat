@@ -7,7 +7,7 @@ class PathWalker {
     tailrec fun startNextPath() : Boolean {
         position = 0
 
-        return if (directions.lastIndex >= 0) {
+        return if (directions.isNotEmpty()) {
             val lastDirection = directions[directions.lastIndex]
 
             if (lastDirection == Direction.Left) {
