@@ -171,22 +171,7 @@ private fun VariableDeclaration.mergeDuplicates() = copy(
         type = type.mergeDuplicates()
 )
 
-
-private fun TopLevelDeclaration.mergeDuplicates(): TopLevelDeclaration {
-    return when(this) {
-        is ClassDeclaration -> mergeDuplicates()
-        is FunctionDeclaration -> mergeDuplicates()
-        is VariableDeclaration -> mergeDuplicates()
-        else -> this
-    }
-}
-
 private fun List<TopLevelDeclaration>.mergeTopLevelDeclarations() : List<TopLevelDeclaration> {
-    map { declaration ->
-        declaration.mergeDuplicates()
-    }
-
-
     val otherDeclarations = mutableListOf<TopLevelDeclaration>()
     val classes = mutableListOf<ClassDeclaration>()
     val functions = mutableListOf<FunctionDeclaration>()
