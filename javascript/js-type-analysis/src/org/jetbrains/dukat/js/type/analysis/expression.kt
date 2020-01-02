@@ -39,7 +39,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
 fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
-    return if (this.body != null) {
+    return this.body?.let {
         val pathWalker = PathWalker()
 
         val versions = mutableListOf<FunctionConstraint.Overload>()
@@ -55,7 +55,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
                 parameters[i].name to parameterConstraint
             }
 
-            val returnTypeConstraints = body?.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
+            val returnTypeConstraints = it.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
             versions.add(FunctionConstraint.Overload(
                     returnConstraints = returnTypeConstraints,
@@ -70,8 +70,6 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
         }
 
         functionConstraint
-    } else {
-        null
     }
 }
 
