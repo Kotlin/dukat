@@ -82,9 +82,8 @@ private fun ParameterValueDeclaration.mergeDuplicates() : ParameterValueDeclarat
     }
 }
 
-private fun FunctionDeclaration.addReturnTypeFrom(originals: List<FunctionDeclaration>) = copy(
-        type = UnionTypeDeclaration(originals.map { it.type }).mergeUnion()
-)
+private fun List<FunctionDeclaration>.combinedReturnType(): ParameterValueDeclaration
+        = UnionTypeDeclaration(this.map { it.type }).mergeUnion()
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
     val groups = this.groupBy { it.normalize(IRRELEVANT_TYPE) }
@@ -93,7 +92,9 @@ private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaratio
         if (functions.size == 1) {
             functions[0]
         } else {
-            functionStub.addReturnTypeFrom(functions).reintroduceUIDsFromSource(functions[0])
+            functionStub.copy(
+                type = functions.combinedReturnType()
+            ).reintroduceUIDsFromSource(functions[0])
         }
     }
 }
@@ -175,7 +176,22 @@ private fun VariableDeclaration.mergeDuplicates() = copy(
         type = type.mergeDuplicates()
 )
 
+
+private fun TopLevelDeclaration.mergeDuplicates(): TopLevelDeclaration {
+    return when(this) {
+        is ClassDeclaration -> mergeDuplicates()
+        is FunctionDeclaration -> mergeDuplicates()
+        is VariableDeclaration -> mergeDuplicates()
+        else -> this
+    }
+}
+
 private fun List<TopLevelDeclaration>.mergeTopLevelDeclarations() : List<TopLevelDeclaration> {
+    map { declaration ->
+        declaration.mergeDuplicates()
+    }
+
+
     val otherDeclarations = mutableListOf<TopLevelDeclaration>()
     val classes = mutableListOf<ClassDeclaration>()
     val functions = mutableListOf<FunctionDeclaration>()
