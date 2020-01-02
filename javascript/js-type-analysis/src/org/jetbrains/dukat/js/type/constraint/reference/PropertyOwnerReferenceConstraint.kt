@@ -3,7 +3,7 @@ package org.jetbrains.dukat.js.type.constraint.reference
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 
 abstract class PropertyOwnerReferenceConstraint(parent: PropertyOwner) : PropertyOwnerConstraint(parent) {
     private val modifiedProperties = LinkedHashMap<String, Constraint>()

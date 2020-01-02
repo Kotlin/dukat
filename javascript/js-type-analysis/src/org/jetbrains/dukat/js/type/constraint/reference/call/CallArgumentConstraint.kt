@@ -5,7 +5,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.ImmutableConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 
 class CallArgumentConstraint(
         private val owner: PropertyOwner,

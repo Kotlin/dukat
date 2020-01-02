@@ -3,7 +3,7 @@ package org.jetbrains.dukat.js.type.analysis
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration

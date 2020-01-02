@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.js.type.property_owner
+package org.jetbrains.dukat.js.type.propertyOwner
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint

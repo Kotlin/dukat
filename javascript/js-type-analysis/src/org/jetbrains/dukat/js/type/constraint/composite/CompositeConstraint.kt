@@ -10,7 +10,7 @@ import org.jetbrains.dukat.js.type.constraint.immutable.resolved.StringTypeConst
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 
 class CompositeConstraint(
         override val owner: PropertyOwner,

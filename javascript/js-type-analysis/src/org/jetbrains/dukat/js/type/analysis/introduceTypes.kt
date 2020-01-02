@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.js.type.analysis
 
-import org.jetbrains.dukat.js.type.export_resolution.CommonJSContext
-import org.jetbrains.dukat.js.type.export_resolution.TypeAnalysisContext
-import org.jetbrains.dukat.js.type.property_owner.Scope
+import org.jetbrains.dukat.js.type.exportResolution.CommonJSContext
+import org.jetbrains.dukat.js.type.exportResolution.TypeAnalysisContext
+import org.jetbrains.dukat.js.type.propertyOwner.Scope
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration

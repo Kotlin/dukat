@@ -4,7 +4,7 @@ import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.ThrowConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.VoidTypeConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
