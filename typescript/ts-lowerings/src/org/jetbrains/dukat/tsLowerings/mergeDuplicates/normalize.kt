@@ -12,13 +12,21 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 const val IRRELEVANT_UID = "<IRRELEVANT>"
 
+private object IRRELEVANT_TYPE : ParameterValueDeclaration {
+    override val nullable: Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override var meta: ParameterValueDeclaration?
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        set(_) {}
+}
+
 internal fun ParameterDeclaration.normalize(name: String = "") = copy(
         name = name,
         type = type.normalize()
 )
 
 internal fun CallSignatureDeclaration.normalizeDeclaration() = normalize().copy(
-        type = UnionTypeDeclaration(emptyList()) //Dummy (invalid type)
+        type = IRRELEVANT_TYPE
 )
 
 internal fun CallSignatureDeclaration.normalize() = copy(
@@ -45,7 +53,7 @@ internal fun FunctionTypeDeclaration.normalize() = copy(
 )
 
 internal fun FunctionDeclaration.normalizeDeclaration() = normalize().copy(
-        type = UnionTypeDeclaration(emptyList()) //Dummy (invalid type)
+        type = IRRELEVANT_TYPE
 )
 
 internal fun FunctionDeclaration.normalize() = copy(
