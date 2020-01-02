@@ -49,7 +49,7 @@ private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration
         type = type,
         modifiers = modifiers,
         initializer = null,
-        uid = getUID()
+        uid = generateUID()
 )
 
 private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStatic: Boolean) = PropertyDeclaration(
@@ -77,7 +77,7 @@ private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<Modi
             typeParameters = emptyList(),
             modifiers = modifiers,
             body = null,
-            uid = getUID()
+            uid = generateUID()
     )
 }
 
@@ -151,7 +151,7 @@ private fun ClassConstraint.toDeclaration(name: String, modifiers: List<Modifier
             typeParameters = emptyList(),
             parentEntities = emptyList(),
             modifiers = modifiers,
-            uid = getUID()
+            uid = generateUID()
     )
 }
 
@@ -202,7 +202,7 @@ private fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
 private fun ObjectConstraint.toType() : ObjectLiteralDeclaration {
     return ObjectLiteralDeclaration(
             members = mapMembers(),
-            uid = getUID()
+            uid = generateUID()
     )
 }
 
