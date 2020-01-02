@@ -88,13 +88,11 @@ private fun List<FunctionDeclaration>.combinedReturnType(): ParameterValueDeclar
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
     val groups = this.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
-    return groups.map { (functionStub, functions) ->
+    return groups.map { (_, functions) ->
         if (functions.size == 1) {
             functions[0]
         } else {
-            functionStub.copy(
-                type = functions.combinedReturnType()
-            ).reintroduceUIDs(functions[0].uid)
+            functions[0].copy(type = functions.combinedReturnType())
         }
     }
 }
