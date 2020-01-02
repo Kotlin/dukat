@@ -55,7 +55,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
                 parameters[i].name to parameterConstraint
             }
 
-            val returnTypeConstraints = body!!.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
+            val returnTypeConstraints = body?.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
 
             versions.add(FunctionConstraint.Overload(
                     returnConstraints = returnTypeConstraints,
