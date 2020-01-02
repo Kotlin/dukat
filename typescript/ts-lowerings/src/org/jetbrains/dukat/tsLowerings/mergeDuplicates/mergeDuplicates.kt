@@ -78,9 +78,7 @@ private fun FunctionDeclaration.addReturnTypeFrom(originals: List<FunctionDeclar
 )
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
-    val fixedFunctions = map { it.mergeDuplicates() }
-
-    val groups = fixedFunctions.groupBy { it.removeUnneededAndReturnType() }
+    val groups = this.groupBy { it.removeUnneededAndReturnType() }
 
     return groups.map { (functionStub, functions) ->
         if (functions.size == 1) {
