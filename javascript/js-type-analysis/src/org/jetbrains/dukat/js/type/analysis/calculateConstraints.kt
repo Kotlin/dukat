@@ -11,7 +11,6 @@ import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
@@ -31,8 +30,8 @@ fun IfStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: Path
     condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
-        PathWalker.Direction.First -> thenStatement.calculateConstraints(owner, path)
-        PathWalker.Direction.Second -> elseStatement?.calculateConstraints(owner, path)
+        PathWalker.Direction.Left -> thenStatement.calculateConstraints(owner, path)
+        PathWalker.Direction.Right -> elseStatement?.calculateConstraints(owner, path)
     }
 }
 
@@ -40,8 +39,8 @@ fun WhileStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: P
     condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
-        PathWalker.Direction.First -> statement.calculateConstraints(owner, path)
-        PathWalker.Direction.Second -> null
+        PathWalker.Direction.Left -> statement.calculateConstraints(owner, path)
+        PathWalker.Direction.Right -> null
     }
 }
 

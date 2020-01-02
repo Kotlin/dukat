@@ -110,11 +110,11 @@ fun BinaryExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path:
         // Non-assignments
         "&&", "||" -> {
             when (path.getNextDirection()) {
-                PathWalker.Direction.First -> {
+                PathWalker.Direction.Left -> {
                     left.calculateConstraints(owner, path)
                     //right isn't being evaluated
                 }
-                PathWalker.Direction.Second -> {
+                PathWalker.Direction.Right -> {
                     left.calculateConstraints(owner, path)
                     right.calculateConstraints(owner, path)
                 }
@@ -214,8 +214,8 @@ fun ConditionalExpressionDeclaration.calculateConstraints(owner: PropertyOwner, 
     condition.calculateConstraints(owner, path)
 
     return when (path.getNextDirection()) {
-        PathWalker.Direction.First -> whenTrue.calculateConstraints(owner, path)
-        PathWalker.Direction.Second -> whenFalse.calculateConstraints(owner, path)
+        PathWalker.Direction.Left -> whenTrue.calculateConstraints(owner, path)
+        PathWalker.Direction.Right -> whenFalse.calculateConstraints(owner, path)
     }
 }
 
