@@ -94,7 +94,7 @@ private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaratio
         } else {
             functionStub.copy(
                 type = functions.combinedReturnType()
-            ).reintroduceUIDsFromSource(functions[0])
+            ).reintroduceUIDs(functions[0].uid)
         }
     }
 }

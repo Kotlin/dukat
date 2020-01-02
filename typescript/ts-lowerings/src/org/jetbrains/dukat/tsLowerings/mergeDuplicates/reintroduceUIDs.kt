@@ -24,10 +24,10 @@ private fun ObjectLiteralDeclaration.reintroduceUIDs() = copy(
         uid = getNewUID()
 )
 
-private fun FunctionDeclaration.reintroduceUIDs() = copy(
+internal fun FunctionDeclaration.reintroduceUIDs(uid: String = getNewUID()) = copy(
         type = type.reintroduceUIDs(),
         parameters = parameters.map { it.reintroduceUIDs() },
-        uid = getNewUID()
+        uid = uid
 )
 
 internal fun CallSignatureDeclaration.reintroduceUIDs() = copy(
@@ -56,7 +56,3 @@ internal fun ParameterValueDeclaration.reintroduceUIDs(): ParameterValueDeclarat
         else -> this
     }
 }
-
-internal fun FunctionDeclaration.reintroduceUIDsFromSource(source: FunctionDeclaration) = reintroduceUIDs().copy(
-        uid = source.uid
-)
