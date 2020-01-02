@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
-private var uid = 0;
+import java.util.*
 
 internal fun getNewUID() : String {
-    return "reintroduced_uid_${uid++}"
+    return UUID.randomUUID().toString()
 }
