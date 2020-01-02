@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -16,6 +17,14 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+
+private object IRRELEVANT_TYPE : ParameterValueDeclaration {
+    override val nullable: Boolean
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { false }
+    override var meta: ParameterValueDeclaration?
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { null }
+        set(_) {}
+}
 
 private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterValueDeclaration> {
     val minimizedFunctions = map { it.mergeDuplicates() }
@@ -78,7 +87,7 @@ private fun FunctionDeclaration.addReturnTypeFrom(originals: List<FunctionDeclar
 )
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
-    val groups = this.groupBy { it.normalizeDeclaration() }
+    val groups = this.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
     return groups.map { (functionStub, functions) ->
         if (functions.size == 1) {
@@ -96,7 +105,7 @@ private fun CallSignatureDeclaration.addReturnTypeFrom(originals: List<CallSigna
 private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSignatureDeclaration> {
     val fixedCallSignatures = map { it.mergeDuplicates() }
 
-    val groups = fixedCallSignatures.groupBy { it.normalizeDeclaration() }
+    val groups = fixedCallSignatures.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
     return groups.map { (callSignatureStub, callSignatures) ->
         if (callSignatures.size == 1) {

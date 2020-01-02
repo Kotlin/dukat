@@ -13,33 +13,21 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 const val IRRELEVANT_UID = "<IRRELEVANT>"
 
-private object IRRELEVANT_TYPE : ParameterValueDeclaration {
-    override val nullable: Boolean
-        get() = raiseConcern("Irrelevant type is not supposed to be used") { false }
-    override var meta: ParameterValueDeclaration?
-        get() = raiseConcern("Irrelevant type is not supposed to be used") { null }
-        set(_) {}
-}
-
 internal fun ParameterDeclaration.normalize(name: String = "") = copy(
         name = name,
         type = type.normalize()
 )
 
-internal fun CallSignatureDeclaration.normalizeDeclaration() = normalize().copy(
-        type = IRRELEVANT_TYPE
-)
-
-internal fun CallSignatureDeclaration.normalize() = copy(
+internal fun CallSignatureDeclaration.normalize(substituteType: ParameterValueDeclaration? = null) = copy(
         parameters = parameters.map { parameter -> parameter.normalize(parameter.name) },
-        type = type.normalize()
+        type = substituteType ?: type.normalize()
 )
 
 internal fun ConstructorDeclaration.normalize() = copy(
         parameters = parameters.map { it.normalize() }
 )
 
-internal fun MemberDeclaration.normalize() : MemberDeclaration {
+internal fun MemberDeclaration.normalize(): MemberDeclaration {
     return when (this) {
         is CallSignatureDeclaration -> this.normalize()
         is ConstructorDeclaration -> this.normalize()
@@ -53,13 +41,9 @@ internal fun FunctionTypeDeclaration.normalize() = copy(
         type = type.normalize()
 )
 
-internal fun FunctionDeclaration.normalizeDeclaration() = normalize().copy(
-        type = IRRELEVANT_TYPE
-)
-
-internal fun FunctionDeclaration.normalize() = copy(
+internal fun FunctionDeclaration.normalize(substituteType: ParameterValueDeclaration? = null) = copy(
         parameters = parameters.map { parameter -> parameter.normalize(parameter.name) },
-        type = type.normalize(),
+        type = substituteType ?: type.normalize(),
         body = null,
         uid = IRRELEVANT_UID
 )
@@ -73,7 +57,7 @@ internal fun ObjectLiteralDeclaration.normalize() = copy(
         uid = IRRELEVANT_UID
 )
 
-internal fun ParameterValueDeclaration.normalize() : ParameterValueDeclaration {
+internal fun ParameterValueDeclaration.normalize(): ParameterValueDeclaration {
     return when (this) {
         is FunctionTypeDeclaration -> this.normalize()
         is ObjectLiteralDeclaration -> this.normalize()
