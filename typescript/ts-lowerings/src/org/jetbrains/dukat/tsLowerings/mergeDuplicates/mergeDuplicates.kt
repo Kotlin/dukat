@@ -20,7 +20,7 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterValueDeclaration> {
     val minimizedFunctions = map { it.mergeDuplicates() }
 
-    val groups = minimizedFunctions.groupBy { it.removeUnneeded() }
+    val groups = minimizedFunctions.groupBy { it.normalize() }
 
     return groups.map { (combination, functions) ->
         if (functions.size == 1) {
