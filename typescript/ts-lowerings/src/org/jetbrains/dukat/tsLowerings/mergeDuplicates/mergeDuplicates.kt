@@ -42,12 +42,22 @@ private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterV
 }
 
 private fun List<ObjectLiteralDeclaration>.mergeObjectTypes() : List<ParameterValueDeclaration> {
-    return map { it.mergeDuplicates() }.distinct()
+    return map { it.mergeDuplicates() }.distinctBy { it.normalize() }
 }
 
 private fun List<TypeDeclaration>.mergeTypeDeclarations() : List<ParameterValueDeclaration> {
     return distinct()
 }
+
+private val UnionTypeDeclaration.flatParameters : List<ParameterValueDeclaration>
+    get() {
+        return params.flatMap {
+            when (it) {
+                is UnionTypeDeclaration -> it.flatParameters
+                else -> listOf(it)
+            }
+        }
+    }
 
 private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     val types = mutableListOf<ParameterValueDeclaration>()
@@ -55,7 +65,7 @@ private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     val objectTypes = mutableListOf<ObjectLiteralDeclaration>()
     val typeDeclarations = mutableListOf<TypeDeclaration>()
 
-    params.forEach {
+    flatParameters.forEach {
         when (it) {
             is FunctionTypeDeclaration -> functionTypes += it
             is ObjectLiteralDeclaration -> objectTypes += it
@@ -204,9 +214,6 @@ fun SourceFileDeclaration.mergeDuplicates() = copy(
         root = root.mergeDuplicates()
 )
 
-fun SourceSetDeclaration.mergeDuplicates() : SourceSetDeclaration {
-    val mergedSources = sources.map { it.mergeDuplicates() }
-    return copy(
-            sources = mergedSources
-    )
-}
+fun SourceSetDeclaration.mergeDuplicates() = copy(
+        sources = sources.map { it.mergeDuplicates() }
+)
