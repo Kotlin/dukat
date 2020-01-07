@@ -301,8 +301,10 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 
     fun resolve(): ClassLikeModel {
+        val parentMembers = classLike.allParentMembers()
+
         val membersLowered = classLike.members.mapNotNull { member ->
-            member.lowerOverrides(classLike.allParentMembers())
+            member.lowerOverrides(parentMembers)
         }
 
         return when (classLike) {
