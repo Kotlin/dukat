@@ -1,9 +1,16 @@
 plugins {
-    id 'kotlin'
+    id("kotlin")
 }
 
 dependencies {
     implementation(project(":ast-common"))
     implementation(project(":panic"))
     implementation(project(":ts-model"))
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-annotations-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}")
 }
