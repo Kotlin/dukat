@@ -31,5 +31,5 @@ external interface ExpectedNoOverrides {
     fun equals(a: Number)
     fun equals(a: String)
     fun hashCode(a: String): Number
-    fun toString(a: Number = definedExternally /* 1 */)
+    fun toString(a: Number = definedExternally)
 }

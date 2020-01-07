@@ -15,10 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withOneAny(a: Any = definedExternally /* 0 */): Any
+external fun withOneAny(a: Any = definedExternally): Any
 
-external fun withOneString(s: String = definedExternally /* "foobar" */): String
+external fun withOneString(s: String = definedExternally): String
 
-external fun withOneStringAndOptional(s: String = definedExternally /* "something" */, settings: JQueryAjaxSettings? = definedExternally): Boolean
+external fun withOneStringAndOptional(s: String = definedExternally, settings: JQueryAjaxSettings? = definedExternally): Boolean
 
 external interface JQueryAjaxSettings

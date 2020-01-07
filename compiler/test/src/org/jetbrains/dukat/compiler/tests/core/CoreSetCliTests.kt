@@ -9,6 +9,7 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
+import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
@@ -56,7 +57,7 @@ class CoreSetCliTests {
             tsPath: String,
             ktPath: String
     ) {
-        print("\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}\n")
+        print("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
