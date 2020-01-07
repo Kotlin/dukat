@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.compiler.tests.BundleTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -10,7 +9,7 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
-import org.jetbrains.dukat.panic.resolvePanicMode
+import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule

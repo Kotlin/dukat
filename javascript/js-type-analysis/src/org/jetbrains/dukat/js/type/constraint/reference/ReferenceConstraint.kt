@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.js.type.constraint.composite.CompositeConstraint
 import org.jetbrains.dukat.js.type.constraint.resolution.ResolutionState
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 open class ReferenceConstraint(

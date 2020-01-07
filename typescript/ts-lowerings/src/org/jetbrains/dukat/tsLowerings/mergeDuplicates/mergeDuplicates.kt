@@ -1,9 +1,11 @@
 package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
+import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionLikeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -17,10 +19,18 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
+private object IRRELEVANT_TYPE : ParameterValueDeclaration {
+    override val nullable: Boolean
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { false }
+    override var meta: ParameterValueDeclaration?
+        get() = raiseConcern("Irrelevant type is not supposed to be used") { null }
+        set(_) {}
+}
+
 private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterValueDeclaration> {
     val minimizedFunctions = map { it.mergeDuplicates() }
 
-    val groups = minimizedFunctions.groupBy { it.removeUnneeded() }
+    val groups = minimizedFunctions.groupBy { it.normalize() }
 
     return groups.map { (combination, functions) ->
         if (functions.size == 1) {
@@ -32,12 +42,22 @@ private fun List<FunctionTypeDeclaration>.mergeFunctionTypes() : List<ParameterV
 }
 
 private fun List<ObjectLiteralDeclaration>.mergeObjectTypes() : List<ParameterValueDeclaration> {
-    return map { it.mergeDuplicates() }.distinct()
+    return map { it.mergeDuplicates() }.distinctBy { it.normalize() }
 }
 
 private fun List<TypeDeclaration>.mergeTypeDeclarations() : List<ParameterValueDeclaration> {
     return distinct()
 }
+
+private val UnionTypeDeclaration.flatParameters : List<ParameterValueDeclaration>
+    get() {
+        return params.flatMap {
+            when (it) {
+                is UnionTypeDeclaration -> it.flatParameters
+                else -> listOf(it)
+            }
+        }
+    }
 
 private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     val types = mutableListOf<ParameterValueDeclaration>()
@@ -45,7 +65,7 @@ private fun UnionTypeDeclaration.mergeUnion() : ParameterValueDeclaration {
     val objectTypes = mutableListOf<ObjectLiteralDeclaration>()
     val typeDeclarations = mutableListOf<TypeDeclaration>()
 
-    params.forEach {
+    flatParameters.forEach {
         when (it) {
             is FunctionTypeDeclaration -> functionTypes += it
             is ObjectLiteralDeclaration -> objectTypes += it
@@ -73,38 +93,31 @@ private fun ParameterValueDeclaration.mergeDuplicates() : ParameterValueDeclarat
     }
 }
 
-private fun FunctionDeclaration.addReturnTypeFrom(originals: List<FunctionDeclaration>) = copy(
-        type = UnionTypeDeclaration(originals.map { it.type }).mergeUnion()
-)
+private fun List<FunctionLikeDeclaration>.combinedReturnType(): ParameterValueDeclaration
+        = UnionTypeDeclaration(this.map { it.type }).mergeUnion()
 
 private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaration> {
-    val fixedFunctions = map { it.mergeDuplicates() }
+    val groups = this.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
-    val groups = fixedFunctions.groupBy { it.removeUnneededAndReturnType() }
-
-    return groups.map { (functionStub, functions) ->
+    return groups.map { (_, functions) ->
         if (functions.size == 1) {
             functions[0]
         } else {
-            functionStub.addReturnTypeFrom(functions).reintroduceUIDsFromSource(functions[0])
+            functions[0].copy(type = functions.combinedReturnType())
         }
     }
 }
 
-private fun CallSignatureDeclaration.addReturnTypeFrom(originals: List<CallSignatureDeclaration>) = copy(
-        type = UnionTypeDeclaration(originals.map { it.type }).mergeUnion()
-)
-
 private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSignatureDeclaration> {
     val fixedCallSignatures = map { it.mergeDuplicates() }
 
-    val groups = fixedCallSignatures.groupBy { it.removeUnneededAndReturnType() }
+    val groups = fixedCallSignatures.groupBy { it.normalize(IRRELEVANT_TYPE) }
 
-    return groups.map { (callSignatureStub, callSignatures) ->
+    return groups.map { (_, callSignatures) ->
         if (callSignatures.size == 1) {
             callSignatures[0]
         } else {
-            callSignatureStub.addReturnTypeFrom(callSignatures).reintroduceUIDs()
+            callSignatures[0].copy(type = callSignatures.combinedReturnType())
         }
     }
 }
@@ -201,9 +214,6 @@ fun SourceFileDeclaration.mergeDuplicates() = copy(
         root = root.mergeDuplicates()
 )
 
-fun SourceSetDeclaration.mergeDuplicates() : SourceSetDeclaration {
-    val mergedSources = sources.map { it.mergeDuplicates() }
-    return copy(
-            sources = mergedSources
-    )
-}
+fun SourceSetDeclaration.mergeDuplicates() = copy(
+        sources = sources.map { it.mergeDuplicates() }
+)

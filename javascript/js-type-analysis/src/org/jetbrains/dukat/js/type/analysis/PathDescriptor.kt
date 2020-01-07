@@ -7,11 +7,11 @@ class PathWalker {
     tailrec fun startNextPath() : Boolean {
         position = 0
 
-        return if (directions.lastIndex >= 0) {
+        return if (directions.isNotEmpty()) {
             val lastDirection = directions[directions.lastIndex]
 
-            if (lastDirection == Direction.First) {
-                directions[directions.lastIndex] = Direction.Second
+            if (lastDirection == Direction.Left) {
+                directions[directions.lastIndex] = Direction.Right
                 true
             } else {
                 directions.removeAt(directions.lastIndex)
@@ -24,14 +24,14 @@ class PathWalker {
 
     fun getNextDirection() : Direction {
         if (directions.size <= position) {
-            directions.add(Direction.First)
+            directions.add(Direction.Left)
         }
 
         return directions[position++]
     }
 
     enum class Direction {
-        First,
-        Second
+        Left,
+        Right
     }
 }

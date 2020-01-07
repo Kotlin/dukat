@@ -5,7 +5,7 @@ import org.jetbrains.dukat.js.type.constraint.composite.UnionTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.immutable.resolved.NoTypeConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.reference.PropertyOwnerReferenceConstraint
-import org.jetbrains.dukat.js.type.property_owner.PropertyOwner
+import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 
 class CallResultConstraint(
         owner: PropertyOwner,
