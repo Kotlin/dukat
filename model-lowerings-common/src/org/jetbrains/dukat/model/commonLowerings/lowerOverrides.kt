@@ -20,12 +20,11 @@ import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 
-
 private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
 }
 
-private data class ParentMembers(val fqName: NameEntity, val methods: Map<NameEntity, List<MethodModel>>, val properties: Map<NameEntity, List<PropertyModel>>)
+private data class MemberData(val fqName: NameEntity?, val memberModel: MemberModel)
 
 private class ClassLikeOverrideResolver(private val context: ModelContext, private val classLike: ClassLikeModel) {
 
@@ -59,58 +58,50 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 
     private fun MemberModel.lowerOverrides(
-            allSuperDeclarations: List<ParentMembers>
+            allSuperDeclarations: Map<NameEntity?, List<MemberData>>
     ): MemberModel? {
         return when (this) {
             is MethodModel -> {
-                val overriden =
-                        allSuperDeclarations.firstOrNull { (_, methods, _) ->
-                            methods[name]?.any { method -> isOverriding(method) } == true
-                        }?.fqName ?: if (isSpecialCase()) {
-                            IdentifierEntity("Any")
-                        } else null
+                val overridden = allSuperDeclarations[name]?.firstOrNull {
+                    (it.memberModel is MethodModel) && (isOverriding(it.memberModel))
+                }?.fqName ?:  if (isSpecialCase()) {
+                    IdentifierEntity("Any")
+                } else null
 
-                if (overriden != null) {
-                    copy(override = overriden, parameters = parameters.map { param -> param.copy(initializer = null) })
+                if (overridden != null) {
+                    copy(override = overridden, parameters = parameters.map { param -> param.copy(initializer = null) })
                 } else {
                     this
                 }
             }
             is PropertyModel -> {
-                var overridenProp: PropertyModel? = null
-                val overriden = allSuperDeclarations.firstOrNull { (_, _, properties) ->
-                    overridenProp = properties[name]?.firstOrNull { prop -> isOverriding(prop) }
-                    overridenProp != null
+                val overridden = allSuperDeclarations[name]?.firstOrNull {
+                    (it.memberModel is PropertyModel) && isOverriding(it.memberModel)
                 }
-                if (isImpossibleOverride(overridenProp)) {
+                if (isImpossibleOverride(overridden?.memberModel)) {
                     null
                 } else {
-                    copy(override = overriden?.fqName)
+                    copy(override = overridden?.fqName)
                 }
             }
-            is ClassModel -> ClassLikeOverrideResolver(context,this).resolve()
-            is InterfaceModel -> ClassLikeOverrideResolver(context, this).resolve()
+            is ClassLikeModel -> ClassLikeOverrideResolver(context,this).resolve()
             else -> this
         }
     }
 
-    private fun ClassLikeModel.allParentMembers(): List<ParentMembers> {
-        return getKnownParents().map { resolvedClassLike ->
-            val methods = mutableListOf<MethodModel>()
-            val properties = mutableListOf<PropertyModel>()
+    private fun ClassLikeModel.allParentMembers(): Map<NameEntity?, List<MemberData>> {
+        val memberMap = mutableMapOf<NameEntity?, MutableList<MemberData>>()
+
+        getKnownParents().forEach { resolvedClassLike ->
             resolvedClassLike.classLike.members.forEach {
                 when (it) {
-                    is MethodModel -> methods.add(it)
-                    is PropertyModel -> properties.add(it)
+                    is MethodModel -> memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it))
+                    is PropertyModel -> memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it))
                 }
             }
-
-            ParentMembers(
-                    resolvedClassLike.resolveFqName(),
-                    methods.groupBy { it.name },
-                    properties.groupBy { it.name }
-            )
         }
+
+        return memberMap
     }
 
     private fun TypeModel.resolveClassLike(): ResolvedClassLike<out ClassLikeModel>? {
@@ -125,8 +116,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return context.resolve(this.fqName)
     }
 
-    private fun MethodModel.isOverriding(otherMethodModel
-                                         : MethodModel): Boolean {
+    private fun MethodModel.isOverriding(otherMethodModel: MethodModel): Boolean {
         if (name != otherMethodModel.name) {
             return false
         }
@@ -143,14 +133,18 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return (name == otherPropertyModel.name) && type.isOverriding(otherPropertyModel.type)
     }
 
-    private fun PropertyModel.isImpossibleOverride(otherPropertyModel: PropertyModel?): Boolean {
+    private fun PropertyModel.isImpossibleOverride(otherPropertyModel: MemberModel?): Boolean {
+        if (otherPropertyModel !is PropertyModel) {
+            return false
+        }
+
         if ((type is TypeParameterReferenceModel)) {
             val classLikeA = type.resolveClassLike()?.classLike
-            val classLikeB = otherPropertyModel?.type?.resolveClassLike()?.classLike
+            val classLikeB = otherPropertyModel.type.resolveClassLike()?.classLike
 
-            return ((classLikeA != null) && (classLikeA === classLikeB)) || classLikeA?.isDescendantOf(classLikeB) == true
+            return ((classLikeA != null) && (classLikeA === classLikeB)) || isDescendantOf(classLikeB)
         }
-        return (!type.nullable && otherPropertyModel?.type?.nullable == true)
+        return (!type.nullable && otherPropertyModel.type.nullable)
     }
 
     private fun MethodModel.isSpecialCase(): Boolean {
@@ -260,7 +254,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return false
     }
 
-    private fun ClassLikeModel.isDescendantOf(otherClassLike: ClassLikeModel?): Boolean {
+    private fun isDescendantOf(otherClassLike: ClassLikeModel?): Boolean {
         return classLike.getKnownParents().map { it.classLike }.contains(otherClassLike)
     }
 
