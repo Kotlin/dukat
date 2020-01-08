@@ -1,5 +1,5 @@
 function undefReferenceFun() {
-    return PropertyOwner.property()
+    return PropertyOwner.property();
 }
 
-module.exports.undefReferenceFun = undefReferenceFun
+module.exports.undefReferenceFun = undefReferenceFun;

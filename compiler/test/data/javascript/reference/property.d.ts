@@ -1,12 +1,12 @@
 class PropertyOwner {
     static property() {
-        return "Hello, world!"
+        return "Hello, world!";
     }
 }
 
 function wrapperFun() {
-    return PropertyOwner.property()
+    return PropertyOwner.property();
 }
 
-module.exports.PropertyOwner = PropertyOwner
-module.exports.wrapperFun = wrapperFun
+module.exports.PropertyOwner = PropertyOwner;
+module.exports.wrapperFun = wrapperFun;

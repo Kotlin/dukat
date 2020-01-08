@@ -1,6 +1,6 @@
 
 function getLength(x) {
-    return --x.length
+    return --x.length;
 }
 
-exports.getLength = getLength
+exports.getLength = getLength;

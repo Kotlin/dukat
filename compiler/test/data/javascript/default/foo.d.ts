@@ -1,4 +1,4 @@
 
 module.exports = function foo() {
-    return "text"
+    return "text";
 }

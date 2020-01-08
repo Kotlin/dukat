@@ -1,6 +1,6 @@
 function X() {}
 
-X.prototype.numProperty = 3
-X.staticNumProperty = 3
+X.prototype.numProperty = 3;
+X.staticNumProperty = 3;
 
-module.exports.X = X
+module.exports.X = X;
