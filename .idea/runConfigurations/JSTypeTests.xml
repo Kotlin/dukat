@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="JSTypeTests" type="JUnit" factoryName="JUnit">
+    <module name="dukat.compiler.test" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.core.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.core" />
+    <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.core.JSTypeTests" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <option name="VM_PARAMETERS" value="-ea -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -Ddukat.test.failure.always=true" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="Gradle.BeforeRunTask" enabled="false" tasks="generateJSBinary" externalProjectPath="$PROJECT_DIR$/compiler" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>

@@ -56,10 +56,10 @@ fun SourceSetDeclaration.isStdLib(): Boolean {
     return sourceName == "<LIBROOT>"
 }
 
-interface TypescriptInputTranslator<T> : InputTranslator<T> {
-    val moduleNameResolver: ModuleNameResolver
-
-    fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
+open class TypescriptLowerer(
+        private val moduleNameResolver: ModuleNameResolver
+) : ECMAScriptLowerer {
+    override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
@@ -108,7 +108,7 @@ interface TypescriptInputTranslator<T> : InputTranslator<T> {
         return models
     }
 
-    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+    override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
         var stdLib: SourceSetModel? = null
         val sources = mutableListOf<SourceSetDeclaration>()
 

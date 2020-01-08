@@ -56,6 +56,8 @@ dependencies {
     implementation(project(":idl-parser"))
     implementation(project(":idl-reference-resolver"))
     implementation(project(":itertools"))
+    implementation(project(":js-type-analysis"))
+    implementation(project(":js-translator"))
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":model-lowerings-common"))
@@ -176,6 +178,33 @@ task generateBinary(type: NodeTask) {
     ] + files
 }
 
+task generateJSBinary(type: NodeTask) {
+    def scriptName = "${project(":node-package").buildDir}/distrib/lib/runtime.js"
+    script = file(scriptName)
+
+    def declarationsDir = "${project.projectDir}/test/data/javascript"
+
+    inputs.dir(declarationsDir)
+    inputs.file(scriptName)
+    inputs.file(DEFAULT_LIB_PATH)
+
+    def outputFile = "${project.buildDir}/javascript/declarations.dukat"
+    outputs.file(outputFile)
+
+    def files = []
+    file(declarationsDir)
+            .eachFileRecurse() {
+                if (it.isFile() && it.name.endsWith(".d.ts")) {
+                    files << it
+                }
+            }
+
+    args = [
+            DEFAULT_LIB_PATH,
+            outputFile
+    ] + files
+}
+
 task extractKoltinJsLibs(type: Copy) {
     configurations.kotlinJsLibs.each {
         from it.absolutePath
@@ -187,6 +216,7 @@ task extractKoltinJsLibs(type: Copy) {
 }
 
 generateBinary.dependsOn = [":node-package:buildDistrib"]
+generateJSBinary.dependsOn = [":node-package:buildDistrib"]
 
 task prepareTopNPackage(type: Copy) {
     from "${TOPN_DIR}/package.template.json"
@@ -213,6 +243,7 @@ test.dependsOn = [
         download,
         downloadDist,
         generateBinary,
+        generateJSBinary,
         fetchDefinitelyTyped,
         installTopN,
         extractKoltinJsLibs,

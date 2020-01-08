@@ -2,17 +2,19 @@ package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.ECMAScriptLowerer
+import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import java.io.File
 
 
 typealias BundleSourceMap = Map<String, SourceSetModel>
 
-class BundleTranslator(private val inputName: String) {
-
-    companion object {
-        val byteTranslator = createJsByteArrayTranslator(ConstNameResolver())
-    }
+class BundleTranslator(
+        private val inputName: String,
+        lowerer: ECMAScriptLowerer = TypescriptLowerer(ConstNameResolver())
+) {
+    private val byteTranslator = JsRuntimeByteArrayTranslator(lowerer)
 
     private val bundleSourceMap = build()
 

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.ts.translator
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
 import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
@@ -10,11 +11,17 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 class JsRuntimeFileTranslator(
-        override val moduleNameResolver: ModuleNameResolver,
+        private val lowerer: ECMAScriptLowerer,
         private val translatorPath: String,
         private val libPath: String,
         private val nodePath: String
-) : TypescriptInputTranslator<String> {
+) : InputTranslator<String> {
+    constructor(
+            nameResolver: ModuleNameResolver,
+            translatorPath: String,
+            libPath: String,
+            nodePath: String
+    ) : this(TypescriptLowerer(nameResolver), translatorPath, libPath, nodePath)
 
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 
@@ -36,6 +43,6 @@ class JsRuntimeFileTranslator(
     }
 
     override fun translate(data: String): SourceBundleModel {
-        return lower(translateFile(data))
+        return lowerer.lower(translateFile(data))
     }
 }
