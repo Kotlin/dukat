@@ -4,6 +4,7 @@ import java.io.File
 
 abstract class FileFetcher {
     abstract val postfix: String
+    open val ktPostfix: String = ".d.kt"
 
     fun fileSet(path: String, postfix: String, recursive: Boolean = false): Sequence<File> {
         val rootFolder = File(path)
@@ -20,7 +21,7 @@ abstract class FileFetcher {
         return fileSet(path, postfix, recursive).mapNotNull { file ->
 
             val tsPath = file.normalize().absolutePath
-            val ktPath = tsPath.replace(postfix, ".d.kt")
+            val ktPath = tsPath.replace(postfix, ktPostfix)
             val descriptor = file.relativeTo(rootFolder).path.removeSuffix(postfix)
 
             if (!(file.name.startsWith("_") || file.parentFile.name.startsWith("_"))) {

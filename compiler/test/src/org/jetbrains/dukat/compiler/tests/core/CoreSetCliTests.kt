@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.compiler.tests.CliTranslator
@@ -21,9 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-
-@Serializable
-private data class ReportJson(val outputs: List<String>)
 
 class ResolvePanicMode : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
@@ -61,7 +57,7 @@ class CoreSetCliTests {
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
+        getTranslator().translateTS(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
 
         val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
 

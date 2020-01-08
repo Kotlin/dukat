@@ -4,7 +4,6 @@ import org.jetbrains.dukat.compiler.tests.BundleTranslator
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
-import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
@@ -32,23 +31,18 @@ class JSTypeTests : OutputTests() {
     }
 
     //Never used
-    override fun getTranslator(): InputTranslator<String> = JsRuntimeFileTranslator(JavaScriptLowerer(ConstNameResolver()), CONVERTER_SOURCE_PATH, DEFAULT_LIB_PATH, NODE_PATH)
+    override fun getTranslator(): InputTranslator<String> = JsRuntimeFileTranslator(JavaScriptLowerer(ConstNameResolver()), CONVERTER_SOURCE_PATH, "--no-lib", NODE_PATH)
 
     companion object : FileFetcher() {
 
         private val bundle = BundleTranslator("./build/javascript/declarations.dukat", JavaScriptLowerer(ConstNameResolver()))
 
         override val postfix = JS_DECLARATION_EXTENSION
+        override val ktPostfix = ".kt"
 
         @JvmStatic
         fun jsSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/javascript").map { (descriptor, tsPath, ktPath) ->
-                arrayOf(
-                        descriptor,
-                        tsPath,
-                        ktPath.dropLast(5) + ".kt"
-                )
-            }.toTypedArray()
+            return fileSetWithDescriptors("./test/data/javascript")
         }
 
         @JvmStatic
