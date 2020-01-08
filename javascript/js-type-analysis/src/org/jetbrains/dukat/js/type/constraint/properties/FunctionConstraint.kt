@@ -10,6 +10,11 @@ class FunctionConstraint(
         owner: PropertyOwner,
         val overloads: List<Overload>
 ) : PropertyOwnerConstraint(owner) {
+    constructor(
+            owner: PropertyOwner,
+            returnConstraints: Constraint,
+            parameterConstraints: List<Pair<String, Constraint>>
+    ) : this(owner, listOf(Overload(returnConstraints, parameterConstraints)))
 
     data class Overload(
         val returnConstraints: Constraint,

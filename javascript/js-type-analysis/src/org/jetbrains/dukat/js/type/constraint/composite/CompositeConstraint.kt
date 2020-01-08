@@ -11,6 +11,7 @@ import org.jetbrains.dukat.js.type.constraint.properties.FunctionConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.ObjectConstraint
 import org.jetbrains.dukat.js.type.constraint.properties.PropertyOwnerConstraint
 import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
+import kotlin.math.max
 
 class CompositeConstraint(
         override val owner: PropertyOwner,
@@ -78,12 +79,10 @@ class CompositeConstraint(
             val resultConstraint: PropertyOwnerConstraint = if (callableConstraints.isNotEmpty() && callsCanBeUnified) {
                 FunctionConstraint(
                         owner = owner,
-                        overloads = callableConstraints.map { callable ->
-                            FunctionConstraint.Overload(
-                                    callable.returnConstraints,
-                                    List(parameterCount) { i -> "`$i`" to NoTypeConstraint }
-                            )
-                        }
+                        returnConstraints = UnionTypeConstraint(
+                                types = callableConstraints.map(CallableConstraint::returnConstraints)
+                        ),
+                        parameterConstraints = List(parameterCount) { "`$it`" to NoTypeConstraint }
                 )
             } else {
                 ObjectConstraint(owner).apply {
