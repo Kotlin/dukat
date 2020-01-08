@@ -128,9 +128,10 @@ function cliMode(args) {
 
     var files = argsProcessed.files;
     var is_ts = files.every(function(file) { return endsWith(file, ".d.ts")});
+    var is_js = files.every(function(file) { return endsWith(file, ".js")});
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
-    if (is_ts) {
+    if (is_ts || is_js) {
         var inputStream = createBinaryStream(argsProcessed.packageName, files);
 
         if (argsProcessed.binaryOutput) {

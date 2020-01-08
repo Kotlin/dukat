@@ -48,7 +48,7 @@ fun ModuleDeclaration.filterOutNonDeclarations(isSubModule: Boolean): ModuleDecl
 }
 
 fun SourceFileDeclaration.filterOutNonDeclarations(): SourceFileDeclaration {
-    return if (fileName.endsWith(".d.ts")) {
+    return if (fileName.endsWith(".d.ts") || fileName.endsWith(".js")) {
         copy(root = root.filterOutNonDeclarations(false))
     } else this
 }

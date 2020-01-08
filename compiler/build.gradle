@@ -186,7 +186,6 @@ task generateJSBinary(type: NodeTask) {
 
     inputs.dir(declarationsDir)
     inputs.file(scriptName)
-    inputs.file(DEFAULT_LIB_PATH)
 
     def outputFile = "${project.buildDir}/javascript/declarations.dukat"
     outputs.file(outputFile)
@@ -194,13 +193,13 @@ task generateJSBinary(type: NodeTask) {
     def files = []
     file(declarationsDir)
             .eachFileRecurse() {
-                if (it.isFile() && it.name.endsWith(".d.ts")) {
+                if (it.isFile() && it.name.endsWith(".js")) {
                     files << it
                 }
             }
 
     args = [
-            DEFAULT_LIB_PATH,
+            "--no-lib",
             outputFile
     ] + files
 }

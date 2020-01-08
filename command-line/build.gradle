@@ -20,6 +20,7 @@ dependencies {
   implementation(project(":ast-model"))
   implementation(project(":compiler"))
   implementation(project(":idl-reference-resolver"))
+  implementation(project(":js-translator"))
   implementation(project(":module-name-resolver"))
   implementation(project(":panic"))
   implementation(project(":translator"))

@@ -50,7 +50,7 @@ export class AstConverter {
         let resourceName = this.rootPackageName;
 
         let packageNameFragments = sourceFile.fileName.split("/");
-        let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+        let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "").replace(".js", "");
 
         const declarations = this.convertStatements(sourceFile.statements, resourceName);
 

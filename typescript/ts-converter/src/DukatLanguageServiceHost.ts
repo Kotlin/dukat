@@ -15,7 +15,9 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getCompilationSettings(): ts.CompilerOptions {
-        return ts.getDefaultCompilerOptions();
+        let compilationSettings = ts.getDefaultCompilerOptions();
+        compilationSettings.allowJs = true;
+        return compilationSettings;
     }
 
     getScriptFileNames(): string[] {

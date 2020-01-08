@@ -6,12 +6,13 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.CONVERTER_SOURCE_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.DEFAULT_LIB_PATH
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.NODE_PATH
+import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
 import org.junit.jupiter.api.BeforeAll
@@ -37,11 +38,17 @@ class JSTypeTests : OutputTests() {
 
         private val bundle = BundleTranslator("./build/javascript/declarations.dukat", JavaScriptLowerer(ConstNameResolver()))
 
-        override val postfix = TS_DECLARATION_EXTENSION
+        override val postfix = JS_DECLARATION_EXTENSION
 
         @JvmStatic
         fun jsSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/javascript")
+            return fileSetWithDescriptors("./test/data/javascript").map { (descriptor, tsPath, ktPath) ->
+                arrayOf(
+                        descriptor,
+                        tsPath,
+                        ktPath.dropLast(5) + ".kt"
+                )
+            }.toTypedArray()
         }
 
         @JvmStatic
@@ -54,20 +61,20 @@ class JSTypeTests : OutputTests() {
 
     private fun assertContentEqualsBinary(
             descriptor: String,
-            tsPath: String,
+            jsPath: String,
             ktPath: String
     ) {
         setPanicMode(PanicMode.NEVER_FAIL)
 
-        val targetShortName = "${descriptor}.d.kt"
+        val targetShortName = "${descriptor}.kt"
 
-        val modules = translateModule(bundle.translate(tsPath))
-        val translated = concatenate(tsPath, modules)
+        val modules = translateModule(bundle.translate(jsPath))
+        val translated = concatenate(jsPath, modules)
 
         assertEquals(
                 translated,
                 File(ktPath).readText().trimEnd(),
-                "\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}"
+                "\nSOURCE:\t${jsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}"
         )
 
         val outputDirectory = File("./build/tests/out")

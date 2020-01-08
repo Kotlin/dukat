@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
+import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
@@ -18,10 +19,13 @@ import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
-import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.ECMAScriptLowerer
+import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -39,10 +43,18 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-fun translateBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
-    val translator = createJsByteArrayTranslator(moduleNameResolver)
+fun translateBinaryBundle(input: ByteArray, outDir: String?, lowerer: ECMAScriptLowerer, pathToReport: String?) {
+    val translator = JsRuntimeByteArrayTranslator(lowerer)
     val translatedUnits = translateModule(input, translator)
     compileUnits(translatedUnits, outDir, pathToReport)
+}
+
+fun translateTSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
+    translateBinaryBundle(input, outDir, TypescriptLowerer(moduleNameResolver), pathToReport)
+}
+
+fun translateJSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
+    translateBinaryBundle(input, outDir, JavaScriptLowerer(moduleNameResolver), pathToReport)
 }
 
 private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
@@ -205,6 +217,9 @@ private fun process(args: List<String>): CliOptions? {
                 arg.endsWith(TS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
+                arg.endsWith(JS_DECLARATION_EXTENSION) -> {
+                    sources.add(arg)
+                }
                 arg.endsWith(IDL_DECLARATION_EXTENSION) ||
                         arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
@@ -213,6 +228,7 @@ private fun process(args: List<String>): CliOptions? {
                     printError("""
 following file extensions are supported:
     *.d.ts - for TypeScript declarations
+    *.js - for JavaScript files
     *.idl, *.webidl - for Web IDL declarations                            
                 """.trimIndent())
                     return null
@@ -221,7 +237,7 @@ following file extensions are supported:
         }
     }
 
-    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath;
+    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
     return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
 }
@@ -249,11 +265,21 @@ fun main(vararg args: String) {
         }
 
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
+        val isJsTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation = options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
         when {
             isTsTranslation -> {
-                translateBinaryBundle(
+                translateTSBinaryBundle(
+                        System.`in`.readBytes(),
+                        options.outDir,
+                        moduleResolver,
+                        options.reportPath
+                )
+            }
+
+            isJsTranslation -> {
+                translateJSBinaryBundle(
                         System.`in`.readBytes(),
                         options.outDir,
                         moduleResolver,
@@ -271,7 +297,7 @@ fun main(vararg args: String) {
             }
 
             else -> {
-                printError("in a single pass you can either pass only *.d.ts files or *.idl files")
+                printError("in a single pass you can either pass only *.d.ts files, *.js files or *.idl files")
                 exitProcess(1)
             }
         }
