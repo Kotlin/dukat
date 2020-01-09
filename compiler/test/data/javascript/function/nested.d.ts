@@ -1,26 +1,26 @@
 
 function numFun() {
-    var x = 3
+    var x = 3;
 
     function foo() {
-        return x
+        return x;
     }
 
-    return foo()
+    return foo();
 }
 
 
-var value = "text"
+var value = "text";
 
 function bar() {
-    return value
+    return value;
 }
 
 function strFun() {
-    var value = 3
+    var value = 3;
 
-    return bar()
+    return bar();
 }
 
-exports.numFun = numFun
-exports.strFun = strFun
+exports.numFun = numFun;
+exports.strFun = strFun;

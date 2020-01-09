@@ -1,19 +1,19 @@
-var num = 3
-var bool = true
-var str = "text"
+var num = 3;
+var bool = true;
+var str = "text";
 
 function numReferenceFun() {
-    return num
+    return num;
 }
 
 function boolReferenceFun() {
-    return bool
+    return bool;
 }
 
 function stringReferenceFun() {
-    return str
+    return str;
 }
 
-module.exports.numReferenceFun = numReferenceFun
-module.exports.boolReferenceFun = boolReferenceFun
-module.exports.stringReferenceFun = stringReferenceFun
+module.exports.numReferenceFun = numReferenceFun;
+module.exports.boolReferenceFun = boolReferenceFun;
+module.exports.stringReferenceFun = stringReferenceFun;

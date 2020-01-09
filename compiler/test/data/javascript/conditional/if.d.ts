@@ -1,21 +1,21 @@
 
 function isNum(x) {
-    return typeof x == "number"
+    return typeof x == "number";
 }
 
 module.exports = {
     max(a, b) {
         if (a > b)
-            return a
+            return a;
 
-        return b
+        return b;
     },
 
     negate(a) {
         if(isNum(a)) {
-            return -a
+            return -a;
         } else {
-            return !a
+            return !a;
         }
     }
-}
+};

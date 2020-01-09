@@ -1,6 +1,6 @@
 
-module.exports.arrowShort = () => "-->"
+module.exports.arrowShort = () => "-->";
 
 module.exports.arrowLong = () => {
-    return "======>"
-}
+    return "======>";
+};

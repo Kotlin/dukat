@@ -1,14 +1,14 @@
 
 module.exports = {
     typeOf(o) {
-        return typeof o
+        return typeof o;
     },
 
     instanceOfObject(o) {
-        return o instanceof Object
+        return o instanceof Object;
     },
 
     keyInObj(key, obj) {
         return key in obj;
     }
-}
+};

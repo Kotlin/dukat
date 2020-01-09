@@ -5,20 +5,20 @@ module.exports = {
     },
 
     numUnaryFun(a) {
-        var b = a
-        a = "text"
-        return b++
+        var b = a;
+        a = "text";
+        return b++;
     },
 
     boolBinaryFun(a, b) {
-        return a == b
+        return a == b;
     },
 
     boolUnaryFun(a) {
-        return !a
+        return !a;
     },
 
     anyFun(a, b) {
-        return a + b
+        return a + b;
     }
-}
+};
