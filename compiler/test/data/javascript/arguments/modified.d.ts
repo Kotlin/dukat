@@ -1,8 +1,8 @@
 
 function addNegativeValue(o) {
-    o.negative = -o.value
+    o.negative = -o.value;
 
     return o
 }
 
-exports.addNegativeValue = addNegativeValue
+exports.addNegativeValue = addNegativeValue;

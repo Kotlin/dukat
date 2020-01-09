@@ -1,14 +1,14 @@
 
 class C {
     foo() {
-        return "text"
+        return "text";
     }
 }
 
-var o = new C()
+var o = new C();
 
-var str = o.foo()
+var str = o.foo();
 
-module.exports.C = C
-module.exports.o = o
-module.exports.str = str
+module.exports.C = C;
+module.exports.o = o;
+module.exports.str = str;

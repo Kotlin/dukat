@@ -1,11 +1,11 @@
 
 function numBinaryFun(a, b) {
-    return a - b
+    return a - b;
 }
 
 function numBinaryFunWrapper(a, b) {
-    return numBinaryFun(a, b)
+    return numBinaryFun(a, b);
 }
 
-module.exports.numBinaryFun = numBinaryFun
-module.exports.numBinaryFunWrapper = numBinaryFunWrapper
+module.exports.numBinaryFun = numBinaryFun;
+module.exports.numBinaryFunWrapper = numBinaryFunWrapper;

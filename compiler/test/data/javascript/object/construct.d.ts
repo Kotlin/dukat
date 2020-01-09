@@ -16,10 +16,10 @@ function negate(x, y, z) {
 v.negate = negate;
 
 
-v.double = {}
+v.double = {};
 
 v.double.x = 2*v.x;
 v.double.y = 2*v.y;
 v.double.z = 2*v.z;
 
-module.exports.v = v
+module.exports.v = v;

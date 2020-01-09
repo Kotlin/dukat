@@ -1,8 +1,8 @@
 
 module.exports = function foo() {
-    return "text"
-}
+    return "text";
+};
 
-module.exports.propertyA = "text"
+module.exports.propertyA = "text";
 
-module.exports.propertyB = 0.0
+module.exports.propertyB = 0.0;

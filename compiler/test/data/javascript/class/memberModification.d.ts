@@ -13,11 +13,11 @@ class ModifiedLiterals {
     }
 }
 
-ModifiedLiterals.getStringLiteral = ModifiedLiterals.getNumberLiteral
-ModifiedLiterals.getBooleanLiteral = ModifiedLiterals.getNumberLiteral
+ModifiedLiterals.getStringLiteral = ModifiedLiterals.getNumberLiteral;
+ModifiedLiterals.getBooleanLiteral = ModifiedLiterals.getNumberLiteral;
 
 
-module.exports.ModifiedLiterals = ModifiedLiterals
-module.exports.falseStr = ModifiedLiterals.getStringLiteral()
-module.exports.trueNum = ModifiedLiterals.getNumberLiteral()
-module.exports.falseBool = ModifiedLiterals.getBooleanLiteral()
+module.exports.ModifiedLiterals = ModifiedLiterals;
+module.exports.falseStr = ModifiedLiterals.getStringLiteral();
+module.exports.trueNum = ModifiedLiterals.getNumberLiteral();
+module.exports.falseBool = ModifiedLiterals.getBooleanLiteral();
