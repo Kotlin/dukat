@@ -81,7 +81,7 @@ class CompositeConstraint(
                         overloads = callableConstraints.map { callable ->
                             FunctionConstraint.Overload(
                                     callable.returnConstraints,
-                                    List(parameterCount) { i -> "`$i`" to NoTypeConstraint }
+                                    List(parameterCount) { "" to NoTypeConstraint }
                             )
                         }
                 )

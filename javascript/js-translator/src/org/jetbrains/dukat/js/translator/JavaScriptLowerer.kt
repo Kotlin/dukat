@@ -6,6 +6,7 @@ import org.jetbrains.dukat.js.type.analysis.introduceTypes
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import org.jetbrains.dukat.tsLowerings.mergeDuplicates.mergeDuplicates
+import org.jetbrains.dukat.tsLowerings.nameUnnamedFunctionParameters
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 
@@ -14,7 +15,8 @@ class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(na
         return super.lower(
                 sourceSet
                         .introduceTypes()
-                        .mergeDuplicates(),
+                        .mergeDuplicates()
+                        .nameUnnamedFunctionParameters(),
                 stdLibSourceSet,
                 renameMap,
                 uidToFqNameMapper
