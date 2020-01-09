@@ -1,16 +1,16 @@
 
 class Literals {
     getStringLiteral() {
-        return "text"
+        return "text";
     }
 
     getNumberLiteral() {
-        return 3.141592653
+        return 3.141592653;
     }
 
     getBooleanLiteral() {
-        return false
+        return false;
     }
 }
 
-module.exports.Literals = Literals
+module.exports.Literals = Literals;

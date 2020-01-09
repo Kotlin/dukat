@@ -1,5 +1,5 @@
 function X() {}
 
-X.numProperty = 3
+X.numProperty = 3;
 
-module.exports.X = X
+module.exports.X = X;

@@ -1,4 +1,4 @@
 
 module.exports.error = (value) => {
-    throw value
-}
+    throw value;
+};

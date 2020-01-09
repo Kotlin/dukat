@@ -7,4 +7,4 @@ module.exports.v = {
     foo() {
         return 5;
     }
-}
+};

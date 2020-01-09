@@ -1,11 +1,11 @@
 
 function minus(a, b) {
-    return a - b
+    return a - b;
 }
 
 function getMinus() {
-    return minus
+    return minus;
 }
 
-exports.minus = minus
-exports.getMinus = getMinus
+exports.minus = minus;
+exports.getMinus = getMinus;
