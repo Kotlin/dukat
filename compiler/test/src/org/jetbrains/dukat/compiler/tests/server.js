@@ -1,26 +1,26 @@
-var http = require("http");
-var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
+const http = require("http");
+const dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
 function createServer(port) {
 
-    var server = http.createServer(function (req, res) {
+    let server = http.createServer(function (req, res) {
         if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'text/plain');
             res.statusCode = 200;
             res.end("OK");
         }
         if (req.method === 'POST' && req.url === '/dukat') {
-            var body = [];
+            let body = [];
             req.on('data', (chunk) => {
                 body.push(chunk);
             }).on('end', function () {
-                var bodyRaw = Buffer.concat(body).toString();
-                var data = JSON.parse(bodyRaw);
+                let bodyRaw = Buffer.concat(body).toString();
+                let data = JSON.parse(bodyRaw);
 
-                var onBinaryStreamData = function (chunk) {
+                let onBinaryStreamData = function (chunk) {
                     res.write(chunk);
                 };
-                var onBinaryStreamEnd = function (chunk) {
+                let onBinaryStreamEnd = function (chunk) {
                     res.end();
                 };
 
@@ -30,7 +30,8 @@ function createServer(port) {
                         data.packageName,
                         data.files,
                         onBinaryStreamData,
-                        onBinaryStreamEnd
+                        onBinaryStreamEnd,
+                        data.useStdLib
                     );
                 } catch (e) {
                     res.setHeader('Content-Type', 'text/plain');

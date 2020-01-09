@@ -22,10 +22,11 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
     private fun translate(
             input: String,
             dirName: String,
-            reportPath: String? = null,
-            lowerer: ECMAScriptLowerer
+            reportPath: String?,
+            lowerer: ECMAScriptLowerer,
+            useStdLib: Boolean
     ) {
-        val binData = CliHttpClient("8090").translate(input)
+        val binData = CliHttpClient("8090").translate(input, useStdLib)
 
         translateBinaryBundle(binData, dirName, lowerer, reportPath)
     }
@@ -39,7 +40,8 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
             input,
             dirName,
             reportPath,
-            TypescriptLowerer(getModuleNameResolver(moduleName))
+            TypescriptLowerer(getModuleNameResolver(moduleName)),
+            true
     )
 
     fun translateJS(
@@ -51,7 +53,8 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
             input,
             dirName,
             reportPath,
-            JavaScriptLowerer(getModuleNameResolver(moduleName))
+            JavaScriptLowerer(getModuleNameResolver(moduleName)),
+            false
     )
 }
 

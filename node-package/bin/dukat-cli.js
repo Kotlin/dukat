@@ -85,14 +85,18 @@ function endsWith(str, postfix) {
     return str.lastIndexOf(postfix) == (str.length - postfix.length);
 }
 
+const DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
 
-function createBinaryStream(packageName, files, onData, onEnd) {
-    var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
-    var stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
+function createBinaryStream(packageName, files, onData, onEnd, useStdLib = true) {
+    let stdlib = "";
 
-    var bundle = createBundle(stdlib, packageName, files);
+    if (useStdLib) {
+        stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
+    }
 
-    var readable = createReadable();
+    let bundle = createBundle(stdlib, packageName, files);
+
+    let readable = createReadable();
 
     if (typeof onData == "function") {
         readable.on("data", onData);
@@ -132,7 +136,7 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts || is_js) {
-        var inputStream = createBinaryStream(argsProcessed.packageName, files);
+        var inputStream = createBinaryStream(argsProcessed.packageName, files, is_ts);
 
         if (argsProcessed.binaryOutput) {
             inputStream.pipe(process.stderr);
