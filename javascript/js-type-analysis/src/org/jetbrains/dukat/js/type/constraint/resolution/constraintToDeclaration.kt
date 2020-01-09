@@ -188,14 +188,6 @@ private fun ObjectConstraint.mapMembers() : List<MemberDeclaration> {
             }
     )
 
-    if (instantiatedClass is PropertyOwner) {
-        val classPrototype = instantiatedClass["prototype"]
-
-        if (classPrototype is ObjectConstraint) {
-            members.addAll(classPrototype.mapMembers())
-        }
-    }
-
     return members
 }
 
