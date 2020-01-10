@@ -13,11 +13,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 data class ResolvedClassLike<T : ClassLikeModel>(
         val classLike: T,
         val fqName: NameEntity?
-) {
-    fun resolveFqName(): NameEntity {
-        return fqName ?: classLike.name
-    }
-}
+)
 
 class ModelContext {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
@@ -81,5 +77,19 @@ class ModelContext {
 
     fun resolve(name: NameEntity?): ResolvedClassLike<out ClassLikeModel>? {
         return resolveInterface(name) ?: resolveClass(name)
+    }
+
+    fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
+        return classLikeModel.parentEntities.mapNotNull { heritageModel ->
+            val value = unalias(heritageModel.value)
+            if (value is TypeValueModel) {
+                resolve(value.fqName)
+            } else null
+        }
+    }
+
+    fun getAllParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
+        val immediateParents = getParents(classLikeModel)
+        return immediateParents + immediateParents.flatMap { immediateParent -> getAllParents(immediateParent.classLike) }
     }
 }

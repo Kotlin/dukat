@@ -45,16 +45,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 
     private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
-        return parentEntities.flatMap { heritageModel ->
-            val value = context.unalias(heritageModel.value)
-            if (value is TypeValueModel) {
-                value.resolveClassLike()?.let { resolvedClassLike ->
-                    listOf(resolvedClassLike) + resolvedClassLike.classLike.getKnownParents()
-                } ?: emptyList()
-            } else {
-                emptyList()
-            }
-        }
+        return context.getAllParents(this)
     }
 
     private fun MemberModel.lowerOverrides(
