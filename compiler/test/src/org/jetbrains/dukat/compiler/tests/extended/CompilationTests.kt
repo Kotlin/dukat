@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
+import java.io.PrintStream
 import kotlin.test.assertEquals
 
 private var CLI_PROCESS: Process? = null
@@ -35,10 +36,9 @@ class CliTestsEnded : AfterAllCallback {
     }
 }
 
-
 private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
-        CompilationTests.report()
+        CompilationTests.report("build/reports/compilation_${context?.displayName}.txt")
     }
 }
 
@@ -59,20 +59,21 @@ abstract class CompilationTests {
 
         private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
-        fun report() {
+        fun report(fileName: String?) {
+            val printStream = if (fileName == null) { System.out } else { PrintStream(fileName) }
             val formatString = "%-24s\t%6s\t%7s\t%5d"
-            println("COMPILATION REPORT")
-            println(java.lang.String.format("%-24s\t%-6s\t%-7s\t%-5s", "name", "trans.", "comp.", "error"))
+            printStream.println("COMPILATION REPORT")
+            printStream.println(java.lang.String.format("%-24s\t%-6s\t%-7s\t%-5s", "name", "trans.", "comp.", "error"))
             reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
                 val errorCount = reportData.errorCount
-                println(java.lang.String.format(formatString, key, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
+                printStream.println(java.lang.String.format(formatString, key, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
-            println("")
-            println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
-            val translationTimes = reportDataMap.values.map { it.translationTime }
-            println("AVG TRANSLATION TIME: ${translationTimes.average()}ms")
+            printStream.println("")
+            printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
+            val translationTimes     = reportDataMap.values.map { it.translationTime }
+            printStream.println("AVG TRANSLATION TIME: ${translationTimes.average()}ms")
             val compilationTimes = reportDataMap.values.map { it.compilationTime }
-            println("AVG COMPILATION TIME: ${compilationTimes.average()}ms")
+            printStream.println("AVG COMPILATION TIME: ${compilationTimes.average()}ms")
         }
     }
 
