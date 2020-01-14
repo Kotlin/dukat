@@ -1,38 +1,50 @@
 package org.jetbrains.dukat.descriptors
 
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.com.intellij.openapi.Disposable
-import org.jetbrains.kotlin.config.AnalysisFlag
+import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
-import org.jetbrains.kotlin.config.languageVersionSettings
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
+import org.jetbrains.kotlin.name.Name
 
-fun generateDefaultEnvironment(): KotlinCoreEnvironment {
-    return KotlinCoreEnvironment.createForTests(
-        Disposable { },
-        CompilerConfiguration(),
-        EnvironmentConfigFiles.JS_CONFIG_FILES
-    )
-}
+class ConfigContext {
 
-fun generateJSConfig(): JsConfig {
+    private val disposable = Disposer.newDisposable()
     val environment = generateDefaultEnvironment()
-    val configuration = environment.configuration.copy()
-    configuration.put(CommonConfigurationKeys.MODULE_NAME, "test-module")
-    configuration.put(JSConfigurationKeys.LIBRARIES, JsConfig.JS_STDLIB)
-    configuration.put(CommonConfigurationKeys.DISABLE_INLINE, true)
+    val stdlibModule = deserializeStdlib()
 
-    val languageVersion = configuration.languageVersionSettings.languageVersion
+    fun destroy() {
+        Disposer.dispose(disposable)
+    }
 
-    configuration.languageVersionSettings = LanguageVersionSettingsImpl(
-        languageVersion,
-        LanguageVersionSettingsImpl.DEFAULT.apiVersion,
-        emptyMap<AnalysisFlag<*>, Any>(),
-        mapOf()
-    )
-    return JsConfig(environment.project, configuration)
+    private fun generateCompilerConfiguration(): CompilerConfiguration {
+        val configuration = CompilerConfiguration()
+        configuration.put<String>(CommonConfigurationKeys.MODULE_NAME, "test-module")
+        configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+        configuration.put(JSConfigurationKeys.LIBRARIES, JsConfig.JS_STDLIB)
+
+        return configuration
+    }
+
+
+    private fun generateDefaultEnvironment(): KotlinCoreEnvironment {
+        return KotlinCoreEnvironment.createForProduction(
+            disposable,
+            generateCompilerConfiguration(),
+            EnvironmentConfigFiles.JS_CONFIG_FILES
+        )
+    }
+
+    fun generateJSConfig(): JsConfig {
+        return JsConfig(environment.project, environment.configuration)
+    }
+
+    private fun deserializeStdlib(): ModuleDescriptor {
+        return generateJSConfig().moduleDescriptors.first { it.name == Name.special("<kotlin>") }
+    }
 }

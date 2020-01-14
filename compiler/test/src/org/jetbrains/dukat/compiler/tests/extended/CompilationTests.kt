@@ -45,7 +45,7 @@ private class TestsEnded : AfterAllCallback {
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class, TestsEnded::class)
 abstract class CompilationTests {
 
-    private fun getTranslator(): CliTranslator = createStandardCliTranslator()
+    protected fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object {
         val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"

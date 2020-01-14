@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.descriptors
 
-import org.jetbrains.dukat.descriptors.generateDefaultEnvironment
-import org.jetbrains.dukat.descriptors.generateJSConfig
+import org.jetbrains.dukat.descriptors.ConfigContext
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.com.intellij.lang.Language
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
@@ -51,18 +50,24 @@ fun doLoadFile(file: File): String {
 }
 
 fun analyze(
-    files: List<KtFile>
+    files: List<KtFile>,
+    configContext: ConfigContext
 ): AnalysisResult {
-    return TopDownAnalyzerFacadeForJS.analyzeFiles(files, generateJSConfig())
+    return TopDownAnalyzerFacadeForJS.analyzeFiles(files, configContext.generateJSConfig())
 }
 
 fun generateModuleDescriptor(files: List<File>): ModuleDescriptor {
-    val environment = generateDefaultEnvironment()
-    val project = environment.project
-    val psiFiles = files.map { file ->
-        val fileName = file.name
-        val filePath = file.parent
-        createFile(fileName, doLoadFile(filePath, fileName), project)
+    val context = ConfigContext()
+    try {
+        val environment = context.environment
+        val project = environment.project
+        val psiFiles = files.map { file ->
+            val fileName = file.name
+            val filePath = file.parent
+            createFile(fileName, doLoadFile(filePath, fileName), project)
+        }
+        return analyze(psiFiles, context).moduleDescriptor
+    } finally {
+        context.destroy()
     }
-    return analyze(psiFiles).moduleDescriptor
 }
