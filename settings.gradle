@@ -34,7 +34,7 @@ gradle.ext {
   jupiterVersion = "5.5.2"
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
   nodeVersion = "13.5.0"
-  npmVersion = "6.9.0"
+  npmVersion = "6.13.4"
   yarnVersion = "1.17.3"
   nodePluginVersion = "1.3.1"
   defaultTsVersion = "3.5.2"
