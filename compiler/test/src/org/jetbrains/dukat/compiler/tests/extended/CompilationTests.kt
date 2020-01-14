@@ -69,8 +69,9 @@ abstract class CompilationTests {
         fun report(fileName: String?) {
             val printStream = if (fileName == null) { System.out } else { TiedPrintStream(PrintStream(fileName), System.out) }
             printStream.println("COMPILATION REPORT")
-            printStream.println(java.lang.String.format("%-24s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
-            val formatString = "%-24s\t%-17s\t%6s\t%7s\t%5d"
+            val namePadding = reportDataMap.keys.maxBy { it.length }?.length ?: 24
+            printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
+            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d"
             reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
                 val errorCount = reportData.errorCount
                 printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
