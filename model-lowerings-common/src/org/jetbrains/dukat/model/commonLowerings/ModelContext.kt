@@ -5,20 +5,67 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
+import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceGraph
 
 data class ResolvedClassLike<T : ClassLikeModel>(
         val classLike: T,
         val fqName: NameEntity?
 )
 
-class ModelContext {
+class ModelContext(vararg sourceSetModels: SourceSetModel?) {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
+
+    private fun register(vararg sourceSetModels: SourceSetModel?) {
+        sourceSetModels.forEach { it?.register() }
+    }
+
+    val inheritanceContext: InheritanceContext
+
+    init {
+        register(*sourceSetModels)
+        inheritanceContext = InheritanceContext(InheritanceGraph(this))
+    }
+
+    private fun ModuleModel.register() {
+        for (declaration in declarations) {
+            declaration.register(name)
+        }
+
+        submodules.forEach { declaration -> declaration.register() }
+    }
+
+    private fun SourceSetModel.register() {
+        sources.map { source -> source.root.register() }
+    }
+
+    private fun ClassLikeModel.register(ownerName: NameEntity) {
+        when (this) {
+            is ClassModel -> registerClass(this, ownerName)
+            is InterfaceModel -> registerInterface(this, ownerName)
+        }
+
+        members.forEach {
+            if (it is ClassLikeModel) {
+                it.register(ownerName.appendLeft(name))
+            }
+        }
+    }
+
+    fun TopLevelModel.register(ownerName: NameEntity) {
+        when (this) {
+            is ClassLikeModel -> register(ownerName)
+            is TypeAliasModel -> registerAlias(this, ownerName)
+        }
+    }
 
     private fun registerInterface(interfaceDeclaration: InterfaceModel, ownerName: NameEntity) {
         myInterfaces[ownerName.appendLeft(interfaceDeclaration.name)] = interfaceDeclaration
@@ -30,14 +77,6 @@ class ModelContext {
 
     private fun registerAlias(typeAlias: TypeAliasModel, ownerName: NameEntity) {
         myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
-    }
-
-    fun register(topLevelModel: TopLevelModel, ownerName: NameEntity) {
-        when (topLevelModel) {
-            is ClassModel -> registerClass(topLevelModel, ownerName)
-            is InterfaceModel -> registerInterface(topLevelModel, ownerName)
-            is TypeAliasModel -> registerAlias(topLevelModel, ownerName)
-        }
     }
 
     fun unalias(typeModel: TypeValueModel): TypeModel {
@@ -79,7 +118,7 @@ class ModelContext {
         return resolveInterface(name) ?: resolveClass(name)
     }
 
-    fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
+    private fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
         return classLikeModel.parentEntities.mapNotNull { heritageModel ->
             val value = unalias(heritageModel.value)
             if (value is TypeValueModel) {
@@ -91,5 +130,9 @@ class ModelContext {
     fun getAllParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
         val immediateParents = getParents(classLikeModel)
         return immediateParents + immediateParents.flatMap { immediateParent -> getAllParents(immediateParent.classLike) }
+    }
+
+    fun getClassLikeIterable(): Iterable<ClassLikeModel> {
+        return (myInterfaces.values + myClassNodes.values)
     }
 }
