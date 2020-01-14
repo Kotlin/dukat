@@ -42,9 +42,9 @@ private class TestsEnded : AfterAllCallback {
     }
 }
 
-private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long)
+private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode)
 private fun MutableMap<String, ReportData>.getReportFor(reportName: String): ReportData {
-    return getOrPut(reportName) { ReportData(0, 0, 0) }
+    return getOrPut(reportName) { ReportData(0, 0, 0, ExitCode.OK) }
 }
 
 private class TiedPrintStream(private val mainStream: PrintStream, private val secondStream: PrintStream) : PrintStream(mainStream) {
@@ -68,12 +68,12 @@ abstract class CompilationTests {
 
         fun report(fileName: String?) {
             val printStream = if (fileName == null) { System.out } else { TiedPrintStream(PrintStream(fileName), System.out) }
-            val formatString = "%-24s\t%6s\t%7s\t%5d"
             printStream.println("COMPILATION REPORT")
-            printStream.println(java.lang.String.format("%-24s\t%-6s\t%-7s\t%-5s", "name", "trans.", "comp.", "error"))
+            printStream.println(java.lang.String.format("%-24s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
+            val formatString = "%-24s\t%-17s\t%6s\t%7s\t%5d"
             reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
                 val errorCount = reportData.errorCount
-                printStream.println(java.lang.String.format(formatString, key, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
+                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
             printStream.println("")
             printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
@@ -109,11 +109,16 @@ abstract class CompilationTests {
             reportDataMap.getReportFor(descriptor).errorCount += 1
         }
 
+        val compilationStarted = System.currentTimeMillis()
         return K2JSCompiler().exec(
                 messageCollector,
                 Services.EMPTY,
                 options
-        )
+        ).also {
+            val reportForDescritpor = reportDataMap.getReportFor(descriptor)
+            reportForDescritpor.compilationResult = it
+            reportForDescritpor.compilationTime = System.currentTimeMillis() - compilationStarted
+        }
     }
 
     protected fun assertContentCompiles(
@@ -138,13 +143,11 @@ abstract class CompilationTests {
 
         val compilationErrorMessage = "$COMPILATION_ERROR_ASSERTION:\n" + sources.joinToString("\n") { source -> source.toFileUriScheme() }
 
-        val compilationStarted = System.currentTimeMillis()
         val compilationResult = compile(
                 descriptor,
                 sources,
                 outSource
         )
-        reportDataMap.getReportFor(descriptor).compilationTime = System.currentTimeMillis() - compilationStarted
 
         assertEquals(
                 ExitCode.OK,
