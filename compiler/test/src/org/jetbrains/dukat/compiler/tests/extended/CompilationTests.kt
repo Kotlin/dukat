@@ -47,6 +47,13 @@ private fun MutableMap<String, ReportData>.getReportFor(reportName: String): Rep
     return getOrPut(reportName) { ReportData(0, 0, 0) }
 }
 
+private class TiedPrintStream(private val mainStream: PrintStream, private val secondStream: PrintStream) : PrintStream(mainStream) {
+    override fun println(x: String?) {
+        super.println(x)
+        secondStream.println(x)
+    }
+}
+
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class, TestsEnded::class)
 abstract class CompilationTests {
 
@@ -60,7 +67,7 @@ abstract class CompilationTests {
         private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
         fun report(fileName: String?) {
-            val printStream = if (fileName == null) { System.out } else { PrintStream(fileName) }
+            val printStream = if (fileName == null) { System.out } else { TiedPrintStream(PrintStream(fileName), System.out) }
             val formatString = "%-24s\t%6s\t%7s\t%5d"
             printStream.println("COMPILATION REPORT")
             printStream.println(java.lang.String.format("%-24s\t%-6s\t%-7s\t%-5s", "name", "trans.", "comp.", "error"))
