@@ -27,26 +27,26 @@ class TopNCompilationTests : CompilationTests() {
 
             return listOf(
                     "@types/async",
-                    "@types/bluebird"
-//                    "@types/body-parser",
-//                    "@types/express",
-//                    "@types/fs-extra",
-//                    "@types/lodash",
-//                    "@types/moment",
-//                    "@types/node",
-//                    "@types/prop-types",
-//                    "@types/react",
-//                    "@types/react-dom",
-//                    "@types/request",
-//                    "@types/underscore",
-//                    "@types/webpack",
-//                    "@types/yargs",
-//                    "axios",
-//                    "chalk",
-//                    "commander/typings",
-//                    "rxjs",
-//                    "tslib/tslib.d.ts",
-//                    "vue/types"
+                    "@types/bluebird",
+                    "@types/body-parser",
+                    "@types/express",
+                    "@types/fs-extra",
+                    "@types/lodash",
+                    "@types/moment",
+                    "@types/node",
+                    "@types/prop-types",
+                    "@types/react",
+                    "@types/react-dom",
+                    "@types/request",
+                    "@types/underscore",
+                    "@types/webpack",
+                    "@types/yargs",
+                    "axios",
+                    "chalk",
+                    "commander/typings",
+                    "rxjs",
+                    "tslib/tslib.d.ts",
+                    "vue/types"
             ).map { descriptor ->
                 val name = if (descriptor.endsWith("d.ts")) {
                     descriptor
