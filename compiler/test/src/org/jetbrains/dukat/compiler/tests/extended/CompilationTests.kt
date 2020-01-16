@@ -38,8 +38,8 @@ class CliTestsEnded : AfterAllCallback {
 
 private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
-        val buildNumber = System.getenv("BUILD_NUMBER")
-        val projectName = System.getenv("TEAMCITY_BUILDCONF_NAME").replace(" ", "_")
+        val buildNumber = System.getenv("BUILD_NUMBER") ?: ""
+        val projectName = System.getenv("TEAMCITY_BUILDCONF_NAME")?.replace(" ", "_") ?: ""
         CompilationTests.report("build/reports/compilation_${context?.displayName}_${projectName}_${buildNumber}.txt")
     }
 }
