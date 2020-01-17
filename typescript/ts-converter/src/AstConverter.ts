@@ -337,6 +337,27 @@ export class AstConverter {
         }
     }
 
+    private createTypeReferenceFromSymbol(symbol: ts.Symbol | null, declaration: ts.Declaration | null): ReferenceEntity | null {
+        if ((symbol == null) || (declaration == null)) {
+            return null;
+        }
+        let typeReference: ReferenceEntity | null = null;
+        if (ts.isImportSpecifier(declaration)) {
+            let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
+            if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
+                let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
+                //TODO: encountered in @types/express, need to work on a separate test case
+                let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
+                    declarationFromSymbol.parent : declarationFromSymbol;
+                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
+            }
+        } else {
+            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+        }
+
+        return typeReference;
+    }
+
     convertType(type: ts.TypeNode | undefined): TypeDeclaration {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
@@ -375,19 +396,7 @@ export class AstConverter {
                                 return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
                             }
 
-                            if (ts.isImportSpecifier(declaration)) {
-                                let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
-                                if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
-                                    let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
-                                    //TODO: encountered in @types/express, need to work on a separate test case
-                                    let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
-                                                            declarationFromSymbol.parent : declarationFromSymbol;
-                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
-                                }
-                            } else {
-                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
-                            }
-
+                            typeReference = this.createTypeReferenceFromSymbol(symbol, declaration);
                         }
                     }
                 }
@@ -673,6 +682,18 @@ export class AstConverter {
         return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
     }
 
+    private getFirstDeclaration(symbol: ts.Symbol | null): ts.Declaration | null  {
+        if (symbol == null) {
+            return null;
+        }
+
+        if (Array.isArray(symbol.declarations)) {
+            return symbol.declarations[0];
+        }
+
+        return null;
+    }
+
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined, parent: ts.Node): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
@@ -699,23 +720,14 @@ export class AstConverter {
                         name = this.astFactory.createIdentifierDeclarationAsNameEntity(expression.getText());
                     }
 
-                    let uid: string | null = null;
-
                     let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
-                    if (symbol) {
-                        if (Array.isArray(symbol.declarations)) {
-                            let declaration = symbol.declarations[0];
-                            if (declaration) {
-                                this.astVisitor.visitType(declaration);
-                                uid = this.exportContext.getUID(declaration);
-                            }
-                        }
+                    let declaration = this.getFirstDeclaration(symbol);
+                    if (declaration) {
+                        this.astVisitor.visitType(declaration);
                     }
 
-                    let parentUid = this.exportContext.getUID(parent);
-
-                    if (parentUid != uid) {
-                        let typeReference = uid ? this.astFactory.createReferenceEntity(uid) : null;
+                    if (declaration != parent) {
+                        let typeReference = this.createTypeReferenceFromSymbol(symbol, declaration);
 
                         if (name) {
                             this.registerDeclaration(
