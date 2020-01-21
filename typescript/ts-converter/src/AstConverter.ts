@@ -76,9 +76,6 @@ export class AstConverter {
                 if (symbol && symbol.valueDeclaration) {
                     referenceFile = tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName);
                 }
-                if (referenceFile) {
-                    referencedFiles.add(referenceFile);
-                }
                 if (node.importClause) {
                     let namedBindings = node.importClause.namedBindings;
                     if (namedBindings) {
@@ -97,6 +94,13 @@ export class AstConverter {
                         }
                     }
                 }
+            }
+        });
+
+        imports.forEach(importClause => {
+            let referencedFile = importClause.getReferencedfile();
+            if (referencedFile) {
+                referencedFiles.add(referencedFile);
             }
         });
 
