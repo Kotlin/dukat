@@ -349,6 +349,8 @@ export class AstFactory implements AstFactory {
 
   createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
     let moduleDeclaration = new declarations.ModuleDeclarationProto();
+
+    moduleDeclaration.setImportsList(imports);
     moduleDeclaration.setPackagename(packageName);
     moduleDeclaration.setDeclarationsList(moduleDeclarations);
     moduleDeclaration.setModifiersList(modifiers);
