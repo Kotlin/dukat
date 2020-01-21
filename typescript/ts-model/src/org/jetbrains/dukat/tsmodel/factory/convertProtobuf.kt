@@ -44,7 +44,6 @@ import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
@@ -55,8 +54,13 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.RegExLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
+import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifier
+import org.jetbrains.dukat.tsmodel.importClause.NamedImportsDeclaration
+import org.jetbrains.dukat.tsmodel.importClause.NamespaceImportDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -87,6 +91,7 @@ import org.jetbrains.dukat.tsmodelproto.FunctionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.HeritageClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.IdentifierDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.IfStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ImportClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ImportEqualsDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.IndexSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.InterfaceDeclarationProto
@@ -108,8 +113,8 @@ import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReferenceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.RegExLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
-import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ThrowStatementDeclarationProto
@@ -186,7 +191,7 @@ fun InterfaceDeclarationProto.convert(): InterfaceDeclaration {
     )
 }
 
-fun BlockDeclarationProto.convert() : BlockDeclaration {
+fun BlockDeclarationProto.convert(): BlockDeclaration {
     return BlockDeclaration(
             statements = statementsList.map { it.convert() }
     )
@@ -235,8 +240,19 @@ private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration 
     return DefinitionInfoDeclaration(fileName)
 }
 
+private fun ImportClauseDeclarationProto.convert(): ImportDeclaration? {
+    return when {
+        hasNamespaceImport() -> NamespaceImportDeclaration(namespaceImport.name)
+        hasNamedImports() -> NamedImportsDeclaration(namedImports.importSpecifiersList.map { ImportSpecifier(it.name, it.propertyName) })
+        else -> null
+    }?.let { clause ->
+        ImportDeclaration(clause, referencedFile)
+    }
+}
+
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     return ModuleDeclaration(packageName.convert(),
+            importsList.mapNotNull { it.convert() },
             declarationsList.map { it.convert() },
             modifiersList.map { it.convert() },
             definitionsInfoList.map { it.convert() },
@@ -257,7 +273,7 @@ fun List<TopLevelDeclarationProto>.convert(): TopLevelDeclaration? {
     return when {
         this.isEmpty() -> null
         this.size == 1 -> this[0].convert()
-        else -> BlockDeclaration( this.map { it.convert() } )
+        else -> BlockDeclaration(this.map { it.convert() })
     }
 }
 
@@ -282,7 +298,7 @@ fun ExpressionStatementDeclarationProto.convert(): ExpressionStatementDeclaratio
 
 fun ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
     return ReturnStatementDeclaration(
-            if(hasExpression()) {
+            if (hasExpression()) {
                 expression.convert()
             } else null
     )
@@ -290,7 +306,7 @@ fun ReturnStatementDeclarationProto.convert(): ReturnStatementDeclaration {
 
 fun ThrowStatementDeclarationProto.convert(): ThrowStatementDeclaration {
     return ThrowStatementDeclaration(
-            if(hasExpression()) {
+            if (hasExpression()) {
                 expression.convert()
             } else null
     )
@@ -449,7 +465,7 @@ private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration 
 }
 
 
-fun BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
+fun BinaryExpressionDeclarationProto.convert(): BinaryExpressionDeclaration {
     return BinaryExpressionDeclaration(
             left = left.convert(),
             operator = operator,
@@ -457,7 +473,7 @@ fun BinaryExpressionDeclarationProto.convert() : BinaryExpressionDeclaration {
     )
 }
 
-fun UnaryExpressionDeclarationProto.convert() : UnaryExpressionDeclaration {
+fun UnaryExpressionDeclarationProto.convert(): UnaryExpressionDeclaration {
     return UnaryExpressionDeclaration(
             operand = operand.convert(),
             operator = operator,
@@ -478,7 +494,7 @@ fun CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
     )
 }
 
-fun NameExpressionDeclarationProto.convert() : NameExpressionDeclaration {
+fun NameExpressionDeclarationProto.convert(): NameExpressionDeclaration {
     return when {
         name.hasIdentifier() -> IdentifierExpressionDeclaration(identifier = name.identifier.convert())
         name.hasQualifier() -> QualifierExpressionDeclaration(qualifier = name.qualifier.convert())
@@ -494,7 +510,7 @@ fun RegExLiteralExpressionDeclarationProto.convert() = RegExLiteralExpressionDec
 fun ObjectLiteralExpressionDeclarationProto.convert() = ObjectLiteralExpressionDeclaration(membersList.map { it.convert() })
 fun ArrayLiteralExpressionDeclarationProto.convert() = ArrayLiteralExpressionDeclaration(elementsList.map { it.convert() })
 
-fun LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
+fun LiteralExpressionDeclarationProto.convert(): LiteralExpressionDeclaration {
     return when {
         hasNumericLiteral() -> numericLiteral.convert()
         hasBigIntLiteral() -> bigIntLiteral.convert()
@@ -507,14 +523,14 @@ fun LiteralExpressionDeclarationProto.convert() : LiteralExpressionDeclaration {
     }
 }
 
-fun PropertyAccessExpressionDeclarationProto.convert() : PropertyAccessExpressionDeclaration {
+fun PropertyAccessExpressionDeclarationProto.convert(): PropertyAccessExpressionDeclaration {
     return PropertyAccessExpressionDeclaration(
             expression = expression.convert(),
             name = name.convert()
     )
 }
 
-fun ElementAccessExpressionDeclarationProto.convert() : ElementAccessExpressionDeclaration {
+fun ElementAccessExpressionDeclarationProto.convert(): ElementAccessExpressionDeclaration {
     return ElementAccessExpressionDeclaration(
             expression = expression.convert(),
             argumentExpression = argumentExpression.convert()
@@ -536,13 +552,13 @@ fun ConditionalExpressionDeclarationProto.convert(): ConditionalExpressionDeclar
     )
 }
 
-fun UnknownExpressionDeclarationProto.convert() : UnknownExpressionDeclaration {
+fun UnknownExpressionDeclarationProto.convert(): UnknownExpressionDeclaration {
     return UnknownExpressionDeclaration(
             meta = meta
     )
 }
 
-fun ExpressionDeclarationProto.convert() : ExpressionDeclaration {
+fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
         hasUnaryExpression() -> unaryExpression.convert()

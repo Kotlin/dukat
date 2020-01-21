@@ -397,12 +397,13 @@ message TopLevelDeclarationProto {
 
 message ModuleDeclarationProto {
     NameDeclarationProto packageName = 1;
-    repeated TopLevelDeclarationProto declarations = 2;
-    repeated ModifierDeclarationProto modifiers = 3;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 4;
-    string uid = 5;
-    string resourceName = 6;
-    bool root = 7;
+    repeated ImportClauseDeclarationProto imports = 2;
+    repeated TopLevelDeclarationProto declarations = 3;
+    repeated ModifierDeclarationProto modifiers = 4;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
+    string uid = 6;
+    string resourceName = 7;
+    bool root = 8;
 }
 
 message SourceFileDeclarationProto {
