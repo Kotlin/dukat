@@ -106,6 +106,7 @@ class SourceBundleBuilder {
       libFiles.push(this.astFactory.createSourceFileDeclaration(
         resourceName, this.astFactory.createModuleDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+          [],
           declarations,
           [],
           [],

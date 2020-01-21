@@ -159,6 +159,27 @@ message MemberDeclarationProto {
     }
 }
 
+message NamespaceImportDeclarationProto {
+    string name = 1;
+}
+
+message NamedImportsDeclarationProto {
+    repeated ImportSpecifierDeclarationProto importSpecifiers = 1;
+}
+
+message ImportSpecifierDeclarationProto {
+    string name = 1;
+    string propertyName = 2;
+}
+
+message ImportClauseDeclarationProto {
+    oneof type {
+        NamespaceImportDeclarationProto namespaceImport = 1;
+        NamedImportsDeclarationProto namedImports = 2;
+    }
+    string referencedFile = 3;
+}
+
 message ReferenceDeclarationProto {
     string uid = 1;
 }

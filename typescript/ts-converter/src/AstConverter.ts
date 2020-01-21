@@ -8,6 +8,7 @@ import {
     Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
+    ImportClauseDeclaration,
     MemberDeclaration,
     ModifierDeclaration,
     ModuleDeclaration,
@@ -56,7 +57,6 @@ export class AstConverter {
 
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
 
-        let packageDeclaration = this.createModuleDeclaration(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
         let referencedFiles = new Set<string>();
         sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
 
@@ -68,12 +68,35 @@ export class AstConverter {
           }
         }
 
+        let imports: Array<ImportClauseDeclaration> = [];
         sourceFile.forEachChild(node => {
             if (ts.isImportDeclaration(node)) {
-              let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
-              if (symbol && symbol.valueDeclaration) {
-                referencedFiles.add(tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName));
-              }
+                let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
+                let referenceFile: string | null = null;
+                if (symbol && symbol.valueDeclaration) {
+                    referenceFile = tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName);
+                }
+                if (referenceFile) {
+                    referencedFiles.add(referenceFile);
+                }
+                if (node.importClause) {
+                    let namedBindings = node.importClause.namedBindings;
+                    if (namedBindings) {
+                        let importClause: ImportClauseDeclaration | null = null;
+                        if (ts.isNamespaceImport(namedBindings)) {
+                            importClause = this.astFactory.createNamespaceImportClause(namedBindings.name.getText());
+                        } else {
+                            importClause = this.astFactory.createNamedImportsClause(namedBindings.elements);
+                        }
+                        if (importClause) {
+                            if (referenceFile) {
+                                importClause.setReferencedfile(referenceFile);
+                            }
+
+                            imports.push(importClause);
+                        }
+                    }
+                }
             }
         });
 
@@ -83,6 +106,16 @@ export class AstConverter {
             referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
           }
         }
+
+        let packageDeclaration = this.astFactory.createModuleDeclaration(
+            resourceName,
+            imports,
+            declarations,
+            this.convertModifiers(sourceFile.modifiers),
+            [],
+            uid(),
+            sourceName,
+            true);
 
         return this.astFactory.createSourceFileDeclaration(
             sourceFile.fileName,
@@ -98,12 +131,8 @@ export class AstConverter {
         });
     }
 
-    createModuleDeclaration(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
-        return this.astFactory.createModuleDeclaration(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
-    }
-
     createModuleDeclarationAsTopLevel(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
-        return this.astFactory.createModuleDeclarationAsTopLevel(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
+        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, [], declarations, modifiers, definitionsInfo, uid, resourceName, root));
     }
 
     convertName(name: ts.BindingName | ts.PropertyName): string | null {
