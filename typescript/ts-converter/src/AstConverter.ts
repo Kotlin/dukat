@@ -47,27 +47,7 @@ export class AstConverter {
         collection.push(declaration);
     }
 
-    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
-        let resourceName = this.rootPackageName;
-
-        let packageNameFragments = sourceFile.fileName.split("/");
-        let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
-
-        const declarations = this.convertStatements(sourceFile.statements, resourceName);
-
-        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
-
-        let referencedFiles = new Set<string>();
-        sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
-
-        if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
-          for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
-            if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-                referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
-            }
-          }
-        }
-
+    private getImports(sourceFile: ts.SourceFile): Array<ImportClauseDeclaration> {
         let imports: Array<ImportClauseDeclaration> = [];
         sourceFile.forEachChild(node => {
             if (ts.isImportDeclaration(node)) {
@@ -97,6 +77,31 @@ export class AstConverter {
             }
         });
 
+        return imports;
+    }
+
+    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
+        let resourceName = this.rootPackageName;
+
+        let packageNameFragments = sourceFile.fileName.split("/");
+        let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+
+        const declarations = this.convertStatements(sourceFile.statements, resourceName);
+
+        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
+
+        let referencedFiles = new Set<string>();
+        sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
+
+        if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
+          for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
+            if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
+                referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+            }
+          }
+        }
+
+        let imports = this.getImports(sourceFile);
         imports.forEach(importClause => {
             let referencedFile = importClause.getReferencedfile();
             if (referencedFile) {
@@ -135,8 +140,8 @@ export class AstConverter {
         });
     }
 
-    createModuleDeclarationAsTopLevel(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
-        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, [], declarations, modifiers, definitionsInfo, uid, resourceName, root));
+    createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, declarations, modifiers, definitionsInfo, uid, resourceName, root));
     }
 
     convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -1011,11 +1016,13 @@ export class AstConverter {
             let uid = this.exportContext.getUID(module);
             let sourceNameFragment = this.resolveAmbientModuleName(module);
 
+            let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
+            let imports = this.getImports(module.getSourceFile());
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName);
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment), this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations
