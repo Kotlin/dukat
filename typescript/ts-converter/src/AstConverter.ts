@@ -8,7 +8,7 @@ import {
     Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
-    ImportClauseDeclaration,
+    ImportClauseDeclaration, ImportSpecifierDeclaration,
     MemberDeclaration,
     ModifierDeclaration,
     ModuleDeclaration,
@@ -63,7 +63,9 @@ export class AstConverter {
                         if (ts.isNamespaceImport(namedBindings)) {
                             importClause = this.astFactory.createNamespaceImportClause(namedBindings.name.getText());
                         } else {
-                            importClause = this.astFactory.createNamedImportsClause(namedBindings.elements);
+                            importClause = this.astFactory.createNamedImportsClause(namedBindings.elements.map(importSpecifier =>
+                                this.createImportSpecifier(importSpecifier)
+                            ));
                         }
                         if (importClause) {
                             if (referenceFile) {
@@ -375,19 +377,32 @@ export class AstConverter {
         }
     }
 
-    private createTypeReferenceFromSymbol(symbol: ts.Symbol | null, declaration: ts.Declaration | null): ReferenceEntity | null {
-        if ((symbol == null) || (declaration == null)) {
+    private createImportSpecifier(importSpecifier: ts.ImportSpecifier): ImportSpecifierDeclaration {
+        return this.astFactory.createImportSpecifier(importSpecifier.name, importSpecifier.propertyName, this.createUid(importSpecifier.name));
+    }
+
+    private createUid(identifier: ts.Identifier): string | null {
+        let typeOfSymbol = this.typeChecker.getDeclaredTypeOfSymbol(this.typeChecker.getSymbolAtLocation(identifier));
+        let uid: string | null = null;
+        if (typeOfSymbol && typeOfSymbol.symbol && Array.isArray(typeOfSymbol.symbol.declarations)) {
+            let declarationFromSymbol = typeOfSymbol.symbol.declarations[0];
+            //TODO: encountered in @types/express, need to work on a separate test case
+            let uidContext = (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent)) ?
+                declarationFromSymbol.parent : declarationFromSymbol;
+            uid = this.exportContext.getUID(uidContext);
+        }
+        return uid;
+    }
+
+    private createTypeReferenceFromSymbol(declaration: ts.Declaration | null): ReferenceEntity | null {
+        if (declaration == null) {
             return null;
         }
         let typeReference: ReferenceEntity | null = null;
         if (ts.isImportSpecifier(declaration)) {
-            let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
-            if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
-                let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
-                //TODO: encountered in @types/express, need to work on a separate test case
-                let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
-                    declarationFromSymbol.parent : declarationFromSymbol;
-                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
+            let uid = this.createUid(declaration.name);
+            if (uid) {
+                typeReference = this.astFactory.createReferenceEntity(uid);
             }
         } else {
             typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
@@ -434,7 +449,7 @@ export class AstConverter {
                                 return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
                             }
 
-                            typeReference = this.createTypeReferenceFromSymbol(symbol, declaration);
+                            typeReference = this.createTypeReferenceFromSymbol(declaration);
                         }
                     }
                 }
@@ -765,7 +780,7 @@ export class AstConverter {
                     }
 
                     if (declaration != parent) {
-                        let typeReference = this.createTypeReferenceFromSymbol(symbol, declaration);
+                        let typeReference = this.createTypeReferenceFromSymbol(declaration);
 
                         if (name) {
                             this.registerDeclaration(

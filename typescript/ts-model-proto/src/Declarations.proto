@@ -170,6 +170,7 @@ message NamedImportsDeclarationProto {
 message ImportSpecifierDeclarationProto {
     string name = 1;
     string propertyName = 2;
+    string uid = 3;
 }
 
 message ImportClauseDeclarationProto {

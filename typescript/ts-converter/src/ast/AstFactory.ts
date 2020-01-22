@@ -37,19 +37,21 @@ export class AstFactory implements AstFactory {
     return importClause;
   }
 
-  private createImportSpecifier(importSpecifierDeclaration: ts.ImportSpecifier): ImportSpecifierDeclaration {
+  createImportSpecifier(name: ts.Identifier, propertyName: ts.Identifier | null, uid: string | null ): ImportSpecifierDeclaration {
     let importSpecifier = new declarations.ImportSpecifierDeclarationProto();
-    importSpecifier.setName(importSpecifierDeclaration.name.getText());
-    if (importSpecifierDeclaration.propertyName) {
-      importSpecifier.setPropertyname(importSpecifierDeclaration.propertyName.getText());
+    importSpecifier.setName(name.getText());
+    if (propertyName) {
+      importSpecifier.setPropertyname(propertyName.getText());
+    }
+    if (uid) {
+      importSpecifier.setUid(uid);
     }
     return importSpecifier;
   }
 
-
-  createNamedImportsClause(importSpecifiers: Array<ts.ImportSpecifier>): ImportClauseDeclaration {
+  createNamedImportsClause(importSpecifiers: Array<ImportSpecifierDeclaration>): ImportClauseDeclaration {
     let namedImportClause = new declarations.NamedImportsDeclarationProto();
-    namedImportClause.setImportspecifiersList(importSpecifiers.map(importSpecifier => this.createImportSpecifier(importSpecifier)));
+    namedImportClause.setImportspecifiersList(importSpecifiers);
     let importClause = new declarations.ImportClauseDeclarationProto();
     importClause.setNamedimports(namedImportClause);
     return importClause;
