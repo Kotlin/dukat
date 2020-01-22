@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
+import java.io.PrintStream
 import kotlin.test.assertEquals
 
 private var CLI_PROCESS: Process? = null
@@ -35,33 +36,56 @@ class CliTestsEnded : AfterAllCallback {
     }
 }
 
-
 private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
-        CompilationTests.report()
+        val buildNumber = System.getenv("BUILD_NUMBER") ?: ""
+        val projectName = System.getenv("TEAMCITY_BUILDCONF_NAME")?.replace(" ", "_") ?: ""
+        CompilationTests.report("build/reports/compilation_${context?.displayName}_${projectName}_${buildNumber}.txt")
+    }
+}
+
+private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode)
+private fun MutableMap<String, ReportData>.getReportFor(reportName: String): ReportData {
+    return getOrPut(reportName) { ReportData(0, 0, 0, ExitCode.OK) }
+}
+
+private class TiedPrintStream(private val mainStream: PrintStream, private val secondStream: PrintStream) : PrintStream(mainStream) {
+    override fun println(x: String?) {
+        super.println(x)
+        secondStream.println(x)
     }
 }
 
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class, TestsEnded::class)
 abstract class CompilationTests {
 
-    private fun getTranslator(): CliTranslator = createStandardCliTranslator()
+    protected fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object {
         val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"
         val FILE_NOT_FIND_ASSERTION = "FILE NOT FOUND"
         val START_TIMESTAMP = System.currentTimeMillis()
 
-        private val reportData: MutableMap<String, Int> = mutableMapOf()
+        private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
-        fun report() {
-            var total = 0
-            println("ERRORS")
-            reportData.toList().sortedByDescending { it.second }.forEach { (key, value) ->
-                println("${key}: ${value} ")
-                total += value
+        fun report(fileName: String?) {
+            val printStream = if (fileName == null) { System.out } else { TiedPrintStream(PrintStream(fileName), System.out) }
+            val passed = reportDataMap.values.count { it.compilationResult == ExitCode.OK }
+            val total = reportDataMap.values.size
+            printStream.println("COMPILATION REPORT ${passed}/${total}")
+            val namePadding = reportDataMap.keys.maxBy { it.length }?.length ?: 24
+            printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
+            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d"
+            reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
+                val errorCount = reportData.errorCount
+                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
-            println("TOTAL: ${total}")
+            printStream.println("")
+            printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
+            val translationTimes     = reportDataMap.values.map { it.translationTime }
+            printStream.println("AVG TRANSLATION TIME: ${translationTimes.average()}ms")
+            val compilationTimes = reportDataMap.values.map { it.compilationTime }
+            printStream.println("AVG COMPILATION TIME: ${compilationTimes.average()}ms")
         }
     }
 
@@ -86,16 +110,20 @@ abstract class CompilationTests {
 
         options.freeArgs = sources
 
-        reportData[descriptor] = 0
         val messageCollector = CompileMessageCollector { _, _, _ ->
-            reportData[descriptor] = reportData.getOrDefault(descriptor, 0) + 1
+            reportDataMap.getReportFor(descriptor).errorCount += 1
         }
 
+        val compilationStarted = System.currentTimeMillis()
         return K2JSCompiler().exec(
                 messageCollector,
                 Services.EMPTY,
                 options
-        )
+        ).also {
+            val reportForDescritpor = reportDataMap.getReportFor(descriptor)
+            reportForDescritpor.compilationResult = it
+            reportForDescritpor.compilationTime = System.currentTimeMillis() - compilationStarted
+        }
     }
 
     protected fun assertContentCompiles(
@@ -107,7 +135,10 @@ abstract class CompilationTests {
         println(targetDir.normalize().absolutePath.toFileUriScheme())
 
         targetDir.deleteRecursively()
+
+        val translationStarted = System.currentTimeMillis()
         getTranslator().translateTS(sourcePath, targetPath)
+        reportDataMap.getReportFor(descriptor).translationTime = System.currentTimeMillis() - translationStarted
 
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"
 
@@ -117,13 +148,16 @@ abstract class CompilationTests {
 
         val compilationErrorMessage = "$COMPILATION_ERROR_ASSERTION:\n" + sources.joinToString("\n") { source -> source.toFileUriScheme() }
 
+        val compilationResult = compile(
+                descriptor,
+                sources,
+                outSource
+        )
+
         assertEquals(
                 ExitCode.OK,
-                compile(
-                        descriptor,
-                        sources,
-                        outSource
-                ), compilationErrorMessage
+                compilationResult,
+                compilationErrorMessage
         )
     }
 

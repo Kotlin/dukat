@@ -8,6 +8,7 @@ import {
     Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
+    ImportClauseDeclaration, ImportSpecifierDeclaration,
     MemberDeclaration,
     ModifierDeclaration,
     ModuleDeclaration,
@@ -46,6 +47,41 @@ export class AstConverter {
         collection.push(declaration);
     }
 
+    private getImports(sourceFile: ts.SourceFile): Array<ImportClauseDeclaration> {
+        let imports: Array<ImportClauseDeclaration> = [];
+        sourceFile.forEachChild(node => {
+            if (ts.isImportDeclaration(node)) {
+                let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
+                let referenceFile: string | null = null;
+                if (symbol && symbol.valueDeclaration) {
+                    referenceFile = tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName);
+                }
+                if (node.importClause) {
+                    let namedBindings = node.importClause.namedBindings;
+                    if (namedBindings) {
+                        let importClause: ImportClauseDeclaration | null = null;
+                        if (ts.isNamespaceImport(namedBindings)) {
+                            importClause = this.astFactory.createNamespaceImportClause(namedBindings.name.getText());
+                        } else {
+                            importClause = this.astFactory.createNamedImportsClause(namedBindings.elements.map(importSpecifier =>
+                                this.createImportSpecifier(importSpecifier)
+                            ));
+                        }
+                        if (importClause) {
+                            if (referenceFile) {
+                                importClause.setReferencedfile(referenceFile);
+                            }
+
+                            imports.push(importClause);
+                        }
+                    }
+                }
+            }
+        });
+
+        return imports;
+    }
+
     createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
         let resourceName = this.rootPackageName;
 
@@ -56,7 +92,6 @@ export class AstConverter {
 
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
 
-        let packageDeclaration = this.createModuleDeclaration(resourceName, declarations, this.convertModifiers(sourceFile.modifiers), [], uid(), sourceName, true);
         let referencedFiles = new Set<string>();
         sourceFile.referencedFiles.forEach(referencedFile => referencedFiles.add(curDir + referencedFile.fileName));
 
@@ -68,12 +103,11 @@ export class AstConverter {
           }
         }
 
-        sourceFile.forEachChild(node => {
-            if (ts.isImportDeclaration(node)) {
-              let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
-              if (symbol && symbol.valueDeclaration) {
-                referencedFiles.add(tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName));
-              }
+        let imports = this.getImports(sourceFile);
+        imports.forEach(importClause => {
+            let referencedFile = importClause.getReferencedfile();
+            if (referencedFile) {
+                referencedFiles.add(referencedFile);
             }
         });
 
@@ -83,6 +117,16 @@ export class AstConverter {
             referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
           }
         }
+
+        let packageDeclaration = this.astFactory.createModuleDeclaration(
+            resourceName,
+            imports,
+            declarations,
+            this.convertModifiers(sourceFile.modifiers),
+            [],
+            uid(),
+            sourceName,
+            true);
 
         return this.astFactory.createSourceFileDeclaration(
             sourceFile.fileName,
@@ -98,12 +142,8 @@ export class AstConverter {
         });
     }
 
-    createModuleDeclaration(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
-        return this.astFactory.createModuleDeclaration(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
-    }
-
-    createModuleDeclarationAsTopLevel(packageName: NameEntity, declarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
-        return this.astFactory.createModuleDeclarationAsTopLevel(packageName, declarations, modifiers, definitionsInfo, uid, resourceName, root);
+    createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, declarations, modifiers, definitionsInfo, uid, resourceName, root));
     }
 
     convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -337,6 +377,40 @@ export class AstConverter {
         }
     }
 
+    private createImportSpecifier(importSpecifier: ts.ImportSpecifier): ImportSpecifierDeclaration {
+        return this.astFactory.createImportSpecifier(importSpecifier.name, importSpecifier.propertyName, this.createUid(importSpecifier.name));
+    }
+
+    private createUid(identifier: ts.Identifier): string | null {
+        let typeOfSymbol = this.typeChecker.getDeclaredTypeOfSymbol(this.typeChecker.getSymbolAtLocation(identifier));
+        let uid: string | null = null;
+        if (typeOfSymbol && typeOfSymbol.symbol && Array.isArray(typeOfSymbol.symbol.declarations)) {
+            let declarationFromSymbol = typeOfSymbol.symbol.declarations[0];
+            //TODO: encountered in @types/express, need to work on a separate test case
+            let uidContext = (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent)) ?
+                declarationFromSymbol.parent : declarationFromSymbol;
+            uid = this.exportContext.getUID(uidContext);
+        }
+        return uid;
+    }
+
+    private createTypeReferenceFromSymbol(declaration: ts.Declaration | null): ReferenceEntity | null {
+        if (declaration == null) {
+            return null;
+        }
+        let typeReference: ReferenceEntity | null = null;
+        if (ts.isImportSpecifier(declaration)) {
+            let uid = this.createUid(declaration.name);
+            if (uid) {
+                typeReference = this.astFactory.createReferenceEntity(uid);
+            }
+        } else {
+            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+        }
+
+        return typeReference;
+    }
+
     convertType(type: ts.TypeNode | undefined): TypeDeclaration {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
@@ -375,19 +449,7 @@ export class AstConverter {
                                 return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
                             }
 
-                            if (ts.isImportSpecifier(declaration)) {
-                                let typeOsSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
-                                if (typeOsSymbol && typeOsSymbol.symbol && Array.isArray(typeOsSymbol.symbol.declarations)) {
-                                    let declarationFromSymbol = typeOsSymbol.symbol.declarations[0];
-                                    //TODO: encountered in @types/express, need to work on a separate test case
-                                    let uidContext =  (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent))?
-                                                            declarationFromSymbol.parent : declarationFromSymbol;
-                                    typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(uidContext));
-                                }
-                            } else {
-                                typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
-                            }
-
+                            typeReference = this.createTypeReferenceFromSymbol(declaration);
                         }
                     }
                 }
@@ -673,6 +735,18 @@ export class AstConverter {
         return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
     }
 
+    private getFirstDeclaration(symbol: ts.Symbol | null): ts.Declaration | null  {
+        if (symbol == null) {
+            return null;
+        }
+
+        if (Array.isArray(symbol.declarations)) {
+            return symbol.declarations[0];
+        }
+
+        return null;
+    }
+
     convertHeritageClauses(heritageClauses: ts.NodeArray<ts.HeritageClause> | undefined, parent: ts.Node): Array<HeritageClauseDeclaration> {
         let parentEntities: Array<HeritageClauseDeclaration> = [];
 
@@ -699,23 +773,14 @@ export class AstConverter {
                         name = this.astFactory.createIdentifierDeclarationAsNameEntity(expression.getText());
                     }
 
-                    let uid: string | null = null;
-
                     let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
-                    if (symbol) {
-                        if (Array.isArray(symbol.declarations)) {
-                            let declaration = symbol.declarations[0];
-                            if (declaration) {
-                                this.astVisitor.visitType(declaration);
-                                uid = this.exportContext.getUID(declaration);
-                            }
-                        }
+                    let declaration = this.getFirstDeclaration(symbol);
+                    if (declaration) {
+                        this.astVisitor.visitType(declaration);
                     }
 
-                    let parentUid = this.exportContext.getUID(parent);
-
-                    if (parentUid != uid) {
-                        let typeReference = uid ? this.astFactory.createReferenceEntity(uid) : null;
+                    if (declaration != parent) {
+                        let typeReference = this.createTypeReferenceFromSymbol(declaration);
 
                         if (name) {
                             this.registerDeclaration(
@@ -966,11 +1031,13 @@ export class AstConverter {
             let uid = this.exportContext.getUID(module);
             let sourceNameFragment = this.resolveAmbientModuleName(module);
 
+            let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
+            let imports = this.getImports(module.getSourceFile());
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements, resourceName);
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment), moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment), this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations

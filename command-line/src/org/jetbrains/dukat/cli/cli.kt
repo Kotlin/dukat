@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
+import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
@@ -43,22 +44,37 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-fun translateBinaryBundle(input: ByteArray, outDir: String?, lowerer: ECMAScriptLowerer, pathToReport: String?) {
+fun translateBinaryBundle(
+        input: ByteArray,
+        outDir: String?,
+        lowerer: ECMAScriptLowerer,
+        pathToReport: String?,
+        generateDescriptors: Boolean
+) {
     val translator = JsRuntimeByteArrayTranslator(lowerer)
-    val translatedUnits = translateModule(input, translator)
-    compileUnits(translatedUnits, outDir, pathToReport)
+    if (!generateDescriptors) {
+        val translatedUnits = translateModule(input, translator)
+        compileUnits(translatedUnits, outDir, pathToReport)
+    } else {
+        writeDescriptorsToFile(translator, input, outDir ?: "./")
+    }
 }
 
-fun translateTSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
-    translateBinaryBundle(input, outDir, TypescriptLowerer(moduleNameResolver), pathToReport)
+fun translateTSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?, generateDescriptors: Boolean) {
+    translateBinaryBundle(input, outDir, TypescriptLowerer(moduleNameResolver), pathToReport, generateDescriptors)
 }
 
-fun translateJSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?) {
-    translateBinaryBundle(input, outDir, JavaScriptLowerer(moduleNameResolver), pathToReport)
+fun translateJSBinaryBundle(input: ByteArray, outDir: String?, moduleNameResolver: ModuleNameResolver, pathToReport: String?, generateDescriptors: Boolean) {
+    translateBinaryBundle(input, outDir, JavaScriptLowerer(moduleNameResolver), pathToReport, generateDescriptors)
 }
 
-private fun compile(filenames: List<String>, outDir: String?, translator: InputTranslator<String>, pathToReport: String?) {
-    val translatedUnits: List<TranslationUnitResult> =  filenames.flatMap { filename ->
+private fun compile(
+        filenames: List<String>,
+        outDir: String?,
+        translator: InputTranslator<String>,
+        pathToReport: String?
+) {
+    val translatedUnits: List<TranslationUnitResult> = filenames.flatMap { filename ->
         val sourceFile = File(filename)
 
         translateModule(sourceFile.absolutePath, translator)
@@ -131,7 +147,8 @@ fun Iterator<String>.readArg(): String? {
 }
 
 private fun printUsage(program: String) {
-    println("""
+    println(
+        """
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
@@ -139,17 +156,19 @@ where possible options include:
     -m  String                      use this value as @file:JsModule annotation value whenever such annotation occurs
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -v, -version                    print version
-""".trimIndent())
+""".trimIndent()
+    )
 }
 
 
 private data class CliOptions(
-        val sources: List<String>,
-        val outDir: String?,
-        val basePackageName: NameEntity,
-        val jsModuleName: String?,
-        val reportPath: String?,
-        val tsDefaultLib: String
+    val sources: List<String>,
+    val outDir: String?,
+    val basePackageName: NameEntity,
+    val jsModuleName: String?,
+    val reportPath: String?,
+    val tsDefaultLib: String,
+    val generateDescriptors: Boolean
 )
 
 
@@ -165,11 +184,16 @@ private fun process(args: List<String>): CliOptions? {
     var basePackageName: NameEntity = ROOT_PACKAGENAME
     var jsModuleName: String? = null
     var reportPath: String? = null
+    var generateDescriptors = false
+
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
         when (arg) {
             "--always-fail" -> {
                 setPanicMode(PanicMode.ALWAYS_FAIL)
+            }
+            "--descriptors" -> {
+                generateDescriptors = true
             }
             "-d" -> {
                 val outDirArg = argsIterator.readArg()
@@ -225,12 +249,14 @@ private fun process(args: List<String>): CliOptions? {
                     sources.add(arg)
                 }
                 else -> {
-                    printError("""
+                    printError(
+                        """
 following file extensions are supported:
     *.d.ts - for TypeScript declarations
     *.js - for JavaScript files
     *.idl, *.webidl - for Web IDL declarations                            
-                """.trimIndent())
+                """.trimIndent()
+                    )
                     return null
                 }
             }
@@ -239,7 +265,7 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
-    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib)
+    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors)
 }
 
 fun main(vararg args: String) {
@@ -274,7 +300,8 @@ fun main(vararg args: String) {
                         System.`in`.readBytes(),
                         options.outDir,
                         moduleResolver,
-                        options.reportPath
+                        options.reportPath,
+                        options.generateDescriptors
                 )
             }
 
@@ -283,11 +310,12 @@ fun main(vararg args: String) {
                         System.`in`.readBytes(),
                         options.outDir,
                         moduleResolver,
-                        options.reportPath
+                        options.reportPath,
+                        options.generateDescriptors
                 )
             }
 
-            isIdlTranslation-> {
+            isIdlTranslation -> {
                 compile(
                         options.sources,
                         options.outDir,

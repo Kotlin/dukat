@@ -255,7 +255,8 @@ test {
             "dukat.test.extended",
             "dukat.test.extended.topn",
             "dukat.test.cli",
-            "dukat.test.failure.always"
+            "dukat.test.failure.always",
+            "dukat.test.descriptorCompilation"
     ].forEach { String projectProperty ->
         if (project.hasProperty(projectProperty)) {
             systemProperty(projectProperty, "true")

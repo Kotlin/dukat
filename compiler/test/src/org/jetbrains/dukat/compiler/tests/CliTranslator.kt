@@ -24,44 +24,50 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
             dirName: String,
             reportPath: String?,
             lowerer: ECMAScriptLowerer,
-            useStdLib: Boolean
+            useStdLib: Boolean,
+            withDescriptors: Boolean
     ) {
         val binData = CliHttpClient("8090").translate(input, useStdLib)
 
-        translateBinaryBundle(binData, dirName, lowerer, reportPath)
+        translateBinaryBundle(binData, dirName, lowerer, reportPath, withDescriptors)
     }
 
     fun translateTS(
             input: String,
             dirName: String,
             reportPath: String? = null,
-            moduleName: String? = null
+            moduleName: String? = null,
+            withDescriptors: Boolean = false
     ) = translate(
             input,
             dirName,
             reportPath,
             TypescriptLowerer(getModuleNameResolver(moduleName)),
-            true
+            true,
+            withDescriptors
     )
 
     fun translateJS(
             input: String,
             dirName: String,
             reportPath: String? = null,
-            moduleName: String? = null
+            moduleName: String? = null,
+            withDescriptors: Boolean = false
     ) = translate(
             input,
             dirName,
             reportPath,
             JavaScriptLowerer(getModuleNameResolver(moduleName)),
-            false
+            false,
+            withDescriptors
     )
 }
 
 
+@UseExperimental(UnstableDefault::class)
 fun createStandardCliTranslator(): CliTranslator {
     return CliTranslator(
-            NodeResolver("../node-package/build/env.json"),
-            "../node-package/build/distrib/bin/dukat-cli.js"
+        NodeResolver("../node-package/build/env.json"),
+        "../node-package/build/distrib/bin/dukat-cli.js"
     )
 }

@@ -32,7 +32,6 @@ let cache = new DocumentCache();
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private libDeclarations = new Map<string, Array<Declaration>>();
-  private fileDeclarationCache = new Map<string, SourceFileDeclaration>();
 
   constructor(
     private stdLib: string
@@ -107,6 +106,7 @@ class SourceBundleBuilder {
       libFiles.push(this.astFactory.createSourceFileDeclaration(
         resourceName, this.astFactory.createModuleDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+          [],
           declarations,
           [],
           [],

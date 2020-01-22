@@ -56,7 +56,7 @@ private class TypeVisitor(private val name: NameEntity, private val importContex
                 val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != fqName) }
                 if ((conflictingImport != null) && (fqName.isTopLevelImport())) {
                     val alias = IdentifierEntity(fqName.translate().replace(".", "_"))
-                    resolvedImports.add(ImportModel(fqName, alias.value))
+                    resolvedImports.add(ImportModel(fqName, alias))
                     ownerContext.copy(node = node.copy(value = alias))
                 } else null
             }
