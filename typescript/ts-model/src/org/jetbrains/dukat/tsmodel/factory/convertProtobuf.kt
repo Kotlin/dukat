@@ -58,7 +58,7 @@ import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclarati
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
-import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifier
+import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifierDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamedImportsDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamespaceImportDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -243,7 +243,7 @@ private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration 
 private fun ImportClauseDeclarationProto.convert(): ImportDeclaration? {
     return when {
         hasNamespaceImport() -> NamespaceImportDeclaration(namespaceImport.name)
-        hasNamedImports() -> NamedImportsDeclaration(namedImports.importSpecifiersList.map { ImportSpecifier(it.name, it.propertyName) })
+        hasNamedImports() -> NamedImportsDeclaration(namedImports.importSpecifiersList.map { ImportSpecifierDeclaration(it.name, it.propertyName, it.uid) })
         else -> null
     }?.let { clause ->
         ImportDeclaration(clause, referencedFile)
