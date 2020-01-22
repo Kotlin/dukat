@@ -22,7 +22,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -70,7 +70,6 @@ import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices.builtIns
 import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.name.FqName
@@ -122,9 +121,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 
     private fun findClassInStdlib(typeModel: TypeValueModel): ClassDescriptor? {
         val packageNames = context.registeredImports.map { FqName(it) }
-        val stdlibModule = context.config.moduleDescriptors.first { it.name == Name.special("<kotlin>") }
         return (packageNames + FqName("kotlin") + FqName("kotlin.collections")).map { packageName ->
-            val packageDescriptor = stdlibModule.getPackage(packageName)
+            val packageDescriptor = context.stdlibModule.getPackage(packageName)
             packageDescriptor.fragments.mapNotNull { fragment ->
                 fragment.getMemberScope().getContributedClassifier(
                     Name.identifier(translateName(typeModel.value)),
@@ -137,7 +135,25 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun findClass(typeModel: TypeValueModel): ClassDescriptor? {
         return context.getDescriptor(typeModel.fqName ?: IdentifierEntity("<ROOT>").appendLeft(typeModel.value))
             ?: when (translateName(typeModel.value)) {
-                "@@None" -> builtIns.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
+                "@@None" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
+                "Any" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.any.toSafe())
+                "Array" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.array.toSafe())
+                "Boolean" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._boolean.toSafe())
+                "Byte" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._byte.toSafe())
+                "Char" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._char.toSafe())
+                "Double" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._double.toSafe())
+                "Enum" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._enum.toSafe())
+                "Float" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._float.toSafe())
+                "Function" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.functionSupertype.toSafe())
+                "Int" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._int.toSafe())
+                "Long" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._long.toSafe())
+                "List" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.list)
+                "Nothing" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.nothing.toSafe())
+                "Number" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.number.toSafe())
+                "Short" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES._short.toSafe())
+                "String" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.string.toSafe())
+                "Suppress" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.suppress)
+                "Unit" -> DefaultBuiltIns.Instance.getBuiltInClassByFqName(FQ_NAMES.unit.toSafe())
                 else -> findClassInStdlib(typeModel)
             }
     }
@@ -206,7 +222,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         val classDescriptor = findClass(typeModel)
                         if (classDescriptor == null) {
                             if (typeModel.value == IdentifierEntity("dynamic")) {
-                                createDynamicType(builtIns)
+                                createDynamicType(DefaultBuiltIns.Instance)
                             } else {
                                 ErrorUtils.createErrorType(translateName(typeModel.value))
                                     .makeNullableAsSpecified(typeModel.nullable)
@@ -231,7 +247,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             val returnType = translateType(typeModel.type, shouldExpand)
             return LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
                 createFunctionType(
-                    builtIns = builtIns,
+                    builtIns = DefaultBuiltIns.Instance,
                     annotations = Annotations.EMPTY,
                     receiverType = null,
                     parameterTypes = parameterTypes,
@@ -253,9 +269,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             val type = translateType(parameter.type)
             val outType = LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
                 if (parameter.vararg) {
-                    builtIns.getPrimitiveArrayKotlinTypeByPrimitiveKotlinType(
+                    DefaultBuiltIns.Instance.getPrimitiveArrayKotlinTypeByPrimitiveKotlinType(
                         type
-                    ) ?: builtIns.getArrayType(Variance.OUT_VARIANCE, type)
+                    ) ?: DefaultBuiltIns.Instance.getArrayType(Variance.OUT_VARIANCE, type)
                 } else {
                     type
                 }
@@ -1071,7 +1087,7 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
                         null
                     } else {
                         expandTypeAlias(
-                            DescriptorContext(context.config),
+                            context,
                             key,
                             (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
                             it.arguments
@@ -1104,7 +1120,7 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
                             null
                         } else {
                             expandTypeAlias(
-                                DescriptorContext(context.config),
+                                context,
                                 key,
                                 (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
                                 it.arguments
@@ -1125,45 +1141,51 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
     context.addResolved(classDescriptor)
 }
 
-fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
+fun SourceBundleModel.translateToDescriptors(): ModuleDescriptor {
 
     val moduleDescriptor = ModuleDescriptorImpl(
         Name.special("<main>"),
         LockBasedStorageManager.NO_LOCKS,
         DefaultBuiltIns.Instance
     )
-
-    val context = DescriptorContext(generateJSConfig())
+    val context = DescriptorContext()
     val translator = DescriptorTranslator(context)
+    try {
+        val fragments = sources.flatMap { it.sources }.map {
+            translator.translateModule(
+                it.root,
+                moduleDescriptor
+            )
+        }
 
-    val fragments = sources.map {
-        translator.translateModule(
-            it.root,
-            moduleDescriptor
+        val namesToAdd = fragments.flatMap { computeAllParents(it.fqName) }.distinct() - fragments.map { it.fqName }
+
+        val provider =
+            PackageFragmentProviderImpl(fragments + namesToAdd.map {
+                EmptyPackageFragmentDescriptor(
+                    moduleDescriptor,
+                    it
+                )
+            })
+
+        moduleDescriptor.setDependencies(
+            ModuleDependenciesImpl(
+                listOf(moduleDescriptor) + DefaultBuiltIns.Instance.builtInsModule,
+                setOf(),
+                listOf()
+            )
         )
+        moduleDescriptor.initialize(provider)
+        sources.flatMap { it.sources }.forEach { sourceFile ->
+            moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
+                .fragments.forEach { it.getMemberScope() }
+        }
+
+        context.initializeConstraints()
+
+        context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
+    } finally {
+        context.destroyConfigContext()
     }
-
-    val namesToAdd = fragments.flatMap { computeAllParents(it.fqName) }.distinct() - fragments.map { it.fqName }
-
-    val provider =
-        PackageFragmentProviderImpl(fragments + namesToAdd.map { EmptyPackageFragmentDescriptor(moduleDescriptor, it) })
-
-    moduleDescriptor.setDependencies(
-        ModuleDependenciesImpl(
-            listOf(moduleDescriptor) + builtIns.builtInsModule,
-            setOf(),
-            listOf()
-        )
-    )
-    moduleDescriptor.initialize(provider)
-    sources.forEach { sourceFile ->
-        moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
-            .fragments.forEach { it.getMemberScope() }
-    }
-
-    context.initializeConstraints()
-
-    context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
-
     return moduleDescriptor
 }

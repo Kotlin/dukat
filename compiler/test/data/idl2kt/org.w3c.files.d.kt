@@ -35,6 +35,7 @@ public external interface BlobPropertyBag {
         set(value) = definedExternally
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun BlobPropertyBag(type: String? = ""): BlobPropertyBag {
     val o = js("({})")
@@ -56,6 +57,7 @@ public external interface FilePropertyBag : BlobPropertyBag {
         set(value) = definedExternally
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun FilePropertyBag(lastModified: Int? = undefined, type: String? = ""): FilePropertyBag {
     val o = js("({})")
@@ -71,6 +73,7 @@ public external abstract class FileList : ItemArrayLike<File> {
     override fun item(index: Int): File?
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline operator fun FileList.get(index: Int): File? = asDynamic()[index]
 

@@ -6,7 +6,7 @@ interface Foo {
 
 interface Boo extends Foo {
     bar();
-    bar(a:number);
-    bar(a: string);
+    bar(b:number);
+    bar(c: string);
     baz: number
 }

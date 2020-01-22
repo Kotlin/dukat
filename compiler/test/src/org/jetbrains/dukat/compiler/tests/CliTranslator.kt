@@ -11,10 +11,11 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 class CliTranslator(private val nodeResolver: NodeResolver, private val translatorPath: String) {
 
     fun translate(
-            input: String,
-            dirName: String,
-            reportPath: String? = null,
-            moduleName: String? = null
+        input: String,
+        dirName: String,
+        reportPath: String? = null,
+        moduleName: String? = null,
+        withDescriptors: Boolean = false
     ) {
         val binData = CliHttpClient("8090").translate(input)
 
@@ -24,14 +25,15 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binData, dirName, moduleNameResolver, reportPath)
+        translateBinaryBundle(binData, dirName, moduleNameResolver, reportPath, withDescriptors)
     }
 }
 
 
+@UseExperimental(UnstableDefault::class)
 fun createStandardCliTranslator(): CliTranslator {
     return CliTranslator(
-            NodeResolver("../node-package/build/env.json"),
-            "../node-package/build/distrib/bin/dukat-cli.js"
+        NodeResolver("../node-package/build/env.json"),
+        "../node-package/build/distrib/bin/dukat-cli.js"
     )
 }

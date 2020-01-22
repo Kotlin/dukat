@@ -47,6 +47,11 @@ where possible options include:
 
 # Recent Changes
 
+### [0.0.25] - 15'January, 2020
+ - Minimal CLI support for compiling binary descriptors (this one so far is for dev purposed)
+ - Some overrides in Typescript are not treated as such in Kotlin, so we have to add reintroduce them to the descendant classes
+ - Filter out all class parents except the very first one for classes    
+
 ### [0.0.24] - 05'December, 2019
  - [In some cases](https://github.com/Kotlin/dukat/commit/041883a44448d6a591b1a922a9fb5a313cf16f2b) @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE") was missing.
  - Mutliple escaping issues fixes.

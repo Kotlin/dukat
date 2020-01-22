@@ -20,6 +20,7 @@ public external interface B {
         set(value) = definedExternally
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun B(a: Boolean? = true, b: Boolean? = false): B {
     val o = js("({})")
