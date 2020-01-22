@@ -30,4 +30,4 @@ external interface `T$1` {
         set(value) = definedExternally
 }
 
-external fun generateVector(vectorProvider: (`0`: Any? /* = null */, `1`: Any? /* = null */, `2`: Any? /* = null */) -> dynamic): `T$1`
+external fun generateVector(vectorProvider: (`0`: Number, `1`: Number, `2`: Number) -> dynamic): `T$1`

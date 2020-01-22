@@ -15,4 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun runOperation(numA: Number, numB: Number, operation: (`0`: Any? /* = null */, `1`: Any? /* = null */) -> Number): Number
+external fun runOperation(numA: Number, numB: Number, operation: (`0`: Number, `1`: Number) -> Number): Number

@@ -178,19 +178,19 @@ fun CallExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: P
     var callResultConstraint: Constraint = CallResultConstraint(owner, callTargetConstraints)
     val argumentConstraints = arguments.map { it.calculateConstraints(owner, path) }
 
-    argumentConstraints.forEachIndexed { argumentNumber, arg ->
-        arg += CallArgumentConstraint(
-                owner,
-                callTargetConstraints,
-                argumentNumber
-        )
-    }
-
     if (callTargetConstraints is CompositeConstraint) {
         callResultConstraint = CompositeConstraint(owner)
 
         //TODO add arguments to CallableConstraint
-        callTargetConstraints += CallableConstraint(argumentConstraints.size, callResultConstraint)
+        callTargetConstraints += CallableConstraint(argumentConstraints, callResultConstraint)
+    } else {
+        argumentConstraints.forEachIndexed { argumentNumber, arg ->
+            arg += CallArgumentConstraint(
+                    owner,
+                    callTargetConstraints,
+                    argumentNumber
+            )
+        }
     }
 
     return callResultConstraint
