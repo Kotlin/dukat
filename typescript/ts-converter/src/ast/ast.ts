@@ -9,8 +9,8 @@ import {
     ExpressionDeclarationProto,
     FunctionDeclarationProto,
     HeritageClauseDeclarationProto,
-    IdentifierDeclarationProto,
-    ImportEqualsDeclarationProto,
+    IdentifierDeclarationProto, ImportClauseDeclarationProto,
+    ImportEqualsDeclarationProto, ImportSpecifierDeclarationProto,
     IndexSignatureDeclarationProto,
     InterfaceDeclarationProto,
     LiteralExpressionDeclarationProto,
@@ -18,6 +18,7 @@ import {
     ModifierDeclarationProto,
     ModuleDeclarationProto,
     NameDeclarationProto,
+    NamespaceImportDeclarationProto,
     ParameterDeclarationProto,
     ParameterValueDeclarationProto,
     PropertyDeclarationProto,
@@ -44,6 +45,9 @@ export type Expression = ExpressionDeclarationProto;
 export type FunctionDeclaration = FunctionDeclarationProto;
 export type HeritageClauseDeclaration = HeritageClauseDeclarationProto;
 export type IdentifierDeclaration = IdentifierDeclarationProto;
+export type ImportClauseDeclaration = ImportClauseDeclarationProto;
+export type NamespaceImportDeclaration = NamespaceImportDeclarationProto;
+export type ImportSpecifierDeclaration = ImportSpecifierDeclarationProto;
 export type ImportEqualsDeclaration = ImportEqualsDeclarationProto;
 export type IndexSignatureDeclaration = IndexSignatureDeclarationProto;
 export type InterfaceDeclaration = InterfaceDeclarationProto;

@@ -29,24 +29,33 @@ private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 
 private val RESERVED_WORDS = setOf(
         "as",
+        "break",
         "class",
+        "continue",
+        "do",
+        "else",
+        "false",
         "for",
         "fun",
+        "if",
         "in",
         "interface",
-        "in",
         "is",
+        "null",
         "object",
         "package",
         "return",
+        "super",
         "this",
         "throw",
+        "true",
         "try",
         "typealias",
         "typeof",
         "val",
         "var",
-        "when"
+        "when",
+        "while"
 )
 
 private val RENAME_PARAM_MAP = mapOf(

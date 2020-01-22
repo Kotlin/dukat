@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.compiler.tests.httpService
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
@@ -34,6 +35,7 @@ class CliHttpClient(private val port: String) {
         } while (pingStatus() != 200 || count > 10)
     }
 
+    @UseExperimental(UnstableDefault::class)
     fun translate(fileName: String): ByteArray {
         val url = URL("http://localhost:${port}/dukat")
         val connection = url.openConnection() as HttpURLConnection
@@ -54,8 +56,14 @@ class CliHttpClient(private val port: String) {
         val outputStream = DataOutputStream(connection.outputStream)
         outputStream.write(postBody)
         outputStream.flush()
+        outputStream.close()
 
-        return connection.inputStream.readBytes()
+        val result = connection.inputStream.readBytes()
+
+        connection.inputStream.close()
+        connection.disconnect()
+
+        return result
     }
 }
 

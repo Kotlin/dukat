@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 import java.util.*
 
-class DescriptorContext(val config: JsConfig) {
+class DescriptorContext {
 
     var currentPackageName: NameEntity = IdentifierEntity("")
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
@@ -29,6 +30,19 @@ class DescriptorContext(val config: JsConfig) {
     private val alreadyResolvedClasses: MutableSet<ClassDescriptor> = mutableSetOf()
     private val constraintToInitialize: MutableMap<TypeParameterDescriptorImpl, MutableList<KotlinType>> =
         mutableMapOf()
+
+    private var configContext: ConfigContext? = null
+
+    fun destroyConfigContext() {
+        if (configContext != null) {
+            configContext!!.destroy()
+        }
+    }
+
+    val stdlibModule: ModuleDescriptor by lazy {
+        configContext = ConfigContext()
+        configContext!!.stdlibModule
+    }
 
     fun registerMethod(methodFqName: NameEntity, methodDescriptor: SimpleFunctionDescriptor) {
         registeredMethods[methodFqName] = methodDescriptor

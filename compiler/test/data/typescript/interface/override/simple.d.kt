@@ -23,7 +23,7 @@ external interface Foo {
 
 external interface Boo : Foo {
     override fun bar()
-    override fun bar(a: Number)
-    fun bar(a: String)
+    override fun bar(b: Number)
+    fun bar(c: String)
     override var baz: Number
 }

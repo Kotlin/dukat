@@ -4,6 +4,7 @@ public external abstract class A : D, UnionAOrBOrC
 
 public external interface B : D, UnionAOrBOrC
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun B(): B {
     val o = js("({})")

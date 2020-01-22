@@ -25,6 +25,7 @@ public external abstract class MediaList : ItemArrayLike<String> {
     override fun item(index: Int): String?
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline operator fun MediaList.get(index: Int): String? = asDynamic()[index]
 
@@ -58,6 +59,7 @@ public external abstract class StyleSheetList : ItemArrayLike<StyleSheet> {
     override fun item(index: Int): StyleSheet?
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynamic()[index]
 
@@ -76,6 +78,7 @@ public external abstract class CSSRuleList : ItemArrayLike<CSSRule> {
     override fun item(index: Int): CSSRule?
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline operator fun CSSRuleList.get(index: Int): CSSRule? = asDynamic()[index]
 
@@ -470,6 +473,7 @@ public external abstract class CSSStyleDeclaration : ItemArrayLike<String> {
     override fun item(index: Int): String
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline operator fun CSSStyleDeclaration.get(index: Int): String? = asDynamic()[index]
 

@@ -358,7 +358,7 @@ private fun MemberModel.translate(): List<String> {
 }
 
 private fun ImportModel.translate(): String {
-    return name.translate() + (asAlias?.let{ " as ${it}" } ?: "")
+    return name.translate() + (asAlias?.let{ " as ${it.value}" } ?: "")
 }
 
 private fun PropertyModel.translateSignature(): List<String> {

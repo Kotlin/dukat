@@ -34,7 +34,7 @@ gradle.ext {
   jupiterVersion = "5.5.2"
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
   nodeVersion = "13.5.0"
-  npmVersion = "6.9.0"
+  npmVersion = "6.13.4"
   yarnVersion = "1.17.3"
   nodePluginVersion = "1.3.1"
   defaultTsVersion = "3.5.2"
@@ -47,6 +47,7 @@ gradle.ext {
 include 'ast-common'
 include 'ast-model'
 include 'command-line'
+include 'graphs'
 include 'model-lowerings-common'
 include 'compiler'
 include 'descriptors'
@@ -55,7 +56,6 @@ include 'idl-lowerings'
 include 'idl-models'
 include 'idl-parser'
 include 'idl-reference-resolver'
-include 'interop'
 include 'itertools'
 include 'js-module-statistics'
 include 'js-translator'
@@ -77,6 +77,9 @@ include 'ts-model-proto'
 include 'ts-node-introduction'
 include 'ts-node-lowering'
 include 'ts-translator'
+
+project(':graphs').projectDir = file("$rootDir/abstract/graphs")
+project(':itertools').projectDir = file("$rootDir/abstract/itertools")
 
 project(':idl-declarations').projectDir = file("$rootDir/idl/idl-declarations")
 project(':idl-lowerings').projectDir = file("$rootDir/idl/idl-lowerings")

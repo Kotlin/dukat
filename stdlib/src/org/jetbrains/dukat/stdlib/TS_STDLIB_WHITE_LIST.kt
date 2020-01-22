@@ -3,6 +3,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 
 val TS_STDLIB_WHITE_LIST = setOf(
         IdentifierEntity("TsStdLib_Iterator"),
+        IdentifierEntity("ErrorConstructor"),
         IdentifierEntity("IteratorResult"),
         IdentifierEntity("IterableIterator"),
         IdentifierEntity("WeakMap"),
