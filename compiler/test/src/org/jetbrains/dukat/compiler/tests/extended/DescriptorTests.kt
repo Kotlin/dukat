@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.cli.compileUnits
@@ -63,7 +64,7 @@ class DescriptorTests : OutputTests() {
         compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
         System.setOut(outPrintStream)
 
-        val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
+        val outputModuleDescriptor = SourceBundleModel(listOf(flattenedSourceSet)).translateToDescriptors()
         val expectedModuleDescriptor =
                 generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
 
