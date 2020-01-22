@@ -48,7 +48,7 @@ export class LibraryDeclarationsVisitor {
     }
   }
 
-  process(node: ts.ExpressionWithTypeArguments | ts.TypeNode) {
+  process(node: ts.TypeNode) {
     const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
     if (!shouldNotBeProcessed) {
       this.checkLibReferences(node)

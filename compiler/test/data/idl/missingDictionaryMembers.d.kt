@@ -9,6 +9,7 @@ public external interface A {
         set(value) = definedExternally
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun A(a: Int? = 0, b: Int? = 1): A {
     val o = js("({})")
@@ -26,6 +27,7 @@ public external interface B : A {
         set(value) = definedExternally
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
 public inline fun B(c: Int? = 2, d: Int? = 3, a: Int? = 0, b: Int? = 1): B {
     val o = js("({})")

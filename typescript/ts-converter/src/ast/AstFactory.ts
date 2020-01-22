@@ -20,13 +20,42 @@ import {
   Declaration,
   TypeParameter,
   TypeParamReferenceDeclaration,
-  TypeReferenceDeclaration
+  TypeReferenceDeclaration, ImportClauseDeclaration, ImportSpecifierDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
+import * as ts from "../../.tsdeclarations/typescript";
 
 export class AstFactory implements AstFactory {
 
   private log = createLogger("AstFactory");
+
+  createNamespaceImportClause(name: string): ImportClauseDeclaration {
+    let namespaceClause = new declarations.NamespaceImportDeclarationProto();
+    namespaceClause.setName(name);
+    let importClause = new declarations.ImportClauseDeclarationProto();
+    importClause.setNamespaceimport(namespaceClause);
+    return importClause;
+  }
+
+  createImportSpecifier(name: ts.Identifier, propertyName: ts.Identifier | null, uid: string | null ): ImportSpecifierDeclaration {
+    let importSpecifier = new declarations.ImportSpecifierDeclarationProto();
+    importSpecifier.setName(name.getText());
+    if (propertyName) {
+      importSpecifier.setPropertyname(propertyName.getText());
+    }
+    if (uid) {
+      importSpecifier.setUid(uid);
+    }
+    return importSpecifier;
+  }
+
+  createNamedImportsClause(importSpecifiers: Array<ImportSpecifierDeclaration>): ImportClauseDeclaration {
+    let namedImportClause = new declarations.NamedImportsDeclarationProto();
+    namedImportClause.setImportspecifiersList(importSpecifiers);
+    let importClause = new declarations.ImportClauseDeclarationProto();
+    importClause.setNamedimports(namedImportClause);
+    return importClause;
+  }
 
   createCallSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
     let callSignature = new declarations.CallSignatureDeclarationProto();
@@ -320,8 +349,10 @@ export class AstFactory implements AstFactory {
     return modifierDeclaration;
   }
 
-  createModuleDeclaration(packageName: NameEntity, moduleDeclarations: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
+  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
     let moduleDeclaration = new declarations.ModuleDeclarationProto();
+
+    moduleDeclaration.setImportsList(imports);
     moduleDeclaration.setPackagename(packageName);
     moduleDeclaration.setDeclarationsList(moduleDeclarations);
     moduleDeclaration.setModifiersList(modifiers);
@@ -332,9 +363,7 @@ export class AstFactory implements AstFactory {
     return moduleDeclaration;
   }
 
-  createModuleDeclarationAsTopLevel(packageName: NameEntity, topLevels: Declaration[], modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
-    let module = this.createModuleDeclaration(packageName, topLevels, modifiers, definitionsInfo, uid, resourceName, root);
-
+  createModuleDeclarationAsTopLevel(module: ModuleDeclaration): Declaration {
     let topLevelDeclaration = new declarations.TopLevelDeclarationProto();
     topLevelDeclaration.setModuledeclaration(module);
     return topLevelDeclaration;
