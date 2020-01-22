@@ -25,6 +25,7 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {tsInternals} from "./TsInternals";
+import {ReferenceDeclarationProto} from "declarations";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
@@ -338,7 +339,7 @@ export class AstConverter {
         return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__");
     }
 
-    createTypeDeclaration(value: string, params: Array<TypeDeclaration> = [], typeReference: string | null = null): TypeDeclaration {
+    createTypeDeclaration(value: string, params: Array<TypeDeclaration> = []): TypeDeclaration {
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
     }
 
@@ -402,10 +403,11 @@ export class AstConverter {
         if (ts.isImportSpecifier(declaration)) {
             let uid = this.createUid(declaration.name);
             if (uid) {
-                typeReference = this.astFactory.createReferenceEntity(uid);
+                let origin = declaration.propertyName ? ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT : ReferenceDeclarationProto.ORIGIN.IMPORT;
+                typeReference = this.astFactory.createReferenceEntity(uid, origin);
             }
         } else {
-            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration));
+            typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration), ReferenceDeclarationProto.ORIGIN.IRRELEVANT);
         }
 
         return typeReference;

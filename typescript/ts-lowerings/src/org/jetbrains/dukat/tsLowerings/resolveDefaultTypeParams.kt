@@ -17,7 +17,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 private class ResolveDefaultTypeParams(private val references: Map<String, ClassLikeDeclaration>) : DeclarationTypeLowering {
 
-    private fun resolveParameters(typeReference: ReferenceEntity<ClassLikeDeclaration>?, parameters: List<ParameterValueDeclaration>): List<ParameterValueDeclaration> {
+    private fun resolveParameters(typeReference: ReferenceEntity?, parameters: List<ParameterValueDeclaration>): List<ParameterValueDeclaration> {
         val paramsResolved = parameters.toMutableList()
 
         references[typeReference?.uid]?.let { reference ->
@@ -73,7 +73,7 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
 
     @Suppress("UNCHECKED_CAST")
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
-        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference as ReferenceEntity<ClassLikeDeclaration>?, declaration.params)), owner)
+        return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference, declaration.params)), owner)
     }
 }
 

@@ -23,6 +23,7 @@ import {
   TypeReferenceDeclaration, ImportClauseDeclaration, ImportSpecifierDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
+import {ReferenceDeclarationProto} from "declarations";
 import * as ts from "../../.tsdeclarations/typescript";
 
 export class AstFactory implements AstFactory {
@@ -401,9 +402,10 @@ export class AstFactory implements AstFactory {
     return nameDeclaration;
   }
 
-  createReferenceEntity<T extends Declaration>(uid: string): ReferenceEntity {
+  createReferenceEntity<T extends Declaration>(uid: string, origin: ReferenceDeclarationProto.ORIGINMap[keyof ReferenceDeclarationProto.ORIGINMap]): ReferenceEntity {
     let reference = new declarations.ReferenceDeclarationProto();
     reference.setUid(uid);
+    reference.setOrigin(origin);
     return reference;
   }
 

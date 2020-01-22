@@ -6,7 +6,9 @@ import org.jetbrains.dukat.astModel.ModuleModel
 
 fun ModuleModel.fetchClassLikes(): List<ModelWithOwnerName<ClassLikeModel>> {
     return declarations.filterIsInstance(ClassLikeModel::class.java).map { ModelWithOwnerName(it, name.appendLeft(it.name)) } +
-            submodules.flatMap { submodule -> submodule.fetchClassLikes() }
+            submodules.flatMap { submodule ->
+                submodule.fetchClassLikes()
+            }
 }
 
 fun ModuleModel.fetchModules(): List<ModelWithOwnerName<ModuleModel>> {

@@ -183,6 +183,12 @@ message ImportClauseDeclarationProto {
 
 message ReferenceDeclarationProto {
     string uid = 1;
+    enum ORIGIN {
+        IRRELEVANT = 0;
+        IMPORT = 1;
+        NAMED_IMPORT = 2;
+    }
+    ORIGIN origin = 2;
 }
 
 message StringLiteralExpressionDeclarationProto {

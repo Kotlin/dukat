@@ -8,23 +8,7 @@ import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.WithUidDeclaration
+import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -280,13 +264,13 @@ class GeneratedInterfacesContext {
         val identicalInterface = findIdenticalInterface(interfaceNode)
         return if (identicalInterface == null) {
             myGeneratedInterfaces[name] = interfaceNode
-            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters, ReferenceEntity(interfaceNode.uid))
+            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters, ReferenceDeclaration(interfaceNode.uid))
 
             registeredGeneratedInterfaces.getOrPut(uid) { mutableListOf() }.add(interfaceNode)
 
             referenceNode
         } else {
-            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, identicalInterface.typeParameters, ReferenceEntity(identicalInterface.uid))
+            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, identicalInterface.typeParameters, ReferenceDeclaration(identicalInterface.uid))
         }
     }
 

@@ -5,38 +5,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
-import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
-import org.jetbrains.dukat.tsmodel.EnumDeclaration
-import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
-import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
-import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
-import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
-import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
-import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
+import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -156,8 +125,13 @@ fun ModifierDeclarationProto.convert(): ModifierDeclaration {
     return ModifierDeclaration(token)
 }
 
-fun <T : Entity> ReferenceDeclarationProto.convert(): ReferenceEntity<T> {
-    return ReferenceEntity(uid)
+fun ReferenceDeclarationProto.convert(): ReferenceDeclaration {
+    val origin = when(origin) {
+        ReferenceDeclarationProto.ORIGIN.IMPORT -> ReferenceOriginDeclaration.IMPORT
+        ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT -> ReferenceOriginDeclaration.NAMED_IMPORT
+        else -> ReferenceOriginDeclaration.IRRELEVANT
+    }
+    return ReferenceDeclaration(uid, origin)
 }
 
 fun HeritageClauseDeclarationProto.convert(): HeritageClauseDeclaration {

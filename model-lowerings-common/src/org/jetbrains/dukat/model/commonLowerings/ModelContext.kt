@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -23,6 +24,7 @@ class ModelContext(vararg sourceSetModels: SourceSetModel?) {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
+    private val myNamedImports: MutableMap<NameEntity, NameEntity> = mutableMapOf()
 
     private fun register(vararg sourceSetModels: SourceSetModel?) {
         sourceSetModels.forEach { it?.register() }
@@ -36,6 +38,10 @@ class ModelContext(vararg sourceSetModels: SourceSetModel?) {
     }
 
     private fun ModuleModel.register() {
+        imports.forEach { importModel ->
+            importModel.register()
+        }
+
         for (declaration in declarations) {
             declaration.register(name)
         }
@@ -60,7 +66,13 @@ class ModelContext(vararg sourceSetModels: SourceSetModel?) {
         }
     }
 
-    fun TopLevelModel.register(ownerName: NameEntity) {
+    private fun ImportModel.register() {
+        asAlias?.let {
+            myNamedImports[it] = name
+        }
+    }
+
+    private fun TopLevelModel.register(ownerName: NameEntity) {
         when (this) {
             is ClassLikeModel -> register(ownerName)
             is TypeAliasModel -> registerAlias(this, ownerName)
@@ -114,8 +126,14 @@ class ModelContext(vararg sourceSetModels: SourceSetModel?) {
         }
     }
 
+    private fun resolveImport(name: NameEntity?): ResolvedClassLike<out ClassLikeModel>? {
+        return myNamedImports[name]?.let {
+            resolveInterface(it) ?: resolveClass(it)
+        }
+    }
+
     fun resolve(name: NameEntity?): ResolvedClassLike<out ClassLikeModel>? {
-        return resolveInterface(name) ?: resolveClass(name)
+        return resolveInterface(name) ?: resolveClass(name) ?: resolveImport(name)
     }
 
     private fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {

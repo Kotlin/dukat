@@ -1,14 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -25,19 +18,19 @@ private fun InterfaceNode.convertToTypeSignature(): TypeValueNode? {
     return if (generated) {
         null
     } else {
-        TypeValueNode(name, processTypeParams(typeParameters), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+        TypeValueNode(name, processTypeParams(typeParameters), ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     }
 }
 
 private fun ClassNode.convertToTypeSignature(): TypeValueNode {
-    return TypeValueNode(name, processTypeParams(typeParameters), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+    return TypeValueNode(name, processTypeParams(typeParameters), ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
 }
 
 private fun FunctionNode.convertToTypeSignature(): TypeValueNode {
     val anyNode = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
     val extendReference = extend
     return if (extendReference != null) {
-        TypeValueNode(extendReference.name, emptyList(), ReferenceEntity(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+        TypeValueNode(extendReference.name, emptyList(), ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     } else {
         anyNode
     }

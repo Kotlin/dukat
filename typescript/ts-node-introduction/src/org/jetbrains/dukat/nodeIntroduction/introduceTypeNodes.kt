@@ -1,15 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.TypeParameterNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.convertToNode
-import org.jetbrains.dukat.ast.model.nodes.transform
+import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -30,7 +22,9 @@ private class TypeNodesLowering : ParameterValueLowering {
             is TypeDeclaration -> TypeValueNode(
                     value = declaration.value,
                     params = declaration.params.map { param -> lowerType(param) },
-                    typeReference = declaration.typeReference,
+                    typeReference = declaration.typeReference?.let {
+                        ReferenceNode(it.uid)
+                    },
                     nullable = declaration.nullable,
                     meta = declaration.meta
             )

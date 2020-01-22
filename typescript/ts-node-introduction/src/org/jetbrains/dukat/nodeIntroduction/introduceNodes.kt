@@ -1,32 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
-import org.jetbrains.dukat.ast.model.nodes.ImportNode
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.ParameterNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.convertToNode
+import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -40,26 +15,7 @@ import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
-import org.jetbrains.dukat.tsmodel.EnumDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -181,7 +137,14 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             HeritageNode(
                     name = declaration.name.convert(),
                     typeArguments = declaration.typeArguments,
-                    reference = declaration.typeReference
+                    reference = declaration.typeReference?.let {
+                        val origin = when (it.origin) {
+                            ReferenceOriginDeclaration.IMPORT -> ReferenceOriginNode.IMPORT
+                            ReferenceOriginDeclaration.NAMED_IMPORT -> ReferenceOriginNode.NAMED_IMPORT
+                            else -> ReferenceOriginNode.IRRELEVANT
+                        }
+                        ReferenceNode(it.uid, origin)
+                    }
             )
         }
     }

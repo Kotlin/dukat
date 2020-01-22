@@ -11,7 +11,7 @@ data class TypeValueNode(
         val value: NameEntity,
         val params: List<ParameterValueDeclaration>,
 
-        val typeReference: ReferenceEntity<Declaration>? = null,
+        val typeReference: ReferenceNode? = null,
         override var nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
 ) : TypeNode

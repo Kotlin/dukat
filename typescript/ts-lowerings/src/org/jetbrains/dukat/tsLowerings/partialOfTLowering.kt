@@ -6,17 +6,7 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
-import org.jetbrains.dukat.tsmodel.PropertyDeclaration
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -120,7 +110,7 @@ private class TypeVisitor(
                 classLikeReferences[uid]?.let { (classLike, owner) ->
                     val generatePartialInterface = classLike.generatePartialInterface(owner, heritageClauses)
                     partialReferences.putIfAbsent(uid, generatePartialInterface)
-                    singleTypeParam.copy(value = generatePartialInterface.name, typeReference = ReferenceEntity(generatePartialInterface.uid))
+                    singleTypeParam.copy(value = generatePartialInterface.name, typeReference = ReferenceDeclaration(generatePartialInterface.uid))
                 } ?: typeAny
             } else {
                 typeAny
