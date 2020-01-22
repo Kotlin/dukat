@@ -32,7 +32,7 @@ class CliHttpClient(private val port: String) {
         do {
             Thread.sleep(250)
             count++
-        } while (pingStatus() != 200 || count > 10)
+        } while (pingStatus() != 200 || count < 10)
     }
 
     @UseExperimental(UnstableDefault::class)
