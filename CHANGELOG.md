@@ -1,5 +1,11 @@
 # Changelog
 
+### [0.0.26] - 24'January 2020
+ - [In some cases](https://github.com/Kotlin/dukat/commit/76050f8fd260a470e152fd508fec5bf7523f4bb0) something that is a valid override in typescript is not an override in kotlin, we have to copy overriden method to the descendant class.
+ - [Rename](https://github.com/Kotlin/dukat/commit/f03826e7cb5a86a1e634d9cdb481df56daeeac78) class if it's name clashes with the named import
+ - [Types](https://github.com/Kotlin/dukat/commit/8d1f0515aa998a6c721253a1c1cfc15ffeac5f3d) from optional params are not forcibly converted to nullables
+    Inline extension functions generated from interfaces are unrolled if there're optional params.
+
 ### [0.0.25] - 15'January, 2020
  - Minimal CLI support for compiling binary descriptors (this one so far is for dev purposed)
  - Some overrides in Typescript are not treated as such in Kotlin, so we have to add reintroduce them to the descendant classes

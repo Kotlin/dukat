@@ -47,6 +47,12 @@ where possible options include:
 
 # Recent Changes
 
+### [0.0.26] - 24'January 2020
+ - [In some cases](https://github.com/Kotlin/dukat/commit/76050f8fd260a470e152fd508fec5bf7523f4bb0) something that is a valid override in typescript is not an override in kotlin, we have to copy overriden method to the descendant class.
+ - [Rename](https://github.com/Kotlin/dukat/commit/f03826e7cb5a86a1e634d9cdb481df56daeeac78) class if it's name clashes with the named import
+ - [Types](https://github.com/Kotlin/dukat/commit/8d1f0515aa998a6c721253a1c1cfc15ffeac5f3d) from optional params are not forcibly converted to nullables
+    Inline extension functions generated from interfaces are unrolled if there're optional params.
+
 ### [0.0.25] - 15'January, 2020
  - Minimal CLI support for compiling binary descriptors (this one so far is for dev purposed)
  - Some overrides in Typescript are not treated as such in Kotlin, so we have to add reintroduce them to the descendant classes
@@ -64,17 +70,6 @@ where possible options include:
  - Always add JsNonModule alongside with JsModule.
  - Convert boolean literals to Boolean while converting types.
  - Copy methods generated from unrolled union types to ancestor classes.  
-
-### [0.0.23] - 07'November, 2019
- - equals should have "override" modifier only when param is Any?
- - Resolve file names from namespaced nodejs packages.
- - Correct override resolving for methods with return type.
- - Resolve overrides when return type is generic.
- - Replace ReadonlyArray from ts stdlib with just Array.
- - Preserve TypeParams in unaliased entities in cases when they were lost.
- - Replace entity inherited from a final class (in a Kotlin stdlib sense with alias.
-
-[see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 
 # Useful links
 
