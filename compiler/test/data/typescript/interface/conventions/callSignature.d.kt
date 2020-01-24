@@ -22,6 +22,8 @@ external interface Foo {
     operator fun invoke(n: Number): Boolean
     @nativeInvoke
     operator fun invoke(foo: Foo, s: String): Bar
+    @nativeInvoke
+    operator fun invoke(a: String = definedExternally, b: Number = definedExternally, c: Boolean = definedExternally)
 }
 
 external interface Bar

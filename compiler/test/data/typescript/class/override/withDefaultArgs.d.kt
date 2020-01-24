@@ -17,10 +17,10 @@ import org.w3c.xhr.*
 
 external open class Foo {
     open fun bar(a: Number = definedExternally)
-    open fun baz(a: Any? = definedExternally)
+    open fun baz(a: Any = definedExternally)
 }
 
 external open class Boo : Foo {
     override fun bar(a: Number)
-    override fun baz(a: Any?)
+    override fun baz(a: Any)
 }

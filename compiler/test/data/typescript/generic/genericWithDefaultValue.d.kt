@@ -22,7 +22,7 @@ external interface Chain<T, V> {
 }
 
 external interface ChainOfArrays<T> : Chain<Array<T>, Array<T>> {
-    fun flatten(shallow: Boolean? = definedExternally): Chain<T, T>
+    fun flatten(shallow: Boolean = definedExternally): Chain<T, T>
 }
 
 external interface AsyncResultObjectCallback<T, E> {
@@ -44,4 +44,4 @@ external interface `T$1`<R> {
     operator fun set(key: String, value: R)
 }
 
-external fun <T, R, E> transform(arr: `T$0`<T>, iteratee: (acc: `T$1`<R>, item: T, key: String, callback: (error: E? /* = null */) -> Unit) -> Unit, callback: AsyncResultObjectCallback<T, E>? = definedExternally)
+external fun <T, R, E> transform(arr: `T$0`<T>, iteratee: (acc: `T$1`<R>, item: T, key: String, callback: (error: E) -> Unit) -> Unit, callback: AsyncResultObjectCallback<T, E> = definedExternally)

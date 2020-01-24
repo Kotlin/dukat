@@ -17,7 +17,7 @@ import org.w3c.xhr.*
 
 external interface Fiber {
     var reset: () -> Any
-    var run: (param: Any? /* = null */) -> Any
+    var run: (param: Any) -> Any
     var throwInto: (ex: Any) -> Any
 }
 
@@ -67,4 +67,4 @@ import Fiber
 
 external var current: Fiber
 
-external fun yield(value: Any? = definedExternally): Any
+external fun yield(value: Any = definedExternally): Any

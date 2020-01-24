@@ -21,4 +21,4 @@ external var withOneArgument: (withOutType: Any) -> String
 
 external var withManyArguments: (num: Number, s: String, a: Any) -> Boolean
 
-external var withOptionalArguments: (num: Number? /* = null */, s: String? /* = null */) -> Boolean
+external var withOptionalArguments: (num: Number, s: String) -> Boolean

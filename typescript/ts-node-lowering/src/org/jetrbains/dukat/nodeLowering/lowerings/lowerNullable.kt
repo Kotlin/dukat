@@ -20,8 +20,7 @@ import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 private class LowerNullable : NodeTypeLowering {
 
     override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
-        val type = if (declaration.optional) declaration.type.makeNullable() else declaration.type
-        return declaration.copy(type = lowerType(type))
+        return declaration.copy(type = lowerType(declaration.type))
     }
 
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {

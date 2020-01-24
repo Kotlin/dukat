@@ -22,7 +22,7 @@ external interface Cipher {
     fun getPipable(): Pipable
 }
 
-external fun createCipher(algorithm: String, options: TransformOptions? = definedExternally): Cipher
+external fun createCipher(algorithm: String, options: TransformOptions = definedExternally): Cipher
 
 external fun createComputable(): Computable
 

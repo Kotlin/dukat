@@ -139,10 +139,10 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res += type.translateMeta()
     }
 
-    if (initializer != null) {
-        res += " = ${initializer!!.translate()}"
+    initializer?.let {
+        res += " = ${it.translate()}"
         if (needsMeta) {
-            res += initializer!!.translateMeta()
+            res += it.translateMeta()
         }
     }
 

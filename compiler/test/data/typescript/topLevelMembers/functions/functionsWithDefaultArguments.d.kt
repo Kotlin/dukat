@@ -19,6 +19,6 @@ external fun withOneAny(a: Any = definedExternally): Any
 
 external fun withOneString(s: String = definedExternally): String
 
-external fun withOneStringAndOptional(s: String = definedExternally, settings: JQueryAjaxSettings? = definedExternally): Boolean
+external fun withOneStringAndOptional(s: String = definedExternally, settings: JQueryAjaxSettings = definedExternally): Boolean
 
 external interface JQueryAjaxSettings

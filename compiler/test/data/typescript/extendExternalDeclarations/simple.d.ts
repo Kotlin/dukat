@@ -6,5 +6,6 @@ interface Event {
     [prop: string]: number;
     someField: string;
     optionalField?: any;
+    ping(marker?: String)
     (resourceId:string, hash?:any, callback?:Function): void;
 }

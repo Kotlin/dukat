@@ -19,7 +19,7 @@ external open class BoxStringEvent : BaseEvent {
     override var data: String
     override fun getDelegateTarget(): Box
     override fun getElement(): HTMLElement
-    override fun <T : Shape> transform(shape: T?): T
+    override fun <T : Shape> transform(shape: T): T
     override fun getSortOfEventTarget(): SortOfElement
     override var prop: String
 }

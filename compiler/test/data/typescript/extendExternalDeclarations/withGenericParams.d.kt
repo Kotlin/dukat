@@ -55,11 +55,11 @@ external interface ArrayType<T> : Type {
     var type: Type
     fun untilZeros(buffer: Buffer): `T$0`<T>
     @nativeInvoke
-    operator fun invoke(length: Number? = definedExternally): `T$0`<T>
+    operator fun invoke(length: Number = definedExternally): `T$0`<T>
     @nativeInvoke
-    operator fun invoke(data: Array<Number>, length: Number? = definedExternally): `T$0`<T>
+    operator fun invoke(data: Array<Number>, length: Number = definedExternally): `T$0`<T>
     @nativeInvoke
-    operator fun invoke(data: Buffer, length: Number? = definedExternally): `T$0`<T>
+    operator fun invoke(data: Buffer, length: Number = definedExternally): `T$0`<T>
     @nativeGetter
     operator fun get(prop: String): Number?
     @nativeSetter
@@ -69,5 +69,5 @@ external interface ArrayType<T> : Type {
         get() = definedExternally
         set(value) = definedExternally
     @nativeInvoke
-    operator fun invoke(resourceId: String, hash: Any? = definedExternally, callback: Function<*>? = definedExternally)
+    operator fun invoke(resourceId: String, hash: Any = definedExternally, callback: Function<*> = definedExternally)
 }

@@ -22,7 +22,7 @@ external interface OptionsB : OptionsA
 external interface MyWritableStream {
     fun ping(id: Any)
     fun setOptions(options: OptionsA)
-    fun write(str: String, encoding: String? = definedExternally, cb: ((err: Error?) -> Unit)? = definedExternally): Boolean
+    fun write(str: String, encoding: String = definedExternally, cb: (err: Error?) -> Unit = definedExternally): Boolean
 }
 
 external open class MyStreamWritable : MyWritableStream {
@@ -30,8 +30,8 @@ external open class MyStreamWritable : MyWritableStream {
     override fun ping(id: Any)
     open fun setOptions(options: OptionsB)
     override fun setOptions(options: OptionsA)
-    open fun write(chunk: Any, encoding: String, cb: ((error: Error?) -> Unit)? = definedExternally): Boolean
-    override fun write(str: String, encoding: String?, cb: ((err: Error?) -> Unit)?): Boolean
+    open fun write(chunk: Any, encoding: String, cb: (error: Error?) -> Unit = definedExternally): Boolean
+    override fun write(str: String, encoding: String, cb: (err: Error?) -> Unit): Boolean
 }
 
 external open class MyAbstractWritableStream {

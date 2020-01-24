@@ -28,4 +28,13 @@ inline var Event.someField: String get() = this.asDynamic().someField; set(value
 
 inline var Event.optionalField: Any? get() = this.asDynamic().optionalField; set(value) { this.asDynamic().optionalField = value }
 
-inline operator fun Event.invoke(resourceId: String, hash: Any? = null, callback: Function<*>? = null) { this.asDynamic().invoke(resourceId, hash, callback) }
+/* extending interface from lib.dom.d.ts */
+inline fun Event.ping() { this.asDynamic().ping() }
+
+inline fun Event.ping(marker: String) { this.asDynamic().ping(marker) }
+
+inline operator fun Event.invoke(resourceId: String) { this.asDynamic().invoke(resourceId) }
+
+inline operator fun Event.invoke(resourceId: String, hash: Any) { this.asDynamic().invoke(resourceId, hash) }
+
+inline operator fun Event.invoke(resourceId: String, hash: Any, callback: Function<*>) { this.asDynamic().invoke(resourceId, hash, callback) }

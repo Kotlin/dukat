@@ -27,9 +27,9 @@ external interface BaseEvent {
         set(value) = definedExternally
     fun getDelegateTarget(): Shape
     fun getElement(): Element
-    fun <T : Shape> transform(shape: T? = definedExternally): T
+    fun <T : Shape> transform(shape: T = definedExternally): T
     var prop: Any
-    fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): InvariantBox<Any>
+    fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<Any>
     var thisIsNullable: String?
         get() = definedExternally
         set(value) = definedExternally
@@ -39,9 +39,9 @@ external open class BoxStringEvent : BaseEvent {
     override var data: String
     override fun getDelegateTarget(): Box
     override fun getElement(): HTMLElement
-    override fun <T : Shape> transform(shape: T?): T
+    override fun <T : Shape> transform(shape: T): T
     override var prop: String
-    open fun queryByReturnType(query: String, parameters: Array<Any>? = definedExternally): InvariantBox<String>
+    open fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<String>
 }
 
 external interface NumberEvent : BaseEvent {
@@ -58,9 +58,9 @@ external open class ChildClass : ParentClass {
 }
 
 external interface _Chain<T, V> {
-    fun flatten(shallow: Boolean? = definedExternally): _Chain<Any, Any>
+    fun flatten(shallow: Boolean = definedExternally): _Chain<Any, Any>
 }
 
 external interface _ChainOfArrays<T> : _Chain<Array<T>, Array<T>> {
-    override fun flatten(shallow: Boolean?): _Chain<T, T>
+    override fun flatten(shallow: Boolean): _Chain<T, T>
 }

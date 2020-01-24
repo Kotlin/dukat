@@ -285,6 +285,20 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
         }
     }
 
+    private fun unrollOptionalParams(parameters: List<ParameterDeclaration>): List<List<ParameterNode>> {
+        var (head, optionalTail) = convertParameters(parameters).partition { !it.optional }
+
+        val generatedParams = mutableListOf(head)
+        val tail = mutableListOf<ParameterNode>()
+        while (optionalTail.isNotEmpty()) {
+            tail.add(optionalTail[0].copy(optional = false, initializer = null))
+            optionalTail = optionalTail.drop(1)
+            generatedParams.add(head + tail)
+        }
+
+        return generatedParams
+    }
+
     private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration, originalSource: String): List<TopLevelEntity> {
         val name = interfaceDeclaration.name
         val inlineSourceComment = SimpleCommentEntity("extending interface from $originalSource")
@@ -293,23 +307,25 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             is MethodSignatureDeclaration -> {
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
-                listOf(FunctionNode(
-                        IdentifierEntity(declaration.name),
-                        convertParameters(declaration.parameters),
-                        declaration.type,
-                        convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
-                        mutableListOf(),
-                        null,
-                        true,
-                        true,
-                        false,
-                        ClassLikeReferenceNode(interfaceDeclaration.uid, name, mergeTypeParameters.map { typeParam ->
-                            typeParam.name
-                        }),
-                        FunctionFromMethodSignatureDeclaration(declaration.name, declaration.parameters.map { IdentifierEntity(it.name) }),
-                        "",
-                        inlineSourceComment
-                ))
+                unrollOptionalParams(declaration.parameters).mapIndexed { index, parameters ->
+                    FunctionNode(
+                            IdentifierEntity(declaration.name),
+                            parameters,
+                            declaration.type,
+                            convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
+                            mutableListOf(),
+                            null,
+                            true,
+                            true,
+                            false,
+                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, mergeTypeParameters.map { typeParam ->
+                                typeParam.name
+                            }),
+                            FunctionFromMethodSignatureDeclaration(declaration.name, parameters.map { IdentifierEntity(it.name) }),
+                            "",
+                            if (index == 0) { inlineSourceComment } else null
+                    )
+                }
             }
             is PropertyDeclaration -> listOf(VariableNode(
                     IdentifierEntity(declaration.name),
@@ -361,23 +377,23 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             null
                     )
             )
-            is CallSignatureDeclaration -> listOf(
-                    FunctionNode(
-                            QualifierEntity(name, IdentifierEntity("invoke")),
-                            convertParameters(declaration.parameters),
-                            declaration.type,
-                            emptyList(),
-                            mutableListOf(),
-                            null,
-                            true,
-                            true,
-                            true,
-                            null,
-                            FunctionFromCallSignature(declaration.parameters.map { IdentifierEntity(it.name) }),
-                            "",
-                            null
-                    )
-            )
+            is CallSignatureDeclaration -> unrollOptionalParams(declaration.parameters).map { parameters ->
+                FunctionNode(
+                        QualifierEntity(name, IdentifierEntity("invoke")),
+                        parameters,
+                        declaration.type,
+                        emptyList(),
+                        mutableListOf(),
+                        null,
+                        true,
+                        true,
+                        true,
+                        null,
+                        FunctionFromCallSignature(parameters.map { IdentifierEntity(it.name) }),
+                        "",
+                        null
+                )
+            }
             else -> emptyList()
         }
     }
