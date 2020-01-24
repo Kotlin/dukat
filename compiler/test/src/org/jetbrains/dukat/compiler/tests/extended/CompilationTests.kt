@@ -44,9 +44,9 @@ private class TestsEnded : AfterAllCallback {
     }
 }
 
-private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode)
+private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode, var errorMessage: String?)
 private fun MutableMap<String, ReportData>.getReportFor(reportName: String): ReportData {
-    return getOrPut(reportName) { ReportData(0, 0, 0, ExitCode.OK) }
+    return getOrPut(reportName) { ReportData(0, 0, 0, ExitCode.OK, null) }
 }
 
 private class TiedPrintStream(private val mainStream: PrintStream, private val secondStream: PrintStream) : PrintStream(mainStream) {
@@ -75,10 +75,11 @@ abstract class CompilationTests {
             printStream.println("COMPILATION REPORT ${passed}/${total}")
             val namePadding = reportDataMap.keys.maxBy { it.length }?.length ?: 24
             printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
-            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d"
+            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d\t%100s"
             reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
                 val errorCount = reportData.errorCount
-                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
+                val errorMessage = reportData.errorMessage?.let { it.substringBefore("\n") } ?: ""
+                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount, errorMessage))
             }
             printStream.println("")
             printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
@@ -110,8 +111,12 @@ abstract class CompilationTests {
 
         options.freeArgs = sources
 
-        val messageCollector = CompileMessageCollector { _, _, _ ->
-            reportDataMap.getReportFor(descriptor).errorCount += 1
+        val messageCollector = CompileMessageCollector { errorMessage, _, _ ->
+            val report = reportDataMap.getReportFor(descriptor)
+            report.errorCount += 1
+            if (report.errorMessage == null) {
+                report.errorMessage = errorMessage
+            }
         }
 
         val compilationStarted = System.currentTimeMillis()
