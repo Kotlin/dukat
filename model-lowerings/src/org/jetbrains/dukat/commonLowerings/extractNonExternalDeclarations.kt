@@ -12,16 +12,16 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ExternalEntityRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
 
-    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, moduleModel: ModuleModel): FunctionModel {
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val node = ownerContext.node;
         if (node.inline) {
             println("INLINE YO!!!! ${node}")
         }
-        return super.lowerFunctionModel(ownerContext, moduleModel)
+        return super.lowerFunctionModel(ownerContext, parentModule)
     }
 
     override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
-        if (parentModule.canNotContainTypeAliases()) {
+        if (parentModule.canNotContainExternalEntities()) {
             register(parentModule.name, ownerContext.node)
         }
         return super.lowerTypeAliasModel(ownerContext, parentModule)
@@ -49,14 +49,14 @@ private fun getAliasFiles(aliasBucket: Map<Pair<NameEntity, String>, List<TypeAl
     }
 }
 
-private fun ModuleModel.canNotContainTypeAliases(): Boolean {
+private fun ModuleModel.canNotContainExternalEntities(): Boolean {
     return annotations.any {
         (it.name == "file:JsQualifier") || (it.name == "file:JsModule")
     }
 }
 
 private fun ModuleModel.filterOutTypeAliases(): ModuleModel {
-    return if (canNotContainTypeAliases()) {
+    return if (canNotContainExternalEntities()) {
         copy(
                 declarations = declarations.filterNot { it is TypeAliasModel },
                 submodules = submodules.map { it.filterOutTypeAliases() }
