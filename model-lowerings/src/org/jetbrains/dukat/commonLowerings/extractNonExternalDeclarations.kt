@@ -2,6 +2,7 @@ package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -9,7 +10,15 @@ import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private class TypeAliasRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
+private class ExternalEntityRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
+
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
+        val node = ownerContext.node;
+        if (node.inline) {
+            println("INLINE YO!!!! ${node}")
+        }
+        return super.lowerFunctionModel(ownerContext)
+    }
 
     override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
         if (moduleOwner.canNotContainTypeAliases()) {
@@ -60,7 +69,7 @@ private fun ModuleModel.filterOutTypeAliases(): ModuleModel {
 fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val aliasBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<TypeAliasModel>>()
     sources.forEach { source ->
-        TypeAliasRegistrator { name, node ->
+        ExternalEntityRegistrator { name, node ->
             aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
         }.lowerRoot(source.root, NodeOwner(source.root, null))
     }
