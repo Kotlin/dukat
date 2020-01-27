@@ -11,11 +11,11 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class TypeAliasRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
-        if (moduleOwner.canNotContainTypeAliases()) {
-            register(moduleOwner.name, ownerContext.node)
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
+        if (parentModule.canNotContainTypeAliases()) {
+            register(parentModule.name, ownerContext.node)
         }
-        return super.lowerTypeAliasModel(ownerContext, moduleOwner)
+        return super.lowerTypeAliasModel(ownerContext, parentModule)
     }
 }
 

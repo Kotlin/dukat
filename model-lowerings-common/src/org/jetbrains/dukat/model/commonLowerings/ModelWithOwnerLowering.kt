@@ -20,17 +20,17 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 interface ModelWithOwnerLowering {
-    fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel
-    fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel
+    fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel
+    fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel
-    fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel
-    fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel
-    fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel
+    fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel
+    fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel
+    fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel
 
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
-    fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel
-    fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel
-    fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>): EnumModel
+    fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel
+    fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel
+    fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>, parentModule: ModuleModel): EnumModel
 
     fun lowerTypeParameterModel(ownerContext: NodeOwner<TypeParameterModel>): TypeParameterModel {
         val typeParameterModel = ownerContext.node
@@ -54,29 +54,29 @@ interface ModelWithOwnerLowering {
         }
     }
 
-    fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>): ClassLikeModel {
+    fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>, parentModule: ModuleModel): ClassLikeModel {
         return when (val declaration = ownerContext.node) {
-            is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext))
-            is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext))
+            is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext), parentModule)
+            is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext), parentModule)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
+    fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel {
         return when (val declaration = ownerContext.node) {
-            is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext))
-            is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext))
-            is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext))
-            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext))
-            is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext))
-            is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext), moduleModel)
-            else -> raiseConcern("unknown TopeLevelDeclaration ${declaration}") { declaration }
+            is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext), parentModule)
+            is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext), parentModule)
+            is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext), parentModule)
+            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext), parentModule)
+            is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext), parentModule)
+            is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext), parentModule)
+            else -> raiseConcern("unknown TopLevelDeclaration ${declaration}") { declaration }
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelModel>, ownerContext: NodeOwner<ModuleModel>, moduleModel: ModuleModel): List<TopLevelModel> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelModel>, ownerContext: NodeOwner<ModuleModel>, parentModule: ModuleModel): List<TopLevelModel> {
         return declarations.map { declaration ->
-            lowerTopLevelModel(NodeOwner(declaration, ownerContext), moduleModel)
+            lowerTopLevelModel(NodeOwner(declaration, ownerContext), parentModule)
         }
     }
 

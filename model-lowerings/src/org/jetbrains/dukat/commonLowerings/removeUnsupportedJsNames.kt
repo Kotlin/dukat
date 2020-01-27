@@ -65,7 +65,7 @@ private fun resolveCommonType(members: List<MemberModel>): TypeModel {
 
 private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val declaration = ownerContext.node
         val (unsupportedMembers, supportedMembers) = declaration.members.partition { member ->
             val name = when (member) {
@@ -129,7 +129,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                 members = resolvedMembers
         )
 
-        return super.lowerInterfaceModel(ownerContext.copy(node = declarationLowered))
+        return super.lowerInterfaceModel(ownerContext.copy(node = declarationLowered), parentModule)
     }
 
 }
