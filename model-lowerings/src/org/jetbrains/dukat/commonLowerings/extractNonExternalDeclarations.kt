@@ -56,29 +56,31 @@ private fun ModuleModel.canNotContainExternalEntities(): Boolean {
     }
 }
 
-private fun ModuleModel.filterOutTypeAliases(): ModuleModel {
+private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     return if (canNotContainExternalEntities()) {
         copy(
                 declarations = declarations.filterNot { it is TypeAliasModel },
-                submodules = submodules.map { it.filterOutTypeAliases() }
+                submodules = submodules.map { it.filterOutExternalDeclarations() }
         )
     } else {
-        this.copy(submodules = submodules.map { it.filterOutTypeAliases() })
+        this.copy(submodules = submodules.map { it.filterOutExternalDeclarations() })
     }
 }
 
 fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val aliasBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<TypeAliasModel>>()
+    val functionsBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<FunctionModel>>()
     sources.forEach { source ->
         ExternalEntityRegistrator { name, node ->
             when (node) {
                 is TypeAliasModel -> aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+                is FunctionModel -> if (node.inline) { functionsBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node) }
             }
         }.lowerRoot(source.root, NodeOwner(source.root, null))
     }
 
     val sourcesLowered =
-            getAliasFiles(aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutTypeAliases()) }
+            getAliasFiles(aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
 
     return copy(sources = sourcesLowered)
 }
