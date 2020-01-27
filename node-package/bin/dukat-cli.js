@@ -45,7 +45,7 @@ function createReadable() {
 
 function processArgs(args) {
     var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
-    var ordinary_args = new Set(["--descriptors"])
+    var ordinary_args = new Set(["--descriptors"]);
     var count = 0;
 
     var packageName = "<ROOT>";
