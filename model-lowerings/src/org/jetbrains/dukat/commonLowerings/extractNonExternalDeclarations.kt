@@ -57,7 +57,7 @@ private fun ModuleModel.filterOutTypeAliases(): ModuleModel {
     }
 }
 
-fun SourceSetModel.extractTypeAliases(): SourceSetModel {
+fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val aliasBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<TypeAliasModel>>()
     sources.forEach { source ->
         TypeAliasRegistrator { name, node ->
