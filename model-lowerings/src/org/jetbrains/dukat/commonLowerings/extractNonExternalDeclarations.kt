@@ -12,12 +12,12 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ExternalEntityRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
 
-    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, moduleModel: ModuleModel): FunctionModel {
         val node = ownerContext.node;
         if (node.inline) {
             println("INLINE YO!!!! ${node}")
         }
-        return super.lowerFunctionModel(ownerContext)
+        return super.lowerFunctionModel(ownerContext, moduleModel)
     }
 
     override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
