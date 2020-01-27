@@ -19,7 +19,7 @@ private class ClassContext : ModelWithOwnerTypeLowering {
     private val myModuleClassesMap: MutableMap<NameEntity, MutableList<ClassModel>> = mutableMapOf()
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         myClassMap[ClassKey(ownerContext.node.name, ownerContext.getQualifiedName())] = ownerContext.node
 
         val owner = ownerContext.getOwners().firstOrNull {
@@ -84,7 +84,7 @@ private class MergeModule(private val classContext: ClassContext) : ModelWithOwn
 
 private class IntroduceNestedClasses(private val classContext: ClassContext) : ModelWithOwnerTypeLowering {
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val resolvedClass = classContext.resolve(ownerContext.node.name, ownerContext.getQualifiedName())
         return resolvedClass ?: ownerContext.node
     }

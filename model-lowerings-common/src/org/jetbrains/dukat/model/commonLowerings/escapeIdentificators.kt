@@ -172,17 +172,17 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
         return super.lowerMethodModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())))
     }
 
-    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val declaration = ownerContext.node
         return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape(),
                 body = declaration.body.map { it.escape() }
-        )))
+        )), parentModule)
     }
 
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
         val declaration = ownerContext.node
-        return super.lowerVariableModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())))
+        return super.lowerVariableModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())), parentModule)
     }
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
@@ -192,25 +192,25 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     }
 
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val declaration = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape()
-        )))
+        )), parentModule)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val declaration = ownerContext.node
 
         return super.lowerClassModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape()
-        )))
+        )), parentModule)
     }
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, moduleModel: ModuleModel): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel {
         return when (val declaration = ownerContext.node) {
             is EnumModel -> declaration.copy(values = declaration.values.map { value -> value.copy(value = value.value.escape()) })
-            else -> super.lowerTopLevelModel(ownerContext, moduleModel)
+            else -> super.lowerTopLevelModel(ownerContext, parentModule)
         }
     }
 

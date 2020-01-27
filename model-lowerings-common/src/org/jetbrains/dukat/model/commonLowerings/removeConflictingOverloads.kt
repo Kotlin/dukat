@@ -54,14 +54,14 @@ private fun filterOutConflictingOverloads(members: List<MemberModel>): List<Memb
 
 private class ConflictingOverloads() : ModelWithOwnerTypeLowering {
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
-        return super.lowerInterfaceModel(ownerContext.copy(node = node))
+        return super.lowerInterfaceModel(ownerContext.copy(node = node), parentModule)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
-        return super.lowerClassModel(ownerContext.copy(node = node))
+        return super.lowerClassModel(ownerContext.copy(node = node), parentModule)
     }
 }
 
