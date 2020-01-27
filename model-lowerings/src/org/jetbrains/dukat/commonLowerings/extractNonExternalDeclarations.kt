@@ -6,11 +6,12 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private class ExternalEntityRegistrator(private val register: (NameEntity, TypeAliasModel) -> Unit) : ModelWithOwnerTypeLowering {
+private class ExternalEntityRegistrator(private val register: (NameEntity, TopLevelModel) -> Unit) : ModelWithOwnerTypeLowering {
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val node = ownerContext.node;
@@ -70,7 +71,9 @@ fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val aliasBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<TypeAliasModel>>()
     sources.forEach { source ->
         ExternalEntityRegistrator { name, node ->
-            aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+            when (node) {
+                is TypeAliasModel -> aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+            }
         }.lowerRoot(source.root, NodeOwner(source.root, null))
     }
 
