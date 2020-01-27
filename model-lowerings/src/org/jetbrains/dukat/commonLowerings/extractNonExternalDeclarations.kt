@@ -20,11 +20,11 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TypeA
         return super.lowerFunctionModel(ownerContext)
     }
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
-        if (moduleOwner.canNotContainTypeAliases()) {
-            register(moduleOwner.name, ownerContext.node)
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
+        if (parentModule.canNotContainTypeAliases()) {
+            register(parentModule.name, ownerContext.node)
         }
-        return super.lowerTypeAliasModel(ownerContext, moduleOwner)
+        return super.lowerTypeAliasModel(ownerContext, parentModule)
     }
 }
 

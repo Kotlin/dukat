@@ -17,37 +17,37 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ModifyVisibility(private val visibility: VisibilityModifierModel) : ModelWithOwnerLowering {
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>): FunctionModel {
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>): InterfaceModel {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>): ObjectModel {
+    override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>): EnumModel {
+    override fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>, parentModule: ModuleModel): EnumModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, moduleOwner: ModuleModel): TypeAliasModel {
+    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel = ownerContext.node
 
-    override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>): MemberModel = ownerContext.node
+    override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel = ownerContext.node
     override fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel = ownerContext.node
 }
 
