@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.commonLowerings
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -29,7 +30,7 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
     }
 }
 
-private fun generateDeclarationFiles(declarationsBucket: Map<Pair<NameEntity, String>, List<TopLevelModel>>): List<SourceFileModel> {
+private fun generateDeclarationFiles(id: String, declarationsBucket: Map<Pair<NameEntity, String>, List<TopLevelModel>>): List<SourceFileModel> {
     return declarationsBucket.map { (nameData, aliases) ->
         val (packageName, fileName) = nameData
         SourceFileModel(
@@ -43,7 +44,7 @@ private fun generateDeclarationFiles(declarationsBucket: Map<Pair<NameEntity, St
                         imports = mutableListOf(),
                         comment = null
                 ),
-                name = packageName,
+                name = IdentifierEntity(id),
                 referencedFiles = emptyList()
         )
 
@@ -74,13 +75,15 @@ fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
         ExternalEntityRegistrator { name, node ->
             when (node) {
                 is TypeAliasModel -> aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
-                is FunctionModel -> if (node.inline) { functionsBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node) }
+                is FunctionModel -> if (node.inline) {
+                    functionsBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+                }
             }
         }.lowerRoot(source.root, NodeOwner(source.root, null))
     }
 
     val sourcesLowered =
-            generateDeclarationFiles(aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
+            generateDeclarationFiles("aliases", aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
 
     return copy(sources = sourcesLowered)
 }
