@@ -1,0 +1,3 @@
+interface SomeAPI {
+    pong(): boolean
+}
