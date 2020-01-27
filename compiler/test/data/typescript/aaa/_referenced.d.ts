@@ -1,3 +1,6 @@
-interface SomeAPI {
-    pong(): boolean
+
+declare module "api" {
+    interface SomeAPI {
+        pong(): boolean
+    }
 }
