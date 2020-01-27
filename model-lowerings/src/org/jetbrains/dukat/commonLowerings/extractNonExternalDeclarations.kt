@@ -16,7 +16,7 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val node = ownerContext.node;
         if (node.inline) {
-            println("INLINE YO!!!! ${node}")
+            register(parentModule.name, node)
         }
         return super.lowerFunctionModel(ownerContext, parentModule)
     }
@@ -29,8 +29,8 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
     }
 }
 
-private fun getAliasFiles(aliasBucket: Map<Pair<NameEntity, String>, List<TypeAliasModel>>): List<SourceFileModel> {
-    return aliasBucket.map { (nameData, aliases) ->
+private fun generateDeclarationFiles(declarationsBucket: Map<Pair<NameEntity, String>, List<TopLevelModel>>): List<SourceFileModel> {
+    return declarationsBucket.map { (nameData, aliases) ->
         val (packageName, fileName) = nameData
         SourceFileModel(
                 fileName = fileName,
@@ -59,7 +59,7 @@ private fun ModuleModel.canNotContainExternalEntities(): Boolean {
 private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     return if (canNotContainExternalEntities()) {
         copy(
-                declarations = declarations.filterNot { it is TypeAliasModel },
+                declarations = declarations.filterNot { (it is TypeAliasModel) || ((it is FunctionModel) && (it.inline)) },
                 submodules = submodules.map { it.filterOutExternalDeclarations() }
         )
     } else {
@@ -80,7 +80,7 @@ fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     }
 
     val sourcesLowered =
-            getAliasFiles(aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
+            generateDeclarationFiles(aliasBucket) + generateDeclarationFiles(functionsBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
 
     return copy(sources = sourcesLowered)
 }
