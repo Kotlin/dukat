@@ -30,11 +30,10 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
     }
 }
 
-private fun generateDeclarationFiles(id: String, declarationsBucket: Map<Pair<NameEntity, String>, List<TopLevelModel>>): List<SourceFileModel> {
-    return declarationsBucket.map { (nameData, aliases) ->
-        val (packageName, fileName) = nameData
+private fun generateDeclarationFiles(id: String, declarationsBucket: Map<NameEntity, List<TopLevelModel>>): List<SourceFileModel> {
+    return declarationsBucket.map { (packageName, aliases) ->
         SourceFileModel(
-                fileName = fileName,
+                fileName = "nonDeclarations",
                 root = ModuleModel(
                         name = packageName,
                         shortName = packageName.rightMost(),
@@ -69,14 +68,14 @@ private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
 }
 
 fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
-    val aliasBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<TypeAliasModel>>()
-    val functionsBucket = mutableMapOf<Pair<NameEntity, String>, MutableList<FunctionModel>>()
+    val aliasBucket = mutableMapOf<NameEntity, MutableList<TypeAliasModel>>()
+    val functionsBucket = mutableMapOf<NameEntity, MutableList<FunctionModel>>()
     sources.forEach { source ->
         ExternalEntityRegistrator { name, node ->
             when (node) {
-                is TypeAliasModel -> aliasBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+                is TypeAliasModel -> aliasBucket.getOrPut(name) { mutableListOf() }.add(node)
                 is FunctionModel -> if (node.inline) {
-                    functionsBucket.getOrPut(Pair(name, source.fileName)) { mutableListOf() }.add(node)
+                    functionsBucket.getOrPut(name) { mutableListOf() }.add(node)
                 }
             }
         }.lowerRoot(source.root, NodeOwner(source.root, null))
