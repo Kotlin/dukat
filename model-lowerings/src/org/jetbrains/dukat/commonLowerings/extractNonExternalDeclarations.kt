@@ -16,7 +16,7 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val node = ownerContext.node;
-        if (node.inline) {
+        if (parentModule.canNotContainExternalEntities() && node.inline) {
             register(parentModule.name, node)
         }
         return super.lowerFunctionModel(ownerContext, parentModule)
@@ -59,7 +59,7 @@ private fun ModuleModel.canNotContainExternalEntities(): Boolean {
 private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     return if (canNotContainExternalEntities()) {
         copy(
-                declarations = declarations.filterNot { (it is TypeAliasModel) },
+                declarations = declarations.filterNot { (it is TypeAliasModel) || ((it is FunctionModel) && it.inline) },
                 submodules = submodules.map { it.filterOutExternalDeclarations() }
         )
     } else {
@@ -82,7 +82,7 @@ fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     }
 
     val sourcesLowered =
-            generateDeclarationFiles("aliases", aliasBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
+            generateDeclarationFiles("aliases", aliasBucket) + generateDeclarationFiles("inlined", functionsBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
 
     return copy(sources = sourcesLowered)
 }
