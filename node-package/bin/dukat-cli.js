@@ -51,6 +51,7 @@ function processArgs(args) {
 
     var packageName = "<ROOT>";
     var binaryOutput = null;
+    var stdlib = path.resolve(__dirname, "..", "d.ts.libs/lib.es6.d.ts");
 
     while (count < args.length) {
         var arg = args[count];
@@ -77,6 +78,7 @@ function processArgs(args) {
     }
 
     var res = {
+        stdlib: stdlib,
         binaryOutput: binaryOutput,
         packageName: packageName,
         files: files
@@ -90,10 +92,7 @@ function endsWith(str, postfix) {
 }
 
 
-function createBinaryStream(packageName, files, onData, onEnd) {
-    var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
-    var stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
-
+function createBinaryStream(stdlib, packageName, files, onData, onEnd) {
     var bundle = createBundle(stdlib, packageName, files);
 
     var readable = createReadable();
@@ -135,7 +134,7 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var inputStream = createBinaryStream(argsProcessed.packageName, files);
+        var inputStream = createBinaryStream(argsProcessed.stdlib, argsProcessed.packageName, files);
 
         if (typeof argsProcessed.binaryOutput == "string") {
             inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
