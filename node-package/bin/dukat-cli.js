@@ -44,6 +44,10 @@ function createReadable() {
     return readable
 }
 
+function getStdLib() {
+    return path.resolve(__dirname, "..", "d.ts.libs/lib.es6.d.ts");
+}
+
 function processArgs(args) {
     var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
     var ordinary_args = new Set(["--descriptors"]);
@@ -51,6 +55,7 @@ function processArgs(args) {
 
     var packageName = "<ROOT>";
     var binaryOutput = null;
+    var stdlib = getStdLib();
 
     while (count < args.length) {
         var arg = args[count];
@@ -59,6 +64,9 @@ function processArgs(args) {
             count += 2;
         } else if(arg == "-b") {
             binaryOutput = args[count + 1];
+            count += 2;
+        } else if(arg == "-l") {
+            stdlib = args[count + 1];
             count += 2;
         } else if (skip_2args.has(arg)) {
             count += 2;
@@ -77,6 +85,7 @@ function processArgs(args) {
     }
 
     var res = {
+        stdlib: stdlib,
         binaryOutput: binaryOutput,
         packageName: packageName,
         files: files
@@ -90,10 +99,7 @@ function endsWith(str, postfix) {
 }
 
 
-function createBinaryStream(packageName, files, onData, onEnd) {
-    var DEFAULT_LIB_PATH = "d.ts.libs/lib.es6.d.ts";
-    var stdlib = path.resolve(__dirname, "..", DEFAULT_LIB_PATH);
-
+function createBinaryStream(stdlib, packageName, files, onData, onEnd) {
     var bundle = createBundle(stdlib, packageName, files);
 
     var readable = createReadable();
@@ -135,7 +141,7 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
 
     if (is_ts) {
-        var inputStream = createBinaryStream(argsProcessed.packageName, files);
+        var inputStream = createBinaryStream(argsProcessed.stdlib, argsProcessed.packageName, files);
 
         if (typeof argsProcessed.binaryOutput == "string") {
             inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
@@ -175,3 +181,4 @@ if (require.main === module) {
 
 exports.translate = main;
 exports.createBinaryStream = createBinaryStream;
+exports.getStdLib = getStdLib;

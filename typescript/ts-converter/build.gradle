@@ -61,7 +61,6 @@ task webpack(type: NodeTask) {
   inputs.dir("${project.buildDir}/package/node_modules")
 
   outputs.file("${project.buildDir}/bundle/converter.js")
-  outputs.file("${project.buildDir}/bundle/runtime.js")
 
   script = file(scriptName)
 }

@@ -3,6 +3,7 @@ var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/d
 
 function createServer(port) {
 
+
     var server = http.createServer(function (req, res) {
         if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'text/plain');
@@ -27,6 +28,7 @@ function createServer(port) {
                 try {
                     res.setHeader('Content-Type', 'application/octet-stream');
                     dukatCli.createBinaryStream(
+                        dukatCli.getStdLib(),
                         data.packageName,
                         data.files,
                         onBinaryStreamData,

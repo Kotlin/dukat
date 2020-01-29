@@ -8,7 +8,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 
 
 @UseExperimental(UnstableDefault::class)
-class CliTranslator(private val nodeResolver: NodeResolver, private val translatorPath: String) {
+class CliTranslator() {
 
     fun translate(
         input: String,
@@ -32,8 +32,5 @@ class CliTranslator(private val nodeResolver: NodeResolver, private val translat
 
 @UseExperimental(UnstableDefault::class)
 fun createStandardCliTranslator(): CliTranslator {
-    return CliTranslator(
-        NodeResolver("../node-package/build/env.json"),
-        "../node-package/build/distrib/bin/dukat-cli.js"
-    )
+    return CliTranslator()
 }

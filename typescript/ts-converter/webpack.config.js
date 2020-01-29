@@ -6,9 +6,6 @@ module.exports = {
   entry: {
     "converter": [
       path.resolve("./build/ts/converter.js")
-    ],
-    "runtime": [
-      path.resolve("./build/ts/runtime.js")
     ]
   },
   resolve: {

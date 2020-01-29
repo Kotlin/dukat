@@ -152,7 +152,7 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
 
 
 task generateBinary(type: NodeTask) {
-    def scriptName = "${project(":node-package").buildDir}/distrib/lib/runtime.js"
+    def scriptName = "${project(":node-package").buildDir}/distrib/bin/dukat-cli.js"
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/typescript"
@@ -173,13 +173,13 @@ task generateBinary(type: NodeTask) {
             }
 
     args = [
-            DEFAULT_LIB_PATH,
+            "-b",
             outputFile
     ] + files
 }
 
 task generateJSBinary(type: NodeTask) {
-    def scriptName = "${project(":node-package").buildDir}/distrib/lib/runtime.js"
+    def scriptName = "${project(":node-package").buildDir}/distrib/bin/dukat-cli.js"
     script = file(scriptName)
 
     def declarationsDir = "${project.projectDir}/test/data/javascript"
@@ -200,7 +200,7 @@ task generateJSBinary(type: NodeTask) {
             }
 
     args = [
-            DEFAULT_LIB_PATH,
+            "-b",
             outputFile
     ] + files
 }
