@@ -64,13 +64,6 @@ class CoreSetTests : OutputTests() {
                 translated,
                 File(ktPath).readText().trimEnd()
         )
-
-        val outputDirectory = File("./build/tests/out")
-        translated.let {
-            val outputFile = outputDirectory.resolve(targetShortName)
-            outputFile.parentFile.mkdirs()
-            outputFile.writeText(translated)
-        }
     }
 
 }
