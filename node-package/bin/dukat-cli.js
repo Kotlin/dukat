@@ -3,6 +3,7 @@
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var path = require('path');
+var fs = require('fs');
 
 var createBundle = require("../lib/converter").createBundle;
 var Readable = require('stream').Readable;
@@ -49,7 +50,7 @@ function processArgs(args) {
     var count = 0;
 
     var packageName = "<ROOT>";
-    var binaryOutput = false;
+    var binaryOutput = null;
 
     while (count < args.length) {
         var arg = args[count];
@@ -57,8 +58,8 @@ function processArgs(args) {
             packageName = args[count + 1];
             count += 2;
         } else if(arg == "-b") {
-            binaryOutput = true;
-            count += 1;
+            binaryOutput = args[count + 1];
+            count += 2;
         } else if (skip_2args.has(arg)) {
             count += 2;
         } else if (ordinary_args.has(arg)) {
@@ -136,8 +137,8 @@ function cliMode(args) {
     if (is_ts) {
         var inputStream = createBinaryStream(argsProcessed.packageName, files);
 
-        if (argsProcessed.binaryOutput) {
-            inputStream.pipe(process.stderr);
+        if (typeof argsProcessed.binaryOutput == "string") {
+            inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
             return null;
         }
 
