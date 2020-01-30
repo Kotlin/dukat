@@ -62,7 +62,7 @@ import {
 } from "declarations";
 import * as ts from "../../.tsdeclarations/typescript";
 
-export class AstFactory implements AstFactory {
+export class AstFactory {
 
   private log = createLogger("AstFactory");
 
