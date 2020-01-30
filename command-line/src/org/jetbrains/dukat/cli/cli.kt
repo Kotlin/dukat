@@ -44,10 +44,11 @@ fun translateBinaryBundle(
     input: ByteArray,
     outDir: String?,
     moduleNameResolver: ModuleNameResolver,
+    packageName: NameEntity?,
     pathToReport: String?,
     generateDescriptors: Boolean
 ) {
-    val translator = createJsByteArrayTranslator(moduleNameResolver)
+    val translator = createJsByteArrayTranslator(moduleNameResolver, packageName)
     if (!generateDescriptors) {
         val translatedUnits = translateModule(input, translator)
         compileUnits(translatedUnits, outDir, pathToReport)
@@ -284,6 +285,7 @@ fun main(vararg args: String) {
                     System.`in`.readBytes(),
                     options.outDir,
                     moduleResolver,
+                    options.basePackageName,
                     options.reportPath,
                     options.generateDescriptors
                 )
