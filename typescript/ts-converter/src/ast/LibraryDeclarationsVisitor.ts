@@ -15,7 +15,7 @@ export class LibraryDeclarationsVisitor {
   ]);
 
   constructor(
-    private libDeclarations: Map<string, Array<Declaration>>,
+    private declarations: Map<string, Array<Declaration>>,
     private typeChecker: ts.TypeChecker,
     private libChecker: (node: ts.Node) => boolean,
     private createDeclarations: (node: ts.Node) => Array<Declaration>
@@ -23,26 +23,29 @@ export class LibraryDeclarationsVisitor {
   }
 
   private registerDeclaration(declaration) {
+    if (this.processed.has(declaration)) {
+      return;
+    }
+
+    this.processed.add(declaration);
+
     const sourceName = declaration.getSourceFile().fileName;
 
-    if (!Array.isArray(this.libDeclarations.get(sourceName))) {
-      this.libDeclarations.set(sourceName, []);
+    if (!Array.isArray(this.declarations.get(sourceName))) {
+      this.declarations.set(sourceName, []);
     }
 
     this.createDeclarations(declaration).forEach(declaration => {
-      this.libDeclarations.get(sourceName)!.push(declaration);
+      this.declarations.get(sourceName)!.push(declaration);
     });
   }
 
-  private checkLibReferences(entity: ts.Node) {
+  private checkReferences(entity: ts.Node) {
     const symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (this.libChecker(declaration)) {
-          if (!this.processed.has(declaration)) {
-            this.processed.add(declaration);
-            this.registerDeclaration(declaration);
-          }
+          this.registerDeclaration(declaration);
         }
       }
     }
@@ -51,12 +54,12 @@ export class LibraryDeclarationsVisitor {
   process(node: ts.TypeNode) {
     const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
     if (!shouldNotBeProcessed) {
-      this.checkLibReferences(node)
+      this.checkReferences(node)
     }
   }
 
-  public forEachLibDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
-    this.libDeclarations.forEach(callback);
+  public forEachDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
+    this.declarations.forEach(callback);
   }
 
 }

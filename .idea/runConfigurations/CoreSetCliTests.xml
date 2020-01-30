@@ -17,8 +17,6 @@
     <envs>
       <env name="DUKAT_LOGLEVEL" value="5" />
     </envs>
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

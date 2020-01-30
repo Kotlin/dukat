@@ -38,19 +38,8 @@ class SourceBundleBuilder {
   ) {
   }
 
-  private createSourceSet(fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
-    let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
-    host.register(fileName);
-
+  private createSourceSet(program: ts.Program, fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
     let logger = createLogger("converter");
-
-    let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
-
-    const program = languageService.getProgram();
-
-    if (program == null) {
-      throw new Error(`failed to create languageService ${fileName}`)
-    }
 
     let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
     let libChecker = (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile());
@@ -93,8 +82,17 @@ class SourceBundleBuilder {
   }
 
   createBundle(packageName: string, files: Array<string>): declarations.SourceBundleDeclarationProto {
+    let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
+    files.forEach(fileName => host.register(fileName));
+    let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
+    const program = languageService.getProgram();
+
+    if (program == null) {
+      throw new Error("failed to create languageService");
+    }
+
     let sourceSets = files.map(fileName => {
-      return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName, packageName));
+      return this.astFactory.createSourceSet(fileName, this.createSourceSet(program, fileName, packageName));
     });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
