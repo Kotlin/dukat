@@ -29,6 +29,7 @@ import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
+import org.jetbrains.dukat.tsLowerings.addPackageName
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
 import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
@@ -62,6 +63,7 @@ open class TypescriptLowerer(
 ) : ECMAScriptLowerer {
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
+                .addPackageName(packageName)
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
                 .renameImpossibleDeclarations()
