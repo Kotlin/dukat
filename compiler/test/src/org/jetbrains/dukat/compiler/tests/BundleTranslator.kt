@@ -12,7 +12,7 @@ typealias BundleSourceMap = Map<String, SourceSetModel>
 
 class BundleTranslator(
         private val inputName: String,
-        lowerer: ECMAScriptLowerer = TypescriptLowerer(ConstNameResolver())
+        lowerer: ECMAScriptLowerer = TypescriptLowerer(ConstNameResolver(), null)
 ) {
     private val byteTranslator = JsRuntimeByteArrayTranslator(lowerer)
 

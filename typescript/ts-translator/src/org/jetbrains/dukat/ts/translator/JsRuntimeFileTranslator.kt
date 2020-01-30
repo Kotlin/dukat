@@ -21,7 +21,7 @@ class JsRuntimeFileTranslator(
             translatorPath: String,
             libPath: String,
             nodePath: String
-    ) : this(TypescriptLowerer(nameResolver), translatorPath, libPath, nodePath)
+    ) : this(TypescriptLowerer(nameResolver, null), translatorPath, libPath, nodePath)
 
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 

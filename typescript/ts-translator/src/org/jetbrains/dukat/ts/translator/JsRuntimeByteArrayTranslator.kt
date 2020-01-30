@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.logger.Logging
@@ -13,7 +14,7 @@ import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 class JsRuntimeByteArrayTranslator(
         private val lowerer: ECMAScriptLowerer
 ) : InputTranslator<ByteArray> {
-    constructor(nameResolver: ModuleNameResolver) : this(TypescriptLowerer(nameResolver))
+    constructor(nameResolver: ModuleNameResolver, packageName: NameEntity?) : this(TypescriptLowerer(nameResolver, packageName))
 
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 

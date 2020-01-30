@@ -57,7 +57,8 @@ fun SourceSetDeclaration.isStdLib(): Boolean {
 }
 
 open class TypescriptLowerer(
-        private val moduleNameResolver: ModuleNameResolver
+        private val moduleNameResolver: ModuleNameResolver,
+        private val packageName: NameEntity?
 ) : ECMAScriptLowerer {
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet

@@ -25,7 +25,7 @@ class CliTranslator() {
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binData, dirName, moduleNameResolver, reportPath, withDescriptors)
+        translateBinaryBundle(binData, dirName, moduleNameResolver, null, reportPath, withDescriptors)
     }
 }
 
