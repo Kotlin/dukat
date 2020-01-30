@@ -38,11 +38,15 @@ class SourceBundleBuilder {
   ) {
   }
 
+<<<<<<< HEAD
   private createSourceSet(program: ts.Program, fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
+=======
+  private createSourceSet(program: ts.Program, libs: Set<string>, fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
+>>>>>>> @{-1}
     let logger = createLogger("converter");
 
     let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
-    let libChecker = (node: ts.Node) => program.isSourceFileDefaultLibrary(node.getSourceFile());
+    let libChecker = (node: ts.Node) => libs.has(node.getSourceFile().fileName);
     let libVisitor = new LibraryDeclarationsVisitor(
       this.libDeclarations,
       program.getTypeChecker(),
@@ -91,8 +95,14 @@ class SourceBundleBuilder {
       throw new Error("failed to create languageService");
     }
 
+<<<<<<< HEAD
     let sourceSets = files.map(fileName => {
       return this.astFactory.createSourceSet(fileName, this.createSourceSet(program, fileName, packageName));
+=======
+    const libs = getLibPaths(program, program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib));
+    let sourceSets = files.map(fileName => {
+      return this.astFactory.createSourceSet(fileName, this.createSourceSet(program, libs, fileName, packageName));
+>>>>>>> @{-1}
     });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
@@ -120,6 +130,23 @@ class SourceBundleBuilder {
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
   }
+}
+
+function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, defaultLibraryPath: string, libs: Set<string> = new Set()) {
+  if (libPath === undefined) {
+    return libs;
+  }
+
+  if (libs.has(libPath.fileName)) {
+    return libs;
+  }
+
+  libs.add(libPath.fileName);
+  libPath.libReferenceDirectives.forEach(libReference => {
+    getLibPaths(program, program.getLibFileFromReference(libReference), defaultLibraryPath, libs);
+  });
+
+  return libs;
 }
 
 export function createBundle(stdlib: string, packageName: string, files: Array<string>) {
