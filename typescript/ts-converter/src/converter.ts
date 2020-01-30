@@ -141,6 +141,6 @@ class SourceBundleBuilder {
   }
 }
 
-export function createBundle(stdlib: string, packageName: string, files: Array<string>) {
+export function createBundle(stdlib: string, files: Array<string>) {
   return new SourceBundleBuilder(stdlib, files).createBundle();
 }
