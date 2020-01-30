@@ -69,7 +69,6 @@ class SourceBundleBuilder {
     );
 
     let astConverter: AstConverter = new AstConverter(
-      packageName,
       new ExportContext((node: ts.Node) => libVisitor.isLibDeclaration(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),

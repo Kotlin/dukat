@@ -32,7 +32,6 @@ export class AstConverter {
     private unsupportedDeclarations = new Set<Number>();
 
     constructor(
-      private rootPackageName: NameEntity,
       private exportContext: ExportContext,
       private typeChecker: ts.TypeChecker,
       private declarationResolver: DeclarationResolver,
@@ -118,7 +117,7 @@ export class AstConverter {
         }
 
         let packageDeclaration = this.astFactory.createModuleDeclaration(
-            this.rootPackageName,
+            this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"),
             imports,
             declarations,
             this.convertModifiers(sourceFile.modifiers),
