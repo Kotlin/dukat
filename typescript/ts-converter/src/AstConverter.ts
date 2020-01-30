@@ -84,12 +84,10 @@ export class AstConverter {
     }
 
     createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
-        let resourceName = this.rootPackageName;
-
         let packageNameFragments = sourceFile.fileName.split("/");
         let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
-        const declarations = this.convertStatements(sourceFile.statements, resourceName);
+        const declarations = this.convertStatements(sourceFile.statements);
 
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
 
@@ -120,7 +118,7 @@ export class AstConverter {
         }
 
         let packageDeclaration = this.astFactory.createModuleDeclaration(
-            resourceName,
+            this.rootPackageName,
             imports,
             declarations,
             this.convertModifiers(sourceFile.modifiers),
@@ -981,11 +979,11 @@ export class AstConverter {
         return res;
     }
 
-    private convertStatement(statement: ts.Node, resourceName: NameEntity): Array<Declaration> {
+    private convertStatement(statement: ts.Node): Array<Declaration> {
         let res: Array<Declaration> = this.convertTopLevelStatement(statement);
 
         if (ts.isModuleDeclaration(statement)) {
-            for (let moduleDeclaration of this.convertModule(statement, resourceName)) {
+            for (let moduleDeclaration of this.convertModule(statement)) {
                 res.push(moduleDeclaration);
             }
         }
@@ -993,10 +991,10 @@ export class AstConverter {
         return res;
     }
 
-    private convertStatements(statements: ts.NodeArray<ts.Node>, resourceName: NameEntity): Array<Declaration> {
+    private convertStatements(statements: ts.NodeArray<ts.Node>): Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
-            for (let decl of this.convertStatement(statement, resourceName)) {
+            for (let decl of this.convertStatement(statement)) {
                 this.registerDeclaration(decl, declarations)
             }
         }
@@ -1016,7 +1014,7 @@ export class AstConverter {
         return moduleDeclaration.name.getText();
     }
 
-    convertModule(module: ts.ModuleDeclaration, resourceName: NameEntity): Array<Declaration> {
+    convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
         let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
 
         const declarations: Declaration[] = [];
@@ -1036,10 +1034,10 @@ export class AstConverter {
             let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
             let imports = this.getImports(module.getSourceFile());
             if (ts.isModuleBlock(body)) {
-                let moduleDeclarations = this.convertStatements(body.statements, resourceName);
+                let moduleDeclarations = this.convertStatements(body.statements);
                 this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, this.convertModule(body, resourceName), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, this.convertModule(body), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations
