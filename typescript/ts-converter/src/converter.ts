@@ -56,10 +56,8 @@ class SourceBundleBuilder {
   ) {
   }
 
-  private createSourceSet(fileName: string, packageNameString: string): Array<SourceFileDeclaration> {
+  private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
     let logger = createLogger("converter");
-
-    let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(packageNameString);
 
     let libVisitor = new LibraryDeclarationsVisitor(
       this.libDeclarations,
@@ -111,9 +109,9 @@ class SourceBundleBuilder {
     return program;
   }
 
-  createBundle(packageName: string): declarations.SourceBundleDeclarationProto {
+  createBundle(): declarations.SourceBundleDeclarationProto {
     let sourceSets = this.files.map(fileName => {
-      return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName, packageName));
+      return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName));
     });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
@@ -144,5 +142,5 @@ class SourceBundleBuilder {
 }
 
 export function createBundle(stdlib: string, packageName: string, files: Array<string>) {
-  return new SourceBundleBuilder(stdlib, files).createBundle(packageName);
+  return new SourceBundleBuilder(stdlib, files).createBundle();
 }
