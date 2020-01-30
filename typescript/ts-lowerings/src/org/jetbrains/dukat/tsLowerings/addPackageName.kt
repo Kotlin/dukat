@@ -5,13 +5,9 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
+
 private fun ModuleDeclaration.addPackageName(packageName: NameEntity): ModuleDeclaration {
-    return copy(packageName = packageName, declarations = declarations.map {
-        when (it) {
-            is ModuleDeclaration -> it.addPackageName(packageName)
-            else -> it
-        }
-    })
+    return copy(packageName = packageName)
 }
 
 private fun SourceFileDeclaration.addPackageName(packageName: NameEntity): SourceFileDeclaration {
