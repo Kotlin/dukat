@@ -6,8 +6,12 @@ import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 private fun ModuleDeclaration.addPackageName(packageName: NameEntity): ModuleDeclaration {
-    println("====? ${packageName}")
-    return this
+    return copy(packageName = packageName, declarations = declarations.map {
+        when (it) {
+            is ModuleDeclaration -> it.addPackageName(packageName)
+            else -> it
+        }
+    })
 }
 
 private fun SourceFileDeclaration.addPackageName(packageName: NameEntity): SourceFileDeclaration {
@@ -15,7 +19,7 @@ private fun SourceFileDeclaration.addPackageName(packageName: NameEntity): Sourc
 }
 
 fun SourceSetDeclaration.addPackageName(packageName: NameEntity?): SourceSetDeclaration {
-    return packageName?.let {
-        packageNameResolved -> copy(sources = sources.map { it.addPackageName(packageNameResolved) })
+    return packageName?.let { packageNameResolved ->
+        copy(sources = sources.map { it.addPackageName(packageNameResolved) })
     } ?: this
 }

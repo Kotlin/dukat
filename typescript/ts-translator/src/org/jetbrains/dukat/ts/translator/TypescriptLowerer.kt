@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -63,7 +64,7 @@ open class TypescriptLowerer(
 ) : ECMAScriptLowerer {
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
-                .addPackageName(packageName)
+                .addPackageName(IdentifierEntity("HEY_HEY"))
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
                 .renameImpossibleDeclarations()
