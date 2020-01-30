@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import {Declaration} from "./ast";
 
 export class LibraryDeclarationsVisitor {
+
   private processed = new Set<ts.Node>();
   private skipTypes = new Set([
     "Array",
@@ -15,10 +16,10 @@ export class LibraryDeclarationsVisitor {
   ]);
 
   constructor(
-    private declarations: Map<string, Array<Declaration>>,
+    private declarations = new Map<string, Array<Declaration>>(),
     private typeChecker: ts.TypeChecker,
-    private libChecker: (node: ts.Node) => boolean,
-    private createDeclarations: (node: ts.Node) => Array<Declaration>
+    private createDeclarations: (node: ts.Node) => Array<Declaration>,
+    private libsSet: Set<string>
   ) {
   }
 
@@ -44,7 +45,7 @@ export class LibraryDeclarationsVisitor {
     const symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        if (this.libChecker(declaration)) {
+        if (this.isLibDeclaration(declaration)) {
           this.registerDeclaration(declaration);
         }
       }
@@ -60,6 +61,10 @@ export class LibraryDeclarationsVisitor {
 
   public forEachDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
     this.declarations.forEach(callback);
+  }
+
+  isLibDeclaration(source: ts.Node): boolean {
+    return this.libsSet.has(source.getSourceFile().fileName);
   }
 
 }
