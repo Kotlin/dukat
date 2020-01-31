@@ -17,7 +17,6 @@ pluginManagement {
     eachPlugin {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
-        println("KOTLIN VERSIon ${gradle.kotlinVersion}")
         useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
       } else if (pluginId == "kotlinx-serialization"){
         useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
@@ -30,14 +29,18 @@ pluginManagement {
   }
 }
 
-try {
-  //TODO: for some reason hasProperty is not working for me
-  gradle.ext.kotlinVersion = getProperty("dukat.kotlinVersion")
-} catch (e) {
-  gradle.ext.kotlinVersion = "1.3.60"
+def buildLog(message) {
+  println("[BUILD] ${message}")
 }
 
 gradle.ext {
+  try {
+    //TODO: for some reason hasProperty is not working for me
+    kotlinVersion = getProperty("dukatKotlinVersion")
+  } catch (e) {
+    kotlinVersion = "1.3.60"
+  }
+
   jupiterVersion = "5.6.0"
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
   nodeVersion = "13.7.0"
@@ -50,6 +53,7 @@ gradle.ext {
   protobufGradlePluginVersion = "0.8.10"
   protobufImplementationVersion = "3.11.1"
 }
+buildLog("gradle settings properties: ${gradle.ext.properties}")
 
 include 'ast-common'
 include 'ast-model'
