@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -55,6 +56,10 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
                 sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
                 else -> sourceFileName
             }
+
+    if (sourceFileName.endsWith(IDL_DECLARATION_EXTENSION) || sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
+        return ktFileNamePrefix.toNameEntity()
+    }
 
     var addModuleName = true
 
