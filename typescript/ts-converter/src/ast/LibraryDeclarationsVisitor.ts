@@ -36,9 +36,7 @@ export class LibraryDeclarationsVisitor {
       this.declarations.set(sourceName, []);
     }
 
-    this.createDeclarations(declaration).forEach(declaration => {
-      this.declarations.get(sourceName)!.push(declaration);
-    });
+    this.declarations.get(sourceName)!.push(...this.createDeclarations(declaration));
   }
 
   private checkReferences(entity: ts.Node) {
