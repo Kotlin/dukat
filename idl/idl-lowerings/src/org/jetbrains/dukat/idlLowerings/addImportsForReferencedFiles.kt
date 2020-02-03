@@ -27,19 +27,21 @@ private class ImportContext(sourceSetModel: SourceSetModel) {
 }
 
 private fun SourceFileModel.addImportsForReferencedFiles(context: ImportContext): SourceFileModel {
-    val newImports = root.imports + referencedFiles.mapNotNull {
+    val newImports = root.imports + (referencedFiles.mapNotNull {
         context.getPackageName(it)
-                ?.let { packageName -> ImportModel(packageName.appendLeft(IdentifierEntity("*"))) }
-        }.distinct().sortedBy { it.name.translate() }
+            ?.let { packageName -> ImportModel(packageName.appendLeft(IdentifierEntity("*"))) }
+    }.distinct() - ImportModel(root.name.appendLeft(IdentifierEntity("*")))).sortedBy { it.name.translate() }
 
-    return copy(root = root.copy(
+    return copy(
+        root = root.copy(
             imports = newImports.toMutableList()
-    ))
+        )
+    )
 }
 
 fun SourceSetModel.addImportsForReferencedFiles(): SourceSetModel {
     val context = ImportContext(this)
     return copy(
-            sources = sources.map { it.addImportsForReferencedFiles(context) }
+        sources = sources.map { it.addImportsForReferencedFiles(context) }
     )
 }

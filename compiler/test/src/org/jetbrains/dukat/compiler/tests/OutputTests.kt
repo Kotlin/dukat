@@ -65,7 +65,7 @@ abstract class OutputTests {
             ktPath: String
     ) {
 
-        val targetShortName = "${descriptor}.d.kt"
+        @Suppress("UNUSED_VARIABLE") val targetShortName = "${descriptor}.d.kt"
 
         val translated = output(tsPath, getTranslator())
 
