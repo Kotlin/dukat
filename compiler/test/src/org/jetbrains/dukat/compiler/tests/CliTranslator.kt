@@ -17,6 +17,7 @@ class CliTranslator() {
         moduleName: String? = null,
         withDescriptors: Boolean = false
     ) {
+        //protobuf
         val binData = CliHttpClient("8090").translate(input)
 
         val moduleNameResolver = if (moduleName == null) {
