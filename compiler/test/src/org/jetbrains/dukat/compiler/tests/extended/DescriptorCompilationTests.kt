@@ -23,8 +23,6 @@ class DescriptorCompilationTests : CompilationTests() {
     }
 
     companion object {
-        private val bundle = ("./build/declarations.dukat")
-
         @JvmStatic
         fun descriptorCompilationSet(): Array<Array<String>> = DefinitelyTypedCompilationTests.extendedSet()
     }
