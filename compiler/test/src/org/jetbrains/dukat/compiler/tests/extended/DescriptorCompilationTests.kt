@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.compiler.tests.core.CoreSetCliTests
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
@@ -23,10 +24,8 @@ class DescriptorCompilationTests : CompilationTests() {
     }
 
     companion object {
-        private val bundle = ("./build/declarations.dukat")
-
         @JvmStatic
-        fun descriptorCompilationSet(): Array<Array<String>> = DefinitelyTypedCompilationTests.extendedSet()
+        fun descriptorCompilationSet(): Array<Array<String>> = CoreSetCliTests.fileSetWithDescriptors("./test/data/typescript")
     }
 
 }
