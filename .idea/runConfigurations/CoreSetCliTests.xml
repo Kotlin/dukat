@@ -15,7 +15,7 @@
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <envs>
-      <env name="DUKAT_LOGLEVEL" value="5" />
+      <env name="DUKAT_LOGLEVEL" value="4" />
     </envs>
     <method v="2" />
   </configuration>
