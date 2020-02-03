@@ -4,6 +4,8 @@ import {Declaration} from "./ast";
 export class LibraryDeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
+  private declarations = new Map<string, Array<Declaration>>();
+
   private skipTypes = new Set([
     "Array",
     "Boolean",
@@ -16,11 +18,10 @@ export class LibraryDeclarationsVisitor {
   ]);
 
   constructor(
-    private declarations = new Map<string, Array<Declaration>>(),
     private typeChecker: ts.TypeChecker,
-    private createDeclarations: (node: ts.Node) => Array<Declaration>,
-    private libsSet: Set<string>
-  ) {
+    private libsSet: Set<string>,
+    public createDeclarations?: (node: ts.Node) => Array<Declaration>
+) {
   }
 
   private registerDeclaration(declaration) {
@@ -36,7 +37,9 @@ export class LibraryDeclarationsVisitor {
       this.declarations.set(sourceName, []);
     }
 
-    this.declarations.get(sourceName)!.push(...this.createDeclarations(declaration));
+    if (this.createDeclarations) {
+      this.declarations.get(sourceName)!.push(...this.createDeclarations(declaration));
+    }
   }
 
   private checkReferences(entity: ts.Node) {

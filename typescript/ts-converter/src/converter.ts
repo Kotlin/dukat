@@ -4,7 +4,7 @@ import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
-import {Declaration, SourceFileDeclaration} from "./ast/ast";
+import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
@@ -47,8 +47,10 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, de
 
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
-  private libDeclarations = new Map<string, Array<Declaration>>();
   private program = this.createProgram();
+
+  private libVisitor = new LibraryDeclarationsVisitor(this.program.getTypeChecker(), getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)));
+  private astConverter: AstConverter = this.createAstConverter(this.libVisitor);
 
   constructor(
     private stdLib: string,
@@ -56,17 +58,8 @@ class SourceBundleBuilder {
   ) {
   }
 
-  private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
-    let logger = createLogger("converter");
-
-    let libVisitor = new LibraryDeclarationsVisitor(
-      this.libDeclarations,
-      this.program.getTypeChecker(),
-      (node: ts.Node) => astConverter.convertTopLevelStatement(node),
-      getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib))
-    );
-
-    let astConverter: AstConverter = new AstConverter(
+  private createAstConverter(libVisitor: LibraryDeclarationsVisitor): AstConverter {
+    let astConverter = new AstConverter(
       new ExportContext((node: ts.Node) => libVisitor.isLibDeclaration(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
@@ -78,19 +71,26 @@ class SourceBundleBuilder {
       }
     );
 
-    return this.createFileDeclarations(fileName, astConverter, this.program);
+    libVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
+    return astConverter;
   }
 
-  createFileDeclarations(fileName: string, astConverter: AstConverter, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
+  private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
+    let logger = createLogger("converter");
+
+    return this.createFileDeclarations(fileName, this.program);
+  }
+
+  createFileDeclarations(fileName: string, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
     if (result.has(fileName)) {
       return [];
     }
-    let fileDeclaration = astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
+    let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
     result.set(fileName, fileDeclaration);
     fileDeclaration
       .getReferencedfilesList()
       .forEach(resourceFileName => {
-        this.createFileDeclarations(resourceFileName, astConverter, program, result);
+        this.createFileDeclarations(resourceFileName, program, result);
       });
 
     return Array.from(result.values());
@@ -119,7 +119,7 @@ class SourceBundleBuilder {
     let libRootUid = "<LIBROOT>";
 
     let libFiles: Array<SourceFileDeclaration> = [];
-    this.libDeclarations.forEach((declarations, resourceName) => {
+    this.libVisitor.forEachDeclaration((declarations, resourceName) => {
       libFiles.push(this.astFactory.createSourceFileDeclaration(
         resourceName, this.astFactory.createModuleDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
