@@ -1,7 +1,6 @@
 import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
-import {createLogger} from "./Logger";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
@@ -57,22 +56,22 @@ class SourceBundleBuilder {
   private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
   constructor(
-    private stdLib: string,
-    private files: Array<string>
+      private stdLib: string,
+      private files: Array<string>
   ) {
   }
 
   private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
     let astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
-      this.program.getTypeChecker(),
-      new DeclarationResolver(this.program),
-      this.astFactory,
-      new class implements AstVisitor {
-        visitType(type: ts.TypeNode): void {
-          declarationsVisitor.process(type);
+        new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
+        this.program.getTypeChecker(),
+        new DeclarationResolver(this.program),
+        this.astFactory,
+        new class implements AstVisitor {
+          visitType(type: ts.TypeNode): void {
+            declarationsVisitor.process(type);
+          }
         }
-      }
     );
 
     declarationsVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
@@ -119,16 +118,16 @@ class SourceBundleBuilder {
     let libAnd: Array<SourceFileDeclaration> = [];
     this.declarationsVisitor.forEachDeclaration((declarations, resourceName) => {
       libAnd.push(this.astFactory.createSourceFileDeclaration(
-        resourceName, this.astFactory.createModuleDeclaration(
-          this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-          [],
-          declarations,
-          [],
-          [],
-          libRootUid,
-          resourceName,
-          true
-        ), []
+          resourceName, this.astFactory.createModuleDeclaration(
+              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+              [],
+              declarations,
+              [],
+              [],
+              libRootUid,
+              resourceName,
+              true
+          ), []
       ));
     });
 
