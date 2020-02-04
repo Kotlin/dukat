@@ -117,6 +117,7 @@ class SourceBundleBuilder {
 
     let transitiveDeclarations: Array<SourceFileDeclaration> = [];
     this.declarationsVisitor.forEachDeclaration((declarations, resourceName) => {
+      let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
       transitiveDeclarations.push(this.astFactory.createSourceFileDeclaration(
           resourceName, this.astFactory.createModuleDeclaration(
               this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
@@ -124,7 +125,7 @@ class SourceBundleBuilder {
               declarations,
               [],
               [],
-              libRootUid,
+              uid,
               resourceName,
               true
           ), []

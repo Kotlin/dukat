@@ -67,11 +67,12 @@ export class DeclarationsVisitor {
 
     isTransientDependency(node: string | ts.Node): boolean {
         const fileName = (typeof node == "string") ? node : node.getSourceFile().fileName;
-        return !this.files.some(directDependencyName => fileName);
+        return !this.files.some(directDependencyName => fileName == directDependencyName);
     }
 
-    isLibDeclaration(source: ts.Node): boolean {
-        return this.libsSet.has(source.getSourceFile().fileName);
+    isLibDeclaration(source: string | ts.Node): boolean {
+        const fileName = (typeof source == "string") ? source : source.getSourceFile().fileName;
+        return this.libsSet.has(fileName);
     }
 
 }
