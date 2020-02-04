@@ -87,11 +87,11 @@ class SourceBundleBuilder {
     }
     let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
     result.set(fileName, fileDeclaration);
-    fileDeclaration
-      .getReferencedfilesList()
-      .forEach(resourceFileName => {
-        this.createFileDeclarations(resourceFileName, program, result);
-      });
+    // fileDeclaration
+    //   .getReferencedfilesList()
+    //   .forEach(resourceFileName => {
+    //     this.createFileDeclarations(resourceFileName, program, result);
+    //   });
 
     return Array.from(result.values());
   }
