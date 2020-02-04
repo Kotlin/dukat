@@ -116,9 +116,9 @@ class SourceBundleBuilder {
 
     let libRootUid = "<LIBROOT>";
 
-    let libFiles: Array<SourceFileDeclaration> = [];
+    let libAnd: Array<SourceFileDeclaration> = [];
     this.declarationsVisitor.forEachDeclaration((declarations, resourceName) => {
-      libFiles.push(this.astFactory.createSourceFileDeclaration(
+      libAnd.push(this.astFactory.createSourceFileDeclaration(
         resourceName, this.astFactory.createModuleDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
           [],
@@ -132,7 +132,7 @@ class SourceBundleBuilder {
       ));
     });
 
-    sourceSets.push(this.astFactory.createSourceSet(libRootUid, libFiles));
+    sourceSets.push(this.astFactory.createSourceSet(libRootUid, libAnd));
 
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
