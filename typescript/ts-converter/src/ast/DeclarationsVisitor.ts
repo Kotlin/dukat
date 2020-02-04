@@ -18,11 +18,11 @@ export class DeclarationsVisitor {
   ]);
 
   constructor(
-    private typeChecker: ts.TypeChecker,
-    private libsSet: Set<string>,
-    private files: Array<string>,
-    public createDeclarations?: (node: ts.Node) => Array<Declaration>
-) {
+      private typeChecker: ts.TypeChecker,
+      private libsSet: Set<string>,
+      private files: Array<string>,
+      public createDeclarations?: (node: ts.Node) => Array<Declaration>
+  ) {
   }
 
   private registerDeclaration(declaration) {
@@ -47,7 +47,9 @@ export class DeclarationsVisitor {
     const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
+        if (this.isTransparentDependency(declaration)) {
           this.registerDeclaration(declaration);
+        }
       }
     }
   }
@@ -61,6 +63,11 @@ export class DeclarationsVisitor {
 
   public forEachDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
     this.declarations.forEach(callback);
+  }
+
+  isTransparentDependency(node: ts.Node): boolean {
+    const fileName = node.getSourceFile().fileName;
+    return this.files.some(directDependencyName => fileName);
   }
 
   isLibDeclaration(source: ts.Node): boolean {

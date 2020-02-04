@@ -80,8 +80,6 @@ class SourceBundleBuilder {
   }
 
   private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
-    let logger = createLogger("converter");
-
     return this.createFileDeclarations(fileName, this.program);
   }
 
@@ -109,6 +107,7 @@ class SourceBundleBuilder {
   }
 
   createBundle(): declarations.SourceBundleDeclarationProto {
+
     let sourceSets = this.files.map(fileName => {
       return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName));
     });
