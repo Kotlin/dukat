@@ -47,7 +47,7 @@ export class DeclarationsVisitor {
         const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
         if (symbol && Array.isArray(symbol.declarations)) {
             for (let declaration of symbol.declarations) {
-                if (this.isTransparentDependency(declaration)) {
+                if (this.isTransientDependency(declaration)) {
                     this.registerDeclaration(declaration);
                 }
             }
@@ -65,7 +65,7 @@ export class DeclarationsVisitor {
         this.declarations.forEach(callback);
     }
 
-    isTransparentDependency(node: string | ts.Node): boolean {
+    isTransientDependency(node: string | ts.Node): boolean {
         const fileName = (typeof node == "string") ? node : node.getSourceFile().fileName;
         return this.files.some(directDependencyName => fileName);
     }
