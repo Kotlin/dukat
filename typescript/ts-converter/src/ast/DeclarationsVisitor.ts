@@ -20,7 +20,7 @@ export class DeclarationsVisitor {
     constructor(
         private typeChecker: ts.TypeChecker,
         private libsSet: Set<string>,
-        private files: Array<string>,
+        private files: Set<string>,
         public createDeclarations?: (node: ts.Node) => Array<Declaration>
     ) {
     }
@@ -67,7 +67,7 @@ export class DeclarationsVisitor {
 
     isTransientDependency(node: string | ts.Node): boolean {
         const fileName = (typeof node == "string") ? node : node.getSourceFile().fileName;
-        return !this.files.some(directDependencyName => fileName == directDependencyName);
+        return !this.files.has(fileName);
     }
 
     isLibDeclaration(source: string | ts.Node): boolean {

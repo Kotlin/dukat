@@ -51,7 +51,7 @@ class SourceBundleBuilder {
   private declarationsVisitor = new DeclarationsVisitor(
       this.program.getTypeChecker(),
       getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)),
-      this.files
+      new Set(this.files.map(file => ts.normalizePath(file)))
   );
   private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
