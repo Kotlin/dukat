@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import {Declaration} from "./ast";
 
-export class LibraryDeclarationsVisitor {
+export class DeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
   private declarations = new Map<string, Array<Declaration>>();
@@ -20,6 +20,7 @@ export class LibraryDeclarationsVisitor {
   constructor(
     private typeChecker: ts.TypeChecker,
     private libsSet: Set<string>,
+    private files: Array<string>,
     public createDeclarations?: (node: ts.Node) => Array<Declaration>
 ) {
   }

@@ -7,7 +7,7 @@ import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
+import {DeclarationsVisitor} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
@@ -49,8 +49,12 @@ class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private program = this.createProgram();
 
-  private libVisitor = new LibraryDeclarationsVisitor(this.program.getTypeChecker(), getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)));
-  private astConverter: AstConverter = this.createAstConverter(this.libVisitor);
+  private declarationsVisitor = new DeclarationsVisitor(
+      this.program.getTypeChecker(),
+      getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)),
+      this.files
+  );
+  private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
   constructor(
     private stdLib: string,
@@ -58,20 +62,20 @@ class SourceBundleBuilder {
   ) {
   }
 
-  private createAstConverter(libVisitor: LibraryDeclarationsVisitor): AstConverter {
+  private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
     let astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => libVisitor.isLibDeclaration(node)),
+      new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
       this.astFactory,
       new class implements AstVisitor {
         visitType(type: ts.TypeNode): void {
-          libVisitor.process(type);
+          declarationsVisitor.process(type);
         }
       }
     );
 
-    libVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
+    declarationsVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
     return astConverter;
   }
 
@@ -87,11 +91,6 @@ class SourceBundleBuilder {
     }
     let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
     result.set(fileName, fileDeclaration);
-    // fileDeclaration
-    //   .getReferencedfilesList()
-    //   .forEach(resourceFileName => {
-    //     this.createFileDeclarations(resourceFileName, program, result);
-    //   });
 
     return Array.from(result.values());
   }
