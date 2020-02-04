@@ -43,13 +43,11 @@ export class DeclarationsVisitor {
     }
   }
 
-  private checkReferences(entity: ts.Node) {
-    const symbol = this.typeChecker.getTypeAtLocation(entity).symbol;
+  private checkReferences(node: ts.Node) {
+    const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        if (this.isLibDeclaration(declaration)) {
           this.registerDeclaration(declaration);
-        }
       }
     }
   }

@@ -115,25 +115,25 @@ class SourceBundleBuilder {
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
-    // let libRootUid = "<LIBROOT>";
+    let libRootUid = "<LIBROOT>";
 
-    // let libFiles: Array<SourceFileDeclaration> = [];
-    // this.libVisitor.forEachDeclaration((declarations, resourceName) => {
-    //   libFiles.push(this.astFactory.createSourceFileDeclaration(
-    //     resourceName, this.astFactory.createModuleDeclaration(
-    //       this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-    //       [],
-    //       declarations,
-    //       [],
-    //       [],
-    //       libRootUid,
-    //       libRootUid,
-    //       true
-    //     ), []
-    //   ));
-    // });
-    //
-    // sourceSets.push(this.astFactory.createSourceSet(libRootUid, libFiles));
+    let libFiles: Array<SourceFileDeclaration> = [];
+    this.declarationsVisitor.forEachDeclaration((declarations, resourceName) => {
+      libFiles.push(this.astFactory.createSourceFileDeclaration(
+        resourceName, this.astFactory.createModuleDeclaration(
+          this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
+          [],
+          declarations,
+          [],
+          [],
+          libRootUid,
+          resourceName,
+          true
+        ), []
+      ));
+    });
+
+    sourceSets.push(this.astFactory.createSourceSet(libRootUid, libFiles));
 
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
