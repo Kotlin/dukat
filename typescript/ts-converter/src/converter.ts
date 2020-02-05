@@ -3,7 +3,7 @@ import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
-import {SourceFileDeclaration} from "./ast/ast";
+import {Declaration, SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
@@ -74,7 +74,6 @@ class SourceBundleBuilder {
         }
     );
 
-    declarationsVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
     return astConverter;
   }
 
@@ -115,9 +114,14 @@ class SourceBundleBuilder {
 
     let libRootUid = "<LIBROOT>";
 
-    this.declarationsVisitor.forEachDeclaration((declarations, resourceSource: RootNode) => {
+    this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: RootNode) => {
       let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
+
+      let declarations: Array<Declaration> = [];
+      nodes.forEach(node => {
+        declarations.push(...this.astConverter.convertTopLevelStatement(node));
+      });
 
       let transitiveSourceFile = this.astFactory.createSourceFileDeclaration(
           resourceName, this.astFactory.createModuleDeclaration(
