@@ -47,6 +47,8 @@ export class DeclarationsVisitor {
 
         this.processed.add(declaration);
 
+        this.visit(declaration);
+
         const sourceFile = declaration.getSourceFile();
 
         if (!Array.isArray(this.declarations.get(sourceFile))) {
@@ -67,6 +69,12 @@ export class DeclarationsVisitor {
                 }
             }
         }
+    }
+
+    visit(declaration: ts.Node) {
+        ts.forEachChild(declaration, node => {
+            this.check(node);
+        });
     }
 
     check(node: ts.TypeNode) {
