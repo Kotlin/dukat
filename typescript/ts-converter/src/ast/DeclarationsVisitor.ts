@@ -1,6 +1,19 @@
 import * as ts from "typescript";
 import {Declaration} from "./ast";
 
+function getContainer(node: ts.Node): ts.SourceFile | ts.ModuleBlock {
+    let parent = node.parent;
+    while (parent) {
+        if (ts.isModuleBlock(parent)) {
+            return parent;
+        }
+
+        parent = parent.parent;
+    }
+
+    return node.getSourceFile();
+}
+
 export class DeclarationsVisitor {
 
     private processed = new Set<ts.Node>();
