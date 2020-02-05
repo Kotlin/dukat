@@ -1,7 +1,9 @@
 import * as ts from "typescript";
 import {Declaration} from "./ast";
 
-function getContainer(node: ts.Node): ts.SourceFile | ts.ModuleBlock {
+export type RootNode = ts.SourceFile | ts.ModuleBlock;
+
+function getContainer(node: ts.Node): RootNode {
     let parent = node.parent;
     while (parent) {
         if (ts.isModuleBlock(parent)) {
@@ -17,7 +19,7 @@ function getContainer(node: ts.Node): ts.SourceFile | ts.ModuleBlock {
 export class DeclarationsVisitor {
 
     private processed = new Set<ts.Node>();
-    private declarations = new Map<string, Array<Declaration>>();
+    private declarations = new Map<RootNode, Array<Declaration>>();
 
     private skipTypes = new Set([
         "Array",
@@ -45,14 +47,14 @@ export class DeclarationsVisitor {
 
         this.processed.add(declaration);
 
-        const sourceName = declaration.getSourceFile().fileName;
+        const sourceFile = declaration.getSourceFile();
 
-        if (!Array.isArray(this.declarations.get(sourceName))) {
-            this.declarations.set(sourceName, []);
+        if (!Array.isArray(this.declarations.get(sourceFile))) {
+            this.declarations.set(sourceFile, []);
         }
 
         if (this.createDeclarations) {
-            this.declarations.get(sourceName)!.push(...this.createDeclarations(declaration));
+            this.declarations.get(sourceFile)!.push(...this.createDeclarations(declaration));
         }
     }
 

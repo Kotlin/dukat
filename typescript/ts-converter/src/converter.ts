@@ -6,7 +6,7 @@ import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {DeclarationsVisitor} from "./ast/DeclarationsVisitor";
+import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
@@ -115,7 +115,8 @@ class SourceBundleBuilder {
 
     let libRootUid = "<LIBROOT>";
 
-    this.declarationsVisitor.forEachDeclaration((declarations, resourceName) => {
+    this.declarationsVisitor.forEachDeclaration((declarations, resourceSource: RootNode) => {
+      let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
       let transitiveSourceFile = this.astFactory.createSourceFileDeclaration(
