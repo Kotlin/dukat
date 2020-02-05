@@ -82,12 +82,22 @@ export class AstConverter {
         return imports;
     }
 
-    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
+    createModuleFromSourceFile(sourceFile: ts.SourceFile): ModuleDeclaration {
         let packageNameFragments = sourceFile.fileName.split("/");
         let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
-        const declarations = this.convertStatements(sourceFile.statements);
+        return  this.astFactory.createModuleDeclaration(
+          this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"),
+          this.getImports(sourceFile),
+          this.convertStatements(sourceFile.statements),
+          this.convertModifiers(sourceFile.modifiers),
+          [],
+          uid(),
+          sourceName,
+          true);
+    }
 
+    createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
 
         let referencedFiles = new Set<string>();
@@ -116,19 +126,9 @@ export class AstConverter {
           }
         }
 
-        let packageDeclaration = this.astFactory.createModuleDeclaration(
-            this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"),
-            imports,
-            declarations,
-            this.convertModifiers(sourceFile.modifiers),
-            [],
-            uid(),
-            sourceName,
-            true);
-
         return this.astFactory.createSourceFileDeclaration(
             sourceFile.fileName,
-            packageDeclaration,
+            this.createModuleFromSourceFile(sourceFile),
             Array.from(referencedFiles)
         );
     }
