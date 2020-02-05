@@ -2,7 +2,7 @@ import * as ts from "typescript";
 
 export type RootNode = ts.SourceFile | ts.ModuleBlock;
 
-function getContainer(node: ts.Node): RootNode {
+function getRootNode(node: ts.Node): RootNode {
   let parent = node.parent;
   while (parent) {
     if (ts.isModuleBlock(parent)) {
