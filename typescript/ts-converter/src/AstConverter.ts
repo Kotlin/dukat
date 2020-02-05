@@ -935,6 +935,7 @@ export class AstConverter {
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
             res.push(this.convertInterfaceDeclaration(statement));
+            this.astVisitor.visitType(statement);
         } else if (ts.isExportAssignment(statement)) {
             let expression = statement.expression;
             if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
