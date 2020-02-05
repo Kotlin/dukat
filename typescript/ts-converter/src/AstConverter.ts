@@ -972,20 +972,12 @@ export class AstConverter {
             } else {
                 this.log.info(`skipping external module reference ${statement.moduleReference.getText()}, kind: ${statement.moduleReference.kind}`)
             }
-        } else {
-            this.unsupportedDeclarations.add(statement.kind);
-        }
-
-        return res;
-    }
-
-    private convertStatement(statement: ts.Node): Array<Declaration> {
-        let res: Array<Declaration> = this.convertTopLevelStatement(statement);
-
-        if (ts.isModuleDeclaration(statement)) {
+        } else if(ts.isModuleDeclaration(statement)) {
             for (let moduleDeclaration of this.convertModule(statement)) {
                 res.push(moduleDeclaration);
             }
+        } else {
+            this.unsupportedDeclarations.add(statement.kind);
         }
 
         return res;
@@ -994,7 +986,7 @@ export class AstConverter {
     private convertStatements(statements: ts.NodeArray<ts.Node>): Array<Declaration> {
         const declarations: Declaration[] = [];
         for (let statement of statements) {
-            for (let decl of this.convertStatement(statement)) {
+            for (let decl of this.convertTopLevelStatement(statement)) {
                 this.registerDeclaration(decl, declarations)
             }
         }
