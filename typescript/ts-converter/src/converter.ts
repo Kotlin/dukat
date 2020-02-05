@@ -69,7 +69,7 @@ class SourceBundleBuilder {
         this.astFactory,
         new class implements AstVisitor {
           visitType(type: ts.TypeNode): void {
-            declarationsVisitor.process(type);
+            declarationsVisitor.check(type);
           }
         }
     );

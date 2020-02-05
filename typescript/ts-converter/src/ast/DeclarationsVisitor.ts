@@ -69,7 +69,7 @@ export class DeclarationsVisitor {
         }
     }
 
-    process(node: ts.TypeNode) {
+    check(node: ts.TypeNode) {
         const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
         if (!shouldNotBeProcessed) {
             this.checkReferences(node)
