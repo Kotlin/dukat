@@ -137,7 +137,7 @@ class SourceBundleBuilder {
           libRootUid,
           libRootUid,
           true
-        ), []
+        )
       ));
     });
 
