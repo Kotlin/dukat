@@ -120,7 +120,7 @@ class SourceBundleBuilder {
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
       console.log(`NODES LENGTH ${nodes.size}`);
-      nodes.forEach(v => console.log("NODE MAP ", v.getText()));
+      nodes.forEach(v => console.log("NODE MAP ", v.getText().substring(0, 90)));
       let filterFunc = (node: ts.Node) => nodes.has(node);
 
       let modules: any[] = [];

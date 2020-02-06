@@ -420,7 +420,7 @@ export class AstConverter {
         if (type == undefined) {
             return this.createTypeDeclaration("Any")
         } else {
-            this.astVisitor.visitType(type);
+            //this.astVisitor.visitType(type);
 
             if (type.kind == ts.SyntaxKind.VoidKeyword) {
                 return this.createTypeDeclaration("Unit")
@@ -781,7 +781,7 @@ export class AstConverter {
                     let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
                     let declaration = this.getFirstDeclaration(symbol);
                     if (declaration) {
-                        this.astVisitor.visitType(declaration);
+                        //this.astVisitor.visitType(declaration);
                     }
 
                     if (declaration != parent) {
@@ -941,7 +941,7 @@ export class AstConverter {
             }
         } else if (ts.isInterfaceDeclaration(statement)) {
             res.push(this.convertInterfaceDeclaration(statement));
-            this.astVisitor.visitType(statement);
+            //this.astVisitor.visitType(statement);
         } else if (ts.isExportAssignment(statement)) {
             let expression = statement.expression;
             if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {

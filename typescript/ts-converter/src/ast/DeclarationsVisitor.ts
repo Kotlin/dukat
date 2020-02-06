@@ -44,6 +44,7 @@ export class DeclarationsVisitor {
     if (this.processed.has(declaration)) {
       return;
     }
+    this.visit(declaration);
 
     this.processed.add(declaration);
 
@@ -56,15 +57,12 @@ export class DeclarationsVisitor {
     this.declarations.get(rootNode)!.add(declaration);
 
     // console.log(`REGISTERING SUCCESS ${ts.SyntaxKind[declaration.kind]} ${rootNode.getSourceFile().fileName} => ${this.declarations.get(rootNode)!.size} => ${text}`);
-
-    this.visit(declaration);
   }
 
   private checkReferences(node: ts.Node) {
     const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
-        //console.log(`CANDIDATE ${node.getText()} => ${this.isTransientDependency(declaration)}`);
         if (this.isTransientDependency(declaration)) {
           this.registerDeclaration(declaration);
         }
@@ -74,15 +72,17 @@ export class DeclarationsVisitor {
 
   visit(declaration: ts.Node) {
     ts.forEachChild(declaration, node => {
-      //console.log(`VISITING ${node.getText()}`);
       this.check(node);
     });
   }
 
   check(node: ts.TypeNode) {
-    const shouldNotBeProcessed = ts.isTypeReferenceNode(node) && this.skipTypes.has(node.typeName.getText());
-    if (!shouldNotBeProcessed) {
-      this.checkReferences(node)
+    if (ts.isTypeReferenceNode(node)) {
+      if (!this.skipTypes.has(node.typeName.getText())) {
+        this.checkReferences(node);
+      }
+    } else {
+      //this.visit(node);
     }
   }
 
