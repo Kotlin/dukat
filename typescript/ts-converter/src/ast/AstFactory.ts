@@ -453,10 +453,9 @@ export class AstFactory {
     return reference;
   }
 
-  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null, referencedFiles: Array<string>): SourceFileDeclaration {
+  createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null): SourceFileDeclaration {
     let sourceFile = new SourceFileDeclarationProto();
     sourceFile.setFilename(fileName);
-    sourceFile.setReferencedfilesList(referencedFiles);
     if (root) {
       sourceFile.setRoot(root);
     }

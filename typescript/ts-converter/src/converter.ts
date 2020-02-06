@@ -135,7 +135,7 @@ class SourceBundleBuilder {
               uid,
               resourceName,
               true
-          ), []
+          )
       );
 
       sourceSets.push(this.astFactory.createSourceSet(resourceName, [transitiveSourceFile]));

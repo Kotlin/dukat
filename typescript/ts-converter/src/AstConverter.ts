@@ -163,8 +163,7 @@ export class AstConverter {
 
         return this.astFactory.createSourceFileDeclaration(
             sourceFile.fileName,
-            this.createModuleFromSourceFile(sourceFile),
-            Array.from(referencedFiles)
+            this.createModuleFromSourceFile(sourceFile)
         );
     }
 

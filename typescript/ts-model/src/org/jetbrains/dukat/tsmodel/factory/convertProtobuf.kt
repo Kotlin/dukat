@@ -561,8 +561,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
 fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
     return SourceFileDeclaration(
             fileName,
-            root.convert(),
-            referencedFilesList
+            root.convert()
     )
 }
 
