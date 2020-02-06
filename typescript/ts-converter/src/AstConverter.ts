@@ -114,15 +114,17 @@ export class AstConverter {
         return imports;
     }
 
-    createModuleFromSourceFile(sourceFile: ts.SourceFile): ModuleDeclaration {
+    createModuleFromSourceFile(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
         let packageNameFragments = sourceFile.fileName.split("/");
         let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+
+        let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
 
         return  this.astFactory.createModuleDeclaration(
           this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"),
           this.getImports(sourceFile),
           this.getReferences(sourceFile),
-          this.convertStatements(sourceFile.statements),
+          this.convertStatements(statements),
           this.convertModifiers(sourceFile.modifiers),
           [],
           uid(),
@@ -1010,7 +1012,7 @@ export class AstConverter {
         return moduleDeclaration.name.getText();
     }
 
-    convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
+    convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<Declaration> {
         let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
 
         const declarations: Declaration[] = [];
@@ -1031,10 +1033,11 @@ export class AstConverter {
             let imports = this.getImports(module.getSourceFile());
             let references = this.getReferences(module.getSourceFile());
             if (ts.isModuleBlock(body)) {
-                let moduleDeclarations = this.convertStatements(body.statements);
+                let statements = filter ? body.statements.filter(filter) : body.statements;
+                let moduleDeclarations = this.convertStatements(statements);
                 this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body, filter), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations
