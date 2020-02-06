@@ -11,6 +11,7 @@ import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
+import * as fs from "fs";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
@@ -87,11 +88,16 @@ class SourceBundleBuilder {
     }
     let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
     result.set(fileName, fileDeclaration);
-    fileDeclaration
-      .getReferencedfilesList()
-      .forEach(resourceFileName => {
-        this.createFileDeclarations(resourceFileName, program, result);
-      });
+
+    let root = fileDeclaration.getRoot();
+    if (root) {
+      root.getImportsList().map(it => it.getReferencedfile())
+        .concat(root.getReferencesList().map(it => it.getReferencedfile()))
+        .filter(it => fs.existsSync(it))
+        .forEach(resourceFileName => {
+          this.createFileDeclarations(resourceFileName, program, result);
+        });
+    }
 
     return Array.from(result.values());
   }
