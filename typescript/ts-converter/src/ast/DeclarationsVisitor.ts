@@ -15,6 +15,61 @@ function getRootNode(node: ts.Node): RootNode {
   return node.getSourceFile();
 }
 
+function isTopLevel(node: ts.Node) {
+  let res = false;
+
+  if (ts.isClassDeclaration(node)) {
+    res = true;
+  }
+
+  if (ts.isClassExpression(node)) {
+    res = true;
+  }
+
+  if (ts.isEnumDeclaration(node)) {
+    res = true;
+  }
+
+  if (ts.isInterfaceDeclaration(node)) {
+    res = true;
+  }
+
+  if (ts.isModuleDeclaration(node)) {
+    res = true;
+  }
+
+  if (ts.isSourceFile(node)) {
+    res = true;
+  }
+
+  if (ts.isTypeAliasDeclaration(node)) {
+    res = true;
+  }
+
+  if (ts.isJSDocTypedefTag(node)) {
+    res = true;
+  }
+
+  if (ts.isJSDocCallbackTag(node)) {
+    res = true;
+  }
+
+  if (ts.isArrowFunction(node) || ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) {
+    res = isTopLevelFunction(node);
+  }
+
+  return res;
+}
+
+function isTopLevelFunction(node: ts.ArrowFunction | ts.FunctionDeclaration | ts.FunctionExpression): boolean {
+  let parent = node.parent;
+  if (ts.isSourceFile(parent) || ts.isModuleDeclaration(parent)) {
+    return true;
+  }
+
+  return false;
+}
+
 export class DeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
@@ -44,19 +99,19 @@ export class DeclarationsVisitor {
     if (this.processed.has(declaration)) {
       return;
     }
-    this.visit(declaration);
 
-    this.processed.add(declaration);
+    if (isTopLevel(declaration)) {
+      const rootNode = declaration.getSourceFile();
 
-    const rootNode = declaration.getSourceFile();
+      if (!this.declarations.has(rootNode)) {
+        this.declarations.set(rootNode, new Set());
+      }
 
-    if (!this.declarations.has(rootNode)) {
-      this.declarations.set(rootNode, new Set());
+      this.declarations.get(rootNode)!.add(declaration);
     }
 
-    this.declarations.get(rootNode)!.add(declaration);
-
-    // console.log(`REGISTERING SUCCESS ${ts.SyntaxKind[declaration.kind]} ${rootNode.getSourceFile().fileName} => ${this.declarations.get(rootNode)!.size} => ${text}`);
+    this.processed.add(declaration);
+    this.visit(declaration);
   }
 
   private checkReferences(node: ts.Node) {
@@ -71,9 +126,12 @@ export class DeclarationsVisitor {
   }
 
   visit(declaration: ts.Node) {
-    ts.forEachChild(declaration, node => {
-      this.check(node);
-    });
+    if (ts.isTypeReferenceNode(declaration)) {
+      if (!this.skipTypes.has(declaration.typeName.getText())) {
+        this.checkReferences(declaration);
+      }
+    }
+    ts.forEachChild(declaration, node => this.visit(node));
   }
 
   check(node: ts.TypeNode) {

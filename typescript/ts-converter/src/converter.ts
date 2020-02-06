@@ -3,14 +3,13 @@ import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
-import {Declaration, ModuleDeclaration, SourceFileDeclaration} from "./ast/ast";
+import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
-import * as fs from "fs";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
@@ -50,29 +49,29 @@ class SourceBundleBuilder {
   private program = this.createProgram();
 
   private declarationsVisitor = new DeclarationsVisitor(
-      this.program.getTypeChecker(),
-      getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)),
-      new Set(this.files.map(file => ts.normalizePath(file)))
+    this.program.getTypeChecker(),
+    getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)),
+    new Set(this.files.map(file => ts.normalizePath(file)))
   );
   private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
   constructor(
-      private stdLib: string,
-      private files: Array<string>
+    private stdLib: string,
+    private files: Array<string>
   ) {
   }
 
   private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
     let astConverter = new AstConverter(
-        new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
-        this.program.getTypeChecker(),
-        new DeclarationResolver(this.program),
-        this.astFactory,
-        new class implements AstVisitor {
-          visitType(type: ts.TypeNode): void {
-            declarationsVisitor.check(type);
-          }
+      new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
+      this.program.getTypeChecker(),
+      new DeclarationResolver(this.program),
+      this.astFactory,
+      new class implements AstVisitor {
+        visitType(type: ts.TypeNode): void {
+          declarationsVisitor.check(type);
         }
+      }
     );
 
     return astConverter;
@@ -83,7 +82,9 @@ class SourceBundleBuilder {
   }
 
   createFileDeclarations(fileName: string, program: ts.Program): Array<SourceFileDeclaration> {
-    return [this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName))];
+    let sourceFile = program.getSourceFile(fileName);
+    this.declarationsVisitor.visit(sourceFile);
+    return [this.astConverter.createSourceFileDeclaration(sourceFile)];
   }
 
   private createProgram(): ts.Program {
@@ -112,7 +113,7 @@ class SourceBundleBuilder {
       let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
-      nodes.forEach(v => console.log("NODE MAP ", v.getText().substring(0, 90)));
+      nodes.forEach(v => console.log(`NODE MAP ${ts.SyntaxKind[v.kind]}`, v.getText().substring(0, 90)));
       let filterFunc = (node: ts.Node) => nodes.has(node);
 
       let modules: any[] = [];
@@ -124,7 +125,7 @@ class SourceBundleBuilder {
 
       let files = modules.map(moduleDeclaration => {
         return this.astFactory.createSourceFileDeclaration(
-          resourceName, moduleDeclaration  as any
+          resourceName, moduleDeclaration as any
         )
       });
 
