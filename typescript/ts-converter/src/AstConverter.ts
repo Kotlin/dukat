@@ -131,36 +131,6 @@ export class AstConverter {
     }
 
     createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
-        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
-
-        let referencedFiles = new Set<string>();
-        sourceFile.referencedFiles.forEach(referencedFile => {
-            referencedFiles.add(curDir + referencedFile.fileName);
-        });
-
-        if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
-          for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
-            if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-                referencedFiles.add(tsInternals.normalizePath(referenceDirective.resolvedFileName));
-            }
-          }
-        }
-
-        let imports = this.getImports(sourceFile);
-        imports.forEach(importClause => {
-            let referencedFile = importClause.getReferencedfile();
-            if (referencedFile) {
-                referencedFiles.add(referencedFile);
-            }
-        });
-
-        for (let importDeclaration of sourceFile.imports) {
-          const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
-          if (module && (typeof module.resolvedFileName == "string")) {
-              referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
-          }
-        }
-
         return this.astFactory.createSourceFileDeclaration(
             sourceFile.fileName,
             this.createModuleFromSourceFile(sourceFile)
