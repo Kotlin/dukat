@@ -18,7 +18,7 @@ function getRootNode(node: ts.Node): RootNode {
 export class DeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
-  private declarations = new Map<RootNode, Array<ts.Node>>();
+  private declarations = new Map<RootNode, Set<ts.Node>>();
 
   private skipTypes = new Set([
     "Array",
@@ -39,6 +39,8 @@ export class DeclarationsVisitor {
   }
 
   private registerDeclaration(declaration) {
+    let text = declaration.getText().substring(0, 50);
+    // console.log(`REGISTERING ${ts.SyntaxKind[declaration.kind]} => ${text}`);
     if (this.processed.has(declaration)) {
       return;
     }
@@ -47,11 +49,13 @@ export class DeclarationsVisitor {
 
     const rootNode = declaration.getSourceFile();
 
-    if (!Array.isArray(this.declarations.get(rootNode))) {
-      this.declarations.set(rootNode, []);
+    if (!this.declarations.has(rootNode)) {
+      this.declarations.set(rootNode, new Set());
     }
 
-    this.declarations.get(rootNode)!.push(declaration);
+    this.declarations.get(rootNode)!.add(declaration);
+
+    // console.log(`REGISTERING SUCCESS ${ts.SyntaxKind[declaration.kind]} ${rootNode.getSourceFile().fileName} => ${this.declarations.get(rootNode)!.size} => ${text}`);
 
     this.visit(declaration);
   }
@@ -60,6 +64,7 @@ export class DeclarationsVisitor {
     const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
+        //console.log(`CANDIDATE ${node.getText()} => ${this.isTransientDependency(declaration)}`);
         if (this.isTransientDependency(declaration)) {
           this.registerDeclaration(declaration);
         }
@@ -69,6 +74,7 @@ export class DeclarationsVisitor {
 
   visit(declaration: ts.Node) {
     ts.forEachChild(declaration, node => {
+      //console.log(`VISITING ${node.getText()}`);
       this.check(node);
     });
   }
@@ -80,7 +86,7 @@ export class DeclarationsVisitor {
     }
   }
 
-  public forEachDeclaration(callback: (value: Array<ts.Node>, key: string) => void) {
+  public forEachDeclaration(callback: (value: Set<ts.Node>, key: string) => void) {
     this.declarations.forEach(callback);
   }
 

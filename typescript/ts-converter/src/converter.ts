@@ -119,12 +119,15 @@ class SourceBundleBuilder {
       let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
+      console.log(`NODES LENGTH ${nodes.size}`);
+      nodes.forEach(v => console.log("NODE MAP ", v.getText()));
+      let filterFunc = (node: ts.Node) => nodes.has(node);
 
       let modules: any[] = [];
       if (ts.isSourceFile(resourceSource)) {
-        modules = [this.astConverter.createModuleFromSourceFile(resourceSource)]
+        modules = [this.astConverter.createModuleFromSourceFile(resourceSource, filterFunc)]
       } else if (ts.isModuleDeclaration(resourceSource)) {
-        modules = this.astConverter.convertModule(resourceSource)
+        modules = this.astConverter.convertModule(resourceSource, filterFunc)
       }
 
       let files = modules.map(moduleDeclaration => {
