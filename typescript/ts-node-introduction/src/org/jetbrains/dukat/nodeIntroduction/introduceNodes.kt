@@ -559,10 +559,13 @@ private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolve
 
 fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
     val fileNameNormalized = File(fileName).normalize().absolutePath
+
+    val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
+
     return SourceFileNode(
             fileNameNormalized,
             root.introduceNodes(fileNameNormalized, moduleNameResolver),
-            referencedFiles.map { referencedFile -> referencedFile },
+            references,
             null
     )
 }

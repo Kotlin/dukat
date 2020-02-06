@@ -8,7 +8,8 @@ import {
     Expression,
     HeritageClauseDeclaration,
     IdentifierDeclaration,
-    ImportClauseDeclaration, ImportSpecifierDeclaration,
+    ImportClauseDeclaration,
+    ImportSpecifierDeclaration,
     MemberDeclaration,
     ModifierDeclaration,
     ModuleDeclaration,
@@ -60,6 +61,14 @@ export class AstConverter {
                 if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
                     referencedFiles.push(this.astFactory.createReferenceClause(_, tsInternals.normalizePath(referenceDirective.resolvedFileName)));
                 }
+            }
+        }
+
+        //TODO: Consider to place it to getImports
+        for (let importDeclaration of sourceFile.imports) {
+            const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
+            if (module && (typeof module.resolvedFileName == "string")) {
+                referencedFiles.push(this.astFactory.createReferenceClause("_", tsInternals.normalizePath(module.resolvedFileName)));
             }
         }
 
@@ -144,7 +153,7 @@ export class AstConverter {
         for (let importDeclaration of sourceFile.imports) {
           const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
           if (module && (typeof module.resolvedFileName == "string")) {
-            referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
+              referencedFiles.add(tsInternals.normalizePath(module.resolvedFileName));
           }
         }
 
