@@ -10,6 +10,7 @@ import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
+import * as fs from "fs";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();

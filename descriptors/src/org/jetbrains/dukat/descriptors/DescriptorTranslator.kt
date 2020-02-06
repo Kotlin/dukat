@@ -30,6 +30,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.descriptors.versionSpecific.VersionSpecificDescriptorAPI
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translate
@@ -303,14 +304,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         parent: DeclarationDescriptor
     ): List<TypeParameterDescriptor> {
         val parametersDescriptors = parameters.mapIndexed { index, parameter ->
-            val parameterDescriptor = TypeParameterDescriptorImpl.createForFurtherModification(
+            val parameterDescriptor = VersionSpecificDescriptorAPI.createForFurtherModification(
                 parent,
-                Annotations.EMPTY,
-                false,
                 translateVariance(parameter.variance),
-                Name.identifier(translateName((parameter.type as TypeValueModel).value)),
-                index,
-                parent.toSourceElement
+                translateName((parameter.type as TypeValueModel).value),
+                index
             )
             context.registerTypeParameter(
                 IdentifierEntity(parameterDescriptor.name.identifier),
