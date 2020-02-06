@@ -18,11 +18,11 @@ pluginManagement {
       def pluginId = requested.id.id
       if (pluginId in kotlin_plugins) {
         useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${gradle.kotlinVersion}")
-      } else if (pluginId == "kotlinx-serialization"){
+      } else if (pluginId == "kotlinx-serialization") {
         useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
       } else if (pluginId == 'com.google.protobuf') {
         useModule("com.google.protobuf:protobuf-gradle-plugin:${gradle.protobufGradlePluginVersion}")
-      } else  if (pluginId == "com.moowork.node") {
+      } else if (pluginId == "com.moowork.node") {
         useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
       }
     }
@@ -55,6 +55,8 @@ gradle.ext {
 }
 buildLog("gradle settings properties: ${gradle.ext.properties}")
 
+include '1.3.60'
+include '1.3.70'
 include 'ast-common'
 include 'ast-model'
 include 'command-line'
@@ -88,6 +90,9 @@ include 'ts-model-proto'
 include 'ts-node-introduction'
 include 'ts-node-lowering'
 include 'ts-translator'
+
+project(':1.3.60').projectDir = file("$rootDir/version-specific/1.3.60")
+project(':1.3.70').projectDir = file("$rootDir/version-specific/1.3.70")
 
 project(':graphs').projectDir = file("$rootDir/abstract/graphs")
 project(':itertools').projectDir = file("$rootDir/abstract/itertools")
