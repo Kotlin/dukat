@@ -124,7 +124,7 @@ class SourceBundleBuilder {
       if (ts.isSourceFile(resourceSource)) {
         modules = [this.astConverter.createModuleFromSourceFile(resourceSource)]
       } else if (ts.isModuleDeclaration(resourceSource)) {
-        modules = this.astConverter.convertTopLevelStatement(resourceSource)
+        modules = this.astConverter.convertModule(resourceSource)
       }
 
       let files = modules.map(moduleDeclaration => {
