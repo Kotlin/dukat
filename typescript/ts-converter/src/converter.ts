@@ -82,14 +82,8 @@ class SourceBundleBuilder {
     return this.createFileDeclarations(fileName, this.program);
   }
 
-  createFileDeclarations(fileName: string, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
-    if (result.has(fileName)) {
-      return [];
-    }
-    let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
-    result.set(fileName, fileDeclaration);
-
-    return Array.from(result.values());
+  createFileDeclarations(fileName: string, program: ts.Program): Array<SourceFileDeclaration> {
+    return [this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName))];
   }
 
   private createProgram(): ts.Program {
@@ -106,7 +100,6 @@ class SourceBundleBuilder {
   }
 
   createBundle(): declarations.SourceBundleDeclarationProto {
-
     let sourceSets = this.files.map(fileName => {
       return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName));
     });
@@ -119,7 +112,6 @@ class SourceBundleBuilder {
       let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
-      console.log(`NODES LENGTH ${nodes.size}`);
       nodes.forEach(v => console.log("NODE MAP ", v.getText().substring(0, 90)));
       let filterFunc = (node: ts.Node) => nodes.has(node);
 
