@@ -5,12 +5,11 @@ import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
+import {SourceFileDeclarationProto} from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
-import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
-import {SourceFileDeclarationProto} from "declarations";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
@@ -67,12 +66,7 @@ class SourceBundleBuilder {
       new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
-      this.astFactory,
-      new class implements AstVisitor {
-        visitType(type: ts.TypeNode): void {
-          declarationsVisitor.check(type);
-        }
-      }
+      this.astFactory
     );
 
     return astConverter;

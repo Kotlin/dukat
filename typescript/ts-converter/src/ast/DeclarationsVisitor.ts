@@ -77,6 +77,7 @@ export class DeclarationsVisitor {
 
   private skipTypes = new Set([
     "Array",
+    "Date",
     "Boolean",
     "Error",
     "Function",
@@ -101,13 +102,15 @@ export class DeclarationsVisitor {
     }
 
     if (isTopLevel(declaration)) {
-      const rootNode = declaration.getSourceFile();
+      if (!(this.isLibDeclaration(declaration) && (this.skipTypes.has(declaration.name)))) {
+        const rootNode = declaration.getSourceFile();
 
-      if (!this.declarations.has(rootNode)) {
-        this.declarations.set(rootNode, new Set());
+        if (!this.declarations.has(rootNode)) {
+          this.declarations.set(rootNode, new Set());
+        }
+
+        this.declarations.get(rootNode)!.add(declaration);
       }
-
-      this.declarations.get(rootNode)!.add(declaration);
     }
 
     this.processed.add(declaration);
