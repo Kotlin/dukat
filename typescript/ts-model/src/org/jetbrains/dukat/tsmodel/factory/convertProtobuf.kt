@@ -30,6 +30,7 @@ import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifierDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamedImportsDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamespaceImportDeclaration
+import org.jetbrains.dukat.tsmodel.importClause.ReferenceClauseDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -79,6 +80,7 @@ import org.jetbrains.dukat.tsmodelproto.ParameterValueDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyAccessExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ReferenceClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReferenceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.RegExLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
@@ -224,9 +226,14 @@ private fun ImportClauseDeclarationProto.convert(): ImportDeclaration? {
     }
 }
 
+private fun ReferenceClauseDeclarationProto.convert(): ReferenceClauseDeclaration {
+    return ReferenceClauseDeclaration(path, referencedFile)
+}
+
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     return ModuleDeclaration(packageName.convert(),
             importsList.mapNotNull { it.convert() },
+            referencesList.map { it.convert() },
             declarationsList.map { it.convert() },
             modifiersList.map { it.convert() },
             definitionsInfoList.map { it.convert() },

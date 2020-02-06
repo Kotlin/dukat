@@ -181,6 +181,11 @@ message ImportClauseDeclarationProto {
     string referencedFile = 3;
 }
 
+message ReferenceClauseDeclarationProto {
+    string path = 1;
+    string referencedFile = 2;
+}
+
 message ReferenceDeclarationProto {
     string uid = 1;
     enum ORIGIN {
@@ -405,12 +410,13 @@ message TopLevelDeclarationProto {
 message ModuleDeclarationProto {
     NameDeclarationProto packageName = 1;
     repeated ImportClauseDeclarationProto imports = 2;
-    repeated TopLevelDeclarationProto declarations = 3;
-    repeated ModifierDeclarationProto modifiers = 4;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
-    string uid = 6;
-    string resourceName = 7;
-    bool root = 8;
+    repeated ReferenceClauseDeclarationProto references = 3;
+    repeated TopLevelDeclarationProto declarations = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 6;
+    string uid = 7;
+    string resourceName = 8;
+    bool root = 9;
 }
 
 message SourceFileDeclarationProto {

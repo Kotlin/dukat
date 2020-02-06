@@ -45,7 +45,7 @@ import {
   ParameterDeclarationProto,
   ParameterValueDeclarationProto,
   PropertyDeclarationProto,
-  QualifierDeclarationProto,
+  QualifierDeclarationProto, ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto, ReturnStatementDeclarationProto,
   SourceFileDeclarationProto,
   SourceSetDeclarationProto,
@@ -84,6 +84,13 @@ export class AstFactory {
       importSpecifier.setUid(uid);
     }
     return importSpecifier;
+  }
+
+  createReferenceClause(path: string, referencedFile: string): ReferenceClauseDeclarationProto {
+    let referenceClause = new ReferenceClauseDeclarationProto();
+    referenceClause.setPath(path);
+    referenceClause.setReferencedfile(referencedFile);
+    return referenceClause;
   }
 
   createNamedImportsClause(importSpecifiers: Array<ImportSpecifierDeclaration>): ImportClauseDeclaration {
@@ -386,7 +393,7 @@ export class AstFactory {
     return modifierDeclaration;
   }
 
-  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
+  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
     let moduleDeclaration = new ModuleDeclarationProto();
 
     moduleDeclaration.setImportsList(imports);
