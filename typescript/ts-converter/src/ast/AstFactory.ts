@@ -397,6 +397,7 @@ export class AstFactory {
     let moduleDeclaration = new ModuleDeclarationProto();
 
     moduleDeclaration.setImportsList(imports);
+    moduleDeclaration.setReferencesList(references);
     moduleDeclaration.setPackagename(packageName);
     moduleDeclaration.setDeclarationsList(moduleDeclarations);
     moduleDeclaration.setModifiersList(modifiers);
