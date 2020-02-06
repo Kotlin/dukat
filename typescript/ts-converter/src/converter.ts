@@ -127,6 +127,7 @@ class SourceBundleBuilder {
           resourceName, this.astFactory.createModuleDeclaration(
               this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
               [],
+              [],
               declarations,
               [],
               [],

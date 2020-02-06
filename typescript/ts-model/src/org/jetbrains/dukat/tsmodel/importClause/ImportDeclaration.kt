@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel.importClause
 
-data class ImportDeclaration(val clause: ImportClauseDeclaration, val referenedFile: String)
+data class ImportDeclaration(val clause: ImportClauseDeclaration, val referencedFile: String)
 
 data class ImportSpecifierDeclaration(val name: String, val propertyName: String?, val uid: String)
 
