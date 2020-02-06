@@ -10,6 +10,7 @@ import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
+import {SourceFileDeclarationProto} from "declarations";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
@@ -107,13 +108,11 @@ class SourceBundleBuilder {
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
-    let libRootUid = "<LIBROOT>";
-
+    let files = new Array<SourceFileDeclarationProto>();
     this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: RootNode) => {
       let resourceName = resourceSource.getSourceFile().fileName;
-      let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
-      nodes.forEach(v => console.log(`NODE MAP ${ts.SyntaxKind[v.kind]}`, v.getText().substring(0, 90)));
+      console.log(`NODE => ${resourceSource.getSourceFile().fileName}`);
       let filterFunc = (node: ts.Node) => nodes.has(node);
 
       let modules: any[] = [];
@@ -123,16 +122,15 @@ class SourceBundleBuilder {
         modules = this.astConverter.convertModule(resourceSource, filterFunc)
       }
 
-      let files = modules.map(moduleDeclaration => {
+      files.push(...modules.map(moduleDeclaration => {
         return this.astFactory.createSourceFileDeclaration(
           resourceName, moduleDeclaration as any
         )
-      });
-
-      console.log(`FILES ${ts.SyntaxKind[resourceSource.kind]} ${resourceSource.getSourceFile().fileName} => ${this.astConverter.convertTopLevelStatement(resourceSource)} => ${files.length}`);
-
-      sourceSets.push(this.astFactory.createSourceSet(resourceName, files));
+      }));
     });
+
+    console.log(`FILES ${files.length}`);
+    sourceSets.push(this.astFactory.createSourceSet("<TRANSIENT>", files));
 
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;
