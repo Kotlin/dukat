@@ -48,7 +48,7 @@ export class AstConverter {
         collection.push(declaration);
     }
 
-    private resolveModulePath(node: ts.ImportDeclaration): string | null {
+    private resolveModulePath(node: ts.Expression): string | null {
         const module = ts.getResolvedModule(node.getSourceFile(), node.text);
         if (module && (typeof module.resolvedFileName == "string")) {
             return tsInternals.normalizePath(module.resolvedFileName);
@@ -99,7 +99,7 @@ export class AstConverter {
                             ));
                         }
                         if (importClause) {
-                            let referenceFile = this.resolveModulePath(node);
+                            let referenceFile = this.resolveModulePath(node.moduleSpecifier);
                             if (referenceFile) {
                                 importClause.setReferencedfile(referenceFile);
                             }
