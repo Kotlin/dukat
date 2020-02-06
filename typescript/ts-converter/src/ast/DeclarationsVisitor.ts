@@ -45,15 +45,15 @@ export class DeclarationsVisitor {
 
     this.processed.add(declaration);
 
-    this.visit(declaration);
+    const rootNode = declaration.getSourceFile();
 
-    const sourceFile = declaration.getSourceFile();
-
-    if (!Array.isArray(this.declarations.get(sourceFile))) {
-      this.declarations.set(sourceFile, []);
+    if (!Array.isArray(this.declarations.get(rootNode))) {
+      this.declarations.set(rootNode, []);
     }
 
-    this.declarations.get(sourceFile)!.push(declaration);
+    this.declarations.get(rootNode)!.push(declaration);
+
+    this.visit(declaration);
   }
 
   private checkReferences(node: ts.Node) {

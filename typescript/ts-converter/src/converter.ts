@@ -3,7 +3,7 @@ import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
-import {Declaration, SourceFileDeclaration} from "./ast/ast";
+import {Declaration, ModuleDeclaration, SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
@@ -119,26 +119,23 @@ class SourceBundleBuilder {
       let resourceName = resourceSource.getSourceFile().fileName;
       let uid = this.declarationsVisitor.isLibDeclaration(resourceName) ? libRootUid : "<TRANSIENT>";
 
-      let declarations: Array<Declaration> = [];
-      nodes.forEach(node => {
-        declarations.push(...this.astConverter.convertTopLevelStatement(node));
+
+      let modules: any[] = [];
+      if (ts.isSourceFile(resourceSource)) {
+        modules = [this.astConverter.createModuleFromSourceFile(resourceSource)]
+      } else if (ts.isModuleDeclaration(resourceSource)) {
+        modules = this.astConverter.convertTopLevelStatement(resourceSource)
+      }
+
+      let files = modules.map(moduleDeclaration => {
+        return this.astFactory.createSourceFileDeclaration(
+          resourceName, moduleDeclaration  as any
+        )
       });
 
-      let transitiveSourceFile = this.astFactory.createSourceFileDeclaration(
-          resourceName, this.astFactory.createModuleDeclaration(
-              this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-              [],
-              [],
-              declarations,
-              [],
-              [],
-              uid,
-              resourceName,
-              true
-          )
-      );
+      console.log(`FILES ${ts.SyntaxKind[resourceSource.kind]} ${resourceSource.getSourceFile().fileName} => ${this.astConverter.convertTopLevelStatement(resourceSource)} => ${files.length}`);
 
-      sourceSets.push(this.astFactory.createSourceSet(resourceName, [transitiveSourceFile]));
+      sourceSets.push(this.astFactory.createSourceSet(resourceName, files));
     });
 
     sourceSetBundle.setSourcesList(sourceSets);
