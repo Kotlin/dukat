@@ -48,6 +48,14 @@ export class AstConverter {
         collection.push(declaration);
     }
 
+    private resolveModulePath(node: ts.ImportDeclaration): string | null {
+        const module = ts.getResolvedModule(node.getSourceFile(), node.text);
+        if (module && (typeof module.resolvedFileName == "string")) {
+            return tsInternals.normalizePath(module.resolvedFileName);
+        }
+        return null;
+    }
+
     private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
 
@@ -66,9 +74,9 @@ export class AstConverter {
 
         //TODO: Consider to place it to getImports
         for (let importDeclaration of sourceFile.imports) {
-            const module = ts.getResolvedModule(sourceFile, importDeclaration.text);
-            if (module && (typeof module.resolvedFileName == "string")) {
-                referencedFiles.push(this.astFactory.createReferenceClause("_", tsInternals.normalizePath(module.resolvedFileName)));
+            const modulePath = this.resolveModulePath(importDeclaration);
+            if (modulePath) {
+                referencedFiles.push(this.astFactory.createReferenceClause("_", modulePath));
             }
         }
 
@@ -79,11 +87,6 @@ export class AstConverter {
         let imports: Array<ImportClauseDeclaration> = [];
         sourceFile.forEachChild(node => {
             if (ts.isImportDeclaration(node)) {
-                let symbol = this.typeChecker.getSymbolAtLocation(node.moduleSpecifier);
-                let referenceFile: string | null = null;
-                if (symbol && symbol.valueDeclaration) {
-                    referenceFile = tsInternals.normalizePath(symbol.valueDeclaration.getSourceFile().fileName);
-                }
                 if (node.importClause) {
                     let namedBindings = node.importClause.namedBindings;
                     if (namedBindings) {
@@ -96,6 +99,7 @@ export class AstConverter {
                             ));
                         }
                         if (importClause) {
+                            let referenceFile = this.resolveModulePath(node);
                             if (referenceFile) {
                                 importClause.setReferencedfile(referenceFile);
                             }
