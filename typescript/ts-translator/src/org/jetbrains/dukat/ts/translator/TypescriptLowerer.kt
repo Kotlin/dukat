@@ -114,30 +114,11 @@ open class TypescriptLowerer(
     }
 
     override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        var stdLib: SourceSetModel? = null
-        val sources = mutableListOf<SourceSetDeclaration>()
-
         val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
         val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
-        sourceBundle.sources.forEach { source ->
-            if ((source.isStdLib()) && (stdLib == null)) {
-                val stdSourceSet = source.renameStdLibEntities() { uid, newName ->
-                    renameMap[uid] = newName
-                }
-                stdLib = lower(stdSourceSet, null, renameMap, uidToFqNameMapper)
-            } else {
-                sources.add(source)
-            }
-        }
-
-        val loweredSources = sources.map { source ->
-            lower(source, stdLib, renameMap, uidToFqNameMapper.toMutableMap())
-        }.toMutableList()
-
-
-        stdLib?.let { loweredSources.add(it) }
-
-        return SourceBundleModel(loweredSources)
+        return SourceBundleModel(sources = sourceBundle.sources.map {
+            lower(it, null, renameMap, uidToFqNameMapper.toMutableMap())
+        })
     }
 }
