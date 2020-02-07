@@ -136,10 +136,6 @@ open class TypescriptLowerer(
         }.toMutableList()
 
 
-        stdLib = stdLib
-                ?.whiteList(TS_STDLIB_WHITE_LIST)
-        //?.splitIntoSeparateEntities()
-
         stdLib?.let { loweredSources.add(it) }
 
         return SourceBundleModel(loweredSources)
