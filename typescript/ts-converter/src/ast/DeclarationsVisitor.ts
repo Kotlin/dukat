@@ -102,15 +102,13 @@ export class DeclarationsVisitor {
     }
 
     if (isTopLevel(declaration)) {
-      if (!(this.isLibDeclaration(declaration) && (this.skipTypes.has(declaration.name)))) {
-        const rootNode = declaration.getSourceFile();
+      const rootNode = declaration.getSourceFile();
 
-        if (!this.declarations.has(rootNode)) {
-          this.declarations.set(rootNode, new Set());
-        }
-
-        this.declarations.get(rootNode)!.add(declaration);
+      if (!this.declarations.has(rootNode)) {
+        this.declarations.set(rootNode, new Set());
       }
+
+      this.declarations.get(rootNode)!.add(declaration);
     }
 
     this.processed.add(declaration);
@@ -118,11 +116,17 @@ export class DeclarationsVisitor {
   }
 
   private checkReferences(node: ts.Node) {
+    if (this.isLibDeclaration(node)) {
+      if (this.skipTypes.has(node.name)) {
+        return;
+      }
+    }
+
     const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (this.isTransientDependency(declaration)) {
-          this.registerDeclaration(declaration);
+            this.registerDeclaration(declaration);
         }
       }
     }
@@ -133,18 +137,12 @@ export class DeclarationsVisitor {
       if (!this.skipTypes.has(declaration.typeName.getText())) {
         this.checkReferences(declaration);
       }
+    } else if (ts.isInterfaceDeclaration(declaration)) {
+      this.checkReferences(declaration);
+    } else if (ts.isTypeAliasDeclaration(declaration)) {
+      this.checkReferences(declaration.type)
     }
     ts.forEachChild(declaration, node => this.visit(node));
-  }
-
-  check(node: ts.TypeNode) {
-    if (ts.isTypeReferenceNode(node)) {
-      if (!this.skipTypes.has(node.typeName.getText())) {
-        this.checkReferences(node);
-      }
-    } else {
-      //this.visit(node);
-    }
   }
 
   public forEachDeclaration(callback: (value: Set<ts.Node>, key: string) => void) {
