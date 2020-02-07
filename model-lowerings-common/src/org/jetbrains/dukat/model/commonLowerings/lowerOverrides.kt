@@ -387,8 +387,8 @@ private class OverrideResolver(private val context: ModelContext) {
     }
 }
 
-fun SourceSetModel.lowerOverrides(stdlib: SourceSetModel?): SourceSetModel {
-    val modelContext = ModelContext(stdlib, this)
+fun SourceSetModel.lowerOverrides(): SourceSetModel {
+    val modelContext = ModelContext(this)
 
     val overrideResolver = OverrideResolver(modelContext)
 

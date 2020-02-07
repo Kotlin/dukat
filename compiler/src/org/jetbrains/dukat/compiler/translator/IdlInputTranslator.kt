@@ -50,7 +50,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .addMissingMembers()
                 .addOverloadsForCallbacks()
                 .convertToModel()
-                .lowerOverrides(null)
+                .lowerOverrides()
                 .escapeIdentificators()
                 .addExplicitGettersAndSetters()
                 .addKDocs()

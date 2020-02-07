@@ -103,7 +103,7 @@ open class TypescriptLowerer(
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
                 .extractNonExternalDeclarations()
-                .lowerOverrides(stdLibSourceSet)
+                .lowerOverrides()
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addImports()
