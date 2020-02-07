@@ -80,6 +80,7 @@ export class DeclarationsVisitor {
     "Date",
     "Boolean",
     "Error",
+    "Event",
     "Function",
     "Number",
     "RegExp",
