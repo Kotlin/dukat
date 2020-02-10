@@ -23,6 +23,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.ParameterModifierModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -133,6 +134,15 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate()
     if (vararg) {
         res = "vararg $res"
+    }
+
+    modifier?.let {
+        val modifierTranslated = when (it) {
+            ParameterModifierModel.NOINLINE -> "noinline"
+            ParameterModifierModel.CROSSINLINE -> "crossinline"
+        }
+
+        res = "$modifierTranslated $res"
     }
 
     if (needsMeta) {

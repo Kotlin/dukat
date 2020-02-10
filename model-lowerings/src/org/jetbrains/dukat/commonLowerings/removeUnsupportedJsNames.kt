@@ -87,7 +87,8 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                             name = "key",
                             type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
                             initializer = null,
-                            vararg = false
+                            vararg = false,
+                            modifier = null
                     )),
                     type = commonType,
                     typeParameters = emptyList(),
@@ -104,12 +105,14 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                             name = "key",
                             type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
                             initializer = null,
-                            vararg = false
+                            vararg = false,
+                            modifier = null
                     ), ParameterModel(
                             name = "value",
                             type = commonType,
                             initializer = null,
-                            vararg = false
+                            vararg = false,
+                            modifier = null
                     )),
                     type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
                     typeParameters = emptyList(),

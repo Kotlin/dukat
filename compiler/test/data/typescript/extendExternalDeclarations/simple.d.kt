@@ -38,3 +38,6 @@ inline operator fun Event.invoke(resourceId: String) { this.asDynamic().invoke(r
 inline operator fun Event.invoke(resourceId: String, hash: Any) { this.asDynamic().invoke(resourceId, hash) }
 
 inline operator fun Event.invoke(resourceId: String, hash: Any, callback: Function<*>) { this.asDynamic().invoke(resourceId, hash, callback) }
+
+/* extending interface from lib.dom.d.ts */
+inline fun Event.ping(noinline param: () -> Boolean): Boolean = this.asDynamic().ping(param)
