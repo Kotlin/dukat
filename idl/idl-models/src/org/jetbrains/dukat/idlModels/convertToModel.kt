@@ -225,7 +225,8 @@ private class IdlFileConverter(
             } else {
                 null
             },
-            vararg = variadic
+            vararg = variadic,
+            modifier = null
         )
     }
 
@@ -430,7 +431,8 @@ private class IdlFileConverter(
             } else {
                 null
             },
-            vararg = false
+            vararg = false,
+            modifier = null
         )
     }
 

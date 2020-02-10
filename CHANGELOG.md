@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.0.27] - 07'February 2020
+ - [build] make it possible to build with arbitrary version of kotlin compiler
+ - [build] typescript compiler version updated to 3.5.3
+ - [descriptors] support for compiling with 1.3.70-eap-42
+ - [typescript] Move top level declarations into a separate file whenever it's invalid to keep them with the rest of declarations (that is, when there's file-level JsQualifier or JsModule annotations)
+ - [idl] Don't add import for the same package this file belongs to
+
 ### [0.0.26] - 24'January 2020
  - [In some cases](https://github.com/Kotlin/dukat/commit/76050f8fd260a470e152fd508fec5bf7523f4bb0) something that is a valid override in typescript is not an override in kotlin, we have to copy overriden method to the descendant class.
  - [Rename](https://github.com/Kotlin/dukat/commit/f03826e7cb5a86a1e634d9cdb481df56daeeac78) class if it's name clashes with the named import

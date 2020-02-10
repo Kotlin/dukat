@@ -18,6 +18,7 @@ import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.compiler.lowerPrimitives
+import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
@@ -108,6 +109,7 @@ open class TypescriptLowerer(
                 .addExplicitGettersAndSetters()
                 .addImports()
                 .anyfyUnresolvedTypes()
+                .addNoinlineModifier()
                 .addStandardImportsAndAnnotations()
 
         return models

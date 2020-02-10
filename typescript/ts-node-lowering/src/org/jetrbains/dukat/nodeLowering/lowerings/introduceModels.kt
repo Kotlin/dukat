@@ -316,7 +316,8 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                         }
                     }
                 },
-                vararg = vararg
+                vararg = vararg,
+                modifier = null
         )
     }
 
