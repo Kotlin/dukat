@@ -111,9 +111,13 @@ class SourceBundleBuilder {
 
       let modules: any[] = [];
       if (ts.isSourceFile(resourceSource)) {
-        modules = [this.astConverter.createModuleFromSourceFile(resourceSource, filterFunc)]
+        modules = [this.astConverter.createModuleFromSourceFile(resourceSource, this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"), filterFunc)]
       } else if (ts.isModuleDeclaration(resourceSource)) {
         modules = this.astConverter.convertModule(resourceSource, filterFunc)
+      }
+
+      for (let module of modules) {
+        console.log(`MODULE ${module.getPackagename()}`);
       }
 
       files.push(...modules.map(moduleDeclaration => {
