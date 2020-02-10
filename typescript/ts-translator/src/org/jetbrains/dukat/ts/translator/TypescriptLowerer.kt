@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -16,7 +15,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
-import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
@@ -30,7 +28,6 @@ import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
-import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.tsLowerings.addPackageName
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
@@ -38,9 +35,8 @@ import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
-import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
-import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
+import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.syncTypeNames
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
