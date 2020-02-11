@@ -89,8 +89,7 @@ export abstract class DeclarationsVisitor {
   ]);
 
   constructor(
-    private typeChecker: ts.TypeChecker,
-    private files: Set<string>
+    private typeChecker: ts.TypeChecker
   ) {
   }
 
@@ -148,11 +147,7 @@ export abstract class DeclarationsVisitor {
     this.declarations.forEach(callback);
   }
 
-  isTransientDependency(node: string | ts.Node): boolean {
-    const fileName = (typeof node == "string") ? node : node.getSourceFile().fileName;
-    return !this.files.has(fileName);
-  }
-
+  abstract isTransientDependency(node: ts.Node): boolean;
   abstract isLibDeclaration(source: ts.Node): boolean;
 
 }

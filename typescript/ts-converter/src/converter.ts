@@ -49,33 +49,41 @@ class SourceBundleBuilder {
   private program = this.createProgram();
 
   private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib));
-  private isLibSource(node: ts.Node): boolean { return this.libsSet.has(node.getSourceFile().fileName)}
+
+  private isLibSource(node: ts.Node): boolean {
+    return this.libsSet.has(node.getSourceFile().fileName)
+  }
 
   private declarationsVisitor = (() => {
     let outerThis = this;
+    let files = new Set(this.files.map(file => ts.normalizePath(file)));
     return new class extends DeclarationsVisitor {
-    isLibDeclaration(source: ts.Node): boolean {
-      return outerThis.isLibSource(source);
-    }
-  }(
-      this.program.getTypeChecker(),
-      new Set(this.files.map(file => ts.normalizePath(file)))
-  )})();
+      isLibDeclaration(source: ts.Node): boolean {
+        return outerThis.isLibSource(source);
+      }
+
+      isTransientDependency(node: ts.Node): boolean {
+        return !files.has(node.getSourceFile().fileName);
+      }
+    }(
+        this.program.getTypeChecker()
+    )
+  })();
 
   private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
   constructor(
-    private stdLib: string,
-    private files: Array<string>
+      private stdLib: string,
+      private files: Array<string>
   ) {
   }
 
   private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
     let astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => this.isLibSource(node)),
-      this.program.getTypeChecker(),
-      new DeclarationResolver(this.program),
-      this.astFactory
+        new ExportContext((node: ts.Node) => this.isLibSource(node)),
+        this.program.getTypeChecker(),
+        new DeclarationResolver(this.program),
+        this.astFactory
     );
 
     return astConverter;
@@ -131,7 +139,7 @@ class SourceBundleBuilder {
 
       files.push(...modules.map(moduleDeclaration => {
         return this.astFactory.createSourceFileDeclaration(
-          resourceName, moduleDeclaration as any
+            resourceName, moduleDeclaration as any
         )
       }));
     });
