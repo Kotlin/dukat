@@ -54,31 +54,32 @@ class SourceBundleBuilder {
     return this.libsSet.has(node.getSourceFile().fileName)
   }
 
-  private declarationsVisitor = (() => {
-    let outerThis = this;
-    let files = new Set(this.files.map(file => ts.normalizePath(file)));
-    return new class extends DeclarationsVisitor {
-      isLibDeclaration(source: ts.Node): boolean {
-        return outerThis.isLibSource(source);
-      }
-
-      isTransientDependency(node: ts.Node): boolean {
-        return !files.has(node.getSourceFile().fileName);
-      }
-    }(
-        this.program.getTypeChecker()
-    )
-  })();
-
-  private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
+  private declarationsVisitor: DeclarationsVisitor;
+  private astConverter: AstConverter = this.createAstConverter();
 
   constructor(
       private stdLib: string,
       private files: Array<string>
   ) {
+
+    let filesSet = new Set(this.files.map(file => ts.normalizePath(file)));
+    let outerThis = this;
+
+    this.declarationsVisitor = new class extends DeclarationsVisitor {
+      isLibDeclaration(source: ts.Node): boolean {
+        return outerThis.isLibSource(source);
+      }
+
+      isTransientDependency(node: ts.Node): boolean {
+        return !filesSet.has(node.getSourceFile().fileName);
+      }
+    }(
+        this.program.getTypeChecker()
+    );
+
   }
 
-  private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
+  private createAstConverter(): AstConverter {
     let astConverter = new AstConverter(
         new ExportContext((node: ts.Node) => this.isLibSource(node)),
         this.program.getTypeChecker(),
