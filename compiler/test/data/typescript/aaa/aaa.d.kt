@@ -15,8 +15,10 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+typealias DD = D
+
 external open class API {
-    open fun createA(): A
+    open fun createA(d: DD): A
 }
 
 // ------------------------------------------------------------------------------------------
@@ -42,3 +44,5 @@ external interface C
 external interface A {
     fun ping(): C
 }
+
+external interface D

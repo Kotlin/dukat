@@ -140,9 +140,7 @@ export abstract class DeclarationsVisitor {
     } else if (ts.isTypeAliasDeclaration(declaration)) {
       this.checkReferences(declaration.type)
     } else if (ts.isHeritageClause(declaration)) {
-      // console.log(`HCLAUSE [${declaration.parent.name.getText()}] ${declaration.getText()}`);
       for (let type of declaration.types) {
-        // console.log(`VISIT TYPE ${type.getText()}`);
         this.checkReferences(type);
       }
     }
