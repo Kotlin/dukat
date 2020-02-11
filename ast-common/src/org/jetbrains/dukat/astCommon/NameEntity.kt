@@ -1,6 +1,13 @@
 package org.jetbrains.dukat.astCommon
 
-sealed class NameEntity : Entity
+sealed class NameEntity : Entity {
+    override fun toString(): String {
+        return when (this) {
+            is IdentifierEntity -> value
+            is QualifierEntity -> "${left}.${right}"
+        }
+    }
+}
 
 data class IdentifierEntity(
         val value: String
