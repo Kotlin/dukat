@@ -70,7 +70,7 @@ function isTopLevelFunction(node: ts.ArrowFunction | ts.FunctionDeclaration | ts
   return false;
 }
 
-export class DeclarationsVisitor {
+export abstract class DeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
   private declarations = new Map<RootNode, Set<ts.Node>>();
@@ -90,14 +90,12 @@ export class DeclarationsVisitor {
 
   constructor(
     private typeChecker: ts.TypeChecker,
-    private libsSet: Set<string>,
     private files: Set<string>
   ) {
   }
 
   private registerDeclaration(declaration) {
     let text = declaration.getText().substring(0, 50);
-    // console.log(`REGISTERING ${ts.SyntaxKind[declaration.kind]} => ${text}`);
     if (this.processed.has(declaration)) {
       return;
     }
@@ -155,8 +153,6 @@ export class DeclarationsVisitor {
     return !this.files.has(fileName);
   }
 
-  isLibDeclaration(source: ts.Node): boolean {
-    return this.libsSet.has(source.getSourceFile().fileName);
-  }
+  abstract isLibDeclaration(source: ts.Node): boolean;
 
 }

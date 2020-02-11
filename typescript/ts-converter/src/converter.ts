@@ -48,11 +48,20 @@ class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private program = this.createProgram();
 
-  private declarationsVisitor = new DeclarationsVisitor(
-    this.program.getTypeChecker(),
-    getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)),
-    new Set(this.files.map(file => ts.normalizePath(file)))
-  );
+  private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib));
+  private isLibSource(node: ts.Node): boolean { return this.libsSet.has(node.getSourceFile().fileName)}
+
+  private declarationsVisitor = (() => {
+    let outerThis = this;
+    return new class extends DeclarationsVisitor {
+    isLibDeclaration(source: ts.Node): boolean {
+      return outerThis.isLibSource(source);
+    }
+  }(
+      this.program.getTypeChecker(),
+      new Set(this.files.map(file => ts.normalizePath(file)))
+  )})();
+
   private astConverter: AstConverter = this.createAstConverter(this.declarationsVisitor);
 
   constructor(
@@ -63,7 +72,7 @@ class SourceBundleBuilder {
 
   private createAstConverter(declarationsVisitor: DeclarationsVisitor): AstConverter {
     let astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => declarationsVisitor.isLibDeclaration(node)),
+      new ExportContext((node: ts.Node) => this.isLibSource(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
       this.astFactory
