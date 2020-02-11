@@ -8,5 +8,6 @@ interface Event {
     optionalField?: any;
     ping(marker?: String)
     (resourceId:string, hash?:any, callback?:Function): void;
+    (resourceId:number): boolean;
     ping(param: () => boolean): boolean;
 }

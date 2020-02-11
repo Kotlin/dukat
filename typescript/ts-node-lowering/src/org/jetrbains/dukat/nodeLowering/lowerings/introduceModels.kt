@@ -390,6 +390,10 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
         } else null
     }
 
+    private fun ParameterValueDeclaration.isUnit(): Boolean {
+        return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
+    }
+
     private fun FunctionNode.resolveBody(): List<StatementModel> {
         return when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
@@ -411,11 +415,16 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                     )))
             )
 
-            is FunctionFromCallSignature -> listOf(ChainCallModel(
-                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                    StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
-            )
-
+            is FunctionFromCallSignature -> {
+                val chainCallModel = ChainCallModel(
+                        StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
+                        StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
+                listOf(if (type.isUnit()) {
+                    chainCallModel
+                } else {
+                    ReturnStatementModel(chainCallModel)
+                })
+            }
             is FunctionFromMethodSignatureDeclaration -> {
                 val bodyStatement = ChainCallModel(
                         StatementCallModel(
