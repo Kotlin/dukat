@@ -75,11 +75,11 @@ class CoreSetCliTests {
                     "Q.kt",
                     "_skippedReferenced.kt",
                     "jquery.kt",
-                    "node-ffi-buffer.kt",
-                    "ref-array.kt",
-                    "ref-array.ref_array.kt",
-                    "ref.kt",
-                    "ref.ref.kt"
+                    "node-ffi-buffer.kt"
+//                    "ref-array.kt",
+//                    "ref-array.ref_array.kt",
+//                    "ref.kt",
+//                    "ref.ref.kt"
             )
             if (skippedDeclarations.contains(targetFile.name)) {
                 null
