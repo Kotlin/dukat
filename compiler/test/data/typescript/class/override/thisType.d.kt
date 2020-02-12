@@ -22,3 +22,6 @@ external open class Emitter {
 external open class ProcessEmitter : Emitter {
     override fun addEvent(name: String): ProcessEmitter /* this */
 }
+
+/* extending interface from lib.es5.d.ts */
+inline fun <T> Array<T>.shuffle(): Array<T> /* this */ = this.asDynamic().shuffle()
