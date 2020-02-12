@@ -7,3 +7,7 @@ declare class Emitter {
 declare class ProcessEmitter extends Emitter {
   addEvent(name: String): this;
 }
+
+interface Array<T> {
+  shuffle(): this;
+}

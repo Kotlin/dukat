@@ -27,12 +27,13 @@ private fun ClassNode.convertToTypeSignature(): TypeValueNode {
 }
 
 private fun FunctionNode.convertToTypeSignature(): TypeValueNode {
-    val anyNode = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
     val extendReference = extend
     return if (extendReference != null) {
-        TypeValueNode(extendReference.name, emptyList(), ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
+        // TODO: ideally  it would be nice to have real TypeValueNodes in class reference (or got rid of class references completely
+        val typeParams = extendReference.typeParameters.map { TypeValueNode(it, emptyList(), null) }
+        TypeValueNode(extendReference.name, typeParams, ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     } else {
-        anyNode
+        TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
     }
 }
 
