@@ -775,7 +775,7 @@ fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
     }.lowerSourceSetDeclaration(this)
 
     return SourceSetModel(
-        "<IRRELEVANT>",
+        listOf("<IRRELEVANT>"),
         sources = files.map { IdlFileConverter(it, typeMap).convert() }
     )
 }

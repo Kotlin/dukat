@@ -22,7 +22,7 @@ class BundleTranslator(
         val inputStream = File(inputName).inputStream()
         val bundle = byteTranslator.lower(byteTranslator.parse(inputStream.readBytes()))
 
-        return bundle.sources.associateBy { source -> source.sourceName }
+        return bundle.sources.associateBy { source -> source.sourceName.first() }
     }
 
     fun translate(fileName: String): SourceSetModel {
