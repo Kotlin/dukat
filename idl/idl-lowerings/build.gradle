@@ -5,8 +5,10 @@ plugins {
 dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
+    implementation(project(":model-lowerings-common"))
     implementation(project(":idl-declarations"))
     implementation(project(":logging"))
+    implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":translator-string"))
 }

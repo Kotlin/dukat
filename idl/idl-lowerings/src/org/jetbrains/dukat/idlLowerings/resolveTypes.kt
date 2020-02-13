@@ -10,6 +10,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.isKnown

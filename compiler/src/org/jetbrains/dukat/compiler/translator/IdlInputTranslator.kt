@@ -7,7 +7,7 @@ import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.idlLowerings.addConstructors
-import org.jetbrains.dukat.idlLowerings.addImportsForReferencedFiles
+import org.jetbrains.dukat.idlLowerings.addImportsForUsedPackages
 import org.jetbrains.dukat.idlLowerings.addMissingMembers
 import org.jetbrains.dukat.idlLowerings.addItemArrayLike
 import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
@@ -56,7 +56,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .addKDocs()
                 .relocateDeclarations()
                 .resolveTopLevelVisibility(alwaysPublic())
-                .addImportsForReferencedFiles()
+                .addImportsForUsedPackages()
                 .omitStdLib()
     }
 

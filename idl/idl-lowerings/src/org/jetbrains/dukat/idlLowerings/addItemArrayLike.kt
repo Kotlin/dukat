@@ -15,8 +15,6 @@ import org.jetbrains.dukat.idlDeclarations.toNotNullable
 
 private class ItemArrayLikeLowering : IDLLowering {
 
-    private var alreadyAddedClassesFromStdlib: Boolean = false
-
     override fun lowerInterfaceDeclaration(declaration: IDLInterfaceDeclaration, owner: IDLFileDeclaration): IDLInterfaceDeclaration {
         val lengthAttribute = declaration.attributes.find {
             it.name == "length" && it.type == IDLSingleTypeDeclaration("unsignedlong", null, false)
@@ -73,23 +71,27 @@ private class ItemArrayLikeLowering : IDLLowering {
                 mixin = false,
                 kind = InterfaceKind.INTERFACE
         )
-        if (newFiles.none { it.packageName == "<LIBROOT>".toNameEntity() }) {
+        if (newFiles.none { it.packageName == libRootPackageName.toNameEntity() }) {
             newFiles += IDLFileDeclaration(
-                    fileName = "<LIBROOT>",
+                    fileName = libRootPackageName,
                     declarations = listOf(),
                     referencedFiles = listOf(),
-                    packageName = "<LIBROOT>".toNameEntity()
+                    packageName = libRootPackageName.toNameEntity()
             )
         }
         return newSourceSet.copy(
                 files = newFiles.map {
-                    if (it.packageName == "<LIBROOT>".toNameEntity()) {
+                    if (it.packageName == libRootPackageName.toNameEntity()) {
                         it.copy(declarations = it.declarations + itemArrayLikeDeclaration)
                     } else {
                         it
                     }
                 }
         )
+    }
+
+    companion object {
+        private const val libRootPackageName = "<LIBROOT>.org.w3c.dom"
     }
 }
 

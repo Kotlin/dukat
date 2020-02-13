@@ -100,9 +100,7 @@ private class IdlFileConverter(
             "Number",
             "dynamic",
             "Promise",
-            "Unit",
-
-            "ItemArrayLike"
+            "Unit"
         )
 
         val toStdMap = mapOf(
