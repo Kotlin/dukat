@@ -1,4 +1,5 @@
 import kotlin.js.*
+import org.khronos.webgl.*
 
 public external open class A(a: Int) {
     var x: Int

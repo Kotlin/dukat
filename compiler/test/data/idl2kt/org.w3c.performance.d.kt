@@ -1,6 +1,7 @@
 package org.w3c.performance
 
 import kotlin.js.*
+import org.khronos.webgl.*
 import org.w3c.dom.events.*
 
 /**

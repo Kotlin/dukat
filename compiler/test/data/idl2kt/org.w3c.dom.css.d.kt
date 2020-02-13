@@ -1,6 +1,7 @@
 package org.w3c.dom.css
 
 import kotlin.js.*
+import org.khronos.webgl.*
 import org.w3c.dom.*
 
 public external abstract class MediaList : ItemArrayLike<String> {
