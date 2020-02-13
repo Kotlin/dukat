@@ -52,7 +52,7 @@ import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 
 fun SourceSetDeclaration.isStdLib(): Boolean {
-    return sourceName == "<LIBROOT>"
+    return sourceName.first() == "<LIBROOT>"
 }
 
 open class TypescriptLowerer(

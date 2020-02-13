@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.0.28] - 13'February 2020
+  - [descriptors] support for `inline` and `crosslinine` modifiers in descriptors
+  - [typescript] Inlined invoke extension function can have return type
+  - [typescript] Merge vars and interfaces even if they are in different files (but in the same package)
+  - [typescript] Merge classlikes correctly (under some conditions they were copied after merge)
+  - [typescript] Preserve type params while resolving this return type in extension functions    
+
 ### [0.0.27] - 07'February 2020
  - [build] make it possible to build with arbitrary version of kotlin compiler
  - [build] typescript compiler version updated to 3.5.3

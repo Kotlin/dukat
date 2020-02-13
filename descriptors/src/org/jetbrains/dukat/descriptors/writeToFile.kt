@@ -31,7 +31,7 @@ fun writeDescriptorsToFile(translator: InputTranslator<ByteArray>, data: ByteArr
 
     val moduleDescriptor = flattenedBundle.translateToDescriptors()
 
-    val name = File(flattenedBundle.sources.first().sourceName).nameWithoutExtension
+    val name = File(flattenedBundle.sources.first().sourceName.first()).nameWithoutExtension
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
