@@ -114,13 +114,15 @@ class SourceBundleBuilder {
   }
 
   createBundle(): declarations.SourceBundleDeclarationProto {
-    let sourceSets = this.files.map(fileName => {
-      return this.astFactory.createSourceSet([fileName], this.createSourceSet(fileName));
+
+    let files = new Array<SourceFileDeclarationProto>();
+
+    this.files.forEach(fileName => {
+      files.push(...this.createSourceSet(fileName));
     });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
-    let files = new Array<SourceFileDeclarationProto>();
     this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: RootNode) => {
       let resourceName = resourceSource.getSourceFile().fileName;
 
@@ -146,10 +148,7 @@ class SourceBundleBuilder {
       }));
     });
 
-    console.log(`FILES ${files.length}`);
-    sourceSets.push(this.astFactory.createSourceSet(["<TRANSIENT>"], files));
-
-    sourceSetBundle.setSourcesList(sourceSets);
+    sourceSetBundle.setSourcesList([this.astFactory.createSourceSet(this.files, files)]);
     return sourceSetBundle;
   }
 }
