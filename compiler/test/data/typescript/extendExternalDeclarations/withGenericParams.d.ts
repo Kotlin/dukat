@@ -1,4 +1,4 @@
-/// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/ref-array/ref-array.d.ts" />
+    /// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/ref-array/ref-array.d.ts" />
 /// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/ref-array/ref-array.d.ts" />
 /// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/q/Q.d.ts" />
 
