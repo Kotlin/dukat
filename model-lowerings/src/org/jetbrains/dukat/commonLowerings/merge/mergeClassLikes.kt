@@ -11,8 +11,6 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.commonLowerings.merge.processing.ModelWithOwnerName
-import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
 import org.jetbrains.dukat.panic.raiseConcern
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageModel>, parentEntitiesB: List<HeritageModel>): List<HeritageModel> {
@@ -63,33 +61,17 @@ private operator fun ClassLikeModel.plus(b: ClassLikeModel): ClassLikeModel {
         is InterfaceModel -> when (b) {
             is InterfaceModel -> a + b
             is ClassModel -> b + a
-            else -> a
+            else -> null
         }
-        is ClassModel -> when (b) {
-            is InterfaceModel -> a + b
-            is ClassModel -> a + b
-            else -> raiseConcern("can not merge unknown ClassLikeModel implementation: ${a}") { a }
-        }
-        else -> a
-    }
+        is ClassModel -> a + b
+        else -> null
+    } ?: raiseConcern("can not merge unknown ClassLikeModel implementation: $a") { a }
 }
 
-private operator fun ModelWithOwnerName<ClassLikeModel>.plus(b: ModelWithOwnerName<ClassLikeModel>): ModelWithOwnerName<ClassLikeModel> {
-    return copy(model = model + b.model)
-}
-
-private fun ModuleModel.mergeClassLikes(bucket: Map<NameEntity, ClassLikeModel>, alreadyMerged: MutableSet<NameEntity> = mutableSetOf()): ModuleModel {
+private fun ModuleModel.mergeClassLikes(bucket: MutableMap<NameEntity, ClassLikeModel>): ModuleModel {
     val declarationsMerged = declarations.mapNotNull {
         if (it is ClassLikeModel) {
-            val key = name.appendLeft(it.name)
-            if (alreadyMerged.contains(key)) {
-                null
-            } else if (bucket.containsKey(key)) {
-                alreadyMerged.add(key)
-                bucket[key]
-            } else {
-                it
-            }
+            bucket.remove(name.appendLeft(it.name))
         } else {
             it
         }
@@ -98,11 +80,20 @@ private fun ModuleModel.mergeClassLikes(bucket: Map<NameEntity, ClassLikeModel>,
     return copy(declarations = declarationsMerged, submodules = submodules.map { it.mergeClassLikes(bucket) })
 }
 
+private fun ModuleModel.scan(classLikesMap: MutableMap<NameEntity, MutableList<ClassLikeModel>>) {
+    declarations.forEach {
+        if (it is ClassLikeModel) {
+            classLikesMap.getOrPut(name.appendLeft(it.name)) { mutableListOf() }.add(it)
+        }
+    }
+
+    submodules.forEach { it.scan(classLikesMap) }
+}
+
 fun SourceSetModel.mergeClassLikes(): SourceSetModel {
-    val interfaces = sources.flatMap { source -> source.root.fetchClassLikes() }
-    val bucket = interfaces
-            .groupBy { it.ownerName }
-            .mapValues { (_, items) -> items.reduce { a, b -> a + b }.model }
+    val classLikesMap: MutableMap<NameEntity, MutableList<ClassLikeModel>> = mutableMapOf()
+    sources.forEach { it.root.scan(classLikesMap) }
+    val bucket = classLikesMap.mapValues { (_, items) -> items.reduce { a, b -> a + b } }.toMutableMap()
 
     return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikes(bucket)) })
 }

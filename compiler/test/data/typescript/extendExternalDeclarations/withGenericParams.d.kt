@@ -47,7 +47,6 @@ import org.w3c.xhr.*
 import ref.Type
 import Buffer
 
-@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface ArrayType<T> : Type {
     var BYTES_PER_ELEMENT: Number
     var fixedLength: Number
