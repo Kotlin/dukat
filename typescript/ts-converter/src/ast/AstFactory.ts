@@ -462,9 +462,9 @@ export class AstFactory {
     return sourceFile;
   }
 
-  createSourceSet(fileName: string, sources: Array<SourceFileDeclaration>): SourceSet {
+  createSourceSet(fileName: Array<string>, sources: Array<SourceFileDeclaration>): SourceSet {
     let sourceSet = new SourceSetDeclarationProto();
-    sourceSet.setSourcename(fileName);
+    sourceSet.setSourcenameList(fileName);
     sourceSet.setSourcesList(sources);
     return sourceSet;
   }
