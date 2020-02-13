@@ -21,6 +21,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.ParameterModifierModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -68,11 +69,9 @@ import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertyGetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertySetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
-import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
-import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorFactory
@@ -290,8 +289,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 name = Name.identifier(translateName(IdentifierEntity(parameter.name))),
                 outType = outType,
                 declaresDefaultValue = parameter.initializer != null,
-                isCrossinline = false,
-                isNoinline = false,
+                isCrossinline = parameter.modifier == ParameterModifierModel.CROSSINLINE,
+                isNoinline = parameter.modifier == ParameterModifierModel.NOINLINE,
                 varargElementType = varargElementType,
                 source = parent.source
             )
