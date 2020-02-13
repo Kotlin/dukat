@@ -14,43 +14,59 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
 
-private fun ModuleModel.scan(mergeMap: MutableMap<Pair<NameEntity, NameEntity>, TopLevelModel?>) {
+private fun getKey(onwnerName: NameEntity, name: NameEntity): Pair<NameEntity, NameEntity> {
+    val owner = when (onwnerName) {
+        IdentifierEntity("<ROOT>") -> IdentifierEntity("<DEFAULT>")
+        IdentifierEntity("<LIBROOT>") -> IdentifierEntity("<DEFAULT>")
+        else -> onwnerName
+    }
+    return Pair(owner, name)
+}
+
+private fun ModuleModel.scanInterfaces(mergeMap: MutableMap<Pair<NameEntity, NameEntity>, TopLevelModel?>) {
     declarations.forEach { declaration ->
         when (declaration) {
-            is InterfaceModel -> mergeMap[Pair(name, declaration.name)] = null
+            is InterfaceModel -> mergeMap[getKey(name, declaration.name)] = null
         }
     }
 
+    submodules.forEach { it.scanInterfaces(mergeMap) }
+}
+
+private fun ModuleModel.scanVariablesAndObjects(mergeMap: MutableMap<Pair<NameEntity, NameEntity>, TopLevelModel?>) {
+
     declarations.forEach { declaration ->
         if ((declaration is VariableModel) || (declaration is ObjectModel)) {
-            if (mergeMap.containsKey(Pair(name, declaration.name))) {
-                mergeMap[Pair(name, declaration.name)] = declaration
+            val key = getKey(name, declaration.name)
+            if (mergeMap.containsKey(key)) {
+                mergeMap[key] = declaration
             }
         }
     }
 
-    submodules.forEach { it.scan(mergeMap) }
+    submodules.forEach { it.scanVariablesAndObjects(mergeMap) }
 }
 
 fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity>, TopLevelModel?>): ModuleModel {
+
     val declarationsMerged = declarations.mapNotNull { declaration ->
         when (declaration) {
             is VariableModel -> {
-                if (!mergeMap.containsKey(Pair(name, declaration.name))) {
+                if (!mergeMap.containsKey(getKey(name, declaration.name))) {
                     declaration
                 } else {
                     null
                 }
             }
             is ObjectModel -> {
-                if (!mergeMap.containsKey(Pair(name, declaration.name))) {
+                if (!mergeMap.containsKey(getKey(name, declaration.name))) {
                     declaration
                 } else {
                     null
                 }
             }
             is InterfaceModel -> {
-                mergeMap[Pair(name, declaration.name)]?.let { correspondingEntity ->
+                mergeMap[getKey(name, declaration.name)]?.let { correspondingEntity ->
                     when (correspondingEntity) {
                         is VariableModel -> {
                             if (correspondingEntity.type is TypeValueModel) {
@@ -86,10 +102,12 @@ fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity
 }
 
 fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
+    val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
+    sources.forEach { it.root.scanInterfaces(mergeMap) }
+    sources.forEach { it.root.scanVariablesAndObjects(mergeMap) }
+
     return transform {
         // TODO: investigate where we ever will see multiple variables with same name
-        val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
-        it.scan(mergeMap)
         it.mergeVarsAndInterfaces(mergeMap)
     }
 }
