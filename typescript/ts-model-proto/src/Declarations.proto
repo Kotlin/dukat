@@ -425,7 +425,7 @@ message SourceFileDeclarationProto {
 }
 
 message SourceSetDeclarationProto {
-    string sourceName = 1;
+    repeated string sourceName = 1;
     repeated SourceFileDeclarationProto sources = 2;
 }
 

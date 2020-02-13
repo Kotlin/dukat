@@ -117,7 +117,7 @@ class SourceBundleBuilder {
 
   createBundle(): declarations.SourceBundleDeclarationProto {
     let sourceSets = this.files.map(fileName => {
-      return this.astFactory.createSourceSet(fileName, this.createSourceSet(fileName));
+      return this.astFactory.createSourceSet([fileName], this.createSourceSet(fileName));
     });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
@@ -141,7 +141,7 @@ class SourceBundleBuilder {
       ));
     });
 
-    sourceSets.push(this.astFactory.createSourceSet(libRootUid, libFiles));
+    sourceSets.push(this.astFactory.createSourceSet([libRootUid], libFiles));
 
     sourceSetBundle.setSourcesList(sourceSets);
     return sourceSetBundle;

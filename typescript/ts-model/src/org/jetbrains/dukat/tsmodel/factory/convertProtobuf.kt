@@ -566,7 +566,7 @@ fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
 }
 
 fun SourceSetDeclarationProto.convert(): SourceSetDeclaration {
-    return SourceSetDeclaration(listOf(sourceName), sourcesList.map { it.convert() })
+    return SourceSetDeclaration(sourceNameList, sourcesList.map { it.convert() })
 }
 
 fun SourceBundleDeclarationProto.convert(): SourceBundleDeclaration {
