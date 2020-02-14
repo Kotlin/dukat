@@ -120,7 +120,16 @@ export abstract class DeclarationsVisitor {
       }
     }
 
-    const symbol = this.typeChecker.getTypeAtLocation(node).symbol;
+    let symbol = this.typeChecker.getTypeAtLocation(node).symbol;
+    if (!symbol) {
+      let symbolAtLocation = this.typeChecker.getSymbolAtLocation(node.typeName);
+      if (symbolAtLocation) {
+        let declaredType = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
+        if (declaredType) {
+          symbol = declaredType.symbol || declaredType.aliasSymbol;
+        }
+      }
+    }
     if (symbol && Array.isArray(symbol.declarations)) {
       for (let declaration of symbol.declarations) {
         if (this.isTransientDependency(declaration)) {
