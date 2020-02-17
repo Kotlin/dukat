@@ -130,9 +130,13 @@ export abstract class DeclarationsVisitor {
         }
       }
     }
+
+    console.log(`CHECK REF FOR ${symbol} <= ${node.getText()}`);
     if (symbol && Array.isArray(symbol.declarations)) {
+      console.log(`CHECK REF FOR RESOLVED !!! ${node.getText()}`);
       for (let declaration of symbol.declarations) {
         if (this.isTransientDependency(declaration)) {
+          console.log(`CHECK REF FOR REGISTERED !!! ${node.getText()}`);
             this.registerDeclaration(declaration);
         }
       }
