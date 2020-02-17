@@ -408,7 +408,7 @@ export class AstFactory {
     return moduleDeclaration;
   }
 
-  createModuleDeclarationAsTopLevel(module: ModuleDeclaration): Declaration {
+  createModuleDeclarationAsTopLevel(module: ModuleDeclaration): TopLevelDeclarationProto {
     let topLevelDeclaration = new TopLevelDeclarationProto();
     topLevelDeclaration.setModuledeclaration(module);
     return topLevelDeclaration;

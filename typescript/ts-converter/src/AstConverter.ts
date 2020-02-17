@@ -25,7 +25,7 @@ import {DeclarationResolver} from "./DeclarationResolver";
 import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
-import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto} from "declarations";
+import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto, TopLevelDeclarationProto} from "declarations";
 import {ModuleBody} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
@@ -145,7 +145,7 @@ export class AstConverter {
     });
   }
 
-  createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+  createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): TopLevelDeclarationProto {
     return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, definitionsInfo, uid, resourceName, root));
   }
 
@@ -1005,7 +1005,7 @@ export class AstConverter {
     return moduleDeclaration.name.getText();
   }
 
-  convertModuleBody(body: ts.ModuleBody, filter?: (node: ts.Node) => boolean): Array<Declaration> {
+  convertModuleBody(body: ts.ModuleBody, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
       let moduleDeclarations: Array<Declaration> | null  = null;
 
       if (ts.isModuleBlock(body)) {
@@ -1037,7 +1037,7 @@ export class AstConverter {
   }
 
 
-  convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<Declaration> {
+  convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
     if (module.body) {
       return this.convertModuleBody(module.body, filter);
     }
