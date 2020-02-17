@@ -1006,29 +1006,34 @@ export class AstConverter {
   }
 
   convertModuleBody(body: ts.ModuleBody, filter?: (node: ts.Node) => boolean): Array<Declaration> {
-      const declarations = new Array<Declaration>();
-      let parentModule = body.parent;
+      let moduleDeclarations: Array<Declaration> | null  = null;
 
-      const definitionsInfoDeclarations = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body).map(definitionInfo => {
-          return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.getFilename());
-      });
-
-      let modifiers = this.convertModifiers(parentModule.modifiers);
-      let uid = this.exportContext.getUID(parentModule);
-      let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
-
-      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
-      let imports = this.getImports(body.getSourceFile());
-      let references = this.getReferences(body.getSourceFile());
       if (ts.isModuleBlock(body)) {
         let statements = filter ? body.statements.filter(filter) : body.statements;
-        let moduleDeclarations = this.convertStatements(statements);
-        this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+        moduleDeclarations = this.convertStatements(statements);
       } else if (ts.isModuleDeclaration(body)) {
-        this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body, filter), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+        moduleDeclarations = this.convertModule(body, filter);
       }
 
-      return declarations
+      if (moduleDeclarations) {
+        let parentModule = body.parent;
+
+        const definitionsInfoDeclarations = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body).map(definitionInfo => {
+          return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.getFilename());
+        });
+
+        let modifiers = this.convertModifiers(parentModule.modifiers);
+        let uid = this.exportContext.getUID(parentModule);
+        let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
+
+        let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
+        let imports = this.getImports(body.getSourceFile());
+        let references = this.getReferences(body.getSourceFile());
+
+        return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false)];
+      }
+
+      return [];
   }
 
 
