@@ -1009,14 +1009,9 @@ export class AstConverter {
       const declarations = new Array<Declaration>();
       let parentModule = body.parent;
 
-      let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body);
-
-      let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
-      if (definitionInfos) {
-        definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
+      const definitionsInfoDeclarations = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body).map(definitionInfo => {
           return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.getFilename());
-        });
-      }
+      });
 
       let modifiers = this.convertModifiers(parentModule.modifiers);
       let uid = this.exportContext.getUID(parentModule);
