@@ -26,7 +26,7 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {AstVisitor} from "./AstVisitor";
 import {tsInternals} from "./TsInternals";
-import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto} from "declarations";
+import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto, AccessorDeclarationProto, MemberDeclarationProto} from "declarations";
 
 export class AstConverter {
     private log = createLogger("AstConverter");
@@ -177,6 +177,43 @@ export class AstConverter {
 
         return null;
     }
+
+    convertAccessorDeclaration(declaration: ts.AccessorDeclaration): MemberDeclaration | null {
+        let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(declaration.typeParameters);
+
+        let parameterDeclarations = declaration.parameters.map(
+            (param, count) => this.convertParameterDeclaration(param, count)
+        );
+
+        if (ts.isIdentifier(declaration.name)) {
+            let method = this.astFactory.createFunctionDeclaration(
+                declaration.name ? declaration.name.getText() : "",
+                parameterDeclarations,
+                declaration.type ? this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
+                typeParameterDeclarations,
+                this.convertModifiers(declaration.modifiers),
+                this.convertBlock(declaration.body),
+                "__NO_UID__"
+            );
+
+            let accessor = new AccessorDeclarationProto();
+            accessor.setMethod(method);
+            if (ts.isGetAccessorDeclaration(declaration)) {
+                accessor.setAccess(AccessorDeclarationProto.ACCESS.READ)
+            } else if (ts.isSetAccessorDeclaration(declaration)) {
+                accessor.setAccess(AccessorDeclarationProto.ACCESS.WRITE)
+            } else {
+                throw Error("Invalid accessor" + declaration)
+            }
+
+            let memberProto = new MemberDeclarationProto();
+            memberProto.setAccessor(accessor);
+            return memberProto;
+        }
+
+        return null;
+    }
+
 
     convertTypeParams(nativeTypeDeclarations: ts.NodeArray<ts.TypeParameterDeclaration> | undefined): Array<TypeParameter> {
         let typeParameterDeclarations: Array<TypeParameter> = [];
@@ -653,6 +690,11 @@ export class AstConverter {
                 this.convertConstructorDeclaration(memberDeclaration as ts.ConstructorDeclaration).map(member => {
                     this.registerDeclaration(member, members);
                 });
+            } else if (ts.isSetAccessorDeclaration(memberDeclaration) || ts.isGetAccessorDeclaration(memberDeclaration)) {
+                let accessorDeclaration = this.convertAccessorDeclaration(memberDeclaration as ts.AccessorDeclaration);
+                if (accessorDeclaration != null) {
+                    this.registerDeclaration(accessorDeclaration, members)
+                }
             }
         }
 

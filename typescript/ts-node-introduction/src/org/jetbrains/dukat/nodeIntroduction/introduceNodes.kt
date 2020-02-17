@@ -35,6 +35,30 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
 
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
+	fun convertPropertyFromAccessorDeclaration(declaration: AccessorDeclaration):PropertyNode {
+		var type = declaration.method.type
+		if (declaration.access == AccessorDeclaration.ACCESS.WRITE) {
+			val customType = declaration.method.parameters.firstOrNull()?.type
+					?: {
+						raiseConcern("Invalid parameters: " + declaration.method.parameters, {})
+						type
+					}()
+			type = customType
+		}
+
+		return PropertyNode(
+				declaration.method.name,
+				type,
+				convertTypeParameters(declaration.method.typeParameters),
+
+				declaration.method.isStatic(),
+				declaration.access == AccessorDeclaration.ACCESS.READ,
+				declaration.access == AccessorDeclaration.ACCESS.WRITE,
+
+				true
+		)
+	}
+
     fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
         return PropertyNode(
                 declaration.name,
@@ -411,6 +435,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     true,
                     null
             ))
+			is AccessorDeclaration -> listOf(convertPropertyFromAccessorDeclaration(declaration))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration))

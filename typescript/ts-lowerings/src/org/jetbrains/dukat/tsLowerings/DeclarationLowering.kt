@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.tsmodel.AccessorDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
@@ -29,6 +30,7 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface DeclarationLowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>): VariableDeclaration
+	fun lowerAccessorDeclaration(declaration: AccessorDeclaration, onwer:NodeOwner<MemberDeclaration>): AccessorDeclaration
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>): FunctionDeclaration
     fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration

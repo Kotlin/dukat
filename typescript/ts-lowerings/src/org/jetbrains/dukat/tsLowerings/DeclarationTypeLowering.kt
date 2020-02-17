@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.tsmodel.AccessorDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -77,6 +78,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration, newOwner)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration, newOwner)
             is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration, newOwner)
+			is AccessorDeclaration -> lowerAccessorDeclaration(declaration, newOwner)
             else -> {
                 logger.debug("[${this}] skipping ${declaration}")
                 declaration
@@ -93,6 +95,10 @@ interface DeclarationTypeLowering : DeclarationLowering {
                 type = lowerParameterValue(declaration.type, owner.wrap(declaration))
         )
     }
+
+	override fun lowerAccessorDeclaration(declaration: AccessorDeclaration, onwer:NodeOwner<MemberDeclaration>):AccessorDeclaration {
+		return declaration.copy()
+	}
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>): FunctionDeclaration {
         return declaration.copy(

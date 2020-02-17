@@ -285,8 +285,8 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                     static = static,
                     override = null,
                     immutable = getter && !setter,
-                    getter = false,
-                    setter = false,
+                    getter = getter,
+                    setter = setter,
                     open = open
             )
             else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
@@ -457,8 +457,52 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
         }
     }
 
+	/**
+	 * 	in kotlin writable accessor is readable  too
+	 *
+	 *		Convert records:
+	 *		"write accessor" + "read accessor" => "write accessor"
+	 *		"read accessor" => "read accessor"
+	 *		"write accessor" => remove (write and not read accessor is not possible in kotlin)
+	 */
+	private fun filterAccessors(className:String, source: List<MemberNode>): List<MemberNode> {
+		val writeAccessors = mutableMapOf<String, PropertyNode>()
+		val readAccessors = mutableMapOf<String, PropertyNode>()
+
+		for (member in source) {
+			if (member is PropertyNode) {
+				if (member.getter) {
+					readAccessors.put(member.name, member)
+				}
+				if (member.setter) {
+					writeAccessors.put(member.name, member)
+				}
+			}
+		}
+
+		val target = mutableListOf<MemberNode>()
+		source.forEach { member->
+			if (member is PropertyNode) {
+				val write = writeAccessors.get(member.name)
+				val read = readAccessors.get(member.name)
+				if (write != null && read != null) {
+					target.add(write)
+				} else if (read != null) {
+					target.add(read)
+				} else if (write != null) {
+					logger.warn("write only accessor: $className::${member.name} now not supported")
+				} else {
+					target.add(member)
+				}
+			} else {
+				target.add(member)
+			}
+		}
+		return target
+	}
+
     private fun ClassNode.convertToClassModel(): TopLevelModel {
-        val membersSplitted = split(members)
+        val membersSplitted = split(filterAccessors(name.toString(), members))
 
         val generatedMethods = mutableListOf<MemberModel>()
         val parentModelEntities = convertParentEntities(parentEntities) {
