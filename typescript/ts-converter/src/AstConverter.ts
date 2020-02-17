@@ -26,6 +26,7 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto} from "declarations";
+import {ModuleBody} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -1004,11 +1005,12 @@ export class AstConverter {
     return moduleDeclaration.name.getText();
   }
 
-  convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<Declaration> {
-    let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
+  convertModuleBody(body: ts.ModuleBody, filter?: (node: ts.Node) => boolean): Array<Declaration> {
+      const declarations = new Array<Declaration>();
+      let parentModule = body.parent;
 
-    const declarations: Declaration[] = [];
-    if (module.body) {
+      let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body);
+
       let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
       if (definitionInfos) {
         definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
@@ -1016,14 +1018,13 @@ export class AstConverter {
         });
       }
 
-      let body = module.body;
-      let modifiers = this.convertModifiers(module.modifiers);
-      let uid = this.exportContext.getUID(module);
-      let sourceNameFragment = this.resolveAmbientModuleName(module);
+      let modifiers = this.convertModifiers(parentModule.modifiers);
+      let uid = this.exportContext.getUID(parentModule);
+      let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
 
       let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
-      let imports = this.getImports(module.getSourceFile());
-      let references = this.getReferences(module.getSourceFile());
+      let imports = this.getImports(body.getSourceFile());
+      let references = this.getReferences(body.getSourceFile());
       if (ts.isModuleBlock(body)) {
         let statements = filter ? body.statements.filter(filter) : body.statements;
         let moduleDeclarations = this.convertStatements(statements);
@@ -1031,8 +1032,16 @@ export class AstConverter {
       } else if (ts.isModuleDeclaration(body)) {
         this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body, filter), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
       }
+
+      return declarations
+  }
+
+
+  convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<Declaration> {
+    if (module.body) {
+      return this.convertModuleBody(module.body, filter);
     }
-    return declarations
+    return [];
   }
 
 }
