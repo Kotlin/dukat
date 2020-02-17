@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.idlLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
 private fun ModuleModel.isLib(): Boolean {
-    return name == IdentifierEntity("<LIBROOT>")
+    return name.leftMost() == IdentifierEntity("<LIBROOT>")
 }
 
 fun SourceSetModel.omitStdLib(): SourceSetModel {

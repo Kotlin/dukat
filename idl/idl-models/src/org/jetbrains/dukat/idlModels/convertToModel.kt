@@ -100,9 +100,7 @@ private class IdlFileConverter(
             "Number",
             "dynamic",
             "Promise",
-            "Unit",
-
-            "ItemArrayLike"
+            "Unit"
         )
 
         val toStdMap = mapOf(
@@ -741,7 +739,10 @@ private class IdlFileConverter(
             declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
             annotations = mutableListOf(),
             submodules = listOf(),
-            imports = mutableListOf(ImportModel("kotlin.js.*".toNameEntity())),
+            imports = mutableListOf(
+                ImportModel("kotlin.js.*".toNameEntity()),
+                ImportModel("org.khronos.webgl.*".toNameEntity()) // for typed arrays
+            ),
             comment = null
         )
 

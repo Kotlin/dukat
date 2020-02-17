@@ -1,4 +1,5 @@
 import kotlin.js.*
+import org.khronos.webgl.*
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
