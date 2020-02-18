@@ -550,7 +550,8 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 external = moduleNameIsStringLiteral,
                 jsModule = null,
                 jsQualifier = null,
-                uid = documentRoot.uid
+                uid = documentRoot.uid,
+                root = documentRoot.root
         )
     }
 }

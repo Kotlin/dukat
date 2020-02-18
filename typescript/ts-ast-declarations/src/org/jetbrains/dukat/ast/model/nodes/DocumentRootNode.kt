@@ -18,5 +18,6 @@ data class DocumentRootNode(
         var jsModule: NameEntity?,
         var jsQualifier: NameEntity?,
 
-        var uid: String
+        var uid: String,
+        val root: Boolean
 ) : TopLevelEntity
