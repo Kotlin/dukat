@@ -7,7 +7,7 @@ import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {SourceFileDeclarationProto} from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {DeclarationsVisitor, RootNode} from "./ast/DeclarationsVisitor";
+import {DeclarationsVisitor} from "./ast/DeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
 import {DocumentCache} from "./DocumentCache";
 
@@ -123,7 +123,7 @@ class SourceBundleBuilder {
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
-    this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: RootNode) => {
+    this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: ts.SourceCode) => {
       let resourceName = resourceSource.getSourceFile().fileName;
 
       console.log(`NODE => ${resourceSource.getSourceFile().fileName}`);

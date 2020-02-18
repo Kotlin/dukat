@@ -1,9 +1,6 @@
 import * as ts from "typescript";
 
-export type RootNode = ts.SourceFile | ts.ModuleBlock;
-
-
-function isTopLevel(node: ts.Node) {
+function isTopLevel(node: ts.Node): boolean {
   let res = false;
 
   if (ts.isClassDeclaration(node)) {
@@ -23,10 +20,6 @@ function isTopLevel(node: ts.Node) {
   }
 
   if (ts.isModuleDeclaration(node)) {
-    res = true;
-  }
-
-  if (ts.isSourceFile(node)) {
     res = true;
   }
 
@@ -61,7 +54,7 @@ function isTopLevelFunction(node: ts.ArrowFunction | ts.FunctionDeclaration | ts
 export abstract class DeclarationsVisitor {
 
   private processed = new Set<ts.Node>();
-  private declarations = new Map<RootNode, Set<ts.Node>>();
+  private declarations = new Map<ts.SourceFile, Set<ts.Node>>();
 
   private skipTypes = new Set([
     "Array",
