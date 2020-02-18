@@ -60,6 +60,7 @@ import {
   UnionTypeDeclarationProto,
   VariableDeclarationProto, WhileStatementDeclarationProto
 } from "declarations";
+import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
 
 export class AstFactory {
@@ -148,7 +149,7 @@ export class AstFactory {
 
   createDefinitionInfoDeclaration(fileName: string): DefinitionInfoDeclaration {
     let definition = new DefinitionInfoDeclarationProto();
-    definition.setFilename(fileName);
+    definition.setFilename(tsInternals.normalizePath(fileName));
     return definition;
   }
 
@@ -455,16 +456,16 @@ export class AstFactory {
 
   createSourceFileDeclaration(fileName: string, root: ModuleDeclaration | null): SourceFileDeclaration {
     let sourceFile = new SourceFileDeclarationProto();
-    sourceFile.setFilename(fileName);
+    sourceFile.setFilename(tsInternals.normalizePath(fileName));
     if (root) {
       sourceFile.setRoot(root);
     }
     return sourceFile;
   }
 
-  createSourceSet(fileName: Array<string>, sources: Array<SourceFileDeclaration>): SourceSet {
+  createSourceSet(fileNames: Array<string>, sources: Array<SourceFileDeclaration>): SourceSet {
     let sourceSet = new SourceSetDeclarationProto();
-    sourceSet.setSourcenameList(fileName);
+    sourceSet.setSourcenameList(fileNames.map(fileName => tsInternals.normalizePath(fileName)));
     sourceSet.setSourcesList(sources);
     return sourceSet;
   }

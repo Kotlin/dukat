@@ -31,7 +31,7 @@ export class LibraryDeclarationsVisitor {
 
     this.processed.add(declaration);
 
-    const sourceName = declaration.getSourceFile().fileName;
+    const sourceName = ts.normalizePath(declaration.getSourceFile().fileName);
 
     if (!Array.isArray(this.declarations.get(sourceName))) {
       this.declarations.set(sourceName, []);
