@@ -1005,7 +1005,7 @@ export class AstConverter {
     return moduleDeclaration.name.getText();
   }
 
-  convertModuleBody(body: ts.ModuleBody, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
+  convertModuleBody(body: ts.ModuleBody | null, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
       let moduleDeclarations: Array<Declaration> | null  = null;
 
       if (ts.isModuleBlock(body)) {
@@ -1038,10 +1038,7 @@ export class AstConverter {
 
 
   convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
-    if (module.body) {
-      return this.convertModuleBody(module.body, filter);
-    }
-    return [];
+    return this.convertModuleBody(module.body, filter);
   }
 
 }
