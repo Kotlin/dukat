@@ -498,9 +498,9 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 
     private fun resolveExternalSource(definitionsInfo: List<DefinitionInfoDeclaration>): String? {
-        return definitionsInfo.firstOrNull()?.fileName?.replace("/", File.separator)?.let {
+        return definitionsInfo.firstOrNull()?.fileName?.let {
             if (it != fileName) {
-                it.split(File.separator).last()
+                File(it).name
             } else null
         }
     }
@@ -559,13 +559,11 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
 private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, NodeOwner(this, null))
 
 fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
-    val fileNameNormalized = File(fileName).normalize().absolutePath
-
     val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
     return SourceFileNode(
-            fileNameNormalized,
-            root.introduceNodes(fileNameNormalized, moduleNameResolver),
+            fileName,
+            root.introduceNodes(fileName, moduleNameResolver),
             references,
             null
     )
