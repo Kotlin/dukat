@@ -1,4 +1,5 @@
 import {
+    AccessorDeclarationProto,
     BlockDeclarationProto,
     CallSignatureDeclarationProto,
     ClassDeclarationProto,
@@ -59,6 +60,7 @@ export type NameEntity = NameDeclarationProto;
 export type ParameterDeclaration = ParameterDeclarationProto;
 export type TypeDeclaration = ParameterValueDeclarationProto;
 export type PropertyDeclaration = PropertyDeclarationProto;
+export type AccessorDeclaration = AccessorDeclarationProto;
 export type ReferenceEntity = ReferenceDeclarationProto;
 export type SourceBundle = SourceBundleDeclarationProto;
 export type SourceFileDeclaration = SourceFileDeclarationProto;

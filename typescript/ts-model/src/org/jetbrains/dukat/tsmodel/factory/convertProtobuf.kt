@@ -41,6 +41,7 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodelproto.AccessorDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ArrayLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
@@ -165,6 +166,11 @@ fun InterfaceDeclarationProto.convert(): InterfaceDeclaration {
             definitionsInfoList.map { DefinitionInfoDeclaration(it.fileName) },
             uid
     )
+}
+
+fun AccessorDeclarationProto.convert(): AccessorDeclaration {
+	val access:AccessorDeclaration.ACCESS = if (this.accessValue == AccessorDeclarationProto.ACCESS.WRITE_VALUE) AccessorDeclaration.ACCESS.WRITE else AccessorDeclaration.ACCESS.READ
+	return AccessorDeclaration(method.convert(),access)
 }
 
 fun BlockDeclarationProto.convert(): BlockDeclaration {
@@ -350,6 +356,7 @@ fun MemberDeclarationProto.convert(): MemberDeclaration {
         hasProperty() -> property.convert()
         hasIndexSignature() -> indexSignature.convert()
         hasCallSignature() -> callSignature.convert()
+		hasAccessor() -> accessor.convert()
         else -> throw Exception("unknown MemberEntityProto: ${this}")
     }
 }

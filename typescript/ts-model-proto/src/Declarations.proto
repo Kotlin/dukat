@@ -138,6 +138,15 @@ message PropertyDeclarationProto {
     repeated ModifierDeclarationProto modifiers = 6;
 }
 
+message AccessorDeclarationProto {
+	FunctionDeclarationProto method = 1;
+    enum ACCESS {
+        READ = 0;
+        WRITE = 1;
+    }
+    ACCESS access = 2;
+}
+
 message ModifierDeclarationProto {
     string token = 1;
 }
@@ -156,6 +165,7 @@ message MemberDeclarationProto {
         MethodSignatureDeclarationProto methodSignature = 5;
         PropertyDeclarationProto property = 6;
         ObjectLiteralDeclarationProto objectLiteral = 7;
+        AccessorDeclarationProto accessor = 8;
     }
 }
 
