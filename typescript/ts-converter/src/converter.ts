@@ -133,8 +133,8 @@ class SourceBundleBuilder {
       if (ts.isSourceFile(resourceSource)) {
         let packageName = this.isLibSource(resourceSource) ? "<LIBROOT>" : "<ROOT>";
         modules = [this.astConverter.createModuleFromSourceFile(resourceSource, this.astFactory.createIdentifierDeclarationAsNameEntity(packageName), filterFunc)]
-      } else if (ts.isModuleDeclaration(resourceSource)) {
-        modules = this.astConverter.convertModule(resourceSource, filterFunc)
+      } else if (ts.isModuleBlock(resourceSource)) {
+        modules = this.astConverter.convertModuleBody(resourceSource, filterFunc).map( it => it.getModuledeclaration())
       }
 
       for (let module of modules) {

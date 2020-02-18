@@ -100,7 +100,7 @@ export abstract class DeclarationsVisitor {
     }
 
     if (isTopLevel(declaration)) {
-      const rootNode = declaration.getSourceFile();
+      const rootNode = getRootNode(declaration);
 
       if (!this.declarations.has(rootNode)) {
         this.declarations.set(rootNode, new Set());
