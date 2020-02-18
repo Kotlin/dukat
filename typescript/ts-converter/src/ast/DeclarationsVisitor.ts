@@ -2,18 +2,6 @@ import * as ts from "typescript";
 
 export type RootNode = ts.SourceFile | ts.ModuleBlock;
 
-function getRootNode(node: ts.Node): RootNode {
-  let parent = node.parent;
-  while (parent) {
-    if (ts.isModuleBlock(parent)) {
-      return parent;
-    }
-
-    parent = parent.parent;
-  }
-
-  return node.getSourceFile();
-}
 
 function isTopLevel(node: ts.Node) {
   let res = false;
@@ -94,19 +82,22 @@ export abstract class DeclarationsVisitor {
   }
 
   private registerDeclaration(declaration) {
-    let text = declaration.getText().substring(0, 50);
     if (this.processed.has(declaration)) {
       return;
     }
 
     if (isTopLevel(declaration)) {
-      const rootNode = getRootNode(declaration);
+      const rootNode = declaration.getSourceFile();
 
       if (!this.declarations.has(rootNode)) {
         this.declarations.set(rootNode, new Set());
       }
 
       this.declarations.get(rootNode)!.add(declaration);
+    }
+
+    if (!ts.isSourceFile(declaration.parent)) {
+      this.registerDeclaration(declaration.parent);
     }
 
     this.processed.add(declaration);
