@@ -1,14 +1,5 @@
 import * as ts from "typescript";
 
-const MERGE_RESOLUTION_SYMBOLS = new Map([
-  [ts.SyntaxKind.InterfaceDeclaration, new Set([
-    ts.SyntaxKind.FunctionDeclaration,
-    ts.SyntaxKind.InterfaceDeclaration,
-    ts.SyntaxKind.VariableDeclaration
-  ])],
-  [ts.SyntaxKind.ModuleDeclaration, new Set([ts.SyntaxKind.ModuleDeclaration])]
-]);
-
 type DefinitionData = {fileName: string}
 
 export class DeclarationResolver {
@@ -16,15 +7,14 @@ export class DeclarationResolver {
   constructor(private program: ts.Program) {
   }
 
-  resolve(kind: ts.SyntaxKind, node: ts.Node): ReadonlyArray<DefinitionData> | undefined {
+  resolve(node: ts.Node): ReadonlyArray<DefinitionData> | undefined {
     let typeChecker = this.program.getTypeChecker();
     let symbol = typeChecker.getSymbolAtLocation(node);
 
     if (symbol) {
       let symbols: Array<DefinitionData> = [];
       for (let declaration of symbol.declarations) {
-        let mergeAllowedSet = MERGE_RESOLUTION_SYMBOLS.get(kind);
-        if (mergeAllowedSet && mergeAllowedSet.has(declaration.kind)) {
+        if (ts.isFunctionDeclaration(declaration) || ts.isInterfaceDeclaration(declaration) || ts.isVariableDeclaration(declaration)) {
           symbols.push({fileName: declaration.getSourceFile().fileName})
         }
       }

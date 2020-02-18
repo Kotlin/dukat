@@ -546,7 +546,6 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
-                definitionsInfo = documentRoot.definitionsInfo,
                 external = moduleNameIsStringLiteral,
                 jsModule = null,
                 jsQualifier = null,

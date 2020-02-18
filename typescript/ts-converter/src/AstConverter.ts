@@ -124,7 +124,6 @@ export class AstConverter {
           this.getReferences(sourceFile),
           this.convertStatements(sourceFile.statements),
           this.convertModifiers(sourceFile.modifiers),
-          [],
           uid(),
           sourceName,
           true);
@@ -144,8 +143,8 @@ export class AstConverter {
         });
     }
 
-    createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
-        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, definitionsInfo, uid, resourceName, root));
+    createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+        return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, root));
     }
 
     convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -820,8 +819,8 @@ export class AstConverter {
         );
     }
 
-    private convertDefinitions(kind: ts.SyntaxKind, name: ts.Node): Array<DefinitionInfoDeclaration> {
-        let definitionInfos = this.declarationResolver.resolve(kind, name);
+    private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
+        let definitionInfos = this.declarationResolver.resolve(name);
 
         let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
         if (definitionInfos) {
@@ -839,7 +838,7 @@ export class AstConverter {
           this.convertMembersToInterfaceMemberDeclarations(statement.members),
           this.convertTypeParams(statement.typeParameters),
           this.convertHeritageClauses(statement.heritageClauses, statement),
-          computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
+          computeDefinitions ? this.convertDefinitions(statement.name) : [],
           this.exportContext.getUID(statement)
         );
     }
@@ -1011,17 +1010,8 @@ export class AstConverter {
     }
 
     convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
-        let definitionInfos = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, module);
-
         const declarations: Declaration[] = [];
         if (module.body) {
-            let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
-            if (definitionInfos) {
-                definitionsInfoDeclarations = definitionInfos.map(definitionInfo => {
-                    return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.getFilename());
-                });
-            }
-
             let body = module.body;
             let modifiers = this.convertModifiers(module.modifiers);
             let uid = this.exportContext.getUID(module);
@@ -1032,9 +1022,9 @@ export class AstConverter {
             let references = this.getReferences(module.getSourceFile());
             if (ts.isModuleBlock(body)) {
                 let moduleDeclarations = this.convertStatements(body.statements);
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false), declarations);
             } else if (ts.isModuleDeclaration(body)) {
-                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body), modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false), declarations);
+                this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body), modifiers, uid, sourceNameFragment, false), declarations);
             }
         }
         return declarations

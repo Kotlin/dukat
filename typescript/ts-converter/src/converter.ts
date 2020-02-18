@@ -133,7 +133,6 @@ class SourceBundleBuilder {
           [],
           declarations,
           [],
-          [],
           libRootUid,
           libRootUid,
           true

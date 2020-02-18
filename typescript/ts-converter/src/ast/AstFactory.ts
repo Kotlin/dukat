@@ -394,7 +394,7 @@ export class AstFactory {
     return modifierDeclaration;
   }
 
-  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
+  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
     let moduleDeclaration = new ModuleDeclarationProto();
 
     moduleDeclaration.setImportsList(imports);

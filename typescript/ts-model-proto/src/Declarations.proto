@@ -413,10 +413,9 @@ message ModuleDeclarationProto {
     repeated ReferenceClauseDeclarationProto references = 3;
     repeated TopLevelDeclarationProto declarations = 4;
     repeated ModifierDeclarationProto modifiers = 5;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 6;
-    string uid = 7;
-    string resourceName = 8;
-    bool root = 9;
+    string uid = 6;
+    string resourceName = 7;
+    bool root = 8;
 }
 
 message SourceFileDeclarationProto {
