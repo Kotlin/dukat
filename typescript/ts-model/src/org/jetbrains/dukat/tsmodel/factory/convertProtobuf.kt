@@ -236,7 +236,6 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
             referencesList.map { it.convert() },
             declarationsList.map { it.convert() },
             modifiersList.map { it.convert() },
-            definitionsInfoList.map { it.convert() },
             uid,
             resourceName,
             root)

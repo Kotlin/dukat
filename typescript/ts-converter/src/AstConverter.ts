@@ -125,7 +125,6 @@ export class AstConverter {
       this.getReferences(sourceFile),
       this.convertStatements(statements),
       this.convertModifiers(sourceFile.modifiers),
-      [],
       uid(),
       sourceName,
       true);
@@ -145,8 +144,8 @@ export class AstConverter {
     });
   }
 
-  createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, resourceName: string, root: boolean): TopLevelDeclarationProto {
-    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, definitionsInfo, uid, resourceName, root));
+  createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): TopLevelDeclarationProto {
+    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, root));
   }
 
   convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -817,7 +816,7 @@ export class AstConverter {
   }
 
   private convertDefinitions(kind: ts.SyntaxKind, name: ts.Node): Array<DefinitionInfoDeclaration> {
-    let definitionInfos = this.declarationResolver.resolve(kind, name);
+    let definitionInfos = this.declarationResolver.resolve(name);
 
     let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
     if (definitionInfos) {
@@ -1018,10 +1017,6 @@ export class AstConverter {
       if (moduleDeclarations) {
         let parentModule = body.parent;
 
-        const definitionsInfoDeclarations = this.convertDefinitions(ts.SyntaxKind.ModuleDeclaration, body).map(definitionInfo => {
-          return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.getFilename());
-        });
-
         let modifiers = this.convertModifiers(parentModule.modifiers);
         let uid = this.exportContext.getUID(parentModule);
         let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
@@ -1030,15 +1025,13 @@ export class AstConverter {
         let imports = this.getImports(body.getSourceFile());
         let references = this.getReferences(body.getSourceFile());
 
-        return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, definitionsInfoDeclarations, uid, sourceNameFragment, false)];
+        return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false)];
       }
 
       return [];
   }
 
-
   convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
     return this.convertModuleBody(module.body, filter);
   }
-
 }
