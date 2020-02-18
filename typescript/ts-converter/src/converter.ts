@@ -126,7 +126,6 @@ class SourceBundleBuilder {
     this.declarationsVisitor.forEachDeclaration((nodes, resourceSource: ts.SourceCode) => {
       let resourceName = resourceSource.getSourceFile().fileName;
 
-      console.log(`NODE => ${resourceSource.getSourceFile().fileName}`);
       let filterFunc = (node: ts.Node) => nodes.has(node);
 
       let modules: any[] = [];

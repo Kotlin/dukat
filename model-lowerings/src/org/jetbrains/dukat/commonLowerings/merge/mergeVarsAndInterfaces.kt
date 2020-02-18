@@ -104,20 +104,7 @@ fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity
 fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
     val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
     sources.forEach { it.root.scanInterfaces(mergeMap) }
-
-    sources.forEach { println(it.fileName) }
-
-    println("PHASE A")
-    mergeMap.forEach { key, value ->
-        println("KEY ${key} => ${value}")
-    }
-
     sources.forEach { it.root.scanVariablesAndObjects(mergeMap) }
-
-    println("PHASE B")
-    mergeMap.forEach { key, value ->
-        println("KEY ${key} => ${value}")
-    }
 
     return transform {
         // TODO: investigate where we ever will see multiple variables with same name
