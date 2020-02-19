@@ -132,10 +132,6 @@ class SourceBundleBuilder {
         modules = [this.astConverter.createModuleFromSourceFile(resourceSource, this.astFactory.createIdentifierDeclarationAsNameEntity(packageName), filterFunc)]
       }
 
-      for (let module of modules) {
-        console.log(`MODULE ${module.getPackagename()}`);
-      }
-
       files.push(...modules.map(moduleDeclaration => {
         return this.astFactory.createSourceFileDeclaration(
             resourceName, moduleDeclaration as any

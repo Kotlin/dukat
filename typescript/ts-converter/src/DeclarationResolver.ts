@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import {DeclarationsVisitor} from "./ast/DeclarationsVisitor";
 
 type DefinitionData = {fileName: string}
 
