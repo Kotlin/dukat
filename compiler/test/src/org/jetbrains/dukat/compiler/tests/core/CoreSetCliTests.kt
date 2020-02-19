@@ -83,7 +83,7 @@ class CoreSetCliTests {
             )
             if (skippedDeclarations.contains(targetFile.name)) {
                 null
-            } else if (output.startsWith("xlib.")) {
+            } else if (output.startsWith("lib.")) {
                 null
             } else {
                 targetFile.readText()
