@@ -56,12 +56,13 @@ export class AstConverter {
         return null;
     }
 
+
     private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
-        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName) + "/";
+        let curDir = tsInternals.getDirectoryPath(sourceFile.fileName);
 
         let referencedFiles = new Array<ReferenceClauseDeclarationProto>();
         sourceFile.referencedFiles.forEach(referencedFile => {
-            referencedFiles.push(this.astFactory.createReferenceClause(referencedFile.fileName, curDir + referencedFile.fileName));
+            referencedFiles.push(this.astFactory.createReferenceClause(tsInternals.normalizePath(referencedFile.fileName), ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir)));
         });
 
         if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
