@@ -131,6 +131,10 @@ export abstract class DeclarationsVisitor {
       }
     } else if (ts.isInterfaceDeclaration(declaration)) {
       this.checkReferences(declaration);
+    } else if (ts.isVariableDeclaration(declaration)) {
+        this.checkReferences(declaration);
+    } else if (ts.isFunctionDeclaration(declaration)) {
+        this.checkReferences(declaration);
     } else if (ts.isTypeAliasDeclaration(declaration)) {
       this.checkReferences(declaration.type)
     } else if (ts.isHeritageClause(declaration)) {
