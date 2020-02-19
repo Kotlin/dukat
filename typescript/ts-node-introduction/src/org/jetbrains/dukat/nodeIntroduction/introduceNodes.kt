@@ -379,7 +379,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
             )
             is CallSignatureDeclaration -> unrollOptionalParams(declaration.parameters).map { parameters ->
                 FunctionNode(
-                        QualifierEntity(name, IdentifierEntity("invoke")),
+                        IdentifierEntity("invoke"),
                         parameters,
                         declaration.type,
                         emptyList(),
@@ -388,7 +388,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                         true,
                         true,
                         true,
-                        null,
+                        ClassLikeReferenceNode(interfaceDeclaration.uid, interfaceDeclaration.name, interfaceDeclaration.typeParameters.map { IdentifierEntity("*") }),
                         FunctionFromCallSignature(parameters.map { IdentifierEntity(it.name) }),
                         "",
                         null
