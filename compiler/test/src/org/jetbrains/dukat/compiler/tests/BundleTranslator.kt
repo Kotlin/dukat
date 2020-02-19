@@ -26,6 +26,6 @@ class BundleTranslator(
     }
 
     fun translate(fileName: String): SourceSetModel {
-        return bundleSourceMap[fileName]!!
+        return bundleSourceMap[fileName.replace(File.separator, "/")]!!
     }
 }
