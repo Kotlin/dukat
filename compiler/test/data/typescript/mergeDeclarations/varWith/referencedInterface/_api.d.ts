@@ -1,7 +1,5 @@
 declare module "api" {
-    interface API {
+    export interface API {
         ping(): boolean;
     }
-
-    export = API
 }
