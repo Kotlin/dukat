@@ -55,7 +55,7 @@ class SourceBundleBuilder {
   }
 
   private declarationsVisitor: DeclarationsVisitor;
-  private astConverter: AstConverter = this.createAstConverter();
+  private astConverter: AstConverter;
 
   constructor(
       private stdLib: string,
@@ -77,18 +77,17 @@ class SourceBundleBuilder {
         this.program.getTypeChecker()
     );
 
-  }
-
-  private createAstConverter(): AstConverter {
-    let astConverter = new AstConverter(
-        new ExportContext((node: ts.Node) => this.isLibSource(node)),
-        this.program.getTypeChecker(),
-        new DeclarationResolver(this.program),
-        this.astFactory
+    this.astConverter = new AstConverter(
+      new ExportContext((node: ts.Node) => this.isLibSource(node)),
+      this.program.getTypeChecker(),
+      new DeclarationResolver(this.program, (declaration => {
+        console.log(`DECL => ${declaration.getText()}`);
+        this.declarationsVisitor.visit(declaration);
+      })),
+      this.astFactory
     );
-
-    return astConverter;
   }
+
 
   private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
     return this.createFileDeclarations(fileName, this.program);
