@@ -345,7 +345,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                     // TODO: discuss what we actually gonna do when there's more than one key
 
                     FunctionNode(
-                            QualifierEntity(name, IdentifierEntity("get")),
+                            IdentifierEntity("get"),
                             convertParameters(declaration.indexTypes),
                             declaration.returnType.makeNullable(),
                             emptyList(),
@@ -354,13 +354,13 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             true,
                             true,
                             true,
-                            null,
+                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
                             IndexSignatureGetter(declaration.indexTypes[0].name),
                             "",
                             null
                     ),
                     FunctionNode(
-                            QualifierEntity(name, IdentifierEntity("set")),
+                            IdentifierEntity("set"),
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
                                     "value", declaration.returnType, null, false, false
                             ))),
@@ -371,7 +371,7 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
                             true,
                             true,
                             true,
-                            null,
+                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
                             IndexSignatureSetter(declaration.indexTypes[0].name),
                             "",
                             null
