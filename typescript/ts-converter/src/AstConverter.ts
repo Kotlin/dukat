@@ -1005,30 +1005,30 @@ export class AstConverter {
   }
 
   convertModuleBody(body: ts.ModuleBody | null, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
-      let moduleDeclarations: Array<Declaration> | null  = null;
+    let moduleDeclarations: Array<Declaration> | null = null;
 
-      if (ts.isModuleBlock(body)) {
-        let statements = filter ? body.statements.filter(filter) : body.statements;
-        moduleDeclarations = this.convertStatements(statements);
-      } else if (ts.isModuleDeclaration(body)) {
-        moduleDeclarations = this.convertModule(body, filter);
-      }
+    if (ts.isModuleBlock(body)) {
+      let statements = filter ? body.statements.filter(filter) : body.statements;
+      moduleDeclarations = this.convertStatements(statements);
+    } else if (ts.isModuleDeclaration(body)) {
+      moduleDeclarations = this.convertModule(body, filter);
+    }
 
-      if (moduleDeclarations) {
-        let parentModule = body.parent;
+    if (moduleDeclarations) {
+      let parentModule = body.parent;
 
-        let modifiers = this.convertModifiers(parentModule.modifiers);
-        let uid = this.exportContext.getUID(parentModule);
-        let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
+      let modifiers = this.convertModifiers(parentModule.modifiers);
+      let uid = this.exportContext.getUID(parentModule);
+      let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
 
-        let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
-        let imports = this.getImports(body.getSourceFile());
-        let references = this.getReferences(body.getSourceFile());
+      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
+      let imports = this.getImports(body.getSourceFile());
+      let references = this.getReferences(body.getSourceFile());
 
-        return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false)];
-      }
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false)];
+    }
 
-      return [];
+    return [];
   }
 
   convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
