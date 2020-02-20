@@ -13,14 +13,16 @@ import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeConstructor
 
 open class CustomClassDescriptor(
     parent: DeclarationDescriptor,
     name: NameEntity,
     modality: Modality,
     classKind: ClassKind,
-    parentTypes: List<KotlinType>,
+    private val parentTypes: List<KotlinType>,
     private val isCompanion: Boolean,
     isTopLevel: Boolean,
     private val companionObject: ClassDescriptor?,
@@ -42,6 +44,10 @@ open class CustomClassDescriptor(
         LockBasedStorageManager.NO_LOCKS
     ) {
 
+    private val typeConstructor by lazy {
+        ClassTypeConstructorImpl(this, typeParameters, parentTypes, LockBasedStorageManager.NO_LOCKS)
+    }
+
     var staticEnumScope: MemberScope? = null
 
     override fun getStaticScope(): MemberScope = staticEnumScope ?: SimpleMemberScope(listOf())
@@ -57,4 +63,9 @@ open class CustomClassDescriptor(
     override fun getDeclaredTypeParameters(): List<TypeParameterDescriptor> {
         return typeParameters
     }
+
+    override fun getTypeConstructor(): TypeConstructor {
+        return typeConstructor
+    }
+
 }

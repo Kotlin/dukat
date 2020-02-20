@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.AnnotationModel
@@ -51,6 +52,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
@@ -219,24 +221,31 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                             typeAlias.defaultType.replace(newTypeArguments).makeNullableAsSpecified(typeModel.nullable)
                         }
                     } else {
-                        val classDescriptor = findClass(typeModel)
+                        val oldName = context.getOldName(typeModel.value)
+                        val newTypeModel = oldName?.let {
+                            typeModel.copy(
+                                value = oldName.rightMost(),
+                                fqName = oldName
+                            )
+                        } ?: typeModel
+                        val classDescriptor = findClass(newTypeModel)
                         if (classDescriptor == null) {
-                            if (typeModel.value == IdentifierEntity("dynamic")) {
+                            if (newTypeModel.value == IdentifierEntity("dynamic")) {
                                 createDynamicType(DefaultBuiltIns.Instance)
                             } else {
-                                ErrorUtils.createErrorType(translateName(typeModel.value))
-                                    .makeNullableAsSpecified(typeModel.nullable)
+                                ErrorUtils.createErrorType(translateName(newTypeModel.value))
+                                    .makeNullableAsSpecified(newTypeModel.nullable)
                             }
                         } else {
                             KotlinTypeFactory.simpleType(
                                 annotations = Annotations.EMPTY,
                                 constructor = classDescriptor.defaultType.constructor,
                                 arguments = generateReplacementTypeArguments(
-                                    typeModel,
+                                    newTypeModel,
                                     typeProjectionTypes,
                                     classDescriptor.declaredTypeParameters
                                 ),
-                                nullable = typeModel.nullable
+                                nullable = newTypeModel.nullable
                             )
                         }
                     }
@@ -534,6 +543,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
         functionDescriptor.isInline = functionModel.inline
         functionDescriptor.isExternal = !functionModel.inline
+        functionDescriptor.isOperator = functionModel.operator
         return functionDescriptor
     }
 
@@ -557,6 +567,39 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             parent.defaultType
         }
         return constructorDescriptor
+    }
+
+    private fun translatePropertySetter(
+        propertyDescriptor: PropertyDescriptor,
+        typeModel: TypeModel,
+        isInline: Boolean
+    ): PropertySetterDescriptor {
+        return PropertySetterDescriptorImpl(
+            propertyDescriptor,
+            Annotations.EMPTY,
+            propertyDescriptor.modality,
+            propertyDescriptor.visibility,
+            false,
+            false,
+            isInline,
+            CallableMemberDescriptor.Kind.DECLARATION,
+            null,
+            propertyDescriptor.source
+        ).also {
+            it.initialize(
+                translateParameters(
+                    listOf(
+                        ParameterModel(
+                            name = "value",
+                            type = typeModel,
+                            initializer = null,
+                            vararg = false,
+                            modifier = null
+                        )
+                    ), parent = it
+                ).first()
+            )
+        }
     }
 
     private fun translateProperty(propertyModel: PropertyModel, parent: ClassDescriptor): PropertyDescriptor {
@@ -643,33 +686,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         }
         getter.initialize(propertyDescriptor.type)
         val setter = if (parent.kind == ClassKind.INTERFACE && propertyModel.setter) {
-            PropertySetterDescriptorImpl(
-                propertyDescriptor,
-                Annotations.EMPTY,
-                propertyDescriptor.modality,
-                propertyDescriptor.visibility,
-                false,
-                false,
-                false,
-                CallableMemberDescriptor.Kind.DECLARATION,
-                null,
-                propertyDescriptor.source
-            ).also {
-                it.initialize(
-                    translateParameters(
-                        listOf(
-                            ParameterModel(
-                                name = "value",
-                                type = propertyModel.type,
-                                initializer = null,
-                                vararg = false,
-                                modifier = null
-                            )
-                        ), parent = it
-                    ).first()
-                )
-            }
-
+            translatePropertySetter(propertyDescriptor, propertyModel.type, isInline = false)
         } else if (!propertyModel.immutable) {
             DescriptorFactory.createDefaultSetter(
                 propertyDescriptor,
@@ -724,15 +741,19 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         )
         getter.initialize(variableDescriptor.type)
         val setter = if (!variableModel.immutable) {
-            DescriptorFactory.createSetter(
-                variableDescriptor,
-                Annotations.EMPTY,
-                Annotations.EMPTY,
-                false,
-                false,
-                variableModel.inline,
-                variableDescriptor.source
-            )
+            if (variableModel.set != null) {
+                translatePropertySetter(variableDescriptor, variableModel.type, isInline = true)
+            } else {
+                DescriptorFactory.createSetter(
+                    variableDescriptor,
+                    Annotations.EMPTY,
+                    Annotations.EMPTY,
+                    false,
+                    false,
+                    variableModel.inline,
+                    variableDescriptor.source
+                )
+            }
         } else {
             null
         }
@@ -1004,6 +1025,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 return scope ?: {
                     context.registeredImports.clear()
                     context.registeredImports.addAll(moduleModel.imports.map { translateName(it.name.shiftRight()!!) })
+                    moduleModel.imports.forEach { import ->
+                        import.asAlias?.let {
+                            context.registerMappedImport(import.name, it)
+                        }
+                    }
                     context.currentPackageName = moduleModel.name
                     scope = MutableMemberScope(moduleModel.declarations.mapNotNull {
                         translateTopLevelModel(

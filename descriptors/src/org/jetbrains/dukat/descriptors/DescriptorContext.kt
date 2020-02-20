@@ -25,6 +25,7 @@ class DescriptorContext {
     private val registeredTypeAliases: MutableMap<NameEntity, TypeAliasDescriptor> = mutableMapOf()
     private val typeParameters: MutableMap<NameEntity, Stack<TypeParameterDescriptor>> = mutableMapOf()
     val registeredImports: MutableList<String> = mutableListOf()
+    private val mappedImportNames: MutableMap<NameEntity, NameEntity> = mutableMapOf()
     private val registeredMethods: MutableMap<NameEntity, SimpleFunctionDescriptor> = mutableMapOf()
     private val registeredProperties: MutableMap<NameEntity, PropertyDescriptorImpl> = mutableMapOf()
     private val alreadyResolvedClasses: MutableSet<ClassDescriptor> = mutableSetOf()
@@ -146,5 +147,11 @@ class DescriptorContext {
             descriptor.setInitialized()
         }
     }
+
+    fun registerMappedImport(oldName: NameEntity, newName: NameEntity) {
+        mappedImportNames[newName] = oldName
+    }
+
+    fun getOldName(newName: NameEntity) = mappedImportNames[newName]
 
 }
