@@ -45,8 +45,14 @@ external interface NativePlatform {
     fun compile(): Boolean
 }
 
+@Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface Platform<T> : NativePlatform, GeneralPlatform {
     fun pong(): Boolean
+
+    companion object {
+        @nativeInvoke
+        operator fun <T> invoke(type: String, length: Number = definedExternally): Platform<T>
+    }
 }
 
 // ------------------------------------------------------------------------------------------
