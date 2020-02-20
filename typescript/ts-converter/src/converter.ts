@@ -17,7 +17,7 @@ function createFileResolver(): FileResolver {
 
 let cache = new DocumentCache();
 
-function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, defaultLibraryPath: string, libs: Set<string> = new Set()) {
+function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, libs: Set<string> = new Set()): Set<string> {
   if (libPath === undefined) {
     return libs;
   }
@@ -28,7 +28,7 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, de
 
   libs.add(libPath.fileName);
   libPath.libReferenceDirectives.forEach(libReference => {
-    getLibPaths(program, program.getLibFileFromReference(libReference), defaultLibraryPath, libs);
+    getLibPaths(program, program.getLibFileFromReference(libReference), libs);
   });
 
   return libs;
@@ -39,7 +39,7 @@ class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private program = this.createProgram();
 
-  private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib));
+  private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
   private isLibSource(node: ts.Node): boolean {
     return this.libsSet.has(node.getSourceFile().fileName)
