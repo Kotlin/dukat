@@ -823,10 +823,10 @@ export class AstConverter {
     private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
         let definitionInfos = this.declarationResolver.resolve(name);
 
-        let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
+        let definitionsInfoDeclarations = new Array<DefinitionInfoDeclaration>();
         if (definitionInfos) {
             definitionsInfoDeclarations = definitionInfos.map((definitionInfo) => {
-                return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
+                return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
             });
         }
 
