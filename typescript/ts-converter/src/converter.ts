@@ -22,11 +22,12 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, li
     return libs;
   }
 
-  if (libs.has(libPath.fileName)) {
+  let value = ts.normalizePath(libPath.fileName);
+  if (libs.has(value)) {
     return libs;
   }
 
-  libs.add(libPath.fileName);
+  libs.add(value);
   libPath.libReferenceDirectives.forEach(libReference => {
     getLibPaths(program, program.getLibFileFromReference(libReference), libs);
   });
@@ -42,7 +43,7 @@ class SourceBundleBuilder {
   private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
   private isLibSource(node: ts.Node): boolean {
-    return this.libsSet.has(node.getSourceFile().fileName)
+    return this.libsSet.has(ts.normalizePath(node.getSourceFile().fileName));
   }
 
   private declarationsVisitor: DeclarationsVisitor;
