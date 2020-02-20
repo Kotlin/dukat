@@ -221,24 +221,31 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                             typeAlias.defaultType.replace(newTypeArguments).makeNullableAsSpecified(typeModel.nullable)
                         }
                     } else {
-                        val classDescriptor = findClass(typeModel)
+                        val oldName = context.getOldName(typeModel.value)
+                        val newTypeModel = oldName?.let {
+                            typeModel.copy(
+                                value = oldName.rightMost(),
+                                fqName = oldName
+                            )
+                        } ?: typeModel
+                        val classDescriptor = findClass(newTypeModel)
                         if (classDescriptor == null) {
-                            if (typeModel.value == IdentifierEntity("dynamic")) {
+                            if (newTypeModel.value == IdentifierEntity("dynamic")) {
                                 createDynamicType(DefaultBuiltIns.Instance)
                             } else {
-                                ErrorUtils.createErrorType(translateName(typeModel.value))
-                                    .makeNullableAsSpecified(typeModel.nullable)
+                                ErrorUtils.createErrorType(translateName(newTypeModel.value))
+                                    .makeNullableAsSpecified(newTypeModel.nullable)
                             }
                         } else {
                             KotlinTypeFactory.simpleType(
                                 annotations = Annotations.EMPTY,
                                 constructor = classDescriptor.defaultType.constructor,
                                 arguments = generateReplacementTypeArguments(
-                                    typeModel,
+                                    newTypeModel,
                                     typeProjectionTypes,
                                     classDescriptor.declaredTypeParameters
                                 ),
-                                nullable = typeModel.nullable
+                                nullable = newTypeModel.nullable
                             )
                         }
                     }
@@ -1018,6 +1025,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 return scope ?: {
                     context.registeredImports.clear()
                     context.registeredImports.addAll(moduleModel.imports.map { translateName(it.name.shiftRight()!!) })
+                    moduleModel.imports.forEach { import ->
+                        import.asAlias?.let {
+                            context.registerMappedImport(import.name, it)
+                        }
+                    }
                     context.currentPackageName = moduleModel.name
                     scope = MutableMemberScope(moduleModel.declarations.mapNotNull {
                         translateTopLevelModel(
