@@ -162,7 +162,7 @@ fun InterfaceDeclarationProto.convert(): InterfaceDeclaration {
             membersList.map { it.convert() },
             typeParametersList.map { it.convert() },
             parentEntitiesList.map { it.convert() },
-            definitionsInfoList.map { DefinitionInfoDeclaration(it.fileName) },
+            definitionsInfoList.map { it.convert() },
             uid
     )
 }
@@ -213,7 +213,7 @@ fun EnumDeclarationProto.convert(): EnumDeclaration {
 }
 
 private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {
-    return DefinitionInfoDeclaration(fileName)
+    return DefinitionInfoDeclaration(uid, fileName)
 }
 
 private fun ImportClauseDeclarationProto.convert(): ImportDeclaration? {

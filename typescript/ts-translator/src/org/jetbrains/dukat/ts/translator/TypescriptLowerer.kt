@@ -35,6 +35,7 @@ import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
+import org.jetbrains.dukat.tsLowerings.mergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
@@ -62,6 +63,7 @@ open class TypescriptLowerer(
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
                 .addPackageName(packageName)
+                .mergeParentsForMergedInterfaces()
                 .filterOutNonDeclarations()
                 .syncTypeNames(renameMap)
                 .renameImpossibleDeclarations()

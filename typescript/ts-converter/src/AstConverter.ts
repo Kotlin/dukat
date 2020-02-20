@@ -821,7 +821,7 @@ export class AstConverter {
     let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
     if (definitionInfos) {
       definitionsInfoDeclarations = definitionInfos.map((definitionInfo) => {
-        return this.astFactory.createDefinitionInfoDeclaration(definitionInfo.fileName);
+        return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
       });
     }
 

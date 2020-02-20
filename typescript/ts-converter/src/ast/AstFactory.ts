@@ -147,8 +147,9 @@ export class AstFactory {
     return memberProto;
   }
 
-  createDefinitionInfoDeclaration(fileName: string): DefinitionInfoDeclaration {
+  createDefinitionInfoDeclaration(uid: string, fileName: string): DefinitionInfoDeclaration {
     let definition = new DefinitionInfoDeclarationProto();
+    definition.setUid(uid);
     definition.setFilename(tsInternals.normalizePath(fileName));
     return definition;
   }

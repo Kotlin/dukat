@@ -20,7 +20,8 @@ message QualifierDeclarationProto {
 }
 
 message DefinitionInfoDeclarationProto {
-    string fileName = 1;
+    string uid = 1;
+    string fileName = 2;
 }
 
 message ExportAssignmentDeclarationProto {
