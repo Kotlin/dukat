@@ -59,16 +59,23 @@ export class AstConverter {
 
     private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
         let curDir = tsInternals.getDirectoryPath(sourceFile.fileName);
+        let visitedReferences = new Set<string>();
 
         let referencedFiles = new Array<ReferenceClauseDeclarationProto>();
         sourceFile.referencedFiles.forEach(referencedFile => {
-            referencedFiles.push(this.astFactory.createReferenceClause(tsInternals.normalizePath(referencedFile.fileName), ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir)));
+            if (!visitedReferences.has(referencedFile.fileName)) {
+                visitedReferences.add(referencedFile.fileName);
+                referencedFiles.push(this.astFactory.createReferenceClause(tsInternals.normalizePath(referencedFile.fileName), ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir)));
+            }
         });
 
         if (sourceFile.resolvedTypeReferenceDirectiveNames instanceof Map) {
             for (let [_, referenceDirective] of sourceFile.resolvedTypeReferenceDirectiveNames) {
                 if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-                    referencedFiles.push(this.astFactory.createReferenceClause(_, tsInternals.normalizePath(referenceDirective.resolvedFileName)));
+                    if (!visitedReferences.has(referenceDirective.resolvedFileName)) {
+                        visitedReferences.add(referenceDirective.resolvedFileName);
+                        referencedFiles.push(this.astFactory.createReferenceClause(_, tsInternals.normalizePath(referenceDirective.resolvedFileName)));
+                    }
                 }
             }
         }
@@ -77,7 +84,10 @@ export class AstConverter {
         for (let importDeclaration of sourceFile.imports) {
             const modulePath = this.resolveModulePath(importDeclaration);
             if (modulePath) {
-                referencedFiles.push(this.astFactory.createReferenceClause("_", modulePath));
+                if (!visitedReferences.has(modulePath)) {
+                    visitedReferences.add(modulePath);
+                    referencedFiles.push(this.astFactory.createReferenceClause("_", modulePath));
+                }
             }
         }
 
