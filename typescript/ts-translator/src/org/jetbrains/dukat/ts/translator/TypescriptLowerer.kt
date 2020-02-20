@@ -7,7 +7,6 @@ import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.addImports
 import org.jetbrains.dukat.commonLowerings.anyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.extractNonExternalDeclarations
-import org.jetbrains.dukat.commonLowerings.filterOutKotlinStdlibEntities
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.mergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.mergeModules
@@ -109,7 +108,7 @@ open class TypescriptLowerer(
                 .addImports()
                 .anyfyUnresolvedTypes()
                 .addNoinlineModifier()
-                .filterOutKotlinStdlibEntities()
+                //.filterOutKotlinStdlibEntities()
                 .addStandardImportsAndAnnotations()
 
         return models
