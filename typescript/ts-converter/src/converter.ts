@@ -35,11 +35,27 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, li
   return libs;
 }
 
+function filesWithReferences(program: ts.Program, files: Array<string>, resolvedFiles = new Array<string>()): Array<string> {
+  files.forEach(file => {
+    let curDir = ts.getDirectoryPath(file);
+
+    let sourceFile = program.getSourceFile(file);
+    if (sourceFile) {
+      resolvedFiles.push(file);
+      console.log(`REFERENCED FILE ${file} => ${sourceFile.referencedFiles.length}`);
+      let referencedFiles = sourceFile.referencedFiles.map(referencedFile => ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir));
+      resolvedFiles.push(...filesWithReferences(program, referencedFiles, resolvedFiles));
+    }
+  });
+
+  return Array.from(new Set(resolvedFiles));
+}
 
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
   private program: ts.Program;
   private libsSet: Set<string>;
+  private files: Array<string>;
 
   private isLibSource(node: ts.Node): boolean {
     return this.libsSet.has(ts.normalizePath(node.getSourceFile().fileName));
@@ -50,10 +66,12 @@ class SourceBundleBuilder {
 
   constructor(
       private stdLib: string,
-      private files: Array<string>
+      originalFiles: Array<string>
   ) {
-    this.program = this.createProgram();
+    this.program = this.createProgram(originalFiles);
     this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
+
+    this.files = filesWithReferences(this.program, originalFiles);
 
     let filesSet = new Set(this.files.map(file => ts.normalizePath(file)));
     let outerThis = this;
@@ -91,9 +109,9 @@ class SourceBundleBuilder {
     return [this.astConverter.createSourceFileDeclaration(sourceFile)];
   }
 
-  private createProgram(): ts.Program {
+  private createProgram(files: Array<string>): ts.Program {
     let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
-    this.files.forEach(fileName => host.register(fileName));
+    files.forEach(fileName => host.register(fileName));
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
     const program = languageService.getProgram();
 
