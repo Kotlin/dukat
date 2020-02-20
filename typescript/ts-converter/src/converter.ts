@@ -17,15 +17,6 @@ function createFileResolver(): FileResolver {
 
 let cache = new DocumentCache();
 
-function buildLibSet(stdLib: string): Set<string> {
-  let host = new DukatLanguageServiceHost(new FileResolver(), stdLib);
-  host.register(stdLib);
-  let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
-  const program = languageService.getProgram();
-
-  return getLibPaths(program, program.getSourceFile(stdLib), ts.getDirectoryPath(stdLib));
-}
-
 function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, defaultLibraryPath: string, libs: Set<string> = new Set()) {
   if (libPath === undefined) {
     return libs;
