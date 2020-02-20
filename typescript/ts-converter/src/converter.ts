@@ -38,9 +38,8 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, li
 
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
-  private program = this.createProgram();
-
-  private libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
+  private program: ts.Program;
+  private libsSet: Set<string>;
 
   private isLibSource(node: ts.Node): boolean {
     return this.libsSet.has(ts.normalizePath(node.getSourceFile().fileName));
@@ -53,6 +52,8 @@ class SourceBundleBuilder {
       private stdLib: string,
       private files: Array<string>
   ) {
+    this.program = this.createProgram();
+    this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
     let filesSet = new Set(this.files.map(file => ts.normalizePath(file)));
     let outerThis = this;
