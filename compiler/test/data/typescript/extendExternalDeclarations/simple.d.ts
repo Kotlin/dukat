@@ -1,4 +1,10 @@
-/// <reference path="../../../testDefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="_env.d.ts" />
+
+type Comparator<T> = (a: T, b: T) => boolean;
+
+interface Api<T> {
+    compare(comparator: Comparator<T>)
+}
 
 interface Event {
     foo()

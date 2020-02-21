@@ -15,6 +15,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+typealias Comparator<T> = (a: T, b: T) -> Boolean
+
+/* extending interface from _env.d.ts */
+inline fun <T> Api<T>.compare(noinline comparator: Comparator<T>) { this.asDynamic().compare(comparator) }
+
 /* extending interface from lib.dom.d.ts */
 inline fun Event.foo() { this.asDynamic().foo() }
 
@@ -43,3 +48,23 @@ inline operator fun Event.invoke(resourceId: Number): Boolean = this.asDynamic()
 
 /* extending interface from lib.dom.d.ts */
 inline fun Event.ping(noinline param: () -> Boolean): Boolean = this.asDynamic().ping(param)
+
+// ------------------------------------------------------------------------------------------
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+
+import kotlin.js.*
+import kotlin.js.Json
+import org.khronos.webgl.*
+import org.w3c.dom.*
+import org.w3c.dom.events.*
+import org.w3c.dom.parsing.*
+import org.w3c.dom.svg.*
+import org.w3c.dom.url.*
+import org.w3c.fetch.*
+import org.w3c.files.*
+import org.w3c.notifications.*
+import org.w3c.performance.*
+import org.w3c.workers.*
+import org.w3c.xhr.*
+
+external interface Api<T>
