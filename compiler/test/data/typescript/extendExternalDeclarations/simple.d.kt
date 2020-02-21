@@ -20,6 +20,9 @@ typealias Comparator<T> = (a: T, b: T) -> Boolean
 /* extending interface from _env.d.ts */
 inline fun <T> Api<T>.compare(noinline comparator: Comparator<T>) { this.asDynamic().compare(comparator) }
 
+/* extending interface from _env.d.ts */
+inline fun <T> Api<T>.compareThemAll(vararg comparator: Comparator<T>) { this.asDynamic().compareThemAll(comparator) }
+
 /* extending interface from lib.dom.d.ts */
 inline fun Event.foo() { this.asDynamic().foo() }
 

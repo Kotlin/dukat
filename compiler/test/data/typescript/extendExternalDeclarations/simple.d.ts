@@ -4,6 +4,7 @@ type Comparator<T> = (a: T, b: T) => boolean;
 
 interface Api<T> {
     compare(comparator: Comparator<T>)
+    compareThemAll(...comparator: Array<Comparator<T>>)
 }
 
 interface Event {
