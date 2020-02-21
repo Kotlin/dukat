@@ -14,7 +14,9 @@ private class NoinlineLowering(private val modelContext: ModelContext) : ModelWi
         val node = ownerContext.node
         val contextResolved = if (node.inline) {
             val nodeResolved = node.copy(parameters = node.parameters.map {
-                if (it.type is TypeValueModel) {
+                if (it.vararg) {
+                    it
+                } else if (it.type is TypeValueModel) {
                     modelContext.unalias(it.type as TypeValueModel).let { resolvedType ->
                         if (resolvedType is FunctionTypeModel) {
                             it.copy(modifier = ParameterModifierModel.NOINLINE)
