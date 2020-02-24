@@ -4,8 +4,8 @@ declare interface Chain<T, V = T> {
   shuffleLambda(): Chain<() => string | undefined>
 }
 
-declare interface ChainOfArrays<T> extends Chain<T[]> {
-  flatten(shallow?: boolean): Chain<T>;
+declare interface ChainOfArrays<G> extends Chain<G[]> {
+  flatten(shallow?: boolean): Chain<G>;
 }
 
 declare interface AsyncResultObjectCallback<T, E = Error> { (err: E | undefined, results: Array<T | undefined>): void; }

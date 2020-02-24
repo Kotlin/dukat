@@ -21,8 +21,8 @@ external interface Chain<T, V> {
     fun shuffleLambda(): Chain<() -> String?, () -> String?>
 }
 
-external interface ChainOfArrays<T> : Chain<Array<T>, Array<T>> {
-    fun flatten(shallow: Boolean = definedExternally): Chain<T, T>
+external interface ChainOfArrays<G> : Chain<Array<G>, Array<G>> {
+    fun flatten(shallow: Boolean = definedExternally): Chain<G, G>
 }
 
 external interface AsyncResultObjectCallback<T, E> {
