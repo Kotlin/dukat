@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -8,9 +7,8 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
-import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -18,52 +16,39 @@ import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 private class ResolveDefaultTypeParams(private val references: Map<String, ClassLikeDeclaration>) : DeclarationTypeLowering {
 
     private fun resolveParameters(typeReference: ReferenceEntity?, parameters: List<ParameterValueDeclaration>): List<ParameterValueDeclaration> {
-        val paramsResolved = parameters.toMutableList()
+        val defaultParams = mutableListOf<ParameterValueDeclaration>()
 
         references[typeReference?.uid]?.let { reference ->
 
             if (parameters.size < reference.typeParameters.size) {
-                val typeReferenceMap = reference.typeParameters.foldRightIndexed(mutableMapOf<NameEntity, Int>()) { index, typeParam, acc ->
-                    acc[typeParam.name] = index
-                    acc
+
+                val typeReferenceMap: Map<NameEntity, Int> by lazy {
+                    reference.typeParameters.mapIndexed { index, typeParam ->
+                        Pair(typeParam.name, index)
+                    }.toMap()
                 }
 
-                var fromIndex = reference.typeParameters.size - parameters.size
-                if (parameters.isEmpty()) {
-                    fromIndex -= 1
-                }
+                val missingTypeParams = reference.typeParameters.subList(parameters.size, reference.typeParameters.size)
 
-                for (i in fromIndex until reference.typeParameters.size) {
-                    reference.typeParameters[i].defaultValue?.let { defValue ->
-                        val value = when (defValue) {
-                            is ObjectLiteralDeclaration -> if (defValue.members.isEmpty()) {
-                                TypeDeclaration(IdentifierEntity("Any"), emptyList())
-                            } else {
-                                defValue
+                missingTypeParams.forEach {
+                    it.defaultValue?.let { defTypeParamValue ->
+                        when (defTypeParamValue) {
+                            is TypeParamReferenceDeclaration -> {
+                                typeReferenceMap[defTypeParamValue.value]?.let { resolvedIndex ->
+                                    parameters[resolvedIndex].let { selfReferenceValue ->
+                                        defaultParams.add(selfReferenceValue)
+                                    }
+                                }
                             }
-                            is TypeDeclaration -> defValue.value
-                            is TypeParamReferenceDeclaration -> defValue.value
-                            else -> null
-                        }
-
-                        if (value != null) {
-                            val defIndex = typeReferenceMap[value]
-
-                            val parameterValue = if (defIndex == null) {
-                                defValue
-                            } else {
-                                parameters[defIndex]
-                            }
-
-                            paramsResolved.add(parameterValue)
+                            else -> defaultParams.add(defTypeParamValue)
                         }
                     }
-
                 }
             }
+
         }
 
-        return paramsResolved
+        return parameters + defaultParams
     }
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
@@ -77,10 +62,15 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
     }
 }
 
-private fun ModuleDeclaration.resolveDefaultTypeParams(): ModuleDeclaration {
-    return ResolveDefaultTypeParams(collectReferences()).lowerDocumentRoot(this)
+private fun ModuleDeclaration.resolveDefaultTypeParams(references: Map<String, ClassLikeDeclaration>): ModuleDeclaration {
+    return ResolveDefaultTypeParams(references).lowerDocumentRoot(this)
 }
 
-private fun SourceFileDeclaration.resolveDefaultTypeParams() = copy(root = root.resolveDefaultTypeParams())
 
-fun SourceSetDeclaration.resolveDefaultTypeParams() = copy(sources = sources.map(SourceFileDeclaration::resolveDefaultTypeParams))
+fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaration {
+    val references = mutableMapOf<String, ClassLikeDeclaration>()
+
+    sources.forEach { source -> source.root.collectReferences(references) }
+
+    return copy(sources = sources.map { it.copy(root = it.root.resolveDefaultTypeParams(references)) })
+}
