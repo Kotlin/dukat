@@ -79,23 +79,27 @@ private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : 
         return TypeSpecifierLowering(aliasParamMap).lowerType(declaration)
     }
 
-    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    private fun resolveType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         val declarationResolved = typeAliasContext.dereference(declaration)
         return if (declarationResolved is DereferenceNode) {
-            super.lowerType(lowerDereferenced(declarationResolved.dereferenced, declarationResolved.aliasParamsMap))
+            lowerDereferenced(declarationResolved.dereferenced, declarationResolved.aliasParamsMap)
         } else {
-            super.lowerType(declarationResolved)
+            declarationResolved
         }
+    }
+
+    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return super.lowerType(this.resolveType(declaration))
     }
 
     private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
         return when (this) {
             is UnionTypeNode -> {
-                val paramsUnrolled = params.flatMap { param -> lowerType(param).unroll() }
+                val paramsUnrolled = params.flatMap { param -> resolveType(param).unroll() }
                 //TODO: investigate whether .toList().distinct is a better option
                 paramsUnrolled.toSet().toList()
             }
-            else -> listOf(lowerType(this))
+            else -> listOf(resolveType(this))
         }
     }
 

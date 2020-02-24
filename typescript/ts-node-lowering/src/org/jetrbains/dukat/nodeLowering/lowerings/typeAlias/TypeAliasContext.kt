@@ -1,6 +1,5 @@
 package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -18,23 +17,13 @@ internal data class DereferenceNode(
 
 class TypeAliasContext {
 
-    private fun TypeAliasNode.canSubstitute(heritageNode: HeritageNode): Boolean {
-        return (name == heritageNode.name)
-    }
-
     private val myTypeAliasMap: MutableMap<String, TypeAliasNode> = mutableMapOf()
 
     fun registerTypeAlias(typeAlias: TypeAliasNode) {
         // TODO: this is our way of avoiding SOE on assigning meta
         myTypeAliasMap[typeAlias.uid] = typeAlias
     }
-
-    fun resolveTypeAlias(heritageClause: HeritageNode): ParameterValueDeclaration? {
-        return myTypeAliasMap.values.firstOrNull { typeAlias ->
-            typeAlias.canSubstitute(heritageClause)
-        }?.typeReference
-    }
-
+    
     fun dereference(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeValueNode ->
