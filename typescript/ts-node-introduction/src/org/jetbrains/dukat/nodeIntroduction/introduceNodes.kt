@@ -18,6 +18,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import java.io.File
@@ -28,8 +29,18 @@ private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
 
+private data class FunctionNodeRecord(
+        val name: String,
+        val reference: List<String>,
+        val params: List<ParameterValueDeclaration>,
+        val type: ParameterValueDeclaration
+)
 
-private class LowerDeclarationsToNodes(private val fileName: String, private val moduleNameResolver: ModuleNameResolver) {
+private class LowerDeclarationsToNodes(
+        private val fileName: String,
+        private val moduleNameResolver: ModuleNameResolver,
+        private val generatedFunctions: MutableSet<FunctionNodeRecord>
+) {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
@@ -305,6 +316,19 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
 
         return when (declaration) {
             is MethodSignatureDeclaration -> {
+                val functionNodeRecord = FunctionNodeRecord(
+                        declaration.name,
+                        interfaceDeclaration.definitionsInfo.map { it.uid },
+                        declaration.parameters.map { it.type },
+                        declaration.type
+                )
+
+                if (generatedFunctions.contains(functionNodeRecord)) {
+                    return emptyList()
+                }
+
+                generatedFunctions.add(functionNodeRecord)
+
                 val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
 
                 unrollOptionalParams(declaration.parameters).mapIndexed { index, parameters ->
@@ -555,20 +579,23 @@ private class LowerDeclarationsToNodes(private val fileName: String, private val
     }
 }
 
-private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, NodeOwner(this, null))
+private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver, generatedFunctions: MutableSet<FunctionNodeRecord>) = LowerDeclarationsToNodes(fileName, moduleNameResolver, generatedFunctions).lowerPackageDeclaration(this, NodeOwner(this, null))
 
-fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
+private fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver, generatedFunctions: MutableSet<FunctionNodeRecord>): SourceFileNode {
     val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
     return SourceFileNode(
             fileName,
-            root.introduceNodes(fileName, moduleNameResolver),
+            root.introduceNodes(fileName, moduleNameResolver, generatedFunctions),
             references,
             null
     )
 }
 
-fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver) =
-        SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
-            source.introduceNodes(moduleNameResolver)
-        })
+fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceSetNode {
+    val generatedFunctions = mutableSetOf<FunctionNodeRecord>()
+
+    return SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
+        source.introduceNodes(moduleNameResolver, generatedFunctions)
+    })
+}
