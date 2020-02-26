@@ -16,13 +16,15 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Chain<T, V> {
-    fun shuffle(): Chain<T, T>
-    fun shuffleString(): Chain<String, String>
-    fun shuffleLambda(): Chain<() -> String?, () -> String?>
+    fun shuffle(): Chain__1<T>
+    fun shuffleString(): Chain__1<String>
+    fun shuffleLambda(): Chain__1<() -> String?>
 }
 
-external interface ChainOfArrays<G> : Chain<Array<G>, Array<G>> {
-    fun flatten(shallow: Boolean = definedExternally): Chain<G, G>
+external interface Chain__1<T> : Chain<T, T>
+
+external interface ChainOfArrays<G> : Chain__1<Array<G>> {
+    fun flatten(shallow: Boolean = definedExternally): Chain__1<G>
 }
 
 external interface AsyncResultObjectCallback<T, E> {

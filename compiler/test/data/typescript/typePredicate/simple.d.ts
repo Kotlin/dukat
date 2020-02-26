@@ -1,1 +1,1 @@
-declare function isValidElement<P>(obj: {}): object is ReactElement<P>;
+declare function isValidElement<P>(obj: {}): object is Element<P>;
