@@ -21,12 +21,12 @@ private fun NameEntity.addPrefix(prefix: String): NameEntity {
 
 private class RenameImpossibleDeclarations(private val namedImports: Set<IdentifierEntity>) : DeclarationTypeLowering {
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
         val declarationResolved = if (namedImports.contains(declaration.name)) { declaration.copy(name = declaration.name.addPrefix("Local")) } else { declaration }
         return super.lowerInterfaceDeclaration(declarationResolved, owner)
     }
 
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterValueDeclaration {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return super.lowerParameterValue(declaration, owner)
     }
 }

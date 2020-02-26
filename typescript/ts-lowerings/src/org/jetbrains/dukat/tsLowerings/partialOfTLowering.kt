@@ -3,7 +3,6 @@ package org.jetbrains.dukat.tsLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.*
@@ -101,7 +100,7 @@ private class TypeVisitor(
         private val heritageClauses: MutableSet<String>
 ) : DeclarationTypeLowering {
 
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         val singleTypeParam = declaration.params.singleOrNull()
         return if (declaration.value == IdentifierEntity("Partial") && (singleTypeParam is TypeDeclaration)) {
             val uid = singleTypeParam.typeReference?.uid

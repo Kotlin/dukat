@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 private class MergeParentsLowerer(private val definitionsMap: Map<List<DefinitionInfoDeclaration>, List<HeritageClauseDeclaration>>) : DeclarationTypeLowering {
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
         val declarationResolved = definitionsMap[declaration.definitionsInfo]?.let { parentEntities ->
             declaration.copy(parentEntities = parentEntities)
         } ?: declaration
