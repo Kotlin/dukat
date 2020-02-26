@@ -4,12 +4,10 @@ import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -30,28 +28,6 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-
-internal fun Entity.getTypeParams(): List<TypeParameterDeclaration> {
-    return when (this) {
-        is CallSignatureDeclaration -> typeParameters
-        is ClassDeclaration -> typeParameters
-        is ConstructorDeclaration -> typeParameters
-        is FunctionDeclaration -> typeParameters
-        is FunctionTypeDeclaration -> emptyList()
-        is GeneratedInterfaceDeclaration -> typeParameters
-        is IndexSignatureDeclaration -> emptyList()
-        is IntersectionTypeDeclaration -> emptyList()
-        is InterfaceDeclaration -> typeParameters
-        is MethodSignatureDeclaration -> typeParameters
-        is PropertyDeclaration -> typeParameters
-        is TupleDeclaration -> emptyList()
-        is TypeDeclaration -> emptyList()
-        is TypeAliasDeclaration -> typeParameters.map { typeParameter -> TypeParameterDeclaration(typeParameter, emptyList(), null) }
-        is UnionTypeDeclaration -> emptyList()
-        is VariableDeclaration -> emptyList()
-        else -> raiseConcern("unknown Entity ${this}") { emptyList<TypeParameterDeclaration>() };
-    }
-}
 
 private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
 
@@ -117,9 +93,12 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     // TODO: it looks like we haven't covered interface generation for interface method signatures
     override fun lowerMethodSignatureDeclaration(owner: NodeOwner<MethodSignatureDeclaration>) = owner.node
 
+    // TODO: This looks like pre-common lowering era code and as such better to got rid of
     override fun lowerInterfaceDeclaration(owner: NodeOwner<InterfaceDeclaration>): InterfaceDeclaration {
         val declaration = owner.node
+
         return declaration.copy(
+                parentEntities = declaration.parentEntities.map { parentEntity -> parentEntity.copy(typeArguments = parentEntity.typeArguments.map { lowerParameterValue(owner.wrap(it)) } ) },
                 typeParameters = lowerTypeParams(owner, declaration.typeParameters),
                 members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
         )
@@ -128,6 +107,7 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     override fun lowerClassDeclaration(owner: NodeOwner<ClassDeclaration>): ClassDeclaration {
         val declaration = owner.node
         return declaration.copy(
+                parentEntities = declaration.parentEntities.map { parentEntity -> parentEntity.copy(typeArguments = parentEntity.typeArguments.map { lowerParameterValue(owner.wrap(it)) } ) },
                 typeParameters = lowerTypeParams(owner, declaration.typeParameters),
                 members = declaration.members.map { member -> lowerMemberDeclaration(owner.wrap(member)) }
         )

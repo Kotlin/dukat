@@ -23,11 +23,11 @@ typealias EventHandler<TCurrentTarget, TData> = EventHandlerBase<TCurrentTarget,
 
 external var yargs: yargs.Argv<Any>
 
-external interface `T$0` {
+external interface `T$1` {
     var x: String
 }
 
-external var yarrrrgs: yargs.Arrrrgv<`T$0`>
+external var yarrrrgs: yargs.Arrrrgv<`T$1`>
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("yargs")
@@ -56,3 +56,9 @@ external interface Argv<T> {
 external interface Arrrrgv<T> {
     fun ping(): T
 }
+
+external interface `T$0` {
+    var x: Number
+}
+
+external interface Rrrrgh : Arrrrgv<`T$0`>

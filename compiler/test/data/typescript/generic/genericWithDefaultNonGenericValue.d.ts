@@ -19,7 +19,10 @@ declare namespace yargs {
   interface Arrrrgv<T = {"x": string}> {
     ping(): T
   }
+
+  interface Rrrrgh extends Arrrrgv<{"x": number}> {}
 }
 
 declare var yargs: yargs.Argv;
 declare var yarrrrgs: yargs.Arrrrgv;
+
