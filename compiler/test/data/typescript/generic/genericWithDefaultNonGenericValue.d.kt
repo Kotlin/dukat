@@ -14,20 +14,20 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import yargs.Argv__0
+import yargs.Arrrrgv__0
 
 external interface TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget>
 
+external interface TriggeredEvent__2<TDelegateTarget, TData> : TriggeredEvent<TDelegateTarget, TData, Any, Any>
+
 external interface EventHandlerBase<TContext, T>
 
-typealias EventHandler<TCurrentTarget, TData> = EventHandlerBase<TCurrentTarget, TriggeredEvent<TCurrentTarget, TData, Any, Any>>
+typealias EventHandler<TCurrentTarget, TData> = EventHandlerBase<TCurrentTarget, TriggeredEvent__2<TCurrentTarget, TData>>
 
-external var yargs: yargs.Argv<Any>
+external var yargs: Argv__0
 
-external interface `T$0` {
-    var x: String
-}
-
-external var yarrrrgs: yargs.Arrrrgv<`T$0`>
+external var yarrrrgs: Arrrrgv__0
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("yargs")
@@ -53,6 +53,20 @@ external interface Argv<T> {
     fun ping(): T
 }
 
+external interface Argv__0 : Argv<Any>
+
 external interface Arrrrgv<T> {
     fun ping(): T
 }
+
+external interface `T$0` {
+    var x: String
+}
+
+external interface Arrrrgv__0 : Arrrrgv<`T$0`>
+
+external interface `T$1` {
+    var x: Number
+}
+
+external interface Rrrrgh : Arrrrgv<`T$1`>

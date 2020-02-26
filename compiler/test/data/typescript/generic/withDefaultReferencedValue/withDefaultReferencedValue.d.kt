@@ -14,12 +14,12 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
-import _api.SyncHook
+import _api.SyncHook__1
 
 external interface Module
 
 external open class SomeAPI {
-    open fun buildModule(): SyncHook<Module, String, Any>
+    open fun buildModule(): SyncHook__1<Module>
 }
 
 // ------------------------------------------------------------------------------------------
@@ -46,3 +46,5 @@ import org.w3c.xhr.*
 external open class Hook<A, B, C, D, E>
 
 external open class SyncHook<T1, T2, T3> : Hook<T1, T2, T3, Any, Nothing?>
+
+external open class SyncHook__1<T1> : SyncHook<T1, String, Any>
