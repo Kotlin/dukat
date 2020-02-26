@@ -19,7 +19,7 @@ private class ClassLikeContext(private val classLikeMap: Map<String, ClassLikeDe
 
 private class FixImpossibleInheritance(private val classLikeContext: ClassLikeContext) : DeclarationTypeLowering {
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>): ClassDeclaration {
+    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
         val parents = classLikeContext.getKnownParents(declaration).filterIsInstance(ClassDeclaration::class.java)
         return if (parents.size > 1) {
             val impossibleParents = parents.subList(1, parents.size).map { it.uid }.toSet()

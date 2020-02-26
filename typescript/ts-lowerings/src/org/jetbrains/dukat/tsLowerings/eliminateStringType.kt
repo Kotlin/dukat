@@ -12,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
 private class EliminateStringType : DeclarationTypeLowering {
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): ParameterValueDeclaration {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return if (declaration is StringLiteralDeclaration) {
             TypeDeclaration(IdentifierEntity("String"), emptyList(), meta = declaration)
         } else super.lowerParameterValue(declaration, owner)

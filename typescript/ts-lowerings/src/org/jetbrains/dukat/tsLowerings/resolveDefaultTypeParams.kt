@@ -8,7 +8,6 @@ import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -51,13 +50,13 @@ private class ResolveDefaultTypeParams(private val references: Map<String, Class
         return parameters + defaultParams
     }
 
-    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
+    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
         val params = resolveParameters(heritageClause.typeReference, heritageClause.typeArguments)
         return super.lowerHeritageClause(heritageClause.copy(typeArguments = params), owner)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         return super.lowerTypeDeclaration(declaration.copy(params = resolveParameters(declaration.typeReference, declaration.params)), owner)
     }
 }

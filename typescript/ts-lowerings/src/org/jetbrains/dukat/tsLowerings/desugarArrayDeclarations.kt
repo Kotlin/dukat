@@ -9,12 +9,12 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class NativeArrayLowering : DeclarationTypeLowering {
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         val value = declaration.value
         return if ((value is IdentifierEntity) && (value.value == "@@ArraySugar")) {
-            declaration.copy(value = IdentifierEntity("Array"), params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
+            declaration.copy(value = IdentifierEntity("Array"), params = declaration.params.map { param -> lowerParameterValue(param, owner?.wrap(declaration)) })
         } else {
-            declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner.wrap(declaration)) })
+            declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner?.wrap(declaration)) })
         }
     }
 

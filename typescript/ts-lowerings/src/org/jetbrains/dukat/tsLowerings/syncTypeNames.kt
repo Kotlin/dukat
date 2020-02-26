@@ -11,14 +11,14 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class SyncNameLowering(private val renameMap: Map<String, NameEntity>) : DeclarationTypeLowering {
 
-    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>): HeritageClauseDeclaration {
+    override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
         val heritageClauseLowered = renameMap[heritageClause.typeReference?.uid]?.let {
             heritageClause.copy(name = it)
         } ?: heritageClause
         return super.lowerHeritageClause(heritageClauseLowered, owner)
     }
 
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>): TypeDeclaration {
+    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         val declarationLowered = renameMap[declaration.typeReference?.uid]?.let {
             declaration.copy(value = it)
         } ?: declaration
