@@ -43,6 +43,9 @@ external interface Processor<T> {
     fun onError(handler: (error: MyVerySpecificException) -> Unit)
 }
 
+/* extending interface from lib.es5.d.ts; replaced ReadonlyArray => Array  */
+inline fun <T> Array<T>.ping(): Boolean = this.asDynamic().ping()
+
 // ------------------------------------------------------------------------------------------
 @file:JsModule("api")
 @file:JsNonModule
