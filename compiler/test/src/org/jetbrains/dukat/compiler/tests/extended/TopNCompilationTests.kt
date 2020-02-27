@@ -32,7 +32,6 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/express",
                     "@types/fs-extra",
                     "@types/lodash",
-                    "@types/moment",
                     "@types/node",
                     "@types/prop-types",
                     "@types/react",
@@ -44,6 +43,7 @@ class TopNCompilationTests : CompilationTests() {
                     "axios",
                     "chalk",
                     "commander/typings",
+                    "moment/moment.d.ts",
                     "rxjs",
                     "tslib/tslib.d.ts",
                     "vue/types"
