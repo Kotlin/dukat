@@ -4,4 +4,5 @@
 interface API {
   ping(): boolean;
   pong(a: string): boolean
+  foo(a: string)
 }
