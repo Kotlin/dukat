@@ -1,10 +1,13 @@
 package org.jetbrains.dukat.commonLowerings
 
+import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
@@ -43,14 +46,22 @@ private fun TypeValueModel.createStdType(name: String): TypeValueModel {
     )
 }
 
+private enum class SubstitutedEntities(val value: IdentifierEntity) {
+    NON_NULLABLE(IdentifierEntity("NonNullable")),
+    EXCLUDE(IdentifierEntity("Exclude")),
+    REQUIRED(IdentifierEntity("Required")),
+    READONLY_ARRAY(IdentifierEntity("ReadonlyArray")),
+    TEMPLATE_STRINGS_ARRAY(IdentifierEntity("TemplateStringsArray"))
+}
+
 private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
     val isLibReference = isLibReference()
 
-    return if (value == IdentifierEntity("NonNullable") || value == IdentifierEntity("Exclude") || value == IdentifierEntity("Required")) {
+    return if (value == SubstitutedEntities.NON_NULLABLE.value || value == SubstitutedEntities.EXCLUDE.value || value == SubstitutedEntities.REQUIRED.value) {
         if (isLibReference) {
             createStdType("Any")
         } else null
-    } else if (value == IdentifierEntity("ReadonlyArray")) {
+    } else if (value == SubstitutedEntities.READONLY_ARRAY.value) {
         if (isLibReference) {
             val fqName = "Array".fqLib()
             copy(
@@ -58,7 +69,7 @@ private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
                 fqName = fqName
             )
         } else null
-    } else if (value == IdentifierEntity("TemplateStringsArray")) {
+    } else if (value == SubstitutedEntities.TEMPLATE_STRINGS_ARRAY.value) {
         val fqName = "Array".fqLib()
         if (isLibReference) {
             val stringFqName = "String".fqLib()
@@ -103,6 +114,33 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             IdentifierEntity("Iterable"),
             IdentifierEntity("String")
     )
+
+    private val substituteInlines = mapOf(
+        Pair(SubstitutedEntities.READONLY_ARRAY.value, "Array")
+    )
+
+    override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
+        val declaration = ownerContext.node
+        val declarationResolved = declaration.extend?.let { extendedInterface ->
+            var commentResolved = declaration.comment
+
+            val extendResolved = substituteInlines.get(extendedInterface.name)?.let { substitutedName ->
+                val comment = declaration.comment
+                commentResolved = when (comment) {
+                    is SimpleCommentEntity -> SimpleCommentEntity("${comment.text}; replaced ${SubstitutedEntities.READONLY_ARRAY.value.value} => ${substitutedName} ")
+                    else -> comment
+                }
+
+                extendedInterface.copy(name = IdentifierEntity(substitutedName))
+            } ?: extendedInterface
+
+            declaration.copy(
+                extend = extendResolved,
+                comment = commentResolved
+            )
+        } ?: declaration
+        return super.lowerFunctionModel(ownerContext.copy(node = declarationResolved), parentModule)
+    }
 
     override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel {
         val declaration = ownerContext.node

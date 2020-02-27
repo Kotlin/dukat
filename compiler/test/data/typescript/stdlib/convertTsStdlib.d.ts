@@ -20,3 +20,7 @@ interface Processor<T> {
 declare module "api" {
   function createIterable(): IterableIterator<string>;
 }
+
+interface ReadonlyArray<T> {
+  ping(): boolean;
+}
