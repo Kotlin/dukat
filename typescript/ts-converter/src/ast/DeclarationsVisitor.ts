@@ -97,6 +97,30 @@ export abstract class DeclarationsVisitor {
     this.visit(declaration);
   }
 
+  private getDeclarations(node: ts.Node): Array<ts.Node> {
+    let symbolAtLocation = this.typeChecker.getSymbolAtLocation(node);
+    if (symbolAtLocation) {
+      if (Array.isArray(symbolAtLocation.declarations)) {
+        return symbolAtLocation.declarations;
+      } else {
+        let declaredTyped = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
+        if (declaredTyped) {
+          let resolvedASymbol = declaredTyped.symbol || declaredTyped.aliasSymbol;
+          if (resolvedASymbol && Array.isArray(resolvedASymbol.declarations)) {
+            return resolvedASymbol.declarations;
+          }
+        }
+      }
+    }
+
+    let symbol = this.typeChecker.getTypeAtLocation(node).symbol;
+    if (symbol && Array.isArray(symbol.declarations)) {
+      return symbol.declarations;
+    }
+
+    return [];
+  }
+
   private checkReferences(node: ts.Node) {
     if (this.isLibDeclaration(node)) {
       if (this.skipTypes.has(node.name)) {
@@ -104,22 +128,10 @@ export abstract class DeclarationsVisitor {
       }
     }
 
-    let symbol = this.typeChecker.getTypeAtLocation(node).symbol;
-    if (!symbol) {
-      let symbolAtLocation = this.typeChecker.getSymbolAtLocation(node.typeName);
-      if (symbolAtLocation) {
-        let declaredType = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
-        if (declaredType) {
-          symbol = declaredType.symbol || declaredType.aliasSymbol;
-        }
-      }
-    }
-
-    if (symbol && Array.isArray(symbol.declarations)) {
-      for (let declaration of symbol.declarations) {
-        if (this.isTransientDependency(declaration)) {
-            this.registerDeclaration(declaration);
-        }
+    let decarations = this.getDeclarations(node);
+    for (let declaration of decarations) {
+      if (this.isTransientDependency(declaration)) {
+        this.registerDeclaration(declaration);
       }
     }
   }
@@ -127,19 +139,14 @@ export abstract class DeclarationsVisitor {
   visit(declaration: ts.Node) {
     if (ts.isTypeReferenceNode(declaration)) {
       if (!this.skipTypes.has(declaration.typeName.getText())) {
-
-        let symbolAtLocation = this.typeChecker.getSymbolAtLocation(declaration.typeName);
-        let typeOfSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
-        console.log(`SYMBOL ${declaration.getText()} :: ${symbolAtLocation.parent} :: ${typeOfSymbol.symbol}`);
-
-        this.checkReferences(declaration);
+        this.checkReferences(declaration.typeName);
       }
     } else if (ts.isInterfaceDeclaration(declaration)) {
       this.checkReferences(declaration);
     } else if (ts.isVariableDeclaration(declaration)) {
-        this.checkReferences(declaration);
+      this.checkReferences(declaration);
     } else if (ts.isFunctionDeclaration(declaration)) {
-        this.checkReferences(declaration);
+      this.checkReferences(declaration);
     } else if (ts.isTypeAliasDeclaration(declaration)) {
       this.checkReferences(declaration.type)
     } else if (ts.isHeritageClause(declaration)) {
@@ -155,6 +162,7 @@ export abstract class DeclarationsVisitor {
   }
 
   abstract isTransientDependency(node: ts.Node): boolean;
+
   abstract isLibDeclaration(source: ts.Node): boolean;
 
 }
