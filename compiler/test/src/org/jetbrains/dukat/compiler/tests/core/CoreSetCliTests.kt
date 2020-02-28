@@ -47,7 +47,7 @@ class CoreSetCliTests {
 
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/typescript")
+            return fileSetWithDescriptors("./test/data/typescript/bbb")
         }
     }
 
