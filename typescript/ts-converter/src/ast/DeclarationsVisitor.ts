@@ -127,6 +127,11 @@ export abstract class DeclarationsVisitor {
   visit(declaration: ts.Node) {
     if (ts.isTypeReferenceNode(declaration)) {
       if (!this.skipTypes.has(declaration.typeName.getText())) {
+
+        let symbolAtLocation = this.typeChecker.getSymbolAtLocation(declaration.typeName);
+        let typeOfSymbol = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
+        console.log(`SYMBOL ${declaration.getText()} :: ${symbolAtLocation.parent} :: ${typeOfSymbol.symbol}`);
+
         this.checkReferences(declaration);
       }
     } else if (ts.isInterfaceDeclaration(declaration)) {
