@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.isStdLibEntity
 
 private fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> when(value) {
@@ -45,8 +46,10 @@ private class TypeVisitor(private val name: NameEntity, private val importContex
             if (!importContext.containsKey(shortName)) {
                 if (moduleName != null) {
                     if (moduleName.normalize() != name.normalize()) {
-                        importContext[shortName] = moduleName
-                        resolvedImports.add(ImportModel(fqName))
+                        if (!isStdLibEntity(fqName)) {
+                            importContext[shortName] = moduleName
+                            resolvedImports.add(ImportModel(fqName))
+                        }
                     }
                 }
                 ownerContext.copy(node = node.copy(value = shortName))

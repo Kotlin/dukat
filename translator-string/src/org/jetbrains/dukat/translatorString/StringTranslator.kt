@@ -637,10 +637,7 @@ class StringTranslator : ModelVisitor {
     }
 
     fun visitImport(import: ImportModel) {
-        val isLibImport = import.name.leftMost() == LIB_PACKAGENAME
-        if (!isLibImport || TS_STDLIB_WHITE_LIST.contains(import.name.shiftLeft())) {
-            addOutput("import ${import.translate()}")
-        }
+        addOutput("import ${import.translate()}")
     }
 
     override fun visitModule(moduleModel: ModuleModel) {
