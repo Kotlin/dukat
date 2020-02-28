@@ -1,6 +1,9 @@
 package org.jetbrains.dukat.stdlib
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.leftMost
+import org.jetbrains.dukat.astCommon.rightMost
 
 val KotlinStdlibEntities = setOf(
         IdentifierEntity("Array"),
@@ -590,3 +593,9 @@ val KotlinStdlibEntities = setOf(
         IdentifierEntity("undefined"),
         IdentifierEntity("window")
 )
+
+fun isStdLibEntity(fqName: NameEntity): Boolean {
+    val leftMost = fqName.leftMost()
+    val isLib = leftMost == IdentifierEntity("<ROOT>") || leftMost == IdentifierEntity("<LIBROOT>")
+    return isLib && KotlinStdlibEntities.contains(fqName.rightMost())
+}
