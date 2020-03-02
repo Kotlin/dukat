@@ -20,12 +20,14 @@ import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
+import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -56,6 +58,18 @@ fun translateBinaryBundle(
     } else {
         writeDescriptorsToFile(translator, input, outDir ?: "./")
     }
+}
+
+fun translateWithBodyBinaryBundle(
+    input: ByteArray,
+    outDir: String?,
+    moduleNameResolver: ModuleNameResolver,
+    packageName: NameEntity?,
+    pathToReport: String?
+) {
+    val translator = createJsByteArrayWithBodyTranslator(moduleNameResolver, packageName)
+    val translatedUnits = translateModule(input, translator)
+    compileUnits(translatedUnits, outDir, pathToReport)
 }
 
 private fun compile(
@@ -228,7 +242,7 @@ private fun process(args: List<String>): CliOptions? {
 
             else -> when {
                 arg.equals("-") -> sources.add("-")
-                arg.endsWith(TS_DECLARATION_EXTENSION) -> {
+                arg.endsWith(D_TS_DECLARATION_EXTENSION) || arg.endsWith(TS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
                 arg.endsWith(JS_DECLARATION_EXTENSION) -> {
@@ -279,13 +293,14 @@ fun main(vararg args: String) {
             exitProcess(1)
         }
 
+        val isDTsTranslation = options.sources.all { it.endsWith(D_TS_DECLARATION_EXTENSION) }
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
         val isJsTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation =
                 options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
         when {
-            isTsTranslation -> {
+            isDTsTranslation -> {
                 translateBinaryBundle(
                         System.`in`.readBytes(),
                         options.outDir,
@@ -311,6 +326,16 @@ fun main(vararg args: String) {
                         options.outDir,
                         IdlInputTranslator(DirectoryReferencesResolver()),
                         options.reportPath
+                )
+            }
+
+            isTsTranslation -> {
+                translateWithBodyBinaryBundle(
+                    System.`in`.readBytes(),
+                    options.outDir,
+                    moduleResolver,
+                    options.basePackageName,
+                    options.reportPath
                 )
             }
 

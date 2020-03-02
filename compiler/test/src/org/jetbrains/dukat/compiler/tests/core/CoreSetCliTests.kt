@@ -11,7 +11,7 @@ import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.panic.resolvePanicMode
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,7 +23,7 @@ import kotlin.test.assertEquals
 
 
 @Serializable
-private data class ReportJson(val outputs: List<String>)
+data class ReportJson(val outputs: List<String>)
 
 class ResolvePanicMode : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
@@ -32,18 +32,18 @@ class ResolvePanicMode : BeforeAllCallback {
 }
 
 @ExtendWith(ResolvePanicMode::class, CliTestsStarted::class, CliTestsEnded::class)
-class CoreSetCliTests {
+open class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
-    fun withValueSource(name: String, tsPath: String, ktPath: String) {
+    open fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEqualsBinary(name, tsPath, ktPath)
     }
 
-    fun getTranslator(): CliTranslator = createStandardCliTranslator()
+    open fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
     companion object : FileFetcher() {
-        override val postfix = TS_DECLARATION_EXTENSION
+        override val postfix = D_TS_DECLARATION_EXTENSION
 
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
@@ -57,7 +57,7 @@ class CoreSetCliTests {
             tsPath: String,
             ktPath: String
     ) {
-        print("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
+        println("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"

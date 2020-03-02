@@ -11,15 +11,15 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 
 
 @OptIn(UnstableDefault::class)
-class CliTranslator() {
+open class CliTranslator {
 
     companion object {
         val HTTP_CLIENT_PORT = "8090"
     }
 
-    private fun translateBinary(input: String) = CliHttpClient(HTTP_CLIENT_PORT).translate(input)
+    protected fun translateBinary(input: String) = CliHttpClient(HTTP_CLIENT_PORT).translate(input)
 
-    fun translateBundle(
+    open fun translateBundle(
             input: String
     ): SourceBundleModel {
         val binData = translateBinary(input)
@@ -27,7 +27,7 @@ class CliTranslator() {
         return translator.translate(binData)
     }
 
-    fun translate(
+    open fun translate(
             input: String,
             dirName: String,
             reportPath: String? = null,

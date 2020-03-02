@@ -11,7 +11,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.dukat.ts.translator.JsRuntimeFileTranslator
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +40,7 @@ class JSTypeTests : OutputTests() {
 
         private val bundle = BundleTranslator("./build/javascript/declarations.dukat", JavaScriptLowerer(ConstNameResolver()))
 
-        override val postfix = TS_DECLARATION_EXTENSION
+        override val postfix = D_TS_DECLARATION_EXTENSION
 
         @JvmStatic
         fun jsSet(): Array<Array<String>> {

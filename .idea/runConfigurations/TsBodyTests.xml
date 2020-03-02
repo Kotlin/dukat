@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="TsBodyTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+        <module name="dukat.compiler.test" />
+        <extension name="coverage">
+            <pattern>
+                <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.extended.*" />
+                <option name="ENABLED" value="true" />
+            </pattern>
+        </extension>
+        <option name="PACKAGE_NAME" value="org.jetbrains.dukat.compiler.tests.extended" />
+        <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.TsBodyTests" />
+        <option name="METHOD_NAME" value="" />
+        <option name="TEST_OBJECT" value="class" />
+        <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.tsBody=true -Ddukat.test.resources.definitelyTyped=$USER_HOME$/.gradle/definitelyTyped/DefinitelyTyped-31929c09c7b4490f87766206b412da4a6a581dc3/types" />
+        <option name="PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+        <method v="2">
+            <option name="Make" enabled="true" />
+        </method>
+    </configuration>
+</component>
