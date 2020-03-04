@@ -16,10 +16,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface AppEvent : Event {
-    override var currentTarget: Element?
+    var currentTarget: Element?
         get() = definedExternally
         set(value) = definedExternally
-    override var target: Element?
+    var target: Element?
         get() = definedExternally
         set(value) = definedExternally
     fun preventDefault(): Any

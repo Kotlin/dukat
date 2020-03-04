@@ -75,7 +75,7 @@ private class ExportAssignmentLowering(
                 docRoot.jsModule = exportOwner.moduleName
             }
         } else {
-            if (!docRoot.root) {
+            if (docRoot.uid != root.uid) {
                 if (docRoot.external) {
                     docRoot.jsModule = docRoot.packageName.process { unquote(it) }
                 } else {

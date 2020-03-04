@@ -31,7 +31,7 @@ export class ExportContext {
 
       let name = resolveName(node);
       if (name) {
-        nodeUid = nodeUid + `${ts.SyntaxKind[node.kind]}-${name}`;
+        nodeUid = nodeUid + `-${ts.SyntaxKind[node.kind]}-${name}`;
       }
 
       this.exportTable.set(node, nodeUid);

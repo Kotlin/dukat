@@ -24,9 +24,9 @@ import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
-import {AstVisitor} from "./AstVisitor";
 import {tsInternals} from "./TsInternals";
-import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto} from "declarations";
+import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto, TopLevelDeclarationProto} from "declarations";
+import {ModuleBody} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -37,7 +37,6 @@ export class AstConverter {
     private typeChecker: ts.TypeChecker,
     private declarationResolver: DeclarationResolver,
     private astFactory: AstFactory,
-    private astVisitor: AstVisitor
   ) {
   }
 
@@ -56,7 +55,6 @@ export class AstConverter {
     return null;
   }
 
-
   private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
     let curDir = tsInternals.getDirectoryPath(sourceFile.fileName);
     let visitedReferences = new Set<string>();
@@ -65,7 +63,7 @@ export class AstConverter {
     sourceFile.referencedFiles.forEach(referencedFile => {
       if (!visitedReferences.has(referencedFile.fileName)) {
         visitedReferences.add(referencedFile.fileName);
-        referencedFiles.push(this.astFactory.createReferenceClause(tsInternals.normalizePath(referencedFile.fileName), ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir)));
+        referencedFiles.push(this.astFactory.createReferenceClause(referencedFile.fileName, ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir)));
       }
     });
 
@@ -125,25 +123,27 @@ export class AstConverter {
     return imports;
   }
 
-  createModuleFromSourceFile(sourceFile: ts.SourceFile): ModuleDeclaration {
+  private createModuleFromSourceFile(sourceFile: ts.SourceFile, packageName: NameEntity, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
     let packageNameFragments = sourceFile.fileName.split("/");
     let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
+    let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
+
     return this.astFactory.createModuleDeclaration(
-      this.astFactory.createIdentifierDeclarationAsNameEntity("<ROOT>"),
+      packageName,
       this.getImports(sourceFile),
       this.getReferences(sourceFile),
-      this.convertStatements(sourceFile.statements),
+      this.convertStatements(statements),
       this.convertModifiers(sourceFile.modifiers),
       uid(),
       sourceName,
       true);
   }
 
-  createSourceFileDeclaration(sourceFile: ts.SourceFile): SourceFileDeclaration {
+  createSourceFileDeclaration(sourceFile: ts.SourceFile, packageName: NameEntity, filter?: (node: ts.Node) => boolean): SourceFileDeclaration {
     return this.astFactory.createSourceFileDeclaration(
       sourceFile.fileName,
-      this.createModuleFromSourceFile(sourceFile)
+      this.createModuleFromSourceFile(sourceFile, packageName, filter)
     );
   }
 
@@ -154,7 +154,7 @@ export class AstConverter {
     });
   }
 
-  createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): Declaration {
+  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): TopLevelDeclarationProto {
     return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, root));
   }
 
@@ -428,8 +428,6 @@ export class AstConverter {
     if (type == undefined) {
       return this.createTypeDeclaration("Any")
     } else {
-      this.astVisitor.visitType(type);
-
       if (type.kind == ts.SyntaxKind.VoidKeyword) {
         return this.createTypeDeclaration("Unit")
       } else if (ts.isArrayTypeNode(type)) {
@@ -788,9 +786,6 @@ export class AstConverter {
 
           let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
           let declaration = this.getFirstDeclaration(symbol);
-          if (declaration) {
-            this.astVisitor.visitType(declaration);
-          }
 
           if (declaration != parent) {
             let typeReference = this.createTypeReferenceFromSymbol(declaration);
@@ -830,10 +825,10 @@ export class AstConverter {
     );
   }
 
-  private convertDefinitions(name: ts.Node): Array<DefinitionInfoDeclaration> {
+  private convertDefinitions(kind: ts.SyntaxKind, name: ts.Node): Array<DefinitionInfoDeclaration> {
     let definitionInfos = this.declarationResolver.resolve(name);
 
-    let definitionsInfoDeclarations = new Array<DefinitionInfoDeclaration>();
+    let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
     if (definitionInfos) {
       definitionsInfoDeclarations = definitionInfos.map((definitionInfo) => {
         return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
@@ -849,7 +844,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
-      computeDefinitions ? this.convertDefinitions(statement.name) : [],
+      computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
       this.exportContext.getUID(statement)
     );
   }
@@ -949,7 +944,6 @@ export class AstConverter {
       }
     } else if (ts.isInterfaceDeclaration(statement)) {
       res.push(this.convertInterfaceDeclaration(statement));
-      this.astVisitor.visitType(statement);
     } else if (ts.isExportAssignment(statement)) {
       let expression = statement.expression;
       if (ts.isIdentifier(expression) || ts.isPropertyAccessExpression(expression)) {
@@ -1020,25 +1014,34 @@ export class AstConverter {
     return moduleDeclaration.name.getText();
   }
 
-  convertModule(module: ts.ModuleDeclaration): Array<Declaration> {
-    const declarations: Declaration[] = [];
-    if (module.body) {
-      let body = module.body;
-      let modifiers = this.convertModifiers(module.modifiers);
-      let uid = this.exportContext.getUID(module);
-      let sourceNameFragment = this.resolveAmbientModuleName(module);
+  convertModuleBody(body: ts.ModuleBody | null, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
+    let moduleDeclarations: Array<Declaration> | null = null;
+
+    if (ts.isModuleBlock(body)) {
+      let statements = filter ? body.statements.filter(filter) : body.statements;
+      moduleDeclarations = this.convertStatements(statements);
+    } else if (ts.isModuleDeclaration(body)) {
+      moduleDeclarations = this.convertModule(body, filter);
+    }
+
+    if (moduleDeclarations) {
+      let parentModule = body.parent;
+
+      let modifiers = this.convertModifiers(parentModule.modifiers);
+      let uid = this.exportContext.getUID(parentModule);
+      let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
 
       let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
-      let imports = this.getImports(module.getSourceFile());
-      let references = this.getReferences(module.getSourceFile());
-      if (ts.isModuleBlock(body)) {
-        let moduleDeclarations = this.convertStatements(body.statements);
-        this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false), declarations);
-      } else if (ts.isModuleDeclaration(body)) {
-        this.registerDeclaration(this.createModuleDeclarationAsTopLevel(packageName, imports, references, this.convertModule(body), modifiers, uid, sourceNameFragment, false), declarations);
-      }
+      let imports = this.getImports(body.getSourceFile());
+      let references = this.getReferences(body.getSourceFile());
+
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false)];
     }
-    return declarations
+
+    return [];
   }
 
+  private convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): Array<TopLevelDeclarationProto> {
+    return this.convertModuleBody(module.body, filter);
+  }
 }

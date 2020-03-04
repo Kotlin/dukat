@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -16,7 +15,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
-import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
@@ -31,7 +29,6 @@ import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
-import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.tsLowerings.addPackageName
 import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.eliminateStringType
@@ -40,9 +37,8 @@ import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
 import org.jetbrains.dukat.tsLowerings.mergeParentsForMergedInterfaces
-import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
-import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
+import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.syncTypeNames
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
@@ -107,7 +103,7 @@ open class TypescriptLowerer(
                 .mergeVarsAndInterfaces()
                 .mergeNestedClasses()
                 .extractNonExternalDeclarations()
-                .lowerOverrides(stdLibSourceSet)
+                .lowerOverrides()
                 .specifyTypeNodesWithModuleData()
                 .addExplicitGettersAndSetters()
                 .addImports()
@@ -120,34 +116,11 @@ open class TypescriptLowerer(
     }
 
     override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        var stdLib: SourceSetModel? = null
-        val sources = mutableListOf<SourceSetDeclaration>()
-
         val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
         val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
-        sourceBundle.sources.forEach { source ->
-            if ((source.isStdLib()) && (stdLib == null)) {
-                val stdSourceSet = source.renameStdLibEntities() { uid, newName ->
-                    renameMap[uid] = newName
-                }
-                stdLib = lower(stdSourceSet, null, renameMap, uidToFqNameMapper)
-            } else {
-                sources.add(source)
-            }
-        }
-
-        val loweredSources = sources.map { source ->
-            lower(source, stdLib, renameMap, uidToFqNameMapper.toMutableMap())
-        }.toMutableList()
-
-
-        stdLib = stdLib
-                ?.whiteList(TS_STDLIB_WHITE_LIST)
-        //?.splitIntoSeparateEntities()
-
-        stdLib?.let { loweredSources.add(it) }
-
-        return SourceBundleModel(loweredSources)
+        return SourceBundleModel(sources = sourceBundle.sources.map {
+            lower(it, null, renameMap, uidToFqNameMapper.toMutableMap())
+        })
     }
 }

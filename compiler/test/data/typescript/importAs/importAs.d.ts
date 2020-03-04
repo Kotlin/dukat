@@ -8,4 +8,5 @@ declare interface Cipher {
 declare function createCipher(algorithm: string, options?: transformable.TransformOptions): Cipher;
 declare function createComputable(): Computable;
 declare function createPipable(): Pipable;
+declare function createYetAnotherPipable(): Pipable;
 

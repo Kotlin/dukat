@@ -17,11 +17,6 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 
-private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> value
-    is QualifierEntity -> "${left.translate()}.${right.translate()}"
-}
-
 private class AnyfyLowering : ModelWithOwnerTypeLowering {
     private fun TypeValueModel.anify(): TypeValueModel {
         return copy(

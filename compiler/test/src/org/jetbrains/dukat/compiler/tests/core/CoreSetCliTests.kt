@@ -65,7 +65,7 @@ class CoreSetCliTests {
 
         val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
 
-        var translated = reportJson.outputs.mapNotNull { output ->
+        var translatedOutput = reportJson.outputs.mapNotNull { output ->
             println("OUTPUT ${output}")
             val targetFile = File(dirName, output)
 
@@ -88,14 +88,17 @@ class CoreSetCliTests {
             } else {
                 targetFile.readText()
             }
-        }.joinToString(OutputTests.SEPARATOR)
-
-        if (translated.isEmpty()) {
-            translated = "// NO DECLARATIONS"
         }
 
+        println("CLI TESTS ${reportJson.outputs.size} => ${translatedOutput.size}")
+        val translated = translatedOutput.joinToString(OutputTests.SEPARATOR)
+
         assertEquals(
-                translated,
+                if (translated.isEmpty()) {
+                    "// NO DECLARATIONS"
+                } else {
+                    translated
+                },
                 File(ktPath).readText().trimEnd()
         )
     }

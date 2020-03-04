@@ -1,17 +1,14 @@
 import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
-import {createLogger} from "./Logger";
 import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
 import {DeclarationResolver} from "./DeclarationResolver";
-import {LibraryDeclarationsVisitor} from "./ast/LibraryDeclarationsVisitor";
 import {ExportContext} from "./ExportContext";
-import {AstVisitor} from "./AstVisitor";
 import {DocumentCache} from "./DocumentCache";
-import * as fs from "fs";
+import {DependencyBuilder} from "./DependencyBuilder";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
@@ -19,92 +16,67 @@ function createFileResolver(): FileResolver {
 
 let cache = new DocumentCache();
 
-function buildLibSet(stdLib: string): Set<string> {
-  let host = new DukatLanguageServiceHost(new FileResolver(), stdLib);
-  host.register(stdLib);
-  let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
-  const program = languageService.getProgram();
-
-  return getLibPaths(program, program.getSourceFile(stdLib), ts.getDirectoryPath(stdLib));
-}
-
-function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, defaultLibraryPath: string, libs: Set<string> = new Set()) {
+function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, libs: Set<string> = new Set()): Set<string> {
   if (libPath === undefined) {
     return libs;
   }
 
-  if (libs.has(libPath.fileName)) {
+  let value = ts.normalizePath(libPath.fileName);
+  if (libs.has(value)) {
     return libs;
   }
 
-  libs.add(libPath.fileName);
+  libs.add(value);
   libPath.libReferenceDirectives.forEach(libReference => {
-    getLibPaths(program, program.getLibFileFromReference(libReference), defaultLibraryPath, libs);
+    getLibPaths(program, program.getLibFileFromReference(libReference), libs);
   });
 
   return libs;
 }
 
-
 class SourceBundleBuilder {
   private astFactory = new AstFactory();
-  private program = this.createProgram();
+  private program: ts.Program;
+  private libsSet: Set<string>;
 
-  private libVisitor = new LibraryDeclarationsVisitor(this.program.getTypeChecker(), getLibPaths(this.program, this.program.getSourceFile(this.stdLib), ts.getDirectoryPath(this.stdLib)));
-  private astConverter: AstConverter = this.createAstConverter(this.libVisitor);
+  private isLibSource(node: ts.Node | string): boolean {
+    let src = (typeof node == "string") ? node : (node.getSourceFile().fileName);
+    return this.libsSet.has(ts.normalizePath(src));
+  }
+
+  private astConverter: AstConverter;
+  private dependencyBuilder: DependencyBuilder;
 
   constructor(
     private stdLib: string,
-    private files: Array<string>
+    originalFiles: Array<string>
   ) {
-  }
+    this.program = this.createProgram(originalFiles);
+    this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
-  private createAstConverter(libVisitor: LibraryDeclarationsVisitor): AstConverter {
-    let astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => libVisitor.isLibDeclaration(node)),
+    let dependencyBuilder = new DependencyBuilder(this.program, new ExportContext((node: ts.Node) => this.isLibSource(node)));
+    originalFiles.forEach(file => {
+      let sourceFile = this.program.getSourceFile(file);
+      if (sourceFile) {
+        dependencyBuilder.buildDependencies(sourceFile);
+      }
+    });
+
+    this.dependencyBuilder = dependencyBuilder;
+
+
+    this.astConverter = new AstConverter(
+      new ExportContext((node: ts.Node) => this.isLibSource(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
-      this.astFactory,
-      new class implements AstVisitor {
-        visitType(type: ts.TypeNode): void {
-          libVisitor.process(type);
-        }
-      }
+      this.astFactory
     );
-
-    libVisitor.createDeclarations = (node: ts.Node) => astConverter.convertTopLevelStatement(node);
-    return astConverter;
   }
 
-  private createSourceSet(fileName: string): Array<SourceFileDeclaration> {
-    let logger = createLogger("converter");
 
-    return this.createFileDeclarations(fileName, this.program);
-  }
-
-  createFileDeclarations(fileName: string, program: ts.Program, result: Map<string, SourceFileDeclaration> = new Map()): Array<SourceFileDeclaration> {
-    if (result.has(fileName)) {
-      return [];
-    }
-    let fileDeclaration = this.astConverter.createSourceFileDeclaration(program.getSourceFile(fileName));
-    result.set(fileName, fileDeclaration);
-
-    let root = fileDeclaration.getRoot();
-    if (root) {
-      root.getImportsList().map(it => it.getReferencedfile())
-        .concat(root.getReferencesList().map(it => it.getReferencedfile()))
-        .filter(it => fs.existsSync(it))
-        .forEach(resourceFileName => {
-          this.createFileDeclarations(resourceFileName, program, result);
-        });
-    }
-
-    return Array.from(result.values());
-  }
-
-  private createProgram(): ts.Program {
+  private createProgram(files: Array<string>): ts.Program {
     let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
-    this.files.forEach(fileName => host.register(fileName));
+    files.forEach(fileName => host.register(fileName));
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
     const program = languageService.getProgram();
 
@@ -116,33 +88,19 @@ class SourceBundleBuilder {
   }
 
   createBundle(): declarations.SourceBundleDeclarationProto {
-    let sourceSets = this.files.map(fileName => {
-      return this.astFactory.createSourceSet([fileName], this.createSourceSet(fileName));
-    });
 
     let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
 
-    let libRootUid = "<LIBROOT>";
+    let sourceSet = new declarations.SourceSetDeclarationProto();
 
-    let libFiles: Array<SourceFileDeclaration> = [];
-    this.libVisitor.forEachDeclaration((declarations, resourceName) => {
-      libFiles.push(this.astFactory.createSourceFileDeclaration(
-        resourceName, this.astFactory.createModuleDeclaration(
-          this.astFactory.createIdentifierDeclarationAsNameEntity(libRootUid),
-          [],
-          [],
-          declarations,
-          [],
-          libRootUid,
-          libRootUid,
-          true
-        )
-      ));
+    let sourceFiles = new Array<SourceFileDeclaration>();
+    this.dependencyBuilder.forEachDependency(dep => {
+      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(this.isLibSource(dep.fileName) ? "<LIBROOT>" : "<ROOT>");
+      sourceFiles.push(this.astConverter.createSourceFileDeclaration(this.program.getSourceFile(dep.fileName), packageName, node => dep.accept(node)));
     });
 
-    sourceSets.push(this.astFactory.createSourceSet([libRootUid], libFiles));
-
-    sourceSetBundle.setSourcesList(sourceSets);
+    sourceSet.setSourcesList(sourceFiles);
+    sourceSetBundle.setSourcesList([sourceSet]);
     return sourceSetBundle;
   }
 }
