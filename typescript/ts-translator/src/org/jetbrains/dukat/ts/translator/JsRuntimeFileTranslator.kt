@@ -16,13 +16,6 @@ class JsRuntimeFileTranslator(
         private val libPath: String,
         private val nodePath: String
 ) : InputTranslator<String> {
-    constructor(
-            nameResolver: ModuleNameResolver,
-            translatorPath: String,
-            libPath: String,
-            nodePath: String
-    ) : this(TypescriptLowerer(nameResolver, null), translatorPath, libPath, nodePath)
-
     private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
 
     private fun translateAsInputStream(fileName: String): InputStream {

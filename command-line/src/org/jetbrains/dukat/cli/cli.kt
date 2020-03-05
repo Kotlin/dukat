@@ -7,9 +7,9 @@ import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
+import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
@@ -19,10 +19,12 @@ import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
-import org.jetbrains.dukat.ts.translator.createJsByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
+import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -43,12 +45,10 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
 fun translateBinaryBundle(
     input: ByteArray,
     outDir: String?,
-    moduleNameResolver: ModuleNameResolver,
-    packageName: NameEntity?,
+    translator: InputTranslator<ByteArray>,
     pathToReport: String?,
     generateDescriptors: Boolean
 ) {
-    val translator = createJsByteArrayTranslator(moduleNameResolver, packageName)
     if (!generateDescriptors) {
         val translatedUnits = translateModule(input, translator)
         compileUnits(translatedUnits, outDir, pathToReport)
@@ -230,6 +230,9 @@ private fun process(args: List<String>): CliOptions? {
                 arg.endsWith(TS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
+                arg.endsWith(JS_DECLARATION_EXTENSION) -> {
+                    sources.add(arg)
+                }
                 arg.endsWith(IDL_DECLARATION_EXTENSION) ||
                         arg.endsWith(WEBIDL_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
@@ -276,6 +279,7 @@ fun main(vararg args: String) {
         }
 
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
+        val isJsTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation =
             options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
@@ -284,10 +288,19 @@ fun main(vararg args: String) {
                 translateBinaryBundle(
                     System.`in`.readBytes(),
                     options.outDir,
-                    moduleResolver,
-                    options.basePackageName,
+                    JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName)),
                     options.reportPath,
                     options.generateDescriptors
+                )
+            }
+
+            isJsTranslation -> {
+                translateBinaryBundle(
+                        System.`in`.readBytes(),
+                        options.outDir,
+                        JsRuntimeByteArrayTranslator(JavaScriptLowerer(moduleResolver)),
+                        options.reportPath,
+                        options.generateDescriptors
                 )
             }
 

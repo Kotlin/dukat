@@ -14,10 +14,6 @@ import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 class JsRuntimeByteArrayTranslator(
         private val lowerer: ECMAScriptLowerer
 ) : InputTranslator<ByteArray> {
-    constructor(nameResolver: ModuleNameResolver, packageName: NameEntity?) : this(TypescriptLowerer(nameResolver, packageName))
-
-    private val logger = Logging.logger(JsRuntimeByteArrayTranslator::class.simpleName.toString())
-
     fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
         return lowerer.lower(sourceBundle)
     }
