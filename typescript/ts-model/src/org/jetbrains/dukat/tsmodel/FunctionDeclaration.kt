@@ -10,4 +10,4 @@ data class FunctionDeclaration(
         val modifiers: List<ModifierDeclaration>,
         val body: BlockDeclaration?,
         override val uid: String
-) : MemberDeclaration, TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration, ExpressionDeclaration, FunctionLikeDeclaration
+) : MemberDeclaration, StatementDeclaration, WithUidDeclaration, ParameterOwnerDeclaration, ExpressionDeclaration, FunctionLikeDeclaration

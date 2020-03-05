@@ -17,6 +17,7 @@ import {
   ParameterDeclaration,
   ReferenceEntity,
   SourceFileDeclaration,
+  StatementDeclaration,
   TypeDeclaration,
   TypeParameter
 } from "./ast/ast";
@@ -216,11 +217,11 @@ export class AstConverter {
     return typeParameterDeclarations;
   }
 
-  private getStatementsFromBlock(block: ts.Block): Array<Declaration> {
-    let statements: Declaration[] = [];
+  private getStatementsFromBlock(block: ts.Block): Array<StatementDeclaration> {
+    let statements: StatementDeclaration[] = [];
 
     for (let statement of block.statements) {
-      for (let decl of this.convertTopLevelStatement(statement)) {
+      for (let decl of this.convertStatement(statement)) {
         this.registerDeclaration(decl, statements)
       }
     }
@@ -237,12 +238,12 @@ export class AstConverter {
     }
   }
 
-  convertBlockStatement(block: ts.Block): Declaration {
+  convertBlockStatement(block: ts.Block): StatementDeclaration {
     let statements = this.getStatementsFromBlock(block);
     return this.astFactory.createBlockStatementDeclaration(statements);
   }
 
-  convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration): Declaration | null {
+  convertFunctionDeclaration(functionDeclaration: ts.FunctionDeclaration): StatementDeclaration | null {
 
     let typeParameterDeclarations: Array<TypeParameter> = this.convertTypeParams(functionDeclaration.typeParameters);
 
@@ -849,10 +850,10 @@ export class AstConverter {
     );
   }
 
-  convertIterationStatement(statement: ts.Node): Declaration | null {
-    let decl: Declaration | null = null;
+  convertIterationStatement(statement: ts.Node): StatementDeclaration | null {
+    let decl: StatementDeclaration | null = null;
 
-    let body = this.convertTopLevelStatement(statement.statement);
+    let body = this.convertStatement(statement.statement);
 
     if (ts.isWhileStatement(statement)) {
       decl = this.astFactory.createWhileStatement(
@@ -864,6 +865,57 @@ export class AstConverter {
     //TODO convert other iteration statements than while statement
 
     return decl
+  }
+
+  convertStatement(statement : ts.Node): Array<StatementDeclaration> {
+    let res: Array<StatementDeclaration> = [];
+
+    if (ts.isExpressionStatement(statement)) {
+      res.push(this.astFactory.createExpressionStatement(
+          this.astExpressionConverter.convertExpression(statement.expression)
+      ));
+    } else if (ts.isIfStatement(statement)) {
+      res.push(this.astFactory.createIfStatement(
+          this.astExpressionConverter.convertExpression(statement.expression),
+          this.convertStatement(statement.thenStatement),
+          statement.elseStatement ? this.convertStatement(statement.elseStatement) : null
+      ));
+    } else if (ts.isIterationStatement(statement)) {
+      let iterationStatement = this.convertIterationStatement(statement);
+
+      if (iterationStatement) {
+        res.push(iterationStatement);
+      }
+    } else if (ts.isReturnStatement(statement)) {
+      res.push(this.astFactory.createReturnStatement(
+          statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+      ));
+    } else if (ts.isThrowStatement(statement)) {
+      res.push(this.astFactory.createThrowStatement(
+          statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+      ))
+    } else if (ts.isVariableStatement(statement)) {
+      for (let declaration of statement.declarationList.declarations) {
+        res.push(this.astFactory.declareVariable(
+            declaration.name.getText(),
+            this.convertType(declaration.type),
+            this.convertModifiers(statement.modifiers),
+            declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
+            this.exportContext.getUID(declaration)
+        ));
+      }
+    } else if (ts.isFunctionDeclaration(statement)) {
+      let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
+      if (convertedFunctionDeclaration != null) {
+        res.push(convertedFunctionDeclaration);
+      }
+    } else if (ts.isBlock(statement)) {
+      let block = this.convertBlockStatement(statement);
+      if (block) {
+        res.push(block);
+      }
+    }
+    return res;
   }
 
   convertTopLevelStatement(statement: ts.Node): Array<Declaration> {
@@ -881,45 +933,19 @@ export class AstConverter {
         enumTokens,
         this.exportContext.getUID(statement)
       ));
-    } else if (ts.isVariableStatement(statement)) {
-      for (let declaration of statement.declarationList.declarations) {
-        res.push(this.astFactory.declareVariable(
-          declaration.name.getText(),
-          this.convertType(declaration.type),
-          this.convertModifiers(statement.modifiers),
-          declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
-          this.exportContext.getUID(declaration)
-        ));
-      }
-    } else if (ts.isExpressionStatement(statement)) {
-      res.push(this.astFactory.createExpressionStatement(
-        this.astExpressionConverter.convertExpression(statement.expression)
+    } else if (
+        ts.isExpressionStatement(statement) ||
+        ts.isIfStatement(statement) ||
+        ts.isIterationStatement(statement) ||
+        ts.isReturnStatement(statement) ||
+        ts.isThrowStatement(statement) ||
+        ts.isBlock(statement) ||
+        ts.isVariableStatement(statement) ||
+        ts.isFunctionDeclaration(statement)
+    ) {
+      res.push(this.astFactory.createStatementAsTopLevel(
+          this.convertStatement(statement)[0]
       ));
-    } else if (ts.isIfStatement(statement)) {
-      res.push(this.astFactory.createIfStatement(
-        this.astExpressionConverter.convertExpression(statement.expression),
-        this.convertTopLevelStatement(statement.thenStatement),
-        statement.elseStatement ? this.convertTopLevelStatement(statement.elseStatement) : null
-      ))
-    } else if (ts.isIterationStatement(statement)) {
-      let iterationStatement = this.convertIterationStatement(statement);
-
-      if (iterationStatement) {
-        res.push(iterationStatement)
-      }
-    } else if (ts.isReturnStatement(statement)) {
-      res.push(this.astFactory.createReturnStatement(
-        statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
-      ));
-    } else if (ts.isThrowStatement(statement)) {
-      res.push(this.astFactory.createThrowStatement(
-        statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
-      ))
-    } else if (ts.isBlock(statement)) {
-      let block = this.convertBlockStatement(statement);
-      if (block) {
-        res.push(block)
-      }
     } else if (ts.isTypeAliasDeclaration(statement)) {
       if (ts.isTypeLiteralNode(statement.type)) {
         res.push(this.convertTypeLiteralToInterfaceDeclaration(
@@ -936,11 +962,6 @@ export class AstConverter {
 
       if (classDeclaration != null) {
         res.push(classDeclaration);
-      }
-    } else if (ts.isFunctionDeclaration(statement)) {
-      let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
-      if (convertedFunctionDeclaration != null) {
-        res.push(convertedFunctionDeclaration);
       }
     } else if (ts.isInterfaceDeclaration(statement)) {
       res.push(this.convertInterfaceDeclaration(statement));

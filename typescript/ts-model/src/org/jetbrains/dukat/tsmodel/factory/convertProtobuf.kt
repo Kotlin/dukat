@@ -1,11 +1,43 @@
 package org.jetbrains.dukat.tsmodel.factory
 
-import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
-import org.jetbrains.dukat.tsmodel.*
+import org.jetbrains.dukat.tsmodel.BlockDeclaration
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
+import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
+import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
+import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
+import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.StatementDeclaration
+import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
+import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -87,6 +119,7 @@ import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.StatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ThrowStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
@@ -249,7 +282,7 @@ fun ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration {
     return ImportEqualsDeclaration(name, moduleReference.convert(), uid)
 }
 
-fun List<TopLevelDeclarationProto>.convert(): TopLevelDeclaration? {
+fun List<StatementDeclarationProto>.convert(): StatementDeclaration? {
     return when {
         this.isEmpty() -> null
         this.size == 1 -> this[0].convert()
@@ -296,19 +329,12 @@ fun TopLevelDeclarationProto.convert(): TopLevelDeclaration {
     return when {
         hasClassDeclaration() -> classDeclaration.convert()
         hasInterfaceDeclaration() -> interfaceDeclaration.convert()
-        hasFunctionDeclaration() -> functionDeclaration.convert()
         hasAliasDeclaration() -> aliasDeclaration.convert()
-        hasVariableDeclaration() -> variableDeclaration.convert()
         hasEnumDeclaration() -> enumDeclaration.convert()
         hasModuleDeclaration() -> moduleDeclaration.convert()
         hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
-        hasIfStatement() -> ifStatement.convert()
-        hasWhileStatement() -> whileStatement.convert()
-        hasExpressionStatement() -> expressionStatement.convert()
-        hasReturnStatement() -> returnStatement.convert()
-        hasThrowStatement() -> throwStatement.convert()
-        hasBlockStatement() -> blockStatement.convert()
+        hasStatement() -> statement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")
     }
 }
@@ -554,6 +580,20 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasConditionalExpression() -> conditionalExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
+    }
+}
+
+fun StatementDeclarationProto.convert(): StatementDeclaration {
+    return when {
+        hasIfStatement() -> ifStatement.convert()
+        hasWhileStatement() -> whileStatement.convert()
+        hasExpressionStatement() -> expressionStatement.convert()
+        hasReturnStatement() -> returnStatement.convert()
+        hasThrowStatement() -> throwStatement.convert()
+        hasBlockStatement() -> blockStatement.convert()
+        hasVariableDeclaration() -> variableDeclaration.convert()
+        hasFunctionDeclaration() -> functionDeclaration.convert()
+        else -> throw Exception("unknown statement: ${this}")
     }
 }
 

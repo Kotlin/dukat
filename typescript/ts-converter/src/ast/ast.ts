@@ -26,6 +26,7 @@ import {
     SourceBundleDeclarationProto,
     SourceFileDeclarationProto,
     SourceSetDeclarationProto,
+    StatementDeclarationProto,
     TopLevelDeclarationProto,
     TypeAliasDeclarationProto,
     TypeParameterDeclarationProto,
@@ -63,6 +64,7 @@ export type ReferenceEntity = ReferenceDeclarationProto;
 export type SourceBundle = SourceBundleDeclarationProto;
 export type SourceFileDeclaration = SourceFileDeclarationProto;
 export type SourceSet = SourceSetDeclarationProto;
+export type StatementDeclaration = StatementDeclarationProto;
 export type Declaration = TopLevelDeclarationProto;
 export type TypeAliasDeclaration = TypeAliasDeclarationProto;
 export type TypeParameter = TypeParameterDeclarationProto;
