@@ -15,23 +15,9 @@ import java.io.File
 
 fun writeDescriptorsToFile(translator: InputTranslator<ByteArray>, data: ByteArray, outputDir: String) {
     val bundle = translator.translate(data)
+    val moduleDescriptor = bundle.translateToDescriptors()
 
-    val flattenedBundle = bundle.copy(sources = bundle.sources.map { sourceSet ->
-        sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
-            sourceFile.root.flattenDeclarations().map {
-                SourceFileModel(
-                    sourceFile.name,
-                    sourceFile.fileName,
-                    it,
-                    sourceFile.referencedFiles
-                )
-            }
-        })
-    })
-
-    val moduleDescriptor = flattenedBundle.translateToDescriptors()
-
-    val name = File(flattenedBundle.sources.first().sourceName.first()).nameWithoutExtension
+    val name = File(bundle.sources.first().sources.first().fileName).nameWithoutExtension
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
