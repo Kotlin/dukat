@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.moduleNameResolver
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
 
-    @UseExperimental(kotlinx.serialization.UnstableDefault::class)
+    @OptIn(kotlinx.serialization.UnstableDefault::class)
     fun resolveName(sourceFile: File): String? {
         val parentDirs = generateSequence(sourceFile.parentFile) { it.parentFile }
 
@@ -16,7 +17,7 @@ class CommonJsNameResolver : ModuleNameResolver {
         return packageJsonOwner?.let { jsonOwner ->
             val packageJsonFile = File(jsonOwner, "package.json")
             val packageJsonContent = packageJsonFile.readText()
-            val packageJson = Json.nonstrict.parse(PackageJsonModel.serializer(), packageJsonContent)
+            val packageJson = Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)).parse(PackageJsonModel.serializer(), packageJsonContent)
 
             if (packageJson.name == null) {
                 jsonOwner.name

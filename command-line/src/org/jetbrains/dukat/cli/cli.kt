@@ -2,6 +2,7 @@ package org.jetbrains.dukat.cli
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
@@ -43,11 +44,11 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
 }
 
 fun translateBinaryBundle(
-    input: ByteArray,
-    outDir: String?,
-    translator: InputTranslator<ByteArray>,
-    pathToReport: String?,
-    generateDescriptors: Boolean
+        input: ByteArray,
+        outDir: String?,
+        translator: InputTranslator<ByteArray>,
+        pathToReport: String?,
+        generateDescriptors: Boolean
 ) {
     if (!generateDescriptors) {
         val translatedUnits = translateModule(input, translator)
@@ -58,10 +59,10 @@ fun translateBinaryBundle(
 }
 
 private fun compile(
-    filenames: List<String>,
-    outDir: String?,
-    translator: InputTranslator<String>,
-    pathToReport: String?
+        filenames: List<String>,
+        outDir: String?,
+        translator: InputTranslator<String>,
+        pathToReport: String?
 ) {
     val translatedUnits: List<TranslationUnitResult> = filenames.flatMap { filename ->
         val sourceFile = File(filename)
@@ -110,11 +111,11 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
     }
 }
 
-@UseExperimental(kotlinx.serialization.UnstableDefault::class)
+@OptIn(kotlinx.serialization.UnstableDefault::class)
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
 
-    val reportBody = Json.indented.stringify(Report.serializer(), report)
+    val reportBody = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).stringify(Report.serializer(), report)
     try {
         println("saving report to ${reportFile.absolutePath}")
         reportFile.absoluteFile.parentFile.mkdirs()
@@ -137,7 +138,7 @@ fun Iterator<String>.readArg(): String? {
 
 private fun printUsage(program: String) {
     println(
-        """
+            """
 Usage: $program [<options>] <d.ts files>
 
 where possible options include:
@@ -151,13 +152,13 @@ where possible options include:
 
 
 private data class CliOptions(
-    val sources: List<String>,
-    val outDir: String?,
-    val basePackageName: NameEntity,
-    val jsModuleName: String?,
-    val reportPath: String?,
-    val tsDefaultLib: String,
-    val generateDescriptors: Boolean
+        val sources: List<String>,
+        val outDir: String?,
+        val basePackageName: NameEntity,
+        val jsModuleName: String?,
+        val reportPath: String?,
+        val tsDefaultLib: String,
+        val generateDescriptors: Boolean
 )
 
 
@@ -239,7 +240,7 @@ private fun process(args: List<String>): CliOptions? {
                 }
                 else -> {
                     printError(
-                        """
+                            """
 following file extensions are supported:
     *.d.ts - for TypeScript declarations
     *.idl, *.webidl - for Web IDL declarations                            
@@ -281,16 +282,16 @@ fun main(vararg args: String) {
         val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
         val isJsTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation =
-            options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
+                options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
         when {
             isTsTranslation -> {
                 translateBinaryBundle(
-                    System.`in`.readBytes(),
-                    options.outDir,
-                    JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName)),
-                    options.reportPath,
-                    options.generateDescriptors
+                        System.`in`.readBytes(),
+                        options.outDir,
+                        JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName)),
+                        options.reportPath,
+                        options.generateDescriptors
                 )
             }
 
@@ -306,10 +307,10 @@ fun main(vararg args: String) {
 
             isIdlTranslation -> {
                 compile(
-                    options.sources,
-                    options.outDir,
-                    IdlInputTranslator(DirectoryReferencesResolver()),
-                    options.reportPath
+                        options.sources,
+                        options.outDir,
+                        IdlInputTranslator(DirectoryReferencesResolver()),
+                        options.reportPath
                 )
             }
 
