@@ -23,7 +23,6 @@ import org.jetbrains.dukat.model.commonLowerings.removeConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.removeRedundantInlineFunction
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
-import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
@@ -77,7 +76,6 @@ open class TypescriptLowerer(
 
 
         val nodes = declarations.introduceNodes(moduleNameResolver)
-                .introduceQualifiedNode()
                 .resolveModuleAnnotations()
                 .lowerVarargs()
                 .lowerIntersectionType()
