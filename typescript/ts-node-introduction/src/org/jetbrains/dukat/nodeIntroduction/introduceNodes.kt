@@ -33,6 +33,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
+import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -146,7 +147,45 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
         )
 
         else -> declaration
+    }.lowerAsNullable()
+}
+
+private fun ParameterValueDeclaration.resolveAsNullableType(): ParameterValueDeclaration? {
+    return when (this) {
+        is UnionTypeNode -> {
+            val params = params.filter { param ->
+                when (param) {
+                    is TypeValueNode -> {
+                        val value = param.value
+                        value != IdentifierEntity("undefined") && value != IdentifierEntity("null")
+                    }
+                    else -> true
+                }
+            }
+
+            if (params.size == 1) {
+                params[0]
+            } else {
+                null
+            }
+        }
+        else -> null
     }
+}
+
+private fun ParameterValueDeclaration.lowerAsNullable(): ParameterValueDeclaration {
+    return resolveAsNullableType()?.let { nullableType ->
+        when (nullableType) {
+            is TypeValueNode -> nullableType.copy(nullable = true, meta = MuteMetadata())
+            is TypeParameterNode -> nullableType.copy(nullable = true)
+            is FunctionTypeNode -> nullableType.copy(nullable = true, meta = MuteMetadata())
+            is UnionTypeNode -> nullableType
+            is IntersectionTypeDeclaration -> nullableType
+            else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
+                nullableType
+            }
+        }
+    } ?: this
 }
 
 private class LowerDeclarationsToNodes(

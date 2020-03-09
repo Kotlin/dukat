@@ -45,7 +45,6 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
-import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
 import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
@@ -78,7 +77,6 @@ open class TypescriptLowerer(
         val nodes = declarations.introduceNodes(moduleNameResolver)
                 .introduceQualifiedNode()
                 .resolveModuleAnnotations()
-                .lowerNullable()
                 .lowerPrimitives()
                 .lowerVarargs()
                 .lowerIntersectionType()
