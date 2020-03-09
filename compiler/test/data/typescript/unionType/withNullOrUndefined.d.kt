@@ -31,7 +31,7 @@ external interface `T$0` {
 }
 
 external open class Foo(a: String?) {
-    open fun someMethod(): dynamic /* String | Number | Nothing? */
+    open fun someMethod(): dynamic /* String? | Number? */
     open var foo: Foo?
     open var optionalFoo: String?
     open var optionalFoo2: String?
@@ -40,7 +40,7 @@ external open class Foo(a: String?) {
 }
 
 external interface IBar {
-    fun someMethod(): dynamic /* String | Number | Nothing? */
+    fun someMethod(): dynamic /* String? | Number? */
     var foo: Foo?
         get() = definedExternally
         set(value) = definedExternally

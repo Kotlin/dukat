@@ -27,7 +27,7 @@ typealias MyVerySpecificException = Error
 
 external interface `T$0` {
     @nativeGetter
-    operator fun get(shortName: String): dynamic /* String | ReadonlyArray<String> */
+    operator fun get(shortName: String): dynamic /* String? | ReadonlyArray<String>? */
     @nativeSetter
     operator fun set(shortName: String, value: String)
     @nativeSetter

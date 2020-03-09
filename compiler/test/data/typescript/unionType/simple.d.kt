@@ -37,7 +37,7 @@ external fun baz(a: Foo, b: Foo)
 
 external interface `T$0` {
     @nativeGetter
-    operator fun get(key: String): dynamic /* String | Number */
+    operator fun get(key: String): dynamic /* String? | Number? */
     @nativeSetter
     operator fun set(key: String, value: String)
     @nativeSetter

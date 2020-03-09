@@ -42,7 +42,7 @@ external open class Foo {
     @nativeSetter
     open operator fun set(n: Number, value: Bar)
     @nativeGetter
-    open operator fun get(s: String): dynamic /* String | Array<String> */
+    open operator fun get(s: String): dynamic /* String? | Array<String>? */
     @nativeSetter
     open operator fun set(s: String, value: String)
     @nativeSetter

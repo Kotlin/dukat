@@ -192,6 +192,12 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                 (unionMember.meta as StringLiteralDeclaration).token
             } else {
                 unionMember.process().translate()
+            }.let {
+                if (nullable) {
+                    "${it}?"
+                } else {
+                    it
+                }
             }
         }
     }

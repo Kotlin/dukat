@@ -152,7 +152,7 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
 private fun ParameterValueDeclaration.resolveAsNullableType(): ParameterValueDeclaration? {
     return when (this) {
         is UnionTypeNode -> {
-            val params = params.filter { param ->
+            val paramsFiltered = params.filter { param ->
                 when (param) {
                     is TypeValueNode -> {
                         val value = param.value
@@ -162,8 +162,12 @@ private fun ParameterValueDeclaration.resolveAsNullableType(): ParameterValueDec
                 }
             }
 
-            if (params.size == 1) {
-                params[0]
+            if ((paramsFiltered.size < params.size)) {
+                if (paramsFiltered.size == 1) {
+                    paramsFiltered[0]
+                } else {
+                    copy(params = paramsFiltered, nullable = true)
+                }
             } else {
                 null
             }
