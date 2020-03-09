@@ -15,7 +15,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
-import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
@@ -35,6 +34,7 @@ import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
+import org.jetbrains.dukat.tsLowerings.lowerPrimitives
 import org.jetbrains.dukat.tsLowerings.mergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
@@ -68,16 +68,17 @@ open class TypescriptLowerer(
                 .renameImpossibleDeclarations()
                 .resolveTypescriptUtilityTypes()
                 .resolveDefaultTypeParams()
+                .lowerPrimitives()
                 .generateInterfaceReferences()
                 .eliminateStringType()
                 .desugarArrayDeclarations()
                 .fixImpossibleInheritance()
                 .lowerPartialOfT()
 
+
         val nodes = declarations.introduceNodes(moduleNameResolver)
                 .introduceQualifiedNode()
                 .resolveModuleAnnotations()
-                .lowerPrimitives()
                 .lowerVarargs()
                 .lowerIntersectionType()
                 .lowerThisType()

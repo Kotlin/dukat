@@ -33,6 +33,6 @@ fun ObjectLiteralDeclaration.canBeJson(): Boolean {
 
     val typeDeclaration = indexType.type
 
-    return (typeDeclaration.isSimpleType("string"))
-            && (indexSignatureDeclaration.returnType.isSimpleType("any"))
+    return (typeDeclaration.isSimpleType("String"))
+            && (indexSignatureDeclaration.returnType.isSimpleType("Any"))
 }
