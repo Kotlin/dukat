@@ -14,15 +14,3 @@ data class ParameterNode(
         val vararg: Boolean,
         val optional: Boolean
 ) : Entity
-
-
-fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
-        name = name,
-        type = type,
-        initializer = if (initializer != null || optional) {
-            TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
-        } else null,
-        meta = null,
-        vararg = vararg,
-        optional = optional
-)

@@ -1,7 +1,37 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.*
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
+import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.ImportNode
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
+import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -15,11 +45,37 @@ import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.*
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
+import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import java.io.File
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
@@ -27,6 +83,70 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
 
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
+}
+
+private fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
+        name = name,
+        type = type.convertToNode(),
+        initializer = if (initializer != null || optional) {
+            TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
+        } else null,
+        meta = null,
+        vararg = vararg,
+        optional = optional
+)
+
+private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration {
+    val declaration = this
+    return when (declaration) {
+        is TypeParamReferenceDeclaration -> TypeParameterNode(
+                name = declaration.value,
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+        is TypeDeclaration -> TypeValueNode(
+                value = declaration.value,
+                params = declaration.params.map { param -> param.convertToNode() },
+                typeReference = declaration.typeReference?.let {
+                    ReferenceNode(it.uid)
+                },
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+        //TODO: investigate where we still have FunctionTypeDeclarations up to this point
+        is FunctionTypeDeclaration -> FunctionTypeNode(
+                parameters = declaration.parameters.map { parameterDeclaration ->
+                    parameterDeclaration.convertToNode()
+                },
+                type = declaration.type.convertToNode(),
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+        is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
+                declaration.name,
+                declaration.typeParameters,
+                declaration.reference,
+                declaration.nullable,
+                declaration.meta
+        )
+        is IntersectionTypeDeclaration -> IntersectionTypeDeclaration(
+                params = declaration.params.map { param -> param.convertToNode() },
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+        is UnionTypeDeclaration -> UnionTypeNode(
+                params = declaration.params.map { param -> param.convertToNode() },
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+        is TupleDeclaration -> TupleTypeNode(
+                params = declaration.params.map { param -> param.convertToNode() },
+                nullable = declaration.nullable,
+                meta = declaration.meta
+        )
+
+        else -> declaration
+    }
 }
 
 private class LowerDeclarationsToNodes(
@@ -41,7 +161,7 @@ private class LowerDeclarationsToNodes(
     fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
         return PropertyNode(
                 declaration.name,
-                if (declaration.optional) declaration.type.makeNullable() else declaration.type,
+                (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
                 convertTypeParameters(declaration.typeParameters),
 
                 declaration.isStatic(),
@@ -60,7 +180,7 @@ private class LowerDeclarationsToNodes(
         return typeParams.map { typeParam ->
             TypeValueNode(
                     value = typeParam.name,
-                    params = typeParam.constraints
+                    params = typeParam.constraints.map { it.convertToNode() }
             )
         }
     }
@@ -71,7 +191,7 @@ private class LowerDeclarationsToNodes(
                     declaration.name,
                     FunctionTypeNode(
                             convertParameters(declaration.parameters),
-                            declaration.type,
+                            declaration.type.convertToNode(),
                             true,
                             null
                     ),
@@ -85,7 +205,7 @@ private class LowerDeclarationsToNodes(
             MethodNode(
                     declaration.name,
                     convertParameters(declaration.parameters),
-                    declaration.type,
+                    declaration.type.convertToNode(),
                     convertTypeParameters(declaration.typeParameters),
                     false,
                     false,
@@ -101,7 +221,7 @@ private class LowerDeclarationsToNodes(
                 MethodNode(
                         "get",
                         convertParameters(declaration.indexTypes),
-                        declaration.returnType.makeNullable(),
+                        declaration.returnType.makeNullable().convertToNode(),
                         emptyList(),
                         false,
                         true,
@@ -110,8 +230,8 @@ private class LowerDeclarationsToNodes(
                 ),
                 MethodNode(
                         "set",
-                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType, null, false, false))),
-                        TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
+                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType.convertToNode(), null, false, false))),
+                        TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
                         false,
                         true,
@@ -126,7 +246,7 @@ private class LowerDeclarationsToNodes(
         return MethodNode(
                 "invoke",
                 convertParameters(parameters),
-                type,
+                type.convertToNode(),
                 convertTypeParameters(typeParameters),
                 false,
                 true,
@@ -139,7 +259,7 @@ private class LowerDeclarationsToNodes(
         return declarations.map { declaration ->
             HeritageNode(
                     name = declaration.name.convert(),
-                    typeArguments = declaration.typeArguments,
+                    typeArguments = declaration.typeArguments.map { it.convertToNode() },
                     reference = declaration.typeReference?.let {
                         val origin = when (it.origin) {
                             ReferenceOriginDeclaration.IMPORT -> ReferenceOriginNode.IMPORT
@@ -162,7 +282,7 @@ private class LowerDeclarationsToNodes(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name, typeParameter.constraints)
+                    TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 convertToHeritageNodes(parentEntities),
                 null,
@@ -226,7 +346,7 @@ private class LowerDeclarationsToNodes(
     private fun TypeAliasDeclaration.convert(): TypeAliasNode {
         return TypeAliasNode(
                 name = aliasName,
-                typeReference = typeReference,
+                typeReference = typeReference.convertToNode(),
                 typeParameters = typeParameters,
                 uid = uid
         )
@@ -242,7 +362,7 @@ private class LowerDeclarationsToNodes(
         return FunctionNode(
                 IdentifierEntity(name),
                 convertParameters(parameters),
-                type,
+                type.convertToNode(),
                 convertTypeParameters(typeParameters),
                 mutableListOf(),
                 exportQualifier,
@@ -262,7 +382,7 @@ private class LowerDeclarationsToNodes(
             is PropertyNode -> memberDeclaration
             is MethodNode -> memberDeclaration.copy(
                     parameters = memberDeclaration.parameters,
-                    type = memberDeclaration.type
+                    type = memberDeclaration.type.convertToNode()
             )
             else -> raiseConcern("unkown method signature") { null }
         }
@@ -314,7 +434,7 @@ private class LowerDeclarationsToNodes(
                     FunctionNode(
                             IdentifierEntity(declaration.name),
                             parameters,
-                            declaration.type,
+                            declaration.type.convertToNode(),
                             convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
                             mutableListOf(),
                             null,
@@ -332,7 +452,7 @@ private class LowerDeclarationsToNodes(
             }
             is PropertyDeclaration -> listOf(VariableNode(
                     IdentifierEntity(declaration.name),
-                    if (declaration.optional) declaration.type.makeNullable() else declaration.type,
+                    (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
                     null,
                     false,
                     true,
@@ -350,7 +470,7 @@ private class LowerDeclarationsToNodes(
                     FunctionNode(
                             IdentifierEntity("get"),
                             convertParameters(declaration.indexTypes),
-                            declaration.returnType.makeNullable(),
+                            declaration.returnType.makeNullable().convertToNode(),
                             emptyList(),
                             mutableListOf(),
                             null,
@@ -365,7 +485,7 @@ private class LowerDeclarationsToNodes(
                     FunctionNode(
                             IdentifierEntity("set"),
                             convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
-                                    "value", declaration.returnType, null, false, false
+                                    "value", declaration.returnType.convertToNode(), null, false, false
                             ))),
                             TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                             emptyList(),
@@ -384,7 +504,7 @@ private class LowerDeclarationsToNodes(
                 FunctionNode(
                         IdentifierEntity("invoke"),
                         parameters,
-                        declaration.type,
+                        declaration.type.convertToNode(),
                         emptyList(),
                         mutableListOf(),
                         null,
@@ -407,7 +527,7 @@ private class LowerDeclarationsToNodes(
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
                     convertParameters(declaration.parameters),
-                    declaration.type,
+                    declaration.type.convertToNode(),
                     convertTypeParameters(declaration.typeParameters),
                     declaration.isStatic(),
                     false,
@@ -459,7 +579,7 @@ private class LowerDeclarationsToNodes(
         } else {
             VariableNode(
                     IdentifierEntity(declaration.name),
-                    type,
+                    type.convertToNode(),
                     null,
                     false,
                     false,
