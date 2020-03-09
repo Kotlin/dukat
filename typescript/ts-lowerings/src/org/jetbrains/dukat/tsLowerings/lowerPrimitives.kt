@@ -48,7 +48,6 @@ private class PrimitivesLowering : DeclarationTypeLowering {
         var meta = declaration.meta
 
         if (declaration.isPrimitive("undefined") || declaration.isPrimitive("null")) {
-            println("PRIMITIVE OWVER ${owner?.node}")
             if (owner?.node !is UnionTypeDeclaration) {
                 value = IdentifierEntity("Nothing")
                 nullable = true
