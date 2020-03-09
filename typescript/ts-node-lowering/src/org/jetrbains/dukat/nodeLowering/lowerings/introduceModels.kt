@@ -1,15 +1,72 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.TypeParameterNode
-import org.jetbrains.dukat.ast.model.nodes.*
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.EnumNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
+import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
+import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
+import org.jetbrains.dukat.ast.model.nodes.HeritageNode
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
+import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
+import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
+import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.*
-import org.jetbrains.dukat.astModel.*
+import org.jetbrains.dukat.astCommon.Entity
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
+import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ConstructorModel
+import org.jetbrains.dukat.astModel.EnumModel
+import org.jetbrains.dukat.astModel.EnumTokenModel
+import org.jetbrains.dukat.astModel.FunctionModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.ImportModel
+import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
+import org.jetbrains.dukat.astModel.MethodModel
+import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
+import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ChainCallModel
@@ -27,16 +84,11 @@ import java.io.File
 
 private val logger = Logging.logger("introduceModels")
 
-private enum class MetaDataOptions {
-    SKIP_NULLS
-}
-
 private fun MemberNode.isStatic() = when (this) {
     is MethodNode -> static
     is PropertyNode -> static
     else -> false
 }
-
 
 private enum class TranslationContext {
     TYPE_CONSTRAINT,
@@ -128,13 +180,6 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
 
         return Members(ownMembers, staticMembers)
     }
-    private fun TranslationContext.resolveAsMetaOptions(): Set<MetaDataOptions> {
-        return if (this == TranslationContext.FUNCTION_TYPE) {
-            setOf()
-        } else {
-            setOf(MetaDataOptions.SKIP_NULLS)
-        }
-    }
 
     private fun NameEntity.addLibPrefix() = IdentifierEntity("<LIBROOT>").appendLeft(this)
     private fun UnionTypeNode.canBeTranslatedAsString(): Boolean {
@@ -154,12 +199,16 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
     private fun HeritageNode.convertToModel(): HeritageModel {
         val isNamedImport = reference?.origin == ReferenceOriginNode.NAMED_IMPORT
         if (isNamedImport) {
-            reference?.getFqName(name)?.let {resolvedName ->
+            reference?.getFqName(name)?.let { resolvedName ->
                 imports.add(ImportModel(resolvedName, name.rightMost()))
             }
         }
 
-        val fqName = if (isNamedImport) {name} else { reference?.getFqName(name) }
+        val fqName = if (isNamedImport) {
+            name
+        } else {
+            reference?.getFqName(name)
+        }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
                 typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
@@ -198,7 +247,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
             is TypeParameterNode -> {
                 TypeParameterReferenceModel(
                         name = name,
-                        metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                        metaDescription = meta.processMeta(),
                         nullable = nullable
                 )
             }
@@ -209,7 +258,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                     TypeValueModel(
                             value,
                             params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
-                            meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                            meta.processMeta(),
                             getFqName(),
                             nullable
                     )
@@ -221,24 +270,25 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                             param.process(TranslationContext.FUNCTION_TYPE)
                         }),
                         type = type.process(TranslationContext.FUNCTION_TYPE),
-                        metaDescription = meta.processMeta(nullable, context.resolveAsMetaOptions()),
+                        metaDescription = meta.processMeta(),
                         nullable = nullable
                 )
             }
             is GeneratedInterfaceReferenceNode -> {
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam -> TypeValueModel(
-                                typeParam.name,
-                                emptyList(),
-                                null,
-                                if (reference?.uid?.endsWith("_GENERATED") == true) {
-                                    null
-                                } else {
-                                    reference?.getFqName(typeParam.name)
-                                })
+                        typeParameters.map { typeParam ->
+                            TypeValueModel(
+                                    typeParam.name,
+                                    emptyList(),
+                                    null,
+                                    if (reference?.uid?.endsWith("_GENERATED") == true) {
+                                        null
+                                    } else {
+                                        reference?.getFqName(typeParam.name)
+                                    })
                         }.map { TypeParameterModel(it, listOf()) },
-                        meta?.processMeta(nullable, setOf(MetaDataOptions.SKIP_NULLS)),
+                        meta?.processMeta(),
                         reference?.getFqName(name),
                         nullable
                 )
@@ -321,21 +371,13 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
         )
     }
 
-    private fun ParameterValueDeclaration?.processMeta(ownerIsNullable: Boolean, metadataOptions: Set<MetaDataOptions> = emptySet()): String? {
+    private fun ParameterValueDeclaration?.processMeta(): String? {
         return when (this) {
             is ThisTypeInGeneratedInterfaceMetaData -> "this"
             is IntersectionMetadata -> params.map {
                 it.process().translate()
             }.joinToString(" & ")
-            else -> {
-                if (!metadataOptions.contains(MetaDataOptions.SKIP_NULLS)) {
-                    val skipNullableAnnotation = this is MuteMetadata
-                    if (ownerIsNullable && !skipNullableAnnotation) {
-                        //TODO: consider rethinking this restriction
-                        return "= null"
-                    } else null
-                } else null
-            }
+            else -> null
         }
     }
 

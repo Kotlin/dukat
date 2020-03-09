@@ -33,7 +33,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
-import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -176,9 +175,9 @@ private fun ParameterValueDeclaration.resolveAsNullableType(): ParameterValueDec
 private fun ParameterValueDeclaration.lowerAsNullable(): ParameterValueDeclaration {
     return resolveAsNullableType()?.let { nullableType ->
         when (nullableType) {
-            is TypeValueNode -> nullableType.copy(nullable = true, meta = MuteMetadata())
+            is TypeValueNode -> nullableType.copy(nullable = true, meta = null)
             is TypeParameterNode -> nullableType.copy(nullable = true)
-            is FunctionTypeNode -> nullableType.copy(nullable = true, meta = MuteMetadata())
+            is FunctionTypeNode -> nullableType.copy(nullable = true, meta = null)
             is UnionTypeNode -> nullableType
             is IntersectionTypeDeclaration -> nullableType
             else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {

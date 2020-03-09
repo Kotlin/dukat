@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.isPrimitive
-import org.jetbrains.dukat.ast.model.nodes.metadata.MuteMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -44,7 +43,7 @@ private class PrimitiveClassLowering : ParameterValueLowering {
         if (declaration.isPrimitive("undefined") || declaration.isPrimitive("null")) {
             value = IdentifierEntity("Nothing")
             nullable = true
-            meta = MuteMetadata()
+            meta = null
         }
 
         return declaration.copy(
