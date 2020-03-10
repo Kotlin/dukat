@@ -3,14 +3,11 @@ package org.jetbrains.dukat.translatorString
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
-import org.jetbrains.dukat.astCommon.leftMost
-import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.DelegationModel
-import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.ExternalDelegationModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -32,16 +29,20 @@ import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
+import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
@@ -211,18 +212,27 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
     return annotationTranslated
 }
 
-private fun StatementCallModel.translate(): String {
-    return "${value.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${if (params == null) "" else "(${params?.joinToString(", ") { it.value }})"}"
+private fun CallExpressionModel.translate(): String {
+    return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${"(${arguments.joinToString(", ") { it.translate() }})"}"
+}
+
+private fun ExpressionModel.translate(): String {
+    return when (this) {
+        is IdentifierExpressionModel -> identifier.translate()
+        is ThisExpressionModel -> "this"
+        is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
+        is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
+        is CallExpressionModel -> translate()
+        else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
+    }
 }
 
 private fun StatementModel.translate(): String {
     return when (this) {
         is AssignmentStatementModel -> "${left.translate()} = ${right.translate()}"
-        is ChainCallModel -> "${left.translate()}.${right.translate()}"
-        is ReturnStatementModel -> "return ${statement.translate()}"
-        is IndexStatementModel -> "${array.translate()}[${index.translate()}]"
-        is StatementCallModel -> translate()
-        else -> raiseConcern("unkown StatementNode ${this}") { "" }
+        is ReturnStatementModel -> "return ${expression.translate()}"
+        is ExpressionStatementModel -> expression.translate()
+        else -> raiseConcern("unknown StatementModel ${this}") { "" }
     }
 }
 
@@ -254,7 +264,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         ""
     } else if (body.size == 1) {
         if (body[0] is ReturnStatementModel) {
-            " = ${(body[0] as ReturnStatementModel).statement.translate()}"
+            " = ${(body[0] as ReturnStatementModel).expression.translate()}"
         } else {
             " { ${body[0].translate()} }"
         }

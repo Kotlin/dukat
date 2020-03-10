@@ -1,11 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astModel.expressions.ExpressionModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 

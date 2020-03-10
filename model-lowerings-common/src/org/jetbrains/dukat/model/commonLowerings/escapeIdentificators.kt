@@ -15,11 +15,15 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
-import org.jetbrains.dukat.astModel.statements.IndexStatementModel
+import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -132,21 +136,30 @@ fun NameEntity.escape(): NameEntity {
 
 private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
-    private fun StatementCallModel.escape(): StatementCallModel {
+    private fun CallExpressionModel.escape(): CallExpressionModel {
         return copy(
-                value = value.renameAsParameter(),
-                params = params?.map { it.copy(value = it.value.renameAsParameter()) },
+                expression = expression.escape(),
+                arguments = arguments.map { it.escape() },
                 typeParameters = typeParameters.map { it.escape() }
         )
     }
 
+    private fun ExpressionModel.escape(): ExpressionModel {
+        return when (this) {
+            is IdentifierExpressionModel -> copy(identifier = identifier.renameAsParameter())
+            is CallExpressionModel -> escape()
+            is PropertyAccessExpressionModel -> copy(left = left.escape(), right = right.escape())
+            is IndexExpressionModel -> copy(array = array.escape(), index = index.escape())
+            is ThisExpressionModel -> this
+            else -> this
+        }
+    }
+
     private fun StatementModel.escape(): StatementModel {
         return when (this) {
-            is StatementCallModel -> escape()
-            is ReturnStatementModel -> copy(statement = statement.escape())
-            is ChainCallModel -> copy(left = left.escape(), right = right.escape())
+            is ExpressionStatementModel -> copy(expression = expression.escape())
+            is ReturnStatementModel -> copy(expression = expression.escape())
             is AssignmentStatementModel -> copy(left = left.escape(), right = right.escape())
-            is IndexStatementModel -> copy(array = array.escape(), index = index.escape())
             else -> this
         }
     }

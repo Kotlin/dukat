@@ -36,7 +36,6 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterface
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
@@ -67,11 +66,14 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
+import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.ChainCallModel
+import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementCallModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
@@ -359,15 +361,30 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                     }
                     TranslationContext.INLINE_EXTENSION -> {
                         if (optional) {
-                            StatementCallModel(IdentifierEntity("null"), null, emptyList(), meta)
+                            ExpressionStatementModel(
+                                IdentifierExpressionModel(
+                                    IdentifierEntity("null")
+                                ),
+                                meta
+                            )
                         } else {
                             null
                         }
                     }
                     else -> {
                         when {
-                            initializer != null -> StatementCallModel(initializer!!.value, null, emptyList(), meta)
-                            optional -> StatementCallModel(IdentifierEntity("definedExternally"), null, emptyList(), meta)
+                            initializer != null -> ExpressionStatementModel(
+                                IdentifierExpressionModel(
+                                    initializer!!.value
+                                ),
+                                meta
+                            )
+                            optional -> ExpressionStatementModel(
+                                IdentifierExpressionModel(
+                                    IdentifierEntity("definedExternally")
+                                ),
+                                meta
+                            )
                             else -> null
                         }
                     }
@@ -417,11 +434,19 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
 
     private fun VariableNode.resolveGetter(): StatementModel? {
         return if (inline) {
-            ChainCallModel(
-                    StatementCallModel(
-                            QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()
+            ExpressionStatementModel(
+                PropertyAccessExpressionModel(
+                    PropertyAccessExpressionModel(
+                        ThisExpressionModel(),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                            listOf()
+                        )
                     ),
-                    StatementCallModel(name.rightMost(), null)
+                    IdentifierExpressionModel(
+                        name.rightMost()
+                    )
+                )
             )
         } else null
     }
@@ -429,11 +454,19 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
     private fun VariableNode.resolveSetter(): StatementModel? {
         return if (inline) {
             AssignmentStatementModel(
-                    ChainCallModel(
-                            StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                            StatementCallModel(name.rightMost(), null)
+                PropertyAccessExpressionModel(
+                    PropertyAccessExpressionModel(
+                        ThisExpressionModel(),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                            listOf()
+                        )
                     ),
-                    StatementCallModel(IdentifierEntity("value"), null)
+                    IdentifierExpressionModel(
+                        name.rightMost()
+                    )
+                ),
+                IdentifierExpressionModel(IdentifierEntity("value"))
             )
         } else null
     }
@@ -445,50 +478,104 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
     private fun FunctionNode.resolveBody(): List<StatementModel> {
         return when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
-                    ReturnStatementModel(
-                            ChainCallModel(
-                                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                                    StatementCallModel(IdentifierEntity("get"), listOf(
-                                            IdentifierEntity(nodeContext.name)
-                                    ))
+                ReturnStatementModel(
+                    PropertyAccessExpressionModel(
+                        PropertyAccessExpressionModel(
+                            ThisExpressionModel(),
+                            CallExpressionModel(
+                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                listOf()
                             )
+                        ),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(
+                                IdentifierEntity("get")
+                            ),
+                            listOf(
+                                IdentifierExpressionModel(
+                                    IdentifierEntity(nodeContext.name)
+                                )
+                            )
+                        )
                     )
+                )
             )
 
-            is IndexSignatureSetter -> listOf(ChainCallModel(
-                    StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                    StatementCallModel(IdentifierEntity("set"), listOf(
-                            IdentifierEntity(nodeContext.name),
-                            IdentifierEntity("value")
-                    )))
+            is IndexSignatureSetter -> listOf(
+                ExpressionStatementModel(
+                    PropertyAccessExpressionModel(
+                        PropertyAccessExpressionModel(
+                            ThisExpressionModel(),
+                            CallExpressionModel(
+                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                listOf()
+                            )
+                        ),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(
+                                IdentifierEntity("set")
+                            ),
+                            listOf(
+                                IdentifierExpressionModel(
+                                    IdentifierEntity(nodeContext.name)
+                                ),
+                                IdentifierExpressionModel(
+                                    IdentifierEntity("value")
+                                )
+                            )
+                        )
+                    )
+                )
             )
 
             is FunctionFromCallSignature -> {
-                val chainCallModel = ChainCallModel(
-                        StatementCallModel(QualifierEntity(IdentifierEntity("this"), IdentifierEntity("asDynamic")), emptyList()),
-                        StatementCallModel(IdentifierEntity("invoke"), nodeContext.params))
-                listOf(if (type.isUnit()) {
-                    chainCallModel
-                } else {
-                    ReturnStatementModel(chainCallModel)
-                })
+                val chainCallExpression = PropertyAccessExpressionModel(
+                    PropertyAccessExpressionModel(
+                        ThisExpressionModel(),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                            listOf()
+                        )
+                    ),
+                    CallExpressionModel(
+                        IdentifierExpressionModel(
+                            IdentifierEntity("invoke")
+                        ),
+                        nodeContext.params.map { IdentifierExpressionModel(it) }
+                    )
+                )
+                listOf(
+                    if (type.isUnit()) {
+                        ExpressionStatementModel(chainCallExpression)
+                    } else {
+                        ReturnStatementModel(chainCallExpression)
+                    }
+                )
             }
             is FunctionFromMethodSignatureDeclaration -> {
-                val bodyStatement = ChainCallModel(
-                        StatementCallModel(
-                                QualifierEntity(
-                                        IdentifierEntity("this"),
-                                        IdentifierEntity("asDynamic")
-                                )
-                                , emptyList()),
-                        StatementCallModel(IdentifierEntity(nodeContext.name), nodeContext.params)
+                val bodyExpression = PropertyAccessExpressionModel(
+                    PropertyAccessExpressionModel(
+                        ThisExpressionModel(),
+                        CallExpressionModel(
+                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                            listOf()
+                        )
+                    ),
+                    CallExpressionModel(
+                        IdentifierExpressionModel(
+                            IdentifierEntity(nodeContext.name)
+                        ),
+                        nodeContext.params.map { IdentifierExpressionModel(it) }
+                    )
                 )
 
-                listOf(if (type.isUnit()) {
-                    bodyStatement
-                } else {
-                    ReturnStatementModel(bodyStatement)
-                })
+                listOf(
+                    if (type.isUnit()) {
+                        ExpressionStatementModel(bodyExpression)
+                    } else {
+                        ReturnStatementModel(bodyExpression)
+                    }
+                )
             }
             else -> emptyList()
         }
