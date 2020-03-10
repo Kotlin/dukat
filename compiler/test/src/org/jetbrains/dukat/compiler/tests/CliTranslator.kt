@@ -10,7 +10,7 @@ import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class CliTranslator() {
 
     companion object {
@@ -47,7 +47,7 @@ class CliTranslator() {
 }
 
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 fun createStandardCliTranslator(): CliTranslator {
     return CliTranslator()
 }

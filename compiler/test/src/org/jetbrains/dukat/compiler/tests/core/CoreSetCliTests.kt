@@ -51,7 +51,7 @@ class CoreSetCliTests {
         }
     }
 
-    @UseExperimental(UnstableDefault::class)
+    @OptIn(UnstableDefault::class)
     protected fun assertContentEqualsBinary(
             descriptor: String,
             tsPath: String,
@@ -63,7 +63,7 @@ class CoreSetCliTests {
         val dirName = "./build/tests/core/cli/${descriptor}"
         getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
 
-        val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
+        @Suppress("DEPRECATION") val reportJson = Json.nonstrict.parse(ReportJson.serializer(), File(reportPath).readText())
 
         var translatedOutput = reportJson.outputs.mapNotNull { output ->
             println("OUTPUT ${output}")

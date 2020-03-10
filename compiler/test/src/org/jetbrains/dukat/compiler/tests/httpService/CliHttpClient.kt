@@ -35,14 +35,14 @@ class CliHttpClient(private val port: String) {
         } while (pingStatus() != 200 || count < 10)
     }
 
-    @UseExperimental(UnstableDefault::class)
+    @OptIn(UnstableDefault::class)
     fun translate(fileName: String): ByteArray {
         val url = URL("http://localhost:${port}/dukat")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.connectTimeout = 10000
 
-        val messageRaw = Json.nonstrict.toJson(TranslationRequest.serializer(), TranslationRequest(
+        @Suppress("DEPRECATION") val messageRaw = Json.nonstrict.toJson(TranslationRequest.serializer(), TranslationRequest(
                 packageName = "<ROOT>",
                 files = listOf(fileName)
         )).toString()
