@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
+import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 sealed class FunctionNodeContext()
@@ -30,5 +31,7 @@ data class FunctionNode(
         val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
         override val uid: String,
-        val comment: CommentEntity?
+        val comment: CommentEntity?,
+
+        val body: BlockDeclaration?
 ) : MemberEntity, TopLevelEntity, UniqueNode

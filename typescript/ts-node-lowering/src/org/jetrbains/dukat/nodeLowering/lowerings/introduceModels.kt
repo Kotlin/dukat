@@ -616,7 +616,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                         inline = inline,
                         operator = operator,
                         extend = extend.convert(),
-                        body = resolveBody(),
+                        body = body?.convert() ?: resolveBody(),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = comment
                 )
