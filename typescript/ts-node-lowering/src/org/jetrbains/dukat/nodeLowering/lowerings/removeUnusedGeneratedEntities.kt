@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
@@ -40,7 +39,7 @@ private fun DocumentRootNode.removeUnusedReferences(referencesToRemove: Set<Stri
     val declarationsResolved = declarations.filter {
         !((it is InterfaceNode) && referencesToRemove.contains(it.uid))
     }.map {
-        when(it) {
+        when (it) {
             is DocumentRootNode -> it.removeUnusedReferences(referencesToRemove)
             else -> it
         }

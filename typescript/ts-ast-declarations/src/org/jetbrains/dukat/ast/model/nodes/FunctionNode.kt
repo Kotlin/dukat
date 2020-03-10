@@ -21,7 +21,6 @@ data class FunctionNode(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
 
-        val generatedReferenceNodes: MutableList<GeneratedInterfaceReferenceNode>,
         var exportQualifier: ExportQualifier?,
 
         val export: Boolean,
