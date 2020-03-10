@@ -16,16 +16,14 @@ import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.whiteList
-import org.jetbrains.dukat.compiler.lowerPrimitives
 import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.removeConflictingOverloads
+import org.jetbrains.dukat.model.commonLowerings.removeRedundantInlineFunction
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
-import org.jetbrains.dukat.nodeIntroduction.introduceQualifiedNode
-import org.jetbrains.dukat.nodeIntroduction.introduceTypeNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
@@ -37,6 +35,8 @@ import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
+import org.jetbrains.dukat.tsLowerings.lowerPrimitives
+import org.jetbrains.dukat.tsLowerings.mergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
 import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
@@ -47,7 +47,6 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
-import org.jetrbains.dukat.nodeLowering.lowerings.lowerNullable
 import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
 import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
@@ -64,25 +63,25 @@ open class TypescriptWithBodyLowerer(
         renameMap: Map<String, NameEntity>,
         uidToFqNameMapper: MutableMap<String, FqNode>
     ): SourceSetModel {
+
         val declarations = sourceSet
             .addPackageName(packageName)
+            .mergeParentsForMergedInterfaces()
             //.filterOutNonDeclarations()
             .syncTypeNames(renameMap)
             .renameImpossibleDeclarations()
             .resolveTypescriptUtilityTypes()
             .resolveDefaultTypeParams()
+            .lowerPrimitives()
             .generateInterfaceReferences()
             .eliminateStringType()
             .desugarArrayDeclarations()
             .fixImpossibleInheritance()
             .lowerPartialOfT()
 
+
         val nodes = declarations.introduceNodes(moduleNameResolver)
-            .introduceTypeNodes()
-            .introduceQualifiedNode()
             .resolveModuleAnnotations()
-            .lowerNullable()
-            .lowerPrimitives()
             .lowerVarargs()
             .lowerIntersectionType()
             .lowerThisType()
@@ -104,13 +103,14 @@ open class TypescriptWithBodyLowerer(
             .mergeVarsAndInterfaces()
             .mergeNestedClasses()
             .extractNonExternalDeclarations()
-            .lowerOverrides(stdLibSourceSet)
+            .lowerOverrides()
             .specifyTypeNodesWithModuleData()
             .addExplicitGettersAndSetters()
             .addImports()
             .anyfyUnresolvedTypes()
             .addNoinlineModifier()
             .addStandardImportsAndAnnotations()
+            .removeRedundantInlineFunction()
 
         return models
     }
