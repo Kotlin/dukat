@@ -13,7 +13,7 @@ class NodeResolver(envDataPath: String) {
     val nodePath: String
 
     init {
-        val envJson = Json.nonstrict.parse(EnvJson.serializer(), File(envDataPath).readText())
+        @Suppress("DEPRECATION") val envJson = Json.nonstrict.parse(EnvJson.serializer(), File(envDataPath).readText())
         nodePath = envJson.NODE
     }
 }
