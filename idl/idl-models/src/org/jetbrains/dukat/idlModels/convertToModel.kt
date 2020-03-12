@@ -34,6 +34,7 @@ import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
+import org.jetbrains.dukat.astModel.expressions.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
@@ -463,8 +464,8 @@ private class IdlFileConverter(
                         IdentifierEntity("js")
                     ),
                     listOf(
-                        IdentifierExpressionModel(
-                            IdentifierEntity("\"({})\"")
+                        StringLiteralExpressionModel(
+                            "\"({})\""
                         )
                     )
                 )

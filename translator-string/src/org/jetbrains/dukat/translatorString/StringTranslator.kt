@@ -35,6 +35,7 @@ import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
+import org.jetbrains.dukat.astModel.expressions.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
@@ -220,6 +221,7 @@ private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
         is ThisExpressionModel -> "this"
+        is StringLiteralExpressionModel -> value
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
@@ -230,7 +232,7 @@ private fun ExpressionModel.translate(): String {
 private fun StatementModel.translate(): String {
     return when (this) {
         is AssignmentStatementModel -> "${left.translate()} = ${right.translate()}"
-        is ReturnStatementModel -> "return ${expression.translate()}"
+        is ReturnStatementModel -> "return ${expression?.translate()}"
         is ExpressionStatementModel -> expression.translate()
         else -> raiseConcern("unknown StatementModel ${this}") { "" }
     }
@@ -264,7 +266,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         ""
     } else if (body.size == 1) {
         if (body[0] is ReturnStatementModel) {
-            " = ${(body[0] as ReturnStatementModel).expression.translate()}"
+            " = ${(body[0] as ReturnStatementModel).expression?.translate()}"
         } else {
             " { ${body[0].translate()} }"
         }

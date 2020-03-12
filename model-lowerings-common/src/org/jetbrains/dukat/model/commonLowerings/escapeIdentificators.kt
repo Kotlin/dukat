@@ -158,7 +158,7 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     private fun StatementModel.escape(): StatementModel {
         return when (this) {
             is ExpressionStatementModel -> copy(expression = expression.escape())
-            is ReturnStatementModel -> copy(expression = expression.escape())
+            is ReturnStatementModel -> copy(expression = expression?.escape())
             is AssignmentStatementModel -> copy(left = left.escape(), right = right.escape())
             else -> this
         }
