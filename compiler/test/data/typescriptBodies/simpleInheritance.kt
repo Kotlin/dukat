@@ -15,31 +15,27 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-open class Animal(open var name: Any) {
-    open fun move(meters: Any) {
-        console.log(this.name.asDynamic() + " moved " + meters.asDynamic() + "m.");
-    }
+open class Animal(open var name: String) {
+    open fun move(meters: Number) { console.log(this.name + " moved " + meters + "m.") }
 }
 
-open class Snake(_name: Any) : Animal(_name) {
+open class Snake(_name: String) : Animal(_name) {
     open fun move() {
-        console.log("Slithering...");
-        super.move(5);
+        console.log("Slithering...")
+        super.move(5)
     }
 }
 
-open class Horse(_name: Any) : Animal(_name) {
+open class Horse(_name: String) : Animal(_name) {
     open fun move() {
-        console.log("Galloping...");
-        super.move(45);
+        console.log("Galloping...")
+        super.move(45)
     }
 }
-
-var sam = Snake("Sammy the Python")
-
-var tom: Animal = Horse("Tommy the Palomino")
 
 fun main() {
+    var sam = Snake("Sammy the Python")
+    var tom: Animal = Horse("Tommy the Palomino")
     sam.move()
     tom.move(45)
 }

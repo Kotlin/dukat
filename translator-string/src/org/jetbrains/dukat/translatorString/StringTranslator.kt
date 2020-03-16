@@ -30,13 +30,17 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
-import org.jetbrains.dukat.astModel.expressions.StringLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
+import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
+import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -217,11 +221,21 @@ private fun CallExpressionModel.translate(): String {
     return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${"(${arguments.joinToString(", ") { it.translate() }})"}"
 }
 
+private fun LiteralExpressionModel.translate(): String {
+    return when (this) {
+        is StringLiteralExpressionModel -> value
+        is NumericLiteralExpressionModel -> value.toString()
+        else -> raiseConcern("unknown LiteralExpressionModel ${this}") { "" }
+    }
+}
+
 private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
         is ThisExpressionModel -> "this"
-        is StringLiteralExpressionModel -> value
+        is SuperExpressionModel -> "super"
+        is LiteralExpressionModel -> this.translate()
+        is BinaryExpressionModel -> "${left.translate()} $operator ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
@@ -246,6 +260,29 @@ private fun ClassLikeReferenceModel.translate(): String {
     }
 }
 
+private fun List<StatementModel>.translate(padding: Int, output: (String) -> Unit) {
+    if (size > 1) {
+        forEach { statement ->
+            output(FORMAT_TAB.repeat(padding + 1) + statement.translate())
+        }
+        output(FORMAT_TAB.repeat(padding) + "}")
+    }
+}
+
+private fun List<StatementModel>?.translateFirstLine(): String {
+    return if (this == null || isEmpty()) {
+        ""
+    } else if (size == 1) {
+        if (this[0] is ReturnStatementModel) {
+            " = ${(this[0] as ReturnStatementModel).expression?.translate()}"
+        } else {
+            " { ${this[0].translate()} }"
+        }
+    } else {
+        " {"
+    }
+}
+
 private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     comment?.translate(output)
 
@@ -262,17 +299,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
     val operator = if (operator) " operator" else ""
 
-    val bodyFirstLine = if (body.isEmpty()) {
-        ""
-    } else if (body.size == 1) {
-        if (body[0] is ReturnStatementModel) {
-            " = ${(body[0] as ReturnStatementModel).expression?.translate()}"
-        } else {
-            " { ${body[0].translate()} }"
-        }
-    } else {
-        " {"
-    }
+    val bodyFirstLine = body.translateFirstLine()
 
     val funName = if (extend == null) {
         name.translate()
@@ -309,7 +336,25 @@ private fun MethodModel.translate(): List<String> {
     val overrideClause = if (override != null) "override " else if (open) "open " else ""
 
     val metaClause = type.translateMeta()
-    return annotations + listOf("${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause")
+
+    val bodyFirstLine = body.translateFirstLine()
+
+    val bodyOtherLines = mutableListOf<String>()
+
+    if (body != null && body!!.size > 1) {
+        body!!.forEach { statement ->
+            bodyOtherLines += FORMAT_TAB + statement.translate()
+        }
+        bodyOtherLines += "}"
+    }
+
+    return annotations +
+            listOf(
+                "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(
+                    parameters
+                )})${returnClause}$metaClause${bodyFirstLine}"
+            ) +
+            bodyOtherLines
 }
 
 private fun ConstructorModel.translate(): List<String> {
