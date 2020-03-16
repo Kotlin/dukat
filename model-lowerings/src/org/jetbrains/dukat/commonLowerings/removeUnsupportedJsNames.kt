@@ -96,7 +96,8 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     override = null,
                     operator = true,
                     annotations = emptyList(),
-                    open = false
+                    open = false,
+                    body = null
             )
 
             val unsupportedSetter = MethodModel(
@@ -120,7 +121,8 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     override = null,
                     operator = true,
                     annotations = emptyList(),
-                    open = false
+                    open = false,
+                    body = null
             )
 
             listOf(unsupportedGetter, unsupportedSetter) + supportedMembers

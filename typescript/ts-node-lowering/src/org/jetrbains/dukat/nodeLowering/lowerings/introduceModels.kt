@@ -670,7 +670,9 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                 operator = operator,
                 annotations = resolveAnnotations(),
 
-                open = open
+                open = open,
+
+                body = body?.convert()
         )
     }
 

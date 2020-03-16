@@ -45,7 +45,8 @@ private fun FunctionModel.convert(): MemberModel {
             override = null,
             operator = false,
             annotations = annotations,
-            open = false
+            open = false,
+            body = body
     )
 }
 

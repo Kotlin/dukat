@@ -252,6 +252,7 @@ private class LowerDeclarationsToNodes(
                     false,
                     false,
                     true,
+                    null,
                     null
             )
         }
@@ -268,6 +269,7 @@ private class LowerDeclarationsToNodes(
                         false,
                         true,
                         true,
+                        null,
                         null
                 ),
                 MethodNode(
@@ -278,6 +280,7 @@ private class LowerDeclarationsToNodes(
                         false,
                         true,
                         true,
+                        null,
                         null
                 )
         )
@@ -293,6 +296,7 @@ private class LowerDeclarationsToNodes(
                 false,
                 true,
                 true,
+                null,
                 null
         )
     }
@@ -574,7 +578,8 @@ private class LowerDeclarationsToNodes(
                     declaration.isStatic(),
                     false,
                     true,
-                    null
+                    null,
+                    declaration.body
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())

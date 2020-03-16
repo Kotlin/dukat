@@ -684,7 +684,8 @@ private class IdlFileConverter(
                 override = null,
                 operator = false,
                 annotations = listOf(),
-                open = false
+                open = false,
+                body = null
             )
             is IDLConstructorDeclaration -> ConstructorModel(
                 parameters = arguments.map { it.convertToModel() },
@@ -711,7 +712,8 @@ private class IdlFileConverter(
                 override = null,
                 operator = false,
                 annotations = listOf(),
-                open = false
+                open = false,
+                body = null
             )
             is IDLSetterDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
@@ -727,7 +729,8 @@ private class IdlFileConverter(
                 override = null,
                 operator = false,
                 annotations = listOf(),
-                open = false
+                open = false,
+                body = null
             )
             else -> raiseConcern("unprocessed member declaration: ${this}") { null }
         }

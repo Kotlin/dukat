@@ -15,6 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun helloWorld() {
-    console.log("Hello, world!")
-}
+fun helloWorld() { console.log("Hello, world!") }
