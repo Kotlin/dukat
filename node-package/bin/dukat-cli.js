@@ -132,7 +132,7 @@ function cliMode(args) {
     var argsProcessed = processArgs(args);
 
     var files = argsProcessed.files;
-    var is_ts = files.every(function(file) { return endsWith(file, ".d.ts")});
+    var is_ts = files.every(function(file) { return endsWith(file, ".d.ts") || endsWith(file, ".ts")});
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
     var is_js = files.every(function(file) { return endsWith(file, ".js")});
 

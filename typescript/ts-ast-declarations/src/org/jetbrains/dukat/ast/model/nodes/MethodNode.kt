@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class MethodNode(
@@ -11,5 +12,7 @@ data class MethodNode(
         val static: Boolean,
         val operator: Boolean,
         val open: Boolean,
-        val meta: MethodNodeMeta?
+        val meta: MethodNodeMeta?,
+
+        val body: BlockDeclaration?
 ) : MemberNode

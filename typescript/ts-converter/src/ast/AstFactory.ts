@@ -19,7 +19,10 @@ import {
   Declaration,
   TypeParameter,
   TypeParamReferenceDeclaration,
-  TypeReferenceDeclaration, ImportClauseDeclaration, ImportSpecifierDeclaration
+  TypeReferenceDeclaration,
+  ImportClauseDeclaration,
+  ImportSpecifierDeclaration,
+  StatementDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
 import {
@@ -48,7 +51,7 @@ import {
   QualifierDeclarationProto, ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto, ReturnStatementDeclarationProto,
   SourceFileDeclarationProto,
-  SourceSetDeclarationProto,
+  SourceSetDeclarationProto, StatementDeclarationProto,
   StringLiteralDeclarationProto,
   ThisTypeDeclarationProto, ThrowStatementDeclarationProto,
   TopLevelDeclarationProto,
@@ -182,16 +185,16 @@ export class AstFactory {
     return topLevelDeclaration;
   }
 
-  createExpressionStatement(expression: Expression): Declaration {
+  createExpressionStatement(expression: Expression): StatementDeclaration {
     let expressionStatement = new ExpressionStatementDeclarationProto();
     expressionStatement.setExpression(expression);
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setExpressionstatement(expressionStatement);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setExpressionstatement(expressionStatement);
+    return statementDeclaration;
   }
 
-  createIfStatement(condition: Expression, thenStatement: Array<Declaration>, elseStatement: Array<Declaration> | null): Declaration {
+  createIfStatement(condition: Expression, thenStatement: Array<StatementDeclaration>, elseStatement: Array<StatementDeclaration> | null): StatementDeclaration {
     let ifStatement = new IfStatementDeclarationProto();
     ifStatement.setCondition(condition);
     ifStatement.setThenstatementList(thenStatement);
@@ -199,55 +202,55 @@ export class AstFactory {
       ifStatement.setElsestatementList(elseStatement);
     }
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setIfstatement(ifStatement);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setIfstatement(ifStatement);
+    return statementDeclaration;
   }
 
-  createWhileStatement(condition: Expression, statement: Array<Declaration>): Declaration {
+  createWhileStatement(condition: Expression, statement: Array<StatementDeclaration>): StatementDeclaration {
     let whileStatement = new WhileStatementDeclarationProto();
     whileStatement.setCondition(condition);
     whileStatement.setStatementList(statement);
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setWhilestatement(whileStatement);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setWhilestatement(whileStatement);
+    return statementDeclaration;
   }
 
-  createReturnStatement(expression: Expression | null): Declaration {
+  createReturnStatement(expression: Expression | null): StatementDeclaration {
     let returnStatement = new ReturnStatementDeclarationProto();
     if (expression) {
       returnStatement.setExpression(expression);
     }
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setReturnstatement(returnStatement);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setReturnstatement(returnStatement);
+    return statementDeclaration;
   }
 
-  createThrowStatement(expression: Expression | null): Declaration {
+  createThrowStatement(expression: Expression | null): StatementDeclaration {
     let throwStatement = new ThrowStatementDeclarationProto();
     if (expression) {
       throwStatement.setExpression(expression);
     }
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setThrowstatement(throwStatement);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setThrowstatement(throwStatement);
+    return statementDeclaration;
   }
 
-  createBlockDeclaration(statements: Array<Declaration>): Block {
+  createBlockDeclaration(statements: Array<StatementDeclaration>): Block {
     let block = new BlockDeclarationProto();
     block.setStatementsList(statements);
     return block
   }
 
-  createBlockStatementDeclaration(statements: Array<Declaration>): Declaration {
+  createBlockStatementDeclaration(statements: Array<StatementDeclaration>): StatementDeclaration {
     let block = this.createBlockDeclaration(statements);
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setBlockstatement(block);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setBlockstatement(block);
+    return statementDeclaration;
   }
 
   createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
@@ -272,12 +275,12 @@ export class AstFactory {
     return memberProto;
   }
 
-  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): Declaration {
+  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): StatementDeclaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setFunctiondeclaration(functionDeclaration);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setFunctiondeclaration(functionDeclaration);
+    return statementDeclaration;
   }
 
   createFunctionTypeDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration): TypeDeclaration {
@@ -471,6 +474,12 @@ export class AstFactory {
     return sourceSet;
   }
 
+  createStatementAsTopLevel(statement: StatementDeclaration): Declaration {
+    let topLevelStatement = new TopLevelDeclarationProto();
+    topLevelStatement.setStatement(statement);
+    return topLevelStatement;
+  }
+
   createStringLiteralDeclaration(token: string): TypeDeclaration {
     let stringLiteral = new StringLiteralDeclarationProto();
     stringLiteral.setToken(token);
@@ -572,7 +581,7 @@ export class AstFactory {
     return memberProto;
   }
 
-  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: string): Declaration {
+  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: string): StatementDeclaration {
     let variableDeclaration = new VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
@@ -582,9 +591,9 @@ export class AstFactory {
     }
     variableDeclaration.setUid(uid);
 
-    let topLevelDeclaration = new TopLevelDeclarationProto();
-    topLevelDeclaration.setVariabledeclaration(variableDeclaration);
-    return topLevelDeclaration;
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setVariabledeclaration(variableDeclaration);
+    return statementDeclaration;
   }
 
 }

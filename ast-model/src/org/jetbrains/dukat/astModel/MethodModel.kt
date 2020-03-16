@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.statements.StatementModel
 
 
 data class MethodModel(
@@ -14,5 +15,7 @@ data class MethodModel(
         val operator: Boolean,
         val annotations: List<AnnotationModel>,
 
-        val open: Boolean
+        val open: Boolean,
+
+        val body: List<StatementModel>?
 ) : MemberModel

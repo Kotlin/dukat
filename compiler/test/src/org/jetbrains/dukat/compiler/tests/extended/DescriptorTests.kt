@@ -11,7 +11,7 @@ import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.valida
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
 import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
 import org.jetbrains.dukat.descriptors.translateToDescriptors
-import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.kotlin.name.FqName
 import org.junit.jupiter.api.DisplayName
@@ -74,7 +74,7 @@ class DescriptorTests {
     companion object : FileFetcher() {
         private val translator = createStandardCliTranslator()
 
-        override val postfix = TS_DECLARATION_EXTENSION
+        override val postfix = D_TS_DECLARATION_EXTENSION
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {

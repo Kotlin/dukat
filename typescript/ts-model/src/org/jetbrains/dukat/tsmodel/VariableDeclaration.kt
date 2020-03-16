@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableDeclaration(
@@ -10,4 +9,4 @@ data class VariableDeclaration(
         val initializer: ExpressionDeclaration?,
 
         override val uid: String
-) : TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration
+) : StatementDeclaration, WithUidDeclaration, ParameterOwnerDeclaration

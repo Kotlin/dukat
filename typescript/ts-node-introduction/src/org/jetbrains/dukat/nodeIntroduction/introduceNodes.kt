@@ -252,6 +252,7 @@ private class LowerDeclarationsToNodes(
                     false,
                     false,
                     true,
+                    null,
                     null
             )
         }
@@ -268,6 +269,7 @@ private class LowerDeclarationsToNodes(
                         false,
                         true,
                         true,
+                        null,
                         null
                 ),
                 MethodNode(
@@ -278,6 +280,7 @@ private class LowerDeclarationsToNodes(
                         false,
                         true,
                         true,
+                        null,
                         null
                 )
         )
@@ -293,6 +296,7 @@ private class LowerDeclarationsToNodes(
                 false,
                 true,
                 true,
+                null,
                 null
         )
     }
@@ -413,7 +417,8 @@ private class LowerDeclarationsToNodes(
                 null,
                 FunctionNodeContextIrrelevant(),
                 uid,
-                null
+                null,
+                body
         )
     }
 
@@ -486,7 +491,8 @@ private class LowerDeclarationsToNodes(
                             }),
                             FunctionFromMethodSignatureDeclaration(declaration.name, parameters.map { IdentifierEntity(it.name) }),
                             "",
-                            if (index == 0) { inlineSourceComment } else null
+                            if (index == 0) { inlineSourceComment } else null,
+                            null
                     )
                 }
             }
@@ -519,6 +525,7 @@ private class LowerDeclarationsToNodes(
                             ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
                             IndexSignatureGetter(declaration.indexTypes[0].name),
                             "",
+                            null,
                             null
                     ),
                     FunctionNode(
@@ -535,6 +542,7 @@ private class LowerDeclarationsToNodes(
                             ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
                             IndexSignatureSetter(declaration.indexTypes[0].name),
                             "",
+                            null,
                             null
                     )
             )
@@ -551,6 +559,7 @@ private class LowerDeclarationsToNodes(
                         ClassLikeReferenceNode(interfaceDeclaration.uid, interfaceDeclaration.name, interfaceDeclaration.typeParameters.map { IdentifierEntity("*") }),
                         FunctionFromCallSignature(parameters.map { IdentifierEntity(it.name) }),
                         "",
+                        null,
                         null
                 )
             }
@@ -569,7 +578,8 @@ private class LowerDeclarationsToNodes(
                     declaration.isStatic(),
                     false,
                     true,
-                    null
+                    null,
+                    declaration.body
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
