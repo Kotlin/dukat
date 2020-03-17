@@ -22,7 +22,10 @@ node {
 task prepareNpmPackage(type: Copy) {
   from "package.template.json"
   into packagePath
-  filter{ String line -> line.replaceAll("__TS_VERSION__", typescriptVersion) }
+  filter{ String line ->
+    line.replaceAll("__TS_VERSION__", typescriptVersion)
+        .replaceAll("__PROTOBUF_VERSION__", gradle.protobufImplementationVersion)
+  }
   rename { String fileName -> fileName.replace(".template", "") }
 
   from "yarn.lock"
