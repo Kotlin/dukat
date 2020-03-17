@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem;
 plugins {
     id "java"
     id "com.google.protobuf"
-    id "com.moowork.node"
+    id "com.github.node-gradle.node"
 }
 
 def targetMainDir = "${project.buildDir}/generated/source/proto/main"
