@@ -34,6 +34,6 @@
   "homepage": "https://github.com/Kotlin/dukat#readme",
   "dependencies": {
     "typescript": "__TS_VERSION__",
-    "google-protobuf": "3.11.2"
+    "google-protobuf": "3.11.4"
   }
 }
