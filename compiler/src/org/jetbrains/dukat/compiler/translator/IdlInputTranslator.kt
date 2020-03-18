@@ -1,15 +1,14 @@
 package org.jetbrains.dukat.compiler.translator
 
 import org.jetbrains.dukat.astModel.SourceBundleModel
-import org.jetbrains.dukat.idlLowerings.addKDocs
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.commonLowerings.addExplicitGettersAndSetters
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.model.commonLowerings.lowerOverrides
+import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.idlLowerings.addConstructors
 import org.jetbrains.dukat.idlLowerings.addImportsForUsedPackages
-import org.jetbrains.dukat.idlLowerings.addMissingMembers
 import org.jetbrains.dukat.idlLowerings.addItemArrayLike
+import org.jetbrains.dukat.idlLowerings.addKDocs
+import org.jetbrains.dukat.idlLowerings.addMissingMembers
 import org.jetbrains.dukat.idlLowerings.addOverloadsForCallbacks
 import org.jetbrains.dukat.idlLowerings.markAbstractOrOpen
 import org.jetbrains.dukat.idlLowerings.omitStdLib
@@ -24,8 +23,10 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.convertToModel
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
+import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.VisibilityModifierResolver
-import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.model.commonLowerings.resolveTopLevelVisibility
 import org.jetbrains.dukat.translator.InputTranslator
 
@@ -33,7 +34,7 @@ private fun alwaysPublic(): VisibilityModifierResolver = object : VisibilityModi
     override fun resolve(): VisibilityModifierModel = VisibilityModifierModel.PUBLIC
 }
 
-class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): InputTranslator<String> {
+class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : InputTranslator<String> {
 
     fun translateSet(fileName: String): SourceSetModel {
         return parseIDL(fileName, nameResolver)
@@ -50,9 +51,11 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver): Input
                 .addMissingMembers()
                 .addOverloadsForCallbacks()
                 .convertToModel()
-                .lowerOverrides()
-                .escapeIdentificators()
-                .addExplicitGettersAndSetters()
+                .lower(
+                        LowerOverrides(),
+                        EscapeIdentificators(),
+                        AddExplicitGettersAndSetters()
+                )
                 .addKDocs()
                 .relocateDeclarations()
                 .resolveTopLevelVisibility(alwaysPublic())

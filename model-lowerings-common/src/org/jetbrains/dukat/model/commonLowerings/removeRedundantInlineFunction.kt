@@ -54,7 +54,7 @@ private fun ModuleModel.removeRedundantInlines(generatedFunctions: MutableMap<Fu
     return copy(declarations = declarationsResolved, submodules = submodules.map { it.removeRedundantInlines(generatedFunctions) })
 }
 
-fun SourceSetModel.removeRedundantInlineFunction(): SourceSetModel {
+private fun SourceSetModel.removeRedundantInlineFunction(): SourceSetModel {
 
     val generatedFunctions = mutableMapOf<FunctionModelRecord, GenerationState>()
 
@@ -65,4 +65,10 @@ fun SourceSetModel.removeRedundantInlineFunction(): SourceSetModel {
     }
 
     return copy(sources = sources.map { it.copy(root = it.root.removeRedundantInlines(generatedFunctions)) })
+}
+
+class RemoveRedundantInlineFunction() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.removeRedundantInlineFunction()
+    }
 }

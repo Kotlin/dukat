@@ -19,6 +19,7 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
 import org.jetbrains.dukat.commonLowerings.merge.processing.fetchModules
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 
 private fun VariableModel.convert(): MemberModel {
     return PropertyModel(
@@ -119,7 +120,7 @@ private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
 
 internal data class MergeClassLikeData(val model: ClassLikeModel, val extractedTypeAliases: List<TypeAliasModel>)
 
-fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
+private fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
     val modules = sources
             .flatMap { source -> source.root.fetchModules() }
             .groupBy { it.ownerName }
@@ -138,4 +139,10 @@ fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
             }
 
     return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikesAndModuleDeclarations(classLikes)) })
+}
+
+class MergeClassLikesAndModuleDeclarations() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.mergeClassLikesAndModuleDeclarations()
+    }
 }

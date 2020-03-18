@@ -87,7 +87,7 @@ private fun String.renameAsParameter(): String {
 }
 
 private fun NameEntity.renameAsParameter(): NameEntity {
-    return when(this) {
+    return when (this) {
         is IdentifierEntity -> copy(value = value.renameAsParameter())
         is QualifierEntity -> this
     }
@@ -134,7 +134,7 @@ fun NameEntity.escape(): NameEntity {
     }
 }
 
-private class EscapeIdentificators : ModelWithOwnerTypeLowering {
+private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
     private fun CallExpressionModel.escape(): CallExpressionModel {
         return copy(
@@ -166,12 +166,12 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         return super.lowerTypeValueModel(
-            ownerContext.copy(
-                node = ownerContext.node.copy(
-                    value = ownerContext.node.value.escape(),
-                    fqName = ownerContext.node.fqName?.escape()
+                ownerContext.copy(
+                        node = ownerContext.node.copy(
+                                value = ownerContext.node.value.escape(),
+                                fqName = ownerContext.node.fqName?.escape()
+                        )
                 )
-            )
         )
     }
 
@@ -237,8 +237,15 @@ private class EscapeIdentificators : ModelWithOwnerTypeLowering {
     }
 }
 
-fun ModuleModel.escapeIdentificators(): ModuleModel {
-    return EscapeIdentificators().lowerRoot(this, NodeOwner(this, null))
+private fun ModuleModel.escapeIdentificators(): ModuleModel {
+    return EscapeIdentificatorsTypeLowering().lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.escapeIdentificators() = transform { it.escapeIdentificators() }
+private fun SourceSetModel.escapeIdentificators() = transform { it.escapeIdentificators() }
+
+class EscapeIdentificators() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.escapeIdentificators()
+    }
+}
+

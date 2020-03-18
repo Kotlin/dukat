@@ -26,8 +26,8 @@ private fun ParameterModel.withoutMeta(): ParameterModel {
 private fun MemberModel.normalize(): MemberModel {
     return when (this) {
         is MethodModel -> copy(
-            parameters = parameters.map { it.withoutMeta() },
-            override = null
+                parameters = parameters.map { it.withoutMeta() },
+                override = null
         )
         else -> this
     }
@@ -69,6 +69,12 @@ fun ModuleModel.removeConflictingOverloads(): ModuleModel {
     return ConflictingOverloads().lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceFileModel.removeConflictingOverloads() = copy(root = root.removeConflictingOverloads())
-fun SourceSetModel.removeConflictingOverloads() =
+private fun SourceFileModel.removeConflictingOverloads() = copy(root = root.removeConflictingOverloads())
+private fun SourceSetModel.removeConflictingOverloads() =
         copy(sources = sources.map(SourceFileModel::removeConflictingOverloads))
+
+class RemoveConflictingOverloads() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.removeConflictingOverloads()
+    }
+}

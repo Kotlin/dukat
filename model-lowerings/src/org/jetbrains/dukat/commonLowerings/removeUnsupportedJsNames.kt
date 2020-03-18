@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -139,8 +140,14 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
 
 }
 
-fun ModuleModel.removeUnsupportedJsNames(): ModuleModel {
+private fun ModuleModel.removeUnsupportedJsNames(): ModuleModel {
     return UnsupportedJsNamesLowering().lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.removeUnsupportedJsNames(): SourceSetModel = transform { it.removeUnsupportedJsNames() }
+private fun SourceSetModel.removeUnsupportedJsNames(): SourceSetModel = transform { it.removeUnsupportedJsNames() }
+
+class RemoveUnsupportedJsNames() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.removeUnsupportedJsNames()
+    }
+}

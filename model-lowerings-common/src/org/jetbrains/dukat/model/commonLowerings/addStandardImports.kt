@@ -40,7 +40,7 @@ private fun ModuleModel.addStandardImportsAndAnnotations() {
     )
 }
 
-fun InterfaceModel.hasNestedEntity(): Boolean {
+private fun InterfaceModel.hasNestedEntity(): Boolean {
     if ((companionObject?.members?.isNotEmpty() == true) || (companionObject?.parentEntities?.isNotEmpty() == true)) {
         return true
     }
@@ -48,7 +48,7 @@ fun InterfaceModel.hasNestedEntity(): Boolean {
     return members.any { (it is ClassLikeModel) }
 }
 
-fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
+private fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
 
     visitTopLevelModel { topLevelModel ->
         when (topLevelModel) {
@@ -66,4 +66,8 @@ fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
     return this
 }
 
-
+class AddStandardImportsAndAnnotations() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.addStandardImportsAndAnnotations()
+    }
+}

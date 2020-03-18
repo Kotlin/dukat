@@ -12,12 +12,13 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.isStdLibEntity
 
 private fun NameEntity.translate(): String = when (this) {
-    is IdentifierEntity -> when(value) {
+    is IdentifierEntity -> when (value) {
         "<ROOT>" -> ""
         "<LIBROOT>" -> ""
         else -> value
@@ -101,4 +102,10 @@ private fun ModuleModel.addImports(): ModuleModel {
     )
 }
 
-fun SourceSetModel.addImports(): SourceSetModel = transform { it.addImports() }
+private fun SourceSetModel.addImports(): SourceSetModel = transform { it.addImports() }
+
+class AddImports() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.addImports()
+    }
+}

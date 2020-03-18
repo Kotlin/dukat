@@ -185,7 +185,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         }
 
         if (name == IdentifierEntity("hashCode") && parameters.isEmpty() &&
-            returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
+                returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
             return true
         }
 
@@ -387,12 +387,18 @@ private class OverrideResolver(private val context: ModelContext) {
     }
 }
 
-fun SourceSetModel.lowerOverrides(): SourceSetModel {
+private fun SourceSetModel.lowerOverrides(): SourceSetModel {
     val modelContext = ModelContext(this)
 
     val overrideResolver = OverrideResolver(modelContext)
 
     return transform {
         overrideResolver.lowerOverrides(it)
+    }
+}
+
+class LowerOverrides() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.lowerOverrides()
     }
 }

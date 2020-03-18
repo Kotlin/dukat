@@ -1,12 +1,13 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -91,7 +92,7 @@ private class IntroduceNestedClasses(private val classContext: ClassContext) : M
 }
 
 
-fun ModuleModel.mergeNestedClasses(): ModuleModel {
+private fun ModuleModel.mergeNestedClasses(): ModuleModel {
     val classContext = ClassContext()
     classContext.lowerRoot(this, NodeOwner(this, null))
 
@@ -100,4 +101,10 @@ fun ModuleModel.mergeNestedClasses(): ModuleModel {
     return IntroduceNestedClasses(classContext).lowerRoot(mergedModules, NodeOwner(mergedModules, null))
 }
 
-fun SourceSetModel.mergeNestedClasses() = transform { it.mergeNestedClasses() }
+private fun SourceSetModel.mergeNestedClasses() = transform { it.mergeNestedClasses() }
+
+class MergeNestedClasses() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.mergeNestedClasses()
+    }
+}

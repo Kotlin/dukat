@@ -38,13 +38,19 @@ private class NoinlineLowering(private val modelContext: ModelContext) : ModelWi
     }
 }
 
-fun ModuleModel.addNoinlineModifier(modelContext: ModelContext): ModuleModel {
+private fun ModuleModel.addNoinlineModifier(modelContext: ModelContext): ModuleModel {
     return NoinlineLowering(modelContext).lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.addNoinlineModifier(): SourceSetModel {
+private fun SourceSetModel.addNoinlineModifier(): SourceSetModel {
     val modelContext = ModelContext(this)
     return transform {
         it.addNoinlineModifier(modelContext)
+    }
+}
+
+class AddNoinlineModifier() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.addNoinlineModifier()
     }
 }

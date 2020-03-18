@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.panic.raiseConcern
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageModel>, parentEntitiesB: List<HeritageModel>): List<HeritageModel> {
@@ -90,10 +91,16 @@ private fun ModuleModel.scan(classLikesMap: MutableMap<NameEntity, MutableList<C
     submodules.forEach { it.scan(classLikesMap) }
 }
 
-fun SourceSetModel.mergeClassLikes(): SourceSetModel {
+private fun SourceSetModel.mergeClassLikes(): SourceSetModel {
     val classLikesMap: MutableMap<NameEntity, MutableList<ClassLikeModel>> = mutableMapOf()
     sources.forEach { it.root.scan(classLikesMap) }
     val bucket = classLikesMap.mapValues { (_, items) -> items.reduce { a, b -> a + b } }.toMutableMap()
 
     return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikes(bucket)) })
+}
+
+class MergeClassLike() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.mergeClassLikes()
+    }
 }

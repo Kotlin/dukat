@@ -1,8 +1,6 @@
 package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.rightMost
@@ -12,6 +10,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
@@ -20,9 +19,9 @@ import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIS
 private class AnyfyLowering : ModelWithOwnerTypeLowering {
     private fun TypeValueModel.anify(): TypeValueModel {
         return copy(
-            value= IdentifierEntity("Any"),
-            params = listOf(),
-            fqName = IdentifierEntity("<LIBROOT>").appendLeft(IdentifierEntity("Any"))
+                value = IdentifierEntity("Any"),
+                params = listOf(),
+                fqName = IdentifierEntity("<LIBROOT>").appendLeft(IdentifierEntity("Any"))
         )
     }
 
@@ -61,12 +60,18 @@ private class AnyfyLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-fun ModuleModel.anyfyUnresolvedTypes(): ModuleModel {
+private fun ModuleModel.anyfyUnresolvedTypes(): ModuleModel {
     return AnyfyLowering().lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.anyfyUnresolvedTypes(): SourceSetModel {
+private fun SourceSetModel.anyfyUnresolvedTypes(): SourceSetModel {
     return transform {
         it.anyfyUnresolvedTypes()
+    }
+}
+
+class AnyfyUnresolvedTypes() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.anyfyUnresolvedTypes()
     }
 }

@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 
 private fun getKey(onwnerName: NameEntity, name: NameEntity): Pair<NameEntity, NameEntity> {
     val owner = when (onwnerName) {
@@ -98,10 +99,10 @@ fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity
         }
     }
 
-    return copy(declarations = declarationsMerged, submodules = submodules.map { it.mergeVarsAndInterfaces(mergeMap) } )
+    return copy(declarations = declarationsMerged, submodules = submodules.map { it.mergeVarsAndInterfaces(mergeMap) })
 }
 
-fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
+private fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
     val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
     sources.forEach { it.root.scanInterfaces(mergeMap) }
     sources.forEach { it.root.scanVariablesAndObjects(mergeMap) }
@@ -109,5 +110,11 @@ fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
     return transform {
         // TODO: investigate where we ever will see multiple variables with same name
         it.mergeVarsAndInterfaces(mergeMap)
+    }
+}
+
+class MergeVarsAndInterfaces() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.mergeVarsAndInterfaces()
     }
 }

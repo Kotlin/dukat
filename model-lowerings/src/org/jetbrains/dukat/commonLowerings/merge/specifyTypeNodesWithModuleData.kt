@@ -15,6 +15,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -117,7 +118,7 @@ private class SpecifyTypeNodes(private val declarationResolver: DeclarationResol
     }
 }
 
-fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
+private fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
 
     val declarationContext = DeclarationResolver()
     declarationContext.process(this, NodeOwner(this, null))
@@ -125,4 +126,10 @@ fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
     return SpecifyTypeNodes(declarationContext).lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.specifyTypeNodesWithModuleData() = transform { it.specifyTypeNodesWithModuleData() }
+private fun SourceSetModel.specifyTypeNodesWithModuleData() = transform { it.specifyTypeNodesWithModuleData() }
+
+class SpecifyTypeNodesWithModuleData() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.specifyTypeNodesWithModuleData()
+    }
+}

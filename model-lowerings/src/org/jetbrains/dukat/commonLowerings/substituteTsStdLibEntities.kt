@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.commonLowerings
 
-import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
@@ -17,6 +16,7 @@ import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -40,9 +40,9 @@ private fun String.fqLib(): NameEntity {
 private fun TypeValueModel.createStdType(name: String): TypeValueModel {
     val nameEntity = IdentifierEntity(name)
     return copy(
-        value = nameEntity,
-        params = emptyList(),
-        fqName = nameEntity.fqLib()
+            value = nameEntity,
+            params = emptyList(),
+            fqName = nameEntity.fqLib()
     )
 }
 
@@ -65,8 +65,8 @@ private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
         if (isLibReference) {
             val fqName = "Array".fqLib()
             copy(
-                value = fqName,
-                fqName = fqName
+                    value = fqName,
+                    fqName = fqName
             )
         } else null
     } else if (value == SubstitutedEntities.TEMPLATE_STRINGS_ARRAY.value) {
@@ -74,20 +74,20 @@ private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
         if (isLibReference) {
             val stringFqName = "String".fqLib()
             copy(
-                value = fqName,
-                fqName = fqName,
-                params = listOf(
-                   TypeParameterModel(
-                      TypeValueModel(
-                           value = stringFqName,
-                           fqName = stringFqName,
-                           params = emptyList(),
-                           metaDescription = null,
-                           nullable = false
-                      ),
-                      emptyList()
-                   )
-                )
+                    value = fqName,
+                    fqName = fqName,
+                    params = listOf(
+                            TypeParameterModel(
+                                    TypeValueModel(
+                                            value = stringFqName,
+                                            fqName = stringFqName,
+                                            params = emptyList(),
+                                            metaDescription = null,
+                                            nullable = false
+                                    ),
+                                    emptyList()
+                            )
+                    )
             )
         } else null
     } else null
@@ -117,7 +117,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
     )
 
     private val substituteInlines = mapOf(
-        Pair(SubstitutedEntities.READONLY_ARRAY.value, "Array")
+            Pair(SubstitutedEntities.READONLY_ARRAY.value, "Array")
     )
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
@@ -136,8 +136,8 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             } ?: extendedInterface
 
             declaration.copy(
-                extend = extendResolved,
-                comment = commentResolved
+                    extend = extendResolved,
+                    comment = commentResolved
             )
         } ?: declaration
         return super.lowerFunctionModel(ownerContext.copy(node = declarationResolved), parentModule)
@@ -174,6 +174,12 @@ private fun SourceFileModel.substituteTsStdLibEntities(): SourceFileModel {
     return copy(root = root.substituteTsStdLibEntities())
 }
 
-fun SourceSetModel.substituteTsStdLibEntities(): SourceSetModel {
+private fun SourceSetModel.substituteTsStdLibEntities(): SourceSetModel {
     return copy(sources = sources.map(SourceFileModel::substituteTsStdLibEntities))
+}
+
+class SubstituteTsStdLibEntities() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.substituteTsStdLibEntities()
+    }
 }

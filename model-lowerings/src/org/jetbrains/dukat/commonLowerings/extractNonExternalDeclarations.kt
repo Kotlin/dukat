@@ -10,11 +10,12 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
-    return when(this) {
+    return when (this) {
         is FunctionModel -> !inline
         is VariableModel -> !inline
         is TypeAliasModel -> false
@@ -85,7 +86,7 @@ private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     }
 }
 
-fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
+private fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val nonDeclarationsBucket = mutableMapOf<NameEntity, MutableList<TopLevelModel>>()
     sources.forEach { source ->
         ExternalEntityRegistrator { name, node ->
@@ -96,4 +97,10 @@ fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     val sourcesLowered = generateDeclarationFiles("nonDeclarations", nonDeclarationsBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
 
     return copy(sources = sourcesLowered)
+}
+
+class ExtractNonExternalDeclarations() : ModelLowering {
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.extractNonExternalDeclarations()
+    }
 }
