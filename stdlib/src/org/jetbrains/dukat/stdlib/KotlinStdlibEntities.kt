@@ -594,6 +594,35 @@ val KotlinStdlibEntities = setOf(
         IdentifierEntity("window")
 )
 
+val KotlinBuiltInEntities = setOf(
+    IdentifierEntity("Annotation"),
+    IdentifierEntity("Any"),
+    IdentifierEntity("Array"),
+    IdentifierEntity("Boolean"),
+    IdentifierEntity("BooleanArray"),
+    IdentifierEntity("Byte"),
+    IdentifierEntity("ByteArray"),
+    IdentifierEntity("Char"),
+    IdentifierEntity("CharSequence"),
+    IdentifierEntity("CharSequence"),
+    IdentifierEntity("Comparable"),
+    IdentifierEntity("Double"),
+    IdentifierEntity("DoubleArray"),
+    IdentifierEntity("Float"),
+    IdentifierEntity("FloatArray"),
+    IdentifierEntity("Int"),
+    IdentifierEntity("Long"),
+    IdentifierEntity("LongArray"),
+    IdentifierEntity("Nothing"),
+    IdentifierEntity("Number"),
+    IdentifierEntity("Short"),
+    IdentifierEntity("ShortArray"),
+    IdentifierEntity("Throwable"),
+
+    //This one is actually is not built in, it's a lie!
+    IdentifierEntity("Function")
+)
+
 fun isStdLibEntity(fqName: NameEntity): Boolean {
     val leftMost = fqName.leftMost()
     val isLib = leftMost == IdentifierEntity("<ROOT>") || leftMost == IdentifierEntity("<LIBROOT>")
