@@ -26,8 +26,14 @@ private class LoweringVarags : NodeTypeLowering {
     }
 }
 
-fun DocumentRootNode.lowerVarargs(): DocumentRootNode {
+private fun DocumentRootNode.lowerVarargs(): DocumentRootNode {
     return LoweringVarags().lowerDocumentRoot(this)
 }
 
-fun SourceSetNode.lowerVarargs() = transform { it.lowerVarargs() }
+private fun SourceSetNode.lowerVarargs() = transform { it.lowerVarargs() }
+
+class LowerVarargs(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.lowerVarargs()
+    }
+}

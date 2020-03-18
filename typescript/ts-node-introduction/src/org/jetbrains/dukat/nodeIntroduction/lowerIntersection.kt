@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private class LowerIntersection : ParameterValueLowering {
     override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
@@ -26,8 +27,14 @@ private class LowerIntersection : ParameterValueLowering {
     }
 }
 
-fun DocumentRootNode.lowerIntersectionType(): DocumentRootNode {
+private fun DocumentRootNode.lowerIntersectionType(): DocumentRootNode {
     return LowerIntersection().lowerDocumentRoot(this)
 }
 
-fun SourceSetNode.lowerIntersectionType() = transform { it.lowerIntersectionType() }
+private fun SourceSetNode.lowerIntersectionType() = transform { it.lowerIntersectionType() }
+
+class LowerIntersectionType(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.lowerIntersectionType()
+    }
+}

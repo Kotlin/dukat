@@ -147,8 +147,14 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
 }
 
 
-fun DocumentRootNode.specifyUnionType(): DocumentRootNode {
+private fun DocumentRootNode.specifyUnionType(): DocumentRootNode {
     return SpecifyUnionTypeLowering().lowerDocumentRoot(this)
 }
 
-fun SourceSetNode.specifyUnionType(): SourceSetNode = transform { it.specifyUnionType() }
+private fun SourceSetNode.specifyUnionType(): SourceSetNode = transform { it.specifyUnionType() }
+
+class SpecifyUnionType(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.specifyUnionType()
+    }
+}

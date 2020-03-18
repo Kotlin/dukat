@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
+import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 
 private fun TypeAliasNode.shouldBeTranslated(): Boolean {
@@ -108,7 +109,7 @@ private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : 
     }
 }
 
-fun SourceSetNode.resolveTypeAliases(): SourceSetNode {
+private fun SourceSetNode.resolveTypeAliases(): SourceSetNode {
     val astContext = TypeAliasContext()
 
     val sourcesResolved = sources.map { source ->
@@ -118,4 +119,10 @@ fun SourceSetNode.resolveTypeAliases(): SourceSetNode {
     return copy(sources = sourcesResolved.map { source ->
         source.copy(root = UnaliasLowering(astContext).lowerDocumentRoot(source.root))
     })
+}
+
+class ResolveTypeAliases(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.resolveTypeAliases()
+    }
 }

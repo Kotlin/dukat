@@ -129,7 +129,7 @@ private fun NodesDataMap<FunctionNode>.generateFunctions(): List<FunctionNode> {
     return generatedFunctions
 }
 
-private class IntroduceMissedOverloads : NodeTypeLowering {
+private class IntroduceMissedOverloadsTypeLowering : NodeTypeLowering {
 
     override fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode {
         return declaration.copy(members = declaration.members + declaration.createDataMap().generateMethods())
@@ -149,8 +149,14 @@ private class IntroduceMissedOverloads : NodeTypeLowering {
     }
 }
 
-fun DocumentRootNode.introduceMissedOverloads(): DocumentRootNode {
-    return IntroduceMissedOverloads().lowerDocumentRoot(this)
+private fun DocumentRootNode.introduceMissedOverloads(): DocumentRootNode {
+    return IntroduceMissedOverloadsTypeLowering().lowerDocumentRoot(this)
 }
 
-fun SourceSetNode.introduceMissedOverloads() = transform { it.introduceMissedOverloads() }
+private fun SourceSetNode.introduceMissedOverloads() = transform { it.introduceMissedOverloads() }
+
+class IntroduceMissedOverloads(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.introduceMissedOverloads()
+    }
+}

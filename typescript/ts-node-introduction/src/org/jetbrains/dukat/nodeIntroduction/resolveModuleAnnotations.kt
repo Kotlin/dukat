@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
+import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private data class ExportTable(
         val assignments: MutableMap<String, DocumentRootNode>,
@@ -193,10 +194,18 @@ private class ExportAssignmentLowering(
 }
 
 
-fun DocumentRootNode.resolveModuleAnnotations(): DocumentRootNode {
+private fun DocumentRootNode.resolveModuleAnnotations(): DocumentRootNode {
     return ExportAssignmentLowering(this).lower()
 }
 
-fun SourceSetNode.resolveModuleAnnotations() = transform {
+
+
+private fun SourceSetNode.resolveModuleAnnotations() = transform {
     it.resolveModuleAnnotations()
+}
+
+class ResolveModuleAnnotations(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.resolveModuleAnnotations()
+    }
 }

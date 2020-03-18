@@ -7,7 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 
 @Suppress("UNCHECKED_CAST")
-fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
+private fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is ClassNode -> {
@@ -37,4 +37,10 @@ fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
 }
 
 
-fun SourceSetNode.rearrangeConstructors() = transform { it.rearrangeConstructors() }
+private fun SourceSetNode.rearrangeConstructors() = transform { it.rearrangeConstructors() }
+
+class RearrangeConstructors(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.rearrangeConstructors()
+    }
+}

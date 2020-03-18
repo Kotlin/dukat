@@ -6,5 +6,5 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 interface ModelLowering: Lowering<SourceSetModel, SourceSetModel>
 
 fun SourceSetModel.lower(vararg lowerings: ModelLowering): SourceSetModel {
-    return lowerings.fold(this) { sourceSet, tsLowering ->  tsLowering.lower(sourceSet) }
+    return lowerings.fold(this) { sourceSet, lowering ->  lowering.lower(sourceSet) }
 }

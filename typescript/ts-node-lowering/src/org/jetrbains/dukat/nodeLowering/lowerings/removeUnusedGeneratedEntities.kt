@@ -48,7 +48,7 @@ private fun DocumentRootNode.removeUnusedReferences(referencesToRemove: Set<Stri
     return copy(declarations = declarationsResolved)
 }
 
-fun DocumentRootNode.removeUnusedGeneratedEntities(): DocumentRootNode {
+private fun DocumentRootNode.removeUnusedGeneratedEntities(): DocumentRootNode {
     val typeRefs = mutableSetOf<String>()
     ParameterValueVisitor(this) { value ->
         when (value) {
@@ -80,4 +80,10 @@ fun DocumentRootNode.removeUnusedGeneratedEntities(): DocumentRootNode {
     return removeUnusedReferences(unusedGeneratedInterfaces)
 }
 
-fun SourceSetNode.removeUnusedGeneratedEntities() = transform { it.removeUnusedGeneratedEntities() }
+private fun SourceSetNode.removeUnusedGeneratedEntities() = transform { it.removeUnusedGeneratedEntities() }
+
+class RemoveUnusedGeneratedEntities(): NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.removeUnusedGeneratedEntities()
+    }
+}

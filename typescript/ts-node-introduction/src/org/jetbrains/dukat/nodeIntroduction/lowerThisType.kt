@@ -3,12 +3,12 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
+import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private fun processTypeParams(typeParams: List<TypeValueNode>): List<TypeValueNode> {
     return typeParams.map { it.copy(params = emptyList()) }
@@ -45,7 +45,7 @@ private fun NodeOwner<*>.classLikeOwnerNode(): TopLevelEntity? {
     return (topOwner?.node as? TopLevelEntity)
 }
 
-private class LowerThisType : NodeWithOwnerTypeLowering {
+private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
 
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         val declaration = owner.node
@@ -67,8 +67,14 @@ private class LowerThisType : NodeWithOwnerTypeLowering {
     }
 }
 
-fun DocumentRootNode.lowerThisType(): DocumentRootNode {
-    return LowerThisType().lowerRoot(this, NodeOwner(this, null))
+private fun DocumentRootNode.lowerThisType(): DocumentRootNode {
+    return LowerThisTypeNodeLowering().lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetNode.lowerThisType() = transform { it.lowerThisType() }
+private fun SourceSetNode.lowerThisType() = transform { it.lowerThisType() }
+
+class LowerThisType():NodeLowering {
+    override fun lower(source: SourceSetNode): SourceSetNode {
+        return source.lowerThisType()
+    }
+}

@@ -23,10 +23,10 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantInlineFunction
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.nodeIntroduction.LowerIntersectionType
+import org.jetbrains.dukat.nodeIntroduction.LowerThisType
+import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
-import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
-import org.jetbrains.dukat.nodeIntroduction.lowerThisType
-import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.EliminateStringType
@@ -44,13 +44,14 @@ import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
-import org.jetrbains.dukat.nodeLowering.lowerings.introduceMissedOverloads
+import org.jetrbains.dukat.nodeLowering.lowerings.IntroduceMissedOverloads
+import org.jetrbains.dukat.nodeLowering.lowerings.LowerVarargs
+import org.jetrbains.dukat.nodeLowering.lowerings.RearrangeConstructors
+import org.jetrbains.dukat.nodeLowering.lowerings.RemoveUnusedGeneratedEntities
+import org.jetrbains.dukat.nodeLowering.lowerings.SpecifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
-import org.jetrbains.dukat.nodeLowering.lowerings.lowerVarargs
-import org.jetrbains.dukat.nodeLowering.lowerings.rearrangeConstructors
-import org.jetrbains.dukat.nodeLowering.lowerings.removeUnusedGeneratedEntities
-import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
-import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
+import org.jetrbains.dukat.nodeLowering.lowerings.lower
+import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.ResolveTypeAliases
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
@@ -76,15 +77,17 @@ open class TypescriptLowerer(
 
 
         val nodes = declarations.introduceNodes(moduleNameResolver)
-                .resolveModuleAnnotations()
-                .lowerVarargs()
-                .lowerIntersectionType()
-                .lowerThisType()
-                .resolveTypeAliases()
-                .specifyUnionType()
-                .removeUnusedGeneratedEntities()
-                .rearrangeConstructors()
-                .introduceMissedOverloads()
+                .lower(
+                    ResolveModuleAnnotations(),
+                    LowerVarargs(),
+                    LowerIntersectionType(),
+                    LowerThisType(),
+                    ResolveTypeAliases(),
+                    SpecifyUnionType(),
+                    RemoveUnusedGeneratedEntities(),
+                    RearrangeConstructors(),
+                    IntroduceMissedOverloads()
+                )
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
