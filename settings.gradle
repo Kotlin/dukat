@@ -103,7 +103,6 @@ project(':idl-models').projectDir = file("$rootDir/idl/idl-models")
 project(':idl-parser').projectDir = file("$rootDir/idl/idl-parser")
 project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference-resolver")
 
-project(':js-module-statistics').projectDir = file("$rootDir/javascript/js-module-statistics")
 project(':js-translator').projectDir = file("$rootDir/javascript/js-translator")
 project(':js-type-analysis').projectDir = file("$rootDir/javascript/js-type-analysis")
 
