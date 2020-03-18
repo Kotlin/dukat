@@ -28,3 +28,9 @@ fun ModuleDeclaration.desugarArrayDeclarations(): ModuleDeclaration {
 fun SourceFileDeclaration.desugarArrayDeclarations() = copy(root = root.desugarArrayDeclarations())
 
 fun SourceSetDeclaration.desugarArrayDeclarations() = copy(sources = sources.map(SourceFileDeclaration::desugarArrayDeclarations))
+
+class DesugarArrayDeclarations(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.desugarArrayDeclarations()
+    }
+}

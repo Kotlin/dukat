@@ -67,4 +67,10 @@ private fun ModuleDeclaration.resolveTypescriptUtilityTypes(): ModuleDeclaration
 
 private fun SourceFileDeclaration.resolveTypescriptUtilityTypes() = copy(root = root.resolveTypescriptUtilityTypes())
 
-fun SourceSetDeclaration.resolveTypescriptUtilityTypes() = copy(sources = sources.map(SourceFileDeclaration::resolveTypescriptUtilityTypes))
+private fun SourceSetDeclaration.resolveTypescriptUtilityTypes() = copy(sources = sources.map(SourceFileDeclaration::resolveTypescriptUtilityTypes))
+
+class ResolveTypescriptUtilityTypes() : TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.resolveTypescriptUtilityTypes()
+    }
+}

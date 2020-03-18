@@ -30,6 +30,12 @@ private fun ModuleDeclaration.syncTypeNames(renameMap: Map<String, NameEntity>):
     return SyncNameLowering(renameMap).lowerDocumentRoot(this)
 }
 
-fun SourceSetDeclaration.syncTypeNames(renameMap: Map<String, NameEntity>): SourceSetDeclaration {
+private fun SourceSetDeclaration.syncTypeNames(renameMap: Map<String, NameEntity>): SourceSetDeclaration {
     return copy(sources = sources.map { source -> source.copy(root = source.root.syncTypeNames(renameMap)) })
+}
+
+class SyncTypeNames(private val renameMap: Map<String, NameEntity>) : TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.syncTypeNames(renameMap)
+    }
 }

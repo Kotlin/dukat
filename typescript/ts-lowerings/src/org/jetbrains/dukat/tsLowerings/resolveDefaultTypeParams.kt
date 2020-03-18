@@ -142,7 +142,7 @@ private fun SourceSetDeclaration.introduceSubstitutedTypes(references: MutableMa
 }
 
 
-fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaration {
+private fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaration {
     val references = mutableMapOf<String, ClassLikeDeclaration>()
     val generatedEntities = mutableMapOf<String, MutableMap<Int, ClassLikeDeclaration>>()
 
@@ -151,4 +151,10 @@ fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaration {
     val sourceSetWithSubstitutedTypes = introduceSubstitutedTypes(references, generatedEntities)
     val sourceSetsWithIntroducedEntities = sourceSetWithSubstitutedTypes.copy(sources = sourceSetWithSubstitutedTypes.sources.map { it.copy(root = it.root.introduceGeneratedEntities(generatedEntities)) })
     return sourceSetsWithIntroducedEntities.copy(sources = sourceSetsWithIntroducedEntities.sources.map { it.copy(root = SubstituteTypeLowering(generatedEntities).lowerDocumentRoot(it.root)) })
+}
+
+public class ResolveDefaultTypeParams(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.resolveDefaultTypeParams()
+    }
 }

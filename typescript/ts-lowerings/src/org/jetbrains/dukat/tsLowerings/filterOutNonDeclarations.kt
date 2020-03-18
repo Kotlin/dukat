@@ -51,4 +51,10 @@ fun SourceFileDeclaration.filterOutNonDeclarations(): SourceFileDeclaration {
    return copy(root = root.filterOutNonDeclarations(false))
 }
 
-fun SourceSetDeclaration.filterOutNonDeclarations() = copy(sources = sources.map(SourceFileDeclaration::filterOutNonDeclarations))
+private fun SourceSetDeclaration.filterOutNonDeclarations() = copy(sources = sources.map(SourceFileDeclaration::filterOutNonDeclarations))
+
+class FilterOutNonDeclarations : TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.filterOutNonDeclarations()
+    }
+}

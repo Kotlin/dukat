@@ -29,7 +29,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 
-private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
+private class GenerateInterfaceReferencesDeclarationLowering : DeclarationWithOwnerLowering {
 
     private val myAstContext: GeneratedInterfacesContext = GeneratedInterfacesContext()
 
@@ -229,15 +229,21 @@ private class GenerateInterfaceReferences : DeclarationWithOwnerLowering {
     }
 }
 
-private fun ModuleDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferences): ModuleDeclaration {
+private fun ModuleDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferencesDeclarationLowering): ModuleDeclaration {
     return generateInterfaceReferences.getContext().introduceGeneratedEntities(generateInterfaceReferences.lowerDocumentRoot(this, NodeOwner(this, null)))
 }
 
-private fun SourceFileDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferences): SourceFileDeclaration {
+private fun SourceFileDeclaration.generateInterfaceReferences(generateInterfaceReferences: GenerateInterfaceReferencesDeclarationLowering): SourceFileDeclaration {
     return copy(root = root.generateInterfaceReferences(generateInterfaceReferences))
 }
 
-fun SourceSetDeclaration.generateInterfaceReferences(): SourceSetDeclaration {
-    val generateInterfaceReferences = GenerateInterfaceReferences()
+private fun SourceSetDeclaration.generateInterfaceReferences(): SourceSetDeclaration {
+    val generateInterfaceReferences = GenerateInterfaceReferencesDeclarationLowering()
     return copy(sources = sources.map { it.generateInterfaceReferences(generateInterfaceReferences) })
+}
+
+class GenerateInterfaceReferences(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.generateInterfaceReferences()
+    }
 }

@@ -69,10 +69,16 @@ private class PrimitivesLowering : DeclarationTypeLowering {
     }
 }
 
-fun ModuleDeclaration.lowerPrimitives(): ModuleDeclaration {
+private fun ModuleDeclaration.lowerPrimitives(): ModuleDeclaration {
     return PrimitivesLowering().lowerDocumentRoot(this)
 }
 
-fun SourceSetDeclaration.lowerPrimitives(): SourceSetDeclaration {
+private fun SourceSetDeclaration.lowerPrimitives(): SourceSetDeclaration {
     return copy(sources = sources.map { it.copy(root = it.root.lowerPrimitives()) })
+}
+
+class LowerPrimitives : TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.lowerPrimitives()
+    }
 }

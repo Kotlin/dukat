@@ -15,7 +15,6 @@ import org.jetbrains.dukat.commonLowerings.merge.mergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.specifyTypeNodesWithModuleData
 import org.jetbrains.dukat.commonLowerings.removeUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.substituteTsStdLibEntities
-import org.jetbrains.dukat.commonLowerings.whiteList
 import org.jetbrains.dukat.model.commonLowerings.addNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.addStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.escapeIdentificators
@@ -27,21 +26,19 @@ import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.nodeIntroduction.lowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.lowerThisType
 import org.jetbrains.dukat.nodeIntroduction.resolveModuleAnnotations
-import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
-import org.jetbrains.dukat.tsLowerings.addPackageName
-import org.jetbrains.dukat.tsLowerings.desugarArrayDeclarations
-import org.jetbrains.dukat.tsLowerings.eliminateStringType
-import org.jetbrains.dukat.tsLowerings.filterOutNonDeclarations
-import org.jetbrains.dukat.tsLowerings.fixImpossibleInheritance
-import org.jetbrains.dukat.tsLowerings.generateInterfaceReferences
-import org.jetbrains.dukat.tsLowerings.lowerPartialOfT
-import org.jetbrains.dukat.tsLowerings.lowerPrimitives
-import org.jetbrains.dukat.tsLowerings.mergeParentsForMergedInterfaces
-import org.jetbrains.dukat.tsLowerings.renameImpossibleDeclarations
-import org.jetbrains.dukat.tsLowerings.renameStdLibEntities
-import org.jetbrains.dukat.tsLowerings.resolveDefaultTypeParams
-import org.jetbrains.dukat.tsLowerings.resolveTypescriptUtilityTypes
-import org.jetbrains.dukat.tsLowerings.syncTypeNames
+import org.jetbrains.dukat.tsLowerings.AddPackageName
+import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
+import org.jetbrains.dukat.tsLowerings.EliminateStringType
+import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
+import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
+import org.jetbrains.dukat.tsLowerings.LowerPartialOf
+import org.jetbrains.dukat.tsLowerings.LowerPrimitives
+import org.jetbrains.dukat.tsLowerings.MergeParentsForMergedInterfaces
+import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
+import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
+import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
+import org.jetbrains.dukat.tsLowerings.SyncTypeNames
+import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
@@ -54,63 +51,64 @@ import org.jetrbains.dukat.nodeLowering.lowerings.specifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.resolveTypeAliases
 
 open class TypescriptWithBodyLowerer(
-    private val moduleNameResolver: ModuleNameResolver,
-    private val packageName: NameEntity?
+        private val moduleNameResolver: ModuleNameResolver,
+        private val packageName: NameEntity?
 ) : ECMAScriptLowerer {
     override fun lower(
-        sourceSet: SourceSetDeclaration,
-        stdLibSourceSet: SourceSetModel?,
-        renameMap: Map<String, NameEntity>,
-        uidToFqNameMapper: MutableMap<String, FqNode>
+            sourceSet: SourceSetDeclaration,
+            stdLibSourceSet: SourceSetModel?,
+            renameMap: Map<String, NameEntity>,
+            uidToFqNameMapper: MutableMap<String, FqNode>
     ): SourceSetModel {
 
         val declarations = sourceSet
-            .addPackageName(packageName)
-            .mergeParentsForMergedInterfaces()
-            //.filterOutNonDeclarations()
-            .syncTypeNames(renameMap)
-            .renameImpossibleDeclarations()
-            .resolveTypescriptUtilityTypes()
-            .resolveDefaultTypeParams()
-            .lowerPrimitives()
-            .generateInterfaceReferences()
-            .eliminateStringType()
-            .desugarArrayDeclarations()
-            .fixImpossibleInheritance()
-            .lowerPartialOfT()
+                .lower(
+                        AddPackageName(packageName),
+                        MergeParentsForMergedInterfaces(),
+                        SyncTypeNames(renameMap),
+                        RenameImpossibleDeclarations(),
+                        ResolveTypescriptUtilityTypes(),
+                        ResolveDefaultTypeParams(),
+                        LowerPrimitives(),
+                        GenerateInterfaceReferences(),
+                        EliminateStringType(),
+                        DesugarArrayDeclarations(),
+                        FixImpossibleInheritance(),
+                        LowerPartialOf()
+                )
 
 
         val nodes = declarations.introduceNodes(moduleNameResolver)
-            .resolveModuleAnnotations()
-            .lowerVarargs()
-            .lowerIntersectionType()
-            .lowerThisType()
-            .resolveTypeAliases()
-            .specifyUnionType()
-            .removeUnusedGeneratedEntities()
-            .rearrangeConstructors()
-            .introduceMissedOverloads()
+                .resolveModuleAnnotations()
+                .lowerVarargs()
+                .lowerIntersectionType()
+                .lowerThisType()
+                .resolveTypeAliases()
+                .specifyUnionType()
+                .removeUnusedGeneratedEntities()
+                .rearrangeConstructors()
+                .introduceMissedOverloads()
 
         val models = nodes
-            .introduceModels(uidToFqNameMapper)
-            .removeConflictingOverloads()
-            .substituteTsStdLibEntities()
-            .escapeIdentificators()
-            .removeUnsupportedJsNames()
-            .mergeClassLikes()
-            .mergeModules()
-            .mergeClassLikesAndModuleDeclarations()
-            .mergeVarsAndInterfaces()
-            .mergeNestedClasses()
-            .extractNonExternalDeclarations()
-            .lowerOverrides()
-            .specifyTypeNodesWithModuleData()
-            .addExplicitGettersAndSetters()
-            .addImports()
-            .anyfyUnresolvedTypes()
-            .addNoinlineModifier()
-            .addStandardImportsAndAnnotations()
-            .removeRedundantInlineFunction()
+                .introduceModels(uidToFqNameMapper)
+                .removeConflictingOverloads()
+                .substituteTsStdLibEntities()
+                .escapeIdentificators()
+                .removeUnsupportedJsNames()
+                .mergeClassLikes()
+                .mergeModules()
+                .mergeClassLikesAndModuleDeclarations()
+                .mergeVarsAndInterfaces()
+                .mergeNestedClasses()
+                .extractNonExternalDeclarations()
+                .lowerOverrides()
+                .specifyTypeNodesWithModuleData()
+                .addExplicitGettersAndSetters()
+                .addImports()
+                .anyfyUnresolvedTypes()
+                .addNoinlineModifier()
+                .addStandardImportsAndAnnotations()
+                .removeRedundantInlineFunction()
 
         return models
     }

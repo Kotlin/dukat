@@ -14,8 +14,14 @@ private fun SourceFileDeclaration.addPackageName(packageName: NameEntity): Sourc
     return copy(root = root.addPackageName(packageName))
 }
 
-fun SourceSetDeclaration.addPackageName(packageName: NameEntity?): SourceSetDeclaration {
+private fun SourceSetDeclaration.addPackageName(packageName: NameEntity?): SourceSetDeclaration {
     return packageName?.let { packageNameResolved ->
         copy(sources = sources.map { it.addPackageName(packageNameResolved) })
     } ?: this
+}
+
+class AddPackageName(private val packageName: NameEntity?): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.addPackageName(packageName)
+    }
 }

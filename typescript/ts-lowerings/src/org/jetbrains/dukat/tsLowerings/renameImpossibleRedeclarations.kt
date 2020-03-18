@@ -19,7 +19,7 @@ private fun NameEntity.addPrefix(prefix: String): NameEntity {
     }
 }
 
-private class RenameImpossibleDeclarations(private val namedImports: Set<IdentifierEntity>) : DeclarationTypeLowering {
+private class RenameImpossibleDeclarationsTypeLowering(private val namedImports: Set<IdentifierEntity>) : DeclarationTypeLowering {
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
         val declarationResolved = if (namedImports.contains(declaration.name)) { declaration.copy(name = declaration.name.addPrefix("Local")) } else { declaration }
@@ -31,19 +31,25 @@ private class RenameImpossibleDeclarations(private val namedImports: Set<Identif
     }
 }
 
-fun ModuleDeclaration.renameImpossibleDeclarations(): ModuleDeclaration {
+private fun ModuleDeclaration.renameImpossibleDeclarations(): ModuleDeclaration {
     val namedImports = imports
             .map { it.clause }
             .filterIsInstance(NamedImportsDeclaration::class.java)
             .flatMap { it.importSpecifiers }
             .mapNotNull { it.propertyName?.let { IdentifierEntity(it) } }.toSet()
-    return RenameImpossibleDeclarations(namedImports).lowerDocumentRoot(this)
+    return RenameImpossibleDeclarationsTypeLowering(namedImports).lowerDocumentRoot(this)
 }
 
-fun SourceFileDeclaration.renameImpossibleDeclarations(): SourceFileDeclaration {
+private fun SourceFileDeclaration.renameImpossibleDeclarations(): SourceFileDeclaration {
     return copy(root = root.renameImpossibleDeclarations())
 }
 
-fun SourceSetDeclaration.renameImpossibleDeclarations(): SourceSetDeclaration {
+private fun SourceSetDeclaration.renameImpossibleDeclarations(): SourceSetDeclaration {
     return copy(sources = sources.map(SourceFileDeclaration::renameImpossibleDeclarations))
+}
+
+class RenameImpossibleDeclarations() : TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.renameImpossibleDeclarations()
+    }
 }

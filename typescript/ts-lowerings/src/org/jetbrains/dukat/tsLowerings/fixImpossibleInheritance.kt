@@ -17,7 +17,7 @@ private class ClassLikeContext(private val classLikeMap: Map<String, ClassLikeDe
     }
 }
 
-private class FixImpossibleInheritance(private val classLikeContext: ClassLikeContext) : DeclarationTypeLowering {
+private class FixImpossibleInheritanceDeclarationLowering(private val classLikeContext: ClassLikeContext) : DeclarationTypeLowering {
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
         val parents = classLikeContext.getKnownParents(declaration).filterIsInstance(ClassDeclaration::class.java)
@@ -53,18 +53,24 @@ private fun SourceSetDeclaration.visitClassLike(visitor: (ClassLikeDeclaration) 
 }
 
 private fun ModuleDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): ModuleDeclaration {
-    return FixImpossibleInheritance(classLikeContext).lowerRoot(this)
+    return FixImpossibleInheritanceDeclarationLowering(classLikeContext).lowerRoot(this)
 }
 
 private fun SourceFileDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): SourceFileDeclaration {
     return copy(root = root.fixImpossibleInheritance(classLikeContext))
 }
 
-fun SourceSetDeclaration.fixImpossibleInheritance(): SourceSetDeclaration {
+private fun SourceSetDeclaration.fixImpossibleInheritance(): SourceSetDeclaration {
     val classLikeMap = mutableMapOf<String, ClassLikeDeclaration>()
     visitClassLike {
         classLikeMap[it.uid] = it
     }
 
     return copy(sources = sources.map { it.fixImpossibleInheritance(ClassLikeContext(classLikeMap)) })
+}
+
+class FixImpossibleInheritance(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.fixImpossibleInheritance()
+    }
 }

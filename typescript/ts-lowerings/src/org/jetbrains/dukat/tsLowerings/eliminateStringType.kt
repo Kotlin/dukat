@@ -11,7 +11,7 @@ import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 
-private class EliminateStringType : DeclarationTypeLowering {
+private class EliminateStringTypeDeclarationLowering : DeclarationTypeLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return if (declaration is StringLiteralDeclaration) {
             TypeDeclaration(IdentifierEntity("String"), emptyList(), meta = declaration)
@@ -19,10 +19,17 @@ private class EliminateStringType : DeclarationTypeLowering {
     }
 }
 
-fun ModuleDeclaration.eliminateStringType(): ModuleDeclaration {
-    return EliminateStringType().lowerDocumentRoot(this)
+private fun ModuleDeclaration.eliminateStringType(): ModuleDeclaration {
+    return EliminateStringTypeDeclarationLowering().lowerDocumentRoot(this)
 }
 
-fun SourceFileDeclaration.eliminateStringType() = copy(root = root.eliminateStringType())
+private fun SourceFileDeclaration.eliminateStringType() = copy(root = root.eliminateStringType())
 
-fun SourceSetDeclaration.eliminateStringType() = copy(sources = sources.map(SourceFileDeclaration::eliminateStringType))
+private fun SourceSetDeclaration.eliminateStringType() = copy(sources = sources.map(SourceFileDeclaration::eliminateStringType))
+
+class EliminateStringType(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.eliminateStringType()
+    }
+}
+

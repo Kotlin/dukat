@@ -56,8 +56,14 @@ private fun SourceSetDeclaration.buildDefinitionsParentsMap(interfaceMap: Map<St
     return definitionsMap
 }
 
-fun SourceSetDeclaration.mergeParentsForMergedInterfaces(): SourceSetDeclaration {
+private fun SourceSetDeclaration.mergeParentsForMergedInterfaces(): SourceSetDeclaration {
     val interfaceMap = buildInterfaceMap()
     val definitionsMap = buildDefinitionsParentsMap(interfaceMap)
     return copy(sources = sources.map { it.copy(root = MergeParentsLowerer(definitionsMap).lowerDocumentRoot(it.root)) })
+}
+
+class MergeParentsForMergedInterfaces(): TsLowering {
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.mergeParentsForMergedInterfaces()
+    }
 }
