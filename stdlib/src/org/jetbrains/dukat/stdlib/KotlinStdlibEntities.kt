@@ -617,6 +617,7 @@ val KotlinBuiltInEntities = setOf(
     IdentifierEntity("Number"),
     IdentifierEntity("Short"),
     IdentifierEntity("ShortArray"),
+    IdentifierEntity("String"),
     IdentifierEntity("Throwable"),
 
     //This one is actually is not built in, it's a lie!
