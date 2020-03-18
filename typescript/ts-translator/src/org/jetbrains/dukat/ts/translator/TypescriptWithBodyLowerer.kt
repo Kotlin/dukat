@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
 import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
-import org.jetbrains.dukat.commonLowerings.ExtractNonExternalDeclarations
+import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLike
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
@@ -104,7 +104,7 @@ open class TypescriptWithBodyLowerer(
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         MergeNestedClasses(),
-                        ExtractNonExternalDeclarations(),
+                        SeparateNonExternalEntities(),
                         LowerOverrides(),
                         SpecifyTypeNodesWithModuleData(),
                         AddExplicitGettersAndSetters(),

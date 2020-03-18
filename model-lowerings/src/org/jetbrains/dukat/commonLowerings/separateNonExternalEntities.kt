@@ -86,7 +86,7 @@ private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     }
 }
 
-private fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
+private fun SourceSetModel.separateNonExternalDeclarations(): SourceSetModel {
     val nonDeclarationsBucket = mutableMapOf<NameEntity, MutableList<TopLevelModel>>()
     sources.forEach { source ->
         ExternalEntityRegistrator { name, node ->
@@ -99,8 +99,8 @@ private fun SourceSetModel.extractNonExternalDeclarations(): SourceSetModel {
     return copy(sources = sourcesLowered)
 }
 
-class ExtractNonExternalDeclarations() : ModelLowering {
+class SeparateNonExternalEntities() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.extractNonExternalDeclarations()
+        return source.separateNonExternalDeclarations()
     }
 }
