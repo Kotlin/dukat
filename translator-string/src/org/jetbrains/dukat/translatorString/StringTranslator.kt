@@ -329,8 +329,8 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         typeParams = " " + typeParams
     }
 
-    val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
-    val operator = if (operator) " operator" else ""
+    val modifier = if (inline) { "inline " } else if (external) { "$KOTLIN_EXTERNAL_KEYWORD " } else { "" }
+    val operator = if (operator) "operator " else ""
 
     val bodyFirstLine = body.translateFirstLine()
 
@@ -342,7 +342,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
 
     output(
         FORMAT_TAB.repeat(padding) +
-                "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${operator} fun${typeParams} ${funName}(${translateParameters(
+                "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${operator}fun${typeParams} ${funName}(${translateParameters(
                     parameters
                 )})${returnClause}${type.translateMeta()}${bodyFirstLine}"
     )
@@ -577,6 +577,7 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
 
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
+
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(
             primaryConstructor.parameters

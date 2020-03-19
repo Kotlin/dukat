@@ -12,8 +12,9 @@ data class ObjectModel(
 
         val parentEntities: List<HeritageModel>,
         override val visibilityModifier: VisibilityModifierModel,
-        override val comment: CommentEntity?
-) : MemberEntity, TopLevelModel
+        override val comment: CommentEntity?,
+        override val external: Boolean
+) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
     if (otherModel == null) {
@@ -25,7 +26,8 @@ fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
                 otherModel.members,
                 listOf(),
                 VisibilityModifierModel.DEFAULT,
-                null
+                null,
+                otherModel.external
         )
     }
 

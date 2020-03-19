@@ -608,7 +608,8 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
                             membersSplitted.static,
                             emptyList(),
                             VisibilityModifierModel.DEFAULT,
-                            null
+                            null,
+                            external
                     )
                 } else {
                     null
@@ -624,7 +625,7 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
                 parentEntities = parentModelEntities,
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
-                external = true,
+                external = external,
                 abstract = false,
                 visibilityModifier = VisibilityModifierModel.DEFAULT
         )
@@ -642,7 +643,8 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
                             membersSplitted.static,
                             emptyList(),
                             VisibilityModifierModel.DEFAULT,
-                            null
+                            null,
+                            false
                     )
                 } else {
                     null
@@ -711,7 +713,8 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
                             ExpressionConverter(this@DocumentConverter).convertBlock(it)
                         } ?: resolveBody(),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
-                        comment = comment
+                        comment = comment,
+                        external = external
                 )
             }
             is VariableNode -> VariableModel(
@@ -734,7 +737,8 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
                     members = members.mapNotNull { member -> member.process() },
                     parentEntities = convertParentEntities(parentEntities),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null
+                    comment = null,
+                    external = external
             )
             is TypeAliasNode -> {
                 TypeAliasModel(

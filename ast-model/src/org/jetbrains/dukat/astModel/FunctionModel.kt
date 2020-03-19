@@ -21,5 +21,6 @@ data class FunctionModel(
         val extend: ClassLikeReferenceModel?,
         val body: List<StatementModel>,
         override val visibilityModifier: VisibilityModifierModel,
-        override val comment: CommentEntity?
-) : MemberEntity, TopLevelModel
+        override val comment: CommentEntity?,
+        override val external: Boolean
+) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel

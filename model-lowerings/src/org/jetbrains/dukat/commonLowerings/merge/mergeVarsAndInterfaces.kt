@@ -83,7 +83,8 @@ fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity
                                                         )
                                                 ),
                                                 VisibilityModifierModel.DEFAULT,
-                                                null
+                                                null,
+                                                external = false
                                         )
                                 )
                             } else null

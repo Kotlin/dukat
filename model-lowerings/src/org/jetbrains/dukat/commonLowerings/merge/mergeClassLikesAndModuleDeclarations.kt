@@ -66,7 +66,7 @@ private fun ObjectModel?.merge(module: ModuleModel): ObjectModel? {
     return this?.copy(members = members + staticMembers) ?: if (staticMembers.isEmpty()) {
         null
     } else {
-        ObjectModel(IdentifierEntity(""), staticMembers, listOf(), VisibilityModifierModel.DEFAULT, null)
+        ObjectModel(IdentifierEntity(""), staticMembers, listOf(), VisibilityModifierModel.DEFAULT, null, false)
     }
 }
 

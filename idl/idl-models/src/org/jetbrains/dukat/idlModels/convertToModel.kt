@@ -278,7 +278,8 @@ private class IdlFileConverter(
                 )
             ),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null
+            comment = null,
+            external = true
         )
     }
 
@@ -324,7 +325,8 @@ private class IdlFileConverter(
                 )
             ),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null
+            comment = null,
+            external = true
         )
     }
 
@@ -356,7 +358,8 @@ private class IdlFileConverter(
                 members = staticMemberModels,
                 parentEntities = listOf(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
+                comment = null,
+                external = true
             )
         } else {
             null
@@ -529,7 +532,8 @@ private class IdlFileConverter(
             extend = null,
             body = generateFunctionBody(),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null
+            comment = null,
+            external = true
         )
         return listOf(declaration, generatedFunction)
     }
@@ -543,7 +547,8 @@ private class IdlFileConverter(
                 members = listOf(),
                 parentEntities = listOf(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
+                comment = null,
+                external = false
             ),
             typeParameters = listOf(),
             parentEntities = unions.map {
@@ -625,7 +630,8 @@ private class IdlFileConverter(
                     operations.mapNotNull { it.convertToModel() },
             parentEntities = listOf(),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null
+            comment = null,
+            external = true
         )
     }
 

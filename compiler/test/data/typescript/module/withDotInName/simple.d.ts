@@ -3,7 +3,3 @@ declare module Foo.Bar.Baz {
     function func();
     class A {}
 }
-
-//declare module "baz.boo" {
-//
-//}

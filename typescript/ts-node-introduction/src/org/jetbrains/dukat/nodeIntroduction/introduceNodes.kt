@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
@@ -41,11 +42,10 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
-import org.jetbrains.dukat.astCommon.appendRight
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -70,7 +70,6 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -82,17 +81,11 @@ import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import java.io.File
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 
 
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
-
-private fun WithModifiersDeclaration.isExternalDeclaration(): Boolean {
-    return modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
-}
-
 
 private fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         name = name,
@@ -344,7 +337,7 @@ private class LowerDeclarationsToNodes(
 
                 uid,
                 exportQualifier,
-                inDeclaredModule || isExternalDeclaration()
+                inDeclaredModule || hasDeclareModifier()
         )
 
         return declaration
@@ -432,7 +425,7 @@ private class LowerDeclarationsToNodes(
                 uid,
                 null,
                 body,
-                inDeclaredModule || isExternalDeclaration()
+                inDeclaredModule || hasDeclareModifier()
         )
     }
 
@@ -505,7 +498,9 @@ private class LowerDeclarationsToNodes(
                             }),
                             FunctionFromMethodSignatureDeclaration(declaration.name, parameters.map { IdentifierEntity(it.name) }),
                             "",
-                            if (index == 0) { inlineSourceComment } else null,
+                            if (index == 0) {
+                                inlineSourceComment
+                            } else null,
                             null,
                             false
                     )
@@ -624,7 +619,7 @@ private class LowerDeclarationsToNodes(
                         null,
                         declaration.uid,
                         null,
-                        declaration.isExternalDeclaration()
+                        declaration.hasDeclareModifier()
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -633,7 +628,7 @@ private class LowerDeclarationsToNodes(
                         type.members.flatMap { member -> lowerMemberDeclaration(member) },
                         emptyList(),
                         declaration.uid,
-                        declaration.isExternalDeclaration()
+                        declaration.hasDeclareModifier()
                 )
 
                 objectNode.copy(members = objectNode.members.map {
@@ -655,19 +650,19 @@ private class LowerDeclarationsToNodes(
                     null,
                     declaration.uid,
                     null,
-                    inDeclaredModule || declaration.isExternalDeclaration()
+                    inDeclaredModule || declaration.hasDeclareModifier()
             )
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>, inDeclaredModule: Boolean): List<TopLevelNode> {
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): List<TopLevelNode> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration, inDeclaredModule))
             is FunctionDeclaration -> listOf(declaration.convert(inDeclaredModule))
             is ClassDeclaration -> listOf(declaration.convert(inDeclaredModule))
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
-            is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
+            is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule))
             is EnumDeclaration -> listOf(declaration.convert())
             is TypeAliasDeclaration -> listOf(declaration.convert())
             is ExportAssignmentDeclaration -> listOf(ExportAssignmentNode(declaration.name, declaration.isExportEquals))
@@ -706,12 +701,10 @@ private class LowerDeclarationsToNodes(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode {
-        val parentDocRoots =
-                owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<ModuleDeclaration>>
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): DocumentRootNode {
 
-        val qualifiers = parentDocRoots.map { it.node.packageName.unquote() }
-        val fullPackageName = qualifiers.reduce { acc, identifier -> identifier.appendRight(acc) }
+        val shortName = documentRoot.packageName.unquote()
+        val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelNode>()
@@ -722,7 +715,7 @@ private class LowerDeclarationsToNodes(
                         declaration.moduleReference.convert(),
                         declaration.uid
                 )
-            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner, owner.node.isExternalDeclaration() || documentRoot.isExternalDeclaration()))
+            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
         }
 
         val moduleNameIsStringLiteral = documentRoot.packageName.isStringLiteral()
@@ -744,19 +737,21 @@ private class LowerDeclarationsToNodes(
                 jsQualifier = null,
                 uid = documentRoot.uid,
                 root = documentRoot.root,
-                external = owner.node.isExternalDeclaration() || documentRoot.isExternalDeclaration()
+                external = isDeclaration
         )
     }
 }
 
-private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, NodeOwner(this, null))
+private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver, isInExternalDeclaration: Boolean)
+        = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
 private fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
+    val isInExternalDeclaration = fileName.endsWith(".d.ts")
     val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
     return SourceFileNode(
             fileName,
-            root.introduceNodes(fileName, moduleNameResolver),
+            root.introduceNodes(fileName, moduleNameResolver, isInExternalDeclaration),
             references,
             null
     )

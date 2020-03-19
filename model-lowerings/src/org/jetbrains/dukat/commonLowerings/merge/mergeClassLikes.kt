@@ -29,7 +29,8 @@ private operator fun ObjectModel?.plus(otherModel: ObjectModel?): ObjectModel? {
                 otherModel.members,
                 listOf(),
                 VisibilityModifierModel.DEFAULT,
-                null
+                null,
+                otherModel.external
         )
     }
 

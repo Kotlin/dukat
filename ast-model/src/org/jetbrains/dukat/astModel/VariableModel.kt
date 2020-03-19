@@ -13,7 +13,7 @@ data class VariableModel(
 
         var immutable: Boolean,
         val inline: Boolean,
-        val external: Boolean,
+        override val external: Boolean,
         val initializer: StatementModel?,
         val get: StatementModel?,
         val set: StatementModel?,
@@ -23,4 +23,4 @@ data class VariableModel(
         override val comment: CommentEntity?,
 
         override val metaDescription: String? = null
-) : TopLevelModel, StatementModel
+) : TopLevelModel, StatementModel, CanHaveEternalModifierModel

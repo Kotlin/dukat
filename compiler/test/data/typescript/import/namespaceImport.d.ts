@@ -1,4 +1,4 @@
-declare namespace lib1 {
+   declare namespace lib1 {
     interface I {
         x: String
     }
