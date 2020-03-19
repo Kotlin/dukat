@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import cartesian
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -126,7 +127,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         return declaration.copy(members = members)
     }
 
-    fun lowerTopLevelDeclarationList(declaration: TopLevelEntity, owner: DocumentRootNode): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarationList(declaration: TopLevelNode, owner: DocumentRootNode): List<TopLevelNode> {
         return when (declaration) {
             is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
@@ -138,7 +139,7 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         }
     }
 
-    override fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
+    override fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: DocumentRootNode): List<TopLevelNode> {
         return declarations.flatMap { declaration ->
             lowerTopLevelDeclarationList(declaration, owner)
         }

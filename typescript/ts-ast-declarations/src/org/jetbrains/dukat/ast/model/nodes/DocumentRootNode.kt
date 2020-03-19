@@ -1,14 +1,14 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class DocumentRootNode(
         val moduleName: NameEntity?,
 
         val packageName: NameEntity,
         var qualifiedPackageName: NameEntity,
-        val declarations: List<TopLevelEntity> = emptyList(),
+        val declarations: List<TopLevelNode> = emptyList(),
         val imports: Map<String, ImportNode>,
 
         val external: Boolean,
@@ -18,4 +18,4 @@ data class DocumentRootNode(
 
         var uid: String,
         val root: Boolean
-) : TopLevelEntity
+) : TopLevelNode

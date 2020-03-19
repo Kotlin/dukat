@@ -2,6 +2,7 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -12,7 +13,6 @@ import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
-import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private data class ExportTable(
@@ -24,7 +24,7 @@ private fun buildExportAssignmentTable(docRoot: DocumentRootNode, exported: Expo
     docRoot.declarations.forEach { declaration ->
         when (declaration) {
             is DocumentRootNode -> buildExportAssignmentTable(declaration, exported)
-            is ExportAssignmentDeclaration -> {
+            is ExportAssignmentNode -> {
                 if (declaration.isExportEquals) {
                     exported.assignments[declaration.name] = docRoot
                 } else {
@@ -166,7 +166,7 @@ private class ExportAssignmentLowering(
                     }
                     declaration
                 }
-                is ExportAssignmentDeclaration -> {
+                is ExportAssignmentNode -> {
                     null
                 }
                 else -> {
@@ -199,12 +199,11 @@ private fun DocumentRootNode.resolveModuleAnnotations(): DocumentRootNode {
 }
 
 
-
 private fun SourceSetNode.resolveModuleAnnotations() = transform {
     it.resolveModuleAnnotations()
 }
 
-class ResolveModuleAnnotations(): NodeLowering {
+class ResolveModuleAnnotations() : NodeLowering {
     override fun lower(source: SourceSetNode): SourceSetNode {
         return source.resolveModuleAnnotations()
     }

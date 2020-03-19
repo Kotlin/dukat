@@ -2,7 +2,8 @@ package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.NameEntity
 
-data class ObjectNode(
+data class
+ObjectNode(
         override val name: NameEntity,
         override val members: List<MemberNode>,
 

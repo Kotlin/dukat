@@ -1,5 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
@@ -26,7 +27,7 @@ private fun TypeAliasNode.shouldBeTranslated(): Boolean {
 }
 
 private fun DocumentRootNode.filterAliases(astContext: TypeAliasContext): DocumentRootNode {
-    val declarationsFiltered = mutableListOf<TopLevelEntity>()
+    val declarationsFiltered = mutableListOf<TopLevelNode>()
     declarations.forEach { declaration ->
         if (declaration is TypeAliasNode) {
             if (!declaration.shouldBeTranslated()) {

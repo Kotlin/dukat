@@ -1,5 +1,6 @@
 package org.jetrbains.dukat.nodeLowering
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -44,7 +45,7 @@ interface Lowering<T : TypeEntity> {
         }
     }
 
-    fun lowerTopLevelEntity(declaration: TopLevelEntity, owner: DocumentRootNode): TopLevelEntity {
+    fun lowerTopLevelEntity(declaration: TopLevelNode, owner: DocumentRootNode): TopLevelNode {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
@@ -56,7 +57,7 @@ interface Lowering<T : TypeEntity> {
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelEntity>, owner: DocumentRootNode): List<TopLevelEntity> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: DocumentRootNode): List<TopLevelNode> {
         return declarations.map { declaration ->
             lowerTopLevelEntity(declaration, owner)
         }

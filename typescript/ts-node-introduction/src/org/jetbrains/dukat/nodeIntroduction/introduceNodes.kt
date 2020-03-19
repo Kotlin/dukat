@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
@@ -7,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
+import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -50,6 +52,7 @@ import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
@@ -340,7 +343,7 @@ private class LowerDeclarationsToNodes(
         return declaration
     }
 
-    private fun InterfaceDeclaration.convert(): List<TopLevelEntity> {
+    private fun InterfaceDeclaration.convert(): List<TopLevelNode> {
         resolveExternalSource(definitionsInfo)?.let { originalSource ->
             return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this, originalSource) }
         }
@@ -468,7 +471,7 @@ private class LowerDeclarationsToNodes(
         return generatedParams
     }
 
-    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration, originalSource: String): List<TopLevelEntity> {
+    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration, originalSource: String): List<TopLevelNode> {
         val name = interfaceDeclaration.name
         val inlineSourceComment = SimpleCommentEntity("extending interface from $originalSource")
 
@@ -590,7 +593,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelEntity {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelNode {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
 
@@ -638,7 +641,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): List<TopLevelEntity> {
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): List<TopLevelNode> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
             is FunctionDeclaration -> listOf(declaration.convert())
@@ -648,7 +651,8 @@ private class LowerDeclarationsToNodes(
             is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
             is EnumDeclaration -> listOf(declaration.convert())
             is TypeAliasDeclaration -> listOf(declaration.convert())
-            else -> listOf(declaration)
+            is ExportAssignmentDeclaration -> listOf(ExportAssignmentNode(declaration.name, declaration.isExportEquals))
+            else -> listOf()
         }
     }
 
@@ -691,7 +695,7 @@ private class LowerDeclarationsToNodes(
         val fullPackageName = qualifiers.reduce { acc, identifier -> identifier.appendRight(acc) }
 
         val imports = mutableMapOf<String, ImportNode>()
-        val nonImports = mutableListOf<TopLevelEntity>()
+        val nonImports = mutableListOf<TopLevelNode>()
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
