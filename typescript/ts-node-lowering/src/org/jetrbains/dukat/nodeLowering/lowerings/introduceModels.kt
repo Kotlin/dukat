@@ -592,7 +592,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
         }
     }
 
-    private fun ClassNode.convertToClassModel(): TopLevelModel {
+    private fun ClassNode.convertToClassModel(): ClassModel {
         val membersSplitted = split(members)
 
         val generatedMethods = mutableListOf<MemberModel>()

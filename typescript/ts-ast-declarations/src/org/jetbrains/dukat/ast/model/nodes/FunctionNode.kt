@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
@@ -34,4 +34,4 @@ data class FunctionNode(
         val comment: CommentEntity?,
 
         val body: BlockDeclaration?
-) : MemberEntity, TopLevelEntity, UniqueNode
+) : MemberEntity, TopLevelNode, UniqueNode

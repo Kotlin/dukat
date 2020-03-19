@@ -1,10 +1,10 @@
 package org.jetbrains.dukat.ast.model.nodes
 
+import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 data class EnumNode(
         val name: NameEntity,
         val values: List<EnumTokenNode>,
         override val uid: String
-) : TopLevelEntity, UniqueNode
+) : TopLevelNode, UniqueNode
