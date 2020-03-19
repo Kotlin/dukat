@@ -329,7 +329,7 @@ private class LowerDeclarationsToNodes(
 
     private fun ClassDeclaration.convert(): ClassNode {
 
-        val exportQualifier = if (ModifierDeclaration.hasDefault(modifiers) && ModifierDeclaration.hasExport(modifiers)) {
+        val exportQualifier = if (hasDefaultModifier() && hasExportModifier()) {
             JsDefault()
         } else null
 
@@ -413,9 +413,8 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun FunctionDeclaration.convert(): FunctionNode {
-        val hasExport = ModifierDeclaration.hasExport(modifiers)
-
-        val exportQualifier = if (ModifierDeclaration.hasDefault(modifiers) && hasExport) {
+        val hasExportModifier = hasExportModifier()
+        val exportQualifier = if (hasDefaultModifier() && hasExportModifier) {
             JsDefault()
         } else null
 
@@ -425,7 +424,7 @@ private class LowerDeclarationsToNodes(
                 type.convertToNode(),
                 convertTypeParameters(typeParameters),
                 exportQualifier,
-                hasExport,
+                hasExportModifier,
                 false,
                 false,
                 null,
