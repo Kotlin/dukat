@@ -82,7 +82,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import java.io.File
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
+import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
 
 
 private fun unquote(name: String): String {
@@ -708,7 +708,7 @@ private class LowerDeclarationsToNodes(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode1 {
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>): DocumentRootNode {
         val parentDocRoots =
                 owner.getOwners().asIterable().reversed().toMutableList() as MutableList<NodeOwner<ModuleDeclaration>>
 
@@ -735,7 +735,7 @@ private class LowerDeclarationsToNodes(
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
-        return DocumentRootNode1(
+        return DocumentRootNode(
                 moduleName = moduleName,
                 packageName = documentRoot.packageName,
                 qualifiedPackageName = fullPackageName,
