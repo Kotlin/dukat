@@ -17,5 +17,6 @@ data class VariableNode(
         val typeParameters: List<TypeValueNode>,
         val extend: ClassLikeReferenceNode?,
         override val uid: String,
-        val comment: CommentEntity?
+        val comment: CommentEntity?,
+        override val external: Boolean
 ) : TopLevelNode, UniqueNode

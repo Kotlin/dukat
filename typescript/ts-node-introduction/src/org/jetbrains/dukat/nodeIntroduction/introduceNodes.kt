@@ -70,6 +70,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -87,6 +88,11 @@ import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode as DocumentRootNode1
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
+
+private fun WithModifiersDeclaration.isExternalDeclaration(): Boolean {
+    return modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
+}
+
 
 private fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         name = name,
@@ -337,7 +343,8 @@ private class LowerDeclarationsToNodes(
                 null,
 
                 uid,
-                exportQualifier
+                exportQualifier,
+                isExternalDeclaration()
         )
 
         return declaration
@@ -355,7 +362,8 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
                 null,
                 false,
-                uid
+                uid,
+                true
         )
 
         return listOf(declaration)
@@ -370,7 +378,8 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
                 null,
                 true,
-                uid
+                uid,
+                true
         )
 
         return declaration
@@ -388,7 +397,8 @@ private class LowerDeclarationsToNodes(
         return EnumNode(
                 name = IdentifierEntity(name),
                 values = values.map { value -> EnumTokenNode(value.value, value.meta) },
-                uid = uid
+                uid = uid,
+                external = false
         )
     }
 
@@ -397,7 +407,8 @@ private class LowerDeclarationsToNodes(
                 name = aliasName,
                 typeReference = typeReference.convertToNode(),
                 typeParameters = typeParameters,
-                uid = uid
+                uid = uid,
+                external = false
         )
     }
 
@@ -421,7 +432,8 @@ private class LowerDeclarationsToNodes(
                 FunctionNodeContextIrrelevant(),
                 uid,
                 null,
-                body
+                body,
+                isExternalDeclaration()
         )
     }
 
@@ -495,7 +507,8 @@ private class LowerDeclarationsToNodes(
                             FunctionFromMethodSignatureDeclaration(declaration.name, parameters.map { IdentifierEntity(it.name) }),
                             "",
                             if (index == 0) { inlineSourceComment } else null,
-                            null
+                            null,
+                            false
                     )
                 }
             }
@@ -510,7 +523,8 @@ private class LowerDeclarationsToNodes(
                         typeParam.name
                     }),
                     "",
-                    inlineSourceComment
+                    inlineSourceComment,
+                    false
             ))
             is IndexSignatureDeclaration -> listOf(
 
@@ -529,7 +543,8 @@ private class LowerDeclarationsToNodes(
                             IndexSignatureGetter(declaration.indexTypes[0].name),
                             "",
                             null,
-                            null
+                            null,
+                            true
                     ),
                     FunctionNode(
                             IdentifierEntity("set"),
@@ -546,7 +561,8 @@ private class LowerDeclarationsToNodes(
                             IndexSignatureSetter(declaration.indexTypes[0].name),
                             "",
                             null,
-                            null
+                            null,
+                            true
                     )
             )
             is CallSignatureDeclaration -> unrollOptionalParams(declaration.parameters).map { parameters ->
@@ -563,7 +579,8 @@ private class LowerDeclarationsToNodes(
                         FunctionFromCallSignature(parameters.map { IdentifierEntity(it.name) }),
                         "",
                         null,
-                        null
+                        null,
+                        true
                 )
             }
             else -> emptyList()
@@ -607,7 +624,8 @@ private class LowerDeclarationsToNodes(
                         emptyList(),
                         null,
                         declaration.uid,
-                        null
+                        null,
+                        declaration.isExternalDeclaration()
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -615,7 +633,8 @@ private class LowerDeclarationsToNodes(
                         IdentifierEntity(declaration.name),
                         type.members.flatMap { member -> lowerMemberDeclaration(member) },
                         emptyList(),
-                        declaration.uid
+                        declaration.uid,
+                        declaration.isExternalDeclaration()
                 )
 
                 objectNode.copy(members = objectNode.members.map {
@@ -636,7 +655,8 @@ private class LowerDeclarationsToNodes(
                     emptyList(),
                     null,
                     declaration.uid,
-                    null
+                    null,
+                    declaration.isExternalDeclaration()
             )
         }
     }

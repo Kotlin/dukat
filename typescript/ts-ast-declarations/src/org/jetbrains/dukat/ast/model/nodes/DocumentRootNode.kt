@@ -11,7 +11,7 @@ data class DocumentRootNode(
         val declarations: List<TopLevelNode> = emptyList(),
         val imports: Map<String, ImportNode>,
 
-        val external: Boolean,
+        override val external: Boolean,
 
         var jsModule: NameEntity?,
         var jsQualifier: NameEntity?,

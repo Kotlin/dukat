@@ -11,5 +11,6 @@ data class ClassNode(
         val primaryConstructor: ConstructorNode?,
 
         override val uid: String,
-        var exportQualifier: ExportQualifier?
+        var exportQualifier: ExportQualifier?,
+        override val external: Boolean
 ) : ClassLikeNode

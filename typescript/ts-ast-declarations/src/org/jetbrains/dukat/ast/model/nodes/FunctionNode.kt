@@ -33,5 +33,6 @@ data class FunctionNode(
         override val uid: String,
         val comment: CommentEntity?,
 
-        val body: BlockDeclaration?
+        val body: BlockDeclaration?,
+        override val external: Boolean
 ) : MemberEntity, TopLevelNode, UniqueNode
