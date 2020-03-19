@@ -10,8 +10,8 @@ data class ModuleDeclaration(
         val references: List<ReferenceClauseDeclaration>,
         val declarations: List<TopLevelDeclaration>,
 
-        val modifiers: List<ModifierDeclaration>,
+        override val modifiers: List<ModifierDeclaration>,
         override val uid: String,
         val resourceName: String,
         val root: Boolean
-) : TopLevelDeclaration, FunctionOwnerDeclaration, WithUidDeclaration
+) : TopLevelDeclaration, FunctionOwnerDeclaration, WithUidDeclaration, WithModifiersDeclaration
