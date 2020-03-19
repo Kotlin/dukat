@@ -270,6 +270,9 @@ private fun StatementModel.translate(): List<String> {
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
         }
+        is VariableModel -> {
+            return listOf(translate())
+        }
         else -> raiseConcern("unknown StatementModel ${this}") { listOf<String>() }
     }
 }
@@ -392,7 +395,8 @@ private fun TypeAliasModel.translate(): String {
 
 private fun VariableModel.translate(): String {
     val variableKeyword = if (immutable) "val" else "var"
-    val modifier = if (inline) "inline" else KOTLIN_EXTERNAL_KEYWORD
+    val modifier = if (inline) "inline " else
+        if (external) "$KOTLIN_EXTERNAL_KEYWORD " else ""
 
     val body = if (initializer != null) {
         " = ${initializer?.translateAsOneLine()}"
@@ -416,7 +420,7 @@ private fun VariableModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier} ${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumModel.translate(): String {

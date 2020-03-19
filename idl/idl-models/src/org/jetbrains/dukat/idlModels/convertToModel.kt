@@ -578,6 +578,7 @@ private class IdlFileConverter(
                 annotations = mutableListOf(),
                 immutable = true,
                 inline = true,
+                external = true,
                 initializer = null,
                 get = ExpressionStatementModel(
                     PropertyAccessExpressionModel(

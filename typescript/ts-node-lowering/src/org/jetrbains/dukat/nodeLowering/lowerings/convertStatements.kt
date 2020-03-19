@@ -1,6 +1,8 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
@@ -13,6 +15,7 @@ import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressio
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
@@ -26,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
@@ -38,87 +42,115 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
-fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
-    return when (this) {
-        is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
-            value
-        )
-        is NumericLiteralExpressionDeclaration -> NumericLiteralExpressionModel(
-            value.toInt()
-        )
-        is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
-            value
-        )
-        else -> raiseConcern("unable to process LiteralExpressionDeclaration ${this}") {
-            StringLiteralExpressionModel("ERROR")
-        }
-    }
-}
-
-fun ExpressionDeclaration.convert(): ExpressionModel {
-    return when (this) {
-        is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
-            identifier
-        )
-        is CallExpressionDeclaration -> CallExpressionModel(
-            expression.convert(),
-            arguments.map { it.convert() }
-        )
-        is PropertyAccessExpressionDeclaration -> PropertyAccessExpressionModel(
-            expression.convert(),
-            IdentifierExpressionModel(name)
-        )
-        is ElementAccessExpressionDeclaration -> IndexExpressionModel(
-            expression.convert(),
-            argumentExpression.convert()
-        )
-        is LiteralExpressionDeclaration -> this.convert()
-        is BinaryExpressionDeclaration -> BinaryExpressionModel(
-            left.convert(),
-            operator,
-            right.convert()
-        )
-        is UnknownExpressionDeclaration -> when (meta) {
-            "this" -> ThisExpressionModel()
-            "super" -> SuperExpressionModel()
-            else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
-                IdentifierExpressionModel(IdentifierEntity(meta))
+internal class ExpressionConverter(val documentConverter: DocumentConverter) {
+    fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
+        return when (this) {
+            is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
+                value
+            )
+            is NumericLiteralExpressionDeclaration -> NumericLiteralExpressionModel(
+                value.toInt()
+            )
+            is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
+                value
+            )
+            else -> raiseConcern("unable to process LiteralExpressionDeclaration ${this}") {
+                StringLiteralExpressionModel("ERROR")
             }
         }
-        else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
-            IdentifierExpressionModel(IdentifierEntity("ERROR"))
-        }
     }
-}
 
-fun StatementDeclaration.convert(): StatementModel {
-    return when (this) {
-        is ExpressionStatementDeclaration -> ExpressionStatementModel(
-            expression.convert()
-        )
-        is ReturnStatementDeclaration -> ReturnStatementModel(
-            expression?.convert()
-        )
-        is IfStatementDeclaration -> IfStatementModel(
-            condition.convert(),
-            thenStatement.convert(),
-            elseStatement?.convert()
-        )
-        is WhileStatementDeclaration -> WhileStatementModel(
-            condition.convert(),
-            statement.convert()
-        )
-        is BlockDeclaration -> BlockStatementModel(
-            statements.map { it.convert() }
-        )
-        else -> raiseConcern("unable to process StatementDeclaration ${this}") {
-            ExpressionStatementModel(
-                IdentifierExpressionModel(IdentifierEntity("ERROR"))
+    fun ExpressionDeclaration.convert(): ExpressionModel {
+        return when (this) {
+            is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
+                identifier
             )
+            is CallExpressionDeclaration -> CallExpressionModel(
+                expression.convert(),
+                arguments.map { it.convert() }
+            )
+            is PropertyAccessExpressionDeclaration -> PropertyAccessExpressionModel(
+                expression.convert(),
+                IdentifierExpressionModel(name)
+            )
+            is ElementAccessExpressionDeclaration -> IndexExpressionModel(
+                expression.convert(),
+                argumentExpression.convert()
+            )
+            is LiteralExpressionDeclaration -> this.convert()
+            is BinaryExpressionDeclaration -> BinaryExpressionModel(
+                left.convert(),
+                operator,
+                right.convert()
+            )
+            is UnknownExpressionDeclaration -> when (meta) {
+                "this" -> ThisExpressionModel()
+                "super" -> SuperExpressionModel()
+                else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
+                    IdentifierExpressionModel(IdentifierEntity(meta))
+                }
+            }
+            else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
+                IdentifierExpressionModel(IdentifierEntity("ERROR"))
+            }
         }
     }
-}
 
-fun BlockDeclaration.convert(): List<StatementModel> {
-    return statements.mapNotNull { it.convert() }
+    fun StatementDeclaration.convert(): StatementModel {
+        return when (this) {
+            is ExpressionStatementDeclaration -> ExpressionStatementModel(
+                expression.convert()
+            )
+            is ReturnStatementDeclaration -> ReturnStatementModel(
+                expression?.convert()
+            )
+            is IfStatementDeclaration -> IfStatementModel(
+                condition.convert(),
+                thenStatement.convert(),
+                elseStatement?.convert()
+            )
+            is WhileStatementDeclaration -> WhileStatementModel(
+                condition.convert(),
+                statement.convert()
+            )
+            is BlockDeclaration -> BlockStatementModel(
+                statements.map { it.convert() }
+            )
+            is VariableDeclaration -> VariableModel(
+                name = IdentifierEntity(name),
+                type = TypeValueModel(
+                    IdentifierEntity("Number"),
+                    listOf(),
+                    null,
+                    null
+                )
+                //TODO
+                /*with (documentConverter) {
+                    type.process()
+                }*/,
+                annotations = mutableListOf(),
+                immutable = false,
+                inline = false,
+                external = false,
+                initializer = initializer?.convert()?.let {
+                    ExpressionStatementModel(it)
+                },
+                get = null,
+                set = null,
+                typeParameters = listOf(),
+                extend = null,
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
+            )
+            else -> raiseConcern("unable to process StatementDeclaration ${this}") {
+                ExpressionStatementModel(
+                    IdentifierExpressionModel(IdentifierEntity("ERROR"))
+                )
+            }
+        }
+    }
+
+    fun convertBlock(blockDeclaration: BlockDeclaration): List<StatementModel> {
+        return blockDeclaration.statements.mapNotNull { it.convert() }
+    }
 }

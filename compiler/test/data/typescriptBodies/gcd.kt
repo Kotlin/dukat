@@ -19,9 +19,9 @@ fun gcd(a: Number, b: Number): Number {
     a = Math.abs(a)
     b = Math.abs(b)
     if (b > a) {
-        //var temp = a
+        var temp: Number = a
         a = b
-        //b = temp
+        b = temp
     }
     while (true) {
         a %= b

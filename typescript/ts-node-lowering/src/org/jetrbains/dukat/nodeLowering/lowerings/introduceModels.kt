@@ -92,7 +92,7 @@ private fun MemberNode.isStatic() = when (this) {
     else -> false
 }
 
-private enum class TranslationContext {
+internal enum class TranslationContext {
     TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
@@ -110,7 +110,7 @@ private typealias UidMutableMapper = MutableMap<String, FqNode>
 
 data class FqNode(val node: Entity, val fqName: NameEntity)
 
-private class DocumentConverter(private val documentRootNode: DocumentRootNode, private val uidToNameMapper: UidMapper) {
+internal class DocumentConverter(private val documentRootNode: DocumentRootNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
 
     companion object {
@@ -224,7 +224,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
         )
     }
 
-    private fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
+    fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = when (context) {
             TranslationContext.TYPE_CONSTRAINT -> IMPOSSIBLE_CONSTRAINT
             else -> IdentifierEntity("dynamic")
@@ -672,7 +672,9 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
 
                 open = open,
 
-                body = body?.convert()
+                body = body?.let {
+                    ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                }
         )
     }
 
@@ -705,7 +707,9 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                         inline = inline,
                         operator = operator,
                         extend = extend.convert(),
-                        body = body?.convert() ?: resolveBody(),
+                        body = body?.let {
+                            ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                        } ?: resolveBody(),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = comment
                 )
@@ -716,6 +720,7 @@ private class DocumentConverter(private val documentRootNode: DocumentRootNode, 
                     annotations = exportQualifier.toAnnotation(),
                     immutable = immutable,
                     inline = inline,
+                    external = true,
                     initializer = null,
                     get = resolveGetter(),
                     set = resolveSetter(),

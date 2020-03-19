@@ -13,11 +13,14 @@ data class VariableModel(
 
         var immutable: Boolean,
         val inline: Boolean,
+        val external: Boolean,
         val initializer: StatementModel?,
         val get: StatementModel?,
         val set: StatementModel?,
         val typeParameters: List<TypeParameterModel>,
         val extend: ClassLikeReferenceModel?,
         override val visibilityModifier: VisibilityModifierModel,
-        override val comment: CommentEntity?
-) : TopLevelModel
+        override val comment: CommentEntity?,
+
+        override val metaDescription: String? = null
+) : TopLevelModel, StatementModel
