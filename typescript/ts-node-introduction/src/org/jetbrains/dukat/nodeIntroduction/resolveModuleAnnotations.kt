@@ -77,7 +77,7 @@ private class ExportAssignmentLowering(
             }
         } else {
             if (docRoot.uid != root.uid) {
-                if (docRoot.external) {
+                if (docRoot.moduleNameIsStringLiteral) {
                     docRoot.jsModule = docRoot.packageName.process { unquote(it) }
                 } else {
                     docRoot.jsQualifier = docRoot.qualifiedPackageName.process { unquote(it) }
@@ -127,7 +127,7 @@ private class ExportAssignmentLowering(
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
 
-                            if (exportOwner.external && (exportOwner.uid == docRoot.uid)) {
+                            if (exportOwner.moduleNameIsStringLiteral && (exportOwner.uid == docRoot.uid)) {
                                 declaration.name = exportOwner.qualifiedPackageName
                             }
 

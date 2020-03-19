@@ -660,9 +660,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): List<TopLevelNode> {
-        val parentModule = owner.node
-        val inDeclaredModule = parentModule.hasDeclareModifier()
+    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>, inDeclaredModule: Boolean): List<TopLevelNode> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration, inDeclaredModule))
             is FunctionDeclaration -> listOf(declaration.convert(inDeclaredModule))
@@ -724,7 +722,7 @@ private class LowerDeclarationsToNodes(
                         declaration.moduleReference.convert(),
                         declaration.uid
                 )
-            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner))
+            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, owner, owner.node.isExternalDeclaration() || documentRoot.isExternalDeclaration()))
         }
 
         val moduleNameIsStringLiteral = documentRoot.packageName.isStringLiteral()
@@ -741,11 +739,12 @@ private class LowerDeclarationsToNodes(
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
-                external = moduleNameIsStringLiteral,
+                moduleNameIsStringLiteral = moduleNameIsStringLiteral,
                 jsModule = null,
                 jsQualifier = null,
                 uid = documentRoot.uid,
-                root = documentRoot.root
+                root = documentRoot.root,
+                external = owner.node.isExternalDeclaration() || documentRoot.isExternalDeclaration()
         )
     }
 }

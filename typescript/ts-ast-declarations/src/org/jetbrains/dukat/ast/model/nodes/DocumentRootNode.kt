@@ -11,11 +11,13 @@ data class DocumentRootNode(
         val declarations: List<TopLevelNode> = emptyList(),
         val imports: Map<String, ImportNode>,
 
-        override val external: Boolean,
+        val moduleNameIsStringLiteral: Boolean,
 
         var jsModule: NameEntity?,
         var jsQualifier: NameEntity?,
 
         var uid: String,
-        val root: Boolean
+        val root: Boolean,
+        override val external: Boolean
+
 ) : TopLevelNode
