@@ -10,5 +10,9 @@ interface WithModifiersDeclaration {
     fun hasExportModifier(): Boolean {
         return modifiers.contains(ModifierDeclaration.EXPORT_KEYWORD)
     }
+
+    fun hasDeclareModifier(): Boolean {
+        return modifiers.contains(ModifierDeclaration.DECLARE_KEYWORD)
+    }
 }
 

@@ -327,7 +327,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    private fun ClassDeclaration.convert(): ClassNode {
+    private fun ClassDeclaration.convert(inDeclaredModule: Boolean): ClassNode {
 
         val exportQualifier = if (hasDefaultModifier() && hasExportModifier()) {
             JsDefault()
@@ -344,7 +344,7 @@ private class LowerDeclarationsToNodes(
 
                 uid,
                 exportQualifier,
-                isExternalDeclaration()
+                inDeclaredModule || isExternalDeclaration()
         )
 
         return declaration
@@ -412,7 +412,7 @@ private class LowerDeclarationsToNodes(
         )
     }
 
-    private fun FunctionDeclaration.convert(): FunctionNode {
+    private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
         val hasExportModifier = hasExportModifier()
         val exportQualifier = if (hasDefaultModifier() && hasExportModifier) {
             JsDefault()
@@ -432,7 +432,7 @@ private class LowerDeclarationsToNodes(
                 uid,
                 null,
                 body,
-                isExternalDeclaration()
+                inDeclaredModule || isExternalDeclaration()
         )
     }
 
@@ -609,7 +609,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelNode {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelNode {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
 
@@ -655,16 +655,18 @@ private class LowerDeclarationsToNodes(
                     null,
                     declaration.uid,
                     null,
-                    declaration.isExternalDeclaration()
+                    inDeclaredModule || declaration.isExternalDeclaration()
             )
         }
     }
 
     fun lowerTopLevelDeclaration(declaration: TopLevelEntity, owner: NodeOwner<ModuleDeclaration>): List<TopLevelNode> {
+        val parentModule = owner.node
+        val inDeclaredModule = parentModule.hasDeclareModifier()
         return when (declaration) {
-            is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration))
-            is FunctionDeclaration -> listOf(declaration.convert())
-            is ClassDeclaration -> listOf(declaration.convert())
+            is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration, inDeclaredModule))
+            is FunctionDeclaration -> listOf(declaration.convert(inDeclaredModule))
+            is ClassDeclaration -> listOf(declaration.convert(inDeclaredModule))
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
             is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, owner.wrap(declaration)))
