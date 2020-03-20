@@ -126,7 +126,6 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
     }
 }
 
-@OptIn(kotlinx.serialization.UnstableDefault::class)
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
 

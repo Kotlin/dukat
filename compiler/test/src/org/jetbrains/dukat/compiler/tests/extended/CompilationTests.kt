@@ -74,12 +74,12 @@ abstract class CompilationTests {
             val total = reportDataMap.values.size
             printStream.println("COMPILATION REPORT ${passed}/${total}")
             val namePadding = reportDataMap.keys.maxBy { it.length }?.length ?: 24
-            printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
-            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d\t%100s"
+            printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s", "name", "result", "trans.", "comp.", "error"))
+            val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d"
             reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
                 val errorCount = reportData.errorCount
                 val errorMessage = reportData.errorMessage?.let { it.substringBefore("\n") } ?: ""
-                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount, errorMessage))
+                printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
             printStream.println("")
             printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
