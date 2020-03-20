@@ -16,12 +16,11 @@ import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
@@ -168,7 +167,7 @@ where possible options include:
 private data class CliOptions(
         val sources: List<String>,
         val outDir: String?,
-        val basePackageName: NameEntity,
+        val basePackageName: NameEntity?,
         val jsModuleName: String?,
         val reportPath: String?,
         val tsDefaultLib: String,
@@ -185,7 +184,7 @@ private fun process(args: List<String>): CliOptions? {
 
     val sources = mutableListOf<String>()
     var outDir: String? = null
-    var basePackageName: NameEntity = ROOT_PACKAGENAME
+    var basePackageName: NameEntity? = null
     var jsModuleName: String? = null
     var reportPath: String? = null
     var generateDescriptors = false
@@ -266,7 +265,7 @@ following file extensions are supported:
         }
     }
 
-    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath;
+    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
     return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors)
 }
