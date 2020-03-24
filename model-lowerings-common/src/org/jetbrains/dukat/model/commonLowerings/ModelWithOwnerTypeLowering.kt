@@ -16,6 +16,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -70,9 +71,14 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
+                parameters = declaration.parameters.map { parameter -> lowerLambdaParameterModel(NodeOwner(parameter, ownerContext)) },
                 type = lowerTypeModel(NodeOwner(declaration.type, ownerContext))
         )
+    }
+
+    override fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>): LambdaParameterModel {
+        val declaration = ownerContext.node
+        return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
     }
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {

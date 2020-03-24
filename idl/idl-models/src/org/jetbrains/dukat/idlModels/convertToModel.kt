@@ -40,6 +40,7 @@ import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
@@ -191,7 +192,7 @@ private class IdlFileConverter(
         }
 
         return FunctionTypeModel(
-            parameters = arguments.filterNot { it.variadic }.map { it.convertToModel() },
+            parameters = arguments.filterNot { it.variadic }.map { it.convertToLambdaParameterModel() },
             type = returnTypeModel,
             metaDescription = comment,
             nullable = nullable
@@ -214,7 +215,15 @@ private class IdlFileConverter(
         }
     }
 
-    private fun IDLArgumentDeclaration.convertToModel(): ParameterModel {
+    private fun IDLArgumentDeclaration.convertToLambdaParameterModel(): LambdaParameterModel {
+        return LambdaParameterModel(
+                name = name,
+                type = type.convertToModel()
+        )
+    }
+
+
+    private fun IDLArgumentDeclaration.convertToParameterModel(): ParameterModel {
         return ParameterModel(
             name = name,
             type = type.convertToModel(),
@@ -235,7 +244,7 @@ private class IdlFileConverter(
     private fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
         return FunctionModel(
             name = IdentifierEntity("set"),
-            parameters = listOf(key.convertToModel(), value.convertToModel()),
+            parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
             type = TypeValueModel(
                 value = IdentifierEntity("Unit"),
                 params = listOf(),
@@ -286,7 +295,7 @@ private class IdlFileConverter(
     private fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
         return FunctionModel(
             name = IdentifierEntity("get"),
-            parameters = listOf(key.convertToModel()),
+            parameters = listOf(key.convertToParameterModel()),
             type = valueType.toNullableIfNotPrimitive().convertToModel(),
             typeParameters = listOf(),
             annotations = mutableListOf(
@@ -684,7 +693,7 @@ private class IdlFileConverter(
             )
             is IDLOperationDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
-                parameters = arguments.map { it.convertToModel() },
+                parameters = arguments.map { it.convertToParameterModel() },
                 type = returnType.convertToModel(),
                 typeParameters = listOf(),
                 static = false,
@@ -695,7 +704,7 @@ private class IdlFileConverter(
                 body = null
             )
             is IDLConstructorDeclaration -> ConstructorModel(
-                parameters = arguments.map { it.convertToModel() },
+                parameters = arguments.map { it.convertToParameterModel() },
                 typeParameters = listOf(),
                 generated = false
             )
@@ -712,7 +721,7 @@ private class IdlFileConverter(
             )
             is IDLGetterDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
-                parameters = listOf(key.convertToModel()),
+                parameters = listOf(key.convertToParameterModel()),
                 type = valueType.convertToModel(),
                 typeParameters = listOf(),
                 static = false,
@@ -724,7 +733,7 @@ private class IdlFileConverter(
             )
             is IDLSetterDeclaration -> MethodModel(
                 name = IdentifierEntity(name),
-                parameters = listOf(key.convertToModel(), value.convertToModel()),
+                parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
                 type = TypeValueModel(
                     value = IdentifierEntity("Unit"),
                     params = listOf(),

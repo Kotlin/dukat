@@ -26,6 +26,7 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
@@ -196,6 +197,13 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
         val declaration = ownerContext.node
         return super.lowerVariableModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())), parentModule)
+    }
+
+
+    override fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>): LambdaParameterModel {
+        val declaration = ownerContext.node
+        val paramName = declaration.name.renameAsParameter()
+        return super.lowerLambdaParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
 
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {

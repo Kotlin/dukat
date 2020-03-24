@@ -75,6 +75,7 @@ import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
@@ -275,7 +276,7 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
             is FunctionTypeNode -> {
                 FunctionTypeModel(
                         parameters = (parameters.map { param ->
-                            param.process(TranslationContext.FUNCTION_TYPE)
+                            param.processAsLambdaParam(TranslationContext.FUNCTION_TYPE)
                         }),
                         type = type.process(TranslationContext.FUNCTION_TYPE),
                         metaDescription = meta.processMeta(),
@@ -350,6 +351,14 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
             else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
         }
     }
+
+    private fun ParameterNode.processAsLambdaParam(context: TranslationContext = TranslationContext.IRRELEVANT): LambdaParameterModel {
+        return LambdaParameterModel(
+                type = type.process(context),
+                name = name
+        )
+    }
+
 
     private fun ParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
         return ParameterModel(

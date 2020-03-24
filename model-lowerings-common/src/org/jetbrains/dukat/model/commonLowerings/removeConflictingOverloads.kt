@@ -33,15 +33,6 @@ private fun MemberModel.normalize(): MemberModel {
     }
 }
 
-private fun MemberModel.withoutMeta(): MemberModel {
-    return when (this) {
-        is MethodModel -> copy(
-                parameters = parameters.map { it.withoutMeta() }
-        )
-        else -> this
-    }
-}
-
 private fun filterOutConflictingOverloads(members: List<MemberModel>): List<MemberModel> {
     return members.groupBy { it.normalize() }.map { (_, bucketMembers) ->
         if (bucketMembers.size > 1) {

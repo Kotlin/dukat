@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ModifyVisibility(private val visibility: VisibilityModifierModel) : ModelWithOwnerLowering {
@@ -45,6 +46,7 @@ private class ModifyVisibility(private val visibility: VisibilityModifierModel) 
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 
+    override fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>) = ownerContext.node
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel = ownerContext.node
 
     override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel = ownerContext.node

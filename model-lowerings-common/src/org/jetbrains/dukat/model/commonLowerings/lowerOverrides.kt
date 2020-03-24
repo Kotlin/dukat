@@ -17,6 +17,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
+import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
 
 private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
@@ -233,6 +234,12 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return listA.zip(listB).all { (a, b) -> comparator(a, b) }
     }
 
+    private fun lambdaTypesAreEquivalent(paramsA: List<LambdaParameterModel>, paramsB: List<LambdaParameterModel>): Boolean {
+        return compareLists(paramsA, paramsB) { a, b ->
+            a.type.isEquivalent(b.type)
+        }
+    }
+
     private fun paramTypesAreEquivalent(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
         return compareLists(paramsA, paramsB) { a, b ->
             a.type.isEquivalent(b.type)
@@ -243,7 +250,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return when (this) {
             is FunctionTypeModel -> copy(
                     nullable = false,
-                    parameters = parameters.map { it.copy(name = "_", type = it.type.normalize(), initializer = null) }
+                    parameters = parameters.map { it.copy(name = "_", type = it.type.normalize()) }
             )
             is TypeValueModel -> copy(nullable = false)
             else -> this
@@ -275,7 +282,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 
     private fun FunctionTypeModel.isEquivalent(modelB: FunctionTypeModel): Boolean {
-        val parametersAreEquivalent = paramTypesAreEquivalent(parameters, modelB.parameters)
+        val parametersAreEquivalent = lambdaTypesAreEquivalent(parameters, modelB.parameters)
         return parametersAreEquivalent && type.isOverridingReturnType(modelB.type)
     }
 
