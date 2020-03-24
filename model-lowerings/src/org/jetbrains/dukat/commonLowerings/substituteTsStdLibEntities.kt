@@ -113,6 +113,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             IdentifierEntity("ReadonlyArray"),
             IdentifierEntity("Error"),
             IdentifierEntity("Iterable"),
+            IdentifierEntity("Iterator"),
             IdentifierEntity("String")
     )
 
