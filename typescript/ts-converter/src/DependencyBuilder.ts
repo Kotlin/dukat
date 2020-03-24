@@ -97,10 +97,6 @@ export class DependencyBuilder {
       this.checkReferences(node.typeName);
     } else if (ts.isInterfaceDeclaration(node)) {
       this.checkReferences(node);
-    } else if (ts.isVariableDeclaration(node)) {
-      this.checkReferences(node);
-    } else if (ts.isFunctionDeclaration(node)) {
-      this.checkReferences(node);
     } else if (ts.isTypeAliasDeclaration(node)) {
       this.checkReferences(node.type)
     } else if (ts.isHeritageClause(node)) {

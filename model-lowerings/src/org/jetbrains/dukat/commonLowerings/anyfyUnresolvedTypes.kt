@@ -14,7 +14,6 @@ import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
-import org.jetbrains.dukat.stdlib.org.jetbrains.dukat.stdlib.TS_STDLIB_WHITE_LIST
 
 private class AnyfyLowering : ModelWithOwnerTypeLowering {
     private fun TypeValueModel.anify(): TypeValueModel {
@@ -27,22 +26,10 @@ private class AnyfyLowering : ModelWithOwnerTypeLowering {
 
     private fun TypeValueModel.checkOrAnyfy(): TypeValueModel {
         val shortName = value.rightMost()
-        return if (fqName == null) {
-            if (!KotlinStdlibEntities.contains(shortName)) {
-                this.anify()
-            } else {
-                this
-            }
+        return if ((fqName == null) && (!KotlinStdlibEntities.contains(shortName))) {
+            this.anify()
         } else {
-            if (fqName?.leftMost() == IdentifierEntity("<LIBROOT>")) {
-                if (TS_STDLIB_WHITE_LIST.contains(shortName) || KotlinStdlibEntities.contains(shortName)) {
-                    this
-                } else {
-                    this.anify()
-                }
-            } else {
-                this
-            }
+            this
         }
     }
 

@@ -17,6 +17,7 @@ import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
+import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
@@ -111,7 +112,8 @@ open class TypescriptLowerer(
                     AddNoinlineModifier(),
                     AddStandardImportsAndAnnotations(),
                     RemoveRedundantInlineFunction(),
-                    RemoveKotlinBuiltIns()
+                    RemoveKotlinBuiltIns(),
+                    CorrectStdLibTypes()
                 )
 
         return models
