@@ -261,7 +261,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     receiverType = null,
                     parameterTypes = parameterTypes,
                     parameterNames = typeModel.parameters.map {
-                        Name.identifier(translateName(IdentifierEntity(it.name)))
+                        Name.identifier(translateName(IdentifierEntity(it.name ?: "_")))
                     },
                     returnType = returnType
                 ).makeNullableAsSpecified(typeModel.nullable)

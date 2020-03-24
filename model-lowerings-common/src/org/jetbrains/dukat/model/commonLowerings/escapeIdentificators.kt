@@ -202,7 +202,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>): LambdaParameterModel {
         val declaration = ownerContext.node
-        val paramName = declaration.name.renameAsParameter()
+        val paramName = declaration.name?.renameAsParameter()
         return super.lowerLambdaParameterModel(ownerContext.copy(node = declaration.copy(name = paramName)))
     }
 
