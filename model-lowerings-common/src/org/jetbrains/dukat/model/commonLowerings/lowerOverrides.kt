@@ -250,7 +250,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return when (this) {
             is FunctionTypeModel -> copy(
                     nullable = false,
-                    parameters = parameters.map { it.copy(type = it.type.normalize()) }
+                    parameters = parameters.map { it.copy(name=null, type = it.type.normalize()) }
             )
             is TypeValueModel -> copy(nullable = false)
             else -> this
