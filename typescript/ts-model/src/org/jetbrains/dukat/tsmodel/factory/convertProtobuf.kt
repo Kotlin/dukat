@@ -25,6 +25,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceKindDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
@@ -166,7 +167,13 @@ fun ReferenceDeclarationProto.convert(): ReferenceDeclaration {
         ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT -> ReferenceOriginDeclaration.NAMED_IMPORT
         else -> ReferenceOriginDeclaration.IRRELEVANT
     }
-    return ReferenceDeclaration(uid, origin)
+    val kind = when(kind) {
+        ReferenceDeclarationProto.KIND.CLASS -> ReferenceKindDeclaration.CLASS
+        ReferenceDeclarationProto.KIND.INTERFACE -> ReferenceKindDeclaration.INTERFACE
+        ReferenceDeclarationProto.KIND.TYPEALIAS -> ReferenceKindDeclaration.TYPEALIAS
+        else -> ReferenceKindDeclaration.IRRELEVANT
+    }
+    return ReferenceDeclaration(uid, origin, kind)
 }
 
 fun HeritageClauseDeclarationProto.convert(): HeritageClauseDeclaration {

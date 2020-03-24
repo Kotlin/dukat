@@ -411,15 +411,23 @@ export class AstConverter {
     if (declaration == null) {
       return null;
     }
+
+    let kind: ReferenceDeclarationProto.KINDMap[keyof ReferenceDeclarationProto.KINDMap] = ReferenceDeclarationProto.KIND.IRRELEVANT_KIND;
+    if (ts.isClassDeclaration(declaration)) {
+      kind = ReferenceDeclarationProto.KIND.CLASS
+    } else if (ts.isInterfaceDeclaration(declaration)) {
+      kind = ReferenceDeclarationProto.KIND.INTERFACE
+    }
+
     let typeReference: ReferenceEntity | null = null;
     if (ts.isImportSpecifier(declaration)) {
       let uid = this.createUid(declaration.name);
       if (uid) {
         let origin = declaration.propertyName ? ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT : ReferenceDeclarationProto.ORIGIN.IMPORT;
-        typeReference = this.astFactory.createReferenceEntity(uid, origin);
+        typeReference = this.astFactory.createReferenceEntity(uid, origin, kind);
       }
     } else {
-      typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration), ReferenceDeclarationProto.ORIGIN.IRRELEVANT);
+      typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration), ReferenceDeclarationProto.ORIGIN.IRRELEVANT, kind);
     }
 
     return typeReference;

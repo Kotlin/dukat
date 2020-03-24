@@ -194,7 +194,14 @@ message ReferenceDeclarationProto {
         IMPORT = 1;
         NAMED_IMPORT = 2;
     }
+    enum KIND {
+        IRRELEVANT_KIND = 0;
+        CLASS = 1;
+        INTERFACE = 2;
+        TYPEALIAS = 3;
+    }
     ORIGIN origin = 2;
+    KIND kind = 3;
 }
 
 message StringLiteralExpressionDeclarationProto {

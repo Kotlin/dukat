@@ -451,10 +451,15 @@ export class AstFactory {
     return nameDeclaration;
   }
 
-  createReferenceEntity<T extends Declaration>(uid: string, origin: ReferenceDeclarationProto.ORIGINMap[keyof ReferenceDeclarationProto.ORIGINMap]): ReferenceEntity {
+  createReferenceEntity<T extends Declaration>(
+    uid: string,
+    origin: ReferenceDeclarationProto.ORIGINMap[keyof ReferenceDeclarationProto.ORIGINMap],
+    kind: ReferenceDeclarationProto.KINDMap[keyof ReferenceDeclarationProto.KINDMap]
+  ): ReferenceEntity {
     let reference = new ReferenceDeclarationProto();
     reference.setUid(uid);
     reference.setOrigin(origin);
+    reference.setKind(kind);
     return reference;
   }
 
