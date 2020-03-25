@@ -9,12 +9,14 @@ import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
 import {DocumentCache} from "./DocumentCache";
 import {DependencyBuilder} from "./DependencyBuilder";
+import {createLogger} from "./Logger";
 
 function createFileResolver(): FileResolver {
   return new FileResolver();
 }
 
 let cache = new DocumentCache();
+let logger = createLogger("converter");
 
 function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, libs: Set<string> = new Set()): Set<string> {
   if (libPath === undefined) {
@@ -94,7 +96,9 @@ class SourceBundleBuilder {
     let sourceSet = new declarations.SourceSetDeclarationProto();
 
     let sourceFiles = new Array<SourceFileDeclaration>();
+
     this.dependencyBuilder.forEachDependency(dep => {
+      logger.debug(`DEP ${dep}`);
       let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(this.isLibSource(dep.fileName) ? "<LIBROOT>" : "<ROOT>");
       sourceFiles.push(this.astConverter.createSourceFileDeclaration(this.program.getSourceFile(dep.fileName), packageName, node => dep.accept(node)));
     });

@@ -20,6 +20,10 @@ export class TranslateAllSymbolsDependency implements Dependency {
   accept(node: ts.Node): boolean {
     return true;
   }
+
+  toString(): string {
+    return `TranslateAllSymbolsDependency: ${this.fileName}`
+  }
 }
 
 export class TranslateSubsetOfSymbolsDependency implements Dependency {
@@ -41,5 +45,9 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
 
   accept(node: ts.Node): boolean {
     return this.symbols.has(this.exportContext.getUID(node)) || ts.isExportAssignment(node) || ts.isModuleDeclaration(node);
+  }
+
+  toString(): string {
+    return `TranslateSubsetOfSymbolsDependency: ${this.fileName} [${this.symbols.size}]`;
   }
 }
