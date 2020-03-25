@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -17,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetrbains.dukat.nodeLowering.IdentityLowering
 
 const val COMPLEXITY_THRESHOLD = 15
@@ -127,19 +126,19 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
         return declaration.copy(members = members)
     }
 
-    fun lowerTopLevelDeclarationList(declaration: TopLevelNode, owner: DocumentRootNode): List<TopLevelNode> {
+    fun lowerTopLevelDeclarationList(declaration: TopLevelNode, owner: ModuleNode): List<TopLevelNode> {
         return when (declaration) {
             is VariableNode -> listOf(lowerVariableNode(declaration))
             is FunctionNode -> generateFunctionNodes(declaration)
             is ClassNode -> listOf(lowerClassNode(declaration))
             is InterfaceNode -> listOf(lowerInterfaceNode(declaration))
-            is DocumentRootNode -> listOf(lowerDocumentRoot(declaration))
+            is ModuleNode -> listOf(lowerModuleNode(declaration))
             is TypeAliasNode -> listOf(lowerTypeAliasNode(declaration, owner))
             else -> listOf(declaration)
         }
     }
 
-    override fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: DocumentRootNode): List<TopLevelNode> {
+    override fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: ModuleNode): List<TopLevelNode> {
         return declarations.flatMap { declaration ->
             lowerTopLevelDeclarationList(declaration, owner)
         }
@@ -148,8 +147,8 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
 }
 
 
-private fun DocumentRootNode.specifyUnionType(): DocumentRootNode {
-    return SpecifyUnionTypeLowering().lowerDocumentRoot(this)
+private fun ModuleNode.specifyUnionType(): ModuleNode {
+    return SpecifyUnionTypeLowering().lowerModuleNode(this)
 }
 
 private fun SourceSetNode.specifyUnionType(): SourceSetNode = transform { it.specifyUnionType() }

@@ -2,7 +2,7 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.ast.model.nodes.transform
@@ -27,8 +27,8 @@ private class LowerIntersection : ParameterValueLowering {
     }
 }
 
-private fun DocumentRootNode.lowerIntersectionType(): DocumentRootNode {
-    return LowerIntersection().lowerDocumentRoot(this)
+private fun ModuleNode.lowerIntersectionType(): ModuleNode {
+    return LowerIntersection().lowerModuleNode(this)
 }
 
 private fun SourceSetNode.lowerIntersectionType() = transform { it.lowerIntersectionType() }

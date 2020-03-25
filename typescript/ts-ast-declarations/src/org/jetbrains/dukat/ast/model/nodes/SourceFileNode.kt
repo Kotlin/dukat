@@ -1,16 +1,15 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.Entity
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class SourceFileNode(
         val fileName: String,
-        val root: DocumentRootNode,
+        val root: ModuleNode,
         val referencedFiles: List<String>,
         val name: NameEntity?
 ) : Entity
 
 
-fun SourceFileNode.transform(rootHandler: (DocumentRootNode) -> DocumentRootNode)
+fun SourceFileNode.transform(rootHandler: (ModuleNode) -> ModuleNode)
     = copy(root = rootHandler(root))

@@ -52,7 +52,7 @@ private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
 
         return when (declaration) {
             is ThisTypeDeclaration -> {
-                val contextNode = owner.classLikeOwnerNode();
+                val contextNode = owner.classLikeOwnerNode()
                 val anyNode = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
 
                 when (contextNode) {
@@ -67,7 +67,7 @@ private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
     }
 }
 
-private fun DocumentRootNode.lowerThisType(): DocumentRootNode {
+private fun ModuleNode.lowerThisType(): ModuleNode {
     return LowerThisTypeNodeLowering().lowerRoot(this, NodeOwner(this, null))
 }
 

@@ -3,7 +3,7 @@ package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.duplicate
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
@@ -11,7 +11,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
@@ -26,7 +25,7 @@ private fun TypeAliasNode.shouldBeTranslated(): Boolean {
     }
 }
 
-private fun DocumentRootNode.filterAliases(astContext: TypeAliasContext): DocumentRootNode {
+private fun ModuleNode.filterAliases(astContext: TypeAliasContext): ModuleNode {
     val declarationsFiltered = mutableListOf<TopLevelNode>()
     declarations.forEach { declaration ->
         if (declaration is TypeAliasNode) {
@@ -35,7 +34,7 @@ private fun DocumentRootNode.filterAliases(astContext: TypeAliasContext): Docume
             } else {
                 declarationsFiltered.add(declaration)
             }
-        } else if (declaration is DocumentRootNode) {
+        } else if (declaration is ModuleNode) {
             declarationsFiltered.add(declaration.filterAliases(astContext))
         } else {
             declarationsFiltered.add(declaration)
@@ -118,7 +117,7 @@ private fun SourceSetNode.resolveTypeAliases(): SourceSetNode {
     }
 
     return copy(sources = sourcesResolved.map { source ->
-        source.copy(root = UnaliasLowering(astContext).lowerDocumentRoot(source.root))
+        source.copy(root = UnaliasLowering(astContext).lowerModuleNode(source.root))
     })
 }
 

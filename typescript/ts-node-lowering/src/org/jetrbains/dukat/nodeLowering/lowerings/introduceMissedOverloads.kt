@@ -1,7 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -75,7 +75,7 @@ private fun ClassNode.createDataMap(): NodesDataMap<MethodNode> {
     return methodsData
 }
 
-private fun DocumentRootNode.createDataMap(): NodesDataMap<FunctionNode> {
+private fun ModuleNode.createDataMap(): NodesDataMap<FunctionNode> {
     val nodeDataMap: NodesDataMap<FunctionNode> = mutableMapOf()
 
     declarations.forEach { member ->
@@ -140,17 +140,17 @@ private class IntroduceMissedOverloadsTypeLowering : NodeTypeLowering {
     }
 
 
-    override fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
-        val nodesDataMap = documentRoot.createDataMap()
+    override fun lowerModuleNode(moduleNode: ModuleNode): ModuleNode {
+        val nodesDataMap = moduleNode.createDataMap()
 
-        return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations, documentRoot) + nodesDataMap.generateFunctions()
+        return moduleNode.copy(
+                declarations = lowerTopLevelDeclarations(moduleNode.declarations, moduleNode) + nodesDataMap.generateFunctions()
         )
     }
 }
 
-private fun DocumentRootNode.introduceMissedOverloads(): DocumentRootNode {
-    return IntroduceMissedOverloadsTypeLowering().lowerDocumentRoot(this)
+private fun ModuleNode.introduceMissedOverloads(): ModuleNode {
+    return IntroduceMissedOverloadsTypeLowering().lowerModuleNode(this)
 }
 
 private fun SourceSetNode.introduceMissedOverloads() = transform { it.introduceMissedOverloads() }

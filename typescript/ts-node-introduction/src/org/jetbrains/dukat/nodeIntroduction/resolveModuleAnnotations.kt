@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -16,14 +16,14 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private data class ExportTable(
-        val assignments: MutableMap<String, DocumentRootNode>,
-        val nonAssignments: MutableMap<String, DocumentRootNode>
+        val assignments: MutableMap<String, ModuleNode>,
+        val nonAssignments: MutableMap<String, ModuleNode>
 )
 
-private fun buildExportAssignmentTable(docRoot: DocumentRootNode, exported: ExportTable = ExportTable(mutableMapOf(), mutableMapOf())): ExportTable {
+private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTable = ExportTable(mutableMapOf(), mutableMapOf())): ExportTable {
     docRoot.declarations.forEach { declaration ->
         when (declaration) {
-            is DocumentRootNode -> buildExportAssignmentTable(declaration, exported)
+            is ModuleNode -> buildExportAssignmentTable(declaration, exported)
             is ExportAssignmentNode -> {
                 if (declaration.isExportEquals) {
                     exported.assignments[declaration.name] = docRoot
@@ -42,24 +42,24 @@ private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
 
-private fun DocumentRootNode.removeExportQualifiers() {
+private fun ModuleNode.removeExportQualifiers() {
     jsQualifier = null
     jsModule = null
 }
 
 private class ExportAssignmentLowering(
-        private val root: DocumentRootNode
+        private val root: ModuleNode
 ) {
     private val myExports: ExportTable = buildExportAssignmentTable(root)
 
-    fun lower(): DocumentRootNode {
+    fun lower(): ModuleNode {
         val mergedDocs = mutableMapOf<String, NameEntity?>()
         val doc = lower(root, mergedDocs)
         mergeDocumentRoot(doc, mergedDocs)
         return doc
     }
 
-    private fun mergeDocumentRoot(docRoot: DocumentRootNode, mergedDocs: MutableMap<String, NameEntity?>) {
+    private fun mergeDocumentRoot(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>) {
         if (mergedDocs.contains(docRoot.uid)) {
             mergedDocs[docRoot.uid]?.let { qualifiedName ->
                 docRoot.jsQualifier = null
@@ -67,10 +67,10 @@ private class ExportAssignmentLowering(
             }
         }
 
-        docRoot.declarations.filterIsInstance(DocumentRootNode::class.java).forEach { mergeDocumentRoot(it, mergedDocs) }
+        docRoot.declarations.filterIsInstance(ModuleNode::class.java).forEach { mergeDocumentRoot(it, mergedDocs) }
     }
 
-    fun lower(docRoot: DocumentRootNode, mergedDocs: MutableMap<String, NameEntity?>): DocumentRootNode {
+    fun lower(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>): ModuleNode {
         if (myExports.assignments.contains(docRoot.uid)) {
             myExports.assignments[docRoot.uid]?.let { exportOwner ->
                 docRoot.jsModule = exportOwner.moduleName
@@ -89,7 +89,7 @@ private class ExportAssignmentLowering(
             val assignments = myExports.assignments
             val nonAssignments = myExports.nonAssignments
             when (declaration) {
-                is DocumentRootNode -> lower(declaration, mergedDocs)
+                is ModuleNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
                     assignments[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let { moduleName ->
@@ -106,7 +106,7 @@ private class ExportAssignmentLowering(
 
                             docRoot.removeExportQualifiers()
 
-                            docRoot.declarations.filterIsInstance(DocumentRootNode::class.java).firstOrNull() { submodule ->
+                            docRoot.declarations.filterIsInstance(ModuleNode::class.java).firstOrNull() { submodule ->
                                 submodule.qualifiedPackageName.rightMost() == declaration.name
                             }?.let { eponymousDeclaration ->
                                 mergedDocs.put(eponymousDeclaration.uid, docRoot.moduleName)
@@ -194,7 +194,7 @@ private class ExportAssignmentLowering(
 }
 
 
-private fun DocumentRootNode.resolveModuleAnnotations(): DocumentRootNode {
+private fun ModuleNode.resolveModuleAnnotations(): ModuleNode {
     return ExportAssignmentLowering(this).lower()
 }
 

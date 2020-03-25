@@ -1,6 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -12,10 +12,10 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 
 
-fun DocumentRootNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
+fun ModuleNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
     visitor(this)
     declarations.forEach {
-        if (it is DocumentRootNode) {
+        if (it is ModuleNode) {
             it.visitTopLevelNode(visitor)
         } else {
             visitor(it)
@@ -23,7 +23,7 @@ fun DocumentRootNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
     }
 }
 
-private class ParameterValueVisitor(private val documentRoot: DocumentRootNode, private val visit: (paramValue: ParameterValueDeclaration) -> Unit) : NodeWithOwnerTypeLowering {
+private class ParameterValueVisitor(private val moduleNode: ModuleNode, private val visit: (paramValue: ParameterValueDeclaration) -> Unit) : NodeWithOwnerTypeLowering {
 
     override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
         visit(owner.node)
@@ -31,16 +31,16 @@ private class ParameterValueVisitor(private val documentRoot: DocumentRootNode, 
     }
 
     fun visit() {
-        lowerRoot(documentRoot, NodeOwner(documentRoot, null))
+        lowerRoot(moduleNode, NodeOwner(moduleNode, null))
     }
 }
 
-private fun DocumentRootNode.removeUnusedReferences(referencesToRemove: Set<String>): DocumentRootNode {
+private fun ModuleNode.removeUnusedReferences(referencesToRemove: Set<String>): ModuleNode {
     val declarationsResolved = declarations.filter {
         !((it is InterfaceNode) && referencesToRemove.contains(it.uid))
     }.map {
         when (it) {
-            is DocumentRootNode -> it.removeUnusedReferences(referencesToRemove)
+            is ModuleNode -> it.removeUnusedReferences(referencesToRemove)
             else -> it
         }
     }
@@ -48,7 +48,7 @@ private fun DocumentRootNode.removeUnusedReferences(referencesToRemove: Set<Stri
     return copy(declarations = declarationsResolved)
 }
 
-private fun DocumentRootNode.removeUnusedGeneratedEntities(): DocumentRootNode {
+private fun ModuleNode.removeUnusedGeneratedEntities(): ModuleNode {
     val typeRefs = mutableSetOf<String>()
     ParameterValueVisitor(this) { value ->
         when (value) {

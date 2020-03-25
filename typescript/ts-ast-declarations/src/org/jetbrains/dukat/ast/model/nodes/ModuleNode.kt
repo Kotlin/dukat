@@ -3,7 +3,7 @@ package org.jetbrains.dukat.ast.model.nodes
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.astCommon.NameEntity
 
-data class DocumentRootNode(
+data class ModuleNode(
         val moduleName: NameEntity?,
 
         val packageName: NameEntity,

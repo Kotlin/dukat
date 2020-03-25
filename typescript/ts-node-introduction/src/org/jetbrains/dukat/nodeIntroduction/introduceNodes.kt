@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
@@ -701,7 +701,7 @@ private class LowerDeclarationsToNodes(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): DocumentRootNode {
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
         val shortName = documentRoot.packageName.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
@@ -726,7 +726,7 @@ private class LowerDeclarationsToNodes(
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
-        return DocumentRootNode(
+        return ModuleNode(
                 moduleName = moduleName,
                 packageName = documentRoot.packageName,
                 qualifiedPackageName = fullPackageName,

@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -15,7 +15,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.TypeEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
@@ -51,21 +50,21 @@ interface NodeWithOwnerLowering<T : TypeEntity> {
             is VariableNode -> lowerVariableNode(owner.wrap(declaration))
             is FunctionNode -> lowerFunctionNode(owner.wrap(declaration))
             is ClassLikeNode -> lowerClassLikeNode(owner.wrap(declaration))
-            is DocumentRootNode -> lowerRoot(declaration, owner.wrap(declaration))
+            is ModuleNode -> lowerRoot(declaration, owner.wrap(declaration))
             is TypeAliasNode -> lowerTypeAliasNode(owner.wrap(declaration))
             else -> declaration.duplicate()
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: NodeOwner<DocumentRootNode>): List<TopLevelNode> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: NodeOwner<ModuleNode>): List<TopLevelNode> {
         return declarations.map { declaration ->
             lowerTopLevelEntity(owner.wrap(declaration))
         }
     }
 
-    fun lowerRoot(documentRoot: DocumentRootNode, owner: NodeOwner<DocumentRootNode>): DocumentRootNode {
-        return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations, owner)
+    fun lowerRoot(moduleNode: ModuleNode, owner: NodeOwner<ModuleNode>): ModuleNode {
+        return moduleNode.copy(
+                declarations = lowerTopLevelDeclarations(moduleNode.declarations, owner)
         )
     }
 }

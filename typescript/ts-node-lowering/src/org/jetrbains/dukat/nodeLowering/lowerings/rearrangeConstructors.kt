@@ -2,12 +2,12 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 
 @Suppress("UNCHECKED_CAST")
-private fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
+private fun ModuleNode.rearrangeConstructors(): ModuleNode {
     val loweredDeclarations = declarations.map { declaration ->
         when (declaration) {
             is ClassNode -> {
@@ -28,7 +28,7 @@ private fun DocumentRootNode.rearrangeConstructors(): DocumentRootNode {
                     primaryConstructor = primaryConstructor
                 )
             }
-            is DocumentRootNode -> declaration.rearrangeConstructors()
+            is ModuleNode -> declaration.rearrangeConstructors()
             else -> declaration
         }
     }

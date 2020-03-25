@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
@@ -111,7 +111,7 @@ private typealias UidMutableMapper = MutableMap<String, FqNode>
 
 data class FqNode(val node: Entity, val fqName: NameEntity)
 
-internal class DocumentConverter(private val documentRootNode: DocumentRootNode, private val uidToNameMapper: UidMapper) {
+internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
 
     companion object {
@@ -120,9 +120,9 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-        val (roots, topDeclarations) = documentRootNode.declarations.partition { it is DocumentRootNode }
+        val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleNode }
 
-        val declarationsMapped = (roots as List<DocumentRootNode>).map { DocumentConverter(it, uidToNameMapper).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
             declaration.convertToModel()
         }
 
@@ -134,18 +134,18 @@ internal class DocumentConverter(private val documentRootNode: DocumentRootNode,
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        documentRootNode.jsModule?.let {
+        moduleNode.jsModule?.let {
             annotations.add(AnnotationModel("file:JsModule", listOf(it)))
             annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
         }
 
-        documentRootNode.jsQualifier?.let {
+        moduleNode.jsQualifier?.let {
             annotations.add(AnnotationModel("file:JsQualifier", listOf(it)))
         }
 
         return ModuleModel(
-                name = documentRootNode.qualifiedPackageName,
-                shortName = documentRootNode.qualifiedPackageName.rightMost(),
+                name = moduleNode.qualifiedPackageName,
+                shortName = moduleNode.qualifiedPackageName.rightMost(),
                 declarations = declarationsFiltered,
                 annotations = annotations,
                 submodules = submodules,
@@ -796,23 +796,23 @@ private class NodeConverter(private val node: SourceSetNode, private val uidToNa
 }
 
 private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : NodeTypeLowering {
-    override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
+    override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerClassLikeNode(declaration, owner)
     }
 
-    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode {
+    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerTypeAliasNode(declaration, owner)
     }
 
-    override fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode {
+    override fun lowerEnumNode(declaration: EnumNode, owner: ModuleNode): EnumNode {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerEnumNode(declaration, owner)
     }
 
     fun process(sourceSet: SourceSetNode) {
-        sourceSet.sources.forEach { source -> lowerDocumentRoot(source.root) }
+        sourceSet.sources.forEach { source -> lowerModuleNode(source.root) }
     }
 }
 

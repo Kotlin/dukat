@@ -4,7 +4,7 @@ import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -16,7 +16,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.TypeEntity
 
 interface Lowering<T : TypeEntity> {
@@ -24,19 +23,19 @@ interface Lowering<T : TypeEntity> {
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
     fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
-    fun lowerEnumNode(declaration: EnumNode, owner: DocumentRootNode): EnumNode = declaration
+    fun lowerEnumNode(declaration: EnumNode, owner: ModuleNode): EnumNode = declaration
 
     fun lowerParameterNode(declaration: ParameterNode): ParameterNode
     fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode
     fun lowerMemberNode(declaration: MemberNode): MemberNode
-    fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: DocumentRootNode): TypeAliasNode
+    fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
     fun lowerTypeNode(declaration: TypeValueNode): T
     fun lowerFunctionNode(declaration: FunctionTypeNode): T
     fun lowerUnionTypeNode(declaration: UnionTypeNode): T
 
-    fun lowerClassLikeNode(declaration: ClassLikeNode, owner: DocumentRootNode): ClassLikeNode {
+    fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         return when (declaration) {
             is InterfaceNode -> lowerInterfaceNode(declaration)
             is ClassNode -> lowerClassNode(declaration)
@@ -45,27 +44,27 @@ interface Lowering<T : TypeEntity> {
         }
     }
 
-    fun lowerTopLevelEntity(declaration: TopLevelNode, owner: DocumentRootNode): TopLevelNode {
+    fun lowerTopLevelEntity(declaration: TopLevelNode, owner: ModuleNode): TopLevelNode {
         return when (declaration) {
             is VariableNode -> lowerVariableNode(declaration)
             is FunctionNode -> lowerFunctionNode(declaration)
             is ClassLikeNode -> lowerClassLikeNode(declaration, owner)
-            is DocumentRootNode -> lowerDocumentRoot(declaration)
+            is ModuleNode -> lowerModuleNode(declaration)
             is TypeAliasNode -> lowerTypeAliasNode(declaration, owner)
             is EnumNode -> lowerEnumNode(declaration, owner)
             else -> declaration.duplicate()
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: DocumentRootNode): List<TopLevelNode> {
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelNode>, owner: ModuleNode): List<TopLevelNode> {
         return declarations.map { declaration ->
             lowerTopLevelEntity(declaration, owner)
         }
     }
 
-    fun lowerDocumentRoot(documentRoot: DocumentRootNode): DocumentRootNode {
-        return documentRoot.copy(
-                declarations = lowerTopLevelDeclarations(documentRoot.declarations, documentRoot)
+    fun lowerModuleNode(moduleNode: ModuleNode): ModuleNode {
+        return moduleNode.copy(
+                declarations = lowerTopLevelDeclarations(moduleNode.declarations, moduleNode)
         )
     }
 }

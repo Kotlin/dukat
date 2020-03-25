@@ -1,6 +1,6 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
-import org.jetbrains.dukat.ast.model.nodes.DocumentRootNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -26,8 +26,8 @@ private class LoweringVarags : NodeTypeLowering {
     }
 }
 
-private fun DocumentRootNode.lowerVarargs(): DocumentRootNode {
-    return LoweringVarags().lowerDocumentRoot(this)
+private fun ModuleNode.lowerVarargs(): ModuleNode {
+    return LoweringVarags().lowerModuleNode(this)
 }
 
 private fun SourceSetNode.lowerVarargs() = transform { it.lowerVarargs() }
