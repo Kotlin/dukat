@@ -262,7 +262,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             }
             is TypeValueNode -> {
                 if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                    TypeValueModel(value, emptyList(), (meta as StringLiteralDeclaration).token, typeReference?.getFqName(value))
+                    TypeValueModel(value.addLibPrefix(), emptyList(), (meta as StringLiteralDeclaration).token, typeReference?.getFqName(value))
                 } else {
                     TypeValueModel(
                             value,
