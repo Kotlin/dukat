@@ -1,12 +1,18 @@
 import * as ts from "typescript";
 import {tsInternals} from "./TsInternals";
 import {ExportContext} from "./ExportContext";
-import {Dependency, TranslateAllSymbolsDependency, TranslateSubsetOfSymbolsDependency} from "./Dependency";
+import {
+  Dependency,
+  SymbolDependency,
+  TranslateAllSymbolsDependency,
+  TranslateSubsetOfSymbolsDependency
+} from "./Dependency";
 
 export class DependencyBuilder {
   private dependencies = new Map<string, Dependency>();
   private visitedFiles = new Set<string>();
   private typeChecker = this.program.getTypeChecker();
+  private checkedReferences = new Set<string>();
 
   private registerDependency(dependency: Dependency) {
     let currentDependency = this.dependencies.get(dependency.fileName);
@@ -83,12 +89,37 @@ export class DependencyBuilder {
     return [];
   }
 
+  private createSymbolDependency(declaration: ts.Declaration): SymbolDependency | undefined {
+    let uid = this.exportContext.getUID(declaration);
+    if (this.checkedReferences.has(uid)) {
+      return undefined;
+    }
+    this.checkedReferences.add(uid);
+
+    let parent = declaration.parent;
+    let parentModuleUids = new Array<string>();
+    while (parent) {
+      if (ts.isModuleDeclaration(parent)) {
+        parentModuleUids.push(this.exportContext.getUID(parent));
+      }
+      parent = parent.parent
+    }
+
+    return new SymbolDependency(uid, parentModuleUids);
+  }
+
+
   private checkReferences(node: ts.Node) {
     let declarations = this.getDeclarations(node);
     for (let declaration of declarations) {
-      let uid = this.exportContext.getUID(declaration);
-      let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, this.exportContext, [uid]);
-      this.registerDependency(translateSubsetOfSymbolsDependency);
+
+      let symbolDependency = this.createSymbolDependency(declaration);
+      if (symbolDependency) {
+        let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, this.exportContext, [
+          symbolDependency
+        ]);
+        this.registerDependency(translateSubsetOfSymbolsDependency);
+      }
     }
   }
 

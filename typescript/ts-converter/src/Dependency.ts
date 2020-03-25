@@ -9,6 +9,10 @@ export interface Dependency {
   accept(node: ts.Node): boolean;
 }
 
+export class SymbolDependency {
+  constructor(public uid: string, public parentModuleUids: Array<string>) {}
+}
+
 export class TranslateAllSymbolsDependency implements Dependency {
   constructor(public fileName: string) {
   }
@@ -28,23 +32,38 @@ export class TranslateAllSymbolsDependency implements Dependency {
 
 export class TranslateSubsetOfSymbolsDependency implements Dependency {
   private symbols: Set<string>;
+  private parentUids: Set<string>;
 
-  constructor(public fileName: string, private exportContext: ExportContext, uids: Array<string>) {
-    this.symbols = new Set(uids);
+  constructor(public fileName: string, private exportContext: ExportContext, private uids: Array<SymbolDependency>) {
+    this.symbols = new Set(uids.map(it => it.uid));
+    this.parentUids = new Set(uids.map(it => it.parentModuleUids).reduce((a, b) => a.concat(b)))
   }
 
   merge(dependency: Dependency): Dependency {
     if (dependency instanceof TranslateAllSymbolsDependency) {
       return dependency;
     } else if (dependency instanceof TranslateSubsetOfSymbolsDependency) {
-      return new TranslateSubsetOfSymbolsDependency(this.fileName, this.exportContext, [...this.symbols].concat([...dependency.symbols]));
+      return new TranslateSubsetOfSymbolsDependency(this.fileName, this.exportContext, [...this.uids].concat([...dependency.uids]));
     } else {
       return this;
     }
   }
 
   accept(node: ts.Node): boolean {
-    return this.symbols.has(this.exportContext.getUID(node)) || ts.isExportAssignment(node) || ts.isModuleDeclaration(node);
+    if (ts.isExportAssignment(node)) {
+      return true;
+    }
+
+    let uid = this.exportContext.getUID(node);
+    if (this.symbols.has(uid)) {
+      return true;
+    }
+
+    if ((ts.isModuleDeclaration(node)) && (this.parentUids.has(uid))) {
+      return true;
+    }
+
+    return false;
   }
 
   toString(): string {
