@@ -6,8 +6,8 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
 import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
-import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
+import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLike
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
@@ -62,58 +62,58 @@ open class TypescriptLowerer(
     override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         val declarations = sourceSet
                 .lower(
-                    AddPackageName(packageName),
-                    MergeParentsForMergedInterfaces(),
-                    FilterOutNonDeclarations(),
-                    SyncTypeNames(renameMap),
-                    RenameImpossibleDeclarations(),
-                    ResolveTypescriptUtilityTypes(),
-                    ResolveDefaultTypeParams(),
-                    LowerPrimitives(),
-                    GenerateInterfaceReferences(),
-                    EliminateStringType(),
-                    DesugarArrayDeclarations(),
-                    FixImpossibleInheritance(),
-                    LowerPartialOf()
+                        AddPackageName(packageName),
+                        MergeParentsForMergedInterfaces(),
+                        FilterOutNonDeclarations(),
+                        SyncTypeNames(renameMap),
+                        RenameImpossibleDeclarations(),
+                        ResolveTypescriptUtilityTypes(),
+                        ResolveDefaultTypeParams(),
+                        LowerPrimitives(),
+                        GenerateInterfaceReferences(),
+                        EliminateStringType(),
+                        DesugarArrayDeclarations(),
+                        FixImpossibleInheritance(),
+                        LowerPartialOf()
                 )
 
 
         val nodes = declarations.introduceNodes(moduleNameResolver)
                 .lower(
-                    ResolveModuleAnnotations(),
-                    LowerVarargs(),
-                    LowerIntersectionType(),
-                    LowerThisType(),
-                    ResolveTypeAliases(),
-                    SpecifyUnionType(),
-                    RemoveUnusedGeneratedEntities(),
-                    RearrangeConstructors(),
-                    IntroduceMissedOverloads()
+                        ResolveModuleAnnotations(),
+                        LowerVarargs(),
+                        LowerIntersectionType(),
+                        LowerThisType(),
+                        ResolveTypeAliases(),
+                        SpecifyUnionType(),
+                        RemoveUnusedGeneratedEntities(),
+                        RearrangeConstructors(),
+                        IntroduceMissedOverloads()
                 )
 
         val models = nodes
                 .introduceModels(uidToFqNameMapper)
                 .lower(
-                    RemoveConflictingOverloads(),
-                    SubstituteTsStdLibEntities(),
-                    EscapeIdentificators(),
-                    RemoveUnsupportedJsNames(),
-                    MergeClassLike(),
-                    MergeModules(),
-                    MergeClassLikesAndModuleDeclarations(),
-                    MergeVarsAndInterfaces(),
-                    MergeNestedClasses(),
-                    SeparateNonExternalEntities(),
-                    LowerOverrides(),
-                    SpecifyTypeNodesWithModuleData(),
-                    AddExplicitGettersAndSetters(),
-                    AddImports(),
-                    AnyfyUnresolvedTypes(),
-                    AddNoinlineModifier(),
-                    AddStandardImportsAndAnnotations(),
-                    RemoveRedundantInlineFunction(),
-                    RemoveKotlinBuiltIns(),
-                    CorrectStdLibTypes()
+                        RemoveConflictingOverloads(),
+                        SubstituteTsStdLibEntities(),
+                        EscapeIdentificators(),
+                        RemoveUnsupportedJsNames(),
+                        MergeClassLike(),
+                        MergeModules(),
+                        MergeClassLikesAndModuleDeclarations(),
+                        MergeVarsAndInterfaces(),
+                        MergeNestedClasses(),
+                        SeparateNonExternalEntities(),
+                        LowerOverrides(),
+                        SpecifyTypeNodesWithModuleData(),
+                        AddExplicitGettersAndSetters(),
+                        AnyfyUnresolvedTypes(),
+                        AddNoinlineModifier(),
+                        RemoveRedundantInlineFunction(),
+                        RemoveKotlinBuiltIns(),
+                        CorrectStdLibTypes(),
+                        AddImports(),
+                        AddStandardImportsAndAnnotations()
                 )
 
         return models
