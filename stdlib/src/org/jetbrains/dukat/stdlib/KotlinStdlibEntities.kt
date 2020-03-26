@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.rightMost
 
 val KotlinStdlibEntities = setOf(
+        IdentifierEntity("Any"),
         IdentifierEntity("Array"),
         IdentifierEntity("Boolean"),
         IdentifierEntity("Error"),
