@@ -111,14 +111,16 @@ export class DependencyBuilder {
 
   private checkReferences(node: ts.Node) {
     let declarations = this.getDeclarations(node);
-    for (let declaration of declarations) {
 
+    for (let declaration of declarations) {
       let symbolDependency = this.createSymbolDependency(declaration);
+
       if (symbolDependency) {
         let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, this.exportContext, [
           symbolDependency
         ]);
         this.registerDependency(translateSubsetOfSymbolsDependency);
+        declaration.forEachChild(node => this.visit(node));
       }
     }
   }
