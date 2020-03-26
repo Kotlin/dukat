@@ -3,7 +3,7 @@ declare function frequencies(a: ReadonlyArray<String>): ReadonlyArray<number>
 declare function processTemplate(a: TemplateStringsArray): TemplateStringsArray
 
 interface NumArray extends Array<Number> {}
-interface SmartArray<T> extends Array<T> {}
+interface SmartNumArray<T extends Number> extends Array<T> {}
 
 declare class MyVerySpecificException extends Error {
   constructor(message?: string)

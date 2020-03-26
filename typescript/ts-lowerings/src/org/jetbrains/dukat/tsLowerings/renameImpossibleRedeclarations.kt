@@ -25,10 +25,6 @@ private class RenameImpossibleDeclarationsTypeLowering(private val namedImports:
         val declarationResolved = if (namedImports.contains(declaration.name)) { declaration.copy(name = declaration.name.addPrefix("Local")) } else { declaration }
         return super.lowerInterfaceDeclaration(declarationResolved, owner)
     }
-
-    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
-        return super.lowerParameterValue(declaration, owner)
-    }
 }
 
 private fun ModuleDeclaration.renameImpossibleDeclarations(): ModuleDeclaration {

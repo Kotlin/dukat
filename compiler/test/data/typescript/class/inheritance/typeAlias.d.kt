@@ -32,3 +32,5 @@ external open class MultithreadedProcessor : AliasedProcessor {
 external open class SinglethreadedProcessor : AliasedProcessor {
     override fun process(input: Array<Number>): NumArray
 }
+
+typealias NumCollection<T> = Array<T>

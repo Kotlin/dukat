@@ -16,3 +16,5 @@ declare class SinglethreadedProcessor implements AliasedProcessor {
   process(input: Array<Number>): NumArray;
 }
 
+type NumCollection<T extends number> = Array<T>
+

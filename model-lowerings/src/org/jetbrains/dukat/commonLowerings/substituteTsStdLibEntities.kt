@@ -97,7 +97,7 @@ private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
 private fun ClassLikeModel.convertToTypeAlias(forbiddenParent: HeritageModel): TypeAliasModel {
     return TypeAliasModel(
             name = name,
-            typeParameters = typeParameters,
+            typeParameters = typeParameters.map { it.copy(constraints = emptyList()) },
             visibilityModifier = VisibilityModifierModel.DEFAULT,
             comment = null,
             typeReference = forbiddenParent.value.copy(params = forbiddenParent.typeParams.map {
