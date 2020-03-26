@@ -354,6 +354,10 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             return true
         }
 
+        if (otherParameterType is TypeParameterReferenceModel) {
+            return true
+        }
+
         if (otherParameterType.isAny()) {
             return if (!inbox) {
                 this is TypeParameterReferenceModel
