@@ -15,21 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface `T$0` {
-    var x: Number
-    var y: Number
-    var z: Number
-}
+external fun actuallyAFunction(): Any?
 
-external interface `T$1` {
-    var x: Number
-    var y: Number
-    var z: Number
-    var negative: Any?
-        get() = definedExternally
-        set(value) = definedExternally
-}
-
-external fun generateVector(vectorProvider: (Any? /* = null */, Any? /* = null */, Any? /* = null */) -> `T$0`): `T$1`
-
-external fun generateVector(vectorProvider: (Any? /* = null */, Any? /* = null */, Any? /* = null */) -> Any?): `T$1`
+external fun generateFun(message: Any?): () -> Any?
