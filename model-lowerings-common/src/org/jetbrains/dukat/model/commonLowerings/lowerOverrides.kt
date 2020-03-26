@@ -2,6 +2,7 @@ package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -201,12 +202,35 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return (this is TypeValueModel && value == IdentifierEntity("dynamic"))
     }
 
+    private fun NameEntity.withLibPrefix(): NameEntity {
+        return when (this) {
+            is IdentifierEntity -> QualifierEntity(IdentifierEntity("<LIBROOT>"), this)
+            is QualifierEntity -> this
+        }
+    }
+
+    private fun TypeValueModel.namesAreEquivalent(typeModelB: TypeValueModel): Boolean {
+        if (fqName == typeModelB.fqName) {
+            return true
+        }
+
+        if (value.withLibPrefix() == typeModelB.fqName) {
+            return true
+        }
+
+        if (typeModelB.value.withLibPrefix() == fqName) {
+            return true
+        }
+
+        return false
+    }
+
     private fun TypeValueModel.isEquivalent(modelB: TypeValueModel): Boolean {
         val a = context.unalias(this)
         val b = context.unalias(modelB)
 
         return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-            a.fqName == b.fqName && typeParamsAreEquivalent(a.params, b.params) && a.nullable == b.nullable
+            a.namesAreEquivalent(b) && typeParamsAreEquivalent(a.params, b.params) && a.nullable == b.nullable
         } else {
             a.isEquivalent(b)
         }

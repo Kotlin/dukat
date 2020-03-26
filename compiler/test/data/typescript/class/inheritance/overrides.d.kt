@@ -51,10 +51,12 @@ external interface NumberEvent : BaseEvent {
 
 external open class ParentClass {
     open var prop: Any
+    open fun ping(message: String)
 }
 
 external open class ChildClass : ParentClass {
     override var prop: String
+    override fun ping(message: String /* "message" */)
 }
 
 external interface _Chain<T, V> {

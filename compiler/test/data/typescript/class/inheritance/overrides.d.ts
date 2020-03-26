@@ -28,10 +28,12 @@ declare interface NumberEvent extends BaseEvent {
 
 export class ParentClass {
     public prop: any;
+    ping(message: string);
 }
 
 export class ChildClass extends ParentClass {
     prop: string;
+    ping(message: "message");
 }
 
 declare interface _Chain<T, V> {
