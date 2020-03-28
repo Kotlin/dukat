@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
-import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 import java.util.*
@@ -32,7 +31,7 @@ class DescriptorContext {
     private val constraintToInitialize: MutableMap<TypeParameterDescriptorImpl, MutableList<KotlinType>> =
         mutableMapOf()
 
-    private var configContext: ConfigContext? = null
+    private var configContext: JsStdlibConfigContext? = null
 
     fun destroyConfigContext() {
         if (configContext != null) {
@@ -41,7 +40,7 @@ class DescriptorContext {
     }
 
     val stdlibModule: ModuleDescriptor by lazy {
-        configContext = ConfigContext()
+        configContext = JsStdlibConfigContext()
         configContext!!.stdlibModule
     }
 

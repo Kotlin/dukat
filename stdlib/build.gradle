@@ -1,65 +1,8 @@
 plugins {
-    id("antlr")
     id("kotlin")
 }
 
-configurations {
-    kotlinJsLibs
-}
-
-sourceSets {
-    generated {
-        java.srcDir "${buildDir}/generated-src/antlr/generated"
-    }
-
-    main {
-        compileClasspath += generated.output
-        runtimeClasspath += generated.output
-    }
-
-    test {
-        compileClasspath += generated.output
-        runtimeClasspath += generated.output
-    }
-}
 
 dependencies {
-    antlr "org.antlr:antlr4:${gradle.antlr4_version}"
-
-    kotlinJsLibs "org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}:sources"
-
     implementation(project(":ast-common"))
-    implementation "org.antlr:antlr4-runtime:${gradle.antlr4_version}"
-
-    runtime files(project.sourceSets.generated.output.classesDirs)
-}
-
-project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
-
-task createGeneratedSourcesDir {
-    doFirst {
-        mkdir "${buildDir}/classes/kotlin/generated"
-    }
-}
-
-compileGeneratedJava {
-    dependsOn(createGeneratedSourcesDir)
-    dependsOn(generateGrammarSource)
-    classpath = configurations.compile
-}
-
-compileKotlin {
-    source += sourceSets.generated.java
-}
-
-task downloadStdLib(type: Copy) {
-    configurations.kotlinJsLibs.each {
-        from zipTree(it.absolutePath).matching { include("**/*.kt") }
-    }
-    into "${project.buildDir}/kotlin-stdlib-js"
-}
-
-generateGrammarSource {
-    outputDirectory = file("${buildDir}/generated-src/antlr/generated")
-    arguments += ["-visitor", "-long-messages", "-package", "org.antlr.kotlin", "-lib", "src/main/antlr4/org/antlr/kotlin"]
 }

@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.descriptors
 
-import org.jetbrains.dukat.descriptors.ConfigContext
+import org.jetbrains.dukat.descriptors.JsStdlibConfigContext
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.com.intellij.lang.Language
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
@@ -51,13 +51,13 @@ fun doLoadFile(file: File): String {
 
 fun analyze(
     files: List<KtFile>,
-    configContext: ConfigContext
+    configContext: JsStdlibConfigContext
 ): AnalysisResult {
     return TopDownAnalyzerFacadeForJS.analyzeFiles(files, configContext.generateJSConfig())
 }
 
 fun generateModuleDescriptor(files: List<File>): ModuleDescriptor {
-    val context = ConfigContext()
+    val context = JsStdlibConfigContext()
     try {
         val environment = context.environment
         val project = environment.project

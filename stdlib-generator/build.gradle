@@ -1,0 +1,24 @@
+plugins {
+    id("kotlin")
+}
+
+configurations {
+    kotlinJsLibs
+}
+
+dependencies {
+    implementation(project(":ast-common"))
+    implementation(project(":ast-model"))
+    implementation(project(":translator"))
+    implementation(project(":translator-string"))
+    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$gradle.kotlinVersion")
+    kotlinJsLibs "org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}"
+}
+
+task downloadStdLib(type: Copy) {
+    configurations.kotlinJsLibs.each {
+        from zipTree(it.absolutePath).matching { include("**/*.meta.js") }
+    }
+    into "${project.buildDir}/kotlin-stdlib-js"
+}
+
