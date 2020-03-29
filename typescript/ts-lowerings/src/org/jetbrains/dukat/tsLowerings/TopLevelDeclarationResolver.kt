@@ -5,12 +5,16 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 
 
 private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, TopLevelDeclaration>) {
     this.declarations.forEach {
         when (it) {
             is ClassLikeDeclaration -> {
+                topLevelDeclarationsMap[it.uid] = it
+            }
+            is  TypeAliasDeclaration -> {
                 topLevelDeclarationsMap[it.uid] = it
             }
             is ModuleDeclaration -> it.scan(topLevelDeclarationsMap)
