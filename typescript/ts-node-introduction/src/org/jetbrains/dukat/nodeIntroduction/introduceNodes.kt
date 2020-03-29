@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
@@ -23,6 +22,7 @@ import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -87,9 +87,32 @@ private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
 
-private fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
+private fun TypeDeclaration.isPrimitive(primitive: String): Boolean {
+    return when (this.value) {
+        is IdentifierEntity -> (value as IdentifierEntity).value == primitive
+        else -> false
+    }
+}
+
+private enum class PARAMETER_CONTEXT {
+    IRRELEVANT,
+    FUNCTION_TYPE
+}
+
+private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
+    if (this is TypeDeclaration) {
+        when {
+            isPrimitive("Array") -> return params[0]
+            isPrimitive("Any") -> return this
+        }
+    }
+
+    return this
+}
+
+private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode = ParameterNode(
         name = name,
-        type = type.convertToNode(),
+        type = (if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) { type.extractVarargType() } else { type }).convertToNode(),
         initializer = if (initializer != null || optional) {
             TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
         } else null,
@@ -97,6 +120,7 @@ private fun ParameterDeclaration.convertToNode(): ParameterNode = ParameterNode(
         vararg = vararg,
         optional = optional
 )
+
 
 private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration {
     val declaration = this
@@ -118,7 +142,7 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
         is FunctionTypeDeclaration -> FunctionTypeNode(
                 parameters = declaration.parameters.map { parameterDeclaration ->
-                    parameterDeclaration.convertToNode()
+                    parameterDeclaration.convertToNode(PARAMETER_CONTEXT.FUNCTION_TYPE)
                 },
                 type = declaration.type.convertToNode(),
                 nullable = declaration.nullable,
