@@ -14,7 +14,7 @@ import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ModifyVisibility(private val visibility: VisibilityModifierModel) : ModelWithOwnerLowering {

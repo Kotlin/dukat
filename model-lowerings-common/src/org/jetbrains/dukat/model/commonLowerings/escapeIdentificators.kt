@@ -27,7 +27,7 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.astModel.visitors.LambdaParameterModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()

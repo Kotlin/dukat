@@ -8,8 +8,8 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 
 data class FunctionModel(
         override val name: NameEntity,
-        val parameters: List<ParameterModel>,
-        val type: TypeModel,
+        override val parameters: List<ParameterModel>,
+        override val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 
         val annotations: MutableList<AnnotationModel>,
@@ -23,4 +23,4 @@ data class FunctionModel(
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean
-) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel
+) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel, CallableModel
