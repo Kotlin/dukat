@@ -30,7 +30,8 @@ private data class MemberData(val fqName: NameEntity?, val memberModel: MemberMo
 private enum class MemberOverrideStatus {
     IS_OVERRIDE,
     IS_NOT_OVERRIDE,
-    IS_RELATED
+    IS_RELATED,
+    IS_IMPOSSIBLE
 }
 
 private class ClassLikeOverrideResolver(private val context: ModelContext, private val classLike: ClassLikeModel) {
@@ -94,8 +95,8 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                 }
             }
             is PropertyModel -> {
-                val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, isOverriding(it.memberModel)) }?.firstOrNull() {
-                    (it.second == MemberOverrideStatus.IS_OVERRIDE) || (it.second == MemberOverrideStatus.IS_RELATED)
+                val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, isOverriding(it.memberModel)) }?.firstOrNull() { (_, status) ->
+                    (status == MemberOverrideStatus.IS_OVERRIDE) || (status == MemberOverrideStatus.IS_RELATED) || (status == MemberOverrideStatus.IS_IMPOSSIBLE)
                 }
 
                 val memberData = overrideData?.first
@@ -108,12 +109,9 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                             listOf(copy(override = memberData?.fqName))
                         }
                     }
-                    MemberOverrideStatus.IS_RELATED -> {
-                        emptyList()
-                    }
-                    else -> {
-                        listOf(this)
-                    }
+                    MemberOverrideStatus.IS_IMPOSSIBLE -> emptyList()
+                    MemberOverrideStatus.IS_RELATED -> emptyList()
+                    else -> listOf(this)
                 }
             }
             is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, this).resolve())
@@ -180,8 +178,12 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             return MemberOverrideStatus.IS_NOT_OVERRIDE
         }
 
-        return if ((name == otherPropertyModel.name) && type.isOverridingReturnType(otherPropertyModel.type)) {
-            MemberOverrideStatus.IS_OVERRIDE
+        return if ((name == otherPropertyModel.name)) {
+            if (type.isOverridingReturnType(otherPropertyModel.type)) {
+                MemberOverrideStatus.IS_OVERRIDE
+            } else {
+                MemberOverrideStatus.IS_IMPOSSIBLE
+            }
         } else {
             if ((type is FunctionTypeModel) && (otherPropertyModel.type is FunctionTypeModel)) {
                 if ((type as CallableModel).isOverriding(otherPropertyModel.type as CallableModel) == MemberOverrideStatus.IS_RELATED) {

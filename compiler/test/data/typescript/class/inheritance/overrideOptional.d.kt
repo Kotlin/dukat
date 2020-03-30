@@ -15,15 +15,22 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface Stream
+external open class Stream
 
-external interface Readable : Stream
+external open class Writable : Stream
 
-external interface Duplex : Readable
+external open class Readable : Stream
+
+external open class Duplex : Readable
 
 external interface ReadableOptions {
     val read: ((self: Readable, size: Number) -> Unit)?
         get() = definedExternally
 }
 
-external interface DuplexOptions : ReadableOptions
+external interface WriteableOptions {
+    val write: ((self: Writable, chunk: Any, encoding: String, callback: (error: Error?) -> Unit) -> Unit)?
+        get() = definedExternally
+}
+
+external interface DuplexOptions : ReadableOptions, WriteableOptions
