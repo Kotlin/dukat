@@ -14,7 +14,6 @@ private class ResolveLoopsLowering : DeclarationStatementLowering {
     }
 
     fun lowerForStatement(statement: ForStatementDeclaration): List<StatementDeclaration> {
-        println(statement.body)
         return listOf(
             BlockDeclaration(
                 statement.initializer.statements +

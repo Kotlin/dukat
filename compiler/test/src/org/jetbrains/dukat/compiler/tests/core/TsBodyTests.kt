@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.compiler.tests.extended
+package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.tests.CliBodyTranslator
 import org.jetbrains.dukat.compiler.tests.CliTranslator
@@ -15,7 +15,6 @@ class TsBodyTests : CoreSetCliTests() {
     @DisplayName("ts body test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("typescriptBodiesSet")
-    @EnabledIfSystemProperty(named = "dukat.test.tsBody", matches = "true")
     override fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEqualsBinary(name, tsPath, ktPath)
     }
