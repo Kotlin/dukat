@@ -72,6 +72,7 @@ import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
@@ -484,8 +485,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
     }
 
-    private fun FunctionNode.resolveBody(): List<StatementModel> {
-        return when (val nodeContext = this.context) {
+    private fun FunctionNode.resolveBody(): BlockStatementModel {
+        return BlockStatementModel(when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
                 ReturnStatementModel(
                     PropertyAccessExpressionModel(
@@ -587,7 +588,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             else -> emptyList()
-        }
+        })
     }
 
     private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {

@@ -22,6 +22,7 @@ import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
@@ -190,7 +191,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
         val declaration = ownerContext.node
         return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape(),
-                body = declaration.body.map { it.escape() }
+                body = BlockStatementModel(declaration.body.statements.map { it.escape() })
         )), parentModule)
     }
 

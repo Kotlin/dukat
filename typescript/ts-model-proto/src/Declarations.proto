@@ -317,6 +317,13 @@ message ExpressionStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message ForStatementDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    repeated StatementDeclarationProto initializer = 2;
+    ExpressionDeclarationProto incrementor = 3;
+    repeated StatementDeclarationProto statement = 4;
+}
+
 message IfStatementDeclarationProto {
     ExpressionDeclarationProto condition = 1;
     repeated StatementDeclarationProto thenStatement = 2;
@@ -405,6 +412,7 @@ message StatementDeclarationProto {
         WhileStatementDeclarationProto whileStatement = 6;
         VariableDeclarationProto variableDeclaration = 7;
         FunctionDeclarationProto functionDeclaration = 8;
+        ForStatementDeclarationProto forStatement = 9;
     }
 }
 

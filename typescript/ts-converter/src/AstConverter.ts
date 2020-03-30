@@ -858,6 +858,22 @@ export class AstConverter {
     );
   }
 
+  convertVariableDeclarationList(list: ts.VariableDeclarationList, modifiers: ts.ModifiersArray | null): Array<StatementDeclaration> {
+    let res: Array<StatementDeclaration> = [];
+
+    for (let declaration of list.declarations) {
+      res.push(this.astFactory.declareVariable(
+          declaration.name.getText(),
+          this.convertType(declaration.type),
+          this.convertModifiers(modifiers),
+          declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
+          this.exportContext.getUID(declaration)
+      ));
+    }
+
+    return res
+  }
+
   convertIterationStatement(statement: ts.Node): StatementDeclaration | null {
     let decl: StatementDeclaration | null = null;
 
@@ -867,6 +883,16 @@ export class AstConverter {
       decl = this.astFactory.createWhileStatement(
         this.astExpressionConverter.convertExpression(statement.expression),
         body
+      )
+    }
+
+    if (ts.isForStatement(statement)) {
+
+      decl = this.astFactory.createForStatement(
+          this.convertVariableDeclarationList(statement.initializer, null),
+          statement.condition ? this.astExpressionConverter.convertExpression(statement.condition) : null,
+          statement.incrementor ? this.astExpressionConverter.convertExpression(statement.incrementor) : null,
+          body
       )
     }
 
@@ -903,15 +929,7 @@ export class AstConverter {
           statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
       ))
     } else if (ts.isVariableStatement(statement)) {
-      for (let declaration of statement.declarationList.declarations) {
-        res.push(this.astFactory.declareVariable(
-            declaration.name.getText(),
-            this.convertType(declaration.type),
-            this.convertModifiers(statement.modifiers),
-            declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
-            this.exportContext.getUID(declaration)
-        ));
-      }
+      res = res.concat(this.convertVariableDeclarationList(statement.declarationList, statement.modifiers))
     } else if (ts.isFunctionDeclaration(statement)) {
       let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
       if (convertedFunctionDeclaration != null) {

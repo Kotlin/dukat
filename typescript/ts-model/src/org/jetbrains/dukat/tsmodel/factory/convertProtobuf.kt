@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
@@ -90,6 +91,7 @@ import org.jetbrains.dukat.tsmodelproto.EnumDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExportAssignmentDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExpressionStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ForStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.FunctionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.HeritageClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.IdentifierDeclarationProto
@@ -300,15 +302,24 @@ fun List<StatementDeclarationProto>.convert(): StatementDeclaration? {
 fun IfStatementDeclarationProto.convert(): IfStatementDeclaration {
     return IfStatementDeclaration(
             condition = condition.convert(),
-            thenStatement = thenStatementList.convert() ?: BlockDeclaration(emptyList()),
-            elseStatement = elseStatementList.convert()
+            thenStatement = (thenStatementList.convert() as BlockDeclaration?) ?: BlockDeclaration(emptyList()),
+            elseStatement = (elseStatementList.convert() as BlockDeclaration?)
+    )
+}
+
+fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
+    return ForStatementDeclaration(
+        initializer = BlockDeclaration(initializerList.map { it.convert() }),
+        condition = condition.convert(),
+        incrementor = incrementor.convert(),
+        body = statementList.convert() as BlockDeclaration
     )
 }
 
 fun WhileStatementDeclarationProto.convert(): WhileStatementDeclaration {
     return WhileStatementDeclaration(
             condition = condition.convert(),
-            statement = statementList.convert() ?: BlockDeclaration(emptyList())
+            statement = (statementList.convert() as BlockDeclaration?) ?: BlockDeclaration(emptyList())
     )
 }
 
@@ -600,6 +611,7 @@ fun StatementDeclarationProto.convert(): StatementDeclaration {
         hasBlockStatement() -> blockStatement.convert()
         hasVariableDeclaration() -> variableDeclaration.convert()
         hasFunctionDeclaration() -> functionDeclaration.convert()
+        hasForStatement() -> forStatement.convert()
         else -> throw Exception("unknown statement: ${this}")
     }
 }

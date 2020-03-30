@@ -31,7 +31,7 @@ import {
   DefinitionInfoDeclarationProto,
   EnumDeclarationProto,
   EnumTokenDeclarationProto,
-  ExportAssignmentDeclarationProto, ExpressionStatementDeclarationProto,
+  ExportAssignmentDeclarationProto, ExpressionStatementDeclarationProto, ForStatementDeclarationProto,
   FunctionDeclarationProto,
   HeritageClauseDeclarationProto,
   IdentifierDeclarationProto, IfStatementDeclarationProto, ImportClauseDeclarationProto,
@@ -204,6 +204,21 @@ export class AstFactory {
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setIfstatement(ifStatement);
+    return statementDeclaration;
+  }
+
+  createForStatement(initializer: Array<StatementDeclaration>, condition: Expression | null, incrementor: Expression | null, statement: Array<StatementDeclaration>): StatementDeclaration {
+    let forStatement = new ForStatementDeclarationProto();
+    forStatement.setInitializerList(initializer);
+    if (condition) {
+      forStatement.setCondition(condition);
+    }
+    if (incrementor) {
+      forStatement.setIncrementor(incrementor);
+    }
+    forStatement.setStatementList(statement);
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setForstatement(forStatement);
     return statementDeclaration;
   }
 

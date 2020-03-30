@@ -20,12 +20,14 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -106,14 +108,14 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is IfStatementDeclaration -> IfStatementModel(
                 condition.convert(),
-                thenStatement.convert(),
-                elseStatement?.convert()
+                convertBlock(thenStatement),
+                elseStatement?.let { convertBlock(it) }
             )
             is WhileStatementDeclaration -> WhileStatementModel(
                 condition.convert(),
-                statement.convert()
+                convertBlock(statement)
             )
-            is BlockDeclaration -> BlockStatementModel(
+            is BlockDeclaration -> RunBlockStatementModel(
                 statements.map { it.convert() }
             )
             is VariableDeclaration -> VariableModel(
@@ -150,7 +152,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
-    fun convertBlock(blockDeclaration: BlockDeclaration): List<StatementModel> {
-        return blockDeclaration.statements.mapNotNull { it.convert() }
+    fun convertBlock(blockDeclaration: BlockDeclaration): BlockStatementModel {
+        return BlockStatementModel(blockDeclaration.statements.mapNotNull { it.convert() })
     }
 }

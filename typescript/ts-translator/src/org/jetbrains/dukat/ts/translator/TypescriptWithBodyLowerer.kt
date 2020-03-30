@@ -36,6 +36,7 @@ import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.MergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
+import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.SyncTypeNames
 import org.jetbrains.dukat.tsLowerings.lower
@@ -74,7 +75,8 @@ open class TypescriptWithBodyLowerer(
                         EliminateStringType(),
                         DesugarArrayDeclarations(),
                         FixImpossibleInheritance(),
-                        LowerPartialOf()
+                        LowerPartialOf(),
+                        ResolveLoops()
                 )
 
 

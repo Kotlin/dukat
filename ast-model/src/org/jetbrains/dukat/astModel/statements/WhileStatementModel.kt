@@ -4,6 +4,6 @@ import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 
 data class WhileStatementModel(
     val condition: ExpressionModel,
-    val body: StatementModel,
+    val body: BlockStatementModel,
     override val metaDescription: String? = null
 ): StatementModel

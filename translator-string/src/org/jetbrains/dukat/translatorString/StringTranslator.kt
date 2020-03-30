@@ -49,6 +49,7 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
+import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -259,6 +260,9 @@ private fun StatementModel.translate(): List<String> {
         is BlockStatementModel -> listOf("{") +
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")
+        is RunBlockStatementModel -> listOf("run {") +
+                statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
+                listOf("}")
         is IfStatementModel -> {
             val header = "if (${condition.translate()}) "
             val mainBranch = thenStatement.translate()
@@ -289,9 +293,9 @@ private fun ClassLikeReferenceModel.translate(): String {
     }
 }
 
-private fun List<StatementModel>?.translate(padding: Int, output: (String) -> Unit) {
-    if (this != null && size > 1) {
-        forEach { statement ->
+private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Unit) {
+    if (this != null) {
+        statements.forEach { statement ->
             output(
                 statement.translate()
                     .map { FORMAT_TAB.repeat(padding + 1) + it }
@@ -302,14 +306,14 @@ private fun List<StatementModel>?.translate(padding: Int, output: (String) -> Un
     }
 }
 
-private fun List<StatementModel>?.translateFirstLine(): String {
-    return if (this == null || isEmpty()) {
+private fun BlockStatementModel?.translateFirstLine(): String {
+    return if (this == null || statements.isEmpty()) {
         ""
-    } else if (size == 1) {
-        if (this[0] is ReturnStatementModel) {
-            " = ${(this[0] as ReturnStatementModel).expression?.translate()}"
+    } else if (statements.size == 1 && statements[0].translate().size == 1) {
+        if (statements[0] is ReturnStatementModel) {
+            " = ${(statements[0] as ReturnStatementModel).expression?.translate()}"
         } else {
-            " { ${this[0].translateAsOneLine()} }"
+            " { ${statements[0].translate()[0]} }"
         }
     } else {
         " {"
@@ -332,6 +336,9 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val modifier = if (inline) { "inline " } else if (external) { "$KOTLIN_EXTERNAL_KEYWORD " } else { "" }
     val operator = if (operator) "operator " else ""
 
+    val shouldBeTranslatedAsOneLine = body.statements.isEmpty() ||
+            (body.statements.size == 1 && body.statements[0].translate().size <= 1)
+
     val bodyFirstLine = body.translateFirstLine()
 
     val funName = if (extend == null) {
@@ -347,7 +354,9 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
                 )})${returnClause}${type.translateMeta()}${bodyFirstLine}"
     )
 
-    body.translate(padding, output)
+    if (!shouldBeTranslatedAsOneLine) {
+        body.translate(padding, output)
+    }
 }
 
 private fun MethodModel.translate(): List<String> {

@@ -37,6 +37,7 @@ import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
+import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
@@ -272,7 +273,7 @@ private class IdlFileConverter(
                 name = ownerName,
                 typeParameters = listOf()
             ),
-            body = listOf(
+            body = BlockStatementModel(listOf(
                 AssignmentStatementModel(
                     IndexExpressionModel(
                         CallExpressionModel(
@@ -285,7 +286,7 @@ private class IdlFileConverter(
                     ),
                     IdentifierExpressionModel(IdentifierEntity(value.name))
                 )
-            ),
+            )),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
             comment = null,
             external = true
@@ -318,7 +319,7 @@ private class IdlFileConverter(
                 name = ownerName,
                 typeParameters = listOf()
             ),
-            body = listOf(
+            body = BlockStatementModel(listOf(
                 ReturnStatementModel(
                     IndexExpressionModel(
                         CallExpressionModel(
@@ -332,7 +333,7 @@ private class IdlFileConverter(
                         )
                     )
                 )
-            ),
+            )),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
             comment = null,
             external = true
@@ -539,7 +540,7 @@ private class IdlFileConverter(
             inline = true,
             operator = false,
             extend = null,
-            body = generateFunctionBody(),
+            body = BlockStatementModel(generateFunctionBody()),
             visibilityModifier = VisibilityModifierModel.DEFAULT,
             comment = null,
             external = true
