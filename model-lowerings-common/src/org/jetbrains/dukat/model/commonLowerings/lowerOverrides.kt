@@ -3,6 +3,8 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astModel.CallableModel
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -10,7 +12,6 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -26,7 +27,7 @@ private fun TypeModel.isAny(): Boolean {
 
 private data class MemberData(val fqName: NameEntity?, val memberModel: MemberModel, val ownerModel: ClassLikeModel)
 
-private enum class MethodOverrideStatus {
+private enum class MemberOverrideStatus {
     IS_OVERRIDE,
     IS_NOT_OVERRIDE,
     IS_RELATED
@@ -70,7 +71,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return when (this) {
             is MethodModel -> {
                 val overridden = allSuperDeclarations[name]?.firstOrNull {
-                    (it.memberModel is MethodModel) && (isOverriding(it.memberModel) == MethodOverrideStatus.IS_OVERRIDE)
+                    (it.memberModel is MethodModel) && (isOverriding(it.memberModel) == MemberOverrideStatus.IS_OVERRIDE)
                 }?.fqName ?: if (isSpecialCase()) {
                     IdentifierEntity("Any")
                 } else null
@@ -79,7 +80,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                     listOf(copy(override = overridden, parameters = parameters.map { param -> param.copy(initializer = null) }))
                 } else {
                     val related = allSuperDeclarations[name]?.firstOrNull {
-                        (it.memberModel is MethodModel) && (isOverriding(it.memberModel) == MethodOverrideStatus.IS_RELATED)
+                        (it.memberModel is MethodModel) && (isOverriding(it.memberModel) == MemberOverrideStatus.IS_RELATED)
                     }
 
                     val ownerModel = related?.ownerModel
@@ -93,13 +94,26 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                 }
             }
             is PropertyModel -> {
-                val overridden = allSuperDeclarations[name]?.firstOrNull {
-                    (it.memberModel is PropertyModel) && isOverriding(it.memberModel)
+                val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, isOverriding(it.memberModel)) }?.firstOrNull() {
+                    (it.second == MemberOverrideStatus.IS_OVERRIDE) || (it.second == MemberOverrideStatus.IS_RELATED)
                 }
-                if (isImpossibleOverride(overridden?.memberModel)) {
-                    emptyList()
-                } else {
-                    listOf(copy(override = overridden?.fqName))
+
+                val memberData = overrideData?.first
+
+                when (overrideData?.second) {
+                    MemberOverrideStatus.IS_OVERRIDE -> {
+                        if (isImpossibleOverride(memberData?.memberModel)) {
+                            emptyList()
+                        } else {
+                            listOf(copy(override = memberData?.fqName))
+                        }
+                    }
+                    MemberOverrideStatus.IS_RELATED -> {
+                        emptyList()
+                    }
+                    else -> {
+                        listOf(this)
+                    }
                 }
             }
             is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, this).resolve())
@@ -134,32 +148,51 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return context.resolve(this.fqName)
     }
 
-    private fun MethodModel.isOverriding(otherMethodModel: MethodModel): MethodOverrideStatus {
-        if (name != otherMethodModel.name) {
-            return MethodOverrideStatus.IS_NOT_OVERRIDE
-        }
-
-        if (typeParameters.size != otherMethodModel.typeParameters.size) {
-            return MethodOverrideStatus.IS_NOT_OVERRIDE
-        }
-
-
-        val parametersAreEquivalent = paramTypesAreEquivalent(parameters, otherMethodModel.parameters)
-        val overridingReturnType = type.isOverridingReturnType(otherMethodModel.type)
+    private fun CallableModel.isOverriding(otherCallableModel: CallableModel): MemberOverrideStatus {
+        val parametersAreEquivalent = paramTypesAreEquivalent(parameters, otherCallableModel.parameters)
+        val overridingReturnType = type.isOverridingReturnType(otherCallableModel.type)
 
         return if (parametersAreEquivalent && overridingReturnType) {
-            MethodOverrideStatus.IS_OVERRIDE
+            MemberOverrideStatus.IS_OVERRIDE
         } else {
-            if (paramTypesAreRelated(parameters, otherMethodModel.parameters) && overridingReturnType) {
-                MethodOverrideStatus.IS_RELATED
+            if (paramTypesAreRelated(parameters, otherCallableModel.parameters) && overridingReturnType) {
+                MemberOverrideStatus.IS_RELATED
             } else {
-                MethodOverrideStatus.IS_NOT_OVERRIDE
+                MemberOverrideStatus.IS_NOT_OVERRIDE
             }
         }
     }
 
-    private fun PropertyModel.isOverriding(otherPropertyModel: PropertyModel): Boolean {
-        return (name == otherPropertyModel.name) && type.isOverridingReturnType(otherPropertyModel.type)
+    private fun MethodModel.isOverriding(otherMethodModel: MethodModel): MemberOverrideStatus {
+        if (name != otherMethodModel.name) {
+            return MemberOverrideStatus.IS_NOT_OVERRIDE
+        }
+
+        if (typeParameters.size != otherMethodModel.typeParameters.size) {
+            return MemberOverrideStatus.IS_NOT_OVERRIDE
+        }
+
+        return (this as CallableModel).isOverriding(otherMethodModel)
+    }
+
+    private fun PropertyModel.isOverriding(otherPropertyModel: MemberModel): MemberOverrideStatus {
+        if (otherPropertyModel !is PropertyModel) {
+            return MemberOverrideStatus.IS_NOT_OVERRIDE
+        }
+
+        return if ((name == otherPropertyModel.name) && type.isOverridingReturnType(otherPropertyModel.type)) {
+            MemberOverrideStatus.IS_OVERRIDE
+        } else {
+            if ((type is FunctionTypeModel) && (otherPropertyModel.type is FunctionTypeModel)) {
+                if ((type as CallableModel).isOverriding(otherPropertyModel.type as CallableModel) == MemberOverrideStatus.IS_RELATED) {
+                    MemberOverrideStatus.IS_RELATED
+                } else {
+                    MemberOverrideStatus.IS_NOT_OVERRIDE
+                }
+            } else {
+                MemberOverrideStatus.IS_NOT_OVERRIDE
+            }
+        }
     }
 
     private fun PropertyModel.isImpossibleOverride(otherPropertyModel: MemberModel?): Boolean {
@@ -264,7 +297,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         }
     }
 
-    private fun paramTypesAreEquivalent(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
+    private fun paramTypesAreEquivalent(paramsA: List<CallableParameterModel>, paramsB: List<CallableParameterModel>): Boolean {
         return compareLists(paramsA, paramsB) { a, b ->
             a.type.isEquivalent(b.type)
         }
@@ -281,7 +314,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         }
     }
 
-    private fun paramTypesAreRelated(paramsA: List<ParameterModel>, paramsB: List<ParameterModel>): Boolean {
+    private fun paramTypesAreRelated(paramsA: List<CallableParameterModel>, paramsB: List<CallableParameterModel>): Boolean {
         return compareLists(paramsA, paramsB) { a, b ->
             if (a.type.isAny() || b.type.isAny()) {
                 true
