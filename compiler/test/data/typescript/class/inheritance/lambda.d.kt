@@ -28,3 +28,10 @@ external interface QuasiSearchFunc {
     @nativeInvoke
     operator fun invoke(source: String, subString: String): Boolean
 }
+
+typealias Send<T> = (body: Any) -> T
+
+external interface CustomSend {
+    @nativeInvoke
+    operator fun <T> invoke(body: Any = definedExternally): T
+}
