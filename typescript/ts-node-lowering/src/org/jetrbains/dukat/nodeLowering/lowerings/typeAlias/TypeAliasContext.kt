@@ -30,7 +30,7 @@ class TypeAliasContext {
                 myTypeAliasMap[declaration.typeReference?.uid]?.let { aliasResolved ->
                     when (val typeReference = aliasResolved.typeReference) {
                         is TypeNode -> {
-                            val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first }, { it.second })
+                            val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first.value }, { it.second })
                             DereferenceNode(typeReference, aliasParamsMap)
                         }
                         else -> typeReference

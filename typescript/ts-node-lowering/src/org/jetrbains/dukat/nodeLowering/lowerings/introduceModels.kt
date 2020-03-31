@@ -591,13 +591,18 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         })
     }
 
-    private fun convertTypeParams(typeParameters: List<TypeValueNode>): List<TypeParameterModel> {
+    private fun convertTypeParams(typeParameters: List<TypeValueNode>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
         return typeParameters.map { typeParam ->
             TypeParameterModel(
                     type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
-                    constraints = typeParam.params
-                            .map { param -> param.process(TranslationContext.TYPE_CONSTRAINT) }
-                            .filterNot { (it is TypeValueModel) && (it.value == IMPOSSIBLE_CONSTRAINT) }
+                    constraints = if (ignoreConstraints) {
+                        emptyList()
+                    } else {
+                        typeParam.params
+                                .map { param -> param.process(TranslationContext.TYPE_CONSTRAINT) }
+                                .filterNot { (it is TypeValueModel) && (it.value == IMPOSSIBLE_CONSTRAINT) }
+
+                    }
             )
         }
     }
@@ -754,7 +759,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 TypeAliasModel(
                         name = name,
                         typeReference = typeReference.process(),
-                        typeParameters = typeParameters.map { typeParameter -> TypeParameterModel(TypeValueModel(typeParameter, listOf(), null, null), emptyList()) },
+                        typeParameters = convertTypeParams(typeParameters, true),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null
                 )

@@ -27,7 +27,6 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto, TopLevelDeclarationProto} from "declarations";
-import {ModuleBody} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -100,7 +99,7 @@ export class AstConverter {
         if (node.importClause) {
           let namedBindings = node.importClause.namedBindings;
           if (namedBindings) {
-            let importClause: ImportClauseDeclaration | null = null;
+            let importClause: ImportClauseDeclaration | null;
             if (ts.isNamespaceImport(namedBindings)) {
               importClause = this.astFactory.createNamespaceImportClause(namedBindings.name.getText());
             } else {
@@ -733,7 +732,7 @@ export class AstConverter {
   private convertTypeAliasDeclaration(declaration: ts.TypeAliasDeclaration): Declaration {
     return this.astFactory.createTypeAliasDeclaration(
       this.convertEntityName(declaration.name),
-      this.convertTypeParamsToTokens(declaration.typeParameters),
+      this.convertTypeParams(declaration.typeParameters),
       this.convertType(declaration.type),
       this.exportContext.getUID(declaration)
     )

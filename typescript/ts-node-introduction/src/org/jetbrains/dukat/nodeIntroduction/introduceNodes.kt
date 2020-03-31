@@ -423,7 +423,9 @@ private class LowerDeclarationsToNodes(
         return TypeAliasNode(
                 name = aliasName,
                 typeReference = typeReference.convertToNode(),
-                typeParameters = typeParameters,
+                typeParameters = typeParameters.map { typeParameter ->
+                    TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
+                },
                 uid = uid,
                 external = false
         )

@@ -5,7 +5,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class TypeAliasDeclaration(
         val aliasName: NameEntity,
-        val typeParameters: List<NameEntity>,
+        val typeParameters: List<TypeParameterDeclaration>,
         val typeReference: ParameterValueDeclaration,
 
         override val uid: String

@@ -361,7 +361,7 @@ message VariableDeclarationProto {
 
 message TypeAliasDeclarationProto {
     NameDeclarationProto aliasName = 1;
-    repeated IdentifierDeclarationProto typeParameters = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 2;
     ParameterValueDeclarationProto typeReference = 3;
     string uid = 4;
 }

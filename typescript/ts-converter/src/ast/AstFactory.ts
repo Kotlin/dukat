@@ -524,7 +524,7 @@ export class AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<IdentifierDeclaration>, typeReference: TypeDeclaration, uid: string): Declaration {
+  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<TypeParameterDeclarationProto>, typeReference: TypeDeclaration, uid: string): Declaration {
     let typeAlias = new TypeAliasDeclarationProto();
     typeAlias.setAliasname(aliasName);
     typeAlias.setTypeparametersList(typeParams);
