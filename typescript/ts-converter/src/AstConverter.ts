@@ -26,7 +26,14 @@ import {DeclarationResolver} from "./DeclarationResolver";
 import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
-import {ReferenceClauseDeclarationProto, ReferenceDeclarationProto, TopLevelDeclarationProto} from "declarations";
+import {
+  ModuleDeclarationProto,
+  ReferenceClauseDeclarationProto,
+  ReferenceDeclarationProto,
+  TopLevelDeclarationProto
+} from "declarations";
+import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
+import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -137,7 +144,8 @@ export class AstConverter {
       this.convertModifiers(sourceFile.modifiers),
       uid(),
       sourceName,
-      true);
+      MODULE_KIND.SOURCE_FILE
+    );
   }
 
   createSourceFileDeclaration(sourceFile: ts.SourceFile, packageName: NameEntity, filter?: (node: ts.Node) => boolean): SourceFileDeclaration {
@@ -154,8 +162,8 @@ export class AstConverter {
     });
   }
 
-  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): TopLevelDeclarationProto {
-    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, root));
+  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
+    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, kind));
   }
 
   convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -1081,7 +1089,7 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, false)];
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE )];
     }
 
     return [];

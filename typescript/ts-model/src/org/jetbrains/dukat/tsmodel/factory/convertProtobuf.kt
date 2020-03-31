@@ -23,6 +23,7 @@ import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
@@ -164,12 +165,12 @@ fun ModifierDeclarationProto.convert(): ModifierDeclaration {
 }
 
 fun ReferenceDeclarationProto.convert(): ReferenceDeclaration {
-    val origin = when(origin) {
+    val origin = when (origin) {
         ReferenceDeclarationProto.ORIGIN.IMPORT -> ReferenceOriginDeclaration.IMPORT
         ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT -> ReferenceOriginDeclaration.NAMED_IMPORT
         else -> ReferenceOriginDeclaration.IRRELEVANT
     }
-    val kind = when(kind) {
+    val kind = when (kind) {
         ReferenceDeclarationProto.KIND.CLASS -> ReferenceKindDeclaration.CLASS
         ReferenceDeclarationProto.KIND.INTERFACE -> ReferenceKindDeclaration.INTERFACE
         ReferenceDeclarationProto.KIND.TYPEALIAS -> ReferenceKindDeclaration.TYPEALIAS
@@ -280,7 +281,12 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
             modifiersList.map { it.convert() },
             uid,
             resourceName,
-            root)
+            when (kind) {
+                ModuleDeclarationProto.MODULE_KIND.SOURCE_FILE -> ModuleDeclarationKind.SOURCE_FILE
+                ModuleDeclarationProto.MODULE_KIND.MODULE -> ModuleDeclarationKind.MODULE
+                ModuleDeclarationProto.MODULE_KIND.NAMESPACE -> ModuleDeclarationKind.NAMESPACE
+                else -> ModuleDeclarationKind.SOURCE_FILE
+            })
 }
 
 fun ExportAssignmentDeclarationProto.convert(): ExportAssignmentDeclaration {
@@ -309,10 +315,10 @@ fun IfStatementDeclarationProto.convert(): IfStatementDeclaration {
 
 fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
     return ForStatementDeclaration(
-        initializer = BlockDeclaration(initializerList.map { it.convert() }),
-        condition = condition.convert(),
-        incrementor = incrementor.convert(),
-        body = statementList.convert() as BlockDeclaration
+            initializer = BlockDeclaration(initializerList.map { it.convert() }),
+            condition = condition.convert(),
+            incrementor = incrementor.convert(),
+            body = statementList.convert() as BlockDeclaration
     )
 }
 

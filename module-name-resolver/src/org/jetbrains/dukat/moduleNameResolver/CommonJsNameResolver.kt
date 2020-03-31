@@ -6,7 +6,6 @@ import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
 
-    @OptIn(kotlinx.serialization.UnstableDefault::class)
     fun resolveName(sourceFile: File): String? {
         val parentDirs = generateSequence(sourceFile.parentFile) { it.parentFile }
 

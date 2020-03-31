@@ -13,5 +13,5 @@ data class ModuleDeclaration(
         override val modifiers: List<ModifierDeclaration>,
         override val uid: String,
         val resourceName: String,
-        val root: Boolean
+        val kind: ModuleDeclarationKind
 ) : TopLevelDeclaration, FunctionOwnerDeclaration, WithUidDeclaration, WithModifiersDeclaration

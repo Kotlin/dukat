@@ -62,6 +62,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
@@ -762,7 +763,6 @@ private class LowerDeclarationsToNodes(
                 jsModule = null,
                 jsQualifier = null,
                 uid = documentRoot.uid,
-                root = documentRoot.root,
                 external = isDeclaration
         )
     }

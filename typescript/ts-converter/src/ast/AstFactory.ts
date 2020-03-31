@@ -1,41 +1,48 @@
 import {
   Block,
   ClassDeclaration,
+  Declaration,
   DefinitionInfoDeclaration,
   EnumTokenDeclaration,
   Expression,
   FunctionDeclaration,
   HeritageClauseDeclaration,
   IdentifierDeclaration,
+  ImportClauseDeclaration,
+  ImportSpecifierDeclaration,
   MemberDeclaration,
   ModifierDeclaration,
   ModuleDeclaration,
   NameEntity,
   ParameterDeclaration,
-  TypeDeclaration,
   ReferenceEntity,
   SourceFileDeclaration,
   SourceSet,
-  Declaration,
+  StatementDeclaration,
+  TypeDeclaration,
   TypeParameter,
   TypeParamReferenceDeclaration,
-  TypeReferenceDeclaration,
-  ImportClauseDeclaration,
-  ImportSpecifierDeclaration,
-  StatementDeclaration
+  TypeReferenceDeclaration
 } from "./ast";
 import {createLogger} from "../Logger";
 import {
-  BlockDeclarationProto, CallSignatureDeclarationProto, ClassDeclarationProto,
+  BlockDeclarationProto,
+  CallSignatureDeclarationProto,
+  ClassDeclarationProto,
   ConstructorDeclarationProto,
   DefinitionInfoDeclarationProto,
   EnumDeclarationProto,
   EnumTokenDeclarationProto,
-  ExportAssignmentDeclarationProto, ExpressionStatementDeclarationProto, ForStatementDeclarationProto,
+  ExportAssignmentDeclarationProto,
+  ExpressionStatementDeclarationProto,
+  ForStatementDeclarationProto,
   FunctionDeclarationProto,
   HeritageClauseDeclarationProto,
-  IdentifierDeclarationProto, IfStatementDeclarationProto, ImportClauseDeclarationProto,
-  ImportEqualsDeclarationProto, ImportSpecifierDeclarationProto,
+  IdentifierDeclarationProto,
+  IfStatementDeclarationProto,
+  ImportClauseDeclarationProto,
+  ImportEqualsDeclarationProto,
+  ImportSpecifierDeclarationProto,
   IndexSignatureDeclarationProto,
   InterfaceDeclarationProto,
   IntersectionTypeDeclarationProto,
@@ -43,17 +50,23 @@ import {
   MethodSignatureDeclarationProto,
   ModifierDeclarationProto,
   ModuleDeclarationProto,
-  NameDeclarationProto, NamedImportsDeclarationProto, NamespaceImportDeclarationProto,
+  NameDeclarationProto,
+  NamedImportsDeclarationProto,
+  NamespaceImportDeclarationProto,
   ObjectLiteralDeclarationProto,
   ParameterDeclarationProto,
   ParameterValueDeclarationProto,
   PropertyDeclarationProto,
-  QualifierDeclarationProto, ReferenceClauseDeclarationProto,
-  ReferenceDeclarationProto, ReturnStatementDeclarationProto,
+  QualifierDeclarationProto,
+  ReferenceClauseDeclarationProto,
+  ReferenceDeclarationProto,
+  ReturnStatementDeclarationProto,
   SourceFileDeclarationProto,
-  SourceSetDeclarationProto, StatementDeclarationProto,
+  SourceSetDeclarationProto,
+  StatementDeclarationProto,
   StringLiteralDeclarationProto,
-  ThisTypeDeclarationProto, ThrowStatementDeclarationProto,
+  ThisTypeDeclarationProto,
+  ThrowStatementDeclarationProto,
   TopLevelDeclarationProto,
   TupleDeclarationProto,
   TypeAliasDeclarationProto,
@@ -61,10 +74,12 @@ import {
   TypeParamReferenceDeclarationProto,
   TypeReferenceDeclarationProto,
   UnionTypeDeclarationProto,
-  VariableDeclarationProto, WhileStatementDeclarationProto
+  VariableDeclarationProto,
+  WhileStatementDeclarationProto
 } from "declarations";
 import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
+import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 
 export class AstFactory {
 
@@ -413,7 +428,7 @@ export class AstFactory {
     return modifierDeclaration;
   }
 
-  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, root: boolean): ModuleDeclaration {
+  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): ModuleDeclaration {
     let moduleDeclaration = new ModuleDeclarationProto();
 
     moduleDeclaration.setImportsList(imports);
@@ -424,7 +439,7 @@ export class AstFactory {
 
     moduleDeclaration.setUid(uid);
     moduleDeclaration.setResourcename(resourceName);
-    moduleDeclaration.setRoot(root);
+    moduleDeclaration.setKind(kind);
     return moduleDeclaration;
   }
 
