@@ -12,6 +12,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.isKotlinStdlibPrefixed
 import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translatorString.translate
 
@@ -47,7 +48,7 @@ private class AddImportsLowering(
     fun getNewImports(): List<ImportModel> {
         return ((sourceFileModel.root.imports + usedPackages.map {
             ImportModel(
-                if (it.isTsStdlibPrefixed()) {
+                if (it.isKotlinStdlibPrefixed()) {
                     it.shiftLeft()
                 } else {
                     it

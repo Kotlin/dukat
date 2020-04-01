@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.idlLowerings
 
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
@@ -12,6 +13,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.toNotNullable
+import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private class ItemArrayLikeLowering : IDLLowering {
@@ -72,17 +74,17 @@ private class ItemArrayLikeLowering : IDLLowering {
                 mixin = false,
                 kind = InterfaceKind.INTERFACE
         )
-        if (newFiles.none { it.packageName == libRootPackageName.toNameEntity() }) {
+        if (newFiles.none { it.packageName == libRootPackageName }) {
             newFiles += IDLFileDeclaration(
-                    fileName = libRootPackageName,
+                    fileName = libRootPackageName.toString(),
                     declarations = listOf(),
                     referencedFiles = listOf(),
-                    packageName = libRootPackageName.toNameEntity()
+                    packageName = libRootPackageName
             )
         }
         return newSourceSet.copy(
                 files = newFiles.map {
-                    if (it.packageName == libRootPackageName.toNameEntity()) {
+                    if (it.packageName == libRootPackageName) {
                         it.copy(declarations = it.declarations + itemArrayLikeDeclaration)
                     } else {
                         it
@@ -92,7 +94,7 @@ private class ItemArrayLikeLowering : IDLLowering {
     }
 
     companion object {
-        private val libRootPackageName = "${TSLIBROOT.value}.org.w3c.dom"
+        private val libRootPackageName = KLIBROOT.appendLeft("org.w3c.dom".toNameEntity())
     }
 }
 

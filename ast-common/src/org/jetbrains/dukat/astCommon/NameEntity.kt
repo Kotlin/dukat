@@ -114,3 +114,7 @@ fun NameEntity.unquote(): NameEntity {
         else -> this
     }
 }
+
+fun NameEntity.startsWith(prefix: NameEntity): Boolean {
+    return generateSequence(this) { it.shiftRight() }.any { prefix == it }
+}
