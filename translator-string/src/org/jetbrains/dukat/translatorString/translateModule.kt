@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
@@ -45,6 +46,19 @@ private fun NameEntity.normalize(): NameEntity? {
     }
 }
 
+private fun NameEntity.replacePrefix(oldPrefix: NameEntity, newPrefix: NameEntity, stringRemainder: NameEntity? = null, onMatch: (() -> Unit)? = null): NameEntity {
+    if (this == oldPrefix) {
+        onMatch?.invoke()
+        return stringRemainder?.appendRight(newPrefix) ?: newPrefix
+    }
+
+    if (this is QualifierEntity) {
+        return left.replacePrefix(oldPrefix, newPrefix, stringRemainder?.appendRight(right) ?: right)
+    }
+
+    return stringRemainder?.appendRight(this) ?: this
+}
+
 
 private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMap: MutableMap<String, Int>): NameEntity {
     val sourceFile = File(fileName)
@@ -64,16 +78,14 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
 
     var addModuleName = true
 
-    var name = packageName.process {
-        if (it == ROOT_PACKAGENAME.value) {
-            ktFileNamePrefix
-        } else if (it == TSLIBROOT.value) {
-            addModuleName = false
-            ktFileNamePrefix
-        } else {
-            unescape(it)
-        }
-    }
+
+    var name =
+            packageName
+                    .replacePrefix(ROOT_PACKAGENAME, ktFileNamePrefix.toNameEntity())
+                    .replacePrefix(TSLIBROOT, ktFileNamePrefix.toNameEntity()) {
+                        addModuleName = false
+                    }
+                    .process { unescape(it) }
 
     if (addModuleName) {
         CommonJsNameResolver().resolveName(sourceFile)?.let { moduleName ->
