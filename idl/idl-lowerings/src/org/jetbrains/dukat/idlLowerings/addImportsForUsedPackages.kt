@@ -3,7 +3,6 @@ package org.jetbrains.dukat.idlLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
-import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -13,7 +12,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translatorString.translate
 
 private class ImportContext(sourceSetModel: SourceSetModel) : ModelWithOwnerTypeLowering {
@@ -48,7 +47,7 @@ private class AddImportsLowering(
     fun getNewImports(): List<ImportModel> {
         return ((sourceFileModel.root.imports + usedPackages.map {
             ImportModel(
-                if (it.leftMost() == TSLIBROOT) {
+                if (it.isTsStdlibPrefixed()) {
                     it.shiftLeft()
                 } else {
                     it

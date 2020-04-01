@@ -16,11 +16,11 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 
-private fun getKey(onwnerName: NameEntity, name: NameEntity): Pair<NameEntity, NameEntity> {
-    val owner = when (onwnerName) {
+private fun getKey(ownerName: NameEntity, name: NameEntity): Pair<NameEntity, NameEntity> {
+    val owner = when (ownerName) {
         IdentifierEntity("<ROOT>") -> IdentifierEntity("<DEFAULT>")
         TSLIBROOT -> IdentifierEntity("<DEFAULT>")
-        else -> onwnerName
+        else -> ownerName
     }
     return Pair(owner, name)
 }

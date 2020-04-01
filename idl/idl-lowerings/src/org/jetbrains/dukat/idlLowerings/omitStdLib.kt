@@ -1,17 +1,11 @@
 package org.jetbrains.dukat.idlLowerings
 
-import org.jetbrains.dukat.astCommon.leftMost
-import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.stdlib.TSLIBROOT
-
-private fun ModuleModel.isLib(): Boolean {
-    return name.leftMost() == TSLIBROOT
-}
+import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 
 fun SourceSetModel.omitStdLib(): SourceSetModel {
     val sourcesResolved = sources.filter { source ->
-        !source.root.isLib()
+        !source.root.name.isTsStdlibPrefixed()
     }
     return copy(sources = sourcesResolved)
 }

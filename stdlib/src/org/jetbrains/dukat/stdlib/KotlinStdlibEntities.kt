@@ -553,6 +553,6 @@ val KotlinBuiltInEntities = setOf(
 
 fun isStdLibEntity(fqName: NameEntity): Boolean {
     val leftMost = fqName.leftMost()
-    val isLib = leftMost == IdentifierEntity("<ROOT>") || leftMost == TSLIBROOT
+    val isLib = leftMost == IdentifierEntity("<ROOT>") || fqName.isTsStdlibPrefixed()
     return isLib && KotlinStdlibEntities.contains(fqName.rightMost())
 }

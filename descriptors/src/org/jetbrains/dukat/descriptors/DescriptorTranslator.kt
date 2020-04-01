@@ -3,7 +3,6 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
-import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.shiftRight
@@ -34,7 +33,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.descriptors.versionSpecific.VersionSpecificDescriptorAPI
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
@@ -472,7 +471,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     )
                     if (overriddenMethod == null) {
                         var override = methodModel.override as NameEntity
-                        if (override.leftMost() == TSLIBROOT) {
+                        if (override.isTsStdlibPrefixed()) {
                             override = override.shiftLeft()!!
                         }
                         val classInStdLib = findClassInStdlib(
@@ -635,7 +634,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     ) as PropertyDescriptor?
                     if (overriddenProperty == null) {
                         var override = propertyModel.override as NameEntity
-                        if (override.leftMost() == TSLIBROOT) {
+                        if (override.isTsStdlibPrefixed()) {
                             override = override.shiftLeft()!!
                         }
                         val classInStdLib = findClassInStdlib(
