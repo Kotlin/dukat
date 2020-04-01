@@ -19,9 +19,10 @@ import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private fun TypeValueModel.isLibReference(): Boolean {
-    return fqName?.leftMost() == IdentifierEntity("<LIBROOT>")
+    return fqName?.leftMost() == TSLIBROOT
 }
 
 private fun HeritageModel.isLibReference(): Boolean {
@@ -30,7 +31,7 @@ private fun HeritageModel.isLibReference(): Boolean {
 
 
 private fun NameEntity.fqLib(): NameEntity {
-    return IdentifierEntity("<LIBROOT>").appendLeft(this)
+    return TSLIBROOT.appendLeft(this)
 }
 
 private fun String.fqLib(): NameEntity {

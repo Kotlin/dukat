@@ -15,12 +15,13 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.stdlib.isStdLibEntity
 
 private fun NameEntity.translate(): String = when (this) {
     is IdentifierEntity -> when (value) {
         "<ROOT>" -> ""
-        "<LIBROOT>" -> ""
+        TSLIBROOT.value -> ""
         else -> value
     }
     is QualifierEntity -> "${left.translate()}.${right.translate()}"

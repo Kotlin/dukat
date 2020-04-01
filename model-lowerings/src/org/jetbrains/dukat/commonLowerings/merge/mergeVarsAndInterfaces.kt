@@ -14,11 +14,12 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private fun getKey(onwnerName: NameEntity, name: NameEntity): Pair<NameEntity, NameEntity> {
     val owner = when (onwnerName) {
         IdentifierEntity("<ROOT>") -> IdentifierEntity("<DEFAULT>")
-        IdentifierEntity("<LIBROOT>") -> IdentifierEntity("<DEFAULT>")
+        TSLIBROOT -> IdentifierEntity("<DEFAULT>")
         else -> onwnerName
     }
     return Pair(owner, name)

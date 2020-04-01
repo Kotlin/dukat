@@ -72,6 +72,7 @@ import org.jetbrains.dukat.idlDeclarations.toNullable
 import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
 import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
@@ -142,7 +143,7 @@ private class IdlFileConverter(
     private fun String.stdFqName(): NameEntity? {
         val name = toStdMap[this] ?: this
         return if (stdLibTypes.contains(name)) {
-            QualifierEntity(IdentifierEntity("<LIBROOT>"), IdentifierEntity(name))
+            QualifierEntity(TSLIBROOT, IdentifierEntity(name))
         } else {
             null
         }

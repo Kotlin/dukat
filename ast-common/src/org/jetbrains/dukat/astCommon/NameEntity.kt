@@ -48,7 +48,7 @@ fun NameEntity.shiftRight(): NameEntity? {
     }
 }
 
-fun NameEntity.leftMost(): NameEntity {
+fun NameEntity.leftMost(): IdentifierEntity {
     return when (this) {
         is IdentifierEntity -> this
         is QualifierEntity -> left.leftMost()

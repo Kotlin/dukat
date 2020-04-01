@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
     implementation(project(":panic"))
+    implementation(project(":stdlib"))
     implementation(project(":translator"))
     implementation(project(":translator-string"))
 

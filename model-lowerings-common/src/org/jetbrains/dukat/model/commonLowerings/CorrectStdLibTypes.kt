@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 
 private fun starParam() = TypeParameterModel(
@@ -35,7 +36,7 @@ private class StdLibTypeCorrectorLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         val node = ownerContext.node
-        val nodeResolved = if (QualifierEntity(IdentifierEntity("<LIBROOT>"), IdentifierEntity("Function")) == node.fqName) {
+        val nodeResolved = if (QualifierEntity(TSLIBROOT, IdentifierEntity("Function")) == node.fqName) {
             node.copy(params = listOf(starParam()))
         } else {
             node

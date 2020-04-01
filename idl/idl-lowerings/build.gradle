@@ -10,5 +10,6 @@ dependencies {
     implementation(project(":logging"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
+    implementation(project(":stdlib"))
     implementation(project(":translator-string"))
 }

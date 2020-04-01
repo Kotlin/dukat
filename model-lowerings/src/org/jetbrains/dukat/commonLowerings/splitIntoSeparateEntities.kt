@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.commonLowerings
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 fun SourceSetModel.splitIntoSeparateEntities(): SourceSetModel {
     return copy(sources = sources.flatMap { source ->
@@ -12,8 +12,8 @@ fun SourceSetModel.splitIntoSeparateEntities(): SourceSetModel {
                     name = declaration.name,
                     fileName = source.fileName,
                     root = ModuleModel(
-                            name = IdentifierEntity("<LIBROOT>"),
-                            shortName = IdentifierEntity("<LIBROOT>"),
+                            name = TSLIBROOT,
+                            shortName = TSLIBROOT,
                             declarations = listOf(declaration),
                             annotations = mutableListOf(),
                             submodules = emptyList(),

@@ -14,13 +14,14 @@ import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private class AnyfyLowering : ModelWithOwnerTypeLowering {
     private fun TypeValueModel.anify(): TypeValueModel {
         return copy(
                 value = IdentifierEntity("Any"),
                 params = listOf(),
-                fqName = IdentifierEntity("<LIBROOT>").appendLeft(IdentifierEntity("Any"))
+                fqName = TSLIBROOT.appendLeft(IdentifierEntity("Any"))
         )
     }
 

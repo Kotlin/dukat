@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
 
 private class ImportContext(sourceSetModel: SourceSetModel) : ModelWithOwnerTypeLowering {
@@ -47,7 +48,7 @@ private class AddImportsLowering(
     fun getNewImports(): List<ImportModel> {
         return ((sourceFileModel.root.imports + usedPackages.map {
             ImportModel(
-                if (it.leftMost() == IdentifierEntity("<LIBROOT>")) {
+                if (it.leftMost() == TSLIBROOT) {
                     it.shiftLeft()
                 } else {
                     it

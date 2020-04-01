@@ -53,7 +53,7 @@ import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.translator.LIB_PACKAGENAME
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
@@ -757,7 +757,7 @@ class StringTranslator : ModelVisitor {
         if (containsSomethingExceptDocRoot) {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
-            if ((moduleModel.name != ROOT_PACKAGENAME) && (moduleModel.name != LIB_PACKAGENAME)) {
+            if ((moduleModel.name != ROOT_PACKAGENAME) && (moduleModel.name != TSLIBROOT)) {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {

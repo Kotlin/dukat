@@ -80,6 +80,7 @@ import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
@@ -157,7 +158,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun ReferenceEntity.getFqName(ownerName: NameEntity): NameEntity? {
         return if (uid.startsWith("lib-")) {
-            IdentifierEntity("<LIBROOT>").appendLeft(ownerName)
+            TSLIBROOT.appendLeft(ownerName)
         } else {
             uidToNameMapper[uid]?.fqName
         }
@@ -165,7 +166,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun TypeValueNode.getFqName(): NameEntity? {
         return typeReference?.getFqName(value) ?: if (KotlinStdlibEntities.contains(value)) {
-            IdentifierEntity("<LIBROOT>").appendLeft(value)
+            TSLIBROOT.appendLeft(value)
         } else null
     }
 
@@ -185,7 +186,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return Members(ownMembers, staticMembers)
     }
 
-    private fun NameEntity.addLibPrefix() = IdentifierEntity("<LIBROOT>").appendLeft(this)
+    private fun NameEntity.addLibPrefix() = TSLIBROOT.appendLeft(this)
     private fun UnionTypeNode.canBeTranslatedAsString(): Boolean {
         return params.all { (it is TypeValueNode) && (it.value == IdentifierEntity("String")) }
     }

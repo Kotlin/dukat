@@ -12,6 +12,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.toNotNullable
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private class ItemArrayLikeLowering : IDLLowering {
 
@@ -91,7 +92,7 @@ private class ItemArrayLikeLowering : IDLLowering {
     }
 
     companion object {
-        private const val libRootPackageName = "<LIBROOT>.org.w3c.dom"
+        private val libRootPackageName = "${TSLIBROOT.value}.org.w3c.dom"
     }
 }
 

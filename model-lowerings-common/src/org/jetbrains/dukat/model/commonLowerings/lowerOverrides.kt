@@ -20,6 +20,7 @@ import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.astModel.LambdaParameterModel
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
@@ -239,7 +240,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
 
     private fun NameEntity.withLibPrefix(): NameEntity {
         return when (this) {
-            is IdentifierEntity -> QualifierEntity(IdentifierEntity("<LIBROOT>"), this)
+            is IdentifierEntity -> QualifierEntity(TSLIBROOT, this)
             is QualifierEntity -> this
         }
     }

@@ -13,8 +13,8 @@ import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translator.LIB_PACKAGENAME
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
@@ -31,7 +31,7 @@ fun NameEntity.translate(): String = when (this) {
     is QualifierEntity -> {
         when (leftMost()) {
             ROOT_PACKAGENAME -> shiftLeft()!!.translate()
-            LIB_PACKAGENAME -> shiftLeft()!!.translate()
+            TSLIBROOT -> shiftLeft()!!.translate()
             else -> "${left.translate()}.${right.translate()}"
         }
     }
@@ -67,7 +67,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     var name = packageName.process {
         if (it == ROOT_PACKAGENAME.value) {
             ktFileNamePrefix
-        } else if (it == LIB_PACKAGENAME.value) {
+        } else if (it == TSLIBROOT.value) {
             addModuleName = false
             ktFileNamePrefix
         } else {
