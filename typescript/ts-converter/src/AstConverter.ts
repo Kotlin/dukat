@@ -837,11 +837,12 @@ export class AstConverter {
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
       this.convertModifiers(statement.modifiers),
+      this.convertDefinitions(statement),
       this.exportContext.getUID(statement)
     );
   }
 
-  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration): Array<DefinitionInfoDeclaration> {
+  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration | ts.ClassDeclaration): Array<DefinitionInfoDeclaration> {
     return this.declarationResolver.resolve(interfaceDeclaration).map((definitionInfo) => {
       return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
     });

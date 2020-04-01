@@ -151,6 +151,7 @@ private fun ClassConstraint.toDeclaration(name: String, modifiers: List<Modifier
             typeParameters = emptyList(),
             parentEntities = emptyList(),
             modifiers = modifiers,
+            definitionsInfo = emptyList(),
             uid = generateUID()
     )
 }

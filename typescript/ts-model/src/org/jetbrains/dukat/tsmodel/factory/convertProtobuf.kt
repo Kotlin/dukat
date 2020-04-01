@@ -195,6 +195,7 @@ fun ClassDeclarationProto.convert(): ClassDeclaration {
             typeParametersList.map { it.convert() },
             parentEntitiesList.map { it.convert() },
             modifiersList.map { it.convert() },
+            definitionsInfoList.map { it.convert() },
             uid
     )
 }

@@ -30,7 +30,7 @@ export class AstExpressionConverter {
     }
 
     createClassExpression(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>) {
-        return AstExpressionFactory.convertClassDeclarationToExpression(this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, "__NO_UID__"));
+        return AstExpressionFactory.convertClassDeclarationToExpression(this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, [], "__NO_UID__"));
     }
 
     createTypeOfExpression(expression: Expression) {

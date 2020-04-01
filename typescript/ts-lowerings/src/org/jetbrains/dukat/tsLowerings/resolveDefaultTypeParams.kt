@@ -98,7 +98,8 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                 extending = false,
                                                 typeReference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
-                                        modifiers = resolvedClassLike.modifiers
+                                        modifiers = resolvedClassLike.modifiers,
+                                        definitionsInfo = resolvedClassLike.definitionsInfo
                                 )
 
                                 else -> resolvedClassLike

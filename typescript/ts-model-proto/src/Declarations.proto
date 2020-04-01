@@ -390,7 +390,8 @@ message ClassDeclarationProto {
     repeated TypeParameterDeclarationProto typeParameters = 3;
     repeated HeritageClauseDeclarationProto parentEntities = 4;
     repeated ModifierDeclarationProto modifiers = 5;
-    string uid = 6;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 6;
+    string uid = 7;
 }
 
 message InterfaceDeclarationProto {

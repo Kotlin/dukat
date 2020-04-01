@@ -131,7 +131,7 @@ export class AstFactory {
     return memberProto;
   }
 
-  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): ClassDeclaration {
+  createClassDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, definitions: Array<DefinitionInfoDeclaration>, uid: string): ClassDeclaration {
     let classDeclaration = new ClassDeclarationProto();
     classDeclaration.setName(name);
     classDeclaration.setModifiersList(modifiers);
@@ -139,11 +139,12 @@ export class AstFactory {
     classDeclaration.setMembersList(members);
     classDeclaration.setTypeparametersList(typeParams);
     classDeclaration.setParententitiesList(parentEntities);
+    classDeclaration.setDefinitionsinfoList(definitions);
     return classDeclaration
   }
 
-  createClassDeclarationAsTopLevel(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, uid: string): Declaration {
-    let classDeclaration = this.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, uid);
+  createClassDeclarationAsTopLevel(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, definitions: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
+    let classDeclaration = this.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, definitions, uid);
 
     let topLevelDeclaration = new TopLevelDeclarationProto();
     topLevelDeclaration.setClassdeclaration(classDeclaration);
