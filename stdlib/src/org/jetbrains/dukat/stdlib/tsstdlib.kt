@@ -7,5 +7,5 @@ import org.jetbrains.dukat.astCommon.leftMost
 val TSLIBROOT = IdentifierEntity("<LIBROOT>")
 
 fun NameEntity.isTsStdlibPrefixed(): Boolean {
-    return TSLIBROOT.leftMost() == TSLIBROOT
+    return leftMost() == TSLIBROOT
 }
