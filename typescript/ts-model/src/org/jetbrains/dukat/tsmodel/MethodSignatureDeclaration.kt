@@ -5,9 +5,9 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class MethodSignatureDeclaration(
         val name: String,
-        val parameters: List<ParameterDeclaration>,
-        val type: ParameterValueDeclaration,
-        val typeParameters: List<TypeParameterDeclaration>,
+        override val parameters: List<ParameterDeclaration>,
+        override val type: ParameterValueDeclaration,
+        override val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
         val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration, ParameterOwnerDeclaration
+) : MemberDeclaration, ParameterOwnerDeclaration, FunctionLikeDeclaration
