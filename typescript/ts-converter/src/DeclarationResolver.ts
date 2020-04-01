@@ -6,14 +6,14 @@ export class DeclarationResolver {
   constructor(private program: ts.Program) {
   }
 
-  resolve(node: ts.Node): ReadonlyArray<ts.Node> | undefined {
+  resolve(node: ts.InterfaceDeclaration): ReadonlyArray<ts.Node> {
     let typeChecker = this.program.getTypeChecker();
-    let symbol = typeChecker.getSymbolAtLocation(node);
+    let symbol = typeChecker.getSymbolAtLocation(node.name);
 
-    if (symbol) {
+    if (symbol && Array.isArray(symbol.declarations)) {
       return symbol.declarations.filter(it => (ts.isFunctionDeclaration(it) || ts.isInterfaceDeclaration(it) || ts.isVariableDeclaration(it)));
     }
 
-    return undefined;
+    return [];
   }
 }

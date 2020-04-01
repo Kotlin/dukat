@@ -841,17 +841,10 @@ export class AstConverter {
     );
   }
 
-  private convertDefinitions(kind: ts.SyntaxKind, name: ts.Node): Array<DefinitionInfoDeclaration> {
-    let definitionInfos = this.declarationResolver.resolve(name);
-
-    let definitionsInfoDeclarations: Array<DefinitionInfoDeclaration> = [];
-    if (definitionInfos) {
-      definitionsInfoDeclarations = definitionInfos.map((definitionInfo) => {
-        return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
-      });
-    }
-
-    return definitionsInfoDeclarations;
+  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration): Array<DefinitionInfoDeclaration> {
+    return this.declarationResolver.resolve(interfaceDeclaration).map((definitionInfo) => {
+      return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
+    });
   }
 
   convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, computeDefinitions: boolean = true): Declaration {
@@ -860,7 +853,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
-      computeDefinitions ? this.convertDefinitions(ts.SyntaxKind.InterfaceDeclaration, statement.name) : [],
+      computeDefinitions ? this.convertDefinitions(statement) : [],
       this.exportContext.getUID(statement)
     );
   }
@@ -870,11 +863,11 @@ export class AstConverter {
 
     for (let declaration of list.declarations) {
       res.push(this.astFactory.declareVariable(
-          declaration.name.getText(),
-          this.convertType(declaration.type),
-          this.convertModifiers(modifiers),
-          declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
-          this.exportContext.getUID(declaration)
+        declaration.name.getText(),
+        this.convertType(declaration.type),
+        this.convertModifiers(modifiers),
+        declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
+        this.exportContext.getUID(declaration)
       ));
     }
 
@@ -896,10 +889,10 @@ export class AstConverter {
     if (ts.isForStatement(statement)) {
 
       decl = this.astFactory.createForStatement(
-          this.convertVariableDeclarationList(statement.initializer, null),
-          statement.condition ? this.astExpressionConverter.convertExpression(statement.condition) : null,
-          statement.incrementor ? this.astExpressionConverter.convertExpression(statement.incrementor) : null,
-          body
+        this.convertVariableDeclarationList(statement.initializer, null),
+        statement.condition ? this.astExpressionConverter.convertExpression(statement.condition) : null,
+        statement.incrementor ? this.astExpressionConverter.convertExpression(statement.incrementor) : null,
+        body
       )
     }
 
@@ -908,18 +901,18 @@ export class AstConverter {
     return decl
   }
 
-  convertStatement(statement : ts.Node): Array<StatementDeclaration> {
+  convertStatement(statement: ts.Node): Array<StatementDeclaration> {
     let res: Array<StatementDeclaration> = [];
 
     if (ts.isExpressionStatement(statement)) {
       res.push(this.astFactory.createExpressionStatement(
-          this.astExpressionConverter.convertExpression(statement.expression)
+        this.astExpressionConverter.convertExpression(statement.expression)
       ));
     } else if (ts.isIfStatement(statement)) {
       res.push(this.astFactory.createIfStatement(
-          this.astExpressionConverter.convertExpression(statement.expression),
-          this.convertStatement(statement.thenStatement),
-          statement.elseStatement ? this.convertStatement(statement.elseStatement) : null
+        this.astExpressionConverter.convertExpression(statement.expression),
+        this.convertStatement(statement.thenStatement),
+        statement.elseStatement ? this.convertStatement(statement.elseStatement) : null
       ));
     } else if (ts.isIterationStatement(statement)) {
       let iterationStatement = this.convertIterationStatement(statement);
@@ -929,11 +922,11 @@ export class AstConverter {
       }
     } else if (ts.isReturnStatement(statement)) {
       res.push(this.astFactory.createReturnStatement(
-          statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+        statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
       ));
     } else if (ts.isThrowStatement(statement)) {
       res.push(this.astFactory.createThrowStatement(
-          statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+        statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
       ))
     } else if (ts.isVariableStatement(statement)) {
       res = res.concat(this.convertVariableDeclarationList(statement.declarationList, statement.modifiers))
@@ -967,17 +960,17 @@ export class AstConverter {
         this.exportContext.getUID(statement)
       ));
     } else if (
-        ts.isExpressionStatement(statement) ||
-        ts.isIfStatement(statement) ||
-        ts.isIterationStatement(statement) ||
-        ts.isReturnStatement(statement) ||
-        ts.isThrowStatement(statement) ||
-        ts.isBlock(statement) ||
-        ts.isVariableStatement(statement) ||
-        ts.isFunctionDeclaration(statement)
+      ts.isExpressionStatement(statement) ||
+      ts.isIfStatement(statement) ||
+      ts.isIterationStatement(statement) ||
+      ts.isReturnStatement(statement) ||
+      ts.isThrowStatement(statement) ||
+      ts.isBlock(statement) ||
+      ts.isVariableStatement(statement) ||
+      ts.isFunctionDeclaration(statement)
     ) {
       res.push(this.astFactory.createStatementAsTopLevel(
-          this.convertStatement(statement)[0]
+        this.convertStatement(statement)[0]
       ));
     } else if (ts.isTypeAliasDeclaration(statement)) {
       if (ts.isTypeLiteralNode(statement.type)) {
@@ -1089,7 +1082,7 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE )];
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE)];
     }
 
     return [];
