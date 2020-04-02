@@ -57,7 +57,6 @@ open class TypescriptWithBodyLowerer(
 ) : ECMAScriptLowerer {
     override fun lower(
             sourceSet: SourceSetDeclaration,
-            stdLibSourceSet: SourceSetModel?,
             renameMap: Map<String, NameEntity>,
             uidToFqNameMapper: MutableMap<String, FqNode>
     ): SourceSetModel {
@@ -123,7 +122,7 @@ open class TypescriptWithBodyLowerer(
         val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
         return SourceBundleModel(sources = sourceBundle.sources.map {
-            lower(it, null, renameMap, uidToFqNameMapper.toMutableMap())
+            lower(it, renameMap, uidToFqNameMapper.toMutableMap())
         })
     }
 }

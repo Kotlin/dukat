@@ -10,12 +10,11 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 
 class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver, null) {
-    override fun lower(sourceSet: SourceSetDeclaration, stdLibSourceSet: SourceSetModel?, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
+    override fun lower(sourceSet: SourceSetDeclaration, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         return super.lower(
                 sourceSet
                         .introduceTypes()
                         .mergeDuplicates(),
-                stdLibSourceSet,
                 renameMap,
                 uidToFqNameMapper
         )
