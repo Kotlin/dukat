@@ -38,7 +38,6 @@ import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
-import org.jetbrains.dukat.tsLowerings.SyncTypeNames
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -57,7 +56,6 @@ open class TypescriptWithBodyLowerer(
 ) : ECMAScriptLowerer {
     override fun lower(
             sourceSet: SourceSetDeclaration,
-            renameMap: Map<String, NameEntity>,
             uidToFqNameMapper: MutableMap<String, FqNode>
     ): SourceSetModel {
 
@@ -65,7 +63,6 @@ open class TypescriptWithBodyLowerer(
                 .lower(
                         AddPackageName(packageName),
                         MergeParentsForMergedInterfaces(),
-                        SyncTypeNames(renameMap),
                         RenameImpossibleDeclarations(),
                         ResolveTypescriptUtilityTypes(),
                         ResolveDefaultTypeParams(),
@@ -118,11 +115,10 @@ open class TypescriptWithBodyLowerer(
     }
 
     override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        val renameMap: MutableMap<String, NameEntity> = mutableMapOf()
         val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
         return SourceBundleModel(sources = sourceBundle.sources.map {
-            lower(it, renameMap, uidToFqNameMapper.toMutableMap())
+            lower(it, uidToFqNameMapper.toMutableMap())
         })
     }
 }

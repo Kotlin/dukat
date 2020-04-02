@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.js.translator
 
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.js.type.analysis.introduceTypes
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
@@ -10,12 +9,11 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 
 class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver, null) {
-    override fun lower(sourceSet: SourceSetDeclaration, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
+    override fun lower(sourceSet: SourceSetDeclaration, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
         return super.lower(
                 sourceSet
                         .introduceTypes()
                         .mergeDuplicates(),
-                renameMap,
                 uidToFqNameMapper
         )
     }

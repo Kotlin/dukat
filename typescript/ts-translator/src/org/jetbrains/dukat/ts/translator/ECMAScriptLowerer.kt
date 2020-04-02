@@ -8,6 +8,6 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 
 interface ECMAScriptLowerer {
-    fun lower(sourceSet: SourceSetDeclaration, renameMap: Map<String, NameEntity>, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel
+    fun lower(sourceSet: SourceSetDeclaration, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel
     fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel
 }
