@@ -6,15 +6,13 @@ import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import org.jetbrains.dukat.tsLowerings.mergeDuplicates.mergeDuplicates
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 
 class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver, null) {
-    override fun lower(sourceSet: SourceSetDeclaration, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
+    override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return super.lower(
                 sourceSet
                         .introduceTypes()
-                        .mergeDuplicates(),
-                uidToFqNameMapper
+                        .mergeDuplicates()
         )
     }
 }

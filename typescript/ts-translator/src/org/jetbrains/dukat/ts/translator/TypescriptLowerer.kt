@@ -59,7 +59,7 @@ open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
         private val packageName: NameEntity?
 ) : ECMAScriptLowerer {
-    override fun lower(sourceSet: SourceSetDeclaration, uidToFqNameMapper: MutableMap<String, FqNode>): SourceSetModel {
+    override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
                 .lower(
                         AddPackageName(packageName),
@@ -92,7 +92,7 @@ open class TypescriptLowerer(
                 )
 
         val models = nodes
-                .introduceModels(uidToFqNameMapper)
+                .introduceModels()
                 .lower(
                         RemoveConflictingOverloads(),
                         SubstituteTsStdLibEntities(),
@@ -120,10 +120,9 @@ open class TypescriptLowerer(
     }
 
     override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-        val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
 
         return SourceBundleModel(sources = sourceBundle.sources.map {
-            lower(it, uidToFqNameMapper.toMutableMap())
+            lower(it)
         })
     }
 }

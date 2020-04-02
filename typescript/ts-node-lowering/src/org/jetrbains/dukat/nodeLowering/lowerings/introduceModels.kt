@@ -823,7 +823,9 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : No
     }
 }
 
-fun SourceSetNode.introduceModels(uidToFqNameMapper: UidMutableMapper): SourceSetModel {
+fun SourceSetNode.introduceModels(): SourceSetModel {
+    val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
+
     ReferenceVisitor { uid, fqModel ->
         uidToFqNameMapper[uid] = fqModel
     }.process(this)
