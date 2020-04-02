@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
+import MergeableDeclaration
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class InterfaceDeclaration(
@@ -7,6 +8,6 @@ data class InterfaceDeclaration(
         override val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         override val parentEntities: List<HeritageClauseDeclaration>,
-        val definitionsInfo: List<DefinitionInfoDeclaration>,
+        override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String
-) : ClassLikeDeclaration, WithUidDeclaration
+) : ClassLikeDeclaration, WithUidDeclaration, MergeableDeclaration
