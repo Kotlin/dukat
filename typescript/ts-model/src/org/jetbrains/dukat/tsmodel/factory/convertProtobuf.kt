@@ -248,6 +248,7 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
             if (hasInitializer()) {
                 initializer?.convert()
             } else null,
+            definitionsInfoList.map { it.convert() },
             uid
     )
 }

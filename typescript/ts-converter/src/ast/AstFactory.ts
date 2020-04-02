@@ -617,7 +617,7 @@ export class AstFactory {
     return memberProto;
   }
 
-  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, uid: string): StatementDeclaration {
+  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, definitions: Array<DefinitionInfoDeclaration>, uid: string): StatementDeclaration {
     let variableDeclaration = new VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
@@ -626,6 +626,7 @@ export class AstFactory {
       variableDeclaration.setInitializer(initializer);
     }
     variableDeclaration.setUid(uid);
+    variableDeclaration.setDefinitionsinfoList(definitions);
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setVariabledeclaration(variableDeclaration);

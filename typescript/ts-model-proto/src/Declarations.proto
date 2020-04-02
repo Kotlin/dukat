@@ -356,7 +356,8 @@ message VariableDeclarationProto {
     ParameterValueDeclarationProto type = 2;
     repeated ModifierDeclarationProto modifiers = 3;
     ExpressionDeclarationProto initializer = 4;
-    string uid = 5;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
+    string uid = 6;
 }
 
 message TypeAliasDeclarationProto {

@@ -49,6 +49,7 @@ private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration
         type = type,
         modifiers = modifiers,
         initializer = null,
+        definitionsInfo = emptyList(),
         uid = generateUID()
 )
 

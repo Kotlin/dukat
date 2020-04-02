@@ -842,7 +842,7 @@ export class AstConverter {
     );
   }
 
-  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration | ts.ClassDeclaration): Array<DefinitionInfoDeclaration> {
+  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration | ts.ClassDeclaration | ts.VariableDeclaration): Array<DefinitionInfoDeclaration> {
     return this.declarationResolver.resolve(interfaceDeclaration).map((definitionInfo) => {
       return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
     });
@@ -868,6 +868,7 @@ export class AstConverter {
         this.convertType(declaration.type),
         this.convertModifiers(modifiers),
         declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
+        this.convertDefinitions(declaration),
         this.exportContext.getUID(declaration)
       ));
     }

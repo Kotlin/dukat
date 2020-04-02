@@ -8,5 +8,6 @@ data class VariableDeclaration(
         override val modifiers: List<ModifierDeclaration>,
         val initializer: ExpressionDeclaration?,
 
+        val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String
 ) : StatementDeclaration, WithUidDeclaration, ParameterOwnerDeclaration, WithModifiersDeclaration
