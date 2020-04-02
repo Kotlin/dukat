@@ -206,7 +206,7 @@ private fun List<TopLevelDeclaration>.mergeTopLevelDeclarations() : List<TopLeve
     return declarations
 }
 
-fun ModuleDeclaration.mergeDuplicates() = copy(
+private fun ModuleDeclaration.mergeDuplicates() = copy(
         declarations = declarations.mergeTopLevelDeclarations()
 )
 

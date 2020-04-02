@@ -6,11 +6,15 @@ import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
 
 private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, TopLevelDeclaration>) {
     this.declarations.forEach {
         when (it) {
+            is VariableDeclaration -> {
+                topLevelDeclarationsMap[it.uid] = it
+            }
             is ClassLikeDeclaration -> {
                 topLevelDeclarationsMap[it.uid] = it
             }
@@ -30,5 +34,9 @@ class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDec
 
     fun resolve(reference: ReferenceDeclaration?): TopLevelDeclaration? {
         return reference?.uid?.let { declarationMap.get(it) }
+    }
+
+    fun resolve(uid: String): TopLevelDeclaration? {
+        return declarationMap.get(uid)
     }
 }
