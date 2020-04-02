@@ -5,7 +5,7 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 var fs = require('fs');
 
-var createBundle = require("../lib/converter").createBundle;
+var createSourceSet = require("../lib/converter").createSourceSet;
 var Readable = require('stream').Readable;
 var EventEmitter = require('events');
 
@@ -95,7 +95,7 @@ function endsWith(str, postfix) {
 
 
 function createBinaryStream(stdlib, files, onData, onEnd) {
-    var bundle = createBundle(stdlib, files);
+    var bundle = createSourceSet(stdlib, files);
 
     var readable = createReadable();
 

@@ -105,6 +105,6 @@ class SourceBundleBuilder {
   }
 }
 
-export function createBundle(stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
+export function createSourceSet(stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
   return new SourceBundleBuilder(stdlib, files).createBundle();
 }
