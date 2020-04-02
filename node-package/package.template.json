@@ -10,6 +10,7 @@
     "bin/dukat-cli.js",
     "lib/converter.js",
     "d.ts.libs/*",
+    "kotlin-stdlib-js/*.meta.js",
     "README.md"
   ],
   "scripts": {

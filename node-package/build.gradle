@@ -21,6 +21,14 @@ node {
 
 configurations {
     cliBinary
+    kotlinJsLibs
+}
+
+dependencies {
+    cliBinary(project(":command-line")) {
+        transitive = false
+    }
+    kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 }
 
 task prepareNpmPackage {
@@ -73,7 +81,6 @@ task buildDistrib {
             from configurations.cliBinary
             into "${DISTRIB_PATH}/build/runtime"
         }
-
     }
 }
 
@@ -123,8 +130,9 @@ task npmPublish(type: NpmTask) {
     args = ["publish",  distribPath,  "--registry", "http://${registry}"]
 }
 
-dependencies {
-    cliBinary(project(":command-line")) {
-        transitive = false
+task downloadKotlinMetaData(type: Copy) {
+    configurations.kotlinJsLibs.each {
+        from zipTree(it.absolutePath).matching { include("**/*.meta.js") }
     }
+    into "$DISTRIB_PATH/kotlin-stdlib-js"
 }
