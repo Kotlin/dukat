@@ -218,8 +218,9 @@ private class IdlFileConverter(
     }
 
     private fun IDLArgumentDeclaration.convertToLambdaParameterModel(): LambdaParameterModel {
+        //TODO: Check whether it makes sense to have nullable names in idl
         return LambdaParameterModel(
-                name = name,
+                name = if (name.isEmpty()) { null } else { name },
                 type = type.convertToModel()
         )
     }
