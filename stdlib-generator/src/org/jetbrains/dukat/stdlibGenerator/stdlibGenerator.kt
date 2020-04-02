@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
@@ -22,6 +23,7 @@ import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoots
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -205,9 +207,6 @@ private fun TypeParameterDescriptor.convertToTypeParameterModel(): TypeParameter
 }
 
 private fun ClassDescriptor.convertToClassModel(): ClassModel {
-    if (declaredTypeParameters.isNotEmpty()) {
-        println("DECL Typ ${name.toString()} PARAMETERS ${declaredTypeParameters}")
-    }
     return ClassModel(
             name = IdentifierEntity(this.name.toString()),
             members = unsubstitutedMemberScope.getDescriptorsFiltered().mapNotNull { it.convertToMemberModel() },
@@ -269,4 +268,31 @@ fun processPackageFragments(packageFragmentProvider: PackageFragmentProvider, fq
     return packageFragmentProvider.getPackageFragments(FqName(fqName)).map {
         it.convertToModuleModel()
     }
+}
+
+private val KOTLIN_STD_PACKAGE_NAMES = listOf(
+        "kotlin.js",
+        "kotlin.js.Json",
+        "org.khronos.webgl",
+        "org.w3c.dom",
+        "org.w3c.dom.events",
+        "org.w3c.dom.parsing",
+        "org.w3c.dom.svg",
+        "org.w3c.dom.url",
+        "org.w3c.fetch",
+        "org.w3c.files",
+        "org.w3c.notifications",
+        "org.w3c.performance",
+        "org.w3c.workers",
+        "org.w3c.xhr"
+)
+
+fun createSourceSetFromMetaDescriptors(source: String, packageNames: List<String>): SourceSetModel {
+    val packageFragmentProvider = getPackageFragmentProvider(source)
+    val sources = packageNames.flatMap { packageName -> processPackageFragments(packageFragmentProvider, packageName) }
+    return SourceSetModel(sources = sources, sourceName = listOf(source))
+}
+
+fun createKotlinStdLibFromMetaDescriptors(source: String): SourceSetModel {
+    return createSourceSetFromMetaDescriptors(source, KOTLIN_STD_PACKAGE_NAMES)
 }
