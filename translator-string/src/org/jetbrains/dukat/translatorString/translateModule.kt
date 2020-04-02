@@ -9,7 +9,6 @@ import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.toNameEntity
-import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
@@ -136,12 +135,6 @@ fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
             null
         }
     }.flatten()
-}
-
-fun translateModule(sourceBundle: SourceBundleModel): List<TranslationUnitResult> {
-    return sourceBundle.sources.flatMap { sourceSet ->
-        translateModule(sourceSet)
-    }
 }
 
 fun translateModule(data: ByteArray, translator: InputTranslator<ByteArray>): List<TranslationUnitResult> {

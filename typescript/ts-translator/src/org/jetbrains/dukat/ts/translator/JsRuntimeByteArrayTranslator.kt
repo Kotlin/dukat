@@ -1,28 +1,23 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.logger.Logging
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
-import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 
 class JsRuntimeByteArrayTranslator(
         private val lowerer: ECMAScriptLowerer
 ) : InputTranslator<ByteArray> {
-    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+    fun lower(sourceBundle: SourceSetDeclaration): SourceSetModel {
         return lowerer.lower(sourceBundle)
     }
 
-    fun parse(data: ByteArray): SourceBundleDeclaration {
-        return SourceBundleDeclarationProto.parseFrom(data).convert()
+    fun parse(data: ByteArray): SourceSetDeclaration {
+        return SourceSetDeclarationProto.parseFrom(data).convert()
     }
 
-    override fun translate(data: ByteArray): SourceBundleModel {
+    override fun translate(data: ByteArray): SourceSetModel {
         return lower(parse(data))
     }
 }

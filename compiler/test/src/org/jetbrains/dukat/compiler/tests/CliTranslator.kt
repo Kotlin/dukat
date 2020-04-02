@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.compiler.tests
 
 import kotlinx.serialization.UnstableDefault
-import org.jetbrains.dukat.astModel.SourceBundleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.cli.translateBinaryBundle
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
@@ -21,9 +21,9 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
 
     protected fun translateBinary(input: String) = CliHttpClient(HTTP_CLIENT_PORT).translate(input)
 
-    override open fun translate(
+    override fun translate(
             input: String
-    ): SourceBundleModel {
+    ): SourceSetModel {
         val binData = translateBinary(input)
         val translator = JsRuntimeByteArrayTranslator(translator)
         return translator.translate(binData)

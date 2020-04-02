@@ -30,7 +30,6 @@ import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceKindDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
-import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -120,7 +119,6 @@ import org.jetbrains.dukat.tsmodelproto.ReferenceClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReferenceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.RegExLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
-import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StatementDeclarationProto
@@ -633,8 +631,4 @@ fun SourceFileDeclarationProto.convert(): SourceFileDeclaration {
 
 fun SourceSetDeclarationProto.convert(): SourceSetDeclaration {
     return SourceSetDeclaration(sourceNameList, sourcesList.map { it.convert() })
-}
-
-fun SourceBundleDeclarationProto.convert(): SourceBundleDeclaration {
-    return SourceBundleDeclaration(sourcesList.map { it.convert() })
 }

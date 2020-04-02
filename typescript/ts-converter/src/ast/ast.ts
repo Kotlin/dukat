@@ -23,7 +23,6 @@ import {
     ParameterValueDeclarationProto,
     PropertyDeclarationProto,
     ReferenceDeclarationProto,
-    SourceBundleDeclarationProto,
     SourceFileDeclarationProto,
     SourceSetDeclarationProto,
     StatementDeclarationProto,
@@ -61,7 +60,6 @@ export type ParameterDeclaration = ParameterDeclarationProto;
 export type TypeDeclaration = ParameterValueDeclarationProto;
 export type PropertyDeclaration = PropertyDeclarationProto;
 export type ReferenceEntity = ReferenceDeclarationProto;
-export type SourceBundle = SourceBundleDeclarationProto;
 export type SourceFileDeclaration = SourceFileDeclarationProto;
 export type SourceSet = SourceSetDeclarationProto;
 export type StatementDeclaration = StatementDeclarationProto;

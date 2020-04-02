@@ -1,12 +1,11 @@
 package org.jetbrains.dukat.ts.translator
 
-import org.jetbrains.dukat.astModel.SourceBundleModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.logger.Logging
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.factory.convert
-import org.jetbrains.dukat.tsmodelproto.SourceBundleDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
@@ -29,12 +28,11 @@ class JsRuntimeFileTranslator(
         return proc.inputStream.buffered()
     }
 
-    private fun translateFile(fileName: String): SourceBundleDeclaration {
-        val proto = SourceBundleDeclarationProto.parseFrom(translateAsInputStream(fileName))
-        return proto.convert()
+    private fun translateFile(fileName: String): SourceSetDeclaration {
+        return SourceSetDeclarationProto.parseFrom(translateAsInputStream(fileName)).convert()
     }
 
-    override fun translate(data: String): SourceBundleModel {
+    override fun translate(data: String): SourceSetModel {
         return lowerer.lower(translateFile(data))
     }
 }

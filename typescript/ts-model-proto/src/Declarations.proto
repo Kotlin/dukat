@@ -457,7 +457,3 @@ message SourceSetDeclarationProto {
     repeated string sourceName = 1;
     repeated SourceFileDeclarationProto sources = 2;
 }
-
-message SourceBundleDeclarationProto {
-    repeated SourceSetDeclarationProto sources = 1;
-}

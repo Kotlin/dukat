@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.translator
 
-import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
@@ -63,8 +62,8 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : Inpu
                 .omitStdLib()
     }
 
-    override fun translate(data: String): SourceBundleModel {
-        return SourceBundleModel(listOf(translateSet(data)))
+    override fun translate(data: String): SourceSetModel {
+        return translateSet(data)
     }
 
 }

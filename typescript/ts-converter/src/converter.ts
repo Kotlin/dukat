@@ -89,10 +89,7 @@ class SourceBundleBuilder {
     return program;
   }
 
-  createBundle(): declarations.SourceBundleDeclarationProto {
-
-    let sourceSetBundle = new declarations.SourceBundleDeclarationProto();
-
+  createBundle(): declarations.SourceSetDeclarationProto {
     let sourceSet = new declarations.SourceSetDeclarationProto();
 
     let sourceFiles = new Array<SourceFileDeclaration>();
@@ -104,11 +101,10 @@ class SourceBundleBuilder {
     });
 
     sourceSet.setSourcesList(sourceFiles);
-    sourceSetBundle.setSourcesList([sourceSet]);
-    return sourceSetBundle;
+    return sourceSet;
   }
 }
 
-export function createBundle(stdlib: string, files: Array<string>) {
+export function createBundle(stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
   return new SourceBundleBuilder(stdlib, files).createBundle();
 }

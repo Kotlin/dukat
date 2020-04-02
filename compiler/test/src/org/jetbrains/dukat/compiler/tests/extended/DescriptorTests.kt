@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
-import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.cli.compileUnits
@@ -35,9 +34,8 @@ class DescriptorTests {
 
     @Suppress("UNUSED_PARAMETER")
     private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
-        val sourceBundle = translator.translate(tsPath)
+        val sourceSet = translator.translate(tsPath)
 
-        val sourceSet = sourceBundle.sources.first()
         val targetPath = "./build/test/data/descriptors/$name"
         File(targetPath).deleteRecursively()
         compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
@@ -53,7 +51,7 @@ class DescriptorTests {
             }
         })
 
-        val outputModuleDescriptor = SourceBundleModel(listOf(flattenedSourceSet)).translateToDescriptors()
+        val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
         val expectedModuleDescriptor =
                 generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
 
