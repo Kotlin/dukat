@@ -52,8 +52,15 @@ task prepareNpmPackage {
 
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
+task downloadKotlinMetaData(type: Copy) {
+    configurations.kotlinJsLibs.each {
+        from zipTree(it.absolutePath).matching { include("**/*.meta.js") }
+    }
+    into "$DISTRIB_PATH/kotlin-stdlib-js"
+}
+
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
+    dependsOn = [downloadKotlinMetaData, ":ts-converter:webpack", yarn, ":command-line:build"]
 
     doLast {
         copy {
@@ -128,11 +135,4 @@ task npmPublish(type: NpmTask) {
 
     def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
     args = ["publish",  distribPath,  "--registry", "http://${registry}"]
-}
-
-task downloadKotlinMetaData(type: Copy) {
-    configurations.kotlinJsLibs.each {
-        from zipTree(it.absolutePath).matching { include("**/*.meta.js") }
-    }
-    into "$DISTRIB_PATH/kotlin-stdlib-js"
 }
