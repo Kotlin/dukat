@@ -10,4 +10,4 @@ data class InterfaceDeclaration(
         override val parentEntities: List<HeritageClauseDeclaration>,
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String
-) : ClassLikeDeclaration, WithUidDeclaration, MergeableDeclaration
+) : ClassLikeDeclaration, MergeableDeclaration
