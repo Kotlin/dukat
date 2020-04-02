@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astModel.SourceBundleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
@@ -39,9 +38,7 @@ import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
-import org.jetbrains.dukat.tsmodel.SourceBundleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.FqNode
 import org.jetrbains.dukat.nodeLowering.lowerings.IntroduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.RearrangeConstructors
 import org.jetrbains.dukat.nodeLowering.lowerings.RemoveUnusedGeneratedEntities
@@ -111,12 +108,5 @@ open class TypescriptWithBodyLowerer(
                 )
 
         return models
-    }
-
-    override fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
-
-        return SourceBundleModel(sources = sourceBundle.sources.map {
-            lower(it)
-        })
     }
 }

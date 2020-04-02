@@ -7,5 +7,10 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 interface ECMAScriptLowerer {
     fun lower(sourceSet: SourceSetDeclaration): SourceSetModel
-    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel
+
+    fun lower(sourceBundle: SourceBundleDeclaration): SourceBundleModel {
+        return SourceBundleModel(sources = sourceBundle.sources.map {
+            lower(it)
+        })
+    }
 }
