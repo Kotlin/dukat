@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.stdlibGenerator
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.ClassModel
@@ -23,6 +25,7 @@ import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoots
@@ -39,6 +42,7 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.ir.util.kotlinPackageFqn
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -123,7 +127,8 @@ private fun KotlinType.convertToTypeModel(): TypeModel {
                 if (isTypeParameter()) {
                     TypeParameterReferenceModel(IdentifierEntity(name), null)
                 } else {
-                    TypeValueModel(IdentifierEntity(name), arguments.map { it.convertToTypeParameterModel() }, null, null, isMarkedNullable)
+                    val fqName = this.constructor.declarationDescriptor?.fqNameSafe?.let { it.toString().toNameEntity().appendRight(KLIBROOT) }
+                    TypeValueModel(IdentifierEntity(name), arguments.map { it.convertToTypeParameterModel() }, null, fqName, isMarkedNullable)
                 }
             }
         }
