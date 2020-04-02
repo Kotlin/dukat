@@ -35,7 +35,7 @@ class DescriptorTests {
 
     @Suppress("UNUSED_PARAMETER")
     private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
-        val sourceBundle = translator.translateBundle(tsPath)
+        val sourceBundle = translator.translate(tsPath)
 
         val sourceSet = sourceBundle.sources.first()
         val targetPath = "./build/test/data/descriptors/$name"

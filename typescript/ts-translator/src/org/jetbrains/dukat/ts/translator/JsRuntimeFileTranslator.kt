@@ -31,7 +31,6 @@ class JsRuntimeFileTranslator(
 
     private fun translateFile(fileName: String): SourceBundleDeclaration {
         val proto = SourceBundleDeclarationProto.parseFrom(translateAsInputStream(fileName))
-        logger.debug("${proto}")
         return proto.convert()
     }
 

@@ -150,33 +150,6 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
-task generateJSBinary(type: NodeTask) {
-    def scriptName = "${project(":node-package").buildDir}/distrib/bin/dukat-cli.js"
-    script = file(scriptName)
-
-    def declarationsDir = "${project.projectDir}/test/data/javascript"
-
-    inputs.dir(declarationsDir)
-    inputs.file(scriptName)
-    inputs.file(DEFAULT_LIB_PATH)
-
-    def outputFile = "${project.buildDir}/javascript/declarations.dukat"
-    outputs.file(outputFile)
-
-    def files = []
-    file(declarationsDir)
-            .eachFileRecurse() {
-                if (it.isFile() && it.name.endsWith(".d.ts")) {
-                    files << it
-                }
-            }
-
-    args = [
-            "-b",
-            outputFile
-    ] + files
-}
-
 task extractKoltinJsLibs(type: Copy) {
     configurations.kotlinJsLibs.each {
         from it.absolutePath
@@ -186,8 +159,6 @@ task extractKoltinJsLibs(type: Copy) {
         return fileName.replace("-${gradle.kotlinVersion}.jar", ".jar")
     }
 }
-
-generateJSBinary.dependsOn = [":node-package:buildDistrib"]
 
 task prepareTopNPackage(type: Copy) {
     from "${TOPN_DIR}/package.template.json"
@@ -213,7 +184,6 @@ yarn.dependsOn = [yarnSetup, prepareTopNPackage]
 test.dependsOn = [
         download,
         downloadDist,
-        generateJSBinary,
         fetchDefinitelyTyped,
         installTopN,
         extractKoltinJsLibs,

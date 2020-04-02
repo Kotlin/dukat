@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="JSTypeTests" type="JUnit" factoryName="JUnit">
     <module name="dukat.compiler.test" />
+    <useClassPathOnly />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.jetbrains.dukat.compiler.tests.core.*" />
@@ -16,7 +17,6 @@
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
-      <option name="Gradle.BeforeRunTask" enabled="false" tasks="generateJSBinary" externalProjectPath="$PROJECT_DIR$/compiler" vmOptions="" scriptParameters="" />
     </method>
   </configuration>
 </component>

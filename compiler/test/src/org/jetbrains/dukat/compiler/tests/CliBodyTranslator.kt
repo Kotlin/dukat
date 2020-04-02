@@ -7,7 +7,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
 
 class CliBodyTranslator : CliTranslator() {
-    override fun translateBundle(
+    override fun translate(
         input: String
     ): SourceBundleModel {
         val binData = translateBinary(input)
