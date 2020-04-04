@@ -1,5 +1,5 @@
 package org.jetbrains.dukat.astModel
 
-interface CanHaveEternalModifierModel {
+interface CanHaveExternalModifierModel : TopLevelModel {
     val external: Boolean
 }

@@ -18,9 +18,9 @@ data class VariableModel(
         val get: StatementModel?,
         val set: StatementModel?,
         val typeParameters: List<TypeParameterModel>,
-        val extend: ClassLikeReferenceModel?,
+        override val extend: ClassLikeReferenceModel?,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
 
         override val metaDescription: String? = null
-) : TopLevelModel, StatementModel, CanHaveEternalModifierModel
+) : TopLevelModel, StatementModel, CanHaveExternalModifierModel, CanBeExtensionModel

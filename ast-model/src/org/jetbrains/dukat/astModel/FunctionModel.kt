@@ -18,9 +18,9 @@ data class FunctionModel(
         val inline: Boolean,
         val operator: Boolean,
 
-        val extend: ClassLikeReferenceModel?,
+        override val extend: ClassLikeReferenceModel?,
         val body: BlockStatementModel,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean
-) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel, CallableModel
+) : MemberEntity, TopLevelModel, CanHaveExternalModifierModel, CallableModel, CanBeExtensionModel

@@ -14,7 +14,7 @@ data class ObjectModel(
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean
-) : MemberEntity, TopLevelModel, CanHaveEternalModifierModel
+) : MemberEntity, TopLevelModel, CanHaveExternalModifierModel
 
 fun ObjectModel?.mergeWith(otherModel: ObjectModel?): ObjectModel? {
     if (otherModel == null) {
