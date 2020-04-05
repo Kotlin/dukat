@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
@@ -18,6 +17,7 @@ import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -51,6 +51,7 @@ import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -76,7 +77,6 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
@@ -104,8 +104,8 @@ internal enum class TranslationContext {
 }
 
 private data class Members(
-        val dynamic: List<MemberModel>,
-        val static: List<MemberModel>
+        val ownMembers: List<MemberModel>,
+        val staticMembers: List<MemberModel>
 )
 
 private typealias UidMapper = Map<String, FqNode>
@@ -170,20 +170,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         } else null
     }
 
-    private fun split(members: List<MemberNode>): Members {
-        val staticMembers = mutableListOf<MemberModel>()
-        val ownMembers = mutableListOf<MemberModel>()
-
-        members.forEach { member ->
-            val memberProcessed = member.process()
-            if (memberProcessed != null) {
-                if (member.isStatic()) {
-                    staticMembers.add(memberProcessed)
-                } else ownMembers.add(memberProcessed)
-            }
-        }
-
-        return Members(ownMembers, staticMembers)
+    private fun ClassLikeNode.processMembers(): Members {
+        val (staticNodes, ownNodes) =  members.partition { it.isStatic() }
+        return Members(ownNodes.mapNotNull { it.process() }, staticNodes.mapNotNull { it.process() })
     }
 
     private fun NameEntity.addLibPrefix() = TSLIBROOT.appendLeft(this)
@@ -615,18 +604,18 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun ClassNode.convertToClassModel(): ClassModel {
-        val membersSplitted = split(members)
+        val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
         val generatedMethods = collectParentGeneratedMethods(parentEntities)
 
         return ClassModel(
                 name = name,
-                members = membersSplitted.dynamic + generatedMethods,
-                companionObject = if (membersSplitted.static.isNotEmpty()) {
+                members = members.ownMembers + generatedMethods,
+                companionObject = if (members.staticMembers.isNotEmpty()) {
                     ObjectModel(
                             IdentifierEntity(""),
-                            membersSplitted.static,
+                            members.staticMembers,
                             emptyList(),
                             VisibilityModifierModel.DEFAULT,
                             null,
@@ -653,15 +642,15 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
-        val membersSplitted = split(members)
+        val members = processMembers()
 
         return InterfaceModel(
                 name = name,
-                members = membersSplitted.dynamic,
-                companionObject = if (membersSplitted.static.isNotEmpty()) {
+                members = members.ownMembers,
+                companionObject = if (members.staticMembers.isNotEmpty()) {
                     ObjectModel(
                             IdentifierEntity(""),
-                            membersSplitted.static,
+                            members.staticMembers,
                             emptyList(),
                             VisibilityModifierModel.DEFAULT,
                             null,
