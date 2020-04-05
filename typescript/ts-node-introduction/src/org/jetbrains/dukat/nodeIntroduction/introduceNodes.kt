@@ -2,6 +2,7 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
+import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
@@ -36,6 +37,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
+import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -156,11 +158,15 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
                 declaration.nullable,
                 declaration.meta
         )
-        is IntersectionTypeDeclaration -> IntersectionTypeDeclaration(
-                params = declaration.params.map { param -> param.convertToNode() },
-                nullable = declaration.nullable,
-                meta = declaration.meta
-        )
+        is IntersectionTypeDeclaration -> {
+            val duplicated =
+                    declaration.params[0].duplicate<ParameterValueDeclaration>()
+            val firstIntersectionType = if (declaration.nullable) duplicated.makeNullable() else duplicated
+            firstIntersectionType.meta =
+                    IntersectionMetadata(declaration.params.map { it.convertToNode() })
+
+            firstIntersectionType.convertToNode()
+        }
         is UnionTypeDeclaration -> UnionTypeNode(
                 params = declaration.params.map { param -> param.convertToNode() },
                 nullable = declaration.nullable,

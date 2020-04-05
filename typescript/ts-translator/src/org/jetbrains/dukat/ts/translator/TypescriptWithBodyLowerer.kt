@@ -21,7 +21,6 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantInlineFunction
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.nodeIntroduction.LowerIntersectionType
 import org.jetbrains.dukat.nodeIntroduction.LowerThisType
 import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
@@ -75,7 +74,6 @@ open class TypescriptWithBodyLowerer(
         val nodes = declarations.introduceNodes(moduleNameResolver)
                 .lower(
                     ResolveModuleAnnotations(),
-                    LowerIntersectionType(),
                     LowerThisType(),
                     ResolveTypeAliases(),
                     SpecifyUnionType(),
