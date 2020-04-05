@@ -125,13 +125,13 @@ private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARA
 )
 
 
-private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration {
+private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): ParameterValueDeclaration {
     val declaration = this
     return when (declaration) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = declaration.value,
                 nullable = declaration.nullable,
-                meta = declaration.meta
+                meta = meta ?: declaration.meta
         )
         is TypeDeclaration -> TypeValueNode(
                 value = declaration.value,
@@ -140,7 +140,7 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
                     ReferenceNode(it.uid)
                 },
                 nullable = declaration.nullable,
-                meta = declaration.meta
+                meta = meta ?: declaration.meta
         )
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
         is FunctionTypeDeclaration -> FunctionTypeNode(
@@ -149,33 +149,27 @@ private fun ParameterValueDeclaration.convertToNode(): ParameterValueDeclaration
                 },
                 type = declaration.type.convertToNode(),
                 nullable = declaration.nullable,
-                meta = declaration.meta
+                meta = meta ?: declaration.meta
         )
         is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
                 declaration.name,
                 declaration.typeParameters,
                 declaration.reference,
                 declaration.nullable,
-                declaration.meta
+                meta ?: declaration.meta
         )
         is IntersectionTypeDeclaration -> {
-            val duplicated =
-                    declaration.params[0].duplicate<ParameterValueDeclaration>()
-            val firstIntersectionType = if (declaration.nullable) duplicated.makeNullable() else duplicated
-            firstIntersectionType.meta =
-                    IntersectionMetadata(declaration.params.map { it.convertToNode() })
-
-            firstIntersectionType.convertToNode()
+            declaration.params[0].convertToNode(IntersectionMetadata(declaration.params.map { it.convertToNode() }))
         }
         is UnionTypeDeclaration -> UnionTypeNode(
                 params = declaration.params.map { param -> param.convertToNode() },
                 nullable = declaration.nullable,
-                meta = declaration.meta
+                meta = meta ?: declaration.meta
         )
         is TupleDeclaration -> TupleTypeNode(
                 params = declaration.params.map { param -> param.convertToNode() },
                 nullable = declaration.nullable,
-                meta = declaration.meta
+                meta = meta ?: declaration.meta
         )
 
         else -> declaration
