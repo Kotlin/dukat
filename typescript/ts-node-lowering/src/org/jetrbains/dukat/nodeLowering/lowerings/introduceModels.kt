@@ -430,17 +430,23 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         }
     }
 
-    private fun convertParentEntities(parentEntities: List<HeritageNode>, generatedMethodsHandler: ((methods: List<MethodModel>) -> Unit)? = null): List<HeritageModel> {
-        return parentEntities.map { parentEntity ->
+    private fun collectParentGeneratedMethods(parentEntities: List<HeritageNode>): List<MethodModel> {
+        return parentEntities.flatMap { parentEntity ->
             val node = uidToNameMapper[parentEntity.reference?.uid]?.node
             if (node is InterfaceNode) {
                 val generatedMethods = node.members.filterIsInstance(MethodNode::class.java).filter { it.meta?.generated == true }
-                if (!generatedMethods.isEmpty()) {
-                    generatedMethodsHandler?.invoke(generatedMethods.map { it.copy() }.map { it.process(uidToNameMapper[node.uid]?.fqName) })
+                generatedMethods.map() {
+                    it.process(uidToNameMapper[node.uid]?.fqName)
                 }
+            } else {
+                emptyList()
             }
-            parentEntity.convertToModel()
         }
+    }
+
+
+    private fun convertParentEntities(parentEntities: List<HeritageNode>): List<HeritageModel> {
+        return parentEntities.map { parentEntity -> parentEntity.convertToModel() }
     }
 
     private fun VariableNode.resolveGetter(): StatementModel? {
@@ -611,10 +617,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun ClassNode.convertToClassModel(): ClassModel {
         val membersSplitted = split(members)
 
-        val generatedMethods = mutableListOf<MemberModel>()
-        val parentModelEntities = convertParentEntities(parentEntities) {
-            generatedMethods.addAll(it)
-        }
+        val parentModelEntities = convertParentEntities(parentEntities)
+        val generatedMethods = collectParentGeneratedMethods(parentEntities)
+
         return ClassModel(
                 name = name,
                 members = membersSplitted.dynamic + generatedMethods,

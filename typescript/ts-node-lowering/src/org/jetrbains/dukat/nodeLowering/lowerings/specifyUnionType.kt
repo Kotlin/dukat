@@ -26,8 +26,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
     var currentComplexity = 1
 
     return params.map { parameterDeclaration ->
-        val type = parameterDeclaration.type
-        when (type) {
+        when (val type = parameterDeclaration.type) {
             is UnionTypeNode -> {
                 currentComplexity *= type.params.size
                 if (currentComplexity <= COMPLEXITY_THRESHOLD) {
@@ -105,13 +104,13 @@ private class SpecifyUnionTypeLowering : IdentityLowering {
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
-        val members = declaration.members.map { member ->
+        val members = declaration.members.flatMap { member ->
             when (member) {
                 is ConstructorNode -> generateConstructors(member)
                 is MethodNode -> generateMethods(member)
                 else -> listOf(member)
             }
-        }.flatten()
+        }
         return declaration.copy(members = members)
     }
 
