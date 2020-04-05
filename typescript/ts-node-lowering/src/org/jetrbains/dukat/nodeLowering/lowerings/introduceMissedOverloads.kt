@@ -1,10 +1,10 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.transform

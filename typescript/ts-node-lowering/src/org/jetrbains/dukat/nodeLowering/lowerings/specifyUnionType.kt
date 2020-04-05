@@ -17,7 +17,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetrbains.dukat.nodeLowering.IdentityLowering
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 const val COMPLEXITY_THRESHOLD = 15
 
@@ -44,7 +44,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
     }
 }
 
-private class SpecifyUnionTypeLowering : IdentityLowering {
+private class SpecifyUnionTypeLowering : NodeTypeLowering {
 
     fun generateParams(params: List<ParameterNode>): Pair<List<List<ParameterNode>>, Boolean> {
         val specifyParams = specifyArguments(params)

@@ -3,8 +3,8 @@ package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.duplicate
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
