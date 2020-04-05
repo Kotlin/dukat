@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.*
+import org.jetbrains.dukat.ast.model.nodes.constants.SELF_REFERENCE_TYPE
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
@@ -33,7 +33,7 @@ private fun FunctionNode.convertToTypeSignature(): TypeValueNode {
         val typeParams = extendReference.typeParameters.map { TypeValueNode(it, emptyList(), null) }
         TypeValueNode(extendReference.name, typeParams, ReferenceNode(uid), false, ThisTypeInGeneratedInterfaceMetaData())
     } else {
-        TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
+        SELF_REFERENCE_TYPE.copy()
     }
 }
 
@@ -51,9 +51,9 @@ private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
         val declaration = owner.node
 
         return when (declaration) {
-            is ThisTypeDeclaration -> {
+            SELF_REFERENCE_TYPE -> {
                 val contextNode = owner.classLikeOwnerNode()
-                val anyNode = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false, ThisTypeInGeneratedInterfaceMetaData())
+                val anyNode = SELF_REFERENCE_TYPE.copy()
 
                 when (contextNode) {
                     is ClassNode -> contextNode.convertToTypeSignature()
