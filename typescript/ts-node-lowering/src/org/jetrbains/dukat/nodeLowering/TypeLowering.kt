@@ -28,6 +28,7 @@ private val logger = Logging.logger("TypeLowering")
 interface TypeLowering : Lowering<ParameterValueDeclaration> {
 
     fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration
+    fun lowerMetaType(declaration: ParameterValueDeclaration): ParameterValueDeclaration
 
     fun lowerIdentificator(identificator: NameEntity): NameEntity {
         return when (identificator) {

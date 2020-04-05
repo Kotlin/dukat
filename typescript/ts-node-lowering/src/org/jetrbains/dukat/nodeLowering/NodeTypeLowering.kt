@@ -32,4 +32,7 @@ interface NodeTypeLowering : TypeLowering {
         }
     }
 
+    override fun lowerMetaType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return declaration
+    }
 }
