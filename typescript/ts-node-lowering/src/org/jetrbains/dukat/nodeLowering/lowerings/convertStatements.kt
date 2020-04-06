@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
+import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
@@ -37,6 +38,7 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
@@ -84,6 +86,11 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 left.convert(),
                 operator,
                 right.convert()
+            )
+            is UnaryExpressionDeclaration -> UnaryExpressionModel(
+                operand.convert(),
+                operator,
+                isPrefix
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()
