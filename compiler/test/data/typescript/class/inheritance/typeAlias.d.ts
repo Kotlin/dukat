@@ -18,3 +18,13 @@ declare class SinglethreadedProcessor implements AliasedProcessor {
 
 type NumCollection<T extends number> = Array<T>
 
+type Many<T> = T | ReadonlyArray<T>;
+type PropertyName = string | number | symbol;
+type PropertyPath = Many<PropertyName>;
+
+interface SomethingStatic {
+  pick<T extends object, U extends keyof T>(
+    object: T,
+    ...props: Array<PropertyPath>
+  ): Pick<T, U>;
+}
