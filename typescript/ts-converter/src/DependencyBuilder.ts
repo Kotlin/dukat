@@ -136,6 +136,12 @@ export class DependencyBuilder {
       for (let type of node.types) {
         this.checkReferences(type);
       }
+    } else if (ts.isExportDeclaration(node)) {
+      if (node.exportClause && Array.isArray(node.exportClause.elements)) {
+          node.exportClause.elements.forEach(exportSpecifier => {
+            this.checkReferences(exportSpecifier.name);
+          });
+      }
     }
     ts.forEachChild(node, node => this.visit(node));
   }
