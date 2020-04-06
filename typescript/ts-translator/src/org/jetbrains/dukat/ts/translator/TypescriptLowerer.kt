@@ -8,10 +8,8 @@ import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
-import org.jetbrains.dukat.commonLowerings.merge.MergeClassLike
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.MergeModules
-import org.jetbrains.dukat.commonLowerings.merge.MergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
@@ -35,7 +33,7 @@ import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
 import org.jetbrains.dukat.tsLowerings.LowerPrimitives
-import org.jetbrains.dukat.tsLowerings.MergeInterfaces
+import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
@@ -59,7 +57,7 @@ open class TypescriptLowerer(
         val declarations = sourceSet
                 .lower(
                         AddPackageName(packageName),
-                        MergeInterfaces(),
+                        MergeClassLikes(),
                         MergeParentsForMergedInterfaces(),
                         ResolveLambdaParents(),
                         FilterOutNonDeclarations(),
@@ -93,11 +91,9 @@ open class TypescriptLowerer(
                         SubstituteTsStdLibEntities(),
                         EscapeIdentificators(),
                         RemoveUnsupportedJsNames(),
-                        MergeClassLike(),
                         MergeModules(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
-                        MergeNestedClasses(),
                         SeparateNonExternalEntities(),
                         LowerOverrides(),
                         SpecifyTypeNodesWithModuleData(),
