@@ -32,6 +32,7 @@ import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
@@ -254,6 +255,7 @@ private fun ExpressionModel.translate(): String {
         } else {
             "${operand.translate()}$operator"
         }
+        is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }
