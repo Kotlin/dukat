@@ -20,7 +20,7 @@ fun f() {
         var i: Number = 0
         while (i < 1000) {
             console.log(i)
-            i += 1
+            i++
         }
     }
 }

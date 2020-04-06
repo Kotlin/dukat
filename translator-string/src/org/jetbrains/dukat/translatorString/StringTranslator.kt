@@ -39,6 +39,7 @@ import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
+import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
@@ -248,6 +249,11 @@ private fun ExpressionModel.translate(): String {
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
+        is UnaryExpressionModel -> if (isPrefix) {
+            "$operator${operand.translate()}"
+        } else {
+            "${operand.translate()}$operator"
+        }
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }
