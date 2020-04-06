@@ -40,11 +40,19 @@ private fun mergeClassAndInterface(a: ClassDeclaration, b: InterfaceDeclaration)
             else -> it
         }
     } + a.members
-    return a.copy(members = membersResolved, parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities))
+    return a.copy(
+            members = membersResolved,
+            typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
+            parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities)
+    )
 }
 
 private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
-    return a.copy(members = b.members + a.members, parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities))
+    return a.copy(
+            members = b.members + a.members,
+            typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
+            parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities)
+    )
 }
 
 private fun merge(a: TopLevelDeclaration, b: TopLevelDeclaration): TopLevelDeclaration {

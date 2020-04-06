@@ -41,7 +41,7 @@ private operator fun InterfaceModel.plus(b: ClassLikeModel): InterfaceModel {
     // according to the spec members are applied in reversed order - https://www.typescriptlang.org/docs/handbook/declaration-merging.html
     return copy(
             members = b.members + members,
-            typeParameters = typeParameters,
+            typeParameters = if (b.typeParameters.size > typeParameters.size) {b.typeParameters} else {typeParameters},
             companionObject = companionObject + b.companionObject,
             parentEntities = mergeParentEntities(parentEntities, b.parentEntities)
     )
@@ -51,7 +51,7 @@ private operator fun ClassModel.plus(b: ClassLikeModel): ClassModel {
     // according to the spec members are applied in reversed order - https://www.typescriptlang.org/docs/handbook/declaration-merging.html
     return copy(
             members = b.members + members,
-            typeParameters = typeParameters,
+            typeParameters = if (b.typeParameters.size > typeParameters.size) {b.typeParameters} else {typeParameters},
             companionObject = companionObject + b.companionObject,
             parentEntities = mergeParentEntities(parentEntities, b.parentEntities)
     )
