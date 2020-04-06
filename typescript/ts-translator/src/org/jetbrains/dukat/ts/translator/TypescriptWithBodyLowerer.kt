@@ -24,7 +24,6 @@ import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
-import org.jetbrains.dukat.tsLowerings.EliminateStringType
 import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
@@ -61,7 +60,6 @@ open class TypescriptWithBodyLowerer(
                         ResolveDefaultTypeParams(),
                         LowerPrimitives(),
                         GenerateInterfaceReferences(),
-                        EliminateStringType(),
                         DesugarArrayDeclarations(),
                         FixImpossibleInheritance(),
                         LowerPartialOf(),

@@ -30,6 +30,7 @@ import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -78,6 +79,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -124,6 +126,9 @@ private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARA
         optional = optional
 )
 
+private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
+    return params.all { it is StringLiteralDeclaration }
+}
 
 private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): ParameterValueDeclaration {
     val declaration = this
@@ -161,11 +166,25 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
         is IntersectionTypeDeclaration -> {
             declaration.params[0].convertToNode(IntersectionMetadata(declaration.params.map { it.convertToNode() }))
         }
-        is UnionTypeDeclaration -> UnionTypeNode(
-                params = declaration.params.map { param -> param.convertToNode() },
-                nullable = declaration.nullable,
-                meta = meta ?: declaration.meta
-        )
+        is StringLiteralDeclaration -> {
+            StringLiteralUnionNode(
+                    params = listOf(declaration.token),
+                    nullable = declaration.nullable
+            )
+        }
+        is UnionTypeDeclaration ->
+            if (declaration.canBeTranslatedAsStringLiteral()) {
+                StringLiteralUnionNode(
+                        params = declaration.params.mapNotNull { (it as? StringLiteralDeclaration)?.token },
+                        nullable = declaration.nullable
+                )
+            } else {
+                UnionTypeNode(
+                        params = declaration.params.map { param -> param.convertToNode() },
+                        nullable = declaration.nullable,
+                        meta = meta ?: declaration.meta
+                )
+            }
         is TupleDeclaration -> TupleTypeNode(
                 params = declaration.params.map { param -> param.convertToNode() },
                 nullable = declaration.nullable,

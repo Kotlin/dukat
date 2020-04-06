@@ -23,6 +23,7 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -176,17 +177,10 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun NameEntity.addLibPrefix() = TSLIBROOT.appendLeft(this)
-    private fun UnionTypeNode.canBeTranslatedAsString(): Boolean {
-        return params.all { (it is TypeValueNode) && (it.value == IdentifierEntity("String")) }
-    }
 
     private fun UnionTypeNode.convertMeta(): String {
         return params.joinToString(" | ") { unionMember ->
-            if (unionMember.meta is StringLiteralDeclaration) {
-                (unionMember.meta as StringLiteralDeclaration).token
-            } else {
-                unionMember.process().translate()
-            }.let {
+            unionMember.process().translate().let {
                 if (nullable) {
                     "${it}?"
                 } else {
@@ -222,22 +216,19 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             else -> IdentifierEntity("dynamic")
         }
         return when (this) {
-            is UnionTypeNode -> if (canBeTranslatedAsString()) {
-                val stringEntity = IdentifierEntity("String")
-                TypeValueModel(
-                        stringEntity,
-                        emptyList(),
-                        convertMeta(),
-                        stringEntity.addLibPrefix()
-                )
-            } else {
-                TypeValueModel(
-                        dynamicName,
-                        emptyList(),
-                        convertMeta(),
-                        null
-                )
-            }
+            is StringLiteralUnionNode -> TypeValueModel(
+                IdentifierEntity("String"),
+                emptyList(),
+                params.joinToString(" | "),
+                null,
+                nullable
+            )
+            is UnionTypeNode -> TypeValueModel(
+                    dynamicName,
+                    emptyList(),
+                    convertMeta(),
+                    null
+            )
             is TupleTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),
