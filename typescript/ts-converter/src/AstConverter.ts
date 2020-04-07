@@ -433,6 +433,14 @@ export class AstConverter {
         let origin = declaration.propertyName ? ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT : ReferenceDeclarationProto.ORIGIN.IMPORT;
         typeReference = this.astFactory.createReferenceEntity(uid, origin, kind);
       }
+    } else if (ts.isImportEqualsDeclaration(declaration)) {
+      let importedSymbol = this.typeChecker.getSymbolAtLocation(declaration.name);
+      if (importedSymbol) {
+        let declaredTyped = this.typeChecker.getDeclaredTypeOfSymbol(importedSymbol);
+        if (declaredTyped.symbol && Array.isArray(declaredTyped.symbol.declarations)) {
+          typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaredTyped.symbol.declarations[0]), ReferenceDeclarationProto.ORIGIN.IRRELEVANT, kind);
+        }
+      }
     } else {
       typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration), ReferenceDeclarationProto.ORIGIN.IRRELEVANT, kind);
     }
