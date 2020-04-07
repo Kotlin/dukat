@@ -99,6 +99,7 @@ internal enum class TranslationContext {
     TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
+    PROPERTY,
     INLINE_EXTENSION,
     CONSTRUCTOR
 }
@@ -274,19 +275,37 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is GeneratedInterfaceReferenceNode -> {
+                val typeParams =  when (context) {
+                    TranslationContext.PROPERTY -> typeParameters.map {
+                        TypeParameterModel(
+                                type = TypeValueModel(
+                                        IdentifierEntity("Any"),
+                                        emptyList(),
+                                        null,
+                                        null,
+                                        true
+                                ),
+                                constraints = emptyList()
+                        )
+                    }
+                    else -> typeParameters.map { typeParam ->
+                        TypeParameterModel(
+                                type = TypeValueModel(
+                                        typeParam.name,
+                                        emptyList(),
+                                        null,
+                                        if (reference?.uid?.endsWith("_GENERATED") == true) {
+                                            null
+                                        } else {
+                                            reference?.getFqName(typeParam.name)
+                                        }),
+                                constraints = emptyList()
+                        )
+                    }
+                }
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam ->
-                            TypeValueModel(
-                                    typeParam.name,
-                                    emptyList(),
-                                    null,
-                                    if (reference?.uid?.endsWith("_GENERATED") == true) {
-                                        null
-                                    } else {
-                                        reference?.getFqName(typeParam.name)
-                                    })
-                        }.map { TypeParameterModel(it, listOf()) },
+                        typeParams,
                         meta?.processMeta(),
                         reference?.getFqName(name),
                         nullable
@@ -329,7 +348,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is MethodNode -> process()
             is PropertyNode -> PropertyModel(
                     name = IdentifierEntity(name),
-                    type = type.process(TranslationContext.IRRELEVANT),
+                    type = type.process(TranslationContext.PROPERTY),
                     typeParameters = convertTypeParams(typeParameters),
                     static = static,
                     override = null,
