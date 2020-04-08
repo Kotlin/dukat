@@ -33,7 +33,6 @@ import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
 import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
-import org.jetbrains.dukat.tsLowerings.MergeParentsForMergedInterfaces
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
@@ -57,7 +56,6 @@ open class TypescriptLowerer(
                 .lower(
                         AddPackageName(packageName),
                         MergeClassLikes(),
-                        MergeParentsForMergedInterfaces(),
                         ResolveLambdaParents(),
                         FilterOutNonDeclarations(),
                         RenameImpossibleDeclarations(),

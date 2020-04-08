@@ -28,8 +28,7 @@ private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageClauseDeclaration>, parentEntitiesB: List<HeritageClauseDeclaration>): List<HeritageClauseDeclaration> {
     val parentSet = parentEntitiesA.toSet()
-    return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }
-}
+    return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }}
 
 private fun mergeVariableAndInterface(a: VariableDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
     println("MERGE VAR ${a} and ${b}")
@@ -80,10 +79,13 @@ private fun merge(a: MergeableDeclaration, b: MergeableDeclaration): MergeableDe
 
 private class MergeClassLikesLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver): TopLevelDeclarationLowering {
     override fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
-        val definitions = declaration.definitionsInfo.mapNotNull { definition -> topLevelDeclarationResolver.resolve(definition.uid) }
-        val onlyClassLikes = definitions.all { it is ClassLikeDeclaration }
+        val definitions = declaration.definitionsInfo
+                .mapNotNull { definition -> topLevelDeclarationResolver.resolve(definition.uid) }
+                .filterIsInstance(ClassLikeDeclaration::class.java)
+
+        val onlyClassLikes = definitions.isNotEmpty()
         return if (onlyClassLikes) {
-            if (declaration.uid == declaration.definitionsInfo.firstOrNull()?.uid) {
+            if (declaration.uid == definitions.firstOrNull()?.uid) {
                 @Suppress("UNCHECKED_CAST")
                 (definitions as List<MergeableDeclaration>).reduce { acc, definitionInfoDeclaration -> merge(acc, definitionInfoDeclaration) }
             } else {

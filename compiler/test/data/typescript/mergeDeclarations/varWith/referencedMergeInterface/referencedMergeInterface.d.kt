@@ -15,9 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-/* extending interface from _api.d.ts */
-inline fun SomeAPI.pong(): Boolean = this.asDynamic().pong()
-
 external interface SomeValue
 
 // ------------------------------------------------------------------------------------------
@@ -40,6 +37,7 @@ import org.w3c.xhr.*
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface SomeAPI {
+    fun pong(): Boolean
     fun ping(): Boolean
 
     companion object : SomeValue by definedExternally
