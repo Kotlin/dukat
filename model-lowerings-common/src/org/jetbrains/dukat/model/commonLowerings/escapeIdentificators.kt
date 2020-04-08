@@ -7,12 +7,13 @@ import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
+import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
@@ -26,9 +27,6 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
-import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.astModel.LambdaParameterModel
-import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
@@ -255,15 +253,9 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-private fun ModuleModel.escapeIdentificators(): ModuleModel {
-    return EscapeIdentificatorsTypeLowering().lowerRoot(this, NodeOwner(this, null))
-}
-
-private fun SourceSetModel.escapeIdentificators() = transform { it.escapeIdentificators() }
-
-class EscapeIdentificators() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.escapeIdentificators()
+class EscapeIdentificators : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        return EscapeIdentificatorsTypeLowering().lowerRoot(module, NodeOwner(module, null))
     }
 }
 

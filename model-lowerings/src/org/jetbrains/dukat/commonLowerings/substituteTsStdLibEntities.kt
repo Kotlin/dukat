@@ -169,20 +169,8 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-private fun ModuleModel.substituteTsStdLibEntities(): ModuleModel {
-    return SubstituteLowering().lowerRoot(this, NodeOwner(this, null))
-}
-
-private fun SourceFileModel.substituteTsStdLibEntities(): SourceFileModel {
-    return copy(root = root.substituteTsStdLibEntities())
-}
-
-private fun SourceSetModel.substituteTsStdLibEntities(): SourceSetModel {
-    return copy(sources = sources.map(SourceFileModel::substituteTsStdLibEntities))
-}
-
 class SubstituteTsStdLibEntities() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.substituteTsStdLibEntities()
+    override fun lower(module: ModuleModel): ModuleModel {
+        return SubstituteLowering().lowerRoot(module, NodeOwner(module, null))
     }
 }

@@ -45,13 +45,8 @@ private class StdLibTypeCorrectorLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-
-private fun SourceFileModel.correctStdLibTypes(): SourceFileModel {
-    return copy(root = StdLibTypeCorrectorLowering().lowerRoot(root, NodeOwner(root, null)))
-}
-
 class CorrectStdLibTypes : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.copy(sources = source.sources.map { it.correctStdLibTypes() })
+    override fun lower(module: ModuleModel): ModuleModel {
+        return StdLibTypeCorrectorLowering().lowerRoot(module, NodeOwner(module, null))
     }
 }

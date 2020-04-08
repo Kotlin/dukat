@@ -1,8 +1,6 @@
 package org.jetbrains.dukat.commonLowerings.merge
 
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 
 
@@ -21,10 +19,8 @@ private fun ModuleModel.mergeModules(): ModuleModel {
     return copy(submodules = submodulesMerged)
 }
 
-private fun SourceSetModel.mergeModules() = transform { it.mergeModules() }
-
-class MergeModules() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.mergeModules()
+class MergeModules : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        return module.mergeModules()
     }
 }

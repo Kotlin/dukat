@@ -9,6 +9,7 @@ import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -18,8 +19,6 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.transform
-import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private fun TypeModel.isAny(): Boolean {
@@ -458,18 +457,15 @@ private class OverrideResolver(private val context: ModelContext) {
     }
 }
 
-private fun SourceSetModel.lowerOverrides(): SourceSetModel {
-    val modelContext = ModelContext(this)
+class LowerOverrides : ModelLowering {
+    private lateinit var modelContext: ModelContext
 
-    val overrideResolver = OverrideResolver(modelContext)
-
-    return transform {
-        overrideResolver.lowerOverrides(it)
+    override fun lower(module: ModuleModel): ModuleModel {
+        return OverrideResolver(modelContext).lowerOverrides(module)
     }
-}
 
-class LowerOverrides() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.lowerOverrides()
+        modelContext = ModelContext(source)
+        return super.lower(source)
     }
 }
