@@ -256,6 +256,7 @@ class GeneratedInterfacesContext {
                         members = declaration.members,
                         typeParameters = generatedTypeParameters,
                         parentEntities = emptyList(),
+                        definitionsInfo = emptyList(),
                         uid = generatedUid,
                         packageOwner = owner.findOwnerPackage()
                 )

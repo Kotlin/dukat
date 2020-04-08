@@ -7,6 +7,7 @@ data class GeneratedInterfaceDeclaration(
         override val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         override val parentEntities: List<HeritageClauseDeclaration>,
+        override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String,
         val packageOwner: ModuleDeclaration
-) : ClassLikeDeclaration, WithUidDeclaration
+) : ClassLikeDeclaration

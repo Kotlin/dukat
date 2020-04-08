@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.tsmodel
 
-import MergeableDeclaration
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class ClassDeclaration(
@@ -11,4 +10,4 @@ data class ClassDeclaration(
         override val modifiers: List<ModifierDeclaration>,
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String
-) : ClassLikeDeclaration, ExpressionDeclaration, WithModifiersDeclaration, MergeableDeclaration
+) : ClassLikeDeclaration, ExpressionDeclaration, WithModifiersDeclaration

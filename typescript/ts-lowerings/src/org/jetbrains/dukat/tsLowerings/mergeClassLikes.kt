@@ -1,6 +1,8 @@
 package org.jetbrains.dukat.tsLowerings
 
 import MergeableDeclaration
+import TopLevelDeclarationLowering
+import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -76,36 +78,28 @@ private fun merge(a: MergeableDeclaration, b: MergeableDeclaration): MergeableDe
     }
 }
 
-@Suppress("UNCHECKED_CAST")
-private fun ModuleDeclaration.mergeInterfaces(topLevelDeclarationResolver: TopLevelDeclarationResolver): ModuleDeclaration {
-    val declarationsResolved = declarations.mapNotNull {
-        if (it is MergeableDeclaration) {
-            val definitions = it.definitionsInfo.mapNotNull { definition -> topLevelDeclarationResolver.resolve(definition.uid) }
-            val onlyClassLikes = definitions.all { it is ClassLikeDeclaration }
-            if (onlyClassLikes) {
-                if (it.uid == it.definitionsInfo.firstOrNull()?.uid) {
-                    (definitions as List<MergeableDeclaration>).reduce { acc, definitionInfoDeclaration -> merge(acc, definitionInfoDeclaration) }
-                } else {
-                    null
-                }
+private class MergeClassLikesLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver): TopLevelDeclarationLowering {
+    override fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
+        val definitions = declaration.definitionsInfo.mapNotNull { definition -> topLevelDeclarationResolver.resolve(definition.uid) }
+        val onlyClassLikes = definitions.all { it is ClassLikeDeclaration }
+        return if (onlyClassLikes) {
+            if (declaration.uid == declaration.definitionsInfo.firstOrNull()?.uid) {
+                @Suppress("UNCHECKED_CAST")
+                (definitions as List<MergeableDeclaration>).reduce { acc, definitionInfoDeclaration -> merge(acc, definitionInfoDeclaration) }
             } else {
-                it
+                null
             }
-        } else if (it is ModuleDeclaration) {
-            it.mergeInterfaces(topLevelDeclarationResolver)
         } else {
-            it
+            declaration
         }
     }
-    return copy(declarations = declarationsResolved)
 }
 
 private fun SourceSetDeclaration.mergeInterfaces(topLevelDeclarationResolver: TopLevelDeclarationResolver): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = it.root.mergeInterfaces(topLevelDeclarationResolver)) })
+    return copy(sources = sources.map { it.copy(root = MergeClassLikesLowering(topLevelDeclarationResolver).lowerDocumentRoot(it.root)) })
 }
 
 class MergeClassLikes() : TsLowering {
-
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         val topLevelDeclarationResolver = TopLevelDeclarationResolver(source)
         return source.mergeInterfaces(topLevelDeclarationResolver)

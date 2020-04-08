@@ -90,6 +90,7 @@ private fun ClassLikeDeclaration.generatePartialInterface(
             membersResolved,
             typeParameters,
             partialParentEntities,
+            emptyList(),
             getUID().withPartialSuffix(),
             owner)
 }
