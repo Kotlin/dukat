@@ -6,6 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -81,6 +82,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is GeneratedInterfaceReferenceNode -> copy() as T
         is InterfaceNode -> copy() as T
         is ObjectNode -> copy() as T
+        is StringLiteralUnionNode -> copy() as T
         is TupleTypeNode -> copy() as T
         is TypeAliasNode -> copy() as T
         is TypeParameterNode -> copy() as T
