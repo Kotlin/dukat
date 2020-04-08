@@ -57,7 +57,7 @@ private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): I
     )
 }
 
-private fun merge(a: TopLevelDeclaration, b: TopLevelDeclaration): TopLevelDeclaration {
+private fun merge(a: MergeableDeclaration, b: MergeableDeclaration): MergeableDeclaration {
     return when (a) {
         is InterfaceDeclaration -> when (b) {
             is InterfaceDeclaration -> mergeInterfaces(a, b)
@@ -76,6 +76,7 @@ private fun merge(a: TopLevelDeclaration, b: TopLevelDeclaration): TopLevelDecla
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 private fun ModuleDeclaration.mergeInterfaces(topLevelDeclarationResolver: TopLevelDeclarationResolver): ModuleDeclaration {
     val declarationsResolved = declarations.mapNotNull {
         if (it is MergeableDeclaration) {
@@ -83,7 +84,7 @@ private fun ModuleDeclaration.mergeInterfaces(topLevelDeclarationResolver: TopLe
             val onlyClassLikes = definitions.all { it is ClassLikeDeclaration }
             if (onlyClassLikes) {
                 if (it.uid == it.definitionsInfo.firstOrNull()?.uid) {
-                    definitions.reduce { acc, definitionInfoDeclaration -> merge(acc, definitionInfoDeclaration) }
+                    (definitions as List<MergeableDeclaration>).reduce { acc, definitionInfoDeclaration -> merge(acc, definitionInfoDeclaration) }
                 } else {
                     null
                 }
