@@ -21,7 +21,7 @@ private fun NameEntity.addPrefix(prefix: String): NameEntity {
 
 private class RenameImpossibleDeclarationsTypeLowering(private val namedImports: Set<IdentifierEntity>) : DeclarationTypeLowering {
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration? {
         val declarationResolved = if (namedImports.contains(declaration.name)) { declaration.copy(name = declaration.name.addPrefix("Local")) } else { declaration }
         return super.lowerInterfaceDeclaration(declarationResolved, owner)
     }

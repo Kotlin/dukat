@@ -20,7 +20,7 @@ private fun FunctionTypeDeclaration.convertToCallSignature(typeParams: List<Type
 
 private class ResolveLambdaParentsLowering(private val topDeclarationResolver: TopLevelDeclarationResolver) : DeclarationTypeLowering {
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration? {
 
         val callSignaturesFromLambda = mutableListOf<CallSignatureDeclaration>()
         val regularParentEntities = declaration.parentEntities.filter {

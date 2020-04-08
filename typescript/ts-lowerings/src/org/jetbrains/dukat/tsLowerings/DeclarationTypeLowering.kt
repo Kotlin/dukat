@@ -148,7 +148,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
     }
 
 
-    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
+    override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration? {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member, owner?.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
@@ -177,7 +177,7 @@ interface DeclarationTypeLowering : DeclarationLowering {
         return declaration.copy(typeReference = lowerParameterValue(declaration.typeReference, owner?.wrap(declaration)))
     }
 
-    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
+    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration? {
         return declaration.copy(
                 members = declaration.members.map { member -> lowerMemberDeclaration(member, owner?.wrap(declaration)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
