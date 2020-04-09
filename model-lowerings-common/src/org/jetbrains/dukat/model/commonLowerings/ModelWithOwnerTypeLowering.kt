@@ -46,7 +46,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         )
     }
 
-    override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel {
+    override fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel? {
         return when (val declaration = ownerContext.node) {
             is MethodModel -> lowerMethodModel(NodeOwner(declaration, ownerContext))
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
@@ -109,7 +109,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) },
+                members = declaration.members.mapNotNull { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) },
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageModel(NodeOwner(heritageClause, ownerContext))
@@ -135,7 +135,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) }
+                members = declaration.members.mapNotNull { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) }
         )
 
     }
@@ -143,7 +143,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                members = declaration.members.map { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) },
+                members = declaration.members.mapNotNull { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) },
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageModel(NodeOwner(heritageClause, ownerContext))

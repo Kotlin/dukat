@@ -19,7 +19,7 @@ import org.jetbrains.dukat.translatorString.translate
 private class ImportContext(sourceSetModel: SourceSetModel) : ModelWithOwnerTypeLowering {
     private val packageContainingClass: MutableMap<NameEntity, NameEntity> = mutableMapOf()
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel? {
         packageContainingClass[ownerContext.node.name] = parentModule.name
 
         return super.lowerTopLevelModel(ownerContext, parentModule)
