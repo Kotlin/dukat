@@ -8,7 +8,7 @@ function resolveName(node: ts.Node): string | null {
     return node.text;
   }
 
-  if (node.name && ts.isIdentifier(node.name)) {
+  if (node.name && (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name))) {
     return node.name.text;
   }
 
