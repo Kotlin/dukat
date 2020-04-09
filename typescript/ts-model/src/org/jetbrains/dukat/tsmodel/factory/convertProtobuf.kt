@@ -40,6 +40,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
+import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -76,6 +77,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodelproto.ArrayLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.AsExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BlockDeclarationProto
@@ -603,6 +605,13 @@ fun UnknownExpressionDeclarationProto.convert(): UnknownExpressionDeclaration {
     )
 }
 
+fun AsExpressionDeclarationProto.convert(): AsExpressionDeclaration {
+    return AsExpressionDeclaration(
+        expression = expression.convert(),
+        type = type.convert()
+    )
+}
+
 fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
@@ -617,6 +626,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasElementAccessExpression() -> elementAccessExpression.convert()
         hasNewExpression() -> newExpression.convert()
         hasConditionalExpression() -> conditionalExpression.convert()
+        hasAsExpression() -> asExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

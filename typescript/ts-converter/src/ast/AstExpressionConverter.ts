@@ -89,6 +89,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
     }
 
+    createAsExpression(expression: Expression, type: TypeDeclaration) : Expression {
+        return AstExpressionFactory.createAsExpression(expression, type)
+    }
+
     createUnknownExpression(value: string): Expression {
         return AstExpressionFactory.createUnknownExpressionDeclarationAsExpression(value);
     }
@@ -335,6 +339,9 @@ export class AstExpressionConverter {
         }
     }
 
+    private convertAsExpression(expression: ts.AssertionExpression): Expression {
+        return this.createAsExpression(this.convertExpression(expression.expression), this.astConverter.convertType(expression.type))
+    }
 
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
@@ -376,6 +383,8 @@ export class AstExpressionConverter {
             return this.convertConditionalExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
+        } else if (ts.isAssertionExpression(expression)) {
+            return this.convertAsExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }
