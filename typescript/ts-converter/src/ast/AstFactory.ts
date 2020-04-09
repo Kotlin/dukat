@@ -28,6 +28,7 @@ import {createLogger} from "../Logger";
 import {
   BlockDeclarationProto,
   CallSignatureDeclarationProto,
+  CaseDeclarationProto,
   ClassDeclarationProto,
   ConstructorDeclarationProto,
   DefinitionInfoDeclarationProto,
@@ -65,6 +66,7 @@ import {
   SourceSetDeclarationProto,
   StatementDeclarationProto,
   StringLiteralDeclarationProto,
+  SwitchStatementDeclarationProto,
   ThisTypeDeclarationProto,
   ThrowStatementDeclarationProto,
   TopLevelDeclarationProto,
@@ -267,6 +269,24 @@ export class AstFactory {
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setThrowstatement(throwStatement);
+    return statementDeclaration;
+  }
+
+  createCaseDeclaration(condition: Expression | null, body: Array<StatementDeclaration>): CaseDeclarationProto {
+    let caseDeclaration = new CaseDeclarationProto();
+    if (condition) {
+      caseDeclaration.setCondition(condition);
+    }
+    caseDeclaration.setStatementList(body);
+    return caseDeclaration;
+  }
+
+  createSwitchStatement(expression: Expression, cases: Array<CaseDeclarationProto>): StatementDeclaration {
+    let switchStatement = new SwitchStatementDeclarationProto();
+    switchStatement.setExpression(expression);
+    switchStatement.setCaseList(cases);
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setSwitchstatement(switchStatement);
     return statementDeclaration;
   }
 

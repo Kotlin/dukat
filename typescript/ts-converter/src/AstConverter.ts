@@ -27,6 +27,7 @@ import {AstExpressionConverter} from "./ast/AstExpressionConverter";
 import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {
+  CaseDeclarationProto,
   ModuleDeclarationProto,
   ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto,
@@ -865,6 +866,33 @@ export class AstConverter {
     return decl
   }
 
+  convertSwitchStatement(statement: ts.SwitchStatement): StatementDeclaration {
+    let expression = this.astExpressionConverter.convertExpression(statement.expression);
+    let cases: Array<CaseDeclarationProto> = [];
+    for (let clause of statement.caseBlock.clauses) {
+      let body: Array<StatementDeclaration> = [];
+      for (let statement of clause.statements) {
+        body = body.concat(this.convertStatement(statement));
+      }
+
+      if (ts.isCaseClause(clause)) {
+        cases.push(this.astFactory.createCaseDeclaration(
+            this.astExpressionConverter.convertExpression(clause.expression),
+            body
+        ))
+      } else {
+        cases.push(this.astFactory.createCaseDeclaration(
+            null,
+            body
+        ))
+      }
+    }
+
+    return this.astFactory.createSwitchStatement(
+        expression, cases
+    )
+  }
+
   convertStatement(statement: ts.Node): Array<StatementDeclaration> {
     if (ts.isExpressionStatement(statement)) {
       return [this.astFactory.createExpressionStatement(
@@ -902,6 +930,9 @@ export class AstConverter {
       if (block) {
         return [block]
       }
+    } else if (ts.isSwitchStatement(statement)) {
+      let switchStatement = this.convertSwitchStatement(statement);
+      res.push(switchStatement)
     }
 
     return [];
