@@ -98,7 +98,7 @@ private class MergeClassLikesLowering(private val topLevelDeclarationResolver: T
 }
 
 private fun SourceSetDeclaration.mergeInterfaces(topLevelDeclarationResolver: TopLevelDeclarationResolver): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = MergeClassLikesLowering(topLevelDeclarationResolver).lowerDocumentRoot(it.root)) })
+    return copy(sources = sources.map { it.copy(root = MergeClassLikesLowering(topLevelDeclarationResolver).lowerSourceDeclaration(it.root)) })
 }
 
 class MergeClassLikes() : TsLowering {

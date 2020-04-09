@@ -44,7 +44,7 @@ private class ResolveLambdaParentsLowering(private val topDeclarationResolver: T
 }
 
 private fun SourceSetDeclaration.resolveLambdaParents(topDeclarationResolver: TopLevelDeclarationResolver): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = ResolveLambdaParentsLowering(topDeclarationResolver).lowerDocumentRoot(it.root)) })
+    return copy(sources = sources.map { it.copy(root = ResolveLambdaParentsLowering(topDeclarationResolver).lowerSourceDeclaration(it.root)) })
 }
 
 class ResolveLambdaParents : TsLowering {

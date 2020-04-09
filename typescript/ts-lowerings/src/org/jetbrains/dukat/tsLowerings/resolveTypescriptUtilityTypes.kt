@@ -62,7 +62,7 @@ private class UtilityTypeLowering : DeclarationTypeLowering {
 }
 
 private fun ModuleDeclaration.resolveTypescriptUtilityTypes(): ModuleDeclaration {
-    return UtilityTypeLowering().lowerDocumentRoot(this)
+    return UtilityTypeLowering().lowerSourceDeclaration(this)
 }
 
 private fun SourceFileDeclaration.resolveTypescriptUtilityTypes() = copy(root = root.resolveTypescriptUtilityTypes())

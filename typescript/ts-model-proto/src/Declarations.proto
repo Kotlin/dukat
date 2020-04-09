@@ -439,6 +439,7 @@ message ModuleDeclarationProto {
     repeated ModifierDeclarationProto modifiers = 5;
     string uid = 6;
     string resourceName = 7;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 8;
 
     enum MODULE_KIND {
             SOURCE_FILE = 0;

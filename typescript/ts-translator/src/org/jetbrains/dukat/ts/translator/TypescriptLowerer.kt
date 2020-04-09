@@ -9,7 +9,6 @@ import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.commonLowerings.merge.MergeModules
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
@@ -33,6 +32,7 @@ import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
 import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
+import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
@@ -55,6 +55,7 @@ open class TypescriptLowerer(
         val declarations = sourceSet
                 .lower(
                         AddPackageName(packageName),
+                        MergeModules(),
                         MergeClassLikes(),
                         ResolveLambdaParents(),
                         FilterOutNonDeclarations(),
@@ -87,7 +88,6 @@ open class TypescriptLowerer(
                         SubstituteTsStdLibEntities(),
                         EscapeIdentificators(),
                         RemoveUnsupportedJsNames(),
-                        MergeModules(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         SeparateNonExternalEntities(),

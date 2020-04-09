@@ -33,20 +33,22 @@ interface TopLevelDeclarationLowering {
             is VariableDeclaration -> lowerVariableDeclaration(declaration, owner)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner as NodeOwner<FunctionOwnerDeclaration>)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration, owner)
-            is ModuleDeclaration -> lowerDocumentRoot(declaration, owner?.wrap(declaration))
+            is ModuleDeclaration -> lowerModuleModel(declaration, owner)
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration, owner)
             else -> declaration
         }
     }
 
-    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<ModuleDeclaration>?): List<TopLevelDeclaration> {
-        return declarations.mapNotNull { declaration ->
+    fun lowerModuleModel(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration? {
+        return moduleDeclaration.copy(declarations = moduleDeclaration.declarations.mapNotNull { declaration ->
             lowerTopLevelDeclaration(declaration, owner)
-        }
+        })
     }
 
-    fun lowerDocumentRoot(documentRoot: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>? = NodeOwner(documentRoot, null)): ModuleDeclaration {
-        return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations, NodeOwner(documentRoot, null)))
+    fun lowerSourceDeclaration(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>? = NodeOwner(moduleDeclaration, null)): ModuleDeclaration {
+        return moduleDeclaration.copy(declarations = moduleDeclaration.declarations.mapNotNull { declaration ->
+            lowerTopLevelDeclaration(declaration, owner)
+        })
     }
 
 }

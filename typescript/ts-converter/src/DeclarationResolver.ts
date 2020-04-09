@@ -6,7 +6,7 @@ export class DeclarationResolver {
   constructor(private program: ts.Program) {
   }
 
-  resolve(node: ts.InterfaceDeclaration | ts.ClassDeclaration | ts.VariableDeclaration | ts.ModuleDeclaration ): ReadonlyArray<ts.Node> {
+  resolve(node: ts.InterfaceDeclaration | ts.ClassDeclaration | ts.VariableDeclaration | ts.ModuleDeclaration): ReadonlyArray<ts.Node> {
     let typeChecker = this.program.getTypeChecker();
     let symbol = typeChecker.getSymbolAtLocation(node.name);
 

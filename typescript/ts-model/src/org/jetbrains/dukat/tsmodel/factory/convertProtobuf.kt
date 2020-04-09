@@ -274,14 +274,16 @@ private fun ReferenceClauseDeclarationProto.convert(): ReferenceClauseDeclaratio
 }
 
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
-    return ModuleDeclaration(packageName.convert(),
-            importsList.mapNotNull { it.convert() },
-            referencesList.map { it.convert() },
-            declarationsList.map { it.convert() },
-            modifiersList.map { it.convert() },
-            uid,
-            resourceName,
-            when (kind) {
+    return ModuleDeclaration(
+            packageName = packageName.convert(),
+            imports = importsList.mapNotNull { it.convert() },
+            references = referencesList.map { it.convert() },
+            declarations = declarationsList.map { it.convert() },
+            modifiers = modifiersList.map { it.convert() },
+            definitionsInfo = definitionsInfoList.map { it.convert() },
+            uid = uid,
+            resourceName = resourceName,
+            kind = when (kind) {
                 ModuleDeclarationProto.MODULE_KIND.SOURCE_FILE -> ModuleDeclarationKind.SOURCE_FILE
                 ModuleDeclarationProto.MODULE_KIND.MODULE -> ModuleDeclarationKind.MODULE
                 ModuleDeclarationProto.MODULE_KIND.NAMESPACE -> ModuleDeclarationKind.NAMESPACE

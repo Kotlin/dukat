@@ -70,7 +70,7 @@ private class PrimitivesLowering : DeclarationTypeLowering {
 }
 
 private fun ModuleDeclaration.lowerPrimitives(): ModuleDeclaration {
-    return PrimitivesLowering().lowerDocumentRoot(this)
+    return PrimitivesLowering().lowerSourceDeclaration(this)
 }
 
 private fun SourceSetDeclaration.lowerPrimitives(): SourceSetDeclaration {

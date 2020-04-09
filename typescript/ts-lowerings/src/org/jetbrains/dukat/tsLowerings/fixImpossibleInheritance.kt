@@ -51,7 +51,7 @@ private fun SourceSetDeclaration.visitClassLike(visitor: (ClassLikeDeclaration) 
 }
 
 private fun ModuleDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): ModuleDeclaration {
-    return FixImpossibleInheritanceDeclarationLowering(classLikeContext).lowerDocumentRoot(this)
+    return FixImpossibleInheritanceDeclarationLowering(classLikeContext).lowerSourceDeclaration(this)
 }
 
 private fun SourceFileDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): SourceFileDeclaration {

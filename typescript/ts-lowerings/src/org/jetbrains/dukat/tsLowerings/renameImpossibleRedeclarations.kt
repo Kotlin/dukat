@@ -31,7 +31,7 @@ private fun ModuleDeclaration.renameImpossibleDeclarations(): ModuleDeclaration 
             .filterIsInstance(NamedImportsDeclaration::class.java)
             .flatMap { it.importSpecifiers }
             .mapNotNull { it.propertyName?.let { IdentifierEntity(it) } }.toSet()
-    return RenameImpossibleDeclarationsTypeLowering(namedImports).lowerDocumentRoot(this)
+    return RenameImpossibleDeclarationsTypeLowering(namedImports).lowerSourceDeclaration(this)
 }
 
 private fun SourceFileDeclaration.renameImpossibleDeclarations(): SourceFileDeclaration {

@@ -8,7 +8,6 @@ import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.commonLowerings.merge.MergeModules
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
@@ -87,7 +86,6 @@ open class TypescriptWithBodyLowerer(
                         SubstituteTsStdLibEntities(),
                         EscapeIdentificators(),
                         RemoveConflictingOverloads(),
-                        MergeModules(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         SeparateNonExternalEntities(),
