@@ -93,6 +93,10 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createAsExpression(expression, type)
     }
 
+    createNonNullExpression(expression: Expression): Expression {
+        return AstExpressionFactory.createNonNullExpression(expression)
+    }
+
     createUnknownExpression(value: string): Expression {
         return AstExpressionFactory.createUnknownExpressionDeclarationAsExpression(value);
     }
@@ -343,6 +347,10 @@ export class AstExpressionConverter {
         return this.createAsExpression(this.convertExpression(expression.expression), this.astConverter.convertType(expression.type))
     }
 
+    private convertNonNullExpression(expression: ts.NonNullExpression): Expression {
+        return this.createNonNullExpression(this.convertExpression(expression.expression))
+    }
+
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
     }
@@ -385,6 +393,8 @@ export class AstExpressionConverter {
             return this.convertToken(expression)
         } else if (ts.isAssertionExpression(expression)) {
             return this.convertAsExpression(expression)
+        } else if (ts.isNonNullExpression(expression)) {
+            return this.convertNonNullExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

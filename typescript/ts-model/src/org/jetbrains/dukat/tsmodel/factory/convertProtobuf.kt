@@ -12,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -25,6 +25,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
+import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
@@ -113,6 +114,7 @@ import org.jetbrains.dukat.tsmodelproto.ModuleDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NameDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NameExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NewExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NonNullExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NumericLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ObjectLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterDeclarationProto
@@ -139,7 +141,6 @@ import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.VariableDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.WhileStatementDeclarationProto
-import kotlin.math.exp
 
 fun NameDeclarationProto.convert(): NameEntity {
     return when {
@@ -627,6 +628,12 @@ fun AsExpressionDeclarationProto.convert(): AsExpressionDeclaration {
     )
 }
 
+fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
+    return NonNullExpressionDeclaration(
+        expression = expression.convert()
+    )
+}
+
 fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
@@ -642,6 +649,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasNewExpression() -> newExpression.convert()
         hasConditionalExpression() -> conditionalExpression.convert()
         hasAsExpression() -> asExpression.convert()
+        hasNonNullExpression() -> nonNullExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

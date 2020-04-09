@@ -5,7 +5,7 @@ import org.jetbrains.dukat.js.type.analysis.PathWalker
 import org.jetbrains.dukat.js.type.analysis.calculateConstraints
 import org.jetbrains.dukat.js.type.constraint.Constraint
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
