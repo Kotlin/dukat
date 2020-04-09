@@ -3,6 +3,7 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
@@ -35,6 +36,7 @@ import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
+import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -98,6 +100,19 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 condition.convert(),
                 whenTrue.convert(),
                 whenFalse.convert()
+            )
+            is AsExpressionDeclaration -> AsExpressionModel(
+                expression.convert(),
+                TypeValueModel(
+                    IdentifierEntity("String"),
+                    listOf(),
+                    null,
+                    null
+                )
+                //TODO
+                /*with (documentConverter) {
+                    type.process()
+                }*/
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()

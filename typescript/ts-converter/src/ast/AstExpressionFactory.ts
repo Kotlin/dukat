@@ -5,7 +5,7 @@ import {
     IdentifierDeclaration,
     LiteralExpression,
     MemberDeclaration,
-    NameEntity
+    NameEntity, TypeDeclaration
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -211,5 +211,14 @@ export class AstExpressionFactory {
         let literalExpression = new declarations.LiteralExpressionDeclarationProto();
         literalExpression.setRegexliteral(regExLiteralExpression);
         return this.asExpression(literalExpression);
+    }
+
+    static createAsExpression(subExpression: Expression, type: TypeDeclaration): Expression {
+        let asExpression = new declarations.AsExpressionDeclarationProto();
+        asExpression.setExpression(subExpression);
+        asExpression.setType(type);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setAsexpression(asExpression);
+        return expression;
     }
 }
