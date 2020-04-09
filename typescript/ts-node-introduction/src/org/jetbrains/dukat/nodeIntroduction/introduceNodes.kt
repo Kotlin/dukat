@@ -3,22 +3,17 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
 import org.jetbrains.dukat.ast.model.makeNullable
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -43,7 +38,6 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.process
@@ -53,7 +47,6 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -85,7 +78,6 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
-import java.io.File
 
 
 private fun unquote(name: String): String {
@@ -117,7 +109,11 @@ private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclara
 
 private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode = ParameterNode(
         name = name,
-        type = (if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) { type.extractVarargType() } else { type }).convertToNode(),
+        type = (if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) {
+            type.extractVarargType()
+        } else {
+            type
+        }).convertToNode(),
         initializer = if (initializer != null || optional) {
             TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
         } else null,
@@ -388,10 +384,6 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun InterfaceDeclaration.convert(): List<TopLevelNode> {
-        resolveExternalSource(definitionsInfo)?.let { originalSource ->
-            return members.flatMap { member -> lowerInlinedInterfaceMemberDeclaration(member, this, originalSource) }
-        }
-
         val declaration = InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
@@ -521,113 +513,6 @@ private class LowerDeclarationsToNodes(
         return generatedParams
     }
 
-    private fun lowerInlinedInterfaceMemberDeclaration(declaration: MemberEntity, interfaceDeclaration: InterfaceDeclaration, originalSource: String): List<TopLevelNode> {
-        val name = interfaceDeclaration.name
-        val inlineSourceComment = SimpleCommentEntity("extending interface from $originalSource")
-
-        return when (declaration) {
-            is MethodSignatureDeclaration -> {
-                val mergeTypeParameters = mergeTypeParameters(interfaceDeclaration.typeParameters, declaration.typeParameters)
-
-                unrollOptionalParams(declaration.parameters).mapIndexed { index, parameters ->
-                    FunctionNode(
-                            IdentifierEntity(declaration.name),
-                            parameters,
-                            declaration.type.convertToNode(),
-                            convertTypeParameters(mergeTypeParameters + declaration.typeParameters),
-                            null,
-                            true,
-                            true,
-                            false,
-                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, mergeTypeParameters.map { typeParam ->
-                                typeParam.name
-                            }),
-                            FunctionFromMethodSignatureDeclaration(declaration.name, parameters.map { IdentifierEntity(it.name) }),
-                            "",
-                            if (index == 0) {
-                                inlineSourceComment
-                            } else null,
-                            null,
-                            false
-                    )
-                }
-            }
-            is PropertyDeclaration -> listOf(VariableNode(
-                    IdentifierEntity(declaration.name),
-                    (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
-                    null,
-                    false,
-                    true,
-                    convertTypeParameters(interfaceDeclaration.typeParameters),
-                    ClassLikeReferenceNode(interfaceDeclaration.uid, name, interfaceDeclaration.typeParameters.map { typeParam ->
-                        typeParam.name
-                    }),
-                    "",
-                    inlineSourceComment,
-                    false
-            ))
-            is IndexSignatureDeclaration -> listOf(
-
-                    // TODO: discuss what we actually gonna do when there's more than one key
-
-                    FunctionNode(
-                            IdentifierEntity("get"),
-                            convertParameters(declaration.indexTypes),
-                            declaration.returnType.makeNullable().convertToNode(),
-                            emptyList(),
-                            null,
-                            true,
-                            true,
-                            true,
-                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
-                            IndexSignatureGetter(declaration.indexTypes[0].name),
-                            "",
-                            null,
-                            null,
-                            true
-                    ),
-                    FunctionNode(
-                            IdentifierEntity("set"),
-                            convertParameters(declaration.indexTypes + listOf(ParameterDeclaration(
-                                    "value", declaration.returnType.convertToNode(), null, false, false
-                            ))),
-                            TypeValueNode(IdentifierEntity("Unit"), emptyList()),
-                            emptyList(),
-                            null,
-                            true,
-                            true,
-                            true,
-                            ClassLikeReferenceNode(interfaceDeclaration.uid, name, emptyList()),
-                            IndexSignatureSetter(declaration.indexTypes[0].name),
-                            "",
-                            null,
-                            null,
-                            true
-                    )
-            )
-            is CallSignatureDeclaration -> unrollOptionalParams(declaration.parameters).map { parameters ->
-                FunctionNode(
-                        IdentifierEntity("invoke"),
-                        parameters,
-                        declaration.type.convertToNode(),
-                        emptyList(),
-                        null,
-                        true,
-                        true,
-                        true,
-                        ClassLikeReferenceNode(interfaceDeclaration.uid, interfaceDeclaration.name, interfaceDeclaration.typeParameters.map { IdentifierEntity("*") }),
-                        FunctionFromCallSignature(parameters.map { IdentifierEntity(it.name) }),
-                        "",
-                        null,
-                        null,
-                        true
-                )
-            }
-            else -> emptyList()
-        }
-    }
-
-
     fun lowerMemberDeclaration(declaration: MemberEntity): List<MemberNode> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -731,14 +616,6 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    private fun resolveExternalSource(definitionsInfo: List<DefinitionInfoDeclaration>): String? {
-        return definitionsInfo.firstOrNull()?.fileName?.let {
-            if (it != fileName) {
-                File(it).name
-            } else null
-        }
-    }
-
     private fun NameEntity.isStringLiteral(): Boolean {
         return when (this) {
             is IdentifierEntity -> value.matches("^[\"\'].*[\"\']$".toRegex())
@@ -787,8 +664,7 @@ private class LowerDeclarationsToNodes(
     }
 }
 
-private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver, isInExternalDeclaration: Boolean)
-        = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
+private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
 private fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
     val isInExternalDeclaration = fileName.endsWith(".d.ts")
