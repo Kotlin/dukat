@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
@@ -28,9 +29,8 @@ import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
-import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -41,6 +41,7 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -113,6 +114,9 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 /*with (documentConverter) {
                     type.process()
                 }*/
+            )
+            is NonNullExpressionDeclaration -> NonNullExpressionModel(
+                expression.convert()
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()

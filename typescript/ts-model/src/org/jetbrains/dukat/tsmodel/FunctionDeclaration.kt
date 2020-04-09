@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class FunctionDeclaration(
@@ -10,4 +11,5 @@ data class FunctionDeclaration(
         override val modifiers: Set<ModifierDeclaration>,
         val body: BlockDeclaration?,
         override val uid: String
-) : MemberDeclaration, StatementDeclaration, WithUidDeclaration, WithModifiersDeclaration, ParameterOwnerDeclaration, ExpressionDeclaration, FunctionLikeDeclaration
+) : MemberDeclaration, StatementDeclaration, WithUidDeclaration, WithModifiersDeclaration, ParameterOwnerDeclaration,
+    ExpressionDeclaration, FunctionLikeDeclaration

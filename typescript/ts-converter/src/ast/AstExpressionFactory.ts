@@ -221,4 +221,12 @@ export class AstExpressionFactory {
         expression.setAsexpression(asExpression);
         return expression;
     }
+
+    static createNonNullExpression(subExpression: Expression): Expression {
+        let nonNullExpression = new declarations.NonNullExpressionDeclarationProto();
+        nonNullExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setNonnullexpression(nonNullExpression);
+        return expression;
+    }
 }

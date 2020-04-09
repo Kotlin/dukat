@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration

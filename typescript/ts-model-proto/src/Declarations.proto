@@ -296,6 +296,10 @@ message AsExpressionDeclarationProto {
     ParameterValueDeclarationProto type = 2;
 }
 
+message NonNullExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -315,7 +319,8 @@ message ExpressionDeclarationProto {
         NewExpressionDeclarationProto newExpression = 11;
         ConditionalExpressionDeclarationProto conditionalExpression = 12;
         AsExpressionDeclarationProto asExpression = 13;
-        UnknownExpressionDeclarationProto unknownExpression = 14;
+        NonNullExpressionDeclarationProto nonNullExpression = 14;
+        UnknownExpressionDeclarationProto unknownExpression = 15;
     }
 }
 
