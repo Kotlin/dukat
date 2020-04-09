@@ -33,7 +33,7 @@ interface TopLevelDeclarationLowering {
             is VariableDeclaration -> lowerVariableDeclaration(declaration, owner)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner as NodeOwner<FunctionOwnerDeclaration>)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration, owner)
-            is ModuleDeclaration -> lowerDocumentRoot(declaration, owner)
+            is ModuleDeclaration -> lowerDocumentRoot(declaration, owner?.wrap(declaration))
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration, owner)
             else -> declaration
         }
