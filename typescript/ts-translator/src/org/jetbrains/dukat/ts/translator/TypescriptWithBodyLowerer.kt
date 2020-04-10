@@ -15,7 +15,6 @@ import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotation
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
-import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantInlineFunction
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.LowerThisType
@@ -97,8 +96,7 @@ open class TypescriptWithBodyLowerer(
                         AddImports(),
                         AnyfyUnresolvedTypes(),
                         AddNoinlineModifier(),
-                        AddStandardImportsAndAnnotations(),
-                        RemoveRedundantInlineFunction()
+                        AddStandardImportsAndAnnotations()
                 )
 
         return models
