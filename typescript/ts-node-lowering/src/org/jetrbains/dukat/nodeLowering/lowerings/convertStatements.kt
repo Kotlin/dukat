@@ -20,6 +20,10 @@ import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressio
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateTokenModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.CaseModel
@@ -53,6 +57,10 @@ import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclarati
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 
 internal class ExpressionConverter(val documentConverter: DocumentConverter) {
     private fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
@@ -68,6 +76,16 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             else -> raiseConcern("unable to process LiteralExpressionDeclaration ${this}") {
                 StringLiteralExpressionModel("ERROR")
+            }
+        }
+    }
+
+    private fun TemplateTokenDeclaration.convert(): TemplateTokenModel {
+        return when (this) {
+            is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.convert() as StringLiteralExpressionModel)
+            is ExpressionTemplateTokenDeclaration -> ExpressionTemplateTokenModel(expression.convert())
+            else -> raiseConcern("unable to process TemplateTokenDeclaration ${this}") {
+                StringTemplateTokenModel(StringLiteralExpressionModel("ERROR"))
             }
         }
     }
@@ -90,6 +108,9 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 argumentExpression.convert()
             )
             is LiteralExpressionDeclaration -> this.convert()
+            is TemplateExpressionDeclaration -> TemplateExpressionModel(
+                tokens.map { it.convert() }
+            )
             is BinaryExpressionDeclaration -> BinaryExpressionModel(
                 left.convert(),
                 operator,

@@ -26,6 +26,7 @@ import {
     SourceFileDeclarationProto,
     SourceSetDeclarationProto,
     StatementDeclarationProto,
+    TemplateTokenDeclarationProto,
     TopLevelDeclarationProto,
     TypeAliasDeclarationProto,
     TypeParameterDeclarationProto,
@@ -64,6 +65,7 @@ export type SourceFileDeclaration = SourceFileDeclarationProto;
 export type SourceSet = SourceSetDeclarationProto;
 export type StatementDeclaration = StatementDeclarationProto;
 export type Declaration = TopLevelDeclarationProto;
+export type TemplateTokenDeclaration = TemplateTokenDeclarationProto;
 export type TypeAliasDeclaration = TypeAliasDeclarationProto;
 export type TypeParameter = TypeParameterDeclarationProto;
 export type TypeParamReferenceDeclaration = TypeParamReferenceDeclarationProto;

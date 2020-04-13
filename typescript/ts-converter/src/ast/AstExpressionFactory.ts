@@ -5,7 +5,7 @@ import {
     IdentifierDeclaration,
     LiteralExpression,
     MemberDeclaration,
-    NameEntity, TypeDeclaration
+    NameEntity, TemplateTokenDeclaration, TypeDeclaration
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -211,6 +211,31 @@ export class AstExpressionFactory {
         let literalExpression = new declarations.LiteralExpressionDeclarationProto();
         literalExpression.setRegexliteral(regExLiteralExpression);
         return this.asExpression(literalExpression);
+    }
+
+    static createStringTemplateToken(value: string): TemplateTokenDeclaration {
+        let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
+        stringLiteralExpression.setValue(value);
+
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setStringliteral(
+            stringLiteralExpression
+        );
+        return templateToken;
+    }
+
+    static createExpressionTemplateToken(expression: Expression): TemplateTokenDeclaration {
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setExpression(expression);
+        return templateToken;
+    }
+
+    static createTemplateExpression(tokens: Array<TemplateTokenDeclaration>): Expression {
+        let templateExpression = new declarations.TemplateExpressionDeclarationProto();
+        templateExpression.setTokenList(tokens);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setTemplateexpression(templateExpression);
+        return expression;
     }
 
     static createAsExpression(subExpression: Expression, type: TypeDeclaration): Expression {
