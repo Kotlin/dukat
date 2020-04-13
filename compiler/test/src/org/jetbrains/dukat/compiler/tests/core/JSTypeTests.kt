@@ -3,6 +3,8 @@ package org.jetbrains.dukat.compiler.tests.core
 import org.jetbrains.dukat.compiler.tests.FileFetcher
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
+import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
+import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
@@ -13,12 +15,14 @@ import org.jetbrains.dukat.translatorString.translateModule
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
 @Disabled
+@ExtendWith(CliTestsStarted::class, CliTestsEnded::class)
 class JSTypeTests : OutputTests() {
     @DisplayName("js type test set")
     @ParameterizedTest(name = "{0}")

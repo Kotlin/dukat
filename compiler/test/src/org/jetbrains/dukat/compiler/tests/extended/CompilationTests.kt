@@ -18,24 +18,6 @@ import java.io.File
 import java.io.PrintStream
 import kotlin.test.assertEquals
 
-private var CLI_PROCESS: Process? = null
-private val PORT = "8090"
-
-class CliTestsStarted : BeforeAllCallback {
-    override fun beforeAll(context: ExtensionContext?) {
-        CLI_PROCESS = CliHttpService().startService(PORT)
-        CliHttpClient(PORT).waitForServer()
-        println("cli http process creation: ${CLI_PROCESS?.isAlive}")
-    }
-}
-
-class CliTestsEnded : AfterAllCallback {
-    override fun afterAll(context: ExtensionContext?) {
-        CLI_PROCESS?.destroy()
-        println("shutting down cli http process")
-    }
-}
-
 private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
         val buildNumber = System.getenv("BUILD_NUMBER") ?: ""
