@@ -5,7 +5,18 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.*
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -52,7 +63,7 @@ private fun ModuleDeclaration.visitClassLike(visit: (classLike: ClassLikeDeclara
 
 private fun ModuleDeclaration.collectClassLikeReferences(): Map<String, ClassLikeWithOwner> {
     val references = mutableMapOf<String, ClassLikeWithOwner>()
-    visitClassLike { classLike, moduleOwner -> references[classLike.getUID()] = ClassLikeWithOwner(classLike, moduleOwner) }
+    visitClassLike { classLike, moduleOwner -> references[classLike.uid] = ClassLikeWithOwner(classLike, moduleOwner) }
     return references
 }
 
@@ -91,7 +102,7 @@ private fun ClassLikeDeclaration.generatePartialInterface(
             typeParameters,
             partialParentEntities,
             emptyList(),
-            getUID().withPartialSuffix(),
+            uid.withPartialSuffix(),
             owner)
 }
 
@@ -125,7 +136,7 @@ private fun ModuleDeclaration.resolveDeclarations(partialReferences: Map<String,
     val declarationResolved: List<TopLevelDeclaration> = declarations.flatMap { declaration ->
         when (declaration) {
             is ClassLikeDeclaration -> {
-                val uid = declaration.getUID()
+                val uid = declaration.uid
                 if (partialReferences[uid] is GeneratedInterfaceDeclaration) {
                     listOf(declaration, partialReferences[uid]!!)
                 } else {
@@ -157,7 +168,7 @@ private fun ModuleDeclaration.lowerPartialOfT(): ModuleDeclaration {
         val originalUid = uid.removeSuffix(PARTIAL_SUFFIX)
         if (partialReferences[originalUid] !is ClassLikeDeclaration) {
             updatedClassReferences[originalUid]?.let { (classLike, owner) ->
-                partialReferencesFromHeritage.putIfAbsent(classLike.getUID(), classLike.generatePartialInterface(owner, null))
+                partialReferencesFromHeritage.putIfAbsent(classLike.uid, classLike.generatePartialInterface(owner, null))
             }
         }
     }

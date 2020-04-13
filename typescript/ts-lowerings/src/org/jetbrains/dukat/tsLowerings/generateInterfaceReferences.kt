@@ -2,7 +2,6 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -16,9 +15,11 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -69,7 +70,7 @@ private class GenerateInterfaceReferencesDeclarationLowering : DeclarationWithOw
             else -> {
                 val ownerEntity = owner.topmostEntity()
 
-                val ownerUID = ownerEntity?.getUID() ?: ""
+                val ownerUID = ownerEntity?.uid ?: ""
 
                 myAstContext.registerObjectLiteralDeclaration(
                         owner.wrap(declaration.copy(members = declaration.members.map { param ->
@@ -114,12 +115,12 @@ private class GenerateInterfaceReferencesDeclarationLowering : DeclarationWithOw
     }
 
 
-    private fun NodeOwner<*>.topmostEntity(): TopLevelEntity? {
+    private fun NodeOwner<*>.topmostEntity(): WithUidDeclaration? {
         val topOwner = generateSequence(this) {
             it.owner
-        }.lastOrNull { (it.node is TopLevelEntity) && (it.node !is ModuleDeclaration) }
+        }.lastOrNull { (it.node is TopLevelDeclaration) && (it.node is WithUidDeclaration) && (it.node !is ModuleDeclaration) }
 
-        return (topOwner?.node as? TopLevelEntity)
+        return (topOwner?.node as? WithUidDeclaration)
     }
 
     private fun <T : Entity> lowerTypeParams(owner: NodeOwner<T>, typeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {

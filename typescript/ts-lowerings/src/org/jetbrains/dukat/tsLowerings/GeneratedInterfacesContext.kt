@@ -1,32 +1,31 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.*
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
-
-internal fun Entity.getUID(): String {
-    return when (this) {
-        is ClassDeclaration -> uid
-        is FunctionDeclaration -> uid
-        is GeneratedInterfaceDeclaration -> uid
-        is InterfaceDeclaration -> uid
-        is ObjectLiteralDeclaration -> uid
-        is TypeAliasDeclaration -> uid
-        is VariableDeclaration -> uid
-        else -> raiseConcern("unknown Entity uid ${this}") { "" };
-    }
-}
 
 @Suppress("UNCHECKED_CAST")
 private fun NodeOwner<*>.findOwnerPackage(): ModuleDeclaration {
