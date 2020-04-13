@@ -8,5 +8,5 @@ data class MethodSignatureDeclaration(
         override val type: ParameterValueDeclaration,
         override val typeParameters: List<TypeParameterDeclaration>,
         val optional: Boolean,
-        val modifiers: List<ModifierDeclaration>
-) : MemberDeclaration, ParameterOwnerDeclaration, FunctionLikeDeclaration
+        override val modifiers: Set<ModifierDeclaration>
+) : MemberDeclaration, ParameterOwnerDeclaration, FunctionLikeDeclaration, WithModifiersDeclaration

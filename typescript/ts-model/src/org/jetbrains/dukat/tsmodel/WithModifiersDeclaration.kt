@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.tsmodel
 
 interface WithModifiersDeclaration {
-    val modifiers: List<ModifierDeclaration>
+    val modifiers: Set<ModifierDeclaration>
 
     fun hasDefaultModifier(): Boolean {
         return modifiers.contains(ModifierDeclaration.DEFAULT_KEYWORD)

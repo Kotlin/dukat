@@ -52,13 +52,12 @@ private fun <T> List<T>.isIdenticalTo(list: List<T>, condition: (a: T, b: T) -> 
     return this.zip(list).all { (a, b) -> condition(a, b) }
 }
 
-
 private fun FunctionDeclaration.isIdenticalTo(functionDeclaration: FunctionDeclaration): Boolean {
     if (!type.isIdenticalTo(functionDeclaration.type)) {
         return false
     }
 
-    if (!modifiers.isIdenticalTo(functionDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+    if (modifiers != functionDeclaration.modifiers) {
         return false
     }
 
@@ -79,7 +78,7 @@ private fun MethodSignatureDeclaration.isIdenticalTo(methodSignatureDeclaration:
         return false
     }
 
-    if (!modifiers.isIdenticalTo(methodSignatureDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+    if (modifiers != methodSignatureDeclaration.modifiers) {
         return false
     }
 
@@ -132,7 +131,7 @@ private fun PropertyDeclaration.isIdenticalTo(propertyDeclaration: PropertyDecla
         return false
     }
 
-    if (!modifiers.isIdenticalTo(propertyDeclaration.modifiers) { a, b -> a.isIdenticalTo(b) }) {
+    if (modifiers != propertyDeclaration.modifiers) {
         return false
     }
 

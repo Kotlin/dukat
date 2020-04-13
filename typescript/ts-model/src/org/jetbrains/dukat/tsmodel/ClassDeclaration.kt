@@ -7,7 +7,7 @@ data class ClassDeclaration(
         override val members: List<MemberDeclaration>,
         override val typeParameters: List<TypeParameterDeclaration>,
         override val parentEntities: List<HeritageClauseDeclaration>,
-        override val modifiers: List<ModifierDeclaration>,
+        override val modifiers: Set<ModifierDeclaration>,
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String
 ) : ClassLikeDeclaration, ExpressionDeclaration, WithModifiersDeclaration

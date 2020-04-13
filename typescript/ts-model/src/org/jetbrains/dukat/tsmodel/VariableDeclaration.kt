@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 data class VariableDeclaration(
         val name: String,
         val type: ParameterValueDeclaration,
-        override val modifiers: List<ModifierDeclaration>,
+        override val modifiers: Set<ModifierDeclaration>,
         val initializer: ExpressionDeclaration?,
 
         override val definitionsInfo: List<DefinitionInfoDeclaration>,

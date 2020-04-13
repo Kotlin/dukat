@@ -192,7 +192,7 @@ fun ClassDeclarationProto.convert(): ClassDeclaration {
             membersList.map { it.convert() },
             typeParametersList.map { it.convert() },
             parentEntitiesList.map { it.convert() },
-            modifiersList.map { it.convert() },
+            modifiersList.map { it.convert() }.toSet(),
             definitionsInfoList.map { it.convert() },
             uid
     )
@@ -221,7 +221,7 @@ fun FunctionDeclarationProto.convert(): FunctionDeclaration {
             parametersList.map { it.convert() },
             type.convert(),
             typeParametersList.map { it.convert() },
-            modifiersList.map { it.convert() },
+            modifiersList.map { it.convert() }.toSet(),
             if (hasBody()) {
                 body.convert()
             } else null,
@@ -242,7 +242,7 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
     return VariableDeclaration(
             name,
             type.convert(),
-            modifiersList.map { it.convert() },
+            modifiersList.map { it.convert() }.toSet(),
             if (hasInitializer()) {
                 initializer?.convert()
             } else null,
@@ -279,7 +279,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
             imports = importsList.mapNotNull { it.convert() },
             references = referencesList.map { it.convert() },
             declarations = declarationsList.map { it.convert() },
-            modifiers = modifiersList.map { it.convert() },
+            modifiers = modifiersList.map { it.convert() }.toSet(),
             definitionsInfo = definitionsInfoList.map { it.convert() },
             uid = uid,
             resourceName = resourceName,
@@ -374,7 +374,7 @@ fun PropertyDeclarationProto.convert(): PropertyDeclaration {
             type.convert(),
             typeParametersList.map { it.convert() },
             optional,
-            modifiersList.map { it.convert() }
+            modifiersList.map { it.convert() }.toSet()
     )
 }
 
@@ -409,7 +409,7 @@ fun ConstructorDeclarationProto.convert(): ConstructorDeclaration {
     return ConstructorDeclaration(
             parametersList.map { it.convert() },
             typeParametersList.map { it.convert() },
-            modifiersList.map { it.convert() },
+            modifiersList.map { it.convert() }.toSet(),
             if (hasBody()) {
                 body.convert()
             } else null
@@ -423,7 +423,7 @@ fun MethodSignatureDeclarationProto.convert(): MethodSignatureDeclaration {
             type.convert(),
             typeParametersList.map { it.convert() },
             optional,
-            modifiersList.map { it.convert() }
+            modifiersList.map { it.convert() }.toSet()
     )
 }
 

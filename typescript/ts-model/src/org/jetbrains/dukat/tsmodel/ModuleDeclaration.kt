@@ -11,7 +11,7 @@ data class ModuleDeclaration(
         val references: List<ReferenceClauseDeclaration>,
         val declarations: List<TopLevelDeclaration>,
 
-        override val modifiers: List<ModifierDeclaration>,
+        override val modifiers: Set<ModifierDeclaration>,
 
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String,

@@ -7,7 +7,7 @@ data class FunctionDeclaration(
         override val parameters: List<ParameterDeclaration>,
         override val type: ParameterValueDeclaration,
         override val typeParameters: List<TypeParameterDeclaration>,
-        override val modifiers: List<ModifierDeclaration>,
+        override val modifiers: Set<ModifierDeclaration>,
         val body: BlockDeclaration?,
         override val uid: String
 ) : MemberDeclaration, StatementDeclaration, WithUidDeclaration, WithModifiersDeclaration, ParameterOwnerDeclaration, ExpressionDeclaration, FunctionLikeDeclaration

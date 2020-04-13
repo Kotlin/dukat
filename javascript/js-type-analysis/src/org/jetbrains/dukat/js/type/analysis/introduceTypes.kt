@@ -27,7 +27,7 @@ private fun ModuleDeclaration.collectConstraints(context: TypeAnalysisContext): 
     return environment
 }
 
-private fun WithModifiersDeclaration.makeExternal(): List<ModifierDeclaration> {
+private fun WithModifiersDeclaration.makeExternal(): Set<ModifierDeclaration> {
     return if (!hasDeclareModifier()) {
         modifiers + ModifierDeclaration.DECLARE_KEYWORD
     } else {

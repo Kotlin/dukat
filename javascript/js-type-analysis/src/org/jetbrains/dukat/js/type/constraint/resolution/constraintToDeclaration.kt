@@ -40,14 +40,16 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-private val DECLARE_MODIFIERS = listOf(ModifierDeclaration.DECLARE_KEYWORD)
-private val EXPORT_MODIFIERS = listOf(ModifierDeclaration.EXPORT_KEYWORD)
-private val STATIC_MODIFIERS = listOf(ModifierDeclaration.STATIC_KEYWORD)
+private val DECLARE_MODIFIERS = setOf(ModifierDeclaration.DECLARE_KEYWORD)
+private val EXPORT_MODIFIERS = setOf(ModifierDeclaration.EXPORT_KEYWORD)
+private val STATIC_MODIFIERS = setOf(ModifierDeclaration.STATIC_KEYWORD)
 
-private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration, modifiers: List<ModifierDeclaration>) = VariableDeclaration(
+private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration, modifiers: Set<ModifierDeclaration>) = VariableDeclaration(
         name = name,
         type = type,
         modifiers = modifiers,
+
+
         initializer = null,
         definitionsInfo = emptyList(),
         uid = generateUID()
@@ -59,7 +61,7 @@ private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration
         type = type,
         typeParameters = emptyList(),
         optional = false,
-        modifiers = if (isStatic) STATIC_MODIFIERS else emptyList()
+        modifiers = if (isStatic) STATIC_MODIFIERS else emptySet()
 )
 
 private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
@@ -70,7 +72,7 @@ private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclarati
         optional = false
 )
 
-private fun FunctionConstraint.toDeclarations(name: String, modifiers: List<ModifierDeclaration>) = overloads.map {
+private fun FunctionConstraint.toDeclarations(name: String, modifiers: Set<ModifierDeclaration>) = overloads.map {
     FunctionDeclaration(
             name = name,
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
@@ -86,7 +88,7 @@ private fun FunctionConstraint.toConstructors() = overloads.map {
     ConstructorDeclaration(
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
             typeParameters = emptyList(),
-            modifiers = emptyList(),
+            modifiers = emptySet(),
             body = null
     )
 }
@@ -106,7 +108,7 @@ private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
 )
 
 private fun FunctionConstraint.toMemberDeclarations(name: String, isStatic: Boolean) =
-        this.toDeclarations(name, if (isStatic) STATIC_MODIFIERS else emptyList())
+        this.toDeclarations(name, if (isStatic) STATIC_MODIFIERS else emptySet())
 
 private fun Constraint.toMemberDeclarations(name: String, isStatic: Boolean = false) : List<MemberDeclaration> {
     return when (this) {
@@ -115,7 +117,7 @@ private fun Constraint.toMemberDeclarations(name: String, isStatic: Boolean = fa
     }
 }
 
-private fun ClassConstraint.toDeclaration(name: String, modifiers: List<ModifierDeclaration>) : ClassDeclaration {
+private fun ClassConstraint.toDeclaration(name: String, modifiers: Set<ModifierDeclaration>) : ClassDeclaration {
     val members = mutableListOf<MemberDeclaration>()
 
     val constructorConstraint = constructorConstraint
@@ -223,7 +225,7 @@ private fun Constraint.toType() : ParameterValueDeclaration {
     }
 }
 
-private fun Constraint.toDeclarations(name: String, exportModifiers: List<ModifierDeclaration>) : List<TopLevelDeclaration> {
+private fun Constraint.toDeclarations(name: String, exportModifiers: Set<ModifierDeclaration>) : List<TopLevelDeclaration> {
     return when (this) {
         is ClassConstraint -> listOf(this.toDeclaration(name, exportModifiers))
         is FunctionConstraint -> this.toDeclarations(name, exportModifiers)
