@@ -35,8 +35,8 @@ private class SubstituteTypeLowering(private val generatedEntities: Map<String, 
     }
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
-        val declarationResolved = generatedEntities[declaration.typeReference?.uid]?.get(declaration.params.size)?.let { reference ->
-            declaration.copy(value = reference.name, typeReference = ReferenceDeclaration(reference.uid))
+        val declarationResolved = generatedEntities[declaration.reference?.uid]?.get(declaration.params.size)?.let { reference ->
+            declaration.copy(value = reference.name, reference = ReferenceDeclaration(reference.uid))
         }
 
         return super.lowerTypeDeclaration(declarationResolved ?: declaration, owner)
@@ -116,7 +116,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
     }
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
-        checkForDefaultTypeParams(declaration.params, references[declaration.typeReference?.uid])
+        checkForDefaultTypeParams(declaration.params, references[declaration.reference?.uid])
         return super.lowerTypeDeclaration(declaration, owner)
     }
 

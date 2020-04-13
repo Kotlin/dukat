@@ -58,10 +58,10 @@ private class PrimitivesLowering : DeclarationTypeLowering {
         return declaration.copy(
                 value = value,
                 params = declaration.params.map { lowerParameterValue(it, owner?.wrap(declaration)) },
-                typeReference = if (value != declaration.value) {
+                reference = if (value != declaration.value) {
                     null
                 } else {
-                    declaration.typeReference
+                    declaration.reference
                 },
                 nullable = nullable,
                 meta = meta

@@ -137,7 +137,7 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
         is TypeDeclaration -> TypeValueNode(
                 value = declaration.value,
                 params = declaration.params.map { param -> param.convertToNode() },
-                typeReference = declaration.typeReference?.let {
+                typeReference = declaration.reference?.let {
                     ReferenceNode(it.uid)
                 },
                 nullable = declaration.nullable,
