@@ -23,7 +23,7 @@ external open class A11yDialog {
     open fun create(el: Element? = definedExternally, containers: NodeList? = definedExternally)
     open fun create(el: Element? = definedExternally, containers: Element? = definedExternally)
     open fun create(el: Element? = definedExternally, containers: String? = definedExternally)
-    open fun on(evt: String, callback: (dialogElement: Any, event: Event) -> Unit)
-    open fun off(evt: String, callback: (dialogElement: Any, event: Event) -> Unit)
+    open fun on(evt: String /* "show" | "hide" | "destroy" | "create" */, callback: (dialogElement: Any, event: Event) -> Unit)
+    open fun off(evt: String /* "show" | "hide" | "destroy" | "create" */, callback: (dialogElement: Any, event: Event) -> Unit)
     open fun create()
 }

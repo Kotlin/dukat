@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsLowerings
 
+import TopLevelDeclarationLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -18,7 +19,7 @@ private fun FunctionTypeDeclaration.convertToCallSignature(typeParams: List<Type
     )
 }
 
-private class ResolveLambdaParentsLowering(private val topDeclarationResolver: TopLevelDeclarationResolver) : DeclarationTypeLowering {
+private class ResolveLambdaParentsLowering(private val topDeclarationResolver: TopLevelDeclarationResolver) : TopLevelDeclarationLowering {
 
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): InterfaceDeclaration {
 
@@ -34,16 +35,16 @@ private class ResolveLambdaParentsLowering(private val topDeclarationResolver: T
         }
 
         val declarationResolved = declaration.copy(
-            parentEntities = regularParentEntities,
-            members = callSignaturesFromLambda + declaration.members
+                parentEntities = regularParentEntities,
+                members = callSignaturesFromLambda + declaration.members
         )
 
-        return super.lowerInterfaceDeclaration(declarationResolved, owner)
+        return declarationResolved
     }
 }
 
 private fun SourceSetDeclaration.resolveLambdaParents(topDeclarationResolver: TopLevelDeclarationResolver): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = ResolveLambdaParentsLowering(topDeclarationResolver).lowerDocumentRoot(it.root)) })
+    return copy(sources = sources.map { it.copy(root = ResolveLambdaParentsLowering(topDeclarationResolver).lowerSourceDeclaration(it.root)) })
 }
 
 class ResolveLambdaParents : TsLowering {

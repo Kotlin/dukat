@@ -4,7 +4,7 @@ declare namespace React {
         bar(): number
         baz(a: any)
     }
-    class Component<P, S> extends Bar implements Foo {
+    class Component<P, S, T = boolean> extends Bar implements Foo {
         boo(p: P, s: S)
     }
     interface Foo {

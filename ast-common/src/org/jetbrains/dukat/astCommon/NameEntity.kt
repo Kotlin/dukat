@@ -1,7 +1,8 @@
 package org.jetbrains.dukat.astCommon
 
 sealed class NameEntity : Entity {
-    override fun toString(): String {
+    // TODO: investigate why both translate and toString() is overrided somewhere else
+    fun asString(): String {
         return when (this) {
             is IdentifierEntity -> value
             is QualifierEntity -> "${left}.${right}"

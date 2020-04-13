@@ -12,7 +12,6 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 
@@ -49,7 +48,7 @@ private fun ModuleModel.scanVariablesAndObjects(mergeMap: MutableMap<Pair<NameEn
     submodules.forEach { it.scanVariablesAndObjects(mergeMap) }
 }
 
-fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity>, TopLevelModel?>): ModuleModel {
+private fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity>, TopLevelModel?>): ModuleModel {
 
     val declarationsMerged = declarations.mapNotNull { declaration ->
         when (declaration) {
@@ -104,19 +103,16 @@ fun ModuleModel.mergeVarsAndInterfaces(mergeMap: Map<Pair<NameEntity, NameEntity
     return copy(declarations = declarationsMerged, submodules = submodules.map { it.mergeVarsAndInterfaces(mergeMap) })
 }
 
-private fun SourceSetModel.mergeVarsAndInterfaces(): SourceSetModel {
-    val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
-    sources.forEach { it.root.scanInterfaces(mergeMap) }
-    sources.forEach { it.root.scanVariablesAndObjects(mergeMap) }
+class MergeVarsAndInterfaces : ModelLowering {
+    private val mergeMap = mutableMapOf<Pair<NameEntity, NameEntity>, TopLevelModel?>()
 
-    return transform {
-        // TODO: investigate where we ever will see multiple variables with same name
-        it.mergeVarsAndInterfaces(mergeMap)
+    override fun lower(module: ModuleModel): ModuleModel {
+        return module.mergeVarsAndInterfaces(mergeMap)
     }
-}
 
-class MergeVarsAndInterfaces() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.mergeVarsAndInterfaces()
+        source.sources.forEach { it.root.scanInterfaces(mergeMap) }
+        source.sources.forEach { it.root.scanVariablesAndObjects(mergeMap) }
+        return super.lower(source)
     }
 }

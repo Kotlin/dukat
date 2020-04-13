@@ -11,7 +11,7 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
-import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
+import org.jetbrains.dukat.model.commonLowerings.TopLevelModelLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
@@ -23,14 +23,14 @@ private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
     }
 }
 
-private class ExternalEntityRegistrator(private val register: (NameEntity, TopLevelModel) -> Unit) : ModelWithOwnerTypeLowering {
+private class ExternalEntityRegistrator(private val register: (NameEntity, TopLevelModel) -> Unit) : TopLevelModelLowering {
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val node = ownerContext.node;
         if (parentModule.canNotContainExternalEntities() && node.inline) {
             register(parentModule.name, node)
         }
-        return super.lowerFunctionModel(ownerContext, parentModule)
+        return node
     }
 
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
@@ -38,14 +38,16 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
         if (parentModule.canNotContainExternalEntities() && node.inline) {
             register(parentModule.name, node)
         }
-        return super.lowerVariableModel(ownerContext, parentModule)
+
+        return ownerContext.node
     }
 
     override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
         if (parentModule.canNotContainExternalEntities()) {
             register(parentModule.name, ownerContext.node)
         }
-        return super.lowerTypeAliasModel(ownerContext, parentModule)
+
+        return ownerContext.node
     }
 }
 
@@ -86,21 +88,21 @@ private fun ModuleModel.filterOutExternalDeclarations(): ModuleModel {
     }
 }
 
-private fun SourceSetModel.separateNonExternalDeclarations(): SourceSetModel {
-    val nonDeclarationsBucket = mutableMapOf<NameEntity, MutableList<TopLevelModel>>()
-    sources.forEach { source ->
-        ExternalEntityRegistrator { name, node ->
-            nonDeclarationsBucket.getOrPut(name) { mutableListOf() }.add(node)
-        }.lowerRoot(source.root, NodeOwner(source.root, null))
+class SeparateNonExternalEntities() : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        return module.filterOutExternalDeclarations()
     }
 
-    val sourcesLowered = generateDeclarationFiles("nonDeclarations", nonDeclarationsBucket) + sources.map { source -> source.copy(root = source.root.filterOutExternalDeclarations()) }
-
-    return copy(sources = sourcesLowered)
-}
-
-class SeparateNonExternalEntities() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.separateNonExternalDeclarations()
+        val nonDeclarationsBucket = mutableMapOf<NameEntity, MutableList<TopLevelModel>>()
+        source.sources.forEach { sourceFile ->
+            ExternalEntityRegistrator { name, node ->
+                nonDeclarationsBucket.getOrPut(name) { mutableListOf() }.add(node)
+            }.lowerRoot(sourceFile.root, NodeOwner(sourceFile.root, null))
+        }
+
+        val sourcesLowered = generateDeclarationFiles("nonDeclarations", nonDeclarationsBucket) + source.sources.map { it.copy(root = lower(it.root)) }
+
+        return source.copy(sources = sourcesLowered)
     }
 }

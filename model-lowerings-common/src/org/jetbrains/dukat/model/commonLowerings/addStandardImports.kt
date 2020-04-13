@@ -48,26 +48,21 @@ private fun InterfaceModel.hasNestedEntity(): Boolean {
     return members.any { (it is ClassLikeModel) }
 }
 
-private fun SourceSetModel.addStandardImportsAndAnnotations(): SourceSetModel {
-
-    visitTopLevelModel { topLevelModel ->
-        when (topLevelModel) {
-            is InterfaceModel -> {
-                if (topLevelModel.hasNestedEntity()) {
-                    topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+class AddStandardImportsAndAnnotations : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        module.visitTopLevelModel { topLevelModel ->
+            when (topLevelModel) {
+                is InterfaceModel -> {
+                    if (topLevelModel.hasNestedEntity()) {
+                        topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+                    }
+                }
+                is ModuleModel -> {
+                    topLevelModel.addStandardImportsAndAnnotations()
                 }
             }
-            is ModuleModel -> {
-                topLevelModel.addStandardImportsAndAnnotations()
-            }
         }
-    }
 
-    return this
-}
-
-class AddStandardImportsAndAnnotations() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.addStandardImportsAndAnnotations()
+        return module
     }
 }

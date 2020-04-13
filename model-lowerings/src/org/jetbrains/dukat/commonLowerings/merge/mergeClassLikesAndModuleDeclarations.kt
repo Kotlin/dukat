@@ -120,29 +120,31 @@ private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
 
 internal data class MergeClassLikeData(val model: ClassLikeModel, val extractedTypeAliases: List<TypeAliasModel>)
 
-private fun SourceSetModel.mergeClassLikesAndModuleDeclarations(): SourceSetModel {
-    val modules = sources
-            .flatMap { source -> source.root.fetchModules() }
-            .groupBy { it.ownerName }
-            .mapValues { (_, v) -> v[0].model }
+class MergeClassLikesAndModuleDeclarations : ModelLowering {
+    private lateinit var classLikes: Map<NameEntity, MergeClassLikeData>
 
-    val classLikes = sources
-            .flatMap { source -> source.root.fetchClassLikes() }
-            .groupBy { it.ownerName }
-            .filterKeys { name -> modules.containsKey(name) }
-            .mapValues { (name, v) ->
-                val moduleToMerge = modules[name]!!
-                MergeClassLikeData(
-                        v[0].model + moduleToMerge,
-                        moduleToMerge.declarations.filterIsInstance(TypeAliasModel::class.java)
-                )
-            }
+    override fun lower(module: ModuleModel): ModuleModel {
+        return module.mergeClassLikesAndModuleDeclarations(classLikes)
+    }
 
-    return copy(sources = sources.map { source -> source.copy(root = source.root.mergeClassLikesAndModuleDeclarations(classLikes)) })
-}
-
-class MergeClassLikesAndModuleDeclarations() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.mergeClassLikesAndModuleDeclarations()
+        val modules = source.sources
+                .flatMap { it.root.fetchModules() }
+                .groupBy { it.ownerName }
+                .mapValues { (_, v) -> v[0].model }
+
+        classLikes = source.sources
+                .flatMap { it.root.fetchClassLikes() }
+                .groupBy { it.ownerName }
+                .filterKeys { name -> modules.containsKey(name) }
+                .mapValues { (name, v) ->
+                    val moduleToMerge = modules[name]!!
+                    MergeClassLikeData(
+                            v[0].model + moduleToMerge,
+                            moduleToMerge.declarations.filterIsInstance(TypeAliasModel::class.java)
+                    )
+                }
+
+        return super.lower(source)
     }
 }

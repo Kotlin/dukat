@@ -449,7 +449,17 @@ export class AstFactory {
     return modifierDeclaration;
   }
 
-  createModuleDeclaration(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, moduleDeclarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): ModuleDeclaration {
+  createModuleDeclaration(
+    packageName: NameEntity,
+    imports: Array<ImportClauseDeclaration>,
+    references: Array<ReferenceClauseDeclarationProto>,
+    moduleDeclarations: Array<Declaration>,
+    modifiers: Array<ModifierDeclaration>,
+    uid: string,
+    resourceName: string,
+    definitions: Array<DefinitionInfoDeclaration>,
+    kind: MODULE_KINDMap[keyof MODULE_KINDMap]
+  ): ModuleDeclaration {
     let moduleDeclaration = new ModuleDeclarationProto();
 
     moduleDeclaration.setImportsList(imports);
@@ -460,6 +470,7 @@ export class AstFactory {
 
     moduleDeclaration.setUid(uid);
     moduleDeclaration.setResourcename(resourceName);
+    moduleDeclaration.setDefinitionsinfoList(definitions);
     moduleDeclaration.setKind(kind);
     return moduleDeclaration;
   }

@@ -30,3 +30,9 @@ declare function addHeaders(headers: MyHeaders);
 declare var someRef: Ref<number>;
 
 declare function addRef(ref: Ref<number>);
+
+interface SomeInterface {
+  cached: {
+    <T extends (...args: any[]) => any>(func: T, resolver?: (...args: any[]) => any): T;
+  };
+}

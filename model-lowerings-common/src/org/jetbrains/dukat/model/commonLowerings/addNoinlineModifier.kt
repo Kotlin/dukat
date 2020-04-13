@@ -6,7 +6,6 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModifierModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class NoinlineLowering(private val modelContext: ModelContext) : ModelWithOwnerTypeLowering {
@@ -38,19 +37,15 @@ private class NoinlineLowering(private val modelContext: ModelContext) : ModelWi
     }
 }
 
-private fun ModuleModel.addNoinlineModifier(modelContext: ModelContext): ModuleModel {
-    return NoinlineLowering(modelContext).lowerRoot(this, NodeOwner(this, null))
-}
+class AddNoinlineModifier: ModelLowering {
+    private lateinit var modelContext: ModelContext
 
-private fun SourceSetModel.addNoinlineModifier(): SourceSetModel {
-    val modelContext = ModelContext(this)
-    return transform {
-        it.addNoinlineModifier(modelContext)
+    override fun lower(module: ModuleModel): ModuleModel {
+        return NoinlineLowering(modelContext).lowerRoot(module, NodeOwner(module, null))
     }
-}
 
-class AddNoinlineModifier() : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.addNoinlineModifier()
+        modelContext = ModelContext(source)
+        return super.lower(source)
     }
 }

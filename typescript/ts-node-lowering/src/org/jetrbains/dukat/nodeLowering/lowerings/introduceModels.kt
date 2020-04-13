@@ -23,6 +23,7 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -83,7 +84,6 @@ import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
@@ -99,6 +99,7 @@ internal enum class TranslationContext {
     TYPE_CONSTRAINT,
     IRRELEVANT,
     FUNCTION_TYPE,
+    PROPERTY,
     INLINE_EXTENSION,
     CONSTRUCTOR
 }
@@ -109,9 +110,16 @@ private data class Members(
 )
 
 private typealias UidMapper = Map<String, FqNode>
-private typealias UidMutableMapper = MutableMap<String, FqNode>
 
 data class FqNode(val node: Entity, val fqName: NameEntity)
+
+private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
+        IdentifierEntity("dynamic"),
+        emptyList(),
+        metaDescription,
+        null
+)
+
 
 internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
@@ -171,22 +179,15 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun ClassLikeNode.processMembers(): Members {
-        val (staticNodes, ownNodes) =  members.partition { it.isStatic() }
+        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
         return Members(ownNodes.mapNotNull { it.process() }, staticNodes.mapNotNull { it.process() })
     }
 
     private fun NameEntity.addLibPrefix() = TSLIBROOT.appendLeft(this)
-    private fun UnionTypeNode.canBeTranslatedAsString(): Boolean {
-        return params.all { (it is TypeValueNode) && (it.value == IdentifierEntity("String")) }
-    }
 
     private fun UnionTypeNode.convertMeta(): String {
         return params.joinToString(" | ") { unionMember ->
-            if (unionMember.meta is StringLiteralDeclaration) {
-                (unionMember.meta as StringLiteralDeclaration).token
-            } else {
-                unionMember.process().translate()
-            }.let {
+            unionMember.process().translate().let {
                 if (nullable) {
                     "${it}?"
                 } else {
@@ -222,22 +223,19 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             else -> IdentifierEntity("dynamic")
         }
         return when (this) {
-            is UnionTypeNode -> if (canBeTranslatedAsString()) {
-                val stringEntity = IdentifierEntity("String")
-                TypeValueModel(
-                        stringEntity,
-                        emptyList(),
-                        convertMeta(),
-                        stringEntity.addLibPrefix()
-                )
-            } else {
-                TypeValueModel(
-                        dynamicName,
-                        emptyList(),
-                        convertMeta(),
-                        null
-                )
-            }
+            is StringLiteralUnionNode -> TypeValueModel(
+                    IdentifierEntity("String"),
+                    emptyList(),
+                    params.joinToString(" | "),
+                    null,
+                    nullable
+            )
+            is UnionTypeNode -> TypeValueModel(
+                    dynamicName,
+                    emptyList(),
+                    convertMeta(),
+                    null
+            )
             is TupleTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),
@@ -252,17 +250,19 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is TypeValueNode -> {
-                if ((value == IdentifierEntity("String")) && (meta is StringLiteralDeclaration)) {
-                    TypeValueModel(value.addLibPrefix(), emptyList(), (meta as StringLiteralDeclaration).token, typeReference?.getFqName(value))
-                } else {
-                    TypeValueModel(
-                            value,
-                            params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
-                            meta.processMeta(),
-                            getFqName(),
-                            nullable
-                    )
-                }
+                uidToNameMapper[typeReference?.uid]?.let {
+                    if ((it.node is TypeAliasNode) && (it.node.typeReference is UnionTypeNode)) {
+                        dynamicType("typealias ${it.node.name.asString()} = dynamic")
+                    } else {
+                        null
+                    }
+                } ?: TypeValueModel(
+                        value,
+                        params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
+                        meta.processMeta(),
+                        getFqName(),
+                        nullable
+                )
             }
             is FunctionTypeNode -> {
                 FunctionTypeModel(
@@ -275,19 +275,37 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is GeneratedInterfaceReferenceNode -> {
+                val typeParams =  when (context) {
+                    TranslationContext.PROPERTY -> typeParameters.map {
+                        TypeParameterModel(
+                                type = TypeValueModel(
+                                        IdentifierEntity("Any"),
+                                        emptyList(),
+                                        null,
+                                        null,
+                                        true
+                                ),
+                                constraints = emptyList()
+                        )
+                    }
+                    else -> typeParameters.map { typeParam ->
+                        TypeParameterModel(
+                                type = TypeValueModel(
+                                        typeParam.name,
+                                        emptyList(),
+                                        null,
+                                        if (reference?.uid?.endsWith("_GENERATED") == true) {
+                                            null
+                                        } else {
+                                            reference?.getFqName(typeParam.name)
+                                        }),
+                                constraints = emptyList()
+                        )
+                    }
+                }
                 TypeValueModel(
                         name,
-                        typeParameters.map { typeParam ->
-                            TypeValueModel(
-                                    typeParam.name,
-                                    emptyList(),
-                                    null,
-                                    if (reference?.uid?.endsWith("_GENERATED") == true) {
-                                        null
-                                    } else {
-                                        reference?.getFqName(typeParam.name)
-                                    })
-                        }.map { TypeParameterModel(it, listOf()) },
+                        typeParams,
                         meta?.processMeta(),
                         reference?.getFqName(name),
                         nullable
@@ -330,7 +348,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is MethodNode -> process()
             is PropertyNode -> PropertyModel(
                     name = IdentifierEntity(name),
-                    type = type.process(TranslationContext.IRRELEVANT),
+                    type = type.process(TranslationContext.PROPERTY),
                     typeParameters = convertTypeParams(typeParameters),
                     static = static,
                     override = null,
@@ -362,10 +380,10 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     TranslationContext.INLINE_EXTENSION -> {
                         if (optional) {
                             ExpressionStatementModel(
-                                IdentifierExpressionModel(
-                                    IdentifierEntity("null")
-                                ),
-                                meta
+                                    IdentifierExpressionModel(
+                                            IdentifierEntity("null")
+                                    ),
+                                    meta
                             )
                         } else {
                             null
@@ -374,16 +392,16 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     else -> {
                         when {
                             initializer != null -> ExpressionStatementModel(
-                                IdentifierExpressionModel(
-                                    initializer!!.value
-                                ),
-                                meta
+                                    IdentifierExpressionModel(
+                                            initializer!!.value
+                                    ),
+                                    meta
                             )
                             optional -> ExpressionStatementModel(
-                                IdentifierExpressionModel(
-                                    IdentifierEntity("definedExternally")
-                                ),
-                                meta
+                                    IdentifierExpressionModel(
+                                            IdentifierEntity("definedExternally")
+                                    ),
+                                    meta
                             )
                             else -> null
                         }
@@ -441,18 +459,18 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun VariableNode.resolveGetter(): StatementModel? {
         return if (inline) {
             ExpressionStatementModel(
-                PropertyAccessExpressionModel(
                     PropertyAccessExpressionModel(
-                        ThisExpressionModel(),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                            listOf()
-                        )
-                    ),
-                    IdentifierExpressionModel(
-                        name.rightMost()
+                            PropertyAccessExpressionModel(
+                                    ThisExpressionModel(),
+                                    CallExpressionModel(
+                                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                            listOf()
+                                    )
+                            ),
+                            IdentifierExpressionModel(
+                                    name.rightMost()
+                            )
                     )
-                )
             )
         } else null
     }
@@ -460,19 +478,19 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun VariableNode.resolveSetter(): StatementModel? {
         return if (inline) {
             AssignmentStatementModel(
-                PropertyAccessExpressionModel(
                     PropertyAccessExpressionModel(
-                        ThisExpressionModel(),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                            listOf()
-                        )
+                            PropertyAccessExpressionModel(
+                                    ThisExpressionModel(),
+                                    CallExpressionModel(
+                                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                            listOf()
+                                    )
+                            ),
+                            IdentifierExpressionModel(
+                                    name.rightMost()
+                            )
                     ),
-                    IdentifierExpressionModel(
-                        name.rightMost()
-                    )
-                ),
-                IdentifierExpressionModel(IdentifierEntity("value"))
+                    IdentifierExpressionModel(IdentifierEntity("value"))
             )
         } else null
     }
@@ -484,103 +502,103 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun FunctionNode.resolveBody(): BlockStatementModel {
         return BlockStatementModel(when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
-                ReturnStatementModel(
-                    PropertyAccessExpressionModel(
-                        PropertyAccessExpressionModel(
-                            ThisExpressionModel(),
-                            CallExpressionModel(
-                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                listOf()
+                    ReturnStatementModel(
+                            PropertyAccessExpressionModel(
+                                    PropertyAccessExpressionModel(
+                                            ThisExpressionModel(),
+                                            CallExpressionModel(
+                                                    IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                                    listOf()
+                                            )
+                                    ),
+                                    CallExpressionModel(
+                                            IdentifierExpressionModel(
+                                                    IdentifierEntity("get")
+                                            ),
+                                            listOf(
+                                                    IdentifierExpressionModel(
+                                                            IdentifierEntity(nodeContext.name)
+                                                    )
+                                            )
+                                    )
                             )
-                        ),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(
-                                IdentifierEntity("get")
-                            ),
-                            listOf(
-                                IdentifierExpressionModel(
-                                    IdentifierEntity(nodeContext.name)
-                                )
-                            )
-                        )
                     )
-                )
             )
 
             is IndexSignatureSetter -> listOf(
-                ExpressionStatementModel(
-                    PropertyAccessExpressionModel(
-                        PropertyAccessExpressionModel(
-                            ThisExpressionModel(),
-                            CallExpressionModel(
-                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                listOf()
+                    ExpressionStatementModel(
+                            PropertyAccessExpressionModel(
+                                    PropertyAccessExpressionModel(
+                                            ThisExpressionModel(),
+                                            CallExpressionModel(
+                                                    IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                                    listOf()
+                                            )
+                                    ),
+                                    CallExpressionModel(
+                                            IdentifierExpressionModel(
+                                                    IdentifierEntity("set")
+                                            ),
+                                            listOf(
+                                                    IdentifierExpressionModel(
+                                                            IdentifierEntity(nodeContext.name)
+                                                    ),
+                                                    IdentifierExpressionModel(
+                                                            IdentifierEntity("value")
+                                                    )
+                                            )
+                                    )
                             )
-                        ),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(
-                                IdentifierEntity("set")
-                            ),
-                            listOf(
-                                IdentifierExpressionModel(
-                                    IdentifierEntity(nodeContext.name)
-                                ),
-                                IdentifierExpressionModel(
-                                    IdentifierEntity("value")
-                                )
-                            )
-                        )
                     )
-                )
             )
 
             is FunctionFromCallSignature -> {
                 val chainCallExpression = PropertyAccessExpressionModel(
-                    PropertyAccessExpressionModel(
-                        ThisExpressionModel(),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                            listOf()
-                        )
-                    ),
-                    CallExpressionModel(
-                        IdentifierExpressionModel(
-                            IdentifierEntity("invoke")
+                        PropertyAccessExpressionModel(
+                                ThisExpressionModel(),
+                                CallExpressionModel(
+                                        IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                        listOf()
+                                )
                         ),
-                        nodeContext.params.map { IdentifierExpressionModel(it) }
-                    )
+                        CallExpressionModel(
+                                IdentifierExpressionModel(
+                                        IdentifierEntity("invoke")
+                                ),
+                                nodeContext.params.map { IdentifierExpressionModel(it) }
+                        )
                 )
                 listOf(
-                    if (type.isUnit()) {
-                        ExpressionStatementModel(chainCallExpression)
-                    } else {
-                        ReturnStatementModel(chainCallExpression)
-                    }
+                        if (type.isUnit()) {
+                            ExpressionStatementModel(chainCallExpression)
+                        } else {
+                            ReturnStatementModel(chainCallExpression)
+                        }
                 )
             }
             is FunctionFromMethodSignatureDeclaration -> {
                 val bodyExpression = PropertyAccessExpressionModel(
-                    PropertyAccessExpressionModel(
-                        ThisExpressionModel(),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                            listOf()
-                        )
-                    ),
-                    CallExpressionModel(
-                        IdentifierExpressionModel(
-                            IdentifierEntity(nodeContext.name)
+                        PropertyAccessExpressionModel(
+                                ThisExpressionModel(),
+                                CallExpressionModel(
+                                        IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                        listOf()
+                                )
                         ),
-                        nodeContext.params.map { IdentifierExpressionModel(it) }
-                    )
+                        CallExpressionModel(
+                                IdentifierExpressionModel(
+                                        IdentifierEntity(nodeContext.name)
+                                ),
+                                nodeContext.params.map { IdentifierExpressionModel(it) }
+                        )
                 )
 
                 listOf(
-                    if (type.isUnit()) {
-                        ExpressionStatementModel(bodyExpression)
-                    } else {
-                        ReturnStatementModel(bodyExpression)
-                    }
+                        if (type.isUnit()) {
+                            ExpressionStatementModel(bodyExpression)
+                        } else {
+                            ReturnStatementModel(bodyExpression)
+                        }
                 )
             }
             else -> emptyList()
@@ -751,13 +769,17 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     external = external
             )
             is TypeAliasNode -> {
-                TypeAliasModel(
-                        name = name,
-                        typeReference = typeReference.process(),
-                        typeParameters = convertTypeParams(typeParameters, true),
-                        visibilityModifier = VisibilityModifierModel.DEFAULT,
-                        comment = null
-                )
+                if (typeReference is UnionTypeNode) {
+                    null
+                } else {
+                    TypeAliasModel(
+                            name = name,
+                            typeReference = typeReference.process(),
+                            typeParameters = convertTypeParams(typeParameters, true),
+                            visibilityModifier = VisibilityModifierModel.DEFAULT,
+                            comment = null
+                    )
+                }
             }
             else -> {
                 logger.debug("skipping ${this}")

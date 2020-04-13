@@ -145,6 +145,7 @@ export class AstConverter {
       this.convertModifiers(sourceFile.modifiers),
       uid(),
       sourceName,
+      [],
       MODULE_KIND.SOURCE_FILE
     );
   }
@@ -163,8 +164,8 @@ export class AstConverter {
     });
   }
 
-  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
-    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, kind));
+  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Array<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
+    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind));
   }
 
   convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -433,6 +434,14 @@ export class AstConverter {
       if (uid) {
         let origin = declaration.propertyName ? ReferenceDeclarationProto.ORIGIN.NAMED_IMPORT : ReferenceDeclarationProto.ORIGIN.IMPORT;
         typeReference = this.astFactory.createReferenceEntity(uid, origin, kind);
+      }
+    } else if (ts.isImportEqualsDeclaration(declaration)) {
+      let importedSymbol = this.typeChecker.getSymbolAtLocation(declaration.name);
+      if (importedSymbol) {
+        let declaredTyped = this.typeChecker.getDeclaredTypeOfSymbol(importedSymbol);
+        if (declaredTyped.symbol && Array.isArray(declaredTyped.symbol.declarations)) {
+          typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaredTyped.symbol.declarations[0]), ReferenceDeclarationProto.ORIGIN.IRRELEVANT, kind);
+        }
       }
     } else {
       typeReference = this.astFactory.createReferenceEntity(this.exportContext.getUID(declaration), ReferenceDeclarationProto.ORIGIN.IRRELEVANT, kind);
@@ -1113,7 +1122,7 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE)];
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE)];
     }
 
     return [];

@@ -22,7 +22,7 @@ private class NativeArrayLowering : DeclarationTypeLowering {
 }
 
 fun ModuleDeclaration.desugarArrayDeclarations(): ModuleDeclaration {
-    return NativeArrayLowering().lowerDocumentRoot(this, NodeOwner(this, null))
+    return NativeArrayLowering().lowerSourceDeclaration(this, NodeOwner(this, null))
 }
 
 fun SourceFileDeclaration.desugarArrayDeclarations() = copy(root = root.desugarArrayDeclarations())

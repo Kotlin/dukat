@@ -114,6 +114,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
             IdentifierEntity("Function"),
             IdentifierEntity("ReadonlyArray"),
             IdentifierEntity("Error"),
+            IdentifierEntity("SyntaxError"),
             IdentifierEntity("Iterable"),
             IdentifierEntity("Iterator"),
             IdentifierEntity("String")
@@ -146,7 +147,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
         return super.lowerFunctionModel(ownerContext.copy(node = declarationResolved), parentModule)
     }
 
-    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel {
+    override fun lowerTopLevelModel(ownerContext: NodeOwner<TopLevelModel>, parentModule: ModuleModel): TopLevelModel? {
         val declaration = ownerContext.node
         val declarationResolved = if (declaration is ClassLikeModel) {
             declaration.parentEntities.firstOrNull { parentEntity ->
@@ -169,20 +170,8 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-private fun ModuleModel.substituteTsStdLibEntities(): ModuleModel {
-    return SubstituteLowering().lowerRoot(this, NodeOwner(this, null))
-}
-
-private fun SourceFileModel.substituteTsStdLibEntities(): SourceFileModel {
-    return copy(root = root.substituteTsStdLibEntities())
-}
-
-private fun SourceSetModel.substituteTsStdLibEntities(): SourceSetModel {
-    return copy(sources = sources.map(SourceFileModel::substituteTsStdLibEntities))
-}
-
 class SubstituteTsStdLibEntities() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.substituteTsStdLibEntities()
+    override fun lower(module: ModuleModel): ModuleModel {
+        return SubstituteLowering().lowerRoot(module, NodeOwner(module, null))
     }
 }

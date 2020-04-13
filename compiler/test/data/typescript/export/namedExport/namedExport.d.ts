@@ -1,0 +1,1 @@
+export {SomeInterface} from "_api";

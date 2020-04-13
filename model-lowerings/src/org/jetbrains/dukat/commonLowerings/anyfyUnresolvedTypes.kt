@@ -2,14 +2,11 @@ package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.appendLeft
-import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -48,18 +45,8 @@ private class AnyfyLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-private fun ModuleModel.anyfyUnresolvedTypes(): ModuleModel {
-    return AnyfyLowering().lowerRoot(this, NodeOwner(this, null))
-}
-
-private fun SourceSetModel.anyfyUnresolvedTypes(): SourceSetModel {
-    return transform {
-        it.anyfyUnresolvedTypes()
-    }
-}
-
-class AnyfyUnresolvedTypes() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.anyfyUnresolvedTypes()
+class AnyfyUnresolvedTypes : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        return AnyfyLowering().lowerRoot(module, NodeOwner(module, null))
     }
 }

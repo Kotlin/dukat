@@ -10,11 +10,9 @@ import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astCommon.size
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -126,10 +124,8 @@ private fun ModuleModel.specifyTypeNodesWithModuleData(): ModuleModel {
     return SpecifyTypeNodes(declarationContext).lowerRoot(this, NodeOwner(this, null))
 }
 
-private fun SourceSetModel.specifyTypeNodesWithModuleData() = transform { it.specifyTypeNodesWithModuleData() }
-
 class SpecifyTypeNodesWithModuleData() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.specifyTypeNodesWithModuleData()
+    override fun lower(module: ModuleModel): ModuleModel {
+        return module.specifyTypeNodesWithModuleData()
     }
 }

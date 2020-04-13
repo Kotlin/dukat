@@ -25,11 +25,11 @@ typealias MultiMap<K, V> = MapLike<K, Values<V>>
 
 typealias MyHeaders = MultiMap<String, String>
 
-external interface `T$0`<T> {
+external interface `T$1`<T> {
     var ip: T
 }
 
-typealias Ping<T> = (packet: `T$0`<T>) -> Boolean
+typealias Ping<T> = (packet: `T$1`<T>) -> Boolean
 
 external var fooMap: MultiMap<String, Number>
 
@@ -56,3 +56,12 @@ external var someRef: dynamic /* String | (instance: Number) -> Any */
 external fun addRef(ref: String)
 
 external fun addRef(ref: (instance: Number) -> Any)
+
+external interface `T$0`<T> {
+    @nativeInvoke
+    operator fun <T : (args: Array<Any>) -> Any> invoke(func: T, resolver: (args: Array<Any>) -> Any = definedExternally): T
+}
+
+external interface SomeInterface {
+    var cached: `T$0`<Any?>
+}

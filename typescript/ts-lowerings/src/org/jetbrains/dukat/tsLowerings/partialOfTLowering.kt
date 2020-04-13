@@ -90,6 +90,7 @@ private fun ClassLikeDeclaration.generatePartialInterface(
             membersResolved,
             typeParameters,
             partialParentEntities,
+            emptyList(),
             getUID().withPartialSuffix(),
             owner)
 }
@@ -146,7 +147,7 @@ private fun ModuleDeclaration.lowerPartialOfT(): ModuleDeclaration {
     val heritageClauses = LinkedHashSet<String>()
 
     var moduleResolved = TypeVisitor(classReferences, partialReferences, heritageClauses)
-            .lowerDocumentRoot(this, NodeOwner(this, null))
+            .lowerSourceDeclaration(this, NodeOwner(this, null))
 
     moduleResolved = moduleResolved.resolveDeclarations(partialReferences)
 

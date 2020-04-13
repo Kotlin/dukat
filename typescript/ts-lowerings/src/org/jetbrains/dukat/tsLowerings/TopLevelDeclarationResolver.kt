@@ -21,7 +21,10 @@ private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, T
             is  TypeAliasDeclaration -> {
                 topLevelDeclarationsMap[it.uid] = it
             }
-            is ModuleDeclaration -> it.scan(topLevelDeclarationsMap)
+            is ModuleDeclaration -> {
+                topLevelDeclarationsMap[it.uid] = it
+                it.scan(topLevelDeclarationsMap)
+            }
         }
     }
 }

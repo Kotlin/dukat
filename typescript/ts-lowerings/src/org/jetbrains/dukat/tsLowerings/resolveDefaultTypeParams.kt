@@ -139,7 +139,7 @@ private fun ModuleDeclaration.introduceGeneratedEntities(generatedEntities: Map<
 }
 
 private fun SourceSetDeclaration.introduceSubstitutedTypes(references: MutableMap<String, ClassLikeDeclaration>, generatedEntities: MutableMap<String, MutableMap<Int, ClassLikeDeclaration>>): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = EntityWithDefaultTypeParamsGenerator(references, generatedEntities).lowerDocumentRoot(it.root)) })
+    return copy(sources = sources.map { it.copy(root = EntityWithDefaultTypeParamsGenerator(references, generatedEntities).lowerSourceDeclaration(it.root)) })
 }
 
 
@@ -151,7 +151,7 @@ private fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaratio
 
     val sourceSetWithSubstitutedTypes = introduceSubstitutedTypes(references, generatedEntities)
     val sourceSetsWithIntroducedEntities = sourceSetWithSubstitutedTypes.copy(sources = sourceSetWithSubstitutedTypes.sources.map { it.copy(root = it.root.introduceGeneratedEntities(generatedEntities)) })
-    return sourceSetsWithIntroducedEntities.copy(sources = sourceSetsWithIntroducedEntities.sources.map { it.copy(root = SubstituteTypeLowering(generatedEntities).lowerDocumentRoot(it.root)) })
+    return sourceSetsWithIntroducedEntities.copy(sources = sourceSetsWithIntroducedEntities.sources.map { it.copy(root = SubstituteTypeLowering(generatedEntities).lowerSourceDeclaration(it.root)) })
 }
 
 public class ResolveDefaultTypeParams(): TsLowering {

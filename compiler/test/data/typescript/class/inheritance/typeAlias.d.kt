@@ -34,3 +34,7 @@ external open class SinglethreadedProcessor : AliasedProcessor {
 }
 
 typealias NumCollection<T> = Array<T>
+
+external interface SomethingStatic {
+    fun <T : Any?, U : Any> pick(obj: T, vararg props: dynamic /* typealias PropertyPath = dynamic */): Any
+}

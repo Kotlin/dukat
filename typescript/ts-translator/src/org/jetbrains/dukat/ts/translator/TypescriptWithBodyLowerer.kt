@@ -7,10 +7,7 @@ import org.jetbrains.dukat.commonLowerings.AddImports
 import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
-import org.jetbrains.dukat.commonLowerings.merge.MergeClassLike
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
-import org.jetbrains.dukat.commonLowerings.merge.MergeModules
-import org.jetbrains.dukat.commonLowerings.merge.MergeNestedClasses
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
@@ -18,7 +15,6 @@ import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotation
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
-import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantInlineFunction
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.LowerThisType
@@ -26,14 +22,15 @@ import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
-import org.jetbrains.dukat.tsLowerings.EliminateStringType
 import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
 import org.jetbrains.dukat.tsLowerings.LowerPrimitives
-import org.jetbrains.dukat.tsLowerings.MergeParentsForMergedInterfaces
+import org.jetbrains.dukat.tsLowerings.MergeClassLikes
+import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
+import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
 import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
@@ -57,13 +54,14 @@ open class TypescriptWithBodyLowerer(
         val declarations = sourceSet
                 .lower(
                         AddPackageName(packageName),
-                        MergeParentsForMergedInterfaces(),
+                        MergeModules(),
+                        MergeClassLikes(),
+                        ResolveLambdaParents(),
                         RenameImpossibleDeclarations(),
                         ResolveTypescriptUtilityTypes(),
                         ResolveDefaultTypeParams(),
                         LowerPrimitives(),
                         GenerateInterfaceReferences(),
-                        EliminateStringType(),
                         DesugarArrayDeclarations(),
                         FixImpossibleInheritance(),
                         LowerPartialOf(),
@@ -89,11 +87,8 @@ open class TypescriptWithBodyLowerer(
                         SubstituteTsStdLibEntities(),
                         EscapeIdentificators(),
                         RemoveConflictingOverloads(),
-                        MergeClassLike(),
-                        MergeModules(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
-                        MergeNestedClasses(),
                         SeparateNonExternalEntities(),
                         LowerOverrides(),
                         SpecifyTypeNodesWithModuleData(),
@@ -101,8 +96,7 @@ open class TypescriptWithBodyLowerer(
                         AddImports(),
                         AnyfyUnresolvedTypes(),
                         AddNoinlineModifier(),
-                        AddStandardImportsAndAnnotations(),
-                        RemoveRedundantInlineFunction()
+                        AddStandardImportsAndAnnotations()
                 )
 
         return models

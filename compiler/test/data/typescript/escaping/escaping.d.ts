@@ -103,3 +103,7 @@ declare namespace fun {
 
     }
 }
+
+type __ = Foo
+
+declare function ping(n: __)

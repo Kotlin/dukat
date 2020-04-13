@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.tsLowerings
 
+import TopLevelDeclarationLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
@@ -17,7 +18,7 @@ private class ClassLikeContext(private val classLikeMap: Map<String, ClassLikeDe
     }
 }
 
-private class FixImpossibleInheritanceDeclarationLowering(private val classLikeContext: ClassLikeContext) : DeclarationTypeLowering {
+private class FixImpossibleInheritanceDeclarationLowering(private val classLikeContext: ClassLikeContext) : TopLevelDeclarationLowering {
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
         val parents = classLikeContext.getKnownParents(declaration).filterIsInstance(ClassDeclaration::class.java)
@@ -28,15 +29,12 @@ private class FixImpossibleInheritanceDeclarationLowering(private val classLikeC
                 !impossibleParents.contains(parentEntity.typeReference?.uid)
             }
 
-            super.lowerClassDeclaration(declaration.copy(parentEntities = parentEntitiesResolved), owner)
+            declaration.copy(parentEntities = parentEntitiesResolved)
         } else {
-            super.lowerClassDeclaration(declaration, owner)
+            declaration
         }
     }
 
-    fun lowerRoot(documentRoot: ModuleDeclaration): ModuleDeclaration {
-        return super.lowerDocumentRoot(documentRoot, NodeOwner(documentRoot, null))
-    }
 }
 
 private fun ModuleDeclaration.visitClassLike(visitor: (ClassLikeDeclaration) -> Unit) {
@@ -53,7 +51,7 @@ private fun SourceSetDeclaration.visitClassLike(visitor: (ClassLikeDeclaration) 
 }
 
 private fun ModuleDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): ModuleDeclaration {
-    return FixImpossibleInheritanceDeclarationLowering(classLikeContext).lowerRoot(this)
+    return FixImpossibleInheritanceDeclarationLowering(classLikeContext).lowerSourceDeclaration(this)
 }
 
 private fun SourceFileDeclaration.fixImpossibleInheritance(classLikeContext: ClassLikeContext): SourceFileDeclaration {
@@ -69,7 +67,7 @@ private fun SourceSetDeclaration.fixImpossibleInheritance(): SourceSetDeclaratio
     return copy(sources = sources.map { it.fixImpossibleInheritance(ClassLikeContext(classLikeMap)) })
 }
 
-class FixImpossibleInheritance(): TsLowering {
+class FixImpossibleInheritance() : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.fixImpossibleInheritance()
     }

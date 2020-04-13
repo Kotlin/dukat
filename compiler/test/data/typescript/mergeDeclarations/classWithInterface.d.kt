@@ -17,7 +17,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class Component<P, S> : Bar, Foo, ComponentLifecycle<P, S> {
+external open class Component<P, S, T> : Bar, Foo, ComponentLifecycle<P, S> {
     open var foo: String
     open fun bar(): Number
     open fun baz(a: Any)

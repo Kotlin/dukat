@@ -56,16 +56,8 @@ private class ConflictingOverloads() : ModelWithOwnerTypeLowering {
     }
 }
 
-fun ModuleModel.removeConflictingOverloads(): ModuleModel {
-    return ConflictingOverloads().lowerRoot(this, NodeOwner(this, null))
-}
-
-private fun SourceFileModel.removeConflictingOverloads() = copy(root = root.removeConflictingOverloads())
-private fun SourceSetModel.removeConflictingOverloads() =
-        copy(sources = sources.map(SourceFileModel::removeConflictingOverloads))
-
-class RemoveConflictingOverloads() : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.removeConflictingOverloads()
+class RemoveConflictingOverloads : ModelLowering {
+    override fun lower(module: ModuleModel): ModuleModel {
+        return ConflictingOverloads().lowerRoot(module, NodeOwner(module, null))
     }
 }
