@@ -55,6 +55,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
@@ -285,6 +286,15 @@ private fun StatementModel.translate(): List<String> {
             val header = "while (${condition.translate()}) "
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
+        }
+        is WhenStatementModel -> {
+            val header = "when (${expression.translate()}) {"
+            val cases = cases.flatMap {
+                val caseHeader = "${it.condition?.translate() ?: "else"} -> "
+                val body = it.body.translate()
+                listOf(caseHeader + body[0]) + body.drop(1)
+            }.map { FORMAT_TAB + it }
+            return listOf(header) + cases + listOf("}")
         }
         is VariableModel -> {
             return listOf(translate())
