@@ -20,6 +20,7 @@ external interface SomethingElse<B> {
 }
 
 external open class Component<A, B, C> : SomethingElse<B> {
+    override fun bing(): Component__2<B, Number>
     open fun pong()
     open fun ping()
 }

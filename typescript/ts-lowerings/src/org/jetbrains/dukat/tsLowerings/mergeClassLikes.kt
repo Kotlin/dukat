@@ -35,20 +35,6 @@ private fun mergeVariableAndInterface(a: VariableDeclaration, b: InterfaceDeclar
     return b
 }
 
-private fun mergeClassAndInterface(a: ClassDeclaration, b: InterfaceDeclaration, uid: String): ClassDeclaration {
-    val membersResolved = b.members.map {
-        when (it) {
-            is MethodSignatureDeclaration -> it.convertToMethod()
-            else -> it
-        }
-    } + a.members
-    return a.copy(
-            members = membersResolved,
-            typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
-            parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities),
-            uid = uid
-    )
-}
 
 private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
     return a.copy(
@@ -58,26 +44,44 @@ private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): I
     )
 }
 
-private fun merge(a: MergeableDeclaration, b: MergeableDeclaration): MergeableDeclaration {
-    return when (a) {
-        is InterfaceDeclaration -> when (b) {
-            is InterfaceDeclaration -> mergeInterfaces(a, b)
-            is ClassDeclaration -> mergeClassAndInterface(b, a, a.uid)
-            else -> a
-        }
-        is ClassDeclaration -> when (b) {
-            is InterfaceDeclaration -> mergeClassAndInterface(a, b, a.uid)
-            else -> a
-        }
-        is VariableDeclaration -> when (b) {
-            is InterfaceDeclaration -> mergeVariableAndInterface(a, b)
-            else -> a
-        }
-        else -> a
-    }
-}
 
 private class MergeClassLikesLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver): TopLevelDeclarationLowering {
+
+    private fun mergeClassAndInterface(a: ClassDeclaration, b: InterfaceDeclaration, uid: String): ClassDeclaration {
+        val parentMembers = topLevelDeclarationResolver.getAllParents(b).flatMap { it.members }
+        val membersResolved = (parentMembers + b.members).map {
+            when (it) {
+                is MethodSignatureDeclaration -> it.convertToMethod()
+                else -> it
+            }
+        } + a.members
+        return a.copy(
+                members = membersResolved,
+                typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
+                parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities),
+                uid = uid
+        )
+    }
+
+    private fun merge(a: MergeableDeclaration, b: MergeableDeclaration): MergeableDeclaration {
+        return when (a) {
+            is InterfaceDeclaration -> when (b) {
+                is InterfaceDeclaration -> mergeInterfaces(a, b)
+                is ClassDeclaration -> mergeClassAndInterface(b, a, a.uid)
+                else -> a
+            }
+            is ClassDeclaration -> when (b) {
+                is InterfaceDeclaration -> mergeClassAndInterface(a, b, a.uid)
+                else -> a
+            }
+            is VariableDeclaration -> when (b) {
+                is InterfaceDeclaration -> mergeVariableAndInterface(a, b)
+                else -> a
+            }
+            else -> a
+        }
+    }
+
     override fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
         val definitions = declaration.definitionsInfo
                 .mapNotNull { definition -> topLevelDeclarationResolver.resolve(definition.uid) }

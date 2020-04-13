@@ -1,12 +1,14 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithReferenceDeclaration
 
 
 private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, TopLevelDeclaration>) {
@@ -36,10 +38,33 @@ class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDec
     }
 
     fun resolve(reference: ReferenceDeclaration?): TopLevelDeclaration? {
-        return reference?.uid?.let { declarationMap.get(it) }
+        return resolve(reference?.uid)
     }
 
-    fun resolve(uid: String): TopLevelDeclaration? {
-        return declarationMap.get(uid)
+    fun resolve(uid: String?): TopLevelDeclaration? {
+        return declarationMap[uid]
+    }
+
+    fun resolveRecursive(uid: String?): TopLevelDeclaration? {
+        return resolve(uid)?.let { resolvedEntity ->
+            when (resolvedEntity) {
+                is TypeAliasDeclaration -> {
+                    val typeReference = resolvedEntity.typeReference
+                    if (typeReference is WithReferenceDeclaration) {
+                        resolveRecursive(typeReference.reference?.uid)
+                    } else {
+                        null
+                    }
+                }
+                else -> resolvedEntity
+            }
+        }
+    }
+
+    fun getAllParents(classLikeDeclaration: ClassLikeDeclaration): List<ClassLikeDeclaration> {
+        val immediateParents = classLikeDeclaration.parentEntities.mapNotNull { heritageClause ->
+            resolveRecursive(heritageClause.reference?.uid) as? ClassLikeDeclaration
+        }
+        return immediateParents + immediateParents.flatMap { immediateParent -> getAllParents(immediateParent) }
     }
 }
