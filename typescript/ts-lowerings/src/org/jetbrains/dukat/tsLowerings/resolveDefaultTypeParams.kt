@@ -27,8 +27,8 @@ private fun NameEntity.addPostfix(postfix: String): NameEntity {
 private class SubstituteTypeLowering(private val generatedEntities: Map<String, Map<Int, ClassLikeDeclaration>>) : DeclarationTypeLowering {
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
-        val heritageClauseResolved = generatedEntities[heritageClause.typeReference?.uid]?.get(heritageClause.typeArguments.size)?.let { reference ->
-            heritageClause.copy(name = reference.name, typeReference = ReferenceDeclaration(reference.uid))
+        val heritageClauseResolved = generatedEntities[heritageClause.reference?.uid]?.get(heritageClause.typeArguments.size)?.let { reference ->
+            heritageClause.copy(name = reference.name, reference = ReferenceDeclaration(reference.uid))
         }
 
         return super.lowerHeritageClause(heritageClauseResolved ?: heritageClause, owner)
@@ -83,7 +83,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                 name = resolvedClassLike.name,
                                                 typeArguments = headValues.map { TypeParamReferenceDeclaration(it.name) } + defValues,
                                                 extending = false,
-                                                typeReference = ReferenceDeclaration(resolvedClassLike.uid)
+                                                reference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
                                         definitionsInfo = emptyList()
                                 )
@@ -96,7 +96,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                 name = resolvedClassLike.name,
                                                 typeArguments = headValues.map { TypeParamReferenceDeclaration(it.name) } + defValues,
                                                 extending = false,
-                                                typeReference = ReferenceDeclaration(resolvedClassLike.uid)
+                                                reference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
                                         modifiers = resolvedClassLike.modifiers,
                                         definitionsInfo = resolvedClassLike.definitionsInfo
@@ -111,7 +111,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
     }
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
-        checkForDefaultTypeParams(heritageClause.typeArguments, references[heritageClause.typeReference?.uid])
+        checkForDefaultTypeParams(heritageClause.typeArguments, references[heritageClause.reference?.uid])
         return super.lowerHeritageClause(heritageClause, owner)
     }
 

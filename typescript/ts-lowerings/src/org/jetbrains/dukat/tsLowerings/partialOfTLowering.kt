@@ -83,11 +83,11 @@ private fun ClassLikeDeclaration.generatePartialInterface(
         parentEntities.map { heritageClauseDeclaration ->
             val partialHeritageClause = heritageClauseDeclaration.copy(
                     name = heritageClauseDeclaration.name.partialName(),
-                    typeReference = heritageClauseDeclaration.typeReference?.copy(uid = heritageClauseDeclaration.typeReference!!.uid.withPartialSuffix())
+                    reference = heritageClauseDeclaration.reference?.copy(uid = heritageClauseDeclaration.reference!!.uid.withPartialSuffix())
             )
 
-            if (partialHeritageClause.typeReference != null) {
-                heritageClauses.add(partialHeritageClause.typeReference!!.uid)
+            if (partialHeritageClause.reference != null) {
+                heritageClauses.add(partialHeritageClause.reference!!.uid)
             }
 
             partialHeritageClause

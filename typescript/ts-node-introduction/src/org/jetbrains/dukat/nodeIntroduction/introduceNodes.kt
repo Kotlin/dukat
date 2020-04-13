@@ -348,7 +348,7 @@ private class LowerDeclarationsToNodes(
             HeritageNode(
                     name = declaration.name.convert(),
                     typeArguments = declaration.typeArguments.map { it.convertToNode() },
-                    reference = declaration.typeReference?.let {
+                    reference = declaration.reference?.let {
                         val origin = when (it.origin) {
                             ReferenceOriginDeclaration.IMPORT -> ReferenceOriginNode.IMPORT
                             ReferenceOriginDeclaration.NAMED_IMPORT -> ReferenceOriginNode.NAMED_IMPORT

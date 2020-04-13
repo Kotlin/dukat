@@ -11,7 +11,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 private class ClassLikeContext(private val classLikeMap: Map<String, ClassLikeDeclaration>) {
     fun getKnownParents(classLike: ClassLikeDeclaration): List<ClassLikeDeclaration> {
         return classLike.parentEntities.mapNotNull {
-            it.typeReference?.uid?.let { uid ->
+            it.reference?.uid?.let { uid ->
                 classLikeMap[uid]
             }
         }
@@ -26,7 +26,7 @@ private class FixImpossibleInheritanceDeclarationLowering(private val classLikeC
             val impossibleParents = parents.subList(1, parents.size).map { it.uid }.toSet()
 
             val parentEntitiesResolved = declaration.parentEntities.filter { parentEntity ->
-                !impossibleParents.contains(parentEntity.typeReference?.uid)
+                !impossibleParents.contains(parentEntity.reference?.uid)
             }
 
             declaration.copy(parentEntities = parentEntitiesResolved)
