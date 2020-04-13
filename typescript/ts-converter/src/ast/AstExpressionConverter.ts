@@ -4,7 +4,9 @@ import {
     Expression, HeritageClauseDeclaration,
     IdentifierDeclaration,
     MemberDeclaration, ModifierDeclaration,
-    NameEntity, ParameterDeclaration, TypeDeclaration, TypeParameter,
+    NameEntity, ParameterDeclaration,
+    TemplateTokenDeclaration,
+    TypeDeclaration, TypeParameter,
 } from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
@@ -89,7 +91,19 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
     }
 
-    createAsExpression(expression: Expression, type: TypeDeclaration) : Expression {
+    createStringTemplateToken(value: string): TemplateTokenDeclaration {
+        return AstExpressionFactory.createStringTemplateToken(value);
+    }
+
+    createExpressionTemplateToken(expression: Expression): TemplateTokenDeclaration {
+        return AstExpressionFactory.createExpressionTemplateToken(expression);
+    }
+
+    createTemplateExpression(tokens: Array<TemplateTokenDeclaration>): Expression {
+        return AstExpressionFactory.createTemplateExpression(tokens)
+    }
+
+    createAsExpression(expression: Expression, type: TypeDeclaration): Expression {
         return AstExpressionFactory.createAsExpression(expression, type)
     }
 
@@ -332,6 +346,42 @@ export class AstExpressionConverter {
         }
     }
 
+    convertTemplateExpression(expression: ts.TemplateExpression): Expression {
+        let tokens: Array<TemplateTokenDeclaration> = [];
+
+        let head = expression.head.getText();
+        // head = "`headTrimmed${"
+        let headTrimmed = head.substr(1, head.length - 3);
+
+        tokens.push(this.createStringTemplateToken(headTrimmed));
+        for (let span of expression.templateSpans) {
+            if (ts.isTemplateMiddle(span.literal)) {
+                // text = "}textTrimmed${"
+                let text = span.literal.getText();
+                let textTrimmed = text.substr(1, text.length - 3);
+
+                tokens.push(this.createExpressionTemplateToken(
+                    this.convertExpression(span.expression)
+                ));
+                tokens.push(this.createStringTemplateToken(textTrimmed));
+            } else if (ts.isTemplateTail(span.literal)) {
+                // text = "}textTrimmed`"
+                let text = span.literal.getText();
+                let textTrimmed = text.substr(1, text.length - 2);
+
+                tokens.push(this.createExpressionTemplateToken(
+                    this.convertExpression(span.expression)
+                ));
+                tokens.push(this.createStringTemplateToken(textTrimmed));
+            }
+        }
+        return this.createTemplateExpression(tokens)
+    }
+
+    convertNoSubstitutionTemplateLiteral(literal: ts.NoSubstitutionTemplateLiteral): Expression {
+        return this.createStringLiteralExpression(literal.getText()
+            .split('`').join( '"'))
+    }
 
     private convertToken(expression: ts.Expression): Expression {
         if (expression.kind == ts.SyntaxKind.TrueKeyword) {
@@ -381,6 +431,10 @@ export class AstExpressionConverter {
             return this.convertNewExpression(expression)
         } else if (ts.isIdentifier(expression) || ts.isQualifiedName(expression)) {
             return this.convertNameExpression(expression);
+        } else if (ts.isTemplateExpression(expression)) {
+            return this.convertTemplateExpression(expression)
+        } else if (ts.isNoSubstitutionTemplateLiteral(expression)) {
+            return this.convertNoSubstitutionTemplateLiteral(expression)
         } else if (ts.isLiteralExpression(expression)) {
             return this.convertLiteralExpression(expression);
         } else if (ts.isObjectLiteralExpression(expression)) {

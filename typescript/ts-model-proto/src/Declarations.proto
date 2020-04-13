@@ -245,6 +245,17 @@ message LiteralExpressionDeclarationProto {
     }
 }
 
+message TemplateTokenDeclarationProto {
+    oneof type {
+        StringLiteralExpressionDeclarationProto stringLiteral = 1;
+        ExpressionDeclarationProto expression = 2;
+    }
+}
+
+message TemplateExpressionDeclarationProto {
+    repeated TemplateTokenDeclarationProto token = 1;
+}
+
 message NameExpressionDeclarationProto {
     NameDeclarationProto name = 1;
 }
@@ -314,13 +325,14 @@ message ExpressionDeclarationProto {
         CallExpressionDeclarationProto callExpression = 6;
         NameExpressionDeclarationProto nameExpression = 7;
         LiteralExpressionDeclarationProto literalExpression = 8;
-        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 9;
-        ElementAccessExpressionDeclarationProto elementAccessExpression = 10;
-        NewExpressionDeclarationProto newExpression = 11;
-        ConditionalExpressionDeclarationProto conditionalExpression = 12;
-        AsExpressionDeclarationProto asExpression = 13;
-        NonNullExpressionDeclarationProto nonNullExpression = 14;
-        UnknownExpressionDeclarationProto unknownExpression = 15;
+        TemplateExpressionDeclarationProto templateExpression = 9;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 10;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 11;
+        NewExpressionDeclarationProto newExpression = 12;
+        ConditionalExpressionDeclarationProto conditionalExpression = 13;
+        AsExpressionDeclarationProto asExpression = 14;
+        NonNullExpressionDeclarationProto nonNullExpression = 15;
+        UnknownExpressionDeclarationProto unknownExpression = 16;
     }
 }
 

@@ -50,6 +50,7 @@ import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -64,6 +65,9 @@ import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifierDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamedImportsDeclaration
@@ -131,6 +135,8 @@ import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SwitchStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TemplateExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TemplateTokenDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ThrowStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeAliasDeclarationProto
@@ -588,6 +594,20 @@ fun LiteralExpressionDeclarationProto.convert(): LiteralExpressionDeclaration {
     }
 }
 
+fun TemplateTokenDeclarationProto.convert(): TemplateTokenDeclaration {
+    return when  {
+        hasExpression() -> ExpressionTemplateTokenDeclaration(expression.convert())
+        hasStringLiteral() -> StringTemplateTokenDeclaration(stringLiteral.convert())
+        else -> throw Exception("unknown templateToken: ${this}")
+    }
+}
+
+fun TemplateExpressionDeclarationProto.convert(): TemplateExpressionDeclaration {
+    return TemplateExpressionDeclaration(
+        tokenList.map { it.convert() }
+    )
+}
+
 fun PropertyAccessExpressionDeclarationProto.convert(): PropertyAccessExpressionDeclaration {
     return PropertyAccessExpressionDeclaration(
             expression = expression.convert(),
@@ -646,6 +666,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasCallExpression() -> callExpression.convert()
         hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
+        hasTemplateExpression() -> templateExpression.convert()
         hasPropertyAccessExpression() -> propertyAccessExpression.convert()
         hasElementAccessExpression() -> elementAccessExpression.convert()
         hasNewExpression() -> newExpression.convert()

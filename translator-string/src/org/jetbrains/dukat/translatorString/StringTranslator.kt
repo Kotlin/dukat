@@ -46,6 +46,10 @@ import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateTokenModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -243,12 +247,21 @@ private fun LiteralExpressionModel.translate(): String {
     }
 }
 
+private fun TemplateTokenModel.translate(): String {
+    return when (this) {
+        is StringTemplateTokenModel -> value.translate()
+        is ExpressionTemplateTokenModel -> "\${${expression.translate()}}"
+        else -> raiseConcern("unknown TemplateTokenModel ${this}") { "" }
+    }
+}
+
 private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
         is ThisExpressionModel -> "this"
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
+        is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
         is BinaryExpressionModel -> "${left.translate()} $operator ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
