@@ -3,6 +3,7 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
@@ -21,6 +22,7 @@ import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressio
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
+import org.jetbrains.dukat.astModel.statements.CaseModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -34,6 +36,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
+import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
@@ -52,7 +55,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
 internal class ExpressionConverter(val documentConverter: DocumentConverter) {
-    fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
+    private fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
                 value
@@ -69,7 +72,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
-    fun ExpressionDeclaration.convert(): ExpressionModel {
+    private fun ExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
                 identifier
@@ -131,7 +134,17 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
-    fun StatementDeclaration.convert(): StatementModel {
+    private fun SwitchStatementDeclaration.convert(): WhenStatementModel {
+        return WhenStatementModel(
+            expression.convert(),
+            cases.map { CaseModel(
+                it.condition?.convert(),
+                convertBlock(it.body)
+            ) }
+        )
+    }
+
+    private fun StatementDeclaration.convert(): StatementModel {
         return when (this) {
             is ExpressionStatementDeclaration -> ExpressionStatementModel(
                 expression.convert()
@@ -148,6 +161,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 condition.convert(),
                 convertBlock(statement)
             )
+            is SwitchStatementDeclaration -> convert()
             is BlockDeclaration -> RunBlockStatementModel(
                 statements.map { it.convert() }
             )
