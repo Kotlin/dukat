@@ -63,6 +63,6 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
-import IterableIterator
+import tsstdlib.IterableIterator
 
 external fun createIterable(): IterableIterator<String>

@@ -763,7 +763,7 @@ class StringTranslator : ModelVisitor {
         if (containsSomethingExceptDocRoot) {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
-            if ((moduleModel.name != ROOT_PACKAGENAME) && (moduleModel.name != TSLIBROOT)) {
+            if ((moduleModel.name != ROOT_PACKAGENAME)) {
                 addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
                 addOutput("")
             } else {

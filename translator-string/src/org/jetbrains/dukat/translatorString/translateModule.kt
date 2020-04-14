@@ -31,7 +31,6 @@ fun NameEntity.translate(): String = when (this) {
     is QualifierEntity -> {
         when (leftMost()) {
             ROOT_PACKAGENAME -> shiftLeft()!!.translate()
-            TSLIBROOT -> shiftLeft()!!.translate()
             else -> "${left.translate()}.${right.translate()}"
         }
     }

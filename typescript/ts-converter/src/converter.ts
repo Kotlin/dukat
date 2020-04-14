@@ -95,8 +95,7 @@ class SourceBundleBuilder {
     let sourceFiles = new Array<SourceFileDeclaration>();
 
     this.dependencyBuilder.forEachDependency(dep => {
-      logger.debug(`DEP ${dep}`);
-      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(this.isLibSource(dep.fileName) ? "<LIBROOT>" : "<ROOT>");
+      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(this.isLibSource(dep.fileName) ? "tsstdlib" : "<ROOT>");
       sourceFiles.push(this.astConverter.createSourceFileDeclaration(this.program.getSourceFile(dep.fileName), packageName, node => dep.accept(node)));
     });
 
