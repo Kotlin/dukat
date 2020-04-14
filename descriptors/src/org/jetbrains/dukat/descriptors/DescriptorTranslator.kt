@@ -816,6 +816,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         InheritanceModifierModel.ABSTRACT -> Modality.ABSTRACT
                         InheritanceModifierModel.OPEN -> Modality.OPEN
                         InheritanceModifierModel.FINAL -> Modality.FINAL
+                        InheritanceModifierModel.SEALED -> Modality.SEALED
                     }
                     is InterfaceModel -> Modality.ABSTRACT
                     else -> Modality.FINAL

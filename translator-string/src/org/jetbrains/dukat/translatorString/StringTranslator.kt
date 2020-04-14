@@ -597,6 +597,7 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
         InheritanceModifierModel.ABSTRACT -> "abstract"
         InheritanceModifierModel.OPEN -> "open"
         InheritanceModifierModel.FINAL -> ""
+        InheritanceModifierModel.SEALED -> "sealed"
     }
 
     val classDeclaration =
