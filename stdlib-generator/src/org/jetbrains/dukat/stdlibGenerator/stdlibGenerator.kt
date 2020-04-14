@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -223,7 +225,12 @@ private fun ClassDescriptor.convertToClassModel(): ClassModel {
             annotations = mutableListOf(),
             comment = null,
             external = isExternal,
-            inheritanceModifier = InheritanceModifierModel.OPEN,
+            inheritanceModifier = when (modality) {
+                Modality.ABSTRACT -> InheritanceModifierModel.ABSTRACT
+                Modality.OPEN -> InheritanceModifierModel.OPEN
+                Modality.FINAL -> InheritanceModifierModel.FINAL
+                Modality.SEALED -> InheritanceModifierModel.SEALED
+            },
             visibilityModifier = VisibilityModifierModel.PUBLIC
     )
 }
