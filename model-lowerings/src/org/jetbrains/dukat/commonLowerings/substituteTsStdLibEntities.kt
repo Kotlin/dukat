@@ -111,7 +111,10 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
 
     private val stdLibFinalEntities = setOf<NameEntity>(
             IdentifierEntity("Array"),
+            IdentifierEntity("Date"),
+            IdentifierEntity("EventListenerHandler"),
             IdentifierEntity("Function"),
+            IdentifierEntity("RegExp"),
             IdentifierEntity("ReadonlyArray"),
             IdentifierEntity("Error"),
             IdentifierEntity("SyntaxError"),
