@@ -31,6 +31,7 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.descriptors.versionSpecific.VersionSpecificDescriptorAPI
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
@@ -811,7 +812,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 parent = parent,
                 name = classLikeModel.name,
                 modality = when (classLikeModel) {
-                    is ClassModel -> if (classLikeModel.abstract) Modality.ABSTRACT else Modality.OPEN
+                    is ClassModel -> when (classLikeModel.inheritanceModifier) {
+                        InheritanceModifierModel.ABSTRACT -> Modality.ABSTRACT
+                        InheritanceModifierModel.OPEN -> Modality.OPEN
+                        InheritanceModifierModel.FINAL -> Modality.FINAL
+                    }
                     is InterfaceModel -> Modality.ABSTRACT
                     else -> Modality.FINAL
                 },

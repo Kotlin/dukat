@@ -43,6 +43,7 @@ import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressio
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
@@ -266,7 +267,7 @@ private fun StatementModel.translate(): List<String> {
         is IfStatementModel -> {
             val header = "if (${condition.translate()}) "
             val mainBranch = thenStatement.translate()
-            val elseBranch = elseStatement?.let { it.translate() } ?: listOf()
+            val elseBranch = elseStatement?.translate() ?: listOf()
             return listOf(header + mainBranch[0]) + mainBranch.drop(1) + elseBranch
         }
         is WhileStatementModel -> {
@@ -592,7 +593,11 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
             primaryConstructor.parameters
         )})"
 
-    val openClause = if (abstract) "abstract" else "open"
+    val openClause = when (inheritanceModifier) {
+        InheritanceModifierModel.ABSTRACT -> "abstract"
+        InheritanceModifierModel.OPEN -> "open"
+        InheritanceModifierModel.FINAL -> ""
+    }
 
     val classDeclaration =
         "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(

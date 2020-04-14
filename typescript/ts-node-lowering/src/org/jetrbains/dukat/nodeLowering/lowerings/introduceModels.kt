@@ -72,6 +72,7 @@ import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
@@ -654,7 +655,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
                 external = external,
-                abstract = false,
+                inheritanceModifier = InheritanceModifierModel.OPEN,
                 visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }

@@ -19,6 +19,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private fun TypeModel.isAny(): Boolean {
@@ -63,7 +64,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 
     private fun ClassLikeModel.isAbstractClass(): Boolean {
-        return (this is ClassModel) && (this.abstract)
+        return (this is ClassModel) && (this.inheritanceModifier == InheritanceModifierModel.ABSTRACT)
     }
 
     private fun MemberModel.lowerOverrides(

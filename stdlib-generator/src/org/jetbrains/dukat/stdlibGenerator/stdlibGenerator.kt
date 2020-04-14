@@ -23,6 +23,7 @@ import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.stdlib.KLIBROOT
@@ -127,7 +128,7 @@ private fun KotlinType.convertToTypeModel(): TypeModel {
                 if (isTypeParameter()) {
                     TypeParameterReferenceModel(IdentifierEntity(name), null)
                 } else {
-                    val fqName = this.constructor.declarationDescriptor?.fqNameSafe?.let { it.toString().toNameEntity().appendRight(KLIBROOT) }
+                    val fqName = this.constructor.declarationDescriptor?.fqNameSafe?.toString()?.toNameEntity()?.appendRight(KLIBROOT)
                     TypeValueModel(IdentifierEntity(name), arguments.map { it.convertToTypeParameterModel() }, null, fqName, isMarkedNullable)
                 }
             }
@@ -222,7 +223,7 @@ private fun ClassDescriptor.convertToClassModel(): ClassModel {
             annotations = mutableListOf(),
             comment = null,
             external = isExternal,
-            abstract = false,
+            inheritanceModifier = InheritanceModifierModel.OPEN,
             visibilityModifier = VisibilityModifierModel.PUBLIC
     )
 }

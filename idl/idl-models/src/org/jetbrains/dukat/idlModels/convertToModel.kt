@@ -42,6 +42,7 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
+import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
@@ -424,7 +425,7 @@ private class IdlFileConverter(
                 annotations = mutableListOf(),
                 comment = null,
                 external = true,
-                abstract = kind == InterfaceKind.ABSTRACT_CLASS,
+                inheritanceModifier = if (kind == InterfaceKind.ABSTRACT_CLASS) { InheritanceModifierModel.ABSTRACT } else { InheritanceModifierModel.OPEN },
                 visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         }
