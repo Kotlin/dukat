@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":translator"))
     implementation(project(":translator-string"))
 
-    if (gradle.kotlinVersion.startsWith("1.3.70")) {
+    if (gradle.kotlinVersion.startsWith("1.3.7")) {
         implementation(project(":descriptors-1.3.70"))
     } else {
         implementation(project(":descriptors-1.3.60"))
