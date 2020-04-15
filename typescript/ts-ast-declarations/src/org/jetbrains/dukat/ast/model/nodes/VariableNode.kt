@@ -10,7 +10,7 @@ data class VariableNode(
         var name: NameEntity,
         val type: ParameterValueDeclaration,
 
-        var exportQualifier: ExportQualifier?,
+        override var exportQualifier: ExportQualifier?,
 
         var immutable: Boolean,
         val inline: Boolean,
@@ -19,4 +19,4 @@ data class VariableNode(
         override val uid: String,
         val comment: CommentEntity?,
         override val external: Boolean
-) : TopLevelNode, UniqueNode
+) : TopLevelNode, ExportableNode

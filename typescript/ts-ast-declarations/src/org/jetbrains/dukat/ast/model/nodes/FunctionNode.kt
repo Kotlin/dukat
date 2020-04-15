@@ -22,7 +22,7 @@ data class FunctionNode(
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
 
-        var exportQualifier: ExportQualifier?,
+        override var exportQualifier: ExportQualifier?,
 
         val export: Boolean,
         val inline: Boolean,
@@ -35,4 +35,4 @@ data class FunctionNode(
 
         val body: BlockDeclaration?,
         override val external: Boolean
-) : MemberEntity, TopLevelNode, UniqueNode
+) : MemberEntity, TopLevelNode, ExportableNode

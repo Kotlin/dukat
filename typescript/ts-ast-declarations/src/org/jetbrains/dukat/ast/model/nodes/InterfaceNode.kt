@@ -8,9 +8,9 @@ data class InterfaceNode(
         override val members: List<MemberNode>,
         val typeParameters: List<TypeValueNode>,
         val parentEntities: List<HeritageNode>,
-        var exportQualifier: ExportQualifier?,
+        override var exportQualifier: ExportQualifier?,
 
         val generated: Boolean,
         override val uid: String,
         override val external: Boolean
-) : ClassLikeNode
+) : ClassLikeNode, ExportableNode
