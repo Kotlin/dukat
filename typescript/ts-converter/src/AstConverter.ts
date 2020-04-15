@@ -44,6 +44,7 @@ export class AstConverter {
     private typeChecker: ts.TypeChecker,
     private declarationResolver: DeclarationResolver,
     private astFactory: AstFactory,
+    private isLibNode: (node: ts.Node) => boolean
   ) {
   }
 
@@ -140,7 +141,8 @@ export class AstConverter {
       uid(),
       sourceName,
       [],
-      MODULE_KIND.SOURCE_FILE
+      MODULE_KIND.SOURCE_FILE,
+      this.isLibNode(sourceFile)
     );
   }
 
@@ -158,8 +160,8 @@ export class AstConverter {
     });
   }
 
-  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
-    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind));
+  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap], isLib: boolean): TopLevelDeclarationProto {
+    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind, isLib));
   }
 
   convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -1012,19 +1014,19 @@ export class AstConverter {
   }
 
   private convertModuleBody(body: ts.ModuleBody | null, filter?: (node: ts.Node) => boolean): TopLevelDeclarationProto | null {
-    let moduleDeclarations: Iterable<Declaration> | undefined;
+    let declarations: Iterable<Declaration> | undefined;
 
     if (ts.isModuleBlock(body)) {
       let statements = filter ? body.statements.filter(filter) : body.statements;
-      moduleDeclarations = this.convertStatements(statements);
+      declarations = this.convertStatements(statements);
     } else if (ts.isModuleDeclaration(body)) {
       let convertedModule = this.convertModule(body, filter);
       if (convertedModule) {
-        moduleDeclarations = [convertedModule];
+        declarations = [convertedModule];
       }
     }
 
-    if (moduleDeclarations) {
+    if (declarations) {
       let parentModule = body.parent;
 
       let modifiers = this.convertModifiers(parentModule.modifiers);
@@ -1035,7 +1037,8 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.MODULE);
+      let isLib = this.isLibNode(body)
+      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.MODULE, isLib);
     }
 
     return null;

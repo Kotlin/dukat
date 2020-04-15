@@ -286,7 +286,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     }
 
     return ModuleDeclaration(
-            packageName = packageName.convert(),
+            name = packageName.convert(),
             imports = importsList.mapNotNull { it.convert() },
             references = referencesList.map { it.convert() },
             export = export,
@@ -300,7 +300,9 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
                 ModuleDeclarationProto.MODULE_KIND.MODULE -> ModuleDeclarationKind.MODULE
                 ModuleDeclarationProto.MODULE_KIND.NAMESPACE -> ModuleDeclarationKind.NAMESPACE
                 else -> ModuleDeclarationKind.SOURCE_FILE
-            })
+            },
+            isLib = isLibSource
+    )
 }
 
 fun ExportAssignmentDeclarationProto.convert(): ExportAssignmentDeclaration {

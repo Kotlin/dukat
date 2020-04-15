@@ -438,7 +438,8 @@ export class AstFactory {
     uid: string,
     resourceName: string,
     definitions: Array<DefinitionInfoDeclaration>,
-    kind: MODULE_KINDMap[keyof MODULE_KINDMap]
+    kind: MODULE_KINDMap[keyof MODULE_KINDMap],
+    isLib: boolean
   ): ModuleDeclaration {
     let moduleDeclaration = new ModuleDeclarationProto();
 
@@ -452,6 +453,8 @@ export class AstFactory {
     moduleDeclaration.setResourcename(resourceName);
     moduleDeclaration.setDefinitionsinfoList(definitions);
     moduleDeclaration.setKind(kind);
+
+    moduleDeclaration.setIslibsource(isLib);
     return moduleDeclaration;
   }
 

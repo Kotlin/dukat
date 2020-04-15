@@ -48,7 +48,6 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
-import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
@@ -625,7 +624,7 @@ private class LowerDeclarationsToNodes(
     @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
-        val shortName = documentRoot.packageName.unquote()
+        val shortName = documentRoot.name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val imports = mutableMapOf<String, ImportNode>()
@@ -640,10 +639,10 @@ private class LowerDeclarationsToNodes(
             } else nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
         }
 
-        val moduleNameIsStringLiteral = documentRoot.packageName.isStringLiteral()
+        val moduleNameIsStringLiteral = documentRoot.name.isStringLiteral()
 
         val moduleName = if (moduleNameIsStringLiteral) {
-            documentRoot.packageName.process { unquote(it) }
+            documentRoot.name.process { unquote(it) }
         } else {
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
@@ -651,7 +650,7 @@ private class LowerDeclarationsToNodes(
         return ModuleNode(
                 moduleName = moduleName,
                 export =  documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
-                packageName = documentRoot.packageName,
+                packageName = documentRoot.name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,

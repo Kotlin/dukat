@@ -84,11 +84,11 @@ private class ExportAssignmentLowering(
         }
 
         val declarationsResolved = docRoot.declarations.map { declaration ->
-            val (assigExports, defaultExports) = myExports
+            val (assignExports, defaultExports) = myExports
             when (declaration) {
                 is ModuleNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
-                    assigExports[declaration.uid]?.let { exportOwner ->
+                    assignExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let { moduleName ->
 
                             docRoot.declarations
@@ -120,7 +120,7 @@ private class ExportAssignmentLowering(
                     declaration
                 }
                 is VariableNode -> {
-                    assigExports[declaration.uid]?.let { exportOwner ->
+                    assignExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
 
@@ -142,7 +142,7 @@ private class ExportAssignmentLowering(
                     declaration
                 }
                 is ClassNode -> {
-                    assigExports[declaration.uid]?.let { exportOwner ->
+                    assignExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null
@@ -153,7 +153,7 @@ private class ExportAssignmentLowering(
                     declaration
                 }
                 is InterfaceNode -> {
-                    assigExports[declaration.uid]?.let { exportOwner ->
+                    assignExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null

@@ -71,7 +71,8 @@ class SourceBundleBuilder {
       new ExportContext((node: ts.Node) => this.isLibSource(node)),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
-      this.astFactory
+      this.astFactory,
+      (node: ts.Node) => this.isLibSource(node)
     );
   }
 

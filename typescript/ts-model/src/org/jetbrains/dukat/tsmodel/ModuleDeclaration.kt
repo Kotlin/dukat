@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ReferenceClauseDeclaration
 
 data class ModuleDeclaration(
-        val packageName: NameEntity,
+        val name: NameEntity,
         val imports: List<ImportDeclaration>,
         val references: List<ReferenceClauseDeclaration>,
         val export: ExportAssignmentDeclaration?,
@@ -17,5 +17,6 @@ data class ModuleDeclaration(
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String,
         val resourceName: String,
-        val kind: ModuleDeclarationKind
+        val kind: ModuleDeclarationKind,
+        val isLib: Boolean
 ) : TopLevelDeclaration, FunctionOwnerDeclaration, WithModifiersDeclaration, MergeableDeclaration

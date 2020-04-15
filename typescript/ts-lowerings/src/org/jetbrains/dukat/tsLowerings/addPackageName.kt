@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
 
 private fun ModuleDeclaration.addPackageName(packageName: NameEntity): ModuleDeclaration {
-    return copy(packageName = packageName)
+    return copy(name = packageName)
 }
 
 private fun SourceFileDeclaration.addPackageName(packageName: NameEntity): SourceFileDeclaration {

@@ -447,6 +447,8 @@ message ModuleDeclarationProto {
             NAMESPACE = 2;
     }
     MODULE_KIND kind = 9;
+
+    bool isLibSource = 10;
 }
 
 message SourceFileDeclarationProto {
