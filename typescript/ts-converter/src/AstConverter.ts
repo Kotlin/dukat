@@ -49,11 +49,6 @@ export class AstConverter {
 
   private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
 
-
-  private registerDeclaration<T>(declaration: T, collection: Array<T>) {
-    collection.push(declaration);
-  }
-
   private resolveModulePath(node: ts.Expression): string | null {
     const module = ts.getResolvedModule(node.getSourceFile(), node.text);
     if (module && (typeof module.resolvedFileName == "string")) {
@@ -229,9 +224,7 @@ export class AstConverter {
     let statements: StatementDeclaration[] = [];
 
     for (let statement of block.statements) {
-      for (let decl of this.convertStatement(statement)) {
-        this.registerDeclaration(decl, statements)
-      }
+      statements.push(...this.convertStatement(statement));
     }
 
     return statements;
@@ -285,18 +278,17 @@ export class AstConverter {
   }
 
   convertModifiers(nativeModifiers: ts.NodeArray<ts.Modifier> | undefined): Array<ModifierDeclaration> {
-    var res: Array<ModifierDeclaration> = [];
-
+    let res: Array<ModifierDeclaration> = [];
     if (nativeModifiers) {
       nativeModifiers.forEach(modifier => {
         if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
-          this.registerDeclaration(this.astFactory.createModifierDeclaration("STATIC"), res);
+          res.push(this.astFactory.createModifierDeclaration("STATIC"))
         } else if (modifier.kind == ts.SyntaxKind.DeclareKeyword) {
-          this.registerDeclaration(this.astFactory.createModifierDeclaration("DECLARE"), res);
+          res.push(this.astFactory.createModifierDeclaration("DECLARE"))
         } else if (modifier.kind == ts.SyntaxKind.ExportKeyword) {
-          this.registerDeclaration(this.astFactory.createModifierDeclaration("EXPORT"), res);
+          res.push(this.astFactory.createModifierDeclaration("EXPORT"))
         } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
-          this.registerDeclaration(this.astFactory.createModifierDeclaration("DEFAULT"), res);
+          res.push(this.astFactory.createModifierDeclaration("DEFAULT"))
         }
       });
     }
@@ -569,24 +561,6 @@ export class AstConverter {
     );
   }
 
-  convertTypeElementToMethodSignatureDeclaration(methodDeclaration: ts.MethodSignature): MemberDeclaration | null {
-    let convertedMethodDeclaration = this.convertMethodSignatureDeclaration(methodDeclaration);
-    if (convertedMethodDeclaration != null) {
-      return convertedMethodDeclaration
-    }
-
-    return null;
-  }
-
-  convertTypeElementToMemberDeclaration(methodDeclaration: ts.MethodSignature): MemberDeclaration | null {
-    let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
-    if (convertedMethodDeclaration != null) {
-      return convertedMethodDeclaration
-    }
-
-    return null;
-  }
-
   convertPropertySignature(node: ts.PropertySignature): MemberDeclaration | null {
     let name = this.convertName(node.name);
 
@@ -597,62 +571,51 @@ export class AstConverter {
     return null;
   }
 
-  convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration): Array<MemberDeclaration> {
-    let res: Array<MemberDeclaration> = [];
+  convertIndexSignature(indexSignatureDeclaration: ts.IndexSignatureDeclaration): MemberDeclaration {
     let parameterDeclarations = indexSignatureDeclaration.parameters
       .map(
         (param, count) => this.convertParameterDeclaration(param, count)
       );
 
-    this.registerDeclaration(
-      this.astFactory.createIndexSignatureDeclaration(
+      return this.astFactory.createIndexSignatureDeclaration(
         parameterDeclarations,
         this.convertType(indexSignatureDeclaration.type)
-      ), res
-    );
-
-    return res;
+      );
   }
 
-  convertTypeElementToInterfaceMemberDeclarations(member: ts.TypeElement): Array<MemberDeclaration> {
-    let res: Array<MemberDeclaration> = [];
-
+  convertTypeElementToInterfaceMemberDeclarations(member: ts.TypeElement): MemberDeclaration | null {
     if (ts.isMethodSignature(member)) {
-      let methodDeclaration = this.convertTypeElementToMethodSignatureDeclaration(member);
+      let methodDeclaration = this.convertMethodSignatureDeclaration(member);
       if (methodDeclaration) {
-        this.registerDeclaration(methodDeclaration, res);
+        return methodDeclaration
       }
     } else if (ts.isPropertySignature(member)) {
       let propertySignatureDeclaration = this.convertPropertySignature(member);
       if (propertySignatureDeclaration !== null) {
-        this.registerDeclaration(
-          propertySignatureDeclaration, res
-        );
+        return propertySignatureDeclaration
       }
     } else if (ts.isIndexSignatureDeclaration(member)) {
-      this.convertIndexSignature(member as ts.IndexSignatureDeclaration).forEach(member =>
-        this.registerDeclaration(member, res)
-      );
+      return this.convertIndexSignature(member);
     } else if (ts.isCallSignatureDeclaration(member)) {
-      this.registerDeclaration(
-        this.astFactory.createCallSignatureDeclaration(
-          this.convertParameterDeclarations(member.parameters),
-          member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
-          this.convertTypeParams(member.typeParameters)
-        ), res
-      );
+      return this.astFactory.createCallSignatureDeclaration(
+        this.convertParameterDeclarations(member.parameters),
+        member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+        this.convertTypeParams(member.typeParameters)
+      )
     }
 
-    return res;
+    return null;
   }
 
   convertMembersToInterfaceMemberDeclarations(members: ts.NodeArray<ts.TypeElement>): Array<MemberDeclaration> {
     let res: Array<MemberDeclaration> = [];
-    members.map(member => {
-      this.convertTypeElementToInterfaceMemberDeclarations(member).map(memberDeclaration => {
-        this.registerDeclaration(memberDeclaration, res);
-      });
-    });
+
+    for (let member of members) {
+      let memberDeclaration = this.convertTypeElementToInterfaceMemberDeclarations(member);
+      if (memberDeclaration) {
+        res.push(memberDeclaration);
+      }
+    }
 
     return res;
   }
@@ -666,26 +629,21 @@ export class AstConverter {
 
     for (let memberDeclaration of classDeclarationMembers) {
       if (ts.isIndexSignatureDeclaration(memberDeclaration)) {
-        this.convertIndexSignature(memberDeclaration as ts.IndexSignatureDeclaration).map(member => {
-          this.registerDeclaration(member, members);
-        });
+        members.push(this.convertIndexSignature(memberDeclaration));
       } else if (ts.isPropertyDeclaration(memberDeclaration)) {
         let propertyDeclaration = this.convertPropertyDeclaration(
           memberDeclaration as ts.PropertyDeclaration
         );
         if (propertyDeclaration != null) {
-          this.registerDeclaration(propertyDeclaration, members);
+          members.push(propertyDeclaration)
         }
       } else if (ts.isMethodDeclaration(memberDeclaration)) {
-        let methodDeclaration = memberDeclaration as (ts.FunctionDeclaration & ts.MethodDeclaration & ts.MethodSignature);
-        let convertedMethodDeclaration = this.convertMethodDeclaration(methodDeclaration);
+        let convertedMethodDeclaration = this.convertMethodDeclaration(memberDeclaration);
         if (convertedMethodDeclaration != null) {
-          this.registerDeclaration(convertedMethodDeclaration, members);
+          members.push(convertedMethodDeclaration)
         }
       } else if (memberDeclaration.kind == ts.SyntaxKind.Constructor) {
-        this.convertConstructorDeclaration(memberDeclaration as ts.ConstructorDeclaration).map(member => {
-          this.registerDeclaration(member, members);
-        });
+        members.push(...this.convertConstructorDeclaration(memberDeclaration));
       }
     }
 
@@ -713,7 +671,6 @@ export class AstConverter {
   }
 
   convertConstructorDeclaration(constructorDeclaration: ts.ConstructorDeclaration): Array<MemberDeclaration> {
-
     let params: Array<ParameterDeclaration> = [];
 
     let res: Array<MemberDeclaration> = [];
@@ -726,23 +683,20 @@ export class AstConverter {
             parameter as ts.ParameterDeclaration
           );
           if (convertedVariable != null) {
-            this.registerDeclaration(convertedVariable, res);
+            res.push(convertedVariable)
           }
         }
       }
 
-      this.registerDeclaration(this.convertParameterDeclaration(parameter, count), params);
+      params.push(this.convertParameterDeclaration(parameter, count));
     });
 
-    this.registerDeclaration(
-      this.astFactory.createConstructorDeclaration(
-        params,
-        this.convertTypeParams(constructorDeclaration.typeParameters),
-        this.convertModifiers(constructorDeclaration.modifiers),
-        this.convertBlock(constructorDeclaration.body)
-      ),
-      res
-    );
+    res.push(this.astFactory.createConstructorDeclaration(
+      params,
+      this.convertTypeParams(constructorDeclaration.typeParameters),
+      this.convertModifiers(constructorDeclaration.modifiers),
+      this.convertBlock(constructorDeclaration.body)
+    ));
 
     return res;
   }
@@ -797,7 +751,7 @@ export class AstConverter {
 
           if (type.typeArguments) {
             for (let typeArgument of type.typeArguments) {
-              this.registerDeclaration(this.convertType(typeArgument), typeArguments)
+              typeArguments.push(this.convertType(typeArgument))
             }
           }
 
@@ -817,18 +771,14 @@ export class AstConverter {
             let typeReference = this.createTypeReferenceFromSymbol(declaration);
 
             if (name) {
-              this.registerDeclaration(
-                this.astFactory.createHeritageClauseDeclaration(
-                  name,
-                  typeArguments,
-                  extending,
-                  typeReference,
-                ), parentEntities
-              );
+              parentEntities.push(this.astFactory.createHeritageClauseDeclaration(
+                name,
+                typeArguments,
+                extending,
+                typeReference,
+              ));
             }
           }
-
-
         }
       }
     }
@@ -914,46 +864,45 @@ export class AstConverter {
   }
 
   convertStatement(statement: ts.Node): Array<StatementDeclaration> {
-    let res: Array<StatementDeclaration> = [];
-
     if (ts.isExpressionStatement(statement)) {
-      res.push(this.astFactory.createExpressionStatement(
+      return [this.astFactory.createExpressionStatement(
         this.astExpressionConverter.convertExpression(statement.expression)
-      ));
+      )]
     } else if (ts.isIfStatement(statement)) {
-      res.push(this.astFactory.createIfStatement(
+      return [this.astFactory.createIfStatement(
         this.astExpressionConverter.convertExpression(statement.expression),
         this.convertStatement(statement.thenStatement),
         statement.elseStatement ? this.convertStatement(statement.elseStatement) : null
-      ));
+      )]
     } else if (ts.isIterationStatement(statement)) {
       let iterationStatement = this.convertIterationStatement(statement);
 
       if (iterationStatement) {
-        res.push(iterationStatement);
+        return [iterationStatement]
       }
     } else if (ts.isReturnStatement(statement)) {
-      res.push(this.astFactory.createReturnStatement(
+      return [this.astFactory.createReturnStatement(
         statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
-      ));
+      )]
     } else if (ts.isThrowStatement(statement)) {
-      res.push(this.astFactory.createThrowStatement(
+      return [this.astFactory.createThrowStatement(
         statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
-      ))
+      )]
     } else if (ts.isVariableStatement(statement)) {
-      res = res.concat(this.convertVariableDeclarationList(statement.declarationList, statement.modifiers))
+      return this.convertVariableDeclarationList(statement.declarationList, statement.modifiers)
     } else if (ts.isFunctionDeclaration(statement)) {
       let convertedFunctionDeclaration = this.convertFunctionDeclaration(statement);
       if (convertedFunctionDeclaration != null) {
-        res.push(convertedFunctionDeclaration);
+        return [convertedFunctionDeclaration];
       }
     } else if (ts.isBlock(statement)) {
       let block = this.convertBlockStatement(statement);
       if (block) {
-        res.push(block);
+        return [block]
       }
     }
-    return res;
+
+    return [];
   }
 
   convertTopLevelStatement(statement: ts.Node): Array<Declaration> {
@@ -1049,10 +998,9 @@ export class AstConverter {
 
   private convertStatements(statements: ts.NodeArray<ts.Node>): Array<Declaration> {
     const declarations: Declaration[] = [];
+
     for (let statement of statements) {
-      for (let decl of this.convertTopLevelStatement(statement)) {
-        this.registerDeclaration(decl, declarations)
-      }
+        declarations.push(...this.convertTopLevelStatement(statement))
     }
 
     return declarations;
