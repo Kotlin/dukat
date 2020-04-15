@@ -1039,7 +1039,7 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.SOURCE_FILE)];
+      return [this.createModuleDeclarationAsTopLevel(packageName, imports, references, moduleDeclarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.MODULE)];
     }
 
     return [];
