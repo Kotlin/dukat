@@ -286,7 +286,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     }
 
     return ModuleDeclaration(
-            name = packageName.convert(),
+            name = if (hasPackageName()) { packageName.convert() } else null,
             imports = importsList.mapNotNull { it.convert() },
             references = referencesList.map { it.convert() },
             export = export,

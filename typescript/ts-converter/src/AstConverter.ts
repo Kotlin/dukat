@@ -126,14 +126,14 @@ export class AstConverter {
     return imports;
   }
 
-  private createModuleFromSourceFile(sourceFile: ts.SourceFile, packageName: NameEntity, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
+  private createModuleFromSourceFile(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
     let packageNameFragments = sourceFile.fileName.split("/");
     let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
     let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
 
     return this.astFactory.createModuleDeclaration(
-      packageName,
+      null,
       this.getImports(sourceFile),
       this.getReferences(sourceFile),
       this.convertStatements(statements),
@@ -146,10 +146,10 @@ export class AstConverter {
     );
   }
 
-  createSourceFileDeclaration(sourceFile: ts.SourceFile, packageName: NameEntity, filter?: (node: ts.Node) => boolean): SourceFileDeclaration {
+  createSourceFileDeclaration(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): SourceFileDeclaration {
     return this.astFactory.createSourceFileDeclaration(
       sourceFile.fileName,
-      this.createModuleFromSourceFile(sourceFile, packageName, filter)
+      this.createModuleFromSourceFile(sourceFile, filter)
     );
   }
 

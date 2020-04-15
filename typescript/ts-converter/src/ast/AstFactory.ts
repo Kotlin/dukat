@@ -430,7 +430,7 @@ export class AstFactory {
   }
 
   createModuleDeclaration(
-    packageName: NameEntity,
+    packageName: NameEntity | null,
     imports: Array<ImportClauseDeclaration>,
     references: Array<ReferenceClauseDeclarationProto>,
     moduleDeclarations: Iterable<Declaration>,
@@ -445,7 +445,11 @@ export class AstFactory {
 
     moduleDeclaration.setImportsList(imports);
     moduleDeclaration.setReferencesList(references);
-    moduleDeclaration.setPackagename(packageName);
+
+    if (packageName) {
+      moduleDeclaration.setPackagename(packageName);
+    }
+
     moduleDeclaration.setDeclarationsList(Array.from(moduleDeclarations));
     moduleDeclaration.setModifiersList(modifiers);
 

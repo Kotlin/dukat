@@ -44,6 +44,7 @@ import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -624,7 +625,13 @@ private class LowerDeclarationsToNodes(
     @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
-        val shortName = documentRoot.name.unquote()
+        val name = documentRoot.name ?: if (documentRoot.isLib) {
+            TSLIBROOT
+        } else {
+            IdentifierEntity("<ROOT>")
+        }
+
+        val shortName = name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val imports = mutableMapOf<String, ImportNode>()
@@ -639,10 +646,10 @@ private class LowerDeclarationsToNodes(
             } else nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
         }
 
-        val moduleNameIsStringLiteral = documentRoot.name.isStringLiteral()
+        val moduleNameIsStringLiteral = name.isStringLiteral()
 
         val moduleName = if (moduleNameIsStringLiteral) {
-            documentRoot.name.process { unquote(it) }
+            name.process { unquote(it) }
         } else {
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
@@ -650,7 +657,7 @@ private class LowerDeclarationsToNodes(
         return ModuleNode(
                 moduleName = moduleName,
                 export =  documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
-                packageName = documentRoot.name,
+                packageName = name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,

@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ReferenceClauseDeclaration
 
 data class ModuleDeclaration(
-        val name: NameEntity,
+        val name: NameEntity?,
         val imports: List<ImportDeclaration>,
         val references: List<ReferenceClauseDeclaration>,
         val export: ExportAssignmentDeclaration?,
