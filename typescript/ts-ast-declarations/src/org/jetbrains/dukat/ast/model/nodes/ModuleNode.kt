@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 
 data class ModuleNode(
         val moduleName: NameEntity?,
+        val export: ExportAssignmentNode?,
 
         val packageName: NameEntity,
         var qualifiedPackageName: NameEntity,

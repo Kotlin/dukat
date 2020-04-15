@@ -274,11 +274,23 @@ private fun ReferenceClauseDeclarationProto.convert(): ReferenceClauseDeclaratio
 }
 
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
+
+    var export: ExportAssignmentDeclaration? = null
+    val declarations = declarationsList.mapNotNull {
+        if (it.hasExportAssignment()) {
+            export = it.exportAssignment.convert()
+            null
+        } else {
+            it.convert()
+        }
+    }
+
     return ModuleDeclaration(
             packageName = packageName.convert(),
             imports = importsList.mapNotNull { it.convert() },
             references = referencesList.map { it.convert() },
-            declarations = declarationsList.map { it.convert() },
+            export = export,
+            declarations = declarations,
             modifiers = modifiersList.map { it.convert() }.toSet(),
             definitionsInfo = definitionsInfoList.map { it.convert() },
             uid = uid,
@@ -358,7 +370,6 @@ fun TopLevelDeclarationProto.convert(): TopLevelDeclaration {
         hasAliasDeclaration() -> aliasDeclaration.convert()
         hasEnumDeclaration() -> enumDeclaration.convert()
         hasModuleDeclaration() -> moduleDeclaration.convert()
-        hasExportAssignment() -> exportAssignment.convert()
         hasImportEquals() -> importEquals.convert()
         hasStatement() -> statement.convert()
         else -> throw Exception("unknown TopLevelEntity: ${this}")

@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
-import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -16,22 +15,21 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private data class ExportTable(
-        val assignments: MutableMap<String, ModuleNode>,
-        val nonAssignments: MutableMap<String, ModuleNode>
+        val assignExports: MutableMap<String, ModuleNode>,
+        val defaultExports: MutableMap<String, ModuleNode>
 )
 
 private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTable = ExportTable(mutableMapOf(), mutableMapOf())): ExportTable {
-    docRoot.declarations.forEach { declaration ->
-        when (declaration) {
-            is ModuleNode -> buildExportAssignmentTable(declaration, exported)
-            is ExportAssignmentNode -> {
-                if (declaration.isExportEquals) {
-                    exported.assignments[declaration.name] = docRoot
-                } else {
-                    exported.nonAssignments[declaration.name] = docRoot
-                }
-            }
+    docRoot.export?.let {
+        if (it.isExportEquals) {
+            exported.assignExports[it.name] = docRoot
+        } else {
+            exported.defaultExports[it.name] = docRoot
         }
+    }
+
+    docRoot.declarations.forEach { declaration ->
+        if (declaration is ModuleNode) { buildExportAssignmentTable(declaration, exported) }
     }
 
     return exported
@@ -71,8 +69,8 @@ private class ExportAssignmentLowering(
     }
 
     fun lower(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>): ModuleNode {
-        if (myExports.assignments.contains(docRoot.uid)) {
-            myExports.assignments[docRoot.uid]?.let { exportOwner ->
+        if (myExports.assignExports.contains(docRoot.uid)) {
+            myExports.assignExports[docRoot.uid]?.let { exportOwner ->
                 docRoot.jsModule = exportOwner.moduleName
             }
         } else {
@@ -85,13 +83,12 @@ private class ExportAssignmentLowering(
             }
         }
 
-        val declarationsResolved = docRoot.declarations.mapNotNull { declaration ->
-            val assignments = myExports.assignments
-            val nonAssignments = myExports.nonAssignments
+        val declarationsResolved = docRoot.declarations.map { declaration ->
+            val (assigExports, defaultExports) = myExports
             when (declaration) {
                 is ModuleNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
-                    assignments[declaration.uid]?.let { exportOwner ->
+                    assigExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let { moduleName ->
 
                             docRoot.declarations
@@ -115,7 +112,7 @@ private class ExportAssignmentLowering(
                     }
 
                     if (!declaration.export) {
-                        if (nonAssignments.containsKey(declaration.uid)) {
+                        if (defaultExports.containsKey(declaration.uid)) {
                             declaration.exportQualifier = JsDefault()
                         }
                     }
@@ -123,7 +120,7 @@ private class ExportAssignmentLowering(
                     declaration
                 }
                 is VariableNode -> {
-                    assignments[declaration.uid]?.let { exportOwner ->
+                    assigExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
 
@@ -138,14 +135,14 @@ private class ExportAssignmentLowering(
                         }
                     }
 
-                    if (nonAssignments.containsKey(declaration.uid)) {
+                    if (defaultExports.containsKey(declaration.uid)) {
                         declaration.exportQualifier = JsDefault()
                     }
 
                     declaration
                 }
                 is ClassNode -> {
-                    assignments[declaration.uid]?.let { exportOwner ->
+                    assigExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null
@@ -156,7 +153,7 @@ private class ExportAssignmentLowering(
                     declaration
                 }
                 is InterfaceNode -> {
-                    assignments[declaration.uid]?.let { exportOwner ->
+                    assigExports[declaration.uid]?.let { exportOwner ->
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
                             exportOwner.jsModule = null
@@ -165,9 +162,6 @@ private class ExportAssignmentLowering(
                         }
                     }
                     declaration
-                }
-                is ExportAssignmentNode -> {
-                    null
                 }
                 else -> {
                     declaration

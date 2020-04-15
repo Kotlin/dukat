@@ -64,7 +64,6 @@ fun <T : Entity> Entity.duplicate(): T {
     return when (this) {
         is ClassDeclaration -> copy() as T
         is EnumDeclaration -> copy() as T
-        is ExportAssignmentDeclaration -> copy() as T
         is ExpressionStatementDeclaration -> copy() as T
         is FunctionDeclaration -> copy() as T
         is FunctionTypeDeclaration -> copy() as T

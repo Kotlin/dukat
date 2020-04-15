@@ -237,14 +237,6 @@ private fun Constraint.toDeclarations(name: String, exportModifiers: Set<Modifie
 fun Constraint.toDeclarations(name: String) = toDeclarations(name, EXPORT_MODIFIERS)
 
 fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLevelDeclaration> {
-    val declarations = this.toDeclarations(defaultExportName, DECLARE_MODIFIERS).toMutableList()
-
-    val uidOwner = declarations.firstOrNull { it is WithUidDeclaration }
-
-    if (uidOwner is WithUidDeclaration) {
-        declarations.add(ExportAssignmentDeclaration(uidOwner.uid, true))
-    }
-
-    return declarations
+    return this.toDeclarations(defaultExportName, DECLARE_MODIFIERS).toMutableList()
 }
 

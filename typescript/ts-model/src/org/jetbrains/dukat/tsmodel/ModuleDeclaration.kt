@@ -9,6 +9,7 @@ data class ModuleDeclaration(
         val packageName: NameEntity,
         val imports: List<ImportDeclaration>,
         val references: List<ReferenceClauseDeclaration>,
+        val export: ExportAssignmentDeclaration?,
         val declarations: List<TopLevelDeclaration>,
 
         override val modifiers: Set<ModifierDeclaration>,

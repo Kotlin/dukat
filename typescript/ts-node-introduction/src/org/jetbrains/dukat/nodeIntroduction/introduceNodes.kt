@@ -596,7 +596,6 @@ private class LowerDeclarationsToNodes(
             is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule))
             is EnumDeclaration -> listOf(declaration.convert())
             is TypeAliasDeclaration -> listOf(declaration.convert())
-            is ExportAssignmentDeclaration -> listOf(ExportAssignmentNode(declaration.name, declaration.isExportEquals))
             else -> listOf()
         }
     }
@@ -651,6 +650,7 @@ private class LowerDeclarationsToNodes(
 
         return ModuleNode(
                 moduleName = moduleName,
+                export =  documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
                 packageName = documentRoot.packageName,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
