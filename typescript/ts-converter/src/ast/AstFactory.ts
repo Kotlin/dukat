@@ -433,7 +433,7 @@ export class AstFactory {
     packageName: NameEntity,
     imports: Array<ImportClauseDeclaration>,
     references: Array<ReferenceClauseDeclarationProto>,
-    moduleDeclarations: Array<Declaration>,
+    moduleDeclarations: Iterable<Declaration>,
     modifiers: Array<ModifierDeclaration>,
     uid: string,
     resourceName: string,
@@ -445,7 +445,7 @@ export class AstFactory {
     moduleDeclaration.setImportsList(imports);
     moduleDeclaration.setReferencesList(references);
     moduleDeclaration.setPackagename(packageName);
-    moduleDeclaration.setDeclarationsList(moduleDeclarations);
+    moduleDeclaration.setDeclarationsList(Array.from(moduleDeclarations));
     moduleDeclaration.setModifiersList(modifiers);
 
     moduleDeclaration.setUid(uid);
