@@ -165,16 +165,12 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         )
     }
 
-    private fun ReferenceEntity.getFqName(ownerName: NameEntity): NameEntity? {
-        return if (uid.startsWith("lib-")) {
-            TSLIBROOT.appendLeft(ownerName)
-        } else {
-            uidToNameMapper[uid]?.fqName
-        }
+    private fun ReferenceEntity.getFqName(): NameEntity? {
+        return uidToNameMapper[uid]?.fqName
     }
 
     private fun TypeValueNode.getFqName(): NameEntity? {
-        return typeReference?.getFqName(value) ?: if (KotlinStdlibEntities.contains(value)) {
+        return typeReference?.getFqName() ?: if (KotlinStdlibEntities.contains(value)) {
             TSLIBROOT.appendLeft(value)
         } else null
     }
@@ -201,7 +197,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun HeritageNode.convertToModel(): HeritageModel {
         val isNamedImport = reference?.origin == ReferenceOriginNode.NAMED_IMPORT
         if (isNamedImport) {
-            reference?.getFqName(name)?.let { resolvedName ->
+            reference?.getFqName()?.let { resolvedName ->
                 imports.add(ImportModel(resolvedName, name.rightMost()))
             }
         }
@@ -209,7 +205,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         val fqName = if (isNamedImport) {
             name
         } else {
-            reference?.getFqName(name)
+            reference?.getFqName()
         }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
@@ -276,7 +272,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is GeneratedInterfaceReferenceNode -> {
-                val typeParams =  when (context) {
+                val typeParams = when (context) {
                     TranslationContext.PROPERTY -> typeParameters.map {
                         TypeParameterModel(
                                 type = TypeValueModel(
@@ -298,7 +294,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                                         if (reference?.uid?.endsWith("_GENERATED") == true) {
                                             null
                                         } else {
-                                            reference?.getFqName(typeParam.name)
+                                            reference?.getFqName()
                                         }),
                                 constraints = emptyList()
                         )
@@ -308,7 +304,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         name,
                         typeParams,
                         meta?.processMeta(),
-                        reference?.getFqName(name),
+                        reference?.getFqName(),
                         nullable
                 )
 
