@@ -17,7 +17,7 @@ data class ModuleNode(
         var jsModule: NameEntity?,
         var jsQualifier: NameEntity?,
 
-        var uid: String,
+        override var uid: String,
         override val external: Boolean
 
 ) : TopLevelNode

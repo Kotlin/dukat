@@ -8,6 +8,6 @@ data class TypeAliasNode(
         val name: NameEntity,
         val typeReference: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
-        val uid: String,
+        override val uid: String,
         override val external: Boolean
 ) : TopLevelNode
