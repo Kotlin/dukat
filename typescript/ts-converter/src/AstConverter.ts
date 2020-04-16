@@ -932,7 +932,7 @@ export class AstConverter {
       }
     } else if (ts.isSwitchStatement(statement)) {
       let switchStatement = this.convertSwitchStatement(statement);
-      res.push(switchStatement)
+      return [switchStatement];
     }
 
     return [];
