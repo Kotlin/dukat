@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
@@ -81,12 +82,12 @@ private class ExportAssignmentLowering(
             }
         }
 
-        val declarationsResolved = docRoot.declarations.map { declaration ->
+        docRoot.declarations.forEach { declaration ->
             val (assignExports) = myExports
+            val exportOwner = assignExports[declaration.uid]
             when (declaration) {
-                is ModuleNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
-                    assignExports[declaration.uid]?.let { exportOwner ->
+                    exportOwner?.let {
                         exportOwner.moduleName?.let { moduleName ->
 
                             docRoot.declarations
@@ -96,8 +97,6 @@ private class ExportAssignmentLowering(
                                         functionNode.exportQualifier = JsModule(moduleName)
                                     }
 
-                            exportOwner.jsModule = null
-                            exportOwner.jsQualifier = null
 
                             docRoot.removeExportQualifiers()
 
@@ -108,11 +107,9 @@ private class ExportAssignmentLowering(
                             }
                         }
                     }
-
-                    declaration
                 }
                 is VariableNode -> {
-                    assignExports[declaration.uid]?.let { exportOwner ->
+                    exportOwner?.let {
                         exportOwner.moduleName?.let {
                             declaration.exportQualifier = JsModule(it)
 
@@ -121,39 +118,29 @@ private class ExportAssignmentLowering(
                             }
 
                             declaration.immutable = true
-                            exportOwner.jsModule = null
 
                             docRoot.removeExportQualifiers()
                         }
                     }
-
-                    declaration
                 }
-                is ClassNode -> {
-                    assignExports[declaration.uid]?.let { exportOwner ->
-                        exportOwner.moduleName?.let {
-                            declaration.exportQualifier = JsModule(it)
-                            exportOwner.jsModule = null
+                is ClassLikeNode -> {
+                    if (declaration is ExportableNode) {
+                        exportOwner?.let {
+                            exportOwner.moduleName?.let {
+                                declaration.exportQualifier = JsModule(it)
 
-                            docRoot.removeExportQualifiers()
+                                docRoot.removeExportQualifiers()
+                            }
                         }
                     }
-                    declaration
                 }
-                is InterfaceNode -> {
-                    assignExports[declaration.uid]?.let { exportOwner ->
-                        exportOwner.moduleName?.let {
-                            declaration.exportQualifier = JsModule(it)
-                            exportOwner.jsModule = null
+            }
+        }
 
-                            docRoot.removeExportQualifiers()
-                        }
-                    }
-                    declaration
-                }
-                else -> {
-                    declaration
-                }
+        val declarationsResolved = docRoot.declarations.map { declaration ->
+            when (declaration) {
+                is ModuleNode -> lower(declaration, mergedDocs)
+                else -> declaration
             }
         }
 
