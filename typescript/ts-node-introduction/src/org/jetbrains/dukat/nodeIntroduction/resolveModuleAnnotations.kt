@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -15,16 +16,13 @@ import org.jetbrains.dukat.astCommon.rightMost
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private data class ExportTable(
-        val assignExports: MutableMap<String, ModuleNode>,
-        val defaultExports: MutableMap<String, ModuleNode>
+        val assignExports: MutableMap<String, ModuleNode>
 )
 
-private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTable = ExportTable(mutableMapOf(), mutableMapOf())): ExportTable {
+private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTable = ExportTable(mutableMapOf())): ExportTable {
     docRoot.export?.let {
         if (it.isExportEquals) {
             exported.assignExports[it.name] = docRoot
-        } else {
-            exported.defaultExports[it.name] = docRoot
         }
     }
 
@@ -84,7 +82,7 @@ private class ExportAssignmentLowering(
         }
 
         val declarationsResolved = docRoot.declarations.map { declaration ->
-            val (assignExports, defaultExports) = myExports
+            val (assignExports) = myExports
             when (declaration) {
                 is ModuleNode -> lower(declaration, mergedDocs)
                 is FunctionNode -> {
@@ -111,12 +109,6 @@ private class ExportAssignmentLowering(
                         }
                     }
 
-                    if (!declaration.export) {
-                        if (defaultExports.containsKey(declaration.uid)) {
-                            declaration.exportQualifier = JsDefault()
-                        }
-                    }
-
                     declaration
                 }
                 is VariableNode -> {
@@ -133,10 +125,6 @@ private class ExportAssignmentLowering(
 
                             docRoot.removeExportQualifiers()
                         }
-                    }
-
-                    if (defaultExports.containsKey(declaration.uid)) {
-                        declaration.exportQualifier = JsDefault()
                     }
 
                     declaration
@@ -171,10 +159,7 @@ private class ExportAssignmentLowering(
 
         val hasDefaults = docRoot.declarations.any { declaration ->
             when (declaration) {
-                is ClassNode -> declaration.exportQualifier is JsDefault
-                is FunctionNode -> declaration.exportQualifier is JsDefault
-                is InterfaceNode -> declaration.exportQualifier is JsDefault
-                is VariableNode -> declaration.exportQualifier is JsDefault
+                is ExportableNode -> declaration.exportQualifier is JsDefault
                 else -> false
             }
         }

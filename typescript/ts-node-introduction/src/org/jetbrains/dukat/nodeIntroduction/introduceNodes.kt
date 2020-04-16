@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
+import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -35,6 +36,7 @@ import org.jetbrains.dukat.ast.model.nodes.constants.SELF_REFERENCE_TYPE
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
@@ -586,7 +588,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): List<TopLevelNode> {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): List<TopLevelNode> {
         return when (declaration) {
             is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration, inDeclaredModule))
             is FunctionDeclaration -> listOf(declaration.convert(inDeclaredModule))
@@ -637,13 +639,30 @@ private class LowerDeclarationsToNodes(
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelNode>()
 
+        val defaultEntityUid = documentRoot.export?.let {
+            if (it.isExportEquals) {
+                null
+            } else {
+                it.name
+            }
+        }
+
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
                 imports[declaration.name] = ImportNode(
                         declaration.moduleReference.convert(),
                         declaration.uid
                 )
-            } else nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
+            } else {
+                val topLevelNodes = lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration).map { topLevelNode ->
+                    if ((topLevelNode is ExportableNode) && (topLevelNode.uid == defaultEntityUid)) {
+                        topLevelNode.exportQualifier = JsDefault()
+                    }
+                    topLevelNode
+                }
+
+                nonImports.addAll(topLevelNodes)
+            }
         }
 
         val moduleNameIsStringLiteral = name.isStringLiteral()
@@ -670,22 +689,27 @@ private class LowerDeclarationsToNodes(
     }
 }
 
-private fun ModuleDeclaration.introduceNodes(fileName: String, moduleNameResolver: ModuleNameResolver, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
-private fun SourceFileDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceFileNode {
-    val isInExternalDeclaration = fileName.endsWith(".d.ts")
-    val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
-    return SourceFileNode(
-            fileName,
-            root.introduceNodes(fileName, moduleNameResolver, isInExternalDeclaration),
-            references,
-            null
-    )
-}
+class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
 
-fun SourceSetDeclaration.introduceNodes(moduleNameResolver: ModuleNameResolver): SourceSetNode {
-    return SourceSetNode(sourceName = sourceName, sources = sources.map { source ->
-        source.introduceNodes(moduleNameResolver)
-    })
+    private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
+
+    private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
+        val isInExternalDeclaration = fileName.endsWith(".d.ts")
+        val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
+
+        return SourceFileNode(
+                fileName,
+                root.introduceNodes(fileName, isInExternalDeclaration),
+                references,
+                null
+        )
+    }
+
+    override fun lower(source: SourceSetDeclaration): SourceSetNode {
+        return SourceSetNode(sourceName = source.sourceName, sources = source.sources.map { sourceFile ->
+            sourceFile.introduceNodes()
+        })
+    }
 }

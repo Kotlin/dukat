@@ -20,9 +20,9 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.nodeIntroduction.LowerThisType
 import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
-import org.jetbrains.dukat.nodeIntroduction.introduceNodes
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.FilterOutNonDeclarations
@@ -69,7 +69,8 @@ open class TypescriptLowerer(
                 )
 
 
-        val nodes = declarations.introduceNodes(moduleNameResolver)
+        val nodes = IntroduceNodes(moduleNameResolver)
+                .lower(declarations)
                 .lower(
                         ResolveModuleAnnotations(),
                         LowerThisType(),

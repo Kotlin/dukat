@@ -18,6 +18,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+@JsName("default")
 external fun bar(): String
 
 external fun baz()
