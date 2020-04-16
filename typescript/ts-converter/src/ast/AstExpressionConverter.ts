@@ -349,30 +349,24 @@ export class AstExpressionConverter {
     convertTemplateExpression(expression: ts.TemplateExpression): Expression {
         let tokens: Array<TemplateTokenDeclaration> = [];
 
-        let head = expression.head.getText();
-        // head = "`headTrimmed${"
-        let headTrimmed = head.substr(1, head.length - 3);
+        let head = expression.head.text;
 
-        tokens.push(this.createStringTemplateToken(headTrimmed));
+        tokens.push(this.createStringTemplateToken(head));
         for (let span of expression.templateSpans) {
             if (ts.isTemplateMiddle(span.literal)) {
-                // text = "}textTrimmed${"
-                let text = span.literal.getText();
-                let textTrimmed = text.substr(1, text.length - 3);
+                let text = span.literal.text;
 
                 tokens.push(this.createExpressionTemplateToken(
                     this.convertExpression(span.expression)
                 ));
-                tokens.push(this.createStringTemplateToken(textTrimmed));
+                tokens.push(this.createStringTemplateToken(text));
             } else if (ts.isTemplateTail(span.literal)) {
-                // text = "}textTrimmed`"
-                let text = span.literal.getText();
-                let textTrimmed = text.substr(1, text.length - 2);
+                let text = span.literal.text;
 
                 tokens.push(this.createExpressionTemplateToken(
                     this.convertExpression(span.expression)
                 ));
-                tokens.push(this.createStringTemplateToken(textTrimmed));
+                tokens.push(this.createStringTemplateToken(text));
             }
         }
         return this.createTemplateExpression(tokens)
