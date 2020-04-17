@@ -85,6 +85,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                 extending = false,
                                                 reference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
+                                        modifiers = resolvedClassLike.modifiers,
                                         definitionsInfo = emptyList()
                                 )
                                 is ClassDeclaration -> ClassDeclaration(
@@ -154,7 +155,7 @@ private fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaratio
     return sourceSetsWithIntroducedEntities.copy(sources = sourceSetsWithIntroducedEntities.sources.map { it.copy(root = SubstituteTypeLowering(generatedEntities).lowerSourceDeclaration(it.root)) })
 }
 
-public class ResolveDefaultTypeParams(): TsLowering {
+class ResolveDefaultTypeParams(): TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.resolveDefaultTypeParams()
     }

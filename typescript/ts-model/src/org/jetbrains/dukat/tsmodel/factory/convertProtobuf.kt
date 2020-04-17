@@ -210,6 +210,7 @@ fun InterfaceDeclarationProto.convert(): InterfaceDeclaration {
             membersList.map { it.convert() },
             typeParametersList.map { it.convert() },
             parentEntitiesList.map { it.convert() },
+            modifiersList.mapNotNull { it.convert() }.toSet(),
             definitionsInfoList.map { it.convert() },
             uid
     )
