@@ -660,6 +660,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.type.members),
       this.convertTypeParams(statement.typeParameters),
       [],
+      [],
       [this.astFactory.createDefinitionInfoDeclaration(uid, statement.getSourceFile().fileName)],
       uid
     );
@@ -816,6 +817,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
+      this.convertModifiers(statement.modifiers),
       computeDefinitions ? this.convertDefinitions(statement) : [],
       this.exportContext.getUID(statement)
     );

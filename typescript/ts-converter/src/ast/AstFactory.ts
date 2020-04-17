@@ -374,7 +374,7 @@ export class AstFactory {
     return memberEntity;
   }
 
-  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
+  createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
     let interfaceDeclaration = new InterfaceDeclarationProto();
     interfaceDeclaration.setName(name);
     interfaceDeclaration.setUid(uid);
@@ -382,6 +382,7 @@ export class AstFactory {
     interfaceDeclaration.setMembersList(members);
     interfaceDeclaration.setTypeparametersList(typeParams);
     interfaceDeclaration.setParententitiesList(parentEntities);
+    interfaceDeclaration.setModifiersList(modifiers);
 
     let topLevelDeclaration = new TopLevelDeclarationProto();
     topLevelDeclaration.setInterfacedeclaration(interfaceDeclaration);

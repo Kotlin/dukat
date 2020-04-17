@@ -400,8 +400,9 @@ message InterfaceDeclarationProto {
     repeated MemberDeclarationProto members = 2;
     repeated TypeParameterDeclarationProto typeParameters = 3;
     repeated HeritageClauseDeclarationProto parentEntities = 4;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
-    string uid = 6;
+    repeated ModifierDeclarationProto modifiers = 5;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 6;
+    string uid = 7;
 }
 
 message StatementDeclarationProto {
