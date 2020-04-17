@@ -140,7 +140,13 @@ message PropertyDeclarationProto {
 }
 
 message ModifierDeclarationProto {
-    string token = 1;
+    enum MODIFIER_KIND {
+        STATIC = 0;
+        DECLARE = 1;
+        EXPORT = 2;
+        DEFAULT = 3;
+    }
+    MODIFIER_KIND token = 1;
 }
 
 message ObjectLiteralDeclarationProto {
