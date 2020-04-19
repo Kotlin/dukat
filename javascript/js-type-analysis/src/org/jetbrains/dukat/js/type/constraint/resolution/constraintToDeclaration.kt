@@ -102,7 +102,7 @@ private fun FunctionConstraint.toCallSignatures() = overloads.map {
 }
 
 private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
-        parameters = List(parameterCount) { NoTypeConstraint.toParameterDeclaration("") },
+        parameters = parameterConstraints.map { it.toParameterDeclaration("") },
         type = returnConstraints.toType(),
         typeParameters = emptyList()
 )

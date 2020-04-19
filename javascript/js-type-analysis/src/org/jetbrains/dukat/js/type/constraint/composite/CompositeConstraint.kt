@@ -69,19 +69,21 @@ class CompositeConstraint(
 
             val callsCanBeUnified = callableConstraints.all {
                 if (parameterCount < 0) {
-                    parameterCount = it.parameterCount
+                    parameterCount = it.parameterConstraints.size
                 }
 
-                it.parameterCount == parameterCount
+                it.parameterConstraints.size == parameterCount
             }
 
             val resultConstraint: PropertyOwnerConstraint = if (callableConstraints.isNotEmpty() && callsCanBeUnified) {
                 FunctionConstraint(
                         owner = owner,
-                        overloads = callableConstraints.map { callable ->
-                            FunctionConstraint.Overload(
-                                    callable.returnConstraints,
-                                    List(parameterCount) { i -> "`$i`" to NoTypeConstraint }
+                        returnConstraints = UnionTypeConstraint(
+                                types = callableConstraints.map(CallableConstraint::returnConstraints)
+                        ),
+                        parameterConstraints = List(parameterCount) { paramNum ->
+                            "`$paramNum`" to UnionTypeConstraint(
+                                    types = callableConstraints.map { it.parameterConstraints[paramNum] }
                             )
                         }
                 )
