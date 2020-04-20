@@ -144,7 +144,7 @@ export class AstConverter {
       uid(),
       sourceName,
       [],
-      MODULE_KIND.SOURCE_FILE,
+      sourceFile.isDeclarationFile ? MODULE_KIND.DECLARATION_FILE : MODULE_KIND.SOURCE_FILE,
       this.isLibNode(sourceFile)
     );
   }
@@ -1066,7 +1066,7 @@ export class AstConverter {
       let references = this.getReferences(body.getSourceFile());
 
       let isLib = this.isLibNode(body)
-      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.MODULE, isLib);
+      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE, isLib);
     }
 
     return null;

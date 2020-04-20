@@ -483,9 +483,10 @@ message ModuleDeclarationProto {
     repeated DefinitionInfoDeclarationProto definitionsInfo = 8;
 
     enum MODULE_KIND {
-            SOURCE_FILE = 0;
-            MODULE = 1;
-            NAMESPACE = 2;
+            DECLARATION_FILE = 0;
+            SOURCE_FILE = 1;
+            AMBIENT_MODULE = 2;
+            NAMESPACE = 3;
     }
     MODULE_KIND kind = 9;
 
