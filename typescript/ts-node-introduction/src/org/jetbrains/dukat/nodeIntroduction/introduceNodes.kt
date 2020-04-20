@@ -60,6 +60,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
@@ -677,13 +678,17 @@ private class LowerDeclarationsToNodes(
 
         return ModuleNode(
                 moduleName = moduleName,
-                export =  documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
+                export = documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
                 moduleNameIsStringLiteral = moduleNameIsStringLiteral,
-                jsModule = if (hasDefaultExport) { moduleName } else { null },
+                jsModule = if (hasDefaultExport) {
+                    moduleName
+                } else {
+                    null
+                },
                 jsQualifier = null,
                 uid = documentRoot.uid,
                 external = isDeclaration
@@ -692,18 +697,16 @@ private class LowerDeclarationsToNodes(
 }
 
 
-
 class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
 
     private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
     private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
-        val isInExternalDeclaration = fileName.endsWith(".d.ts")
         val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
         return SourceFileNode(
                 fileName,
-                root.introduceNodes(fileName, isInExternalDeclaration),
+                root.introduceNodes(fileName, root.kind == ModuleDeclarationKind.DECLARATION_FILE),
                 references,
                 null
         )
