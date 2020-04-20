@@ -140,7 +140,13 @@ message PropertyDeclarationProto {
 }
 
 message ModifierDeclarationProto {
-    string token = 1;
+    enum MODIFIER_KIND {
+        STATIC = 0;
+        DECLARE = 1;
+        EXPORT = 2;
+        DEFAULT = 3;
+    }
+    MODIFIER_KIND token = 1;
 }
 
 message ObjectLiteralDeclarationProto {
@@ -433,8 +439,9 @@ message InterfaceDeclarationProto {
     repeated MemberDeclarationProto members = 2;
     repeated TypeParameterDeclarationProto typeParameters = 3;
     repeated HeritageClauseDeclarationProto parentEntities = 4;
-    repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
-    string uid = 6;
+    repeated ModifierDeclarationProto modifiers = 5;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 6;
+    string uid = 7;
 }
 
 message StatementDeclarationProto {

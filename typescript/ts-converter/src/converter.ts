@@ -56,7 +56,7 @@ class SourceBundleBuilder {
     this.program = this.createProgram(originalFiles);
     this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
-    let dependencyBuilder = new DependencyBuilder(this.program, new ExportContext((node: ts.Node) => this.isLibSource(node)));
+    let dependencyBuilder = new DependencyBuilder(this.program, new ExportContext());
     originalFiles.forEach(file => {
       let sourceFile = this.program.getSourceFile(file);
       if (sourceFile) {
@@ -66,9 +66,8 @@ class SourceBundleBuilder {
 
     this.dependencyBuilder = dependencyBuilder;
 
-
     this.astConverter = new AstConverter(
-      new ExportContext((node: ts.Node) => this.isLibSource(node)),
+      new ExportContext(),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
       this.astFactory,

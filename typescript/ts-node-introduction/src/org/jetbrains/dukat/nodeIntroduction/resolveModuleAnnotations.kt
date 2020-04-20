@@ -1,14 +1,11 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ExportableNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -28,7 +25,9 @@ private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTabl
     }
 
     docRoot.declarations.forEach { declaration ->
-        if (declaration is ModuleNode) { buildExportAssignmentTable(declaration, exported) }
+        if (declaration is ModuleNode) {
+            buildExportAssignmentTable(declaration, exported)
+        }
     }
 
     return exported
@@ -142,17 +141,6 @@ private class ExportAssignmentLowering(
                 is ModuleNode -> lower(declaration, mergedDocs)
                 else -> declaration
             }
-        }
-
-        val hasDefaults = docRoot.declarations.any { declaration ->
-            when (declaration) {
-                is ExportableNode -> declaration.exportQualifier is JsDefault
-                else -> false
-            }
-        }
-
-        if (hasDefaults && (docRoot.jsModule == null)) {
-            docRoot.jsModule = docRoot.moduleName
         }
 
         return docRoot.copy(declarations = declarationsResolved)

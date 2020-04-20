@@ -639,13 +639,9 @@ private class LowerDeclarationsToNodes(
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelNode>()
 
-        val defaultEntityUid = documentRoot.export?.let {
-            if (it.isExportEquals) {
-                null
-            } else {
-                it.name
-            }
-        }
+        val globaleExportUid = documentRoot.export?.name
+
+        var hasExport = false
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
@@ -654,11 +650,15 @@ private class LowerDeclarationsToNodes(
                         declaration.uid
                 )
             } else {
-                val topLevelNodes = lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration).map { topLevelNode ->
-                    if ((topLevelNode is ExportableNode) && (topLevelNode.uid == defaultEntityUid)) {
-                        topLevelNode.exportQualifier = JsDefault()
-                    }
-                    topLevelNode
+                val topLevelNodes = lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration)
+
+                if (!hasExport) {
+                    topLevelNodes
+                            .firstOrNull { topLevelNode -> (topLevelNode is ExportableNode) && (topLevelNode.uid == globaleExportUid) }
+                            ?.let { defaultExported ->
+                                hasExport = true
+                                (defaultExported as? ExportableNode)?.exportQualifier = JsDefault()
+                            }
                 }
 
                 nonImports.addAll(topLevelNodes)
@@ -673,6 +673,8 @@ private class LowerDeclarationsToNodes(
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
+        val hasDefaultExport = hasExport && (documentRoot.export?.isExportEquals == false)
+
         return ModuleNode(
                 moduleName = moduleName,
                 export =  documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
@@ -681,7 +683,7 @@ private class LowerDeclarationsToNodes(
                 declarations = nonImports,
                 imports = imports,
                 moduleNameIsStringLiteral = moduleNameIsStringLiteral,
-                jsModule = null,
+                jsModule = if (hasDefaultExport) { moduleName } else { null },
                 jsQualifier = null,
                 uid = documentRoot.uid,
                 external = isDeclaration

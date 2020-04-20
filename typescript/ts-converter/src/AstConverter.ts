@@ -28,6 +28,7 @@ import {ExportContext} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {
   CaseDeclarationProto,
+  ModifierDeclarationProto,
   ModuleDeclarationProto,
   ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto,
@@ -35,6 +36,7 @@ import {
 } from "declarations";
 import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
+import MODIFIER_KIND = ModifierDeclarationProto.MODIFIER_KIND;
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -285,13 +287,13 @@ export class AstConverter {
     if (nativeModifiers) {
       nativeModifiers.forEach(modifier => {
         if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
-          res.push(this.astFactory.createModifierDeclaration("STATIC"))
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.STATIC))
         } else if (modifier.kind == ts.SyntaxKind.DeclareKeyword) {
-          res.push(this.astFactory.createModifierDeclaration("DECLARE"))
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.DECLARE))
         } else if (modifier.kind == ts.SyntaxKind.ExportKeyword) {
-          res.push(this.astFactory.createModifierDeclaration("EXPORT"))
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.EXPORT))
         } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
-          res.push(this.astFactory.createModifierDeclaration("DEFAULT"))
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.DEFAULT))
         }
       });
     }
@@ -661,6 +663,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.type.members),
       this.convertTypeParams(statement.typeParameters),
       [],
+      [],
       [this.astFactory.createDefinitionInfoDeclaration(uid, statement.getSourceFile().fileName)],
       uid
     );
@@ -817,6 +820,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
+      this.convertModifiers(statement.modifiers),
       computeDefinitions ? this.convertDefinitions(statement) : [],
       this.exportContext.getUID(statement)
     );

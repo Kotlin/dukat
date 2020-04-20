@@ -11,6 +11,8 @@ import {
 import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
 import {AstFactory} from "./AstFactory";
+import {ModifierDeclarationProto} from "declarations";
+import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
 
 export class AstExpressionConverter {
     constructor(
