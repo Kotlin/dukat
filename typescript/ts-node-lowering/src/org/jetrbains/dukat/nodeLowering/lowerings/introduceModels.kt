@@ -361,7 +361,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun ParameterNode.processAsLambdaParam(context: TranslationContext = TranslationContext.IRRELEVANT): LambdaParameterModel {
         return LambdaParameterModel(
                 type = type.process(context),
-                name = name
+                //TODO: we have to do this check because somewhere deep in constrainToDeclaration conversion something is passing empty param
+                name = if (name.isEmpty()) { null } else { name }
         )
     }
 

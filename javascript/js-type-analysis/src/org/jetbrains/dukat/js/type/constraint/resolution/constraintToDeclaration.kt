@@ -64,13 +64,15 @@ private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration
         modifiers = if (isStatic) STATIC_MODIFIERS else emptySet()
 )
 
-private fun Constraint.toParameterDeclaration(name: String) = ParameterDeclaration(
-        name = name,
-        type = this.toType(),
-        initializer = null,
-        vararg = false,
-        optional = false
-)
+private fun Constraint.toParameterDeclaration(name: String): ParameterDeclaration {
+    return ParameterDeclaration(
+            name = name,
+            type = this.toType(),
+            initializer = null,
+            vararg = false,
+            optional = false
+    )
+}
 
 private fun FunctionConstraint.toDeclarations(name: String, modifiers: Set<ModifierDeclaration>) = overloads.map {
     FunctionDeclaration(
