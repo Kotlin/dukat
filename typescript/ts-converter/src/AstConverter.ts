@@ -872,20 +872,13 @@ export class AstConverter {
     for (let clause of statement.caseBlock.clauses) {
       let body: Array<StatementDeclaration> = [];
       for (let statement of clause.statements) {
-        body = body.concat(this.convertStatement(statement));
+        body.push(...this.convertStatement(statement));
       }
-
-      if (ts.isCaseClause(clause)) {
-        cases.push(this.astFactory.createCaseDeclaration(
-            this.astExpressionConverter.convertExpression(clause.expression),
-            body
-        ))
-      } else {
-        cases.push(this.astFactory.createCaseDeclaration(
-            null,
-            body
-        ))
-      }
+      cases.push(this.astFactory.createCaseDeclaration(
+          ts.isCaseClause ?
+              this.astExpressionConverter.convertExpression(clause.expression) : null,
+          body
+      ));
     }
 
     return this.astFactory.createSwitchStatement(
