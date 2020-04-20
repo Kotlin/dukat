@@ -879,7 +879,7 @@ export class AstConverter {
         body.push(...this.convertStatement(statement));
       }
       cases.push(this.astFactory.createCaseDeclaration(
-          ts.isCaseClause ?
+          ts.isCaseClause(clause) ?
               this.astExpressionConverter.convertExpression(clause.expression) : null,
           body
       ));
