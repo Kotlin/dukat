@@ -30,18 +30,26 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
 import org.jetbrains.dukat.astModel.comments.DocumentationCommentModel
+import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
+import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
+import org.jetbrains.dukat.astModel.expressions.templates.TemplateTokenModel
 import org.jetbrains.dukat.astModel.isGeneric
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
@@ -52,6 +60,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
@@ -239,16 +248,33 @@ private fun LiteralExpressionModel.translate(): String {
     }
 }
 
+private fun TemplateTokenModel.translate(): String {
+    return when (this) {
+        is StringTemplateTokenModel -> value.translate()
+        is ExpressionTemplateTokenModel -> "\${${expression.translate()}}"
+        else -> raiseConcern("unknown TemplateTokenModel ${this}") { "" }
+    }
+}
+
 private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
         is ThisExpressionModel -> "this"
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
+        is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
         is BinaryExpressionModel -> "${left.translate()} $operator ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
+        is UnaryExpressionModel -> if (isPrefix) {
+            "$operator${operand.translate()}"
+        } else {
+            "${operand.translate()}$operator"
+        }
+        is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
+        is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
+        is NonNullExpressionModel -> "${expression.translate()}!!"
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }
@@ -274,6 +300,15 @@ private fun StatementModel.translate(): List<String> {
             val header = "while (${condition.translate()}) "
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
+        }
+        is WhenStatementModel -> {
+            val header = "when (${expression.translate()}) {"
+            val cases = cases.flatMap {
+                val caseHeader = "${it.condition?.translate() ?: "else"} -> "
+                val body = it.body.translate()
+                listOf(caseHeader + body[0]) + body.drop(1)
+            }.map { FORMAT_TAB + it }
+            return listOf(header) + cases + listOf("}")
         }
         is VariableModel -> {
             return listOf(translate())

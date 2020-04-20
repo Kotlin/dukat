@@ -4,7 +4,9 @@ import {
     Expression, HeritageClauseDeclaration,
     IdentifierDeclaration,
     MemberDeclaration, ModifierDeclaration,
-    NameEntity, ParameterDeclaration, TypeDeclaration, TypeParameter,
+    NameEntity, ParameterDeclaration,
+    TemplateTokenDeclaration,
+    TypeDeclaration, TypeParameter,
 } from "./ast";
 import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
@@ -89,6 +91,26 @@ export class AstExpressionConverter {
 
     createRegExLiteralExpression(value: string): Expression {
         return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
+    }
+
+    createStringTemplateToken(value: string): TemplateTokenDeclaration {
+        return AstExpressionFactory.createStringTemplateToken(value);
+    }
+
+    createExpressionTemplateToken(expression: Expression): TemplateTokenDeclaration {
+        return AstExpressionFactory.createExpressionTemplateToken(expression);
+    }
+
+    createTemplateExpression(tokens: Array<TemplateTokenDeclaration>): Expression {
+        return AstExpressionFactory.createTemplateExpression(tokens)
+    }
+
+    createAsExpression(expression: Expression, type: TypeDeclaration): Expression {
+        return AstExpressionFactory.createAsExpression(expression, type)
+    }
+
+    createNonNullExpression(expression: Expression): Expression {
+        return AstExpressionFactory.createNonNullExpression(expression)
     }
 
     createUnknownExpression(value: string): Expression {
@@ -326,6 +348,36 @@ export class AstExpressionConverter {
         }
     }
 
+    convertTemplateExpression(expression: ts.TemplateExpression): Expression {
+        let tokens: Array<TemplateTokenDeclaration> = [];
+
+        let head = expression.head.text;
+
+        tokens.push(this.createStringTemplateToken(head));
+        for (let span of expression.templateSpans) {
+            if (ts.isTemplateMiddle(span.literal)) {
+                let text = span.literal.text;
+
+                tokens.push(this.createExpressionTemplateToken(
+                    this.convertExpression(span.expression)
+                ));
+                tokens.push(this.createStringTemplateToken(text));
+            } else if (ts.isTemplateTail(span.literal)) {
+                let text = span.literal.text;
+
+                tokens.push(this.createExpressionTemplateToken(
+                    this.convertExpression(span.expression)
+                ));
+                tokens.push(this.createStringTemplateToken(text));
+            }
+        }
+        return this.createTemplateExpression(tokens)
+    }
+
+    convertNoSubstitutionTemplateLiteral(literal: ts.NoSubstitutionTemplateLiteral): Expression {
+        return this.createStringLiteralExpression(literal.getText()
+            .split('`').join( '"'))
+    }
 
     private convertToken(expression: ts.Expression): Expression {
         if (expression.kind == ts.SyntaxKind.TrueKeyword) {
@@ -337,6 +389,13 @@ export class AstExpressionConverter {
         }
     }
 
+    private convertAsExpression(expression: ts.AssertionExpression): Expression {
+        return this.createAsExpression(this.convertExpression(expression.expression), this.astConverter.convertType(expression.type))
+    }
+
+    private convertNonNullExpression(expression: ts.NonNullExpression): Expression {
+        return this.createNonNullExpression(this.convertExpression(expression.expression))
+    }
 
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
@@ -368,6 +427,10 @@ export class AstExpressionConverter {
             return this.convertNewExpression(expression)
         } else if (ts.isIdentifier(expression) || ts.isQualifiedName(expression)) {
             return this.convertNameExpression(expression);
+        } else if (ts.isTemplateExpression(expression)) {
+            return this.convertTemplateExpression(expression)
+        } else if (ts.isNoSubstitutionTemplateLiteral(expression)) {
+            return this.convertNoSubstitutionTemplateLiteral(expression)
         } else if (ts.isLiteralExpression(expression)) {
             return this.convertLiteralExpression(expression);
         } else if (ts.isObjectLiteralExpression(expression)) {
@@ -378,6 +441,10 @@ export class AstExpressionConverter {
             return this.convertConditionalExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
+        } else if (ts.isAssertionExpression(expression)) {
+            return this.convertAsExpression(expression)
+        } else if (ts.isNonNullExpression(expression)) {
+            return this.convertNonNullExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

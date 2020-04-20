@@ -5,7 +5,7 @@ import {
     IdentifierDeclaration,
     LiteralExpression,
     MemberDeclaration,
-    NameEntity
+    NameEntity, TemplateTokenDeclaration, TypeDeclaration
 } from "./ast";
 
 export class AstExpressionFactory {
@@ -211,5 +211,47 @@ export class AstExpressionFactory {
         let literalExpression = new declarations.LiteralExpressionDeclarationProto();
         literalExpression.setRegexliteral(regExLiteralExpression);
         return this.asExpression(literalExpression);
+    }
+
+    static createStringTemplateToken(value: string): TemplateTokenDeclaration {
+        let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
+        stringLiteralExpression.setValue(value);
+
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setStringliteral(
+            stringLiteralExpression
+        );
+        return templateToken;
+    }
+
+    static createExpressionTemplateToken(expression: Expression): TemplateTokenDeclaration {
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setExpression(expression);
+        return templateToken;
+    }
+
+    static createTemplateExpression(tokens: Array<TemplateTokenDeclaration>): Expression {
+        let templateExpression = new declarations.TemplateExpressionDeclarationProto();
+        templateExpression.setTokenList(tokens);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setTemplateexpression(templateExpression);
+        return expression;
+    }
+
+    static createAsExpression(subExpression: Expression, type: TypeDeclaration): Expression {
+        let asExpression = new declarations.AsExpressionDeclarationProto();
+        asExpression.setExpression(subExpression);
+        asExpression.setType(type);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setAsexpression(asExpression);
+        return expression;
+    }
+
+    static createNonNullExpression(subExpression: Expression): Expression {
+        let nonNullExpression = new declarations.NonNullExpressionDeclarationProto();
+        nonNullExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setNonnullexpression(nonNullExpression);
+        return expression;
     }
 }

@@ -251,6 +251,17 @@ message LiteralExpressionDeclarationProto {
     }
 }
 
+message TemplateTokenDeclarationProto {
+    oneof type {
+        StringLiteralExpressionDeclarationProto stringLiteral = 1;
+        ExpressionDeclarationProto expression = 2;
+    }
+}
+
+message TemplateExpressionDeclarationProto {
+    repeated TemplateTokenDeclarationProto token = 1;
+}
+
 message NameExpressionDeclarationProto {
     NameDeclarationProto name = 1;
 }
@@ -297,6 +308,15 @@ message ConditionalExpressionDeclarationProto {
     ExpressionDeclarationProto whenFalse = 3;
 }
 
+message AsExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    ParameterValueDeclarationProto type = 2;
+}
+
+message NonNullExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -311,11 +331,14 @@ message ExpressionDeclarationProto {
         CallExpressionDeclarationProto callExpression = 6;
         NameExpressionDeclarationProto nameExpression = 7;
         LiteralExpressionDeclarationProto literalExpression = 8;
-        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 9;
-        ElementAccessExpressionDeclarationProto elementAccessExpression = 10;
-        NewExpressionDeclarationProto newExpression = 11;
-        ConditionalExpressionDeclarationProto conditionalExpression = 12;
-        UnknownExpressionDeclarationProto unknownExpression = 13;
+        TemplateExpressionDeclarationProto templateExpression = 9;
+        PropertyAccessExpressionDeclarationProto propertyAccessExpression = 10;
+        ElementAccessExpressionDeclarationProto elementAccessExpression = 11;
+        NewExpressionDeclarationProto newExpression = 12;
+        ConditionalExpressionDeclarationProto conditionalExpression = 13;
+        AsExpressionDeclarationProto asExpression = 14;
+        NonNullExpressionDeclarationProto nonNullExpression = 15;
+        UnknownExpressionDeclarationProto unknownExpression = 16;
     }
 }
 
@@ -328,6 +351,16 @@ message ForStatementDeclarationProto {
     repeated StatementDeclarationProto initializer = 2;
     ExpressionDeclarationProto incrementor = 3;
     repeated StatementDeclarationProto statement = 4;
+}
+
+message CaseDeclarationProto {
+    ExpressionDeclarationProto condition = 1;
+    repeated StatementDeclarationProto statement = 2;
+}
+
+message SwitchStatementDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    repeated CaseDeclarationProto case = 2;
 }
 
 message IfStatementDeclarationProto {
@@ -422,6 +455,7 @@ message StatementDeclarationProto {
         VariableDeclarationProto variableDeclaration = 7;
         FunctionDeclarationProto functionDeclaration = 8;
         ForStatementDeclarationProto forStatement = 9;
+        SwitchStatementDeclarationProto switchStatement = 10;
     }
 }
 

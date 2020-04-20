@@ -22,9 +22,9 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
     protected fun translateBinary(input: String) = CliHttpClient(HTTP_CLIENT_PORT).translate(input)
 
     override fun translate(
-            input: String
+        data: String
     ): SourceSetModel {
-        val binData = translateBinary(input)
+        val binData = translateBinary(data)
         val translator = JsRuntimeByteArrayTranslator(translator)
         return translator.translate(binData)
     }

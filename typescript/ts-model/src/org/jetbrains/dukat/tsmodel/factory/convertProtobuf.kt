@@ -5,13 +5,14 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
-import org.jetbrains.dukat.tsmodel.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -24,6 +25,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
+import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
@@ -33,6 +35,7 @@ import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
+import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
@@ -40,12 +43,14 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
+import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -60,6 +65,9 @@ import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.NameExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.ImportSpecifierDeclaration
 import org.jetbrains.dukat.tsmodel.importClause.NamedImportsDeclaration
@@ -76,12 +84,14 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodelproto.ArrayLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.AsExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BlockDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BooleanLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.CallExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.CallSignatureDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.CaseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConditionalExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
@@ -108,6 +118,7 @@ import org.jetbrains.dukat.tsmodelproto.ModuleDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NameDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NameExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NewExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.NonNullExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.NumericLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ObjectLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterDeclarationProto
@@ -123,6 +134,9 @@ import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SwitchStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TemplateExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TemplateTokenDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ThrowStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeAliasDeclarationProto
@@ -320,10 +334,17 @@ fun ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration {
     return ImportEqualsDeclaration(name, moduleReference.convert(), uid)
 }
 
-fun List<StatementDeclarationProto>.convert(): StatementDeclaration? {
+fun List<StatementDeclarationProto>.convert(): BlockDeclaration? {
     return when {
         this.isEmpty() -> null
-        this.size == 1 -> this[0].convert()
+        this.size == 1 -> {
+            val statement = this[0].convert()
+            if (statement is BlockDeclaration) {
+                statement
+            } else {
+                BlockDeclaration(listOf(statement))
+            }
+        }
         else -> BlockDeclaration(this.map { it.convert() })
     }
 }
@@ -331,8 +352,8 @@ fun List<StatementDeclarationProto>.convert(): StatementDeclaration? {
 fun IfStatementDeclarationProto.convert(): IfStatementDeclaration {
     return IfStatementDeclaration(
             condition = condition.convert(),
-            thenStatement = (thenStatementList.convert() as BlockDeclaration?) ?: BlockDeclaration(emptyList()),
-            elseStatement = (elseStatementList.convert() as BlockDeclaration?)
+            thenStatement = thenStatementList.convert() ?: BlockDeclaration(emptyList()),
+            elseStatement = elseStatementList.convert()
     )
 }
 
@@ -341,14 +362,32 @@ fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
             initializer = BlockDeclaration(initializerList.map { it.convert() }),
             condition = condition.convert(),
             incrementor = incrementor.convert(),
-            body = statementList.convert() as BlockDeclaration
+            body = statementList.convert() ?: BlockDeclaration(emptyList())
     )
 }
 
 fun WhileStatementDeclarationProto.convert(): WhileStatementDeclaration {
     return WhileStatementDeclaration(
             condition = condition.convert(),
-            statement = (statementList.convert() as BlockDeclaration?) ?: BlockDeclaration(emptyList())
+            statement = statementList.convert() ?: BlockDeclaration(emptyList())
+    )
+}
+
+fun CaseDeclarationProto.convert(): CaseDeclaration {
+    return CaseDeclaration(
+        condition = if (hasCondition()) {
+            condition.convert()
+        } else {
+            null
+        },
+        body = statementList.convert() ?: BlockDeclaration(emptyList())
+    )
+}
+
+fun SwitchStatementDeclarationProto.convert(): SwitchStatementDeclaration {
+    return SwitchStatementDeclaration(
+        expression = expression.convert(),
+        cases = caseList.map { it.convert() }
     )
 }
 
@@ -575,6 +614,20 @@ fun LiteralExpressionDeclarationProto.convert(): LiteralExpressionDeclaration {
     }
 }
 
+fun TemplateTokenDeclarationProto.convert(): TemplateTokenDeclaration {
+    return when  {
+        hasExpression() -> ExpressionTemplateTokenDeclaration(expression.convert())
+        hasStringLiteral() -> StringTemplateTokenDeclaration(stringLiteral.convert())
+        else -> throw Exception("unknown templateToken: ${this}")
+    }
+}
+
+fun TemplateExpressionDeclarationProto.convert(): TemplateExpressionDeclaration {
+    return TemplateExpressionDeclaration(
+        tokenList.map { it.convert() }
+    )
+}
+
 fun PropertyAccessExpressionDeclarationProto.convert(): PropertyAccessExpressionDeclaration {
     return PropertyAccessExpressionDeclaration(
             expression = expression.convert(),
@@ -610,6 +663,19 @@ fun UnknownExpressionDeclarationProto.convert(): UnknownExpressionDeclaration {
     )
 }
 
+fun AsExpressionDeclarationProto.convert(): AsExpressionDeclaration {
+    return AsExpressionDeclaration(
+        expression = expression.convert(),
+        type = type.convert()
+    )
+}
+
+fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
+    return NonNullExpressionDeclaration(
+        expression = expression.convert()
+    )
+}
+
 fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
@@ -620,10 +686,13 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasCallExpression() -> callExpression.convert()
         hasNameExpression() -> nameExpression.convert()
         hasLiteralExpression() -> literalExpression.convert()
+        hasTemplateExpression() -> templateExpression.convert()
         hasPropertyAccessExpression() -> propertyAccessExpression.convert()
         hasElementAccessExpression() -> elementAccessExpression.convert()
         hasNewExpression() -> newExpression.convert()
         hasConditionalExpression() -> conditionalExpression.convert()
+        hasAsExpression() -> asExpression.convert()
+        hasNonNullExpression() -> nonNullExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }
@@ -640,6 +709,7 @@ fun StatementDeclarationProto.convert(): StatementDeclaration {
         hasVariableDeclaration() -> variableDeclaration.convert()
         hasFunctionDeclaration() -> functionDeclaration.convert()
         hasForStatement() -> forStatement.convert()
+        hasSwitchStatement() -> switchStatement.convert()
         else -> throw Exception("unknown statement: ${this}")
     }
 }

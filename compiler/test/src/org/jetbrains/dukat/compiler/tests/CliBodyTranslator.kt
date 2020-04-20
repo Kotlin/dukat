@@ -8,9 +8,9 @@ import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
 
 class CliBodyTranslator : CliTranslator() {
     override fun translate(
-        input: String
+        data: String
     ): SourceSetModel {
-        val binData = translateBinary(input)
+        val binData = translateBinary(data)
         val translator = createJsByteArrayWithBodyTranslator(CommonJsNameResolver(), null)
         return translator.translate(binData)
     }
