@@ -13,7 +13,6 @@ import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,7 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-@Disabled
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class)
 class JSTypeTests : OutputTests() {
     @DisplayName("js type test set")
