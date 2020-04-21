@@ -392,7 +392,6 @@ private class LowerDeclarationsToNodes(
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                null,
                 false,
                 uid,
                 true
@@ -408,7 +407,6 @@ private class LowerDeclarationsToNodes(
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                null,
                 true,
                 uid,
                 true

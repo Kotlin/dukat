@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
+import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
@@ -122,14 +123,12 @@ private class ExportAssignmentLowering(
                         }
                     }
                 }
-                is ClassLikeNode -> {
-                    if (declaration is ExportableNode) {
-                        exportOwner?.let {
-                            exportOwner.moduleName?.let {
-                                declaration.exportQualifier = JsModule(it)
+                is ClassNode -> {
+                    exportOwner?.let {
+                        exportOwner.moduleName?.let {
+                            declaration.exportQualifier = JsModule(it)
 
-                                docRoot.removeExportQualifiers()
-                            }
+                            docRoot.removeExportQualifiers()
                         }
                     }
                 }

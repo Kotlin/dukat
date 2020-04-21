@@ -677,7 +677,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 },
                 typeParameters = convertTypeParams(typeParameters),
                 parentEntities = convertParentEntities(parentEntities),
-                annotations = exportQualifier.toAnnotation(),
+                annotations = mutableListOf(),
                 comment = null,
                 external = true,
                 visibilityModifier = VisibilityModifierModel.DEFAULT
