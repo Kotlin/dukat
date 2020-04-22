@@ -22,6 +22,7 @@ private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
             type = type,
             modifiers = modifiers,
             body = null,
+            definitionsInfo = emptyList(),
             uid = "__NO_UID__"
     )
 }

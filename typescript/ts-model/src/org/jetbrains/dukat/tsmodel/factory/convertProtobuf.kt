@@ -246,6 +246,7 @@ fun FunctionDeclarationProto.convert(): FunctionDeclaration {
             if (hasBody()) {
                 body.convert()
             } else null,
+            definitionsInfoList.map { it.convert() },
             uid
     )
 }
