@@ -269,12 +269,13 @@ export class AstConverter {
         this.convertType(functionDeclaration.type) : this.createTypeDeclaration("Unit");
 
       return this.astFactory.createFunctionDeclarationAsTopLevel(
-        functionDeclaration.name ? functionDeclaration.name.getText() : "",
+        functionDeclaration.name.text,
         parameterDeclarations,
         returnType,
         typeParameterDeclarations,
         this.convertModifiers(functionDeclaration.modifiers),
         this.convertBlock(functionDeclaration.body),
+        this.convertDefinitions(functionDeclaration),
         uid
       );
     }
@@ -808,20 +809,20 @@ export class AstConverter {
     );
   }
 
-  private convertDefinitions(interfaceDeclaration: ts.InterfaceDeclaration | ts.ClassDeclaration | ts.VariableDeclaration): Array<DefinitionInfoDeclaration> {
-    return this.declarationResolver.resolve(interfaceDeclaration).map((definitionInfo) => {
+  private convertDefinitions(mergeableDeclaration: ts.FunctionDeclaration | ts.InterfaceDeclaration | ts.ClassDeclaration | ts.VariableDeclaration | ts.ModuleDeclaration): Array<DefinitionInfoDeclaration> {
+    return this.declarationResolver.resolve(mergeableDeclaration).map((definitionInfo) => {
       return this.astFactory.createDefinitionInfoDeclaration(this.exportContext.getUID(definitionInfo), definitionInfo.getSourceFile().fileName);
     });
   }
 
-  convertInterfaceDeclaration(statement: ts.InterfaceDeclaration, computeDefinitions: boolean = true): Declaration {
+  convertInterfaceDeclaration(statement: ts.InterfaceDeclaration): Declaration {
     return this.astFactory.createInterfaceDeclaration(
       this.astFactory.createIdentifierDeclarationAsNameEntity(statement.name.getText()),
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
       this.convertModifiers(statement.modifiers),
-      computeDefinitions ? this.convertDefinitions(statement) : [],
+      this.convertDefinitions(statement),
       this.exportContext.getUID(statement)
     );
   }

@@ -305,7 +305,7 @@ export class AstFactory {
     return statementDeclaration;
   }
 
-  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): FunctionDeclaration {
+  createFunctionDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): FunctionDeclaration {
     let functionDeclaration = new FunctionDeclarationProto();
     functionDeclaration.setName(name);
     functionDeclaration.setParametersList(parameters);
@@ -316,19 +316,20 @@ export class AstFactory {
       functionDeclaration.setBody(body);
     }
     functionDeclaration.setUid(uid);
+    functionDeclaration.setDefinitionsinfoList(definitionsInfo);
     return functionDeclaration
   }
 
   createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): MemberDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [], uid);
 
     let memberProto = new MemberDeclarationProto();
     memberProto.setFunctiondeclaration(functionDeclaration);
     return memberProto;
   }
 
-  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string): StatementDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, uid);
+  createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): StatementDeclaration {
+    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, definitionsInfo, uid);
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setFunctiondeclaration(functionDeclaration);

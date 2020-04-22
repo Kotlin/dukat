@@ -113,7 +113,8 @@ message FunctionDeclarationProto {
     repeated TypeParameterDeclarationProto typeParameters = 4;
     repeated ModifierDeclarationProto modifiers = 5;
     BlockDeclarationProto body = 6;
-    string uid = 7;
+    repeated DefinitionInfoDeclarationProto definitionsInfo = 7;
+    string uid = 8;
 }
 
 message IndexSignatureDeclarationProto {
