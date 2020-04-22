@@ -5,9 +5,10 @@ function f(a: number) {
             break;
         case 1:
             console.log("y");
-            break;
         case 2:
             break;
+        case 3:
+            
         default:
             console.log("default");
     }

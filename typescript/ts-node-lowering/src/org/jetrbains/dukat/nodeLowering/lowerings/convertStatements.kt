@@ -3,7 +3,6 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
@@ -26,16 +25,21 @@ import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionMode
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateTokenModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
+import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.CaseModel
+import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
+import org.jetbrains.dukat.tsmodel.CaseDeclaration
+import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
@@ -48,6 +52,7 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
@@ -74,7 +79,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
                 value
             )
-            else -> raiseConcern("unable to process LiteralExpressionDeclaration ${this}") {
+            else -> raiseConcern("unable to process LiteralExpressionDeclaration $this") {
                 StringLiteralExpressionModel("ERROR")
             }
         }
@@ -84,7 +89,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         return when (this) {
             is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.convert() as StringLiteralExpressionModel)
             is ExpressionTemplateTokenDeclaration -> ExpressionTemplateTokenModel(expression.convert())
-            else -> raiseConcern("unable to process TemplateTokenDeclaration ${this}") {
+            else -> raiseConcern("unable to process TemplateTokenDeclaration $this") {
                 StringTemplateTokenModel(StringLiteralExpressionModel("ERROR"))
             }
         }
@@ -145,23 +150,103 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()
                 "super" -> SuperExpressionModel()
-                else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
+                else -> raiseConcern("unable to process ExpressionDeclaration $this") {
                     IdentifierExpressionModel(IdentifierEntity(meta))
                 }
             }
-            else -> raiseConcern("unable to process ExpressionDeclaration ${this}") {
+            else -> raiseConcern("unable to process ExpressionDeclaration $this") {
                 IdentifierExpressionModel(IdentifierEntity("ERROR"))
             }
         }
     }
 
+    private fun BlockDeclaration.isFallthroughBlock(): Boolean {
+        return when (statements.lastOrNull()) {
+            null -> true
+            is BreakStatementDeclaration -> false
+            else -> true
+        }
+    }
+
+    private fun SwitchStatementDeclaration.splitToFallthroughBlocks(): List<List<CaseDeclaration>> {
+        val fallthroughBlocks = mutableListOf<List<CaseDeclaration>>()
+        var currentBlock = mutableListOf<CaseDeclaration>()
+        cases.forEach {
+            currentBlock.add(it)
+            if (!it.body.isFallthroughBlock()) {
+                fallthroughBlocks += currentBlock
+                currentBlock = mutableListOf()
+            }
+        }
+        if (currentBlock.isNotEmpty()) {
+            fallthroughBlocks += currentBlock
+        }
+        return fallthroughBlocks
+    }
+
+    private fun StatementModel.removeBreaks(): StatementModel? {
+        return when (this) {
+            is BlockStatementModel -> removeBreaks()
+            is BreakStatementModel -> null
+            is IfStatementModel -> copy(
+                thenStatement = thenStatement.removeBreaks(),
+                elseStatement = elseStatement?.removeBreaks()
+            )
+            is RunBlockStatementModel -> copy(statements = statements.mapNotNull { it.removeBreaks() })
+            is WhenStatementModel -> copy(cases = cases.map { it.copy(body = it.body.removeBreaks()) })
+            is WhileStatementModel -> copy(body = body.removeBreaks())
+            else -> this
+        }
+    }
+
+    private fun BlockStatementModel.removeBreaks() = copy(statements = statements.mapNotNull { it.removeBreaks() })
+
+    private fun List<CaseDeclaration>.convert(expressionToCompare: ExpressionModel): CaseModel? {
+        return when (this.size) {
+            0 -> null
+            1 -> CaseModel(
+                first().condition?.convert()?.let { listOf(it) },
+                convertBlock(first().body)
+            )
+            else -> {
+                val condition = if (none { it.condition == null }) {
+                    map { it.condition!!.convert() }
+                } else {
+                    null
+                }
+                val body = map { case ->
+                    if (case.condition == null) {
+                        case.body.statements.map { it.convert() }
+                    } else {
+                        listOf(
+                            IfStatementModel(
+                                BinaryExpressionModel(
+                                    expressionToCompare,
+                                    "==",
+                                    case.condition!!.convert()
+                                ),
+                                convertBlock(case.body),
+                                null
+                            )
+                        )
+                    }
+                }.flatten()
+                CaseModel(
+                    condition,
+                    BlockStatementModel(body)
+                )
+            }
+        }
+    }
+
     private fun SwitchStatementDeclaration.convert(): WhenStatementModel {
+        val expressionToCompare = expression.convert()
+
         return WhenStatementModel(
-            expression.convert(),
-            cases.map { CaseModel(
-                it.condition?.convert(),
-                convertBlock(it.body)
-            ) }
+            expressionToCompare,
+            splitToFallthroughBlocks()
+                .mapNotNull { it.convert(expressionToCompare) }
+                .map { it.copy(body = it.body.removeBreaks()) }
         )
     }
 
@@ -173,6 +258,8 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is ReturnStatementDeclaration -> ReturnStatementModel(
                 expression?.convert()
             )
+            is BreakStatementDeclaration -> BreakStatementModel()
+            is ContinueStatementDeclaration -> ContinueStatementModel()
             is IfStatementDeclaration -> IfStatementModel(
                 condition.convert(),
                 convertBlock(thenStatement),
@@ -212,7 +299,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null
             )
-            else -> raiseConcern("unable to process StatementDeclaration ${this}") {
+            else -> raiseConcern("unable to process StatementDeclaration $this") {
                 ExpressionStatementModel(
                     IdentifierExpressionModel(IdentifierEntity("ERROR"))
                 )
@@ -221,6 +308,6 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
     }
 
     fun convertBlock(blockDeclaration: BlockDeclaration): BlockStatementModel {
-        return BlockStatementModel(blockDeclaration.statements.mapNotNull { it.convert() })
+        return BlockStatementModel(blockDeclaration.statements.map { it.convert() })
     }
 }

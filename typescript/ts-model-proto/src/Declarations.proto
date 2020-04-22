@@ -379,6 +379,14 @@ message ReturnStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message BreakStatementDeclarationProto {
+
+}
+
+message ContinueStatementDeclarationProto {
+
+}
+
 message ThrowStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
@@ -457,6 +465,8 @@ message StatementDeclarationProto {
         FunctionDeclarationProto functionDeclaration = 8;
         ForStatementDeclarationProto forStatement = 9;
         SwitchStatementDeclarationProto switchStatement = 10;
+        BreakStatementDeclarationProto breakStatement = 11;
+        ContinueStatementDeclarationProto continueStatement = 12;
     }
 }
 

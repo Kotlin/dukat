@@ -55,6 +55,8 @@ import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
+import org.jetbrains.dukat.astModel.statements.BreakStatementModel
+import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -283,6 +285,8 @@ private fun StatementModel.translate(): List<String> {
     return when (this) {
         is AssignmentStatementModel -> listOf("${left.translate()} = ${right.translate()}")
         is ReturnStatementModel -> listOf("return ${expression?.translate()}")
+        is BreakStatementModel -> listOf("break")
+        is ContinueStatementModel -> listOf("continue")
         is ExpressionStatementModel -> listOf(expression.translate())
         is BlockStatementModel -> listOf("{") +
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
@@ -303,9 +307,9 @@ private fun StatementModel.translate(): List<String> {
         }
         is WhenStatementModel -> {
             val header = "when (${expression.translate()}) {"
-            val cases = cases.flatMap {
-                val caseHeader = "${it.condition?.translate() ?: "else"} -> "
-                val body = it.body.translate()
+            val cases = cases.flatMap { case ->
+                val caseHeader = "${case.condition?.joinToString { it.translate() } ?: "else"} -> "
+                val body = case.body.translate()
                 listOf(caseHeader + body[0]) + body.drop(1)
             }.map { FORMAT_TAB + it }
             return listOf(header) + cases + listOf("}")
