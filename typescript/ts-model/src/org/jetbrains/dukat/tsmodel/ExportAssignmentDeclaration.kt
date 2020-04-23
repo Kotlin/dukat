@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.tsmodel
 
 data class ExportAssignmentDeclaration(
-        val name: String,
+        val uids: List<String>,
         val isExportEquals: Boolean
 )

@@ -19,7 +19,9 @@ private data class ExportTable(
 private fun buildExportAssignmentTable(docRoot: ModuleNode, exported: ExportTable = ExportTable(mutableMapOf())): ExportTable {
     docRoot.export?.let {
         if (it.isExportEquals) {
-            exported.assignExports[it.name] = docRoot
+            it.uids.forEach {uid ->
+                exported.assignExports[uid] = docRoot
+            }
         }
     }
 
@@ -88,6 +90,7 @@ private class ExportAssignmentLowering(
                     exportOwner?.let {
                         exportOwner.moduleName?.let { moduleName ->
 
+                        declaration.exportQualifier = JsModule(moduleName)
                             docRoot.declarations
                                     .filterIsInstance(FunctionNode::class.java)
                                     .filter { it.name == declaration.name }

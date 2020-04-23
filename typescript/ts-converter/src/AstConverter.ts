@@ -990,11 +990,9 @@ export class AstConverter {
           }
 
           if (Array.isArray(symbol.declarations) && symbol.declarations.length > 0) {
-            let declaration = symbol.declarations[0];
-
-            let uid = this.exportContext.getUID(declaration);
             yield this.astFactory.createExportAssignmentDeclaration(
-              uid, !!statement.isExportEquals
+              symbol.declarations.map(it => this.exportContext.getUID(it)),
+              !!statement.isExportEquals
             )
           }
         }

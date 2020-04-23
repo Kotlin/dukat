@@ -6,5 +6,7 @@ enum class ModifierDeclaration : Entity {
     DECLARE_KEYWORD,
     STATIC_KEYWORD,
     EXPORT_KEYWORD,
-    DEFAULT_KEYWORD
+    DEFAULT_KEYWORD,
+
+    SYNTH_EXPORT_ASSIGNMENT
 }

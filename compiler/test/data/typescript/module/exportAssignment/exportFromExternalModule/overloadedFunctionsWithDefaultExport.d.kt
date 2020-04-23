@@ -20,6 +20,8 @@ external interface Result
 external interface Options
 
 // ------------------------------------------------------------------------------------------
+@file:JsModule("fluff")
+@file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package fluff
 
@@ -40,11 +42,11 @@ import org.w3c.xhr.*
 import Result
 import Options
 
-@JsModule("fluff")
+@JsName("default")
 external fun fluffify(): Result
 
-@JsModule("fluff")
+@JsName("default")
 external fun fluffify(files: Array<String>): Result
 
-@JsModule("fluff")
+@JsName("default")
 external fun fluffify(opts: Options): Result

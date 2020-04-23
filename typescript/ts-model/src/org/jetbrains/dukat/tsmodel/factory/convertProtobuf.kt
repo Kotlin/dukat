@@ -329,7 +329,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
 }
 
 fun ExportAssignmentDeclarationProto.convert(): ExportAssignmentDeclaration {
-    return ExportAssignmentDeclaration(name, isExportEquals)
+    return ExportAssignmentDeclaration(uidList, isExportEquals)
 }
 
 fun ImportEqualsDeclarationProto.convert(): ImportEqualsDeclaration {

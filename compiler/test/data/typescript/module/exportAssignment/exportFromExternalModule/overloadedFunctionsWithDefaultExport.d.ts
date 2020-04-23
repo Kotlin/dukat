@@ -6,5 +6,5 @@ declare module "fluff" {
 	function fluffify(files: string[]): Result;
 	function fluffify(opts: Options): Result;
 
-	export = fluffify;
+	export default fluffify;
 }

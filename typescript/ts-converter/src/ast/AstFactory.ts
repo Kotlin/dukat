@@ -194,9 +194,9 @@ export class AstFactory {
     return enumToken;
   }
 
-  createExportAssignmentDeclaration(name: string, isExportEquals: boolean): Declaration {
+  createExportAssignmentDeclaration(uids: Array<string>, isExportEquals: boolean): Declaration {
     let exportAssignment = new ExportAssignmentDeclarationProto();
-    exportAssignment.setName(name);
+    exportAssignment.setUidList(uids);
     exportAssignment.setIsexportequals(isExportEquals);
 
     let topLevelDeclaration = new TopLevelDeclarationProto();

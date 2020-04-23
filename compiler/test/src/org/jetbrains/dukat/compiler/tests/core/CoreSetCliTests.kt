@@ -39,6 +39,7 @@ open class CoreSetCliTests {
     @MethodSource("coreSet")
     open fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEqualsBinary(name, tsPath, ktPath)
+        assertContentEqualsBinary(name, tsPath, ktPath)
     }
 
     open fun getTranslator(): CliTranslator = createStandardCliTranslator()

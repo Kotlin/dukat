@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
-import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -33,6 +32,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.constants.SELF_REFERENCE_TYPE
+import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -70,6 +70,7 @@ import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -364,11 +365,6 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun ClassDeclaration.convert(inDeclaredModule: Boolean): ClassNode {
-
-        val exportQualifier = if (hasDefaultModifier() && hasExportModifier()) {
-            JsDefault()
-        } else null
-
         val declaration = ClassNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
@@ -379,7 +375,7 @@ private class LowerDeclarationsToNodes(
                 null,
 
                 uid,
-                exportQualifier,
+                resolveAsExportQualifier(),
                 inDeclaredModule || hasDeclareModifier()
         )
 
@@ -444,19 +440,21 @@ private class LowerDeclarationsToNodes(
         )
     }
 
-    private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
-        val hasExportModifier = hasExportModifier()
-        val exportQualifier = if (hasDefaultModifier() && hasExportModifier) {
+    private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
+        return if (hasDefaultModifier() && hasExportModifier()) {
             JsDefault()
         } else null
+    }
+
+    private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
 
         return FunctionNode(
                 IdentifierEntity(name),
                 convertParameters(parameters),
                 type.convertToNode(),
                 convertTypeParameters(typeParameters),
-                exportQualifier,
-                hasExportModifier,
+                resolveAsExportQualifier(),
+                hasExportModifier(),
                 false,
                 false,
                 null,
@@ -544,7 +542,7 @@ private class LowerDeclarationsToNodes(
                 VariableNode(
                         IdentifierEntity(declaration.name),
                         TypeValueNode(IdentifierEntity("Json"), emptyList()),
-                        null,
+                        declaration.resolveAsExportQualifier(),
                         false,
                         false,
                         emptyList(),
@@ -575,7 +573,7 @@ private class LowerDeclarationsToNodes(
             VariableNode(
                     IdentifierEntity(declaration.name),
                     type.convertToNode(),
-                    null,
+                    declaration.resolveAsExportQualifier(),
                     false,
                     false,
                     emptyList(),
@@ -638,9 +636,7 @@ private class LowerDeclarationsToNodes(
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelNode>()
 
-        val globaleExportUid = documentRoot.export?.name
 
-        var hasExport = false
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {
@@ -649,18 +645,7 @@ private class LowerDeclarationsToNodes(
                         declaration.uid
                 )
             } else {
-                val topLevelNodes = lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration)
-
-                if (!hasExport) {
-                    topLevelNodes
-                            .firstOrNull { topLevelNode -> (topLevelNode is ExportableNode) && (topLevelNode.uid == globaleExportUid) }
-                            ?.let { defaultExported ->
-                                hasExport = true
-                                (defaultExported as? ExportableNode)?.exportQualifier = JsDefault()
-                            }
-                }
-
-                nonImports.addAll(topLevelNodes)
+                nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
             }
         }
 
@@ -672,11 +657,13 @@ private class LowerDeclarationsToNodes(
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
-        val hasDefaultExport = hasExport && (documentRoot.export?.isExportEquals == false)
+        val hasDefaultExport = documentRoot.declarations.any {
+            (it is WithModifiersDeclaration) && (it !is InterfaceDeclaration) && (it.hasExportModifier()) && (it.hasDefaultModifier())
+         }
 
         return ModuleNode(
                 moduleName = moduleName,
-                export = documentRoot.export?.let { ExportAssignmentNode(it.name, it.isExportEquals) },
+                export = documentRoot.export?.let { ExportAssignmentNode(it.uids, it.isExportEquals) },
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,

@@ -28,6 +28,7 @@ import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.FilterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
+import org.jetbrains.dukat.tsLowerings.IntroduceSyntheticExportModifiers
 import org.jetbrains.dukat.tsLowerings.LowerPartialOf
 import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
@@ -56,6 +57,7 @@ open class TypescriptLowerer(
                         AddPackageName(packageName),
                         MergeModules(),
                         MergeClassLikes(),
+                        IntroduceSyntheticExportModifiers(),
                         ResolveLambdaParents(),
                         FilterOutNonDeclarations(),
                         RenameImpossibleDeclarations(),
