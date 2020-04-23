@@ -162,7 +162,6 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
 
     private fun BlockDeclaration.isFallthroughBlock(): Boolean {
         return when (statements.lastOrNull()) {
-            null -> true
             is BreakStatementDeclaration -> false
             else -> true
         }
@@ -210,7 +209,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             else -> {
                 val condition = if (none { it.condition == null }) {
-                    map { it.condition!!.convert() }
+                    mapNotNull { it.condition?.convert() }
                 } else {
                     null
                 }
@@ -245,8 +244,10 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         return WhenStatementModel(
             expressionToCompare,
             splitToFallthroughBlocks()
-                .mapNotNull { it.convert(expressionToCompare) }
-                .map { it.copy(body = it.body.removeBreaks()) }
+                .mapNotNull {
+                    val caseModel = it.convert(expressionToCompare)
+                    caseModel?.copy(body = caseModel.body.removeBreaks())
+                }
         )
     }
 
