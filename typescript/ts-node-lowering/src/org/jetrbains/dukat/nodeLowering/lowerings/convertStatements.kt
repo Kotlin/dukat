@@ -19,6 +19,10 @@ import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressio
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -95,6 +99,48 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
+    private fun convertBinaryOperator(operator: String): BinaryOperatorModel {
+        return when (operator) {
+            "+" -> PLUS
+            "-" -> MINUS
+            "*" -> MULT
+            "/" -> DIV
+            "%" -> MOD
+            "=" -> ASSIGN
+            "+=" -> PLUS_ASSIGN
+            "-=" -> MINUS_ASSIGN
+            "*=" -> MULT_ASSIGN
+            "/=" -> DIV_ASSIGN
+            "%=" -> MOD_ASSIGN
+            "&&" -> AND
+            "||" -> OR
+            "==" -> EQ
+            "!=" -> NOT_EQ
+            "===" -> REF_EQ
+            "!==" -> REF_NOT_EQ
+            "<" -> LT
+            ">" -> GT
+            "<=" -> LE
+            ">=" -> GE
+            else -> raiseConcern("unable to process binary operator $this") {
+                PLUS
+            }
+        }
+    }
+
+    private fun convertUnaryOperator(operator: String): UnaryOperatorModel {
+        return when (operator) {
+            "++" -> INCREMENT
+            "--" -> DECREMENT
+            "+" -> UNARY_PLUS
+            "-" -> UNARY_MINUS
+            "!" -> NOT
+            else -> raiseConcern("unable to process unary operator $this") {
+                INCREMENT
+            }
+        }
+    }
+
     private fun ExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
@@ -118,12 +164,12 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is BinaryExpressionDeclaration -> BinaryExpressionModel(
                 left.convert(),
-                operator,
+                convertBinaryOperator(operator),
                 right.convert()
             )
             is UnaryExpressionDeclaration -> UnaryExpressionModel(
                 operand.convert(),
-                operator,
+                convertUnaryOperator(operator),
                 isPrefix
             )
             is ConditionalExpressionDeclaration -> ConditionalExpressionModel(
@@ -221,7 +267,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                             IfStatementModel(
                                 BinaryExpressionModel(
                                     expressionToCompare,
-                                    "==",
+                                    EQ,
                                     case.condition!!.convert()
                                 ),
                                 convertBlock(case.body),
