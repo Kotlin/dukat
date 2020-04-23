@@ -142,6 +142,8 @@ export class DependencyBuilder {
             this.checkReferences(exportSpecifier.name);
           });
       }
+    } else if (ts.isCallExpression(node)) {
+      this.checkReferences(node.expression)
     }
     ts.forEachChild(node, node => this.visit(node));
   }

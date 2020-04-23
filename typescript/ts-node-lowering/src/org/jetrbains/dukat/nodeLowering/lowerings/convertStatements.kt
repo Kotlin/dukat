@@ -48,6 +48,7 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
@@ -96,6 +97,10 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 identifier
             )
             is CallExpressionDeclaration -> CallExpressionModel(
+                expression.convert(),
+                arguments.map { it.convert() }
+            )
+            is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
                 arguments.map { it.convert() }
             )
