@@ -6,16 +6,12 @@ import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSimpleExtendedAttributeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.isKnown
-import org.jetbrains.dukat.idlDeclarations.InterfaceKind
-import org.jetbrains.dukat.idlDeclarations.isPrimitive
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 
@@ -25,6 +21,10 @@ private class TypeResolver : IDLLowering {
 
     private val resolvedUnionTypes: MutableSet<String> = mutableSetOf()
     private val failedToResolveUnionTypes: MutableSet<String> = mutableSetOf()
+
+    private val namedDeclarationsToAdd: MutableMap<String, MutableSet<IDLUnionDeclaration>> = mutableMapOf()
+    private val anonymousDeclarationsToAdd: MutableSet<IDLUnionDeclaration> = mutableSetOf()
+
     private val dependenciesToAdd: MutableMap<String, MutableSet<IDLSingleTypeDeclaration>> = mutableMapOf()
 
     private var sourceSet: IDLSourceSetDeclaration = IDLSourceSetDeclaration(listOf())
@@ -32,6 +32,10 @@ private class TypeResolver : IDLLowering {
 
     fun getDependencies(declaration: IDLClassLikeDeclaration): List<IDLSingleTypeDeclaration> {
         return dependenciesToAdd[declaration.name]?.toList() ?: listOf()
+    }
+
+    fun getNamedDeclarationsToAdd(fileName: String): List<IDLUnionDeclaration> {
+        return namedDeclarationsToAdd[fileName]?.toList() ?: listOf()
     }
 
     private fun processUnionType(unionType: IDLUnionTypeDeclaration) {
@@ -72,6 +76,18 @@ private class TypeResolver : IDLLowering {
             }
         }
         resolvedUnionTypes += unionType.name
+        if (unionType.originFile != null) {
+            namedDeclarationsToAdd.putIfAbsent(unionType.originFile!!, mutableSetOf())
+            namedDeclarationsToAdd[unionType.originFile!!]!!.add(IDLUnionDeclaration(
+                name = unionType.name,
+                unions = listOf()
+            ))
+        } else {
+            anonymousDeclarationsToAdd.add(IDLUnionDeclaration(
+                name = unionType.name,
+                unions = listOf()
+            ))
+        }
         for ((interfaceName, dependencies) in newDependenciesToAdd) {
             dependenciesToAdd.putIfAbsent(interfaceName, mutableSetOf())
             dependenciesToAdd[interfaceName]!!.addAll(dependencies)
@@ -148,20 +164,24 @@ private class TypeResolver : IDLLowering {
         currentFile = fileDeclaration
         var newFileDeclaration = super.lowerFileDeclaration(fileDeclaration)
         newFileDeclaration = newFileDeclaration.copy(
-                declarations = newFileDeclaration.declarations + resolvedUnionTypes.map {
-                    IDLUnionDeclaration(
-                            name = it,
-                            unions = listOf()
-                    )
-                }
+                declarations = newFileDeclaration.declarations + anonymousDeclarationsToAdd
         )
-        resolvedUnionTypes.clear()
+        anonymousDeclarationsToAdd.clear()
         return newFileDeclaration
     }
 
     override fun lowerSourceSetDeclaration(sourceSet: IDLSourceSetDeclaration): IDLSourceSetDeclaration {
         this.sourceSet = sourceSet
         return super.lowerSourceSetDeclaration(sourceSet)
+    }
+}
+
+private class DeclarationAdder(val typeResolver: TypeResolver) : IDLLowering {
+    override fun lowerFileDeclaration(fileDeclaration: IDLFileDeclaration): IDLFileDeclaration {
+        return fileDeclaration.copy(
+            declarations = fileDeclaration.declarations +
+                    typeResolver.getNamedDeclarationsToAdd(fileDeclaration.fileName)
+        )
     }
 }
 
@@ -195,7 +215,10 @@ private class DependencyResolver(val typeResolver: TypeResolver) : IDLLowering {
 fun IDLSourceSetDeclaration.resolveTypes(): IDLSourceSetDeclaration {
     val typeResolver = TypeResolver()
     val dependencyResolver = DependencyResolver(typeResolver)
+    val declarationAdder = DeclarationAdder(typeResolver)
     return dependencyResolver.lowerSourceSetDeclaration(
+        declarationAdder.lowerSourceSetDeclaration(
             typeResolver.lowerSourceSetDeclaration(this)
+        )
     )
 }

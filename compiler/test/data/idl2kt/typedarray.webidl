@@ -28,6 +28,7 @@ interface ArrayBufferView {
     readonly attribute unsigned long byteLength;
 };
 
+typedef (ArrayBuffer or ArrayBufferView) BufferDataSource;
 
 // The 'byte' type does not currently exist in Web IDL.
 // In this IDL, it should be a signed 8 bit type.

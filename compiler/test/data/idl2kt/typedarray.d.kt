@@ -308,3 +308,5 @@ public external open class DataView(buffer: ArrayBuffer, byteOffset: Int = defin
     fun setFloat32(byteOffset: Int, value: Float, littleEndian: Boolean = definedExternally)
     fun setFloat64(byteOffset: Int, value: Double, littleEndian: Boolean = definedExternally)
 }
+
+public external interface BufferDataSource

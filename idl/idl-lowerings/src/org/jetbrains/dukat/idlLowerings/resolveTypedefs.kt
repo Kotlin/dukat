@@ -7,6 +7,7 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
 import org.jetbrains.dukat.idlDeclarations.IDLUnionTypeDeclaration
+import org.jetbrains.dukat.idlDeclarations.changeOrigin
 
 private class TypedefResolver(val context: TypedefContext) : IDLLowering {
 
@@ -54,8 +55,8 @@ private class TypedefResolver(val context: TypedefContext) : IDLLowering {
 private class TypedefContext : IDLLowering {
     private val typedefs: MutableMap<String, IDLTypeDeclaration> = mutableMapOf()
 
-    fun registerTypedef(declaration: IDLTypedefDeclaration) {
-        typedefs[declaration.name] = declaration.typeReference
+    fun registerTypedef(declaration: IDLTypedefDeclaration, owner: IDLFileDeclaration) {
+        typedefs[declaration.name] = declaration.typeReference.changeOrigin(owner.fileName)
     }
 
     fun resolveType(declaration: IDLSingleTypeDeclaration): IDLTypeDeclaration {
@@ -67,7 +68,7 @@ private class TypedefContext : IDLLowering {
     }
 
     override fun lowerTypedefDeclaration(declaration: IDLTypedefDeclaration, owner: IDLFileDeclaration): IDLTypedefDeclaration {
-        registerTypedef(declaration)
+        registerTypedef(declaration, owner)
         return declaration
     }
 }

@@ -6365,6 +6365,8 @@ public external interface UnionAudioTrackOrTextTrackOrVideoTrack
 
 public external interface UnionElementOrMouseEvent
 
+public external interface UnionMessagePortOrWindowProxy
+
 public external interface RenderingContext
 
 public external interface HTMLOrSVGImageElement : CanvasImageSource
@@ -6372,8 +6374,6 @@ public external interface HTMLOrSVGImageElement : CanvasImageSource
 public external interface CanvasImageSource : ImageBitmapSource
 
 public external interface ImageBitmapSource
-
-public external interface UnionMessagePortOrWindowProxy
 
 public external interface HTMLOrSVGScriptElement
 

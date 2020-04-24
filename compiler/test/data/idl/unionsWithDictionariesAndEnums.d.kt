@@ -17,9 +17,9 @@ public external abstract class E {
     open var y: UnionAOrBOrC
 }
 
-public external interface D
-
 public external interface UnionAOrBOrC
+
+public external interface D
 
 /* please, don't implement this interface! */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

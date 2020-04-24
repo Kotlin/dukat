@@ -39,3 +39,10 @@ fun IDLTypeDeclaration.changeComment(newComment: String?): IDLTypeDeclaration {
         else -> this
     }
 }
+
+fun IDLTypeDeclaration.changeOrigin(newOrigin: String?): IDLTypeDeclaration {
+    return when (this) {
+        is IDLUnionTypeDeclaration -> copy(originFile = newOrigin)
+        else -> this
+    }
+}

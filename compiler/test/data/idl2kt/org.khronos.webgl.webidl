@@ -74,7 +74,6 @@ interface WebGLShaderPrecisionFormat {
     readonly attribute GLint precision;
 };
 
-typedef (ArrayBuffer or ArrayBufferView) BufferDataSource;
 typedef (ImageBitmap or
          ImageData or
          HTMLImageElement or

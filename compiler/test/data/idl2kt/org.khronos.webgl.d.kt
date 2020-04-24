@@ -894,7 +894,5 @@ public inline fun WebGLContextEventInit(statusMessage: String? = "", bubbles: Bo
     return o
 }
 
-public external interface BufferDataSource
-
 public external interface TexImageSource
 

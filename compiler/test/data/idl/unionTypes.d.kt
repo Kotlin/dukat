@@ -23,8 +23,8 @@ public external abstract class ResolvedUnions {
     fun f(x: ABC?): ABC
 }
 
+public external interface UnionCOrD
+
 public external interface ABC : ABCD
 
 public external interface ABCD
-
-public external interface UnionCOrD

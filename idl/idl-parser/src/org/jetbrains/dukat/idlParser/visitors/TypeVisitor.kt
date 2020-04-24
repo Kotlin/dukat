@@ -32,6 +32,7 @@ internal class TypeVisitor(private var name: String = "",
                             prefix = "Union"
                     ) { it.name },
                     unionMembers = unionMembers,
+                    originFile = null,
                     nullable = nullable
             )
             TypeKind.FUNCTION -> IDLFunctionTypeDeclaration(
