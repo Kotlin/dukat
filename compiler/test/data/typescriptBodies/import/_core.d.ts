@@ -8,7 +8,6 @@ export namespace SomeNamespace {
 
 export function c();
 
-export var myTwo : {
-    (x:number, y:number):number;
-    (x:number):string;
+export interface CallSignatureInterface {
+    (x: number, y: number): number;
 }
