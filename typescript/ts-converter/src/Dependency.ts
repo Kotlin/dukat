@@ -51,7 +51,6 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
 
   accept(node: ts.Node): boolean {
 
-    console.log(ts.SyntaxKind[node.kind]);
 
     if (ts.isExportAssignment(node)) {
       return true;
@@ -59,8 +58,7 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
 
     let uid = this.exportContext.getUID(node);
 
-    console.log(uid);
-    console.log(this.symbols);
+
     if (this.symbols.has(uid)) {
       return true;
     }
