@@ -10,8 +10,11 @@ declare class Message {
   once(event: 'end' | 'finish' | 'basta', listener: () => void): this;
 }
 
-
 declare interface Ping {
   ping(a: Number | String);
   ping(a: Boolean | Number);
 }
+
+declare function addListener(event: "disconnect", listener: (worker: Ping) => void): Message;
+declare function addListener(event: "online", listener: (worker: Ping) => void): Message;
+

@@ -1,13 +1,13 @@
 package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.SourceFileModel
-import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -29,6 +29,13 @@ private fun MemberModel.normalize(): MemberModel {
                 parameters = parameters.map { it.withoutMeta() },
                 override = null
         )
+        else -> this
+    }
+}
+
+private fun TopLevelModel.normalize(): TopLevelModel {
+    return when (this) {
+        is FunctionModel -> copy(parameters = parameters.map { it.withoutMeta() })
         else -> this
     }
 }
@@ -58,6 +65,15 @@ private class ConflictingOverloads() : ModelWithOwnerTypeLowering {
 
 class RemoveConflictingOverloads : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
-        return ConflictingOverloads().lowerRoot(module, NodeOwner(module, null))
+        val declarationsResolved = module.declarations.groupBy { it.normalize() }.map { (_, bucketMembers) ->
+            if (bucketMembers.size > 1) {
+                bucketMembers.first().normalize()
+            } else {
+                bucketMembers.first()
+            }
+        }
+
+        val moduleResolved = module.copy(declarations = declarationsResolved)
+        return ConflictingOverloads().lowerRoot(moduleResolved, NodeOwner(moduleResolved, null))
     }
 }

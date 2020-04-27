@@ -25,3 +25,5 @@ external interface Ping {
     fun ping(a: String)
     fun ping(a: Boolean)
 }
+
+external fun addListener(event: String, listener: (worker: Ping) -> Unit): Message
