@@ -27,10 +27,12 @@ import {
 import {createLogger} from "../Logger";
 import {
   BlockDeclarationProto,
+  BreakStatementDeclarationProto,
   CallSignatureDeclarationProto,
   CaseDeclarationProto,
   ClassDeclarationProto,
   ConstructorDeclarationProto,
+  ContinueStatementDeclarationProto,
   DefinitionInfoDeclarationProto,
   EnumDeclarationProto,
   EnumTokenDeclarationProto,
@@ -259,6 +261,22 @@ export class AstFactory {
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setReturnstatement(returnStatement);
+    return statementDeclaration;
+  }
+
+  createBreakStatement(): StatementDeclaration {
+    let breakStatement = new BreakStatementDeclarationProto();
+
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setBreakstatement(breakStatement);
+    return statementDeclaration;
+  }
+
+  createContinueStatement(): StatementDeclaration {
+    let continueStatement = new ContinueStatementDeclarationProto();
+
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setContinuestatement(continueStatement);
     return statementDeclaration;
   }
 

@@ -912,6 +912,10 @@ export class AstConverter {
       return [this.astFactory.createReturnStatement(
         statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
       )]
+    } else if (ts.isBreakStatement(statement)) {
+      return [this.astFactory.createBreakStatement()]
+    } else if (ts.isContinueStatement(statement)) {
+      return [this.astFactory.createContinueStatement()]
     } else if (ts.isThrowStatement(statement)) {
       return [this.astFactory.createThrowStatement(
         statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null

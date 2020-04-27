@@ -20,12 +20,16 @@ fun f(a: Number) {
         0 -> {
             console.log("x")
         }
-        1 -> {
-            console.log("y")
-        }
-        2 -> {
+        1, 2 -> {
+            if (a == 1) {
+                console.log("y")
+            }
+            if (a == 2) {
+            }
         }
         else -> {
+            if (a == 3) {
+            }
             console.log("default")
         }
     }

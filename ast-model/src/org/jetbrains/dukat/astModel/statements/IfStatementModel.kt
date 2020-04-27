@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 
 data class IfStatementModel(
     val condition: ExpressionModel,
-    val thenStatement: StatementModel,
-    val elseStatement: StatementModel?,
+    val thenStatement: BlockStatementModel,
+    val elseStatement: BlockStatementModel?,
     override val metaDescription: String? = null
 ): StatementModel

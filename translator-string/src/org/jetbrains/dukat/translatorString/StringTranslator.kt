@@ -46,6 +46,10 @@ import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -55,6 +59,8 @@ import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
+import org.jetbrains.dukat.astModel.statements.BreakStatementModel
+import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
@@ -256,6 +262,48 @@ private fun TemplateTokenModel.translate(): String {
     }
 }
 
+private fun BinaryOperatorModel.translate(): String {
+    return when (this) {
+        PLUS -> "+"
+        MINUS -> "-"
+        MULT -> "*"
+        DIV -> "/"
+        MOD -> "%"
+        ASSIGN -> "="
+        PLUS_ASSIGN -> "+="
+        MINUS_ASSIGN -> "-="
+        MULT_ASSIGN -> "*="
+        DIV_ASSIGN -> "/="
+        MOD_ASSIGN -> "%="
+        AND -> "&&"
+        OR -> "||"
+        EQ -> "=="
+        NOT_EQ -> "!="
+        REF_EQ -> "==="
+        REF_NOT_EQ -> "1"
+        LT -> "<"
+        GT -> ">"
+        LE -> "<="
+        GE -> ">="
+        else -> raiseConcern("unable to process binaryOperatorModel $this") {
+            ""
+        }
+    }
+}
+
+private fun UnaryOperatorModel.translate(): String {
+    return when (this) {
+        INCREMENT -> "++"
+        DECREMENT -> "--"
+        UNARY_PLUS -> "+"
+        UNARY_MINUS -> "-"
+        NOT -> "!"
+        else -> raiseConcern("unable to process unaryOperatorModel $this") {
+            ""
+        }
+    }
+}
+
 private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
@@ -263,14 +311,14 @@ private fun ExpressionModel.translate(): String {
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
         is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
-        is BinaryExpressionModel -> "${left.translate()} $operator ${right.translate()}"
+        is BinaryExpressionModel -> "${left.translate()} ${operator.translate()} ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
         is UnaryExpressionModel -> if (isPrefix) {
-            "$operator${operand.translate()}"
+            "${operator.translate()}${operand.translate()}"
         } else {
-            "${operand.translate()}$operator"
+            "${operand.translate()}${operator.translate()}"
         }
         is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
@@ -283,6 +331,8 @@ private fun StatementModel.translate(): List<String> {
     return when (this) {
         is AssignmentStatementModel -> listOf("${left.translate()} = ${right.translate()}")
         is ReturnStatementModel -> listOf("return ${expression?.translate()}")
+        is BreakStatementModel -> listOf("break")
+        is ContinueStatementModel -> listOf("continue")
         is ExpressionStatementModel -> listOf(expression.translate())
         is BlockStatementModel -> listOf("{") +
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
@@ -303,9 +353,9 @@ private fun StatementModel.translate(): List<String> {
         }
         is WhenStatementModel -> {
             val header = "when (${expression.translate()}) {"
-            val cases = cases.flatMap {
-                val caseHeader = "${it.condition?.translate() ?: "else"} -> "
-                val body = it.body.translate()
+            val cases = cases.flatMap { case ->
+                val caseHeader = "${case.condition?.joinToString { it.translate() } ?: "else"} -> "
+                val body = case.body.translate()
                 listOf(caseHeader + body[0]) + body.drop(1)
             }.map { FORMAT_TAB + it }
             return listOf(header) + cases + listOf("}")
