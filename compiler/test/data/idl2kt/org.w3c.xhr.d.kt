@@ -87,14 +87,8 @@ public external open class ProgressEvent(type: String, eventInitDict: ProgressEv
 
 public external interface ProgressEventInit : EventInit {
     var lengthComputable: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var loaded: Number? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var total: Number? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -127,4 +121,3 @@ public inline val XMLHttpRequestResponseType.Companion.DOCUMENT: XMLHttpRequestR
 public inline val XMLHttpRequestResponseType.Companion.JSON: XMLHttpRequestResponseType get() = "json".asDynamic().unsafeCast<XMLHttpRequestResponseType>()
 
 public inline val XMLHttpRequestResponseType.Companion.TEXT: XMLHttpRequestResponseType get() = "text".asDynamic().unsafeCast<XMLHttpRequestResponseType>()
-

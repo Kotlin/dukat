@@ -51,53 +51,21 @@ public external abstract class MediaStreamTrack : EventTarget {
  */
 public external interface MediaTrackSupportedConstraints {
     var width: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var height: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var aspectRatio: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var frameRate: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var facingMode: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var resizeMode: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var volume: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleRate: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleSize: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var echoCancellation: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var autoGainControl: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var noiseSuppression: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var latency: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var channelCount: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var deviceId: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
     var groupId: Boolean? /* = true */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -125,53 +93,21 @@ public inline fun MediaTrackSupportedConstraints(width: Boolean? = true, height:
 
 public external interface MediaTrackCapabilities {
     var width: ULongRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var height: ULongRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var aspectRatio: DoubleRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var frameRate: DoubleRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var facingMode: Array<String>?
-        get() = definedExternally
-        set(value) = definedExternally
     var resizeMode: Array<String>?
-        get() = definedExternally
-        set(value) = definedExternally
     var volume: DoubleRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleRate: ULongRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleSize: ULongRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var echoCancellation: Array<Boolean>?
-        get() = definedExternally
-        set(value) = definedExternally
     var autoGainControl: Array<Boolean>?
-        get() = definedExternally
-        set(value) = definedExternally
     var noiseSuppression: Array<Boolean>?
-        get() = definedExternally
-        set(value) = definedExternally
     var latency: DoubleRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var channelCount: ULongRange?
-        get() = definedExternally
-        set(value) = definedExternally
     var deviceId: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var groupId: String?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -202,8 +138,6 @@ public inline fun MediaTrackCapabilities(width: ULongRange? = undefined, height:
  */
 public external interface MediaTrackConstraints : MediaTrackConstraintSet {
     var advanced: Array<MediaTrackConstraintSet>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -309,53 +243,21 @@ public inline fun MediaTrackConstraintSet(width: dynamic = undefined, height: dy
  */
 public external interface MediaTrackSettings {
     var width: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var height: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var aspectRatio: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var frameRate: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var facingMode: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var resizeMode: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var volume: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleRate: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var sampleSize: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var echoCancellation: Boolean?
-        get() = definedExternally
-        set(value) = definedExternally
     var autoGainControl: Boolean?
-        get() = definedExternally
-        set(value) = definedExternally
     var noiseSuppression: Boolean?
-        get() = definedExternally
-        set(value) = definedExternally
     var latency: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var channelCount: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var deviceId: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var groupId: String?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -397,8 +299,6 @@ public external open class MediaStreamTrackEvent(type: String, eventInitDict: Me
 
 public external interface MediaStreamTrackEventInit : EventInit {
     var track: MediaStreamTrack?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -488,8 +388,6 @@ public inline fun MediaStreamConstraints(video: dynamic = false, audio: dynamic 
 
 public external interface ConstrainablePattern {
     var onoverconstrained: ((Event) -> dynamic)?
-        get() = definedExternally
-        set(value) = definedExternally
     fun getCapabilities(): Capabilities
     fun getConstraints(): Constraints
     fun getSettings(): Settings
@@ -501,11 +399,7 @@ public external interface ConstrainablePattern {
  */
 public external interface DoubleRange {
     var max: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var min: Double?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -519,11 +413,7 @@ public inline fun DoubleRange(max: Double? = undefined, min: Double? = undefined
 
 public external interface ConstrainDoubleRange : DoubleRange {
     var exact: Double?
-        get() = definedExternally
-        set(value) = definedExternally
     var ideal: Double?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -539,11 +429,7 @@ public inline fun ConstrainDoubleRange(exact: Double? = undefined, ideal: Double
 
 public external interface ULongRange {
     var max: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var min: Int?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -557,11 +443,7 @@ public inline fun ULongRange(max: Int? = undefined, min: Int? = undefined): ULon
 
 public external interface ConstrainULongRange : ULongRange {
     var exact: Int?
-        get() = definedExternally
-        set(value) = definedExternally
     var ideal: Int?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -580,11 +462,7 @@ public inline fun ConstrainULongRange(exact: Int? = undefined, ideal: Int? = und
  */
 public external interface ConstrainBooleanParameters {
     var exact: Boolean?
-        get() = definedExternally
-        set(value) = definedExternally
     var ideal: Boolean?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -646,8 +524,6 @@ public inline fun ConstraintSet(): ConstraintSet {
 
 public external interface Constraints : ConstraintSet {
     var advanced: Array<ConstraintSet>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -703,4 +579,3 @@ public inline val MediaDeviceKind.Companion.AUDIOINPUT: MediaDeviceKind get() = 
 public inline val MediaDeviceKind.Companion.AUDIOOUTPUT: MediaDeviceKind get() = "audiooutput".asDynamic().unsafeCast<MediaDeviceKind>()
 
 public inline val MediaDeviceKind.Companion.VIDEOINPUT: MediaDeviceKind get() = "videoinput".asDynamic().unsafeCast<MediaDeviceKind>()
-

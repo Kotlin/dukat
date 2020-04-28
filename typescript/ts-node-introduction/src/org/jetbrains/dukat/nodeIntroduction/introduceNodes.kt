@@ -248,15 +248,15 @@ private class LowerDeclarationsToNodes(
 
     fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
         return PropertyNode(
-                declaration.name,
-                (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
-                convertTypeParameters(declaration.typeParameters),
+                name = declaration.name,
+                type = (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
+                typeParameters = convertTypeParameters(declaration.typeParameters),
 
-                declaration.isStatic(),
-                declaration.optional,
-                declaration.optional,  // TODO: it's actually wrong
+                static = declaration.isStatic(),
+                getter = declaration.optional,
+                setter = declaration.optional,  // TODO: it's actually wrong
 
-                true
+                open = true
         )
     }
 

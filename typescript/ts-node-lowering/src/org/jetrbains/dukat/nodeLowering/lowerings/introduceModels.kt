@@ -96,13 +96,13 @@ private fun MemberNode.isStatic() = when (this) {
     else -> false
 }
 
-internal enum class TranslationContext {
-    TYPE_CONSTRAINT,
-    IRRELEVANT,
-    FUNCTION_TYPE,
-    PROPERTY,
-    INLINE_EXTENSION,
-    CONSTRUCTOR
+internal sealed class TranslationContext {
+    object TYPE_CONSTRAINT : TranslationContext()
+    object IRRELEVANT : TranslationContext()
+    object FUNCTION_TYPE : TranslationContext()
+    data class PROPERTY(val optional: Boolean) : TranslationContext()
+    object INLINE_EXTENSION : TranslationContext()
+    object CONSTRUCTOR : TranslationContext()
 }
 
 private data class Members(
@@ -225,7 +225,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     emptyList(),
                     params.joinToString(" | "),
                     null,
-                    nullable
+                    context == TranslationContext.PROPERTY(true)
             )
             is UnionTypeNode -> TypeValueModel(
                     dynamicName,
@@ -273,7 +273,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             }
             is GeneratedInterfaceReferenceNode -> {
                 val typeParams = when (context) {
-                    TranslationContext.PROPERTY -> typeParameters.map {
+                    is TranslationContext.PROPERTY -> typeParameters.map {
                         TypeParameterModel(
                                 type = TypeValueModel(
                                         IdentifierEntity("Any"),
@@ -345,13 +345,13 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is MethodNode -> process()
             is PropertyNode -> PropertyModel(
                     name = IdentifierEntity(name),
-                    type = type.process(TranslationContext.PROPERTY),
+                    type = type.process(TranslationContext.PROPERTY(getter || setter)),
                     typeParameters = convertTypeParams(typeParameters),
                     static = static,
                     override = null,
                     immutable = getter && !setter,
-                    getter = false,
-                    setter = false,
+                    getter = getter,
+                    setter = setter,
                     open = open
             )
             else -> raiseConcern("unprocessed MemberNode: ${this}") { null }

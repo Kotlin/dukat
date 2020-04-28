@@ -21,11 +21,7 @@ public external open class UIEvent(type: String, eventInitDict: UIEventInit = de
 
 public external interface UIEventInit : EventInit {
     var view: Window? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
     var detail: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -56,8 +52,6 @@ public external open class FocusEvent(type: String, eventInitDict: FocusEventIni
 
 public external interface FocusEventInit : UIEventInit {
     var relatedTarget: EventTarget? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -107,29 +101,13 @@ public external open class MouseEvent(type: String, eventInitDict: MouseEventIni
 
 public external interface MouseEventInit : EventModifierInit {
     var screenX: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var screenY: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var clientX: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var clientY: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var button: Short? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var buttons: Short? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var relatedTarget: EventTarget? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
     var region: String? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -168,47 +146,19 @@ public inline fun MouseEventInit(screenX: Int? = 0, screenY: Int? = 0, clientX: 
 
 public external interface EventModifierInit : UIEventInit {
     var ctrlKey: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var shiftKey: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var altKey: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var metaKey: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierAltGraph: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierCapsLock: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierFn: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierFnLock: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierHyper: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierNumLock: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierScrollLock: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierSuper: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierSymbol: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var modifierSymbolLock: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -259,17 +209,9 @@ public external open class WheelEvent(type: String, eventInitDict: WheelEventIni
 
 public external interface WheelEventInit : MouseEventInit {
     var deltaX: Double? /* = 0.0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var deltaY: Double? /* = 0.0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var deltaZ: Double? /* = 0.0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var deltaMode: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -327,11 +269,7 @@ public external open class InputEvent(type: String, eventInitDict: InputEventIni
 
 public external interface InputEventInit : UIEventInit {
     var data: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var isComposing: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -380,20 +318,10 @@ public external open class KeyboardEvent(type: String, eventInitDict: KeyboardEv
 
 public external interface KeyboardEventInit : EventModifierInit {
     var key: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var code: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var location: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var repeat: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var isComposing: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -443,8 +371,6 @@ public external open class CompositionEvent(type: String, eventInitDict: Composi
 
 public external interface CompositionEventInit : UIEventInit {
     var data: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -505,4 +431,3 @@ public external abstract class EventTarget {
 public external interface EventListener {
     fun handleEvent(event: Event)
 }
-

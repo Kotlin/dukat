@@ -26,8 +26,6 @@ external interface `T$1` {
     var y: Number
     var z: Number
     var negative: Any?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 external fun generateVector(vectorProvider: (`0`: Any?, `1`: Any?, `2`: Any?) -> `T$0`): `T$1`

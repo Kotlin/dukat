@@ -7,35 +7,15 @@ import org.w3c.dom.events.*
 
 public external interface PointerEventInit : MouseEventInit {
     var pointerId: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var width: Double? /* = 1.0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var height: Double? /* = 1.0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var pressure: Float? /* = 0f */
-        get() = definedExternally
-        set(value) = definedExternally
     var tangentialPressure: Float? /* = 0f */
-        get() = definedExternally
-        set(value) = definedExternally
     var tiltX: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var tiltY: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var twist: Int? /* = 0 */
-        get() = definedExternally
-        set(value) = definedExternally
     var pointerType: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var isPrimary: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -104,4 +84,3 @@ public external open class PointerEvent(type: String, eventInitDict: PointerEven
         val BUBBLING_PHASE: Short
     }
 }
-

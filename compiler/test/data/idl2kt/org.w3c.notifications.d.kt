@@ -40,56 +40,24 @@ public external open class Notification(title: String, options: NotificationOpti
 
 public external interface NotificationOptions {
     var dir: NotificationDirection? /* = NotificationDirection.AUTO */
-        get() = definedExternally
-        set(value) = definedExternally
     var lang: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var body: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var tag: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
     var image: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var icon: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var badge: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var sound: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var vibrate: dynamic
         get() = definedExternally
         set(value) = definedExternally
     var timestamp: Number?
-        get() = definedExternally
-        set(value) = definedExternally
     var renotify: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var silent: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var noscreen: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var requireInteraction: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var sticky: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var data: Any? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
     var actions: Array<NotificationAction>? /* = arrayOf() */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -118,14 +86,8 @@ public inline fun NotificationOptions(dir: NotificationDirection? = Notification
 
 public external interface NotificationAction {
     var action: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var title: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var icon: String?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -140,8 +102,6 @@ public inline fun NotificationAction(action: String?, title: String?, icon: Stri
 
 public external interface GetNotificationOptions {
     var tag: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -169,11 +129,7 @@ public external open class NotificationEvent(type: String, eventInitDict: Notifi
 
 public external interface NotificationEventInit : ExtendableEventInit {
     var notification: Notification?
-        get() = definedExternally
-        set(value) = definedExternally
     var action: String? /* = "" */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -211,4 +167,3 @@ public inline val NotificationDirection.Companion.AUTO: NotificationDirection ge
 public inline val NotificationDirection.Companion.LTR: NotificationDirection get() = "ltr".asDynamic().unsafeCast<NotificationDirection>()
 
 public inline val NotificationDirection.Companion.RTL: NotificationDirection get() = "rtl".asDynamic().unsafeCast<NotificationDirection>()
-

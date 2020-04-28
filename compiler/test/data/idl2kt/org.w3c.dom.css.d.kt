@@ -54,7 +54,6 @@ public inline operator fun StyleSheetList.get(index: Int): StyleSheet? = asDynam
  */
 public external interface LinkStyle {
     val sheet: StyleSheet?
-        get() = definedExternally
 }
 
 /**
@@ -477,4 +476,3 @@ public external abstract class CSS {
 }
 
 public external interface UnionElementOrProcessingInstruction
-

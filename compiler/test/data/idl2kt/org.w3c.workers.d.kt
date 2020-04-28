@@ -50,11 +50,7 @@ public external abstract class ServiceWorkerContainer : EventTarget {
 
 public external interface RegistrationOptions {
     var scope: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var type: WorkerType? /* = WorkerType.CLASSIC */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -86,20 +82,10 @@ public external open class ServiceWorkerMessageEvent(type: String, eventInitDict
 
 public external interface ServiceWorkerMessageEventInit : EventInit {
     var data: Any?
-        get() = definedExternally
-        set(value) = definedExternally
     var origin: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var lastEventId: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var source: UnionMessagePortOrServiceWorker?
-        get() = definedExternally
-        set(value) = definedExternally
     var ports: Array<MessagePort>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -166,11 +152,7 @@ public external abstract class Clients {
 
 public external interface ClientQueryOptions {
     var includeUncontrolled: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var type: ClientType? /* = ClientType.WINDOW */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -224,11 +206,7 @@ public external open class InstallEvent(type: String, eventInitDict: ExtendableE
 
 public external interface ForeignFetchOptions {
     var scopes: Array<String>?
-        get() = definedExternally
-        set(value) = definedExternally
     var origins: Array<String>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -259,14 +237,8 @@ public external open class FetchEvent(type: String, eventInitDict: FetchEventIni
 
 public external interface FetchEventInit : ExtendableEventInit {
     var request: Request?
-        get() = definedExternally
-        set(value) = definedExternally
     var clientId: String? /* = null */
-        get() = definedExternally
-        set(value) = definedExternally
     var isReload: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -297,11 +269,7 @@ public external open class ForeignFetchEvent(type: String, eventInitDict: Foreig
 
 public external interface ForeignFetchEventInit : ExtendableEventInit {
     var request: Request?
-        get() = definedExternally
-        set(value) = definedExternally
     var origin: String? /* = "null" */
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -318,14 +286,8 @@ public inline fun ForeignFetchEventInit(request: Request?, origin: String? = "nu
 
 public external interface ForeignFetchResponse {
     var response: Response?
-        get() = definedExternally
-        set(value) = definedExternally
     var origin: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var headers: Array<String>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -358,20 +320,10 @@ public external open class ExtendableMessageEvent(type: String, eventInitDict: E
 
 public external interface ExtendableMessageEventInit : ExtendableEventInit {
     var data: Any?
-        get() = definedExternally
-        set(value) = definedExternally
     var origin: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var lastEventId: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var source: UnionClientOrMessagePortOrServiceWorker?
-        get() = definedExternally
-        set(value) = definedExternally
     var ports: Array<MessagePort>?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -404,17 +356,9 @@ public external abstract class Cache {
 
 public external interface CacheQueryOptions {
     var ignoreSearch: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var ignoreMethod: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var ignoreVary: Boolean? /* = false */
-        get() = definedExternally
-        set(value) = definedExternally
     var cacheName: String?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -430,17 +374,9 @@ public inline fun CacheQueryOptions(ignoreSearch: Boolean? = false, ignoreMethod
 
 public external interface CacheBatchOperation {
     var type: String?
-        get() = definedExternally
-        set(value) = definedExternally
     var request: Request?
-        get() = definedExternally
-        set(value) = definedExternally
     var response: Response?
-        get() = definedExternally
-        set(value) = definedExternally
     var options: CacheQueryOptions?
-        get() = definedExternally
-        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -521,4 +457,3 @@ public inline val ClientType.Companion.WORKER: ClientType get() = "worker".asDyn
 public inline val ClientType.Companion.SHAREDWORKER: ClientType get() = "sharedworker".asDynamic().unsafeCast<ClientType>()
 
 public inline val ClientType.Companion.ALL: ClientType get() = "all".asDynamic().unsafeCast<ClientType>()
-

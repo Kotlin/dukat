@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ts.translator
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
@@ -16,6 +17,8 @@ import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotation
 import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.ModelLowering
+import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
 import org.jetbrains.dukat.model.commonLowerings.lower

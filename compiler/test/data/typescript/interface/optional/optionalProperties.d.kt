@@ -16,16 +16,19 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface Foo {
-    var varAsAny: Any?
+    var propAny: Any?
         get() = definedExternally
         set(value) = definedExternally
-    var varAsNumber: Number?
+    var propNumber: Number?
         get() = definedExternally
         set(value) = definedExternally
-    var varAsBoolean: Boolean?
+    var propBoolean: Boolean?
         get() = definedExternally
         set(value) = definedExternally
-    var varAsString: String?
+    var propString: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var propAliased: String? /* "boolean" | "number" | "string" */
         get() = definedExternally
         set(value) = definedExternally
 }

@@ -10,12 +10,12 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class AddExplicitGettersAndSettersTypeLowering : ModelWithOwnerTypeLowering {
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
-        val type = ownerContext.node.type
-        val shouldHaveExplicitGettersAndSetters =
-                type.nullable || (type is TypeValueModel && type.value == IdentifierEntity("dynamic"))
+        val node = ownerContext.node
+        val type = node.type
+        val shouldHaveExplicitGettersAndSetters = (type is TypeValueModel && type.value == IdentifierEntity("dynamic"))
         return ownerContext.node.copy(
-                getter = shouldHaveExplicitGettersAndSetters,
-                setter = shouldHaveExplicitGettersAndSetters && !ownerContext.node.immutable
+                getter = node.getter || shouldHaveExplicitGettersAndSetters,
+                setter = node.setter || (shouldHaveExplicitGettersAndSetters && !ownerContext.node.immutable)
         )
     }
 }
