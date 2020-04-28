@@ -29,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
@@ -49,6 +50,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
         is TypeNode -> makeNullable()
 
+        is StringLiteralDeclaration -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
         is TypeParamReferenceDeclaration -> copy(nullable = true)
         is FunctionTypeDeclaration -> copy(nullable = true)

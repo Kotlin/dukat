@@ -31,6 +31,9 @@ external interface Foo {
     var propAliased: String? /* "boolean" | "number" | "string" */
         get() = definedExternally
         set(value) = definedExternally
+    var propSingleLiteral: String? /* "a" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 // ------------------------------------------------------------------------------------------

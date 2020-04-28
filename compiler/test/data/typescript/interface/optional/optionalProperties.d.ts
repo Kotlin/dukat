@@ -6,6 +6,7 @@ interface Foo {
     propBoolean?: boolean;
     propString?: string;
     propAliased?: SomeProp;
+    propSingleLiteral?: "a";
 }
 declare namespace foo {
     interface Bar {
