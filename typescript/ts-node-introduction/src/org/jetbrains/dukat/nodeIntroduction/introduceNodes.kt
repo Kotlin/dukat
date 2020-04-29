@@ -131,8 +131,7 @@ private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
 }
 
 private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): ParameterValueDeclaration {
-    val declaration = this
-    return when (declaration) {
+    return when (val declaration = this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = declaration.value,
                 nullable = declaration.nullable,
@@ -183,7 +182,7 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
                         params = declaration.params.map { param -> param.convertToNode() },
                         nullable = declaration.nullable,
                         meta = meta ?: declaration.meta
-                )
+                ).lowerAsNullable()
             }
         is TupleDeclaration -> TupleTypeNode(
                 params = declaration.params.map { param -> param.convertToNode() },
@@ -192,37 +191,32 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
         )
         is ThisTypeDeclaration -> SELF_REFERENCE_TYPE
         else -> declaration
-    }.lowerAsNullable()
-}
-
-private fun ParameterValueDeclaration.resolveAsNullableType(): ParameterValueDeclaration? {
-    return when (this) {
-        is UnionTypeNode -> {
-            val paramsFiltered = params.filter { param ->
-                when (param) {
-                    is TypeValueNode -> {
-                        val value = param.value
-                        value != IdentifierEntity("undefined") && value != IdentifierEntity("null")
-                    }
-                    else -> true
-                }
-            }
-
-            if ((paramsFiltered.size < params.size)) {
-                if (paramsFiltered.size == 1) {
-                    paramsFiltered[0]
-                } else {
-                    copy(params = paramsFiltered, nullable = true)
-                }
-            } else {
-                null
-            }
-        }
-        else -> null
     }
 }
 
-private fun ParameterValueDeclaration.lowerAsNullable(): ParameterValueDeclaration {
+private fun UnionTypeNode.resolveAsNullableType(): ParameterValueDeclaration? {
+    val paramsFiltered = params.filter { param ->
+        when (param) {
+            is TypeValueNode -> {
+                val value = param.value
+                value != IdentifierEntity("undefined") && value != IdentifierEntity("null")
+            }
+            else -> true
+        }
+    }
+
+    return if ((paramsFiltered.size < params.size)) {
+        if (paramsFiltered.size == 1) {
+            paramsFiltered[0]
+        } else {
+            copy(params = paramsFiltered, nullable = true)
+        }
+    } else {
+        null
+    }
+}
+
+private fun UnionTypeNode.lowerAsNullable(): ParameterValueDeclaration {
     return resolveAsNullableType()?.let { nullableType ->
         when (nullableType) {
             is TypeValueNode -> nullableType.copy(nullable = true, meta = null)
