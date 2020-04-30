@@ -2,7 +2,6 @@ package org.jetrbains.dukat.nodeLowering.lowerings.typeAlias
 
 import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.TypeParameterNode
-import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -10,8 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
@@ -45,56 +42,9 @@ private fun ModuleNode.filterAliases(astContext: TypeAliasContext): ModuleNode {
     return copy(declarations = declarationsFiltered)
 }
 
-
-private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, TypeNode>) : NodeTypeLowering {
-
-    private fun spec(declaration: TypeNode): TypeNode {
-        val declarationResolved = when (declaration) {
-            is TypeParameterNode -> aliasParamMap.getOrDefault(declaration.name, declaration)
-            is TypeValueNode -> aliasParamMap.getOrDefault(declaration.value, declaration)
-            else -> declaration
-        }
-
-        if (declarationResolved != declaration) {
-            declarationResolved.meta = declaration.meta
-        }
-
-        return declarationResolved
-    }
-
-    override fun lowerMeta(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
-        return when (declaration) {
-            is IntersectionMetadata -> {
-                    IntersectionMetadata(params = declaration.params.map {
-                        //TODO: this is our way of avoiding SOE on assigning meta
-                        (when (it) {
-                            is TypeNode -> lowerType(it)
-                            else -> lowerMeta(it)
-                        }).duplicate<ParameterValueDeclaration>()
-                    })
-            }
-            else -> super.lowerMeta(declaration)
-        }
-    }
-
-    override fun lowerType(declaration: TypeNode): TypeNode {
-        return spec(super.lowerType(declaration))
-    }
-}
-
 private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : NodeTypeLowering {
-
-    fun lowerDereferenced(declaration: TypeNode, aliasParamMap: Map<NameEntity, TypeNode>): TypeNode {
-        return TypeSpecifierLowering(aliasParamMap).lowerType(declaration)
-    }
-
     private fun resolveType(declaration: TypeNode): TypeNode {
-        val declarationResolved = typeAliasContext.dereference(declaration)
-        return if (declarationResolved is DereferenceNode) {
-            lowerDereferenced(declarationResolved.dereferenced, declarationResolved.aliasParamsMap)
-        } else {
-            declarationResolved
-        }
+        return typeAliasContext.dereference(declaration)
     }
 
     override fun lowerType(declaration: TypeNode): TypeNode {
@@ -130,7 +80,7 @@ private fun SourceSetNode.resolveTypeAliases(): SourceSetNode {
     })
 }
 
-class ResolveTypeAliases(): NodeLowering {
+class ResolveTypeAliases() : NodeLowering {
     override fun lower(source: SourceSetNode): SourceSetNode {
         return source.resolveTypeAliases()
     }
