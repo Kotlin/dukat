@@ -50,11 +50,15 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
   }
 
   accept(node: ts.Node): boolean {
+
+
     if (ts.isExportAssignment(node)) {
       return true;
     }
 
     let uid = this.exportContext.getUID(node);
+
+
     if (this.symbols.has(uid)) {
       return true;
     }
