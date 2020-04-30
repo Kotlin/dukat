@@ -37,6 +37,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDe
 import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 
 fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
     return this.body?.let {
@@ -239,6 +240,7 @@ fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathW
         is FunctionDeclaration -> this.addTo(owner) ?: NoTypeConstraint
         is ClassDeclaration -> this.addTo(owner, path) ?: NoTypeConstraint
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
+        is QualifierExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner)
         is PropertyAccessExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner)
         is BinaryExpressionDeclaration -> this.calculateConstraints(owner, path)
         is UnaryExpressionDeclaration -> this.calculateConstraints(owner, path)

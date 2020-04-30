@@ -67,6 +67,7 @@ import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclarati
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
@@ -147,6 +148,12 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
                 identifier
             )
+            is QualifierExpressionDeclaration -> {
+                println(qualifier)
+                IdentifierExpressionModel(
+                    qualifier
+                )
+            }
             is CallExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
                 arguments.map { it.convert() }

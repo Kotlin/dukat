@@ -207,9 +207,16 @@ export class AstExpressionConverter {
     }
 
     convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
+        let convertedExpression = this.convertExpression(expression.expression)
+        let rightSideName = AstExpressionFactory.createIdentifier(expression.name.getText())
+        if (convertedExpression.hasNameexpression()) {
+            let leftSideName = convertedExpression.getNameexpression()!.getName()!
+            let newName = AstExpressionFactory.createQualifierAsNameEntity(leftSideName, rightSideName)
+            return AstExpressionFactory.createNameExpressionDeclarationAsExpression(newName)
+        }
         return this.createPropertyAccessExpression(
-            this.convertExpression(expression.expression),
-            AstExpressionFactory.createIdentifier(expression.name.getText())
+            convertedExpression,
+            rightSideName
         )
     }
 
