@@ -26,6 +26,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -214,7 +215,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         )
     }
 
-    fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
+    fun TypeNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = when (context) {
             TranslationContext.TYPE_CONSTRAINT -> IMPOSSIBLE_CONSTRAINT
             else -> IdentifierEntity("dynamic")
@@ -309,7 +310,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
 
             }
-            else -> raiseConcern("unable to process ParameterValueDeclaration ${this}") {
+            else -> raiseConcern("unable to process TypeNode ${this}") {
                 TypeValueModel(
                         IdentifierEntity("dynamic"),
                         emptyList(),
@@ -413,7 +414,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     private fun ParameterValueDeclaration?.processMeta(): String? {
         return when (this) {
             is ThisTypeInGeneratedInterfaceMetaData -> "this"
-            is IntersectionMetadata -> params.map {
+            is IntersectionMetadata -> params.filterIsInstance(TypeNode::class.java).map {
                 it.process().translate()
             }.joinToString(" & ")
             else -> null
@@ -493,7 +494,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         } else null
     }
 
-    private fun ParameterValueDeclaration.isUnit(): Boolean {
+    private fun TypeNode.isUnit(): Boolean {
         return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
     }
 
