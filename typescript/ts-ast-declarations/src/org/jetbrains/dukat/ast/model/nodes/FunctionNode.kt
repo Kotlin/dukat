@@ -7,7 +7,6 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 sealed class FunctionNodeContext()
 data class FunctionFromMethodSignatureDeclaration(val name: String, val params: List<IdentifierEntity>) : FunctionNodeContext()
@@ -19,7 +18,7 @@ class FunctionNodeContextIrrelevant() : FunctionNodeContext()
 data class FunctionNode(
         val name: NameEntity,
         val parameters: List<ParameterNode>,
-        val type: ParameterValueDeclaration,
+        val type: TypeNode,
         val typeParameters: List<TypeValueNode>,
 
         override var exportQualifier: ExportQualifier?,

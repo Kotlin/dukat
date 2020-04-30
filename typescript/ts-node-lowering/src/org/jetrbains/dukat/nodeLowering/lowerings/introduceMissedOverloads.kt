@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -97,7 +98,7 @@ private fun <T> Map.Entry<NameEntity, NodeDataRecord<T>>.process(
     optionalData.forEach { types, (argsCount, names, originalNode) ->
 
         val params = types.zip(names).map { (type, name) ->
-            ParameterNode(name, type, null, null, false, false)
+            ParameterNode(name, type as TypeNode, null, null, false, false)
         }
 
         val argsCountGrouped = argsCount.groupingBy { it }.eachCount()

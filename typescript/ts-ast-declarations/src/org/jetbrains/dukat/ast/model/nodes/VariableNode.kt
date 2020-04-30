@@ -4,11 +4,10 @@ import org.jetbrains.dukat.ast.model.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableNode(
         var name: NameEntity,
-        val type: ParameterValueDeclaration,
+        val type: TypeNode,
 
         override var exportQualifier: ExportQualifier?,
 

@@ -3,10 +3,8 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.*
 import org.jetbrains.dukat.ast.model.nodes.constants.SELF_REFERENCE_TYPE
 import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
@@ -47,7 +45,7 @@ private fun NodeOwner<*>.classLikeOwnerNode(): TopLevelEntity? {
 
 private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
 
-    override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+    override fun lowerTypeNode(owner: NodeOwner<TypeNode>): TypeNode {
         val declaration = owner.node
 
         return when (declaration) {
@@ -62,7 +60,7 @@ private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
                     else -> anyNode
                 }
             }
-            else -> super.lowerParameterValue(owner)
+            else -> super.lowerTypeNode(owner)
         }
     }
 }

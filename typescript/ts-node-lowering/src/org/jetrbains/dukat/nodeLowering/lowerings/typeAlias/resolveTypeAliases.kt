@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -45,9 +46,9 @@ private fun ModuleNode.filterAliases(astContext: TypeAliasContext): ModuleNode {
 }
 
 
-private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, ParameterValueDeclaration>) : NodeTypeLowering {
+private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, TypeNode>) : NodeTypeLowering {
 
-    private fun spec(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    private fun spec(declaration: TypeNode): TypeNode {
         val declarationResolved = when (declaration) {
             is TypeParameterNode -> aliasParamMap.getOrDefault(declaration.name, declaration)
             is TypeValueNode -> aliasParamMap.getOrDefault(declaration.value, declaration)
@@ -61,26 +62,33 @@ private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, P
         return declarationResolved
     }
 
-    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerMeta(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is IntersectionMetadata -> {
-                IntersectionMetadata(params = declaration.params.map {
-                    //TODO: this is our way of avoiding SOE on assigning meta
-                    lowerType(it).duplicate<ParameterValueDeclaration>()
-                })
+                    IntersectionMetadata(params = declaration.params.map {
+                        //TODO: this is our way of avoiding SOE on assigning meta
+                        (when (it) {
+                            is TypeNode -> lowerType(it)
+                            else -> lowerMeta(it)
+                        }).duplicate<ParameterValueDeclaration>()
+                    })
             }
-            else -> spec(super.lowerType(declaration))
+            else -> super.lowerMeta(declaration)
         }
+    }
+
+    override fun lowerType(declaration: TypeNode): TypeNode {
+        return spec(super.lowerType(declaration))
     }
 }
 
 private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : NodeTypeLowering {
 
-    fun lowerDereferenced(declaration: ParameterValueDeclaration, aliasParamMap: Map<NameEntity, ParameterValueDeclaration>): ParameterValueDeclaration {
+    fun lowerDereferenced(declaration: TypeNode, aliasParamMap: Map<NameEntity, TypeNode>): TypeNode {
         return TypeSpecifierLowering(aliasParamMap).lowerType(declaration)
     }
 
-    private fun resolveType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    private fun resolveType(declaration: TypeNode): TypeNode {
         val declarationResolved = typeAliasContext.dereference(declaration)
         return if (declarationResolved is DereferenceNode) {
             lowerDereferenced(declarationResolved.dereferenced, declarationResolved.aliasParamsMap)
@@ -89,11 +97,11 @@ private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : 
         }
     }
 
-    override fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerType(declaration: TypeNode): TypeNode {
         return super.lowerType(this.resolveType(declaration))
     }
 
-    private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
+    private fun TypeNode.unroll(): List<ParameterValueDeclaration> {
         return when (this) {
             is UnionTypeNode -> {
                 val paramsUnrolled = params.flatMap { param -> resolveType(param).unroll() }
@@ -104,8 +112,9 @@ private class UnaliasLowering(private val typeAliasContext: TypeAliasContext) : 
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
-        return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll()))
+        return super.lowerUnionTypeNode(declaration.copy(params = declaration.unroll() as List<TypeNode>))
     }
 }
 

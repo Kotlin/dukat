@@ -6,7 +6,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class TypeAliasNode(
         val name: NameEntity,
-        val typeReference: ParameterValueDeclaration,
+        val typeReference: TypeNode,
         val typeParameters: List<TypeValueNode>,
         override val uid: String,
         override val external: Boolean

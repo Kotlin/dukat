@@ -28,6 +28,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -111,26 +112,29 @@ private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclara
     return this
 }
 
-private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode = ParameterNode(
-        name = name,
-        type = (if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) {
-            type.extractVarargType()
-        } else {
-            type
-        }).convertToNode(),
-        initializer = if (initializer != null || optional) {
-            TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
-        } else null,
-        meta = null,
-        vararg = vararg,
-        optional = optional
-)
+private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode {
+    val parameterValueDeclaration = if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) {
+        type.extractVarargType()
+    } else {
+        type
+    }
+    return ParameterNode(
+            name = name,
+            type = parameterValueDeclaration.convertToNode(),
+            initializer = if (initializer != null || optional) {
+                TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
+            } else null,
+            meta = null,
+            vararg = vararg,
+            optional = optional
+    )
+}
 
 private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
     return params.all { it is StringLiteralDeclaration }
 }
 
-private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): ParameterValueDeclaration {
+private fun ParameterValueDeclaration.convertToNodeNullable(meta: ParameterValueDeclaration? = null): TypeNode? {
     return when (val declaration = this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = declaration.value,
@@ -163,7 +167,7 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
                 meta ?: declaration.meta
         )
         is IntersectionTypeDeclaration -> {
-            declaration.params[0].convertToNode(IntersectionMetadata(declaration.params.map { it.convertToNode() }))
+            declaration.params[0].convertToNodeNullable(IntersectionMetadata(declaration.params.map { it.convertToNodeNullable() ?: it }))
         }
         is StringLiteralDeclaration -> {
             StringLiteralUnionNode(
@@ -190,11 +194,18 @@ private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclarat
                 meta = meta ?: declaration.meta
         )
         is ThisTypeDeclaration -> SELF_REFERENCE_TYPE
-        else -> declaration
+        is TypeNode -> declaration
+        else -> null
     }
 }
 
-private fun UnionTypeNode.resolveAsNullableType(): ParameterValueDeclaration? {
+private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
+
+private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): TypeNode {
+    return convertToNodeNullable(meta) ?: TYPE_ANY
+}
+
+private fun UnionTypeNode.resolveAsNullableType(): TypeNode? {
     val paramsFiltered = params.filter { param ->
         when (param) {
             is TypeValueNode -> {
@@ -216,14 +227,13 @@ private fun UnionTypeNode.resolveAsNullableType(): ParameterValueDeclaration? {
     }
 }
 
-private fun UnionTypeNode.lowerAsNullable(): ParameterValueDeclaration {
+private fun UnionTypeNode.lowerAsNullable(): TypeNode {
     return resolveAsNullableType()?.let { nullableType ->
         when (nullableType) {
             is TypeValueNode -> nullableType.copy(nullable = true, meta = null)
             is TypeParameterNode -> nullableType.copy(nullable = true)
             is FunctionTypeNode -> nullableType.copy(nullable = true, meta = null)
             is UnionTypeNode -> nullableType
-            is IntersectionTypeDeclaration -> nullableType
             else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
                 nullableType
             }
@@ -241,9 +251,10 @@ private class LowerDeclarationsToNodes(
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
     fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
+        val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
         return PropertyNode(
                 name = declaration.name,
-                type = (if (declaration.optional) declaration.type.makeNullable() else declaration.type).convertToNode(),
+                type = parameterValueDeclaration.convertToNode(),
                 typeParameters = convertTypeParameters(declaration.typeParameters),
 
                 static = declaration.isStatic(),
@@ -300,11 +311,12 @@ private class LowerDeclarationsToNodes(
 
 
     private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<MethodNode> {
+        val parameterValueDeclaration = declaration.returnType.makeNullable()
         return listOf(
                 MethodNode(
                         "get",
                         convertParameters(declaration.indexTypes),
-                        declaration.returnType.makeNullable().convertToNode(),
+                        parameterValueDeclaration.convertToNode(),
                         emptyList(),
                         false,
                         true,
@@ -314,7 +326,7 @@ private class LowerDeclarationsToNodes(
                 ),
                 MethodNode(
                         "set",
-                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType.convertToNode(), null, false, false))),
+                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable() ?: declaration.returnType, null, false, false))),
                         TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
                         false,

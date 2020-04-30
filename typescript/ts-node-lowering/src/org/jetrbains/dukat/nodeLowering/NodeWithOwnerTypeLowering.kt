@@ -12,6 +12,7 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -39,9 +40,9 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         }
     }
 
-    fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+    fun lowerTypeNode(owner: NodeOwner<TypeNode>): TypeNode {
         return when (val declaration = owner.node) {
-            is TypeValueNode -> lowerTypeNode(owner.wrap(declaration))
+            is TypeValueNode -> lowerTypeValueNode(owner.wrap(declaration))
             is FunctionTypeNode -> lowerFunctionTypeNode(owner.wrap(declaration))
             is UnionTypeNode -> lowerUnionTypeNode(owner.wrap(declaration))
             else -> declaration
@@ -54,9 +55,9 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
                 name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(params = typeParameter.params.map { param -> lowerParameterValue(owner.wrap(param)) })
+                    typeParameter.copy(params = typeParameter.params.map { param -> lowerTypeNode(owner.wrap(param)) })
                 },
-                type = lowerParameterValue(owner.wrap(declaration.type))
+                type = lowerTypeNode(owner.wrap(declaration.type))
         )
     }
 
@@ -64,7 +65,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                type = lowerParameterValue(owner.wrap(declaration.type)),
+                type = lowerTypeNode(owner.wrap(declaration.type)),
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(owner.wrap(typeParameter))
                 }
@@ -90,9 +91,9 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
                 name = lowerIdentificator(declaration.name),
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(params = typeParameter.params.map { param -> lowerParameterValue(owner.wrap(param)) })
+                    typeParameter.copy(params = typeParameter.params.map { param -> lowerTypeNode(owner.wrap(param)) })
                 },
-                type = lowerParameterValue(NodeOwner(declaration.type, owner))
+                type = lowerTypeNode(NodeOwner(declaration.type, owner))
         )
     }
 
@@ -100,21 +101,21 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val declaration = owner.node
         return declaration.copy(
                 value = lowerIdentificator(declaration.value),
-                params = declaration.params.map { param -> lowerParameterValue(NodeOwner(param, owner)) }
+                params = declaration.params.map { param -> lowerTypeNode(NodeOwner(param, owner)) }
         )
     }
 
     override fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): UnionTypeNode {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param ->
-            lowerParameterValue(owner.wrap(param))
+            lowerTypeNode(owner.wrap(param))
         })
     }
 
-    override fun lowerTypeNode(owner: NodeOwner<TypeValueNode>): TypeValueNode {
+    override fun lowerTypeValueNode(owner: NodeOwner<TypeValueNode>): TypeValueNode {
         val declaration = owner.node
         return declaration.copy(params = declaration.params.map { param ->
-            lowerParameterValue(owner.wrap(param))
+            lowerTypeNode(owner.wrap(param))
         })
     }
 
@@ -122,7 +123,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val declaration = owner.node
         return declaration.copy(
                 parameters = declaration.parameters.map { param -> lowerParameterNode(owner.wrap(param)) },
-                type = lowerParameterValue(owner.wrap(declaration.type))
+                type = lowerTypeNode(owner.wrap(declaration.type))
         )
     }
 
@@ -130,7 +131,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                type = lowerParameterValue(owner.wrap(declaration.type))
+                type = lowerTypeNode(owner.wrap(declaration.type))
         )
     }
 
@@ -138,7 +139,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val declaration = owner.node
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
-                type = lowerParameterValue(owner.wrap(declaration.type))
+                type = lowerTypeNode(owner.wrap(declaration.type))
         )
     }
 
@@ -146,7 +147,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         val heritageClause = owner.node
         val typeArguments = heritageClause.typeArguments.map { typeArgument ->
             // TODO: obviously very clumsy place
-            lowerParameterValue(owner.wrap(typeArgument))
+            lowerTypeNode(owner.wrap(typeArgument))
         }
         return heritageClause.copy(typeArguments = typeArguments)
     }
@@ -170,7 +171,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
 
     override fun lowerTypeAliasNode(owner: NodeOwner<TypeAliasNode>): TypeAliasNode {
         val declaration = owner.node
-        return declaration.copy(typeReference = lowerParameterValue(owner.wrap(declaration.typeReference)))
+        return declaration.copy(typeReference = lowerTypeNode(owner.wrap(declaration.typeReference)))
     }
 
     fun lowerConstructorNode(owner: NodeOwner<ConstructorNode>): ConstructorNode {
@@ -178,7 +179,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(params = typeParameter.params.map { param -> lowerParameterValue(owner.wrap(param)) })
+                    typeParameter.copy(params = typeParameter.params.map { param -> lowerTypeNode(owner.wrap(param)) })
                 }
         )
     }
@@ -200,7 +201,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
                     lowerHeritageNode(owner.wrap(heritageClause))
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
-                    lowerTypeNode(owner.wrap(typeParameter))
+                    lowerTypeValueNode(owner.wrap(typeParameter))
                 }
         )
     }

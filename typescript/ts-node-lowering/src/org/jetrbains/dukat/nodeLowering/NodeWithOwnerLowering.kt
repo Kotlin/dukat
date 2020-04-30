@@ -30,7 +30,7 @@ interface NodeWithOwnerLowering<T : TypeEntity> {
     fun lowerTypeAliasNode(owner: NodeOwner<TypeAliasNode>): TypeAliasNode
     fun lowerObjectNode(owner: NodeOwner<ObjectNode>): ObjectNode
 
-    fun lowerTypeNode(owner: NodeOwner<TypeValueNode>): T
+    fun lowerTypeValueNode(owner: NodeOwner<TypeValueNode>): T
     fun lowerFunctionTypeNode(owner: NodeOwner<FunctionTypeNode>): T
     fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): T
 

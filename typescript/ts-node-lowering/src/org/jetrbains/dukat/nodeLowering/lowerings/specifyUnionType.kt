@@ -14,6 +14,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNodeMeta
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
@@ -31,7 +32,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
                 currentComplexity *= type.params.size
                 if (currentComplexity <= COMPLEXITY_THRESHOLD) {
                     type.params.map { param ->
-                        parameterDeclaration.copy(type = if (type.nullable) param.makeNullable() else param)
+                        parameterDeclaration.copy(type = (if (type.nullable) param.makeNullable() else param))
                     }
                 } else {
                     listOf(parameterDeclaration)

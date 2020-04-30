@@ -15,6 +15,7 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -29,7 +30,7 @@ private val logger = Logging.logger("TypeLowering")
 
 interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
 
-    fun lowerType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    fun lowerType(declaration: TypeNode): TypeNode {
         return when (declaration) {
             is TypeParameterNode -> lowerTypeParameter(declaration)
             is TypeValueNode -> lowerTypeNode(declaration)
@@ -40,7 +41,9 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
         }
     }
 
-    fun lowerMetaType(declaration: ParameterValueDeclaration) = declaration
+    fun lowerMeta(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+        return declaration
+    }
 
     fun lowerTupleNode(declaration: TupleTypeNode): TupleTypeNode {
         return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
@@ -48,7 +51,7 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
 
     fun lowerTypeParameter(declaration: TypeParameterNode): TypeParameterNode {
         return declaration.copy(meta = declaration.meta?.let {
-            lowerType(it)
+            lowerMeta(it)
         })
     }
 
@@ -121,7 +124,7 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
     override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(
             params = declaration.params.map { param -> lowerType(param) },
-            meta = declaration.meta?.let { lowerType(it) }
+            meta = declaration.meta?.let { lowerMeta(it) }
         )
     }
 

@@ -9,11 +9,11 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 internal data class DereferenceNode(
         val dereferenced: TypeNode,
-        val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration>,
+        val aliasParamsMap: Map<NameEntity, TypeNode>,
 
         override val nullable: Boolean = false,
         override var meta: ParameterValueDeclaration? = null
-) : ParameterValueDeclaration
+) : TypeNode
 
 class TypeAliasContext {
 
@@ -24,16 +24,15 @@ class TypeAliasContext {
         myTypeAliasMap[typeAlias.uid] = typeAlias
     }
     
-    fun dereference(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    fun dereference(declaration: TypeNode): TypeNode {
         return when (declaration) {
             is TypeValueNode ->
                 myTypeAliasMap[declaration.typeReference?.uid]?.let { aliasResolved ->
                     when (val typeReference = aliasResolved.typeReference) {
-                        is TypeNode -> {
-                            val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first.value }, { it.second })
+                        else -> {
+                            val aliasParamsMap: Map<NameEntity, TypeNode> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first.value }, { it.second })
                             DereferenceNode(typeReference, aliasParamsMap)
                         }
-                        else -> typeReference
                     }
                 } ?: declaration
             else -> declaration

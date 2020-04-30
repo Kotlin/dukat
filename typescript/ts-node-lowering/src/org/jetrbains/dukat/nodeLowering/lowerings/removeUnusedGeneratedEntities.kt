@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -25,9 +26,9 @@ fun ModuleNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
 
 private class ParameterValueVisitor(private val moduleNode: ModuleNode, private val visit: (paramValue: ParameterValueDeclaration) -> Unit) : NodeWithOwnerTypeLowering {
 
-    override fun lowerParameterValue(owner: NodeOwner<ParameterValueDeclaration>): ParameterValueDeclaration {
+    override fun lowerTypeNode(owner: NodeOwner<TypeNode>): TypeNode {
         visit(owner.node)
-        return super.lowerParameterValue(owner)
+        return super.lowerTypeNode(owner)
     }
 
     fun visit() {
