@@ -149,7 +149,6 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 identifier
             )
             is QualifierExpressionDeclaration -> {
-                println(qualifier)
                 IdentifierExpressionModel(
                     qualifier
                 )
