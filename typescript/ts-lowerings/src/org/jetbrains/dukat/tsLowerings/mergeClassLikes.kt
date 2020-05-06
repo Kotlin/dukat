@@ -2,17 +2,22 @@ package org.jetbrains.dukat.tsLowerings
 
 import MergeableDeclaration
 import TopLevelDeclarationLowering
+import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
     return FunctionDeclaration(
@@ -29,7 +34,8 @@ private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
 
 private fun mergeParentEntities(parentEntitiesA: List<HeritageClauseDeclaration>, parentEntitiesB: List<HeritageClauseDeclaration>): List<HeritageClauseDeclaration> {
     val parentSet = parentEntitiesA.toSet()
-    return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }}
+    return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }
+}
 
 private fun mergeVariableAndInterface(a: VariableDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
     println("MERGE VAR ${a} and ${b}")
@@ -40,16 +46,43 @@ private fun mergeVariableAndInterface(a: VariableDeclaration, b: InterfaceDeclar
 private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
     return a.copy(
             members = b.members + a.members,
-            typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
+            typeParameters = if (b.typeParameters.size > a.typeParameters.size) {
+                b.typeParameters
+            } else {
+                a.typeParameters
+            },
             parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities)
     )
 }
 
 
-private class MergeClassLikesLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver): TopLevelDeclarationLowering {
+private class SpecifyTypeReferenceLowering(private val typeParamMap: Map<NameEntity, ParameterValueDeclaration?>) : DeclarationTypeLowering {
+    override fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+        return typeParamMap.get(declaration.value) ?: declaration
+    }
+}
+
+private class MergeClassLikesLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver) : TopLevelDeclarationLowering {
+
+    private fun resolveParentMethods(classLikeDeclaration: ClassLikeDeclaration): List<MemberDeclaration> {
+        return classLikeDeclaration.parentEntities.flatMap { heritageClause ->
+            val parentClass = topLevelDeclarationResolver.resolveRecursive(heritageClause.reference?.uid)
+            if (parentClass is ClassLikeDeclaration) {
+                val typeParams = parentClass.typeParameters.mapIndexed { index, typeParam ->
+                    Pair(typeParam.name, heritageClause.typeArguments.getOrNull(index))
+                }.toMap()
+
+                ((SpecifyTypeReferenceLowering(typeParams).lowerClassLikeDeclaration(parentClass, null) as? ClassLikeDeclaration)?.let { resolveClass ->
+                    resolveClass.members
+                } ?: emptyList()) + resolveParentMethods(parentClass)
+            } else {
+                emptyList()
+            }
+        }
+    }
 
     private fun mergeClassAndInterface(a: ClassDeclaration, b: InterfaceDeclaration, uid: String): ClassDeclaration {
-        val parentMembers = topLevelDeclarationResolver.getAllParents(b).flatMap { it.members }
+        val parentMembers = resolveParentMethods(b)
         val membersResolved = (parentMembers + b.members).map {
             when (it) {
                 is MethodSignatureDeclaration -> it.convertToMethod()
@@ -58,7 +91,11 @@ private class MergeClassLikesLowering(private val topLevelDeclarationResolver: T
         } + a.members
         return a.copy(
                 members = membersResolved,
-                typeParameters = if (b.typeParameters.size > a.typeParameters.size) {b.typeParameters} else {a.typeParameters},
+                typeParameters = if (b.typeParameters.size > a.typeParameters.size) {
+                    b.typeParameters
+                } else {
+                    a.typeParameters
+                },
                 parentEntities = mergeParentEntities(a.parentEntities, b.parentEntities),
                 uid = uid
         )

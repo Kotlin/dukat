@@ -60,11 +60,4 @@ class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDec
             }
         }
     }
-
-    fun getAllParents(classLikeDeclaration: ClassLikeDeclaration): List<ClassLikeDeclaration> {
-        val immediateParents = classLikeDeclaration.parentEntities.mapNotNull { heritageClause ->
-            resolveRecursive(heritageClause.reference?.uid) as? ClassLikeDeclaration
-        }
-        return immediateParents + immediateParents.flatMap { immediateParent -> getAllParents(immediateParent) }
-    }
 }

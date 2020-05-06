@@ -26,6 +26,7 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 interface DeclarationLowering : TopLevelDeclarationLowering {
@@ -40,12 +41,14 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
     fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): MethodSignatureDeclaration
     fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): IndexSignatureDeclaration
     fun lowerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ObjectLiteralDeclaration
+    fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration = declaration
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration, owner)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration, owner)
             is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration, owner)
+            is TypeParamReferenceDeclaration -> lowerTypeParamReferenceDeclaration(declaration, owner)
             is TupleDeclaration -> lowerTupleDeclaration(declaration, owner)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration, owner)
             is ObjectLiteralDeclaration -> lowerObjectLiteralDeclaration(declaration, owner)
