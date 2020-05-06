@@ -30,9 +30,6 @@ def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/Defi
 def TOPN_DIR = "${project.projectDir}/test/data/topN"
 def TOPN_TARGET_DIR = "${project.buildDir}/tests/topN"
 
-def DEFAULT_LIB_PATH = "${project(":ts-converter").buildDir}/package/node_modules/typescript/lib/lib.es6.d.ts"
-
-
 node {
     workDir = gradle.nodeWorkingDir
     // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
