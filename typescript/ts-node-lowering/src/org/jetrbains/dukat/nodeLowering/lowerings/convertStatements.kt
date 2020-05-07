@@ -193,7 +193,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is AsExpressionDeclaration -> AsExpressionModel(
                 expression.convert(),
                 TypeValueModel(
-                    IdentifierEntity("String"),
+                    IdentifierEntity("Any"),
                     listOf(),
                     null,
                     null
@@ -341,7 +341,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is VariableDeclaration -> VariableModel(
                 name = IdentifierEntity(name),
                 type = TypeValueModel(
-                    IdentifierEntity("Number"),
+                    IdentifierEntity("Any"),
                     listOf(),
                     null,
                     null
