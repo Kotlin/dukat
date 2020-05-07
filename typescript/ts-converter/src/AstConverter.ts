@@ -866,6 +866,14 @@ export class AstConverter {
       )
     }
 
+    if (ts.isForOfStatement(statement)) {
+      decl = this.astFactory.createForOfStatement(
+          this.convertVariableDeclarationList(statement.initializer, null),
+          this.astExpressionConverter.convertExpression(statement.expression),
+          body
+      )
+    }
+
     //TODO convert other iteration statements than while statement
 
     return decl

@@ -33,6 +33,7 @@ import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.CaseModel
 import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.astModel.statements.ForInStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
@@ -45,6 +46,7 @@ import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -326,6 +328,11 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is WhileStatementDeclaration -> WhileStatementModel(
                 condition.convert(),
                 convertBlock(statement)
+            )
+            is ForOfStatementDeclaration -> ForInStatementModel(
+                variable.convert() as VariableModel,
+                expression.convert(),
+                convertBlock(body)
             )
             is SwitchStatementDeclaration -> convert()
             is BlockDeclaration -> RunBlockStatementModel(

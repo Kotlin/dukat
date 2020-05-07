@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.EnumTokenDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -105,6 +106,7 @@ import org.jetbrains.dukat.tsmodelproto.EnumDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExportAssignmentDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ExpressionStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ForOfStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ForStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.FunctionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.HeritageClauseDeclarationProto
@@ -369,6 +371,14 @@ fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
             condition = condition.convert(),
             incrementor = incrementor.convert(),
             body = statementList.convert() ?: BlockDeclaration(emptyList())
+    )
+}
+
+fun ForOfStatementDeclarationProto.convert(): ForOfStatementDeclaration {
+    return ForOfStatementDeclaration(
+        variable = variable.convert() as VariableDeclaration,
+        expression = expression.convert(),
+        body = statementList.convert() ?: BlockDeclaration(emptyList())
     )
 }
 
@@ -726,6 +736,7 @@ fun StatementDeclarationProto.convert(): StatementDeclaration {
         hasFunctionDeclaration() -> functionDeclaration.convert()
         hasForStatement() -> forStatement.convert()
         hasSwitchStatement() -> switchStatement.convert()
+        hasForOfStatement() -> forOfStatement.convert()
         else -> throw Exception("unknown statement: ${this}")
     }
 }

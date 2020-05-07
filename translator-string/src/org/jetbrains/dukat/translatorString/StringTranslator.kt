@@ -62,6 +62,7 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.astModel.statements.ForInStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
@@ -361,6 +362,11 @@ private fun StatementModel.translate(): List<String> {
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
         }
+        is ForInStatementModel -> {
+            val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()})"
+            val body = body.translate()
+            return listOf(header + body[0]) + body.drop(1)
+        }
         is WhenStatementModel -> {
             val header = "when (${expression.translate()}) {"
             val cases = cases.flatMap { case ->
@@ -498,8 +504,12 @@ private fun TypeAliasModel.translate(): String {
     return "typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
 }
 
-private fun VariableModel.translate(): String {
-    val variableKeyword = if (immutable) "val" else "var"
+private fun VariableModel.translate(asDeclaration: Boolean = true): String {
+    val variableKeyword = if (asDeclaration) {
+        if (immutable) "val " else "var "
+    } else {
+        ""
+    }
     val modifier = if (inline) "inline " else
         if (external) "$KOTLIN_EXTERNAL_KEYWORD " else ""
 
@@ -525,7 +535,7 @@ private fun VariableModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams}${varName}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumModel.translate(): String {

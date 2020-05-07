@@ -38,6 +38,7 @@ import {
   EnumTokenDeclarationProto,
   ExportAssignmentDeclarationProto,
   ExpressionStatementDeclarationProto,
+  ForOfStatementDeclarationProto,
   ForStatementDeclarationProto,
   FunctionDeclarationProto,
   HeritageClauseDeclarationProto,
@@ -240,6 +241,16 @@ export class AstFactory {
     forStatement.setStatementList(statement);
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setForstatement(forStatement);
+    return statementDeclaration;
+  }
+
+  createForOfStatement(initializer: Array<StatementDeclaration>, expression: Expression, statement: Array<StatementDeclaration>): StatementDeclaration {
+    let forOfStatement = new ForOfStatementDeclarationProto();
+    forOfStatement.setVariable(initializer[0]);
+    forOfStatement.setExpression(expression)
+    forOfStatement.setStatementList(statement);
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setForofstatement(forOfStatement);
     return statementDeclaration;
   }
 
