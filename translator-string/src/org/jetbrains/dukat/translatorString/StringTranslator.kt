@@ -514,7 +514,7 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
         if (external) "$KOTLIN_EXTERNAL_KEYWORD " else ""
 
     val body = if (initializer != null) {
-        " = ${initializer?.translateAsOneLine()}"
+        " = ${initializer?.translate()}"
     } else if ((get != null) && (set != null)) {
         val getter = "get() = ${get?.translateAsOneLine()};"
         val setter = "set(value) { ${set?.translateAsOneLine()} }"
@@ -552,8 +552,9 @@ private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
+    val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
 
-    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
+    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {

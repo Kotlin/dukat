@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 
 data class PropertyModel(
         val name: NameEntity,
@@ -10,6 +11,8 @@ data class PropertyModel(
         val static: Boolean,
         val override: NameEntity?,
         val immutable: Boolean,
+
+        val initializer: ExpressionModel?,
 
         val getter: Boolean,
         val setter: Boolean,

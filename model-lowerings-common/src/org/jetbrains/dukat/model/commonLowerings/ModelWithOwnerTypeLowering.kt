@@ -125,7 +125,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) },
             get = declaration.get?.let { lowerStatementModel(NodeOwner(it, ownerContext)) },
             set = declaration.set?.let { lowerStatementModel(NodeOwner(it, ownerContext)) },
-            initializer = declaration.initializer?.let { lowerStatementModel(NodeOwner(it, ownerContext)) }
+            initializer = declaration.initializer?.let { lowerExpressionModel(NodeOwner(it, ownerContext)) }
         )
     }
 

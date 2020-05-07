@@ -258,6 +258,7 @@ private class LowerDeclarationsToNodes(
                 typeParameters = convertTypeParameters(declaration.typeParameters),
 
                 static = declaration.isStatic(),
+                initializer = declaration.initializer,
                 getter = declaration.optional,
                 setter = declaration.optional,  // TODO: it's actually wrong
 
@@ -290,6 +291,7 @@ private class LowerDeclarationsToNodes(
                     ),
                     convertTypeParameters(declaration.typeParameters),
                     false,
+                    null,
                     true,
                     false,
                     true

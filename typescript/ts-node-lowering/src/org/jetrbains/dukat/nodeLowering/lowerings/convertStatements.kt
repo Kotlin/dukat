@@ -20,9 +20,33 @@ import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.NOT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_PLUS
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -145,7 +169,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
-    private fun ExpressionDeclaration.convert(): ExpressionModel {
+    fun ExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
                 identifier
@@ -354,9 +378,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 immutable = false,
                 inline = false,
                 external = false,
-                initializer = initializer?.convert()?.let {
-                    ExpressionStatementModel(it)
-                },
+                initializer = initializer?.convert(),
                 get = null,
                 set = null,
                 typeParameters = listOf(),

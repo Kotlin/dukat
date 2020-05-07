@@ -691,6 +691,7 @@ private class IdlFileConverter(
                 static = false,
                 override = null,
                 immutable = readOnly,
+                initializer = null,
                 getter = false,
                 setter = false,
                 open = open
@@ -719,6 +720,7 @@ private class IdlFileConverter(
                 static = false,
                 override = null,
                 immutable = false,
+                initializer = null,
                 getter = false,
                 setter = false,
                 open = false
