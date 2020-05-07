@@ -341,10 +341,20 @@ private fun StatementModel.translate(): List<String> {
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")
         is IfStatementModel -> {
-            val header = "if (${condition.translate()}) "
-            val mainBranch = thenStatement.translate()
-            val elseBranch = elseStatement?.translate() ?: listOf()
-            return listOf(header + mainBranch[0]) + mainBranch.drop(1) + elseBranch
+            val header = "if (${condition.translate()}) {"
+            val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+            return when {
+                elseStatement == null -> listOf(header) + mainBranch + listOf("}")
+                elseStatement!!.statements.size == 1 && elseStatement!!.statements[0] is IfStatementModel -> {
+                    val nestedIf = elseStatement!!.statements[0]
+                    val translatedNestedIf = nestedIf.translate()
+                    listOf(header) + mainBranch + listOf("} else ${translatedNestedIf[0]}") + translatedNestedIf.drop(1)
+                }
+                else -> {
+                    val elseBranch = elseStatement!!.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+                    listOf(header) + mainBranch + listOf("} else {") + elseBranch + listOf("}")
+                }
+            }
         }
         is WhileStatementModel -> {
             val header = "while (${condition.translate()}) "
@@ -382,11 +392,11 @@ private fun ClassLikeReferenceModel.translate(): String {
 private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Unit) {
     if (this != null) {
         statements.forEach { statement ->
-            output(
-                statement.translate()
-                    .map { FORMAT_TAB.repeat(padding + 1) + it }
-                    .joinToString(separator = LINE_SEPARATOR)
-            )
+            statement.translate().forEach { statementLine ->
+                output(
+                    FORMAT_TAB.repeat(padding + 1) + statementLine
+                )
+            }
         }
         output(FORMAT_TAB.repeat(padding) + "}")
     }
