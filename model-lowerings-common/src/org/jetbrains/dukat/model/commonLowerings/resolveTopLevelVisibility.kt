@@ -18,7 +18,7 @@ import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ModifyVisibility(private val visibility: VisibilityModifierModel) : ModelWithOwnerLowering {
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 

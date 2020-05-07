@@ -33,9 +33,9 @@ private class ExternalEntityRegistrator(private val register: (NameEntity, TopLe
         return node
     }
 
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel {
         val node = ownerContext.node;
-        if (parentModule.canNotContainExternalEntities() && node.inline) {
+        if (parentModule != null && parentModule.canNotContainExternalEntities() && node.inline) {
             register(parentModule.name, node)
         }
 

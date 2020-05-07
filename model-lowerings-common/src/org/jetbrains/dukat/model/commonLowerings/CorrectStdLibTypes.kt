@@ -28,7 +28,7 @@ private fun ClassLikeReferenceModel.correct(): ClassLikeReferenceModel {
 
 
 private class StdLibTypeCorrectorLowering : ModelWithOwnerTypeLowering {
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel {
         val node = ownerContext.node
         val nodeResolved = node.copy(extend = node.extend?.correct())
         return super.lowerVariableModel(ownerContext.copy(node = nodeResolved), parentModule)

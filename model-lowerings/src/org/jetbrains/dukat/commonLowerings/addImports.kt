@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astCommon.shiftRight
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -31,39 +32,54 @@ private fun NameEntity.isTopLevelImport(): Boolean {
     return false
 }
 
-private class TypeVisitor(private val name: NameEntity, private val importContext: MutableMap<NameEntity, NameEntity>) : ModelWithOwnerTypeLowering {
+private class NameVisitor(private val name: NameEntity, private val importContext: MutableMap<NameEntity, NameEntity>) : ModelWithOwnerTypeLowering {
     val resolvedImports = linkedSetOf<ImportModel>()
+
+    private fun getNewName(oldName: NameEntity): NameEntity? {
+        val moduleName = oldName.shiftRight()
+        val shortName = oldName.rightMost()
+
+        return if (!importContext.containsKey(shortName)) {
+            if (moduleName != null) {
+                if (moduleName.normalize() != name.normalize()) {
+                    if (!isStdLibEntity(oldName)) {
+                        importContext[shortName] = moduleName
+                        resolvedImports.add(ImportModel(oldName))
+                    }
+                }
+            }
+            shortName
+        } else if (importContext[shortName] == moduleName) {
+            shortName
+        } else {
+            val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != oldName) }
+            if ((conflictingImport != null) && (oldName.isTopLevelImport())) {
+                val alias = IdentifierEntity(oldName.translate().replace(".", "_"))
+                resolvedImports.add(ImportModel(oldName, alias))
+                alias
+            } else null
+        }
+    }
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         val node = ownerContext.node
 
         val ownerContextResolved = node.fqName?.let { fqName ->
-            val moduleName = fqName.shiftRight()
-            val shortName = fqName.rightMost()
-
-            if (!importContext.containsKey(shortName)) {
-                if (moduleName != null) {
-                    if (moduleName.normalize() != name.normalize()) {
-                        if (!isStdLibEntity(fqName)) {
-                            importContext[shortName] = moduleName
-                            resolvedImports.add(ImportModel(fqName))
-                        }
-                    }
-                }
-                ownerContext.copy(node = node.copy(value = shortName))
-            } else if (importContext[shortName] == moduleName) {
-                ownerContext.copy(node = node.copy(value = shortName))
-            } else {
-                val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != fqName) }
-                if ((conflictingImport != null) && (fqName.isTopLevelImport())) {
-                    val alias = IdentifierEntity(fqName.translate().replace(".", "_"))
-                    resolvedImports.add(ImportModel(fqName, alias))
-                    ownerContext.copy(node = node.copy(value = alias))
-                } else null
-            }
+            getNewName(fqName)?.let { ownerContext.copy(node = node.copy(value = it)) }
         } ?: ownerContext
 
         return super.lowerTypeValueModel(ownerContextResolved)
+    }
+
+    override fun lowerIdentifierExpressionModel(ownerContext: NodeOwner<IdentifierExpressionModel>): IdentifierExpressionModel {
+
+        // TODO: enable it when we figure out correct approach to star imports
+
+        /*val node = ownerContext.node
+
+        return getNewName(node.identifier)?.let { node.copy(identifier = it) } ?: node*/
+
+        return ownerContext.node
     }
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
@@ -90,11 +106,11 @@ private fun ModuleModel.addImports(): ModuleModel {
     val importContext = mutableMapOf<NameEntity, NameEntity>()
     declarations.map { importContext[it.name] = name }
 
-    val typeVisitor = TypeVisitor(name, importContext)
-    val moduleWithFqNames = typeVisitor.lowerRoot(this, NodeOwner(this, null))
+    val nameVisitor = NameVisitor(name, importContext)
+    val moduleWithFqNames = nameVisitor.lowerRoot(this, NodeOwner(this, null))
 
     return moduleWithFqNames.copy(
-            imports = (typeVisitor.resolvedImports + moduleWithFqNames.imports).toMutableList(),
+            imports = (nameVisitor.resolvedImports + moduleWithFqNames.imports).toMutableList(),
             submodules = moduleWithFqNames.submodules.map { submodule -> submodule.addImports() }
     )
 }

@@ -194,7 +194,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
         )), parentModule)
     }
 
-    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel): VariableModel {
+    override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel {
         val declaration = ownerContext.node
         return super.lowerVariableModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())), parentModule)
     }
