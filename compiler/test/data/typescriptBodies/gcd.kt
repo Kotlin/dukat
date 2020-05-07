@@ -19,7 +19,7 @@ fun gcd(a: Number, b: Number): Number {
     a = Math.abs(a)
     b = Math.abs(b)
     if (b > a) {
-        var temp: Number = a
+        var temp: Any = a
         a = b
         b = temp
     }
