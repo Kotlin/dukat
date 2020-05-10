@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -69,5 +70,5 @@ class CliHttpClient(private val port: String) {
 }
 
 fun main() {
-    CliHttpClient("8090").waitForServer()
+    CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
 }
