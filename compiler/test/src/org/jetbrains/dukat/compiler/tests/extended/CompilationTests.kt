@@ -3,15 +3,12 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
-import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
-import org.jetbrains.dukat.compiler.tests.httpService.CliHttpService
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
 import org.junit.jupiter.api.extension.AfterAllCallback
-import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File

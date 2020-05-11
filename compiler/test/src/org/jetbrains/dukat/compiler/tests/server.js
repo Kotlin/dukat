@@ -3,7 +3,6 @@ var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/d
 
 function createServer(port) {
 
-
     var server = http.createServer(function (req, res) {
         if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'text/plain');
