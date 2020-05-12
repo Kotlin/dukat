@@ -8,7 +8,7 @@ def PROPERTY_PACKAGE = "dukat.npm.packageVersion"
 
 def DISTRIB_PATH = "${project.buildDir}/distrib"
 def TYPESCRIPT_VERSION = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
-def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE) : gradle.defaultNpmPackageVersion
+def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE).replace("%DEFAULT%", gradle.defaultNpmPackageVersion) : gradle.defaultNpmPackageVersion
 
 node {
     workDir = gradle.nodeWorkingDir
