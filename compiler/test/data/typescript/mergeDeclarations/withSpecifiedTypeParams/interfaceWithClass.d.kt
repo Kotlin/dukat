@@ -26,7 +26,7 @@ external interface BaseB<T> {
 }
 
 external open class Stats : BaseA<Number>, BaseB<String> {
-    open fun ping(o: Number)
+    override fun ping(o: Number)
     override fun pong(): Number
     override var uid: Number
     override var description: String

@@ -27,3 +27,19 @@ external interface ChildProcess {
 external interface ChildProcessGeneralized<I : Writable, K : Readable> : ChildProcess {
     override fun ping(): K
 }
+
+external interface SomeBase
+
+external open class SomeImplementation : SomeBase
+
+external interface Base<T, S : SomeBase> {
+    fun ping(o: T)
+    fun pong(): T
+    fun bang(s: S)
+}
+
+external open class App : Base<Number, SomeImplementation> {
+    override fun ping(o: Number)
+    override fun pong(): Number
+    override fun bang(s: SomeImplementation)
+}

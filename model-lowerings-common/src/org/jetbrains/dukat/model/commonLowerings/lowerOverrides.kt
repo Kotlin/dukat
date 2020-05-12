@@ -355,6 +355,10 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             return true
         }
 
+        if ((this is TypeValueModel) && (otherParameterType is TypeParameterReferenceModel)) {
+            return true
+        }
+
         if ((this is TypeParameterReferenceModel) && (otherParameterType is TypeValueModel)) {
             this.resolveAsTypeParamConstraint()?.let {
                 return it.isEquivalent(otherParameterType)
