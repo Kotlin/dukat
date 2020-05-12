@@ -123,11 +123,22 @@ task npmrc() {
     }
 }
 
+
+
 task npmPublish(type: NpmTask) {
     dependsOn = [npmrc, npmPack]
 
     def distribPath = "dukat-${PACKAGE_VERSION}.tgz"
 
     def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
-    args = ["publish",  distribPath,  "--registry", "http://${registry}"]
+    def npmArgs = ["publish",  distribPath,  "--registry", "http://${registry}"]
+
+    if (project.hasProperty("dukat.npm.tag")) {
+        npmArgs += ["--tag", project.getProperty("dukat.npm.tag") as String]
+    }
+
+    println("publishing npm artifact:")
+    println("npm " + npmArgs.join(" "))
+
+    args = npmArgs
 }
