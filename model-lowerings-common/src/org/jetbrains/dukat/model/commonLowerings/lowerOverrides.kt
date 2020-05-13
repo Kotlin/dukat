@@ -3,6 +3,7 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.CallableModel
 import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -15,6 +16,7 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
+import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
@@ -310,7 +312,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return when (this) {
             is FunctionTypeModel -> copy(
                     nullable = false,
-                    parameters = parameters.map { it.copy(name=null, type = it.type.normalize()) }
+                    parameters = parameters.map { it.copy(name = null, type = it.type.normalize()) }
             )
             is TypeValueModel -> copy(nullable = false)
             else -> this

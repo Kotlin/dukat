@@ -20,49 +20,44 @@ data class ResolvedClassLike<T : ClassLikeModel>(
         val fqName: NameEntity?
 )
 
-class ModelContext(vararg sourceSetModels: SourceSetModel?) {
+private fun SourceSetModel.forEachTopLevelModel(handler: (TopLevelModel, ownerName: NameEntity) -> Unit) {
+    sources.forEach { sourceFile ->
+        sourceFile.root.forEachTopLevelModel(handler)
+    }
+}
+
+private fun ModuleModel.forEachTopLevelModel(handler: (TopLevelModel, ownerName: NameEntity) -> Unit) {
+    declarations.forEach { topLevelModel ->
+        handler(topLevelModel, name)
+        if (topLevelModel is ClassLikeModel) {
+            topLevelModel.members.filterIsInstance(TopLevelModel::class.java).forEach { handler(it, name.appendLeft(topLevelModel.name)) }
+        }
+    }
+
+    submodules.forEach { submodule ->
+        submodule.forEachTopLevelModel(handler)
+    }
+
+    imports.forEach { handler(it, name) }
+}
+
+class ModelContext(sourceSetModel: SourceSetModel) {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
     private val myNamedImports: MutableMap<NameEntity, NameEntity> = mutableMapOf()
 
-    private fun register(vararg sourceSetModels: SourceSetModel?) {
-        sourceSetModels.forEach { it?.register() }
-    }
-
     val inheritanceContext: InheritanceContext
 
     init {
-        register(*sourceSetModels)
+        sourceSetModel.forEachTopLevelModel { topLevelModel, ownerName -> topLevelModel.register(ownerName) }
         inheritanceContext = InheritanceContext(InheritanceGraph(this))
-    }
-
-    private fun ModuleModel.register() {
-        imports.forEach { importModel ->
-            importModel.register()
-        }
-
-        for (declaration in declarations) {
-            declaration.register(name)
-        }
-
-        submodules.forEach { declaration -> declaration.register() }
-    }
-
-    private fun SourceSetModel.register() {
-        sources.map { source -> source.root.register() }
     }
 
     private fun ClassLikeModel.register(ownerName: NameEntity) {
         when (this) {
             is ClassModel -> registerClass(this, ownerName)
             is InterfaceModel -> registerInterface(this, ownerName)
-        }
-
-        members.forEach {
-            if (it is ClassLikeModel) {
-                it.register(ownerName.appendLeft(name))
-            }
         }
     }
 
@@ -76,6 +71,7 @@ class ModelContext(vararg sourceSetModels: SourceSetModel?) {
         when (this) {
             is ClassLikeModel -> register(ownerName)
             is TypeAliasModel -> registerAlias(this, ownerName)
+            is ImportModel -> register()
         }
     }
 
