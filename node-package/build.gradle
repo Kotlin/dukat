@@ -137,8 +137,5 @@ task npmPublish(type: NpmTask) {
         npmArgs += ["--tag", project.getProperty("dukat.npm.tag") as String]
     }
 
-    println("publishing npm artifact:")
-    println("npm " + npmArgs.join(" "))
-
     args = npmArgs
 }
