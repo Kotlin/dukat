@@ -13,6 +13,13 @@ The simplest way to use is install the latest version form [npm](https://www.npm
 npm install -g dukat
 ```
 
+On a weekly basis we also deply a dev build which sums up what we currently have in master, 
+so **if you want to checkout the snapshot version, use `dukat@next`**:
+
+```
+npm install -g dukat@next
+```
+
 # Usage
 
 ```shell
