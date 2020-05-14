@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
@@ -71,6 +72,7 @@ import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -188,6 +190,10 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is CallExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
                 arguments.map { it.convert() }
+            )
+            is FunctionDeclaration -> LambdaExpressionModel(
+                listOf(), // TODO
+                convertBlock(body!!)
             )
             is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
