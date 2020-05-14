@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
+import RemoveDuplicateMembers
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
@@ -99,7 +100,8 @@ open class TypescriptWithBodyLowerer(
                         AddImports(),
                         AnyfyUnresolvedTypes(),
                         AddNoinlineModifier(),
-                        AddStandardImportsAndAnnotations()
+                        AddStandardImportsAndAnnotations(),
+                        RemoveDuplicateMembers()
                 )
 
         return models

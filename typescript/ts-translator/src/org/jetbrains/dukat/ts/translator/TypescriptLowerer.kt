@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
+import RemoveDuplicateMembers
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -105,6 +106,7 @@ open class TypescriptLowerer(
                         AddNoinlineModifier(),
                         RemoveKotlinBuiltIns(),
                         CorrectStdLibTypes(),
+                        RemoveDuplicateMembers(),
                         AddImports(),
                         AddStandardImportsAndAnnotations()
                 )
