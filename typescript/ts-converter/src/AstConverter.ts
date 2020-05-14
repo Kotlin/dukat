@@ -934,7 +934,7 @@ export class AstConverter {
       return [this.astFactory.createContinueStatement()]
     } else if (ts.isThrowStatement(statement)) {
       return [this.astFactory.createThrowStatement(
-        statement.expression ? this.astExpressionConverter.convertExpression(statement.expression) : null
+        this.astExpressionConverter.convertExpression(statement.expression)
       )]
     } else if (ts.isVariableStatement(statement)) {
       return this.convertVariableDeclarationList(statement.declarationList, statement.modifiers)

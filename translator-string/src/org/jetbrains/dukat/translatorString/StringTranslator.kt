@@ -67,6 +67,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -332,6 +333,7 @@ private fun StatementModel.translate(): List<String> {
     return when (this) {
         is AssignmentStatementModel -> listOf("${left.translate()} = ${right.translate()}")
         is ReturnStatementModel -> listOf("return ${expression?.translate()}")
+        is ThrowStatementModel -> listOf("throw ${expression.translate()}")
         is BreakStatementModel -> listOf("break")
         is ContinueStatementModel -> listOf("continue")
         is ExpressionStatementModel -> listOf(expression.translate())

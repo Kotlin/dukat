@@ -61,6 +61,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -74,6 +75,7 @@ import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
@@ -345,6 +347,9 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is ReturnStatementDeclaration -> ReturnStatementModel(
                 expression?.convert()
+            )
+            is ThrowStatementDeclaration -> ThrowStatementModel(
+                expression.convert()
             )
             is BreakStatementDeclaration -> BreakStatementModel()
             is ContinueStatementDeclaration -> ContinueStatementModel()

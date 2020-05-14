@@ -53,7 +53,7 @@ fun ReturnStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: 
 }
 
 fun ThrowStatementDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
-    expression?.calculateConstraints(owner, path)
+    expression.calculateConstraints(owner, path)
     return ThrowConstraint
 }
 

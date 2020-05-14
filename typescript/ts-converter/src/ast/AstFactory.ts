@@ -291,11 +291,9 @@ export class AstFactory {
     return statementDeclaration;
   }
 
-  createThrowStatement(expression: Expression | null): StatementDeclaration {
+  createThrowStatement(expression: Expression): StatementDeclaration {
     let throwStatement = new ThrowStatementDeclarationProto();
-    if (expression) {
-      throwStatement.setExpression(expression);
-    }
+    throwStatement.setExpression(expression);
 
     let statementDeclaration = new StatementDeclarationProto();
     statementDeclaration.setThrowstatement(throwStatement);
