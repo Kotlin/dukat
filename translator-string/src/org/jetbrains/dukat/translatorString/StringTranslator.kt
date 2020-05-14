@@ -62,6 +62,7 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.astModel.statements.ForInStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
@@ -341,13 +342,29 @@ private fun StatementModel.translate(): List<String> {
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")
         is IfStatementModel -> {
-            val header = "if (${condition.translate()}) "
-            val mainBranch = thenStatement.translate()
-            val elseBranch = elseStatement?.translate() ?: listOf()
-            return listOf(header + mainBranch[0]) + mainBranch.drop(1) + elseBranch
+            val header = "if (${condition.translate()}) {"
+            val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+            val elseStatement = elseStatement
+            return when {
+                elseStatement == null -> listOf(header) + mainBranch + listOf("}")
+                elseStatement.statements.size == 1 && elseStatement.statements.first() is IfStatementModel -> {
+                    val nestedIf = elseStatement.statements.first()
+                    val translatedNestedIf = nestedIf.translate()
+                    listOf(header) + mainBranch + listOf("} else ${translatedNestedIf.first()}") + translatedNestedIf.drop(1)
+                }
+                else -> {
+                    val elseBranch = elseStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+                    listOf(header) + mainBranch + listOf("} else {") + elseBranch + listOf("}")
+                }
+            }
         }
         is WhileStatementModel -> {
             val header = "while (${condition.translate()}) "
+            val body = body.translate()
+            return listOf(header + body[0]) + body.drop(1)
+        }
+        is ForInStatementModel -> {
+            val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()})"
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
         }
@@ -382,11 +399,11 @@ private fun ClassLikeReferenceModel.translate(): String {
 private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Unit) {
     if (this != null) {
         statements.forEach { statement ->
-            output(
-                statement.translate()
-                    .map { FORMAT_TAB.repeat(padding + 1) + it }
-                    .joinToString(separator = LINE_SEPARATOR)
-            )
+            statement.translate().forEach { statementLine ->
+                output(
+                    FORMAT_TAB.repeat(padding + 1) + statementLine
+                )
+            }
         }
         output(FORMAT_TAB.repeat(padding) + "}")
     }
@@ -488,13 +505,17 @@ private fun TypeAliasModel.translate(): String {
     return "typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
 }
 
-private fun VariableModel.translate(): String {
-    val variableKeyword = if (immutable) "val" else "var"
+private fun VariableModel.translate(asDeclaration: Boolean = true): String {
+    val variableKeyword = if (asDeclaration) {
+        if (immutable) "val " else "var "
+    } else {
+        ""
+    }
     val modifier = if (inline) "inline " else
         if (external) "$KOTLIN_EXTERNAL_KEYWORD " else ""
 
     val body = if (initializer != null) {
-        " = ${initializer?.translateAsOneLine()}"
+        " = ${initializer?.translate()}"
     } else if ((get != null) && (set != null)) {
         val getter = "get() = ${get?.translateAsOneLine()};"
         val setter = "set(value) { ${set?.translateAsOneLine()} }"
@@ -515,7 +536,7 @@ private fun VariableModel.translate(): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams} ${varName}: ${type.translate()}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams}${varName}: ${type.translate()}${type.translateMeta()}${body}"
 }
 
 private fun EnumModel.translate(): String {
@@ -532,8 +553,9 @@ private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
+    val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
 
-    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}"
+    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {

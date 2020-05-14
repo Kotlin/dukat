@@ -16,8 +16,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f() {
-    var x: Number = "hi there"
-    var s: Number = x as String
-    var ss: Number = s.substring(0, 3)
+    var x: Any = "hi there"
+    var s: Any = x as Any
+    var ss: Any = s.substring(0, 3)
     console.log(ss)
 }

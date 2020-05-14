@@ -182,6 +182,7 @@ private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
                     static = false,
                     override = override,
                     immutable = !isVar,
+                    initializer = null,
                     getter = getter != null,
                     setter = setter != null,
                     type = getType().convertToTypeModel(),

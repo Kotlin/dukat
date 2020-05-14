@@ -186,7 +186,8 @@ export class AstConverter {
     if (name != null) {
       return this.astFactory.declareProperty(
         name,
-        null,
+        nativePropertyDeclaration.initializer ?
+            this.astExpressionConverter.convertExpression(nativePropertyDeclaration.initializer) : null,
         this.convertType(nativePropertyDeclaration.type),
         [],
         false,
@@ -571,7 +572,14 @@ export class AstConverter {
     let name = this.convertName(node.name);
 
     if (name !== null) {
-      return this.createProperty(name, null, this.convertType(node.type), [], !!node.questionToken);
+      return this.createProperty(
+          name,
+          node.initializer ?
+              this.astExpressionConverter.convertExpression(node.initializer) : null,
+          this.convertType(node.type),
+          [],
+          !!node.questionToken
+      );
     }
 
     return null;
@@ -863,6 +871,14 @@ export class AstConverter {
         statement.condition ? this.astExpressionConverter.convertExpression(statement.condition) : null,
         statement.incrementor ? this.astExpressionConverter.convertExpression(statement.incrementor) : null,
         body
+      )
+    }
+
+    if (ts.isForOfStatement(statement)) {
+      decl = this.astFactory.createForOfStatement(
+          this.convertVariableDeclarationList(statement.initializer, null),
+          this.astExpressionConverter.convertExpression(statement.expression),
+          body
       )
     }
 

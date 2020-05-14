@@ -354,6 +354,12 @@ message ForStatementDeclarationProto {
     repeated StatementDeclarationProto statement = 4;
 }
 
+message ForOfStatementDeclarationProto {
+    StatementDeclarationProto variable = 1;
+    ExpressionDeclarationProto expression = 2;
+    repeated StatementDeclarationProto statement = 3;
+}
+
 message CaseDeclarationProto {
     ExpressionDeclarationProto condition = 1;
     repeated StatementDeclarationProto statement = 2;
@@ -464,9 +470,10 @@ message StatementDeclarationProto {
         VariableDeclarationProto variableDeclaration = 7;
         FunctionDeclarationProto functionDeclaration = 8;
         ForStatementDeclarationProto forStatement = 9;
-        SwitchStatementDeclarationProto switchStatement = 10;
-        BreakStatementDeclarationProto breakStatement = 11;
-        ContinueStatementDeclarationProto continueStatement = 12;
+        ForOfStatementDeclarationProto forOfStatement = 10;
+        SwitchStatementDeclarationProto switchStatement = 11;
+        BreakStatementDeclarationProto breakStatement = 12;
+        ContinueStatementDeclarationProto continueStatement = 13;
     }
 }
 

@@ -20,9 +20,33 @@ import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.NOT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_PLUS
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -33,6 +57,7 @@ import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.CaseModel
 import org.jetbrains.dukat.astModel.statements.ContinueStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.astModel.statements.ForInStatementModel
 import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
@@ -45,6 +70,7 @@ import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
@@ -143,7 +169,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
         }
     }
 
-    private fun ExpressionDeclaration.convert(): ExpressionModel {
+    fun ExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
                 identifier
@@ -191,7 +217,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is AsExpressionDeclaration -> AsExpressionModel(
                 expression.convert(),
                 TypeValueModel(
-                    IdentifierEntity("String"),
+                    IdentifierEntity("Any"),
                     listOf(),
                     null,
                     null
@@ -327,6 +353,11 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 condition.convert(),
                 convertBlock(statement)
             )
+            is ForOfStatementDeclaration -> ForInStatementModel(
+                variable.convert() as VariableModel,
+                expression.convert(),
+                convertBlock(body)
+            )
             is SwitchStatementDeclaration -> convert()
             is BlockDeclaration -> RunBlockStatementModel(
                 statements.map { it.convert() }
@@ -334,7 +365,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is VariableDeclaration -> VariableModel(
                 name = IdentifierEntity(name),
                 type = TypeValueModel(
-                    IdentifierEntity("Number"),
+                    IdentifierEntity("Any"),
                     listOf(),
                     null,
                     null
@@ -347,9 +378,7 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 immutable = false,
                 inline = false,
                 external = false,
-                initializer = initializer?.convert()?.let {
-                    ExpressionStatementModel(it)
-                },
+                initializer = initializer?.convert(),
                 get = null,
                 set = null,
                 typeParameters = listOf(),

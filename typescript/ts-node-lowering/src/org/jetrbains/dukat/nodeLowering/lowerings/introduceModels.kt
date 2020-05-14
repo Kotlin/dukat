@@ -351,6 +351,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     static = static,
                     override = null,
                     immutable = getter && !setter,
+                    initializer = with(ExpressionConverter(this@DocumentConverter)) {
+                        initializer?.convert()
+                    },
                     getter = getter,
                     setter = setter,
                     open = open

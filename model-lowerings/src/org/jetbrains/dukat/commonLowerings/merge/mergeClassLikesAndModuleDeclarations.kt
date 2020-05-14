@@ -29,6 +29,7 @@ private fun VariableModel.convert(): MemberModel {
             static = false,
             override = null,
             immutable = immutable,
+            initializer = initializer,
             getter = false,
             setter = false,
             open = false
