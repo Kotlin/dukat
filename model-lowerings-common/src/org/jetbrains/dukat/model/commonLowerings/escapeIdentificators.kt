@@ -190,7 +190,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
         val declaration = ownerContext.node
         return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
                 name = declaration.name.escape(),
-                body = BlockStatementModel(declaration.body.statements.map { it.escape() })
+                body = declaration.body?.let { BlockStatementModel(it.statements.map { it.escape() }) }
         )), parentModule)
     }
 

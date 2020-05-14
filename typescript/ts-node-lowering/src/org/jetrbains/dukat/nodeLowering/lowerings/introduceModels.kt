@@ -501,7 +501,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
     }
 
-    private fun FunctionNode.resolveBody(): BlockStatementModel {
+    private fun FunctionNode.resolveBody(): BlockStatementModel? {
         return BlockStatementModel(when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
                     ReturnStatementModel(
@@ -603,7 +603,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         }
                 )
             }
-            else -> emptyList()
+            else -> return null
         })
     }
 

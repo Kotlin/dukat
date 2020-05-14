@@ -410,16 +410,17 @@ private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Uni
 }
 
 private fun BlockStatementModel?.translateFirstLine(): String {
-    return if (this == null || statements.isEmpty()) {
-        ""
-    } else if (statements.size == 1 && statements[0].translate().size == 1) {
-        if (statements[0] is ReturnStatementModel) {
-            " = ${(statements[0] as ReturnStatementModel).expression?.translate()}"
-        } else {
-            " { ${statements[0].translate()[0]} }"
+    return when {
+        this == null -> ""
+        statements.isEmpty() -> " { }"
+        statements.size == 1 && statements.single().translate().size == 1 -> {
+            if (statements.single() is ReturnStatementModel) {
+                " = ${(statements.single() as ReturnStatementModel).expression?.translate()}"
+            } else {
+                " { ${statements.single().translate().single()} }"
+            }
         }
-    } else {
-        " {"
+        else -> " {"
     }
 }
 
@@ -439,7 +440,9 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val modifier = if (inline) { "inline " } else if (external) { "$KOTLIN_EXTERNAL_KEYWORD " } else { "" }
     val operator = if (operator) "operator " else ""
 
-    val shouldBeTranslatedAsOneLine = body.statements.isEmpty() ||
+    val body = body
+
+    val shouldBeTranslatedAsOneLine = body == null || body.statements.isEmpty() ||
             (body.statements.size == 1 && body.statements[0].translate().size <= 1)
 
     val bodyFirstLine = body.translateFirstLine()
@@ -485,7 +488,17 @@ private fun MethodModel.translate(): List<String> {
 
     val bodyOtherLines = mutableListOf<String>()
 
-    body.translate(0) { bodyOtherLines += it }
+    val body = body
+
+    if (body != null) {
+
+        val shouldBeTranslatedAsOneLine = body.statements.isEmpty() ||
+                (body.statements.size == 1 && body.statements[0].translate().size <= 1)
+
+        if (!shouldBeTranslatedAsOneLine) {
+            body.translate(0) { bodyOtherLines += it }
+        }
+    }
 
     return annotations +
             listOf(
