@@ -388,8 +388,8 @@ private class LowerDeclarationsToNodes(
         return declaration
     }
 
-    private fun InterfaceDeclaration.convert(): List<TopLevelNode> {
-        val declaration = InterfaceNode(
+    private fun InterfaceDeclaration.convert(): TopLevelNode {
+        return InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member) },
                 convertTypeParameters(typeParameters),
@@ -398,8 +398,6 @@ private class LowerDeclarationsToNodes(
                 uid,
                 true
         )
-
-        return listOf(declaration)
     }
 
 
@@ -591,17 +589,17 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): List<TopLevelNode> {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelNode? {
         return when (declaration) {
-            is VariableDeclaration -> listOf(lowerVariableDeclaration(declaration, inDeclaredModule))
-            is FunctionDeclaration -> listOf(declaration.convert(inDeclaredModule))
-            is ClassDeclaration -> listOf(declaration.convert(inDeclaredModule))
+            is VariableDeclaration -> lowerVariableDeclaration(declaration, inDeclaredModule)
+            is FunctionDeclaration -> declaration.convert(inDeclaredModule)
+            is ClassDeclaration -> declaration.convert(inDeclaredModule)
             is InterfaceDeclaration -> declaration.convert()
-            is GeneratedInterfaceDeclaration -> listOf(declaration.convert())
-            is ModuleDeclaration -> listOf(lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule))
-            is EnumDeclaration -> listOf(declaration.convert())
-            is TypeAliasDeclaration -> listOf(declaration.convert())
-            else -> listOf()
+            is GeneratedInterfaceDeclaration -> declaration.convert()
+            is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule)
+            is EnumDeclaration -> declaration.convert()
+            is TypeAliasDeclaration -> declaration.convert()
+            else -> null
         }
     }
 
@@ -651,7 +649,7 @@ private class LowerDeclarationsToNodes(
                         declaration.uid
                 )
             } else {
-                nonImports.addAll(lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration))
+                lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration)?.let { nonImports.add(it) }
             }
         }
 
