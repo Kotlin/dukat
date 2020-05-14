@@ -16,7 +16,6 @@ import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
-import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
@@ -88,6 +87,7 @@ import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
@@ -100,7 +100,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclar
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 
 internal class ExpressionConverter(val documentConverter: DocumentConverter) {
-    private fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
+    private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
                 value
@@ -110,6 +110,10 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
                 value
+            )
+            is ArrayLiteralExpressionDeclaration -> CallExpressionModel(
+                IdentifierExpressionModel(IdentifierEntity("arrayOf")),
+                elements.map { it.convert() }
             )
             else -> raiseConcern("unable to process LiteralExpressionDeclaration $this") {
                 StringLiteralExpressionModel("ERROR")
