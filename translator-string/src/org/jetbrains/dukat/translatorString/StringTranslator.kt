@@ -344,15 +344,16 @@ private fun StatementModel.translate(): List<String> {
         is IfStatementModel -> {
             val header = "if (${condition.translate()}) {"
             val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+            val elseStatement = elseStatement
             return when {
                 elseStatement == null -> listOf(header) + mainBranch + listOf("}")
-                elseStatement!!.statements.size == 1 && elseStatement!!.statements[0] is IfStatementModel -> {
-                    val nestedIf = elseStatement!!.statements[0]
+                elseStatement.statements.size == 1 && elseStatement.statements.first() is IfStatementModel -> {
+                    val nestedIf = elseStatement.statements.first()
                     val translatedNestedIf = nestedIf.translate()
-                    listOf(header) + mainBranch + listOf("} else ${translatedNestedIf[0]}") + translatedNestedIf.drop(1)
+                    listOf(header) + mainBranch + listOf("} else ${translatedNestedIf.first()}") + translatedNestedIf.drop(1)
                 }
                 else -> {
-                    val elseBranch = elseStatement!!.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
+                    val elseBranch = elseStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
                     listOf(header) + mainBranch + listOf("} else {") + elseBranch + listOf("}")
                 }
             }
