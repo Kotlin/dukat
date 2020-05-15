@@ -250,7 +250,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is TypeValueNode -> {
                 uidToNameMapper[typeReference?.uid]?.let {
                     if ((it.node is TypeAliasNode) && (it.node.typeReference is UnionTypeNode)) {
-                        dynamicType("typealias ${it.node.name.asString()} = dynamic")
+                        dynamicType("typealias ${it.node.name} = dynamic")
                     } else {
                         null
                     }

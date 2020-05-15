@@ -1,24 +1,19 @@
 package org.jetbrains.dukat.astCommon
 
-sealed class NameEntity : Entity {
-    // TODO: investigate why both translate and toString() is overrided somewhere else
-    fun asString(): String {
-        return when (this) {
-            is IdentifierEntity -> value
-            is QualifierEntity -> "${left}.${right}"
-        }
-    }
-}
+sealed class NameEntity : Entity
 
 data class IdentifierEntity(
         val value: String
-) : NameEntity()
+) : NameEntity() {
+    override fun toString() = value
+}
 
 data class QualifierEntity(
         val left: NameEntity,
         val right: IdentifierEntity
-) : NameEntity()
-
+) : NameEntity() {
+    override fun toString() = "${left}.${right}"
+}
 
 private operator fun NameEntity.plus(b: NameEntity): NameEntity {
     return when (b) {
