@@ -52,4 +52,8 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     fileExists(filePath: string): boolean {
         return this.fileResolver.exists(filePath);
     }
+
+    readDirectory(path: string, extensions?: readonly string[], exclude?: readonly string[], include?: readonly string[], depth?: number): string[] {
+        return ts.sys.readDirectory(path, extensions, exclude, include, depth);
+    }
 }
