@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -192,8 +193,25 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
                 arguments.map { it.convert() }
             )
             is FunctionDeclaration -> LambdaExpressionModel(
-                listOf(), // TODO
-                convertBlock(body!!)
+                parameters.map {
+                    ParameterModel(
+                        it.name,
+                        TypeValueModel(
+                            IdentifierEntity("Any"),
+                            listOf(),
+                            null,
+                            null
+                        ),
+                        //TODO
+                        /*with (documentConverter) {
+                            type.process()
+                        }*/
+                        null,
+                        false,
+                        null
+                    )
+                },
+                convertLambdaBody(body!!)
             )
             is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
@@ -411,5 +429,69 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
 
     fun convertBlock(blockDeclaration: BlockDeclaration): BlockStatementModel {
         return BlockStatementModel(blockDeclaration.statements.map { it.convert() })
+    }
+
+    private fun BlockDeclaration.countReturns(): Int {
+        return statements.sumBy { when (it) {
+            is ReturnStatementDeclaration -> if (it.expression == null) {
+                2
+            } else {
+                1
+            }
+            is IfStatementDeclaration -> {
+                it.thenStatement.countReturns() + (it.elseStatement?.countReturns() ?: 0)
+            }
+            is WhileStatementDeclaration -> it.statement.countReturns()
+            is ForOfStatementDeclaration -> it.body.countReturns()
+            is SwitchStatementDeclaration -> it.cases.sumBy { case -> case.body.countReturns() }
+            is BlockDeclaration -> it.countReturns()
+            else -> 0
+        } }
+    }
+
+    private fun BlockDeclaration.removeReturns(): BlockDeclaration {
+        return BlockDeclaration(statements.map {
+            when (it) {
+                is ReturnStatementDeclaration -> {
+                    it.expression?.let { e -> ExpressionStatementDeclaration(e) } ?: it
+                }
+                is IfStatementDeclaration -> {
+                    it.copy(
+                        thenStatement = it.thenStatement.removeReturns(),
+                        elseStatement = it.elseStatement?.removeReturns()
+                    )
+                }
+                is WhileStatementDeclaration -> it.copy(
+                    statement = it.statement.removeReturns()
+                )
+                is ForOfStatementDeclaration -> it.copy(
+                    body = it.body.removeReturns()
+                )
+                is SwitchStatementDeclaration -> it.copy(
+                    cases = it.cases.map { case -> case.copy(body = case.body.removeReturns()) }
+                )
+                is BlockDeclaration -> it.removeReturns()
+                else -> it
+            }
+        })
+    }
+
+    private fun convertLambdaBody(lambdaBody: BlockDeclaration): BlockStatementModel {
+        if (lambdaBody.countReturns() <= 1) {
+            return convertBlock(lambdaBody.removeReturns())
+        }
+        return raiseConcern("multi return lambdas are not supported yet") {
+            BlockStatementModel(
+                listOf(
+                    ExpressionStatementModel(
+                        IdentifierExpressionModel(
+                            IdentifierEntity(
+                                "MULTI_RETURN_LAMBDAS_ARE_NOT_SUPPORTED_YET"
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 }
