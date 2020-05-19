@@ -54,6 +54,6 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     readDirectory(path: string, extensions?: readonly string[], exclude?: readonly string[], include?: readonly string[], depth?: number): string[] {
-        return ts.fileResolver.readDirectory(path, extensions, exclude, include, depth);
+        return this.fileResolver.readDirectory(path, extensions, exclude, include, depth);
     }
 }
