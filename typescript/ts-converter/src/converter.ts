@@ -1,7 +1,6 @@
 import {DukatLanguageServiceHost} from "./DukatLanguageServiceHost";
 import {AstConverter} from "./AstConverter";
 import * as ts from "typescript";
-import {FileResolver} from "./FileResolver";
 import {AstFactory} from "./ast/AstFactory";
 import {SourceFileDeclaration} from "./ast/ast";
 import * as declarations from "declarations";
@@ -9,14 +8,8 @@ import {DeclarationResolver} from "./DeclarationResolver";
 import {ExportContext} from "./ExportContext";
 import {DocumentCache} from "./DocumentCache";
 import {DependencyBuilder} from "./DependencyBuilder";
-import {createLogger} from "./Logger";
-
-function createFileResolver(): FileResolver {
-  return new FileResolver();
-}
 
 let cache = new DocumentCache();
-let logger = createLogger("converter");
 
 function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, libs: Set<string> = new Set()): Set<string> {
   if (libPath === undefined) {
@@ -77,7 +70,7 @@ class SourceBundleBuilder {
 
 
   private createProgram(files: Array<string>): ts.Program {
-    let host = new DukatLanguageServiceHost(createFileResolver(), this.stdLib);
+    let host = new DukatLanguageServiceHost(this.stdLib);
     files.forEach(fileName => host.register(fileName));
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
     const program = languageService.getProgram();

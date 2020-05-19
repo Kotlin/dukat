@@ -1,13 +1,13 @@
 import * as ts from "typescript";
-import {FileResolver} from "./FileResolver";
 import {createLogger} from "./Logger";
+import {System} from "../.tsdeclarations/typescript";
 
 export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     private static log = createLogger("DukatLanguageServiceHost");
+    private fileResolver: System = ts.sys;
 
     constructor(
-        public fileResolver: FileResolver,
         private defaultLib: string,
         private knownFiles = new Set<string>(),
         private currentDirectory: string = "",
@@ -37,7 +37,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
-        const contents = this.fileResolver.resolve(fileName);
+        const contents = this.fileResolver.readFile(fileName);
         return ts.ScriptSnapshot.fromString(contents);
     }
 
@@ -50,10 +50,10 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     fileExists(filePath: string): boolean {
-        return this.fileResolver.exists(filePath);
+        return this.fileResolver.fileExists(filePath);
     }
 
     readDirectory(path: string, extensions?: readonly string[], exclude?: readonly string[], include?: readonly string[], depth?: number): string[] {
-        return ts.sys.readDirectory(path, extensions, exclude, include, depth);
+        return ts.fileResolver.readDirectory(path, extensions, exclude, include, depth);
     }
 }
