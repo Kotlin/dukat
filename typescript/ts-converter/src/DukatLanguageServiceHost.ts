@@ -1,8 +1,8 @@
 import * as ts from "typescript";
 import {createLogger} from "./Logger";
-import {System} from "../.tsdeclarations/typescript";
+import {ConfigFileDiagnosticsReporter, System} from "../.tsdeclarations/typescript";
 
-export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
+export class DukatLanguageServiceHost implements ts.LanguageServiceHost, ConfigFileDiagnosticsReporter {
 
     private static log = createLogger("DukatLanguageServiceHost");
     private fileResolver: System = ts.sys;
@@ -20,7 +20,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
             const parsedCmd = ts.getParsedCommandLineOfConfigFile(
               this.tsConfig,
               ts.getDefaultCompilerOptions(),
-              ts.sys
+              this
             );
 
             return parsedCmd.options;
@@ -70,5 +70,11 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     readDirectory(path: string, extensions?: readonly string[], exclude?: readonly string[], include?: readonly string[], depth?: number): string[] {
         return this.fileResolver.readDirectory(path, extensions, exclude, include, depth);
+    }
+
+    onUnRecoverableConfigFileDiagnostic(diagnostic: ts.Diagnostic): void {
+        let error = new Error(diagnostic.messageText);
+        (error as any).tsDiagnostic = diagnostic;
+        throw error;
     }
 }

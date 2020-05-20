@@ -143,20 +143,33 @@ function cliMode(args) {
     var is_js = files.every(function(file) { return endsWith(file, ".js")});
 
     if (is_ts || is_js) {
-        var inputStream = createReadableStream(createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, files));
+        try {
+            let bundle = createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, files);
 
-        if (typeof argsProcessed.binaryOutput == "string") {
-            inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
-            return null;
+            var inputStream = createReadableStream(bundle);
+
+            if (typeof argsProcessed.binaryOutput == "string") {
+                inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
+                return null;
+            }
+
+            var commandArgs = [
+                "-Ddukat.cli.internal.packagedir=" + packageDir,
+                "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+
+            var dukatProcess = run("java", commandArgs);
+            inputStream.pipe(dukatProcess.stdin);
+            return dukatProcess;
+        } catch (e) {
+            if (e.hasOwnProperty("tsDiagnostic")) {
+                console.log(`failed to parse tsconfig: ${argsProcessed.tsConfig}`);
+            } else {
+                console.log("unresolved exception");
+            }
+            console.log(e);
+            process.exit(1);
         }
 
-        var commandArgs = [
-            "-Ddukat.cli.internal.packagedir=" + packageDir,
-            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
-
-        var dukatProcess = run("java", commandArgs);
-        inputStream.pipe(dukatProcess.stdin);
-        return dukatProcess;
     } else if (is_idl) {
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
