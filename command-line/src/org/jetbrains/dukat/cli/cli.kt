@@ -171,7 +171,8 @@ private data class CliOptions(
         val jsModuleName: String?,
         val reportPath: String?,
         val tsDefaultLib: String,
-        val generateDescriptors: Boolean
+        val generateDescriptors: Boolean,
+        val tsConfig: String?
 )
 
 
@@ -188,6 +189,7 @@ private fun process(args: List<String>): CliOptions? {
     var jsModuleName: String? = null
     var reportPath: String? = null
     var generateDescriptors = false
+    var tsConfig: String? = null
 
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
@@ -238,6 +240,14 @@ private fun process(args: List<String>): CliOptions? {
                 }
 
             }
+            "--ts-config" -> {
+                tsConfig = argsIterator.readArg()
+
+                if (tsConfig == null) {
+                    printError("'--ts-config' should be followed with a json config")
+                    return null
+                }
+            }
 
             else -> when {
                 arg.equals("-") -> sources.add("-")
@@ -267,7 +277,7 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
-    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors)
+    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
 }
 
 fun main(vararg args: String) {

@@ -8,6 +8,7 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     private fileResolver: System = ts.sys;
 
     constructor(
+        private tsConfig: string | null,
         private defaultLib: string,
         private knownFiles = new Set<string>(),
         private currentDirectory: string = "",
@@ -15,9 +16,19 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getCompilationSettings(): ts.CompilerOptions {
-        let compilerOptions = ts.getDefaultCompilerOptions();
-        compilerOptions.allowJs = true;
-        return compilerOptions;
+        if (this.tsConfig) {
+            const parsedCmd = ts.getParsedCommandLineOfConfigFile(
+              this.tsConfig,
+              ts.getDefaultCompilerOptions(),
+              ts.sys
+            );
+
+            return parsedCmd.options;
+        } else {
+            let compilerOptions = ts.getDefaultCompilerOptions();
+            compilerOptions.allowJs = true;
+            return compilerOptions;
+        }
     }
 
     getScriptFileNames(): string[] {
@@ -47,6 +58,10 @@ export class DukatLanguageServiceHost implements ts.LanguageServiceHost {
 
     register(knownFile: string) {
         this.knownFiles.add(knownFile);
+    }
+
+    readFile(filePath: string): string | undefined {
+        return this.fileResolver.readFile(filePath) ;
     }
 
     fileExists(filePath: string): boolean {

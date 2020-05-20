@@ -55,11 +55,15 @@ function processArgs(args) {
 
     var binaryOutput = null;
     var stdlib = getStdLib();
+    var tsConfig = null;
 
     while (count < args.length) {
         var arg = args[count];
-        if(arg == "-b") {
+        if (arg == "-b") {
             binaryOutput = args[count + 1];
+            count += 2;
+        } else if (arg == "--ts-config") {
+            tsConfig = args[count + 1];
             count += 2;
         } else if(arg == "-l") {
             stdlib = args[count + 1];
@@ -80,13 +84,12 @@ function processArgs(args) {
         });
     }
 
-    var res = {
+    return {
         stdlib: stdlib,
         binaryOutput: binaryOutput,
-        files: files
+        files: files,
+        tsConfig: tsConfig
     };
-
-    return res;
 }
 
 function endsWith(str, postfix) {
@@ -94,9 +97,12 @@ function endsWith(str, postfix) {
 }
 
 
-function createBinaryStream(stdlib, files, onData, onEnd) {
-    var bundle = createSourceSet(stdlib, files);
 
+function createBinary(tsConfig, stdlib, files) {
+    return createSourceSet(tsConfig, stdlib, files);
+}
+
+function createReadableStream(binary, onData, onEnd) {
     var readable = createReadable();
 
     if (typeof onData == "function") {
@@ -107,7 +113,7 @@ function createBinaryStream(stdlib, files, onData, onEnd) {
         readable.on("end", onEnd);
     }
 
-    readable.push(bundle.serializeBinary());
+    readable.push(binary.serializeBinary());
     readable.push(null);
 
     return readable;
@@ -137,7 +143,7 @@ function cliMode(args) {
     var is_js = files.every(function(file) { return endsWith(file, ".js")});
 
     if (is_ts || is_js) {
-        var inputStream = createBinaryStream(argsProcessed.stdlib, files);
+        var inputStream = createReadableStream(createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, files));
 
         if (typeof argsProcessed.binaryOutput == "string") {
             inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
@@ -176,5 +182,6 @@ if (require.main === module) {
 }
 
 exports.translate = main;
-exports.createBinaryStream = createBinaryStream;
+exports.createBinary = createBinary;
+exports.createReadableStream = createReadableStream;
 exports.getStdLib = getStdLib;

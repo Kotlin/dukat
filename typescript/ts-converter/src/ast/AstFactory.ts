@@ -573,13 +573,6 @@ export class AstFactory {
     return sourceFile;
   }
 
-  createSourceSet(fileNames: Array<string>, sources: Array<SourceFileDeclaration>): SourceSet {
-    let sourceSet = new SourceSetDeclarationProto();
-    sourceSet.setSourcenameList(fileNames.map(fileName => tsInternals.normalizePath(fileName)));
-    sourceSet.setSourcesList(sources);
-    return sourceSet;
-  }
-
   createStatementAsTopLevel(statement: StatementDeclaration): Declaration {
     let topLevelStatement = new TopLevelDeclarationProto();
     topLevelStatement.setStatement(statement);

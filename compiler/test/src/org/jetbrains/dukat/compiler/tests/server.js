@@ -26,9 +26,12 @@ function createServer(port) {
 
                 try {
                     res.setHeader('Content-Type', 'application/octet-stream');
-                    dukatCli.createBinaryStream(
-                        dukatCli.getStdLib(),
-                        data.files,
+                    dukatCli.createReadableStream(
+                        dukatCli.createBinary(
+                            null,
+                            dukatCli.getStdLib(),
+                            data.files
+                        ),
                         onBinaryStreamData,
                         onBinaryStreamEnd
                     );

@@ -43,6 +43,7 @@ class SourceBundleBuilder {
   private dependencyBuilder: DependencyBuilder;
 
   constructor(
+    private tsConfig: string | null,
     private stdLib: string,
     originalFiles: Array<string>
   ) {
@@ -70,9 +71,11 @@ class SourceBundleBuilder {
 
 
   private createProgram(files: Array<string>): ts.Program {
-    let host = new DukatLanguageServiceHost(this.stdLib);
+    let host = new DukatLanguageServiceHost(this.tsConfig, this.stdLib);
+
     files.forEach(fileName => host.register(fileName));
     let languageService = ts.createLanguageService(host, (ts as any).createDocumentRegistryInternal(void 0, void 0, cache || void 0));
+
     const program = languageService.getProgram();
 
     if (program == null) {
@@ -96,6 +99,6 @@ class SourceBundleBuilder {
   }
 }
 
-export function createSourceSet(stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
-  return new SourceBundleBuilder(stdlib, files).createBundle();
+export function createSourceSet(tsConfig: string | null, stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
+  return new SourceBundleBuilder(tsConfig, stdlib, files).createBundle();
 }
