@@ -502,7 +502,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun FunctionNode.resolveBody(): BlockStatementModel? {
-        return BlockStatementModel(when (val nodeContext = this.context) {
+        val blockStatements = when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
                     ReturnStatementModel(
                             PropertyAccessExpressionModel(
@@ -603,8 +603,10 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         }
                 )
             }
-            else -> return null
-        })
+            else -> null
+        }
+
+        return  blockStatements?.let { BlockStatementModel(it) }
     }
 
     private fun convertTypeParams(typeParameters: List<TypeValueNode>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
