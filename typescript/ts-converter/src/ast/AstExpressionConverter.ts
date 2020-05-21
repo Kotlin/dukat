@@ -29,8 +29,8 @@ export class AstExpressionConverter {
         return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
     }
 
-    createFunctionExpression(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null) {
-        return AstExpressionFactory.convertFunctionDeclarationToExpression(this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [],"__NO_UID__"));
+    createFunctionExpression(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, isGenerator: boolean) {
+        return AstExpressionFactory.convertFunctionDeclarationToExpression(this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [],"__NO_UID__", isGenerator));
     }
 
     createClassExpression(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>) {
@@ -59,6 +59,10 @@ export class AstExpressionConverter {
 
     createConditionalExpression(condition: Expression, whenTrue: Expression, whenFalse: Expression) {
         return AstExpressionFactory.createConditionalExpressionDeclarationAsExpression(condition, whenTrue, whenFalse);
+    }
+
+    createYieldExpression(expression: Expression | null, hasAsterisk: boolean) {
+        return AstExpressionFactory.createYieldExpressionDeclarationAsExpression(expression, hasAsterisk)
     }
 
     createNameExpression(name: NameEntity): Expression {
@@ -175,7 +179,8 @@ export class AstExpressionConverter {
             returnType,
             typeParameterDeclarations,
             this.astConverter.convertModifiers(expression.modifiers),
-            this.convertBody(expression.body)
+            this.convertBody(expression.body),
+            expression.asteriskToken
         )
     }
 
@@ -243,6 +248,13 @@ export class AstExpressionConverter {
         )
     }
 
+    convertYieldExpression(expression: ts.YieldExpression): Expression {
+        return this.createYieldExpression(
+            expression.expression ? this.convertExpression(expression.expression) : null,
+            expression.asteriskToken
+        )
+    }
+
     convertNameExpression(name: ts.EntityName): Expression {
         return this.createNameExpression(
             this.convertEntityName(name)
@@ -301,6 +313,7 @@ export class AstExpressionConverter {
                 this.astConverter.convertTypeParams(method.typeParameters),
                 this.astConverter.convertModifiers(method.modifiers),
                 this.astConverter.convertBlock(method.body),
+                method.asteriskToken
             );
         } else {
             return null;
@@ -446,6 +459,8 @@ export class AstExpressionConverter {
             return this.convertArrayLiteralExpression(expression);
         } else if (ts.isConditionalExpression(expression)) {
             return this.convertConditionalExpression(expression);
+        } else if (ts.isYieldExpression(expression)) {
+            return this.convertYieldExpression(expression);
         } else if (ts.isToken(expression)) {
             return this.convertToken(expression)
         } else if (ts.isAssertionExpression(expression)) {

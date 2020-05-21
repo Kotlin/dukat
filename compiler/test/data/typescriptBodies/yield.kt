@@ -15,8 +15,13 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun f() {
-    var a: Any = arrayOf(1, 2, 3)
-    var b: Any = a.map({ x: Any -> var y: Any = x * x; y })
-    b.forEach({ x: Any -> console.log(x) })
+fun f() = iterator({ var i: Any = 1; while (true) { yield(i); i++ } })
+
+fun g() {
+    for (x: Any in f()) {
+        if (x > 10) {
+            break
+        }
+        console.log(x)
+    }
 }

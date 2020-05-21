@@ -57,6 +57,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclar
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BigIntLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
@@ -153,6 +154,7 @@ import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.VariableDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.WhileStatementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.YieldExpressionDeclarationProto
 
 fun NameDeclarationProto.convert(): NameEntity {
     return when {
@@ -253,7 +255,8 @@ fun FunctionDeclarationProto.convert(): FunctionDeclaration {
                 body.convert()
             } else null,
             definitionsInfoList.map { it.convert() },
-            uid
+            uid,
+            isGenerator
     )
 }
 
@@ -368,8 +371,8 @@ fun IfStatementDeclarationProto.convert(): IfStatementDeclaration {
 fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
     return ForStatementDeclaration(
             initializer = BlockDeclaration(initializerList.map { it.convert() }),
-            condition = condition.convert(),
-            incrementor = incrementor.convert(),
+            condition = if (hasCondition()) condition.convert() else null,
+            incrementor = if (hasIncrementor()) incrementor.convert() else null,
             body = statementList.convert() ?: BlockDeclaration(emptyList())
     )
 }
@@ -698,6 +701,13 @@ fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
     )
 }
 
+fun YieldExpressionDeclarationProto.convert(): YieldExpressionDeclaration {
+    return YieldExpressionDeclaration(
+        expression = expression.convert(),
+        hasAsterisk = hasAsterisk
+    )
+}
+
 fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
     return when {
         hasBinaryExpression() -> binaryExpression.convert()
@@ -715,6 +725,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasConditionalExpression() -> conditionalExpression.convert()
         hasAsExpression() -> asExpression.convert()
         hasNonNullExpression() -> nonNullExpression.convert()
+        hasYieldExpression() -> yieldExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

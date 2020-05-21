@@ -92,6 +92,7 @@ import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
@@ -259,6 +260,12 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is NonNullExpressionDeclaration -> NonNullExpressionModel(
                 expression.convert()
+            )
+            is YieldExpressionDeclaration -> CallExpressionModel(
+                expression = IdentifierExpressionModel(IdentifierEntity(
+                    if (hasAsterisk) "yieldAll" else "yield"
+                )),
+                arguments = listOf(expression.convert())
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()

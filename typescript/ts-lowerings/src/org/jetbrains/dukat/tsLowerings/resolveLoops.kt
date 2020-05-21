@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.ForStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 
 private class ResolveLoopsLowering : DeclarationStatementLowering {
     override fun lowerExpression(expression: ExpressionDeclaration): ExpressionDeclaration {
@@ -18,10 +19,12 @@ private class ResolveLoopsLowering : DeclarationStatementLowering {
             BlockDeclaration(
                 statement.initializer.statements +
                         WhileStatementDeclaration(
-                            statement.condition,
+                            statement.condition ?: BooleanLiteralExpressionDeclaration(true),
                             BlockDeclaration(
                                 statement.body.statements +
-                                        ExpressionStatementDeclaration(statement.incrementor)
+                                        (statement.incrementor?.let {
+                                            listOf(ExpressionStatementDeclaration(it))
+                                        } ?: emptyList())
                             )
                         )
             )

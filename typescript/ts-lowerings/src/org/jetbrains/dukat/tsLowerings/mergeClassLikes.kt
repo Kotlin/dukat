@@ -28,7 +28,8 @@ private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
             modifiers = modifiers,
             body = null,
             definitionsInfo = emptyList(),
-            uid = "__NO_UID__"
+            uid = "__NO_UID__",
+            isGenerator = false
     )
 }
 

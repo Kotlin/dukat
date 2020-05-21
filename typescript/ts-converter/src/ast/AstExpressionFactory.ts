@@ -92,6 +92,19 @@ export class AstExpressionFactory {
         return expressionProto;
     }
 
+    static createYieldExpressionDeclarationAsExpression(expression: Expression | null, hasAsterisk: boolean) {
+        let yieldExpression = new declarations.YieldExpressionDeclarationProto();
+
+        if (expression) {
+            yieldExpression.setExpression(expression)
+        }
+        yieldExpression.setHasasterisk(hasAsterisk);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setYieldexpression(yieldExpression);
+        return expressionProto;
+    }
+
     static createQualifierAsNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
         let qualifier = new declarations.QualifierDeclarationProto();
         qualifier.setLeft(left);
