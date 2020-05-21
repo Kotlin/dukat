@@ -19,6 +19,7 @@ fun h() {
     SomeNamespace.a()
     SomeNamespace.Class()
     c()
+    Pinger()
 }
 
 // ------------------------------------------------------------------------------------------
@@ -40,6 +41,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external fun c()
+
+external open class Pinger {
+    open fun ping()
+}
 
 // ------------------------------------------------------------------------------------------
 @file:JsQualifier("SomeNamespace")
