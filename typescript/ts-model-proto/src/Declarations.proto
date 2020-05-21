@@ -115,6 +115,7 @@ message FunctionDeclarationProto {
     BlockDeclarationProto body = 6;
     repeated DefinitionInfoDeclarationProto definitionsInfo = 7;
     string uid = 8;
+    bool isGenerator = 9;
 }
 
 message IndexSignatureDeclarationProto {
@@ -318,6 +319,11 @@ message NonNullExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message YieldExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+    bool hasAsterisk = 2;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -339,7 +345,8 @@ message ExpressionDeclarationProto {
         ConditionalExpressionDeclarationProto conditionalExpression = 13;
         AsExpressionDeclarationProto asExpression = 14;
         NonNullExpressionDeclarationProto nonNullExpression = 15;
-        UnknownExpressionDeclarationProto unknownExpression = 16;
+        YieldExpressionDeclarationProto yieldExpression = 16;
+        UnknownExpressionDeclarationProto unknownExpression = 17;
     }
 }
 

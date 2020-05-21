@@ -83,7 +83,8 @@ private fun FunctionConstraint.toDeclarations(name: String, modifiers: Set<Modif
             modifiers = modifiers,
             body = null,
             definitionsInfo = emptyList(),
-            uid = generateUID()
+            uid = generateUID(),
+            isGenerator = false
     )
 }
 

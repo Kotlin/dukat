@@ -306,7 +306,8 @@ private class LowerDeclarationsToNodes(
                     false,
                     true,
                     null,
-                    null
+                    null,
+                    false
             )
         }
     }
@@ -324,7 +325,8 @@ private class LowerDeclarationsToNodes(
                         true,
                         true,
                         null,
-                        null
+                        null,
+                        false
                 ),
                 MethodNode(
                         "set",
@@ -335,7 +337,8 @@ private class LowerDeclarationsToNodes(
                         true,
                         true,
                         null,
-                        null
+                        null,
+                        false
                 )
         )
     }
@@ -351,7 +354,8 @@ private class LowerDeclarationsToNodes(
                 true,
                 true,
                 null,
-                null
+                null,
+                false
         )
     }
 
@@ -468,7 +472,8 @@ private class LowerDeclarationsToNodes(
                 uid,
                 null,
                 body,
-                inDeclaredModule || hasDeclareModifier()
+                inDeclaredModule || hasDeclareModifier(),
+                isGenerator
         )
     }
 
@@ -529,7 +534,8 @@ private class LowerDeclarationsToNodes(
                     false,
                     true,
                     null,
-                    declaration.body
+                    declaration.body,
+                    declaration.isGenerator
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())

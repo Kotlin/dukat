@@ -24,7 +24,8 @@ fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
             modifiers = modifiers,
             body = body,
             definitionsInfo = emptyList(),
-            uid = ""
+            uid = "",
+            isGenerator = false
     ).addTo(owner)
 }
 

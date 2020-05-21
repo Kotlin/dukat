@@ -277,7 +277,8 @@ export class AstConverter {
         this.convertModifiers(functionDeclaration.modifiers),
         this.convertBlock(functionDeclaration.body),
         this.convertDefinitions(functionDeclaration),
-        uid
+        uid,
+        functionDeclaration.asteriskToken
       );
     }
 
@@ -346,6 +347,7 @@ export class AstConverter {
         typeParameterDeclarations,
         this.convertModifiers(declaration.modifiers),
         this.convertBlock(declaration.body),
+        declaration.asteriskToken
       );
     }
 
@@ -353,9 +355,9 @@ export class AstConverter {
   }
 
 
-  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
+  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, isGenerator: boolean): MemberDeclaration {
     // TODO: reintroduce method declaration
-    return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__");
+    return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__", isGenerator);
   }
 
   createTypeDeclaration(value: string, params: Array<TypeDeclaration> = []): TypeDeclaration {

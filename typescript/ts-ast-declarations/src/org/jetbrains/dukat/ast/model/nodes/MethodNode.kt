@@ -13,5 +13,6 @@ data class MethodNode(
         val open: Boolean,
         val meta: MethodNodeMeta?,
 
-        val body: BlockDeclaration?
+        val body: BlockDeclaration?,
+        val isGenerator: Boolean
 ) : MemberNode

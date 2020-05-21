@@ -33,5 +33,6 @@ data class FunctionNode(
         val comment: CommentEntity?,
 
         val body: BlockDeclaration?,
-        override val external: Boolean
+        override val external: Boolean,
+        val isGenerator: Boolean
 ) : MemberEntity, TopLevelNode, ExportableNode

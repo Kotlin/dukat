@@ -46,6 +46,7 @@ import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.literals.NullLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
@@ -253,6 +254,7 @@ private fun LiteralExpressionModel.translate(): String {
         is StringLiteralExpressionModel -> value
         is NumericLiteralExpressionModel -> value.toString()
         is BooleanLiteralExpressionModel -> value.toString()
+        is NullLiteralExpressionModel -> "null"
         else -> raiseConcern("unknown LiteralExpressionModel ${this}") { "" }
     }
 }
@@ -326,7 +328,10 @@ private fun ExpressionModel.translate(): String {
         is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> "${expression.translate()}!!"
-        is LambdaExpressionModel -> "{ ${translateParameters(parameters)} -> ${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")}}"
+        is LambdaExpressionModel -> {
+            val arguments = if (parameters.isNotEmpty()) "${translateParameters(parameters)} -> " else ""
+            "{ $arguments${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")} }"
+        }
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }
@@ -368,7 +373,7 @@ private fun StatementModel.translate(): List<String> {
             return listOf(header + body[0]) + body.drop(1)
         }
         is ForInStatementModel -> {
-            val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()})"
+            val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()}) "
             val body = body.translate()
             return listOf(header + body[0]) + body.drop(1)
         }
@@ -405,14 +410,14 @@ private fun StatementModel.translateAsOneLine(): String {
                 }
                 else -> {
                     val elseBranch = elseStatement.statements.joinToString(separator = "; ") { it.translateAsOneLine() }
-                    "$header $mainBranch } else { $elseBranch"
+                    "$header $mainBranch } else { $elseBranch }"
                 }
             }
         }
         is WhileStatementModel -> {
             val header = "while (${condition.translate()}) "
             val body = body.translateAsOneLine()
-            return "$header $body"
+            return "$header$body"
         }
         is ForInStatementModel -> {
             val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()})"

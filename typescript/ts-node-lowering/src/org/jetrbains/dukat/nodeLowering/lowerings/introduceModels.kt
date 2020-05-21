@@ -71,6 +71,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
+import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
@@ -501,6 +502,26 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
     }
 
+    private fun BlockStatementModel.wrapBodyAsLazyIterator(): BlockStatementModel {
+        return BlockStatementModel(
+            statements = listOf(
+                ReturnStatementModel(
+                    expression = CallExpressionModel(
+                        expression = IdentifierExpressionModel(
+                            IdentifierEntity("iterator")
+                        ),
+                        arguments = listOf(
+                            LambdaExpressionModel(
+                                parameters = listOf(),
+                                body = this
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    }
+
     private fun FunctionNode.resolveBody(): BlockStatementModel? {
         val blockStatements = when (val nodeContext = this.context) {
             is IndexSignatureGetter -> listOf(
@@ -707,7 +728,12 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 open = open,
 
                 body = body?.let {
-                    ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                    val convertedBody = ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                    if (isGenerator) {
+                        convertedBody.wrapBodyAsLazyIterator()
+                    } else {
+                        convertedBody
+                    }
                 }
         )
     }
@@ -742,7 +768,12 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         operator = operator,
                         extend = extend.convert(),
                         body = body?.let {
-                            ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                            val convertedBody = ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                            if (isGenerator) {
+                                convertedBody.wrapBodyAsLazyIterator()
+                            } else {
+                                convertedBody
+                            }
                         } ?: resolveBody(),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = comment,

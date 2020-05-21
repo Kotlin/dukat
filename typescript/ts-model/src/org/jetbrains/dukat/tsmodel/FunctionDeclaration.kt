@@ -12,6 +12,7 @@ data class FunctionDeclaration(
         override val modifiers: Set<ModifierDeclaration>,
         val body: BlockDeclaration?,
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
-        override val uid: String
+        override val uid: String,
+        val isGenerator: Boolean
 ) : MemberDeclaration, StatementDeclaration, WithUidDeclaration, WithModifiersDeclaration, ParameterOwnerDeclaration,
     ExpressionDeclaration, FunctionLikeDeclaration, MergeableDeclaration
