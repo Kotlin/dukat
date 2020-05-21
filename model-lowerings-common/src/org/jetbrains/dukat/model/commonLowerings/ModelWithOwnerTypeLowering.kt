@@ -96,7 +96,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) },
                 type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)),
                 typeParameters = declaration.typeParameters.map { lowerTypeParameterModel(ownerContext.wrap(it)) },
-                body = lowerStatementBody(NodeOwner(declaration.body, ownerContext))
+                body = declaration.body?.let { lowerStatementBody(NodeOwner(it, ownerContext)) }
         )
     }
 

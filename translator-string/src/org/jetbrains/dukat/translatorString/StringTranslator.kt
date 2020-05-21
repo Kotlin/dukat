@@ -37,6 +37,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
@@ -67,6 +68,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -281,7 +283,7 @@ private fun BinaryOperatorModel.translate(): String {
         EQ -> "=="
         NOT_EQ -> "!="
         REF_EQ -> "==="
-        REF_NOT_EQ -> "1"
+        REF_NOT_EQ -> "!=="
         LT -> "<"
         GT -> ">"
         LE -> "<="
@@ -324,6 +326,7 @@ private fun ExpressionModel.translate(): String {
         is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> "${expression.translate()}!!"
+        is LambdaExpressionModel -> "{ ${translateParameters(parameters)} -> ${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")}}"
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }
@@ -332,6 +335,7 @@ private fun StatementModel.translate(): List<String> {
     return when (this) {
         is AssignmentStatementModel -> listOf("${left.translate()} = ${right.translate()}")
         is ReturnStatementModel -> listOf("return ${expression?.translate()}")
+        is ThrowStatementModel -> listOf("throw ${expression.translate()}")
         is BreakStatementModel -> listOf("break")
         is ContinueStatementModel -> listOf("continue")
         is ExpressionStatementModel -> listOf(expression.translate())
@@ -345,7 +349,7 @@ private fun StatementModel.translate(): List<String> {
             val header = "if (${condition.translate()}) {"
             val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
             val elseStatement = elseStatement
-            return when {
+            when {
                 elseStatement == null -> listOf(header) + mainBranch + listOf("}")
                 elseStatement.statements.size == 1 && elseStatement.statements.first() is IfStatementModel -> {
                     val nestedIf = elseStatement.statements.first()
@@ -385,7 +389,47 @@ private fun StatementModel.translate(): List<String> {
 }
 
 private fun StatementModel.translateAsOneLine(): String {
-    return translate().joinToString(separator = " ")
+    return when (this) {
+        is BlockStatementModel -> "{ ${statements.joinToString(separator = "; ") { it.translateAsOneLine() }} }"
+        is RunBlockStatementModel -> "run { ${statements.joinToString(separator = "; ") { it.translateAsOneLine() }} }"
+        is IfStatementModel -> {
+            val header = "if (${condition.translate()}) {"
+            val mainBranch = thenStatement.statements.joinToString(separator = "; ") { it.translateAsOneLine() }
+            val elseStatement = elseStatement
+            when {
+                elseStatement == null -> "$header $mainBranch }"
+                elseStatement.statements.size == 1 && elseStatement.statements.first() is IfStatementModel -> {
+                    val nestedIf = elseStatement.statements.first()
+                    val translatedNestedIf = nestedIf.translateAsOneLine()
+                    "$header $mainBranch } else $translatedNestedIf"
+                }
+                else -> {
+                    val elseBranch = elseStatement.statements.joinToString(separator = "; ") { it.translateAsOneLine() }
+                    "$header $mainBranch } else { $elseBranch"
+                }
+            }
+        }
+        is WhileStatementModel -> {
+            val header = "while (${condition.translate()}) "
+            val body = body.translateAsOneLine()
+            return "$header $body"
+        }
+        is ForInStatementModel -> {
+            val header = "for (${variable.translate(asDeclaration = false)} in ${expression.translate()})"
+            val body = body.translateAsOneLine()
+            return "$header $body"
+        }
+        is WhenStatementModel -> {
+            val header = "when (${expression.translate()}) {"
+            val cases = cases.map { case ->
+                val caseHeader = "${case.condition?.joinToString { it.translate() } ?: "else"} -> "
+                val body = case.body.translateAsOneLine()
+                "$caseHeader $body"
+            }.joinToString(separator = "; ")
+            return "$header $cases }"
+        }
+        else -> translate().joinToString(separator = " ")
+    }
 }
 
 private fun ClassLikeReferenceModel.translate(): String {
@@ -410,16 +454,17 @@ private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Uni
 }
 
 private fun BlockStatementModel?.translateFirstLine(): String {
-    return if (this == null || statements.isEmpty()) {
-        ""
-    } else if (statements.size == 1 && statements[0].translate().size == 1) {
-        if (statements[0] is ReturnStatementModel) {
-            " = ${(statements[0] as ReturnStatementModel).expression?.translate()}"
-        } else {
-            " { ${statements[0].translate()[0]} }"
+    return when {
+        this == null -> ""
+        statements.isEmpty() -> " { }"
+        statements.size == 1 && statements.single().translate().size == 1 -> {
+            if (statements.single() is ReturnStatementModel) {
+                " = ${(statements.single() as ReturnStatementModel).expression?.translate()}"
+            } else {
+                " { ${statements.single().translate().single()} }"
+            }
         }
-    } else {
-        " {"
+        else -> " {"
     }
 }
 
@@ -439,7 +484,9 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val modifier = if (inline) { "inline " } else if (external) { "$KOTLIN_EXTERNAL_KEYWORD " } else { "" }
     val operator = if (operator) "operator " else ""
 
-    val shouldBeTranslatedAsOneLine = body.statements.isEmpty() ||
+    val body = body
+
+    val shouldBeTranslatedAsOneLine = body == null || body.statements.isEmpty() ||
             (body.statements.size == 1 && body.statements[0].translate().size <= 1)
 
     val bodyFirstLine = body.translateFirstLine()
@@ -485,7 +532,17 @@ private fun MethodModel.translate(): List<String> {
 
     val bodyOtherLines = mutableListOf<String>()
 
-    body.translate(0) { bodyOtherLines += it }
+    val body = body
+
+    if (body != null) {
+
+        val shouldBeTranslatedAsOneLine = body.statements.isEmpty() ||
+                (body.statements.size == 1 && body.statements[0].translate().size <= 1)
+
+        if (!shouldBeTranslatedAsOneLine) {
+            body.translate(0) { bodyOtherLines += it }
+        }
+    }
 
     return annotations +
             listOf(

@@ -19,7 +19,7 @@ data class FunctionModel(
         val operator: Boolean,
 
         override val extend: ClassLikeReferenceModel?,
-        val body: BlockStatementModel,
+        val body: BlockStatementModel?,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean

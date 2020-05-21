@@ -429,9 +429,7 @@ fun ContinueStatementDeclarationProto.convert(): ContinueStatementDeclaration {
 
 fun ThrowStatementDeclarationProto.convert(): ThrowStatementDeclaration {
     return ThrowStatementDeclaration(
-            if (hasExpression()) {
-                expression.convert()
-            } else null
+        expression.convert()
     )
 }
 

@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -10,13 +11,13 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
-import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
@@ -62,6 +63,7 @@ import org.jetbrains.dukat.astModel.statements.IfStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.RunBlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
+import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
@@ -71,10 +73,12 @@ import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
@@ -88,6 +92,7 @@ import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.literal.ArrayLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.BooleanLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.LiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.NumericLiteralExpressionDeclaration
@@ -100,7 +105,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclar
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 
 internal class ExpressionConverter(val documentConverter: DocumentConverter) {
-    private fun LiteralExpressionDeclaration.convert(): LiteralExpressionModel {
+    private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
                 value
@@ -110,6 +115,10 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
             is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
                 value
+            )
+            is ArrayLiteralExpressionDeclaration -> CallExpressionModel(
+                IdentifierExpressionModel(IdentifierEntity("arrayOf")),
+                elements.map { it.convert() }
             )
             else -> raiseConcern("unable to process LiteralExpressionDeclaration $this") {
                 StringLiteralExpressionModel("ERROR")
@@ -182,6 +191,27 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is CallExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
                 arguments.map { it.convert() }
+            )
+            is FunctionDeclaration -> LambdaExpressionModel(
+                parameters.map {
+                    ParameterModel(
+                        it.name,
+                        TypeValueModel(
+                            IdentifierEntity("Any"),
+                            listOf(),
+                            null,
+                            null
+                        ),
+                        //TODO
+                        /*with (documentConverter) {
+                            type.process()
+                        }*/
+                        null,
+                        false,
+                        null
+                    )
+                },
+                convertLambdaBody(body!!)
             )
             is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
@@ -342,6 +372,9 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             is ReturnStatementDeclaration -> ReturnStatementModel(
                 expression?.convert()
             )
+            is ThrowStatementDeclaration -> ThrowStatementModel(
+                expression.convert()
+            )
             is BreakStatementDeclaration -> BreakStatementModel()
             is ContinueStatementDeclaration -> ContinueStatementModel()
             is IfStatementDeclaration -> IfStatementModel(
@@ -396,5 +429,69 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
 
     fun convertBlock(blockDeclaration: BlockDeclaration): BlockStatementModel {
         return BlockStatementModel(blockDeclaration.statements.map { it.convert() })
+    }
+
+    private fun BlockDeclaration.countReturns(): Int {
+        return statements.sumBy { when (it) {
+            is ReturnStatementDeclaration -> if (it.expression == null) {
+                2
+            } else {
+                1
+            }
+            is IfStatementDeclaration -> {
+                it.thenStatement.countReturns() + (it.elseStatement?.countReturns() ?: 0)
+            }
+            is WhileStatementDeclaration -> it.statement.countReturns()
+            is ForOfStatementDeclaration -> it.body.countReturns()
+            is SwitchStatementDeclaration -> it.cases.sumBy { case -> case.body.countReturns() }
+            is BlockDeclaration -> it.countReturns()
+            else -> 0
+        } }
+    }
+
+    private fun BlockDeclaration.removeReturns(): BlockDeclaration {
+        return BlockDeclaration(statements.map {
+            when (it) {
+                is ReturnStatementDeclaration -> {
+                    it.expression?.let { e -> ExpressionStatementDeclaration(e) } ?: it
+                }
+                is IfStatementDeclaration -> {
+                    it.copy(
+                        thenStatement = it.thenStatement.removeReturns(),
+                        elseStatement = it.elseStatement?.removeReturns()
+                    )
+                }
+                is WhileStatementDeclaration -> it.copy(
+                    statement = it.statement.removeReturns()
+                )
+                is ForOfStatementDeclaration -> it.copy(
+                    body = it.body.removeReturns()
+                )
+                is SwitchStatementDeclaration -> it.copy(
+                    cases = it.cases.map { case -> case.copy(body = case.body.removeReturns()) }
+                )
+                is BlockDeclaration -> it.removeReturns()
+                else -> it
+            }
+        })
+    }
+
+    private fun convertLambdaBody(lambdaBody: BlockDeclaration): BlockStatementModel {
+        if (lambdaBody.countReturns() <= 1) {
+            return convertBlock(lambdaBody.removeReturns())
+        }
+        return raiseConcern("multi return lambdas are not supported yet") {
+            BlockStatementModel(
+                listOf(
+                    ExpressionStatementModel(
+                        IdentifierExpressionModel(
+                            IdentifierEntity(
+                                "MULTI_RETURN_LAMBDAS_ARE_NOT_SUPPORTED_YET"
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 }
