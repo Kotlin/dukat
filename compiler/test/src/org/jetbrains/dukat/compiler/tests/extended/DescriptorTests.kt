@@ -70,14 +70,12 @@ class DescriptorTests {
         )
     }
 
-    companion object : FileFetcher() {
+    companion object {
         private val translator = createStandardCliTranslator()
-
-        override val postfix = D_TS_DECLARATION_EXTENSION
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/typescript/")
+            return FileFetcher("./test/data/typescript/", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
     }
 

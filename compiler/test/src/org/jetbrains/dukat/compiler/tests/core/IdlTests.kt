@@ -21,12 +21,10 @@ class IdlTests : OutputTests() {
 
     override fun getTranslator(): InputTranslator<String> = translator
 
-    companion object : FileFetcher() {
-        override val postfix = WEBIDL_DECLARATION_EXTENSION
-
+    companion object {
         @JvmStatic
         fun idlSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/idl")
+            return FileFetcher("./test/data/idl", WEBIDL_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
 
         val translator: InputTranslator<String> = IdlInputTranslator(EmptyReferencesResolver())

@@ -43,12 +43,10 @@ open class CoreSetCliTests {
 
     open fun getTranslator(): CliTranslator = createStandardCliTranslator()
 
-    companion object : FileFetcher() {
-        override val postfix = D_TS_DECLARATION_EXTENSION
-
+    companion object {
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/typescript")
+            return FileFetcher("./test/data/typescript", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
     }
 

@@ -2,36 +2,30 @@ package org.jetbrains.dukat.compiler.tests
 
 import java.io.File
 
-abstract class FileFetcher {
-    abstract val postfix: String
+class FileFetcher(private val path: String, private val postfix: String, private val outputExtension: String = ".d.kt") {
 
-    fun fileSet(path: String, postfix: String, recursive: Boolean = false): Sequence<File> {
-        val rootFolder = File(path)
-
-        val files = if (recursive) rootFolder.walk() else rootFolder.walkTopDown()
-
-        return files.filter { file ->
-            file.path.endsWith(postfix)
+    fun fileSet(path: String, accept: (String) -> Boolean): Sequence<File> {
+        return File(path).walkTopDown().filter { file ->
+            accept(file.path)
         }
     }
 
-    fun fileSetWithDescriptors(
-        path: String,
-        recursive: Boolean = false,
-        resultPostfix: String = ".d.kt"
-    ): Array<Array<String>> {
-        val rootFolder = File(path)
-        return fileSet(path, postfix, recursive).mapNotNull { file ->
+    fun getDescriptor(path: String) = path.removeSuffix(postfix)
+    fun getTarget(sourcePath: String) = sourcePath.replace(postfix, outputExtension)
 
-            val tsPath = file.normalize().absolutePath
-            val ktPath = tsPath.replace(postfix, resultPostfix)
-            val descriptor = file.relativeTo(rootFolder).path.removeSuffix(postfix)
+    fun fileSetWithDescriptors(): Array<Array<String>> {
+        val rootFolder = File(path)
+        return fileSet(path) { fileName -> fileName.endsWith(postfix) }.mapNotNull { file ->
+
+            val sourcePath = file.normalize().absolutePath
+            val targetPath = getTarget(sourcePath)
+            val descriptor = getDescriptor(file.relativeTo(rootFolder).path)
 
             if (!(file.name.startsWith("_") || file.parentFile.name.startsWith("_"))) {
                 arrayOf(
                         descriptor,
-                        tsPath,
-                        ktPath
+                        sourcePath,
+                        targetPath
                 )
             } else null
         }.toList().toTypedArray()

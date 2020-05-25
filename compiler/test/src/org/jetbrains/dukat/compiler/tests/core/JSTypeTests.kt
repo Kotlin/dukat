@@ -31,13 +31,10 @@ class JSTypeTests : OutputTests() {
 
     override fun getTranslator(): InputTranslator<String> = createStandardCliTranslator(JavaScriptLowerer(ConstNameResolver()))
 
-    companion object : FileFetcher() {
-
-        override val postfix = JS_DECLARATION_EXTENSION
-
+    companion object {
         @JvmStatic
         fun jsSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/javascript")
+            return FileFetcher("./test/data/javascript", JS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
 
         @JvmStatic

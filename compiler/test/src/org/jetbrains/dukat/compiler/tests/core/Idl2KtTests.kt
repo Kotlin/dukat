@@ -9,7 +9,6 @@ import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
@@ -37,12 +36,10 @@ class Idl2KtTests : OutputTests() {
 
     override fun getTranslator(): InputTranslator<String> = translator
 
-    companion object : FileFetcher() {
-        override val postfix = WEBIDL_DECLARATION_EXTENSION
-
+    companion object {
         @JvmStatic
         fun idl2ktSet(): Array<Array<String>> {
-            return fileSetWithDescriptors("./test/data/idl2kt")
+            return FileFetcher("./test/data/idl2kt", WEBIDL_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
 
         val translator: InputTranslator<String> = IdlInputTranslator(DirectoryReferencesResolver())

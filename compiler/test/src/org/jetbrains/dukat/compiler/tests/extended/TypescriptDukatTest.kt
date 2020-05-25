@@ -19,9 +19,7 @@ class TypescriptDukatCompilationTest : CompilationTests() {
         assertContentCompiles(descriptor, sourcePath)
     }
 
-    companion object : FileFetcher() {
-
-        override val postfix = ".ts"
+    companion object  {
         private const val inputPath = "../typescript/ts-converter/src/"
         private const val entryPoint = "converter.ts"
 
