@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import org.jetbrains.dukat.compiler.tests.FileFetcher
+import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.idlReferenceResolver.EmptyReferencesResolver
@@ -24,7 +24,7 @@ class IdlTests : OutputTests() {
     companion object {
         @JvmStatic
         fun idlSet(): Array<Array<String>> {
-            return FileFetcher("./test/data/idl", WEBIDL_DECLARATION_EXTENSION).fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/idl", WEBIDL_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
 
         val translator: InputTranslator<String> = IdlInputTranslator(EmptyReferencesResolver())

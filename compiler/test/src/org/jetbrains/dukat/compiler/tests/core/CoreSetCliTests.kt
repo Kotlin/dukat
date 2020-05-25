@@ -5,7 +5,7 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.compiler.tests.CliTranslator
-import org.jetbrains.dukat.compiler.tests.FileFetcher
+import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
@@ -46,7 +46,7 @@ open class CoreSetCliTests {
     companion object {
         @JvmStatic
         fun coreSet(): Array<Array<String>> {
-            return FileFetcher("./test/data/typescript", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/typescript", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
     }
 

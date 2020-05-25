@@ -2,7 +2,7 @@ package org.jetbrains.dukat.compiler.tests.core
 
 import org.jetbrains.dukat.compiler.tests.CliBodyTranslator
 import org.jetbrains.dukat.compiler.tests.CliTranslator
-import org.jetbrains.dukat.compiler.tests.FileFetcher
+import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,7 +22,7 @@ class TsBodyTests : CoreSetCliTests() {
     companion object {
         @JvmStatic
         fun typescriptBodiesSet(): Array<Array<String>> {
-            return FileFetcher("./test/data/typescriptBodies", TS_DECLARATION_EXTENSION, ".kt").fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/typescriptBodies", TS_DECLARATION_EXTENSION, ".kt").fileSetWithDescriptors()
         }
     }
 }

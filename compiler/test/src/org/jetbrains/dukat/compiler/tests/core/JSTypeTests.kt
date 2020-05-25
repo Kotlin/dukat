@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.core
 
-import org.jetbrains.dukat.compiler.tests.FileFetcher
+import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
@@ -34,7 +34,7 @@ class JSTypeTests : OutputTests() {
     companion object {
         @JvmStatic
         fun jsSet(): Array<Array<String>> {
-            return FileFetcher("./test/data/javascript", JS_DECLARATION_EXTENSION).fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/javascript", JS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
 
         @JvmStatic

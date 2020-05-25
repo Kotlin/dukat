@@ -3,7 +3,7 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.cli.compileUnits
-import org.jetbrains.dukat.compiler.tests.FileFetcher
+import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
@@ -75,7 +75,7 @@ class DescriptorTests {
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return FileFetcher("./test/data/typescript/", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/typescript/", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
         }
     }
 
