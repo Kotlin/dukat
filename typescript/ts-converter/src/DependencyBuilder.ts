@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import {tsInternals} from "./TsInternals";
-import {ExportContext} from "./ExportContext";
+
 import {
   Dependency,
   SymbolDependency,
@@ -12,7 +12,7 @@ export class DependencyBuilder {
   private dependencies = new Map<string, Dependency>();
   private visitedFiles = new Set<string>();
   private typeChecker = this.program.getTypeChecker();
-  private checkedReferences = new Set<string>();
+  private checkedReferences = new Set<ts.Node>();
 
   private registerDependency(dependency: Dependency) {
     let currentDependency = this.dependencies.get(dependency.fileName);
@@ -50,8 +50,7 @@ export class DependencyBuilder {
   }
 
   constructor(
-    private program: ts.Program,
-    private exportContext: ExportContext
+    private program: ts.Program
   ) {
   }
 
@@ -90,22 +89,12 @@ export class DependencyBuilder {
   }
 
   private createSymbolDependency(declaration: ts.Declaration): SymbolDependency | undefined {
-    let uid = this.exportContext.getUID(declaration);
-    if (this.checkedReferences.has(uid)) {
+    if (this.checkedReferences.has(declaration)) {
       return undefined;
     }
-    this.checkedReferences.add(uid);
+    this.checkedReferences.add(declaration);
 
-    let parent = declaration.parent;
-    let parentModuleUids = new Array<string>();
-    while (parent) {
-      if (ts.isModuleDeclaration(parent)) {
-        parentModuleUids.push(this.exportContext.getUID(parent));
-      }
-      parent = parent.parent
-    }
-
-    return new SymbolDependency(uid, parentModuleUids);
+    return new SymbolDependency(declaration);
   }
 
 
@@ -116,7 +105,7 @@ export class DependencyBuilder {
       let symbolDependency = this.createSymbolDependency(declaration);
 
       if (symbolDependency) {
-        let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, this.exportContext, [
+        let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, [
           symbolDependency
         ]);
         this.registerDependency(translateSubsetOfSymbolsDependency);

@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import {ExportContext} from "./ExportContext";
 
 export interface Dependency {
   fileName: string;
@@ -10,7 +9,7 @@ export interface Dependency {
 }
 
 export class SymbolDependency {
-  constructor(public uid: string, public parentModuleUids: Array<string>) {}
+  constructor(public node: ts.Node) {}
 }
 
 export class TranslateAllSymbolsDependency implements Dependency {
@@ -31,40 +30,44 @@ export class TranslateAllSymbolsDependency implements Dependency {
 }
 
 export class TranslateSubsetOfSymbolsDependency implements Dependency {
-  private symbols: Set<string>;
-  private parentUids: Set<string>;
+  private symbols: Set<ts.Node>;
+  private parentUids: Set<ts.Node> = new Set<ts.Node>();
 
-  constructor(public fileName: string, private exportContext: ExportContext, private uids: Array<SymbolDependency>) {
-    this.symbols = new Set(uids.map(it => it.uid));
-    this.parentUids = new Set(uids.map(it => it.parentModuleUids).reduce((a, b) => a.concat(b)))
+  constructor(public fileName: string, private symbolDependencies: Array<SymbolDependency>) {
+    this.symbols = new Set(symbolDependencies.map(it => {
+      let node = it.node;
+      let parent = node.parent;
+      while (parent) {
+        if (ts.isModuleDeclaration(parent)) {
+          this.parentUids.add(parent)
+        }
+        parent = parent.parent
+      }
+      return it.node;
+    }));
   }
 
   merge(dependency: Dependency): Dependency {
     if (dependency instanceof TranslateAllSymbolsDependency) {
       return dependency;
     } else if (dependency instanceof TranslateSubsetOfSymbolsDependency) {
-      return new TranslateSubsetOfSymbolsDependency(this.fileName, this.exportContext, [...this.uids].concat([...dependency.uids]));
+      return new TranslateSubsetOfSymbolsDependency(this.fileName, [...this.symbolDependencies].concat([...dependency.symbolDependencies]));
     } else {
       return this;
     }
   }
 
   accept(node: ts.Node): boolean {
-
-
     if (ts.isExportAssignment(node)) {
       return true;
     }
 
-    let uid = this.exportContext.getUID(node);
-
-
-    if (this.symbols.has(uid)) {
+    if (this.symbols.has(node)) {
       return true;
     }
 
-    if ((ts.isModuleDeclaration(node)) && (this.parentUids.has(uid))) {
-      return true;
+    if (ts.isModuleDeclaration(node) && this.parentUids.has(node)) {
+        return true;
     }
 
     return false;

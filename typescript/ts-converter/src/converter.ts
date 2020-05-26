@@ -50,7 +50,7 @@ class SourceBundleBuilder {
     this.program = this.createProgram(originalFiles);
     this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
-    let dependencyBuilder = new DependencyBuilder(this.program, new ExportContext());
+    let dependencyBuilder = new DependencyBuilder(this.program);
     originalFiles.forEach(file => {
       let sourceFile = this.program.getSourceFile(file);
       if (sourceFile) {
