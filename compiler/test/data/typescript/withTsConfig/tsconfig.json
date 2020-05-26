@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "listEmittedFiles": true,
+    "baseUrl": "./",
+    "typeRoots" : ["./types"]
+  },
+  "include": [
+    "aaa.d.ts"
+  ]
+}

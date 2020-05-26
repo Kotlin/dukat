@@ -16,12 +16,12 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 @OptIn(UnstableDefault::class)
 open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptLowerer(CommonJsNameResolver(), null)): InputTranslator<String> {
 
-    protected fun translateBinary(input: String) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input)
+    protected fun translateBinary(input: String, tsConfig: String?) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input, tsConfig)
 
     override fun translate(
         data: String
     ): SourceSetModel {
-        val binData = translateBinary(data)
+        val binData = translateBinary(data, null)
         val translator = JsRuntimeByteArrayTranslator(translator)
         return translator.translate(binData)
     }
@@ -31,9 +31,11 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
             dirName: String,
             reportPath: String? = null,
             moduleName: String? = null,
-            withDescriptors: Boolean = false
+            withDescriptors: Boolean = false,
+            tsConfig: String? = null
     ) {
-        val binData = translateBinary(input)
+
+        val binData = translateBinary(input, tsConfig)
 
         val moduleNameResolver = if (moduleName == null) {
             CommonJsNameResolver()

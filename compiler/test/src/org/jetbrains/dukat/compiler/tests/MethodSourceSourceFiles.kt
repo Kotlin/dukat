@@ -21,10 +21,13 @@ class MethodSourceSourceFiles(
             val targetPath = getTarget(sourcePath)
             val descriptor = getDescriptor(file.relativeTo(rootFolder).path)
 
+            val tsConfig = File(file.parent, "tsconfig.json")
+
             arrayOf(
                     descriptor,
                     sourcePath,
-                    targetPath
+                    targetPath,
+                    if (tsConfig.exists()) tsConfig.normalize().absolutePath else ""
             )
         }.toList().toTypedArray()
     }

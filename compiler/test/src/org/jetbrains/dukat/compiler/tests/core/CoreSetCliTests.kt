@@ -37,8 +37,8 @@ open class CoreSetCliTests {
     @DisplayName("core test set [cli run]")
     @ParameterizedTest(name = "{0}")
     @MethodSource("coreSet")
-    open fun withValueSource(name: String, tsPath: String, ktPath: String) {
-        assertContentEqualsBinary(name, tsPath, ktPath)
+    open fun withValueSource(name: String, tsPath: String, ktPath: String, tsConfig: String) {
+        assertContentEqualsBinary(name, tsPath, ktPath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     open fun getTranslator(): CliTranslator = createStandardCliTranslator()
@@ -54,13 +54,14 @@ open class CoreSetCliTests {
     protected fun assertContentEqualsBinary(
             descriptor: String,
             tsPath: String,
-            ktPath: String
+            ktPath: String,
+            tsConfig: String?
     ) {
         println("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>")
+        getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>", false, tsConfig)
 
         val reportJson = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).parse(ReportJson.serializer(), File(reportPath).readText())
 

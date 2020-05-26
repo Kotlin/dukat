@@ -11,7 +11,8 @@ import java.net.URL
 @Serializable
 private data class TranslationRequest(
         val packageName: String,
-        val files: List<String>
+        val files: List<String>,
+        val tsConfig: String?
 )
 
 class CliHttpClient(private val port: String) {
@@ -36,7 +37,7 @@ class CliHttpClient(private val port: String) {
         } while (pingStatus() != 200 || count < 10)
     }
 
-    fun translate(fileName: String): ByteArray {
+    fun translate(fileName: String, tsConfig: String?): ByteArray {
         val url = URL("http://localhost:${port}/dukat")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
@@ -44,7 +45,8 @@ class CliHttpClient(private val port: String) {
 
         val messageRaw = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).toJson(TranslationRequest.serializer(), TranslationRequest(
                 packageName = "<ROOT>",
-                files = listOf(fileName)
+                files = listOf(fileName),
+                tsConfig = tsConfig
         )).toString()
         val postBody = messageRaw.toByteArray()
 

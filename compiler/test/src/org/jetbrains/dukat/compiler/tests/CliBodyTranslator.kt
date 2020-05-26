@@ -10,7 +10,7 @@ class CliBodyTranslator : CliTranslator() {
     override fun translate(
         data: String
     ): SourceSetModel {
-        val binData = translateBinary(data)
+        val binData = translateBinary(data, null)
         val translator = createJsByteArrayWithBodyTranslator(CommonJsNameResolver(), null)
         return translator.translate(binData)
     }
@@ -20,9 +20,10 @@ class CliBodyTranslator : CliTranslator() {
         dirName: String,
         reportPath: String?,
         moduleName: String?,
-        withDescriptors: Boolean
+        withDescriptors: Boolean,
+        tsConfig: String?
     ) {
-        val binData = translateBinary(input)
+        val binData = translateBinary(input, tsConfig)
 
         val moduleNameResolver = if (moduleName == null) {
             CommonJsNameResolver()

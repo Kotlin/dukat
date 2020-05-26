@@ -13,8 +13,8 @@ class TsBodyTests : CoreSetCliTests() {
     @DisplayName("ts body test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("typescriptBodiesSet")
-    override fun withValueSource(name: String, tsPath: String, ktPath: String) {
-        assertContentEqualsBinary(name, tsPath, ktPath)
+    override fun withValueSource(name: String, tsPath: String, ktPath: String, tsConfig: String) {
+        assertContentEqualsBinary(name, tsPath, ktPath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     override fun getTranslator(): CliTranslator = CliBodyTranslator()
