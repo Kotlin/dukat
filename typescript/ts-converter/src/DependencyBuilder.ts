@@ -95,10 +95,18 @@ export class DependencyBuilder {
         return;
       }
       this.checkedReferences.add(declaration);
-      let translateSubsetOfSymbolsDependency = TranslateSubsetOfSymbolsDependency.create(declaration.getSourceFile().fileName, [
+      let sourceFile = declaration.getSourceFile();
+
+      this.registerDependency(TranslateSubsetOfSymbolsDependency.create(sourceFile.fileName, [
         declaration
-      ]);
-      this.registerDependency(translateSubsetOfSymbolsDependency);
+      ]));
+
+      sourceFile.forEachChild(node => {
+        if (ts.isImportDeclaration(node)) {
+          this.visit(node)
+        }
+      });
+
       declaration.forEachChild(node => this.visit(node));
     }
   }
