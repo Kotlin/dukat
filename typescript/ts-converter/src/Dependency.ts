@@ -8,6 +8,16 @@ export interface Dependency {
   accept(node: ts.Node): boolean;
 }
 
+function union<T>(...sets: Array<Set<T>>): Set<T> {
+  let s = new Set<T>();
+  for (let set of sets) {
+    for (let item of set) {
+      s.add(item)
+    }
+  }
+  return s;
+}
+
 export class TranslateAllSymbolsDependency implements Dependency {
   constructor(public fileName: string) {
   }
@@ -26,27 +36,34 @@ export class TranslateAllSymbolsDependency implements Dependency {
 }
 
 export class TranslateSubsetOfSymbolsDependency implements Dependency {
-  private symbols: Set<ts.Node>;
-  private parentUids: Set<ts.Node> = new Set<ts.Node>();
+  private constructor(public fileName: string, private symbols: Set<ts.Node>, private parentUids: Set<ts.Node>) {}
 
-  constructor(public fileName: string, private symbolDependencies: Array<ts.Node>) {
-    this.symbols = new Set(symbolDependencies)
-    this.symbols.forEach(node => {
+  static create(fileName: string, symbolDependencies: Array<ts.Node>): TranslateSubsetOfSymbolsDependency {
+    let symbols = new Set(symbolDependencies);
+    let parentUids = new Set<ts.Node>();
+
+    symbols.forEach(node => {
       let parent = node.parent;
       while (parent) {
         if (ts.isModuleDeclaration(parent)) {
-          this.parentUids.add(parent);
+          parentUids.add(parent);
         }
         parent = parent.parent;
       }
     });
+
+    return new TranslateSubsetOfSymbolsDependency(fileName, symbols, parentUids);
   }
 
   merge(dependency: Dependency): Dependency {
     if (dependency instanceof TranslateAllSymbolsDependency) {
       return dependency;
     } else if (dependency instanceof TranslateSubsetOfSymbolsDependency) {
-      return new TranslateSubsetOfSymbolsDependency(this.fileName, [...this.symbolDependencies].concat([...dependency.symbolDependencies]));
+      return new TranslateSubsetOfSymbolsDependency(
+        this.fileName,
+        union(this.symbols, dependency.symbols),
+        union(this.parentUids, dependency.parentUids)
+      );
     } else {
       return this;
     }
@@ -62,7 +79,7 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
     }
 
     if (ts.isModuleDeclaration(node) && this.parentUids.has(node)) {
-        return true;
+      return true;
     }
 
     return false;

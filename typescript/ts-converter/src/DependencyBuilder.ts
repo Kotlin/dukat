@@ -95,7 +95,7 @@ export class DependencyBuilder {
         return;
       }
       this.checkedReferences.add(declaration);
-      let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, [
+      let translateSubsetOfSymbolsDependency = TranslateSubsetOfSymbolsDependency.create(declaration.getSourceFile().fileName, [
         declaration
       ]);
       this.registerDependency(translateSubsetOfSymbolsDependency);
