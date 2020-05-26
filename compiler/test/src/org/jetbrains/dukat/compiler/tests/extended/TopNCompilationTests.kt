@@ -31,6 +31,7 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/body-parser",
                     "@types/express",
                     "@types/fs-extra",
+                    "@types/jquery",
                     "@types/lodash",
                     "@types/node",
                     "@types/prop-types",
