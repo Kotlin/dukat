@@ -48,7 +48,15 @@ jar {
 
 def configFile = file("${project(":node-package").projectDir}/package.template.json")
 def json = new JsonSlurper().parseText(configFile.text)
-def dukatVersion = json.version
+
+
+// TODO: Duplication of logic in node-package/build.gradle
+def PROPERTY_PACKAGE = "dukat.npm.packageVersion"
+def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE)
+        .replace("__DEFAULT__", gradle.defaultNpmPackageVersion)
+        .replace("__TIMESTAMP__", new Date().format("yyyyMMdd")) : gradle.defaultNpmPackageVersion
+
+def dukatVersion = json.version == "__PACKAGE_VERSION__" ? PACKAGE_VERSION : json.version
 
 bintray {
   user = System.getenv('BINTRAY_USER')
