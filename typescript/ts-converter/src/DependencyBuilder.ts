@@ -3,7 +3,6 @@ import {tsInternals} from "./TsInternals";
 
 import {
   Dependency,
-  SymbolDependency,
   TranslateAllSymbolsDependency,
   TranslateSubsetOfSymbolsDependency
 } from "./Dependency";
@@ -40,7 +39,7 @@ export class DependencyBuilder {
     if (source.resolvedTypeReferenceDirectiveNames instanceof Map) {
       for (let [_, referenceDirective] of source.resolvedTypeReferenceDirectiveNames) {
         if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-            this.buildDependencies(this.program.getSourceFile(tsInternals.normalizePath(referenceDirective.resolvedFileName)));
+          this.buildDependencies(this.program.getSourceFile(tsInternals.normalizePath(referenceDirective.resolvedFileName)));
         }
       }
     }
@@ -88,29 +87,19 @@ export class DependencyBuilder {
     return [];
   }
 
-  private createSymbolDependency(declaration: ts.Declaration): SymbolDependency | undefined {
-    if (this.checkedReferences.has(declaration)) {
-      return undefined;
-    }
-    this.checkedReferences.add(declaration);
-
-    return new SymbolDependency(declaration);
-  }
-
-
   private checkReferences(node: ts.Node) {
     let declarations = this.getDeclarations(node);
 
     for (let declaration of declarations) {
-      let symbolDependency = this.createSymbolDependency(declaration);
-
-      if (symbolDependency) {
-        let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, [
-          symbolDependency
-        ]);
-        this.registerDependency(translateSubsetOfSymbolsDependency);
-        declaration.forEachChild(node => this.visit(node));
+      if (this.checkedReferences.has(declaration)) {
+        return;
       }
+      this.checkedReferences.add(declaration);
+      let translateSubsetOfSymbolsDependency = new TranslateSubsetOfSymbolsDependency(declaration.getSourceFile().fileName, [
+        declaration
+      ]);
+      this.registerDependency(translateSubsetOfSymbolsDependency);
+      declaration.forEachChild(node => this.visit(node));
     }
   }
 
@@ -131,9 +120,9 @@ export class DependencyBuilder {
       }
     } else if (ts.isExportDeclaration(node)) {
       if (node.exportClause && Array.isArray(node.exportClause.elements)) {
-          node.exportClause.elements.forEach(exportSpecifier => {
-            this.checkReferences(exportSpecifier.name);
-          });
+        node.exportClause.elements.forEach(exportSpecifier => {
+          this.checkReferences(exportSpecifier.name);
+        });
       }
     } else if (ts.isCallExpression(node)) {
       this.checkReferences(node.expression)

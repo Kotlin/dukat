@@ -8,10 +8,6 @@ export interface Dependency {
   accept(node: ts.Node): boolean;
 }
 
-export class SymbolDependency {
-  constructor(public node: ts.Node) {}
-}
-
 export class TranslateAllSymbolsDependency implements Dependency {
   constructor(public fileName: string) {
   }
@@ -33,18 +29,17 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
   private symbols: Set<ts.Node>;
   private parentUids: Set<ts.Node> = new Set<ts.Node>();
 
-  constructor(public fileName: string, private symbolDependencies: Array<SymbolDependency>) {
-    this.symbols = new Set(symbolDependencies.map(it => {
-      let node = it.node;
+  constructor(public fileName: string, private symbolDependencies: Array<ts.Node>) {
+    this.symbols = new Set(symbolDependencies)
+    this.symbols.forEach(node => {
       let parent = node.parent;
       while (parent) {
         if (ts.isModuleDeclaration(parent)) {
-          this.parentUids.add(parent)
+          this.parentUids.add(parent);
         }
-        parent = parent.parent
+        parent = parent.parent;
       }
-      return it.node;
-    }));
+    });
   }
 
   merge(dependency: Dependency): Dependency {
