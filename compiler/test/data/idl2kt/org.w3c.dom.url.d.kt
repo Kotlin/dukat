@@ -2,6 +2,7 @@ package org.w3c.dom.url
 
 import kotlin.js.*
 import org.khronos.webgl.*
+import org.w3c.dom.mediasource.*
 import org.w3c.files.*
 
 /**
@@ -24,6 +25,7 @@ public external open class URL(url: String, base: String = definedExternally) {
     companion object {
         fun domainToASCII(domain: String): String
         fun domainToUnicode(domain: String): String
+        fun createObjectURL(mediaSource: MediaSource): String
         fun createObjectURL(blob: Blob): String
         fun createFor(blob: Blob): String
         fun revokeObjectURL(url: String)

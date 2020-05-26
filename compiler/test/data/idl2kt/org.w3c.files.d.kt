@@ -9,7 +9,7 @@ import org.w3c.xhr.*
 /**
  * Exposes the JavaScript [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob) to Kotlin
  */
-public external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) : ImageBitmapSource {
+public external open class Blob(blobParts: Array<dynamic> = definedExternally, options: BlobPropertyBag = definedExternally) : MediaProvider, ImageBitmapSource {
     open val size: Number
     open val type: String
     open val isClosed: Boolean

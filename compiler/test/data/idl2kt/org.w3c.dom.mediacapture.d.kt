@@ -8,7 +8,7 @@ import org.w3c.dom.events.*
 /**
  * Exposes the JavaScript [MediaStream](https://developer.mozilla.org/en/docs/Web/API/MediaStream) to Kotlin
  */
-public external open class MediaStream() : EventTarget {
+public external open class MediaStream() : EventTarget, MediaProvider {
     constructor(stream: MediaStream)
     constructor(tracks: Array<MediaStreamTrack>)
     open val id: String
