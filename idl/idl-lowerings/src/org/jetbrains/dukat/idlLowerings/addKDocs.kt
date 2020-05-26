@@ -384,5 +384,14 @@ val classesToBeDocumented: Set<NameEntity> = listOf(
         "File",
         "FileList",
         "FileReader",
-        "FileReaderSync"
+        "FileReaderSync",
+        "MediaKeySystemConfiguration",
+        "MediaKeySystemAccess",
+        "MediaKeys",
+        "MediaKeySession",
+        "MediaKeyStatusMap",
+        "MediaKeyMessageEvent",
+        "MediaSource",
+        "SourceBuffer",
+        "SourceBufferList"
 ).map { IdentifierEntity(it) }.toSet()
