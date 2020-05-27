@@ -40,9 +40,17 @@ public external abstract class SVGElement : Element, GlobalEventHandlers, SVGEle
 
 public external interface SVGBoundingBoxOptions {
     var fill: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var stroke: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var markers: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var clipped: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -678,7 +686,9 @@ public external open class SVGUseElementShadowRoot : ShadowRoot {
 
 public external interface SVGElementInstance {
     val correspondingElement: SVGElement?
+        get() = definedExternally
     val correspondingUseElement: SVGUseElement?
+        get() = definedExternally
 }
 
 public external open class ShadowAnimation(source: dynamic, newTarget: dynamic) {
@@ -1817,3 +1827,4 @@ public external abstract class SVGViewElement : SVGElement, SVGFitToViewBox, SVG
         val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
     }
 }
+

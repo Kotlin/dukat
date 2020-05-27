@@ -1477,6 +1477,8 @@ public external open class TrackEvent(type: String, eventInitDict: TrackEventIni
 
 public external interface TrackEventInit : EventInit {
     var track: UnionAudioTrackOrTextTrackOrVideoTrack? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2530,6 +2532,8 @@ public external open class RelatedEvent(type: String, eventInitDict: RelatedEven
 
 public external interface RelatedEventInit : EventInit {
     var relatedTarget: EventTarget? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2671,6 +2675,8 @@ public external abstract class HTMLSlotElement : HTMLElement {
 
 public external interface AssignedNodesOptions {
     var flatten: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2715,6 +2721,8 @@ public external abstract class HTMLCanvasElement : HTMLElement, CanvasImageSourc
 
 public external interface CanvasRenderingContext2DSettings {
     var alpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2899,13 +2907,29 @@ public external abstract class TextMetrics {
 
 public external interface HitRegionOptions {
     var path: Path2D? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var fillRule: CanvasFillRule? /* = CanvasFillRule.NONZERO */
+        get() = definedExternally
+        set(value) = definedExternally
     var id: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var parentID: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var cursor: String? /* = "inherit" */
+        get() = definedExternally
+        set(value) = definedExternally
     var control: Element? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var label: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var role: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2964,6 +2988,8 @@ public external abstract class ImageBitmapRenderingContext {
 
 public external interface ImageBitmapRenderingContextSettings {
     var alpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -2985,6 +3011,8 @@ public external abstract class CustomElementRegistry {
 
 public external interface ElementDefinitionOptions {
     var extends: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3056,6 +3084,8 @@ public external open class DragEvent(type: String, eventInitDict: DragEventInit 
 
 public external interface DragEventInit : MouseEventInit {
     var dataTransfer: DataTransfer? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3219,6 +3249,8 @@ public external open class PopStateEvent(type: String, eventInitDict: PopStateEv
 
 public external interface PopStateEventInit : EventInit {
     var state: Any? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3249,7 +3281,11 @@ public external open class HashChangeEvent(type: String, eventInitDict: HashChan
 
 public external interface HashChangeEventInit : EventInit {
     var oldURL: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var newURL: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3280,6 +3316,8 @@ public external open class PageTransitionEvent(type: String, eventInitDict: Page
 
 public external interface PageTransitionEventInit : EventInit {
     var persisted: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3358,10 +3396,20 @@ public external open class ErrorEvent(type: String, eventInitDict: ErrorEventIni
 
 public external interface ErrorEventInit : EventInit {
     var message: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var filename: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var lineno: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var colno: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var error: Any? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3397,6 +3445,8 @@ public external open class PromiseRejectionEvent(type: String, eventInitDict: Pr
 public external interface PromiseRejectionEventInit : EventInit {
     var promise: Promise<Any?>?
     var reason: Any?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3416,76 +3466,218 @@ public inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any
  */
 public external interface GlobalEventHandlers {
     var onabort: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onblur: ((FocusEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncancel: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncanplay: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncanplaythrough: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onchange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onclick: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onclose: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncontextmenu: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncuechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondblclick: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondrag: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragend: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragenter: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragexit: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragleave: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragover: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondragstart: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondrop: ((DragEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ondurationchange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onemptied: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onended: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onerror: ((dynamic, String, Int, Int, Any?) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onfocus: ((FocusEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oninput: ((InputEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oninvalid: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeydown: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeypress: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onkeyup: ((KeyboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onload: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadeddata: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadedmetadata: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadend: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onloadstart: ((ProgressEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmousedown: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseenter: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseleave: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmousemove: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseout: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseover: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmouseup: ((MouseEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onwheel: ((WheelEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpause: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onplay: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onplaying: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onprogress: ((ProgressEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onratechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onreset: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onresize: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onscroll: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onseeked: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onseeking: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onselect: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onshow: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onstalled: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onsubmit: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onsuspend: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ontimeupdate: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ontoggle: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onvolumechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onwaiting: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ongotpointercapture: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onlostpointercapture: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerdown: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointermove: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerup: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointercancel: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerover: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerout: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerenter: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpointerleave: ((PointerEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 /**
@@ -3493,26 +3685,62 @@ public external interface GlobalEventHandlers {
  */
 public external interface WindowEventHandlers {
     var onafterprint: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onbeforeprint: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onbeforeunload: ((BeforeUnloadEvent) -> String?)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onhashchange: ((HashChangeEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onlanguagechange: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onmessage: ((MessageEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onoffline: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var ononline: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpagehide: ((PageTransitionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpageshow: ((PageTransitionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpopstate: ((PopStateEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onrejectionhandled: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onstorage: ((StorageEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onunhandledrejection: ((PromiseRejectionEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onunload: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 public external interface DocumentAndElementEventHandlers {
     var oncopy: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var oncut: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
     var onpaste: ((ClipboardEvent) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 /**
@@ -3664,11 +3892,23 @@ public external abstract class ImageBitmap : CanvasImageSource, TexImageSource {
 
 public external interface ImageBitmapOptions {
     var imageOrientation: ImageOrientation? /* = ImageOrientation.NONE */
+        get() = definedExternally
+        set(value) = definedExternally
     var premultiplyAlpha: PremultiplyAlpha? /* = PremultiplyAlpha.DEFAULT */
+        get() = definedExternally
+        set(value) = definedExternally
     var colorSpaceConversion: ColorSpaceConversion? /* = ColorSpaceConversion.DEFAULT */
+        get() = definedExternally
+        set(value) = definedExternally
     var resizeWidth: Int?
+        get() = definedExternally
+        set(value) = definedExternally
     var resizeHeight: Int?
+        get() = definedExternally
+        set(value) = definedExternally
     var resizeQuality: ResizeQuality? /* = ResizeQuality.LOW */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3705,10 +3945,20 @@ public external open class MessageEvent(type: String, eventInitDict: MessageEven
 
 public external interface MessageEventInit : EventInit {
     var data: Any? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var origin: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var lastEventId: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var source: UnionMessagePortOrWindowProxy? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var ports: Array<MessagePort>? /* = arrayOf() */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3747,6 +3997,8 @@ public external open class EventSource(url: String, eventSourceInitDict: EventSo
 
 public external interface EventSourceInit {
     var withCredentials: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3803,8 +4055,14 @@ public external open class CloseEvent(type: String, eventInitDict: CloseEventIni
 
 public external interface CloseEventInit : EventInit {
     var wasClean: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var code: Short? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var reason: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -3888,6 +4146,8 @@ public external abstract class SharedWorkerGlobalScope : WorkerGlobalScope {
  */
 public external interface AbstractWorker {
     var onerror: ((Event) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 /**
@@ -3902,7 +4162,11 @@ public external open class Worker(scriptURL: String, options: WorkerOptions = de
 
 public external interface WorkerOptions {
     var type: WorkerType? /* = WorkerType.CLASSIC */
+        get() = definedExternally
+        set(value) = definedExternally
     var credentials: RequestCredentials? /* = RequestCredentials.OMIT */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4005,10 +4269,20 @@ public external open class StorageEvent(type: String, eventInitDict: StorageEven
 
 public external interface StorageEventInit : EventInit {
     var key: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var oldValue: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var newValue: String? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
     var url: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var storageArea: Storage? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4229,8 +4503,14 @@ public external interface External {
 
 public external interface EventInit {
     var bubbles: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var cancelable: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var composed: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4260,6 +4540,8 @@ public external open class CustomEvent(type: String, eventInitDict: CustomEventI
 
 public external interface CustomEventInit : EventInit {
     var detail: Any? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4275,6 +4557,8 @@ public inline fun CustomEventInit(detail: Any? = null, bubbles: Boolean? = false
 
 public external interface EventListenerOptions {
     var capture: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4287,7 +4571,11 @@ public inline fun EventListenerOptions(capture: Boolean? = false): EventListener
 
 public external interface AddEventListenerOptions : EventListenerOptions {
     var passive: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var once: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4309,6 +4597,7 @@ public external interface NonElementParentNode {
  */
 public external interface DocumentOrShadowRoot {
     val fullscreenElement: Element?
+        get() = definedExternally
 }
 
 /**
@@ -4317,7 +4606,9 @@ public external interface DocumentOrShadowRoot {
 public external interface ParentNode {
     val children: HTMLCollection
     val firstElementChild: Element?
+        get() = definedExternally
     val lastElementChild: Element?
+        get() = definedExternally
     val childElementCount: Int
     fun prepend(vararg nodes: dynamic)
     fun append(vararg nodes: dynamic)
@@ -4330,7 +4621,9 @@ public external interface ParentNode {
  */
 public external interface NonDocumentTypeChildNode {
     val previousElementSibling: Element?
+        get() = definedExternally
     val nextElementSibling: Element?
+        get() = definedExternally
 }
 
 /**
@@ -4348,6 +4641,7 @@ public external interface ChildNode {
  */
 public external interface Slotable {
     val assignedSlot: HTMLSlotElement?
+        get() = definedExternally
 }
 
 /**
@@ -4391,12 +4685,26 @@ public external open class MutationObserver(callback: (Array<MutationRecord>, Mu
  */
 public external interface MutationObserverInit {
     var childList: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var attributes: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
     var characterData: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
     var subtree: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var attributeOldValue: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
     var characterDataOldValue: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
     var attributeFilter: Array<String>?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4486,6 +4794,8 @@ public external abstract class Node : EventTarget {
 
 public external interface GetRootNodeOptions {
     var composed: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -4730,6 +5040,8 @@ public external open class XMLDocument : Document {
 
 public external interface ElementCreationOptions {
     var `is`: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5306,9 +5618,17 @@ public external open class DOMPoint : DOMPointReadOnly {
  */
 public external interface DOMPointInit {
     var x: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var y: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var z: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var w: Double? /* = 1.0 */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5348,9 +5668,17 @@ public external open class DOMRectReadOnly(x: Double, y: Double, width: Double, 
 
 public external interface DOMRectInit {
     var x: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var y: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var width: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var height: Double? /* = 0.0 */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5479,6 +5807,8 @@ public external open class DOMMatrix() : DOMMatrixReadOnly {
 
 public external interface ScrollOptions {
     var behavior: ScrollBehavior? /* = ScrollBehavior.AUTO */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5494,7 +5824,11 @@ public inline fun ScrollOptions(behavior: ScrollBehavior? = ScrollBehavior.AUTO)
  */
 public external interface ScrollToOptions : ScrollOptions {
     var left: Double?
+        get() = definedExternally
+        set(value) = definedExternally
     var top: Double?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5537,7 +5871,11 @@ public external open class MediaQueryListEvent(type: String, eventInitDict: Medi
 
 public external interface MediaQueryListEventInit : EventInit {
     var media: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var matches: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5575,7 +5913,11 @@ public external abstract class CaretPosition {
 
 public external interface ScrollIntoViewOptions : ScrollOptions {
     var block: ScrollLogicalPosition? /* = ScrollLogicalPosition.CENTER */
+        get() = definedExternally
+        set(value) = definedExternally
     var inline: ScrollLogicalPosition? /* = ScrollLogicalPosition.CENTER */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -5590,6 +5932,8 @@ public inline fun ScrollIntoViewOptions(block: ScrollLogicalPosition? = ScrollLo
 
 public external interface BoxQuadOptions {
     var box: CSSBoxType? /* = CSSBoxType.BORDER */
+        get() = definedExternally
+        set(value) = definedExternally
     var relativeTo: dynamic
         get() = definedExternally
         set(value) = definedExternally
@@ -5606,7 +5950,11 @@ public inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeT
 
 public external interface ConvertCoordinateOptions {
     var fromBox: CSSBoxType? /* = CSSBoxType.BORDER */
+        get() = definedExternally
+        set(value) = definedExternally
     var toBox: CSSBoxType? /* = CSSBoxType.BORDER */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -6308,3 +6656,4 @@ public inline val CSSBoxType.Companion.BORDER: CSSBoxType get() = "border".asDyn
 public inline val CSSBoxType.Companion.PADDING: CSSBoxType get() = "padding".asDynamic().unsafeCast<CSSBoxType>()
 
 public inline val CSSBoxType.Companion.CONTENT: CSSBoxType get() = "content".asDynamic().unsafeCast<CSSBoxType>()
+

@@ -3,13 +3,29 @@ import org.khronos.webgl.*
 
 public external interface WebGLContextAttributes {
     var alpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var depth: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var stencil: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var antialias: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var premultipliedAlpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var preserveDrawingBuffer: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var preferLowPowerToHighPerformance: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var failIfMajorPerformanceCaveat: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -29,15 +45,35 @@ public inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean?
 
 public external interface PointerEventInit {
     var pointerId: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var width: Double? /* = 1.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var height: Double? /* = 1.0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var pressure: Float? /* = 0f */
+        get() = definedExternally
+        set(value) = definedExternally
     var tangentialPressure: Float? /* = 0f */
+        get() = definedExternally
+        set(value) = definedExternally
     var tiltX: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var tiltY: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var twist: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var pointerType: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
     var isPrimary: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -64,6 +100,8 @@ public external abstract class A {
 public external interface UndefinedMemberDictionary {
     var str: String?
     var str2: String?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")

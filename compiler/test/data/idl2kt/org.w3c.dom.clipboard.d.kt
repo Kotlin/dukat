@@ -7,6 +7,8 @@ import org.w3c.dom.events.*
 
 public external interface ClipboardEventInit : EventInit {
     var clipboardData: DataTransfer? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -46,6 +48,8 @@ public external abstract class Clipboard : EventTarget {
 
 public external interface ClipboardPermissionDescriptor {
     var allowWithoutGesture: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -55,3 +59,4 @@ public inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = 
     o["allowWithoutGesture"] = allowWithoutGesture
     return o
 }
+

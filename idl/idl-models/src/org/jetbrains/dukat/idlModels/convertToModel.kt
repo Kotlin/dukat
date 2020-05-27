@@ -90,54 +90,54 @@ private fun IDLDeclaration.resolveName(): String? {
 
 
 private class IdlFileConverter(
-    private val fileDeclaration: IDLFileDeclaration,
-    private val typeMap: Map<String, NameEntity?>
+        private val fileDeclaration: IDLFileDeclaration,
+        private val typeMap: Map<String, NameEntity?>
 ) {
 
     private companion object {
         val stdLibTypes = setOf(
-            "Any",
-            "Array",
-            "Boolean",
-            "String",
-            "Int",
-            "Float",
-            "Double",
-            "Short",
-            "Number",
-            "dynamic",
-            "Promise",
-            "Unit"
+                "Any",
+                "Array",
+                "Boolean",
+                "String",
+                "Int",
+                "Float",
+                "Double",
+                "Short",
+                "Number",
+                "dynamic",
+                "Promise",
+                "Unit"
         )
 
         val toStdMap = mapOf(
-            "ByteString" to "String",
-            "CSSOMString" to "String",
-            "DOMError" to "dynamic",
-            "DOMString" to "String",
-            "FrozenArray" to "Array",
-            "Promise" to "Promise",
-            "USVString" to "String",
-            "\$Array" to "Array",
-            "\$dynamic" to "dynamic",
-            "any" to "Any",
-            "boolean" to "Boolean",
-            "byte" to "Byte",
-            "double" to "Double",
-            "float" to "Float",
-            "long" to "Int",
-            "longlong" to "Int",
-            "object" to "dynamic",
-            "octet" to "Byte",
-            "record" to "dynamic",
-            "sequence" to "Array",
-            "short" to "Short",
-            "unrestricteddouble" to "Double",
-            "unrestrictedfloat" to "Float",
-            "unsignedlong" to "Int",
-            "unsignedlonglong" to "Number",
-            "unsignedshort" to "Short",
-            "void" to "Unit"
+                "ByteString" to "String",
+                "CSSOMString" to "String",
+                "DOMError" to "dynamic",
+                "DOMString" to "String",
+                "FrozenArray" to "Array",
+                "Promise" to "Promise",
+                "USVString" to "String",
+                "\$Array" to "Array",
+                "\$dynamic" to "dynamic",
+                "any" to "Any",
+                "boolean" to "Boolean",
+                "byte" to "Byte",
+                "double" to "Double",
+                "float" to "Float",
+                "long" to "Int",
+                "longlong" to "Int",
+                "object" to "dynamic",
+                "octet" to "Byte",
+                "record" to "dynamic",
+                "sequence" to "Array",
+                "short" to "Short",
+                "unrestricteddouble" to "Double",
+                "unrestrictedfloat" to "Float",
+                "unsignedlong" to "Int",
+                "unsignedlonglong" to "Number",
+                "unsignedshort" to "Short",
+                "void" to "Unit"
         )
     }
 
@@ -163,26 +163,26 @@ private class IdlFileConverter(
         val resolvedName = toStdMap[name] ?: name
 
         val typeModel = TypeValueModel(
-            value = IdentifierEntity(resolvedName),
-            params = listOfNotNull(typeParameter?.convertToModel())
-                .map { TypeParameterModel(it, listOf()) }
-                .map {
-                    if (name == "FrozenArray") {
-                        it.copy(variance = Variance.COVARIANT)
-                    } else {
-                        it
-                    }
-                },
-            metaDescription = comment,
-            fqName = toFqName()
+                value = IdentifierEntity(resolvedName),
+                params = listOfNotNull(typeParameter?.convertToModel())
+                        .map { TypeParameterModel(it, listOf()) }
+                        .map {
+                            if (name == "FrozenArray") {
+                                it.copy(variance = Variance.COVARIANT)
+                            } else {
+                                it
+                            }
+                        },
+                metaDescription = comment,
+                fqName = toFqName()
         )
 
         return typeModel.copy(
-            nullable = when (typeModel.value) {
-                IdentifierEntity("dynamic") -> false
-                IdentifierEntity("Any") -> true
-                else -> nullable
-            }
+                nullable = when (typeModel.value) {
+                    IdentifierEntity("dynamic") -> false
+                    IdentifierEntity("Any") -> true
+                    else -> nullable
+                }
         )
     }
 
@@ -195,10 +195,10 @@ private class IdlFileConverter(
         }
 
         return FunctionTypeModel(
-            parameters = arguments.filterNot { it.variadic }.map { it.convertToLambdaParameterModel() },
-            type = returnTypeModel,
-            metaDescription = comment,
-            nullable = nullable
+                parameters = arguments.filterNot { it.variadic }.map { it.convertToLambdaParameterModel() },
+                type = returnTypeModel,
+                metaDescription = comment,
+                nullable = nullable
         )
     }
 
@@ -209,10 +209,10 @@ private class IdlFileConverter(
             //there shouldn't be any UnionTypeDeclarations at this stage
             else -> raiseConcern("unprocessed type declaration: ${this}") {
                 TypeValueModel(
-                    IdentifierEntity("IMPOSSIBLE"),
-                    listOf(),
-                    null,
-                    null
+                        IdentifierEntity("IMPOSSIBLE"),
+                        listOf(),
+                        null,
+                        null
                 )
             }
         }
@@ -221,7 +221,11 @@ private class IdlFileConverter(
     private fun IDLArgumentDeclaration.convertToLambdaParameterModel(): LambdaParameterModel {
         //TODO: Check whether it makes sense to have nullable names in idl
         return LambdaParameterModel(
-                name = if (name.isEmpty()) { null } else { name },
+                name = if (name.isEmpty()) {
+                    null
+                } else {
+                    name
+                },
                 type = type.convertToModel()
         )
     }
@@ -229,117 +233,117 @@ private class IdlFileConverter(
 
     private fun IDLArgumentDeclaration.convertToParameterModel(): ParameterModel {
         return ParameterModel(
-            name = name,
-            type = type.convertToModel(),
-            initializer = if (optional || defaultValue != null) {
-                ExpressionStatementModel(
-                    IdentifierExpressionModel(
-                        IdentifierEntity("definedExternally")
+                name = name,
+                type = type.convertToModel(),
+                initializer = if (optional || defaultValue != null) {
+                    ExpressionStatementModel(
+                            IdentifierExpressionModel(
+                                    IdentifierEntity("definedExternally")
+                            )
                     )
-                )
-            } else {
-                null
-            },
-            vararg = variadic,
-            modifier = null
+                } else {
+                    null
+                },
+                vararg = variadic,
+                modifier = null
         )
     }
 
     private fun IDLSetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
         return FunctionModel(
-            name = IdentifierEntity("set"),
-            parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
-            type = TypeValueModel(
-                value = IdentifierEntity("Unit"),
-                params = listOf(),
-                metaDescription = null,
-                fqName = "Unit".stdFqName()
-            ),
-            typeParameters = listOf(),
-            annotations = mutableListOf(
-                AnnotationModel(
-                    name = "Suppress",
-                    params = listOf(
-                        IdentifierEntity("INVISIBLE_REFERENCE"),
-                        IdentifierEntity("INVISIBLE_MEMBER")
-                    )
+                name = IdentifierEntity("set"),
+                parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
+                type = TypeValueModel(
+                        value = IdentifierEntity("Unit"),
+                        params = listOf(),
+                        metaDescription = null,
+                        fqName = "Unit".stdFqName()
                 ),
-                AnnotationModel(
-                    name = "kotlin.internal.InlineOnly",
-                    params = listOf()
-                )
-            ),
-            export = false,
-            inline = true,
-            operator = true,
-            extend = ClassLikeReferenceModel(
-                name = ownerName,
-                typeParameters = listOf()
-            ),
-            body = BlockStatementModel(listOf(
-                AssignmentStatementModel(
-                    IndexExpressionModel(
-                        CallExpressionModel(
-                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                            listOf()
+                typeParameters = listOf(),
+                annotations = mutableListOf(
+                        AnnotationModel(
+                                name = "Suppress",
+                                params = listOf(
+                                        IdentifierEntity("INVISIBLE_REFERENCE"),
+                                        IdentifierEntity("INVISIBLE_MEMBER")
+                                )
                         ),
-                        IdentifierExpressionModel(
-                            IdentifierEntity(key.name)
+                        AnnotationModel(
+                                name = "kotlin.internal.InlineOnly",
+                                params = listOf()
                         )
-                    ),
-                    IdentifierExpressionModel(IdentifierEntity(value.name))
-                )
-            )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null,
-            external = true
+                ),
+                export = false,
+                inline = true,
+                operator = true,
+                extend = ClassLikeReferenceModel(
+                        name = ownerName,
+                        typeParameters = listOf()
+                ),
+                body = BlockStatementModel(listOf(
+                        AssignmentStatementModel(
+                                IndexExpressionModel(
+                                        CallExpressionModel(
+                                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                                listOf()
+                                        ),
+                                        IdentifierExpressionModel(
+                                                IdentifierEntity(key.name)
+                                        )
+                                ),
+                                IdentifierExpressionModel(IdentifierEntity(value.name))
+                        )
+                )),
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null,
+                external = true
         )
     }
 
     private fun IDLGetterDeclaration.processAsTopLevel(ownerName: NameEntity): FunctionModel {
         return FunctionModel(
-            name = IdentifierEntity("get"),
-            parameters = listOf(key.convertToParameterModel()),
-            type = valueType.toNullableIfNotPrimitive().convertToModel(),
-            typeParameters = listOf(),
-            annotations = mutableListOf(
-                AnnotationModel(
-                    name = "Suppress",
-                    params = listOf(
-                        IdentifierEntity("INVISIBLE_REFERENCE"),
-                        IdentifierEntity("INVISIBLE_MEMBER")
-                    )
-                ),
-                AnnotationModel(
-                    name = "kotlin.internal.InlineOnly",
-                    params = listOf()
-                )
-            ),
-            export = false,
-            inline = true,
-            operator = true,
-            extend = ClassLikeReferenceModel(
-                name = ownerName,
-                typeParameters = listOf()
-            ),
-            body = BlockStatementModel(listOf(
-                ReturnStatementModel(
-                    IndexExpressionModel(
-                        CallExpressionModel(
-                            IdentifierExpressionModel(
-                                IdentifierEntity("asDynamic")
-                            ),
-                            listOf()
+                name = IdentifierEntity("get"),
+                parameters = listOf(key.convertToParameterModel()),
+                type = valueType.toNullableIfNotPrimitive().convertToModel(),
+                typeParameters = listOf(),
+                annotations = mutableListOf(
+                        AnnotationModel(
+                                name = "Suppress",
+                                params = listOf(
+                                        IdentifierEntity("INVISIBLE_REFERENCE"),
+                                        IdentifierEntity("INVISIBLE_MEMBER")
+                                )
                         ),
-                        IdentifierExpressionModel(
-                            IdentifierEntity(key.name)
+                        AnnotationModel(
+                                name = "kotlin.internal.InlineOnly",
+                                params = listOf()
                         )
-                    )
-                )
-            )),
-            visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null,
-            external = true
+                ),
+                export = false,
+                inline = true,
+                operator = true,
+                extend = ClassLikeReferenceModel(
+                        name = ownerName,
+                        typeParameters = listOf()
+                ),
+                body = BlockStatementModel(listOf(
+                        ReturnStatementModel(
+                                IndexExpressionModel(
+                                        CallExpressionModel(
+                                                IdentifierExpressionModel(
+                                                        IdentifierEntity("asDynamic")
+                                                ),
+                                                listOf()
+                                        ),
+                                        IdentifierExpressionModel(
+                                                IdentifierEntity(key.name)
+                                        )
+                                )
+                        )
+                )),
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null,
+                external = true
         )
     }
 
@@ -357,8 +361,8 @@ private class IdlFileConverter(
                         getters.filterNot { it.name == "get" } +
                         setters.filterNot { it.name == "set" }
                 ).mapNotNull {
-            it.convertToModel()
-        }.distinct()
+                    it.convertToModel()
+                }.distinct()
 
 
         val staticMemberModels = (staticAttributes + staticOperations).mapNotNull {
@@ -367,12 +371,12 @@ private class IdlFileConverter(
 
         val companionObjectModel = if (staticMemberModels.isNotEmpty()) {
             ObjectModel(
-                name = IdentifierEntity(""),
-                members = staticMemberModels,
-                parentEntities = listOf(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null,
-                external = true
+                    name = IdentifierEntity(""),
+                    members = staticMemberModels,
+                    parentEntities = listOf(),
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null,
+                    external = true
             )
         } else {
             null
@@ -380,53 +384,57 @@ private class IdlFileConverter(
 
         val parentModels = (parents + unions).map {
             HeritageModel(
-                it.convertToModel(),
-                listOf(),
-                null
+                    it.convertToModel(),
+                    listOf(),
+                    null
             )
         }
 
         val annotationModels = listOfNotNull(
-            if (companionObjectModel != null) {
-                AnnotationModel(
-                    "Suppress",
-                    listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
-                )
-            } else {
-                null
-            }
+                if (companionObjectModel != null) {
+                    AnnotationModel(
+                            "Suppress",
+                            listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                    )
+                } else {
+                    null
+                }
         ).toMutableList()
 
         val declaration = if (
-            kind == InterfaceKind.INTERFACE) {
+                kind == InterfaceKind.INTERFACE) {
             InterfaceModel(
-                name = IdentifierEntity(name),
-                members = dynamicMemberModels,
-                companionObject = companionObjectModel,
-                typeParameters = listOf(),
-                parentEntities = parentModels,
-                comment = null,
-                annotations = annotationModels,
-                external = true,
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                    name = IdentifierEntity(name),
+                    members = dynamicMemberModels,
+                    companionObject = companionObjectModel,
+                    typeParameters = listOf(),
+                    parentEntities = parentModels,
+                    comment = null,
+                    annotations = annotationModels,
+                    external = true,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         } else {
             ClassModel(
-                name = IdentifierEntity(name),
-                members = dynamicMemberModels,
-                companionObject = companionObjectModel,
-                typeParameters = listOf(),
-                parentEntities = parentModels,
-                primaryConstructor = if (primaryConstructor != null) {
-                    primaryConstructor!!.convertToModel() as ConstructorModel
-                } else {
-                    null
-                },
-                annotations = mutableListOf(),
-                comment = null,
-                external = true,
-                inheritanceModifier = if (kind == InterfaceKind.ABSTRACT_CLASS) { InheritanceModifierModel.ABSTRACT } else { InheritanceModifierModel.OPEN },
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                    name = IdentifierEntity(name),
+                    members = dynamicMemberModels,
+                    companionObject = companionObjectModel,
+                    typeParameters = listOf(),
+                    parentEntities = parentModels,
+                    primaryConstructor = if (primaryConstructor != null) {
+                        primaryConstructor!!.convertToModel() as ConstructorModel
+                    } else {
+                        null
+                    },
+                    annotations = mutableListOf(),
+                    comment = null,
+                    external = true,
+                    inheritanceModifier = if (kind == InterfaceKind.ABSTRACT_CLASS) {
+                        InheritanceModifierModel.ABSTRACT
+                    } else {
+                        InheritanceModifierModel.OPEN
+                    },
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
         }
         val getterModels = getters.map { it.processAsTopLevel(declaration.name) }
@@ -436,201 +444,201 @@ private class IdlFileConverter(
 
     private fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
         return ParameterModel(
-            name = name,
-            type = type.toNullable().changeComment(null).convertToModel(),
-            initializer = if (defaultValue != null && !required) {
-                ExpressionStatementModel(
-                    IdentifierExpressionModel(
-                        IdentifierEntity(defaultValue!!)
+                name = name,
+                type = type.toNullable().changeComment(null).convertToModel(),
+                initializer = if (defaultValue != null && !required) {
+                    ExpressionStatementModel(
+                            IdentifierExpressionModel(
+                                    IdentifierEntity(defaultValue!!)
+                            )
                     )
-                )
-            } else {
-                null
-            },
-            vararg = false,
-            modifier = null
+                } else {
+                    null
+                },
+                vararg = false,
+                modifier = null
         )
     }
 
     private fun IDLDictionaryMemberDeclaration.convertToAssignmentStatementModel(): AssignmentStatementModel {
         return AssignmentStatementModel(
-            IndexExpressionModel(
-                IdentifierExpressionModel(
-                    IdentifierEntity("o")
+                IndexExpressionModel(
+                        IdentifierExpressionModel(
+                                IdentifierEntity("o")
+                        ),
+                        IdentifierExpressionModel(
+                                IdentifierEntity("\"$name\"")
+                        )
                 ),
                 IdentifierExpressionModel(
-                    IdentifierEntity("\"$name\"")
+                        IdentifierEntity(name)
                 )
-            ),
-            IdentifierExpressionModel(
-                IdentifierEntity(name)
-            )
         )
     }
 
     fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
         val functionBody: MutableList<StatementModel> = mutableListOf(
-            AssignmentStatementModel(
-                //TODO: change to honest variable creation
-                IdentifierExpressionModel(
-                    IdentifierEntity("val o")
-                ),
-                CallExpressionModel(
-                    IdentifierExpressionModel(
-                        IdentifierEntity("js")
-                    ),
-                    listOf(
-                        StringLiteralExpressionModel(
-                            "\"({})\""
+                AssignmentStatementModel(
+                        //TODO: change to honest variable creation
+                        IdentifierExpressionModel(
+                                IdentifierEntity("val o")
+                        ),
+                        CallExpressionModel(
+                                IdentifierExpressionModel(
+                                        IdentifierEntity("js")
+                                ),
+                                listOf(
+                                        StringLiteralExpressionModel(
+                                                "\"({})\""
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         )
         functionBody.addAll(members.map { it.convertToAssignmentStatementModel() })
         functionBody.add(
-            ReturnStatementModel(
-                IdentifierExpressionModel(
-                    IdentifierEntity("o")
+                ReturnStatementModel(
+                        IdentifierExpressionModel(
+                                IdentifierEntity("o")
+                        )
                 )
-            )
         )
         return functionBody
     }
 
     private fun IDLDictionaryDeclaration.convertToModel(): List<TopLevelModel> {
         val declaration = InterfaceModel(
-            name = IdentifierEntity(name),
-            members = members.filterNot { it.inherited }.mapNotNull { it.convertToModel() },
-            companionObject = null,
-            typeParameters = listOf(),
-            parentEntities = (parents + unions).map {
-                HeritageModel(
-                    it.convertToModel(),
-                    listOf(),
-                    null
-                )
-            },
-            comment = null,
-            annotations = mutableListOf(),
-            external = true,
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+                name = IdentifierEntity(name),
+                members = members.filterNot { it.inherited }.mapNotNull { it.convertToModel() },
+                companionObject = null,
+                typeParameters = listOf(),
+                parentEntities = (parents + unions).map {
+                    HeritageModel(
+                            it.convertToModel(),
+                            listOf(),
+                            null
+                    )
+                },
+                comment = null,
+                annotations = mutableListOf(),
+                external = true,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         val generatedFunction = FunctionModel(
-            name = IdentifierEntity(name),
-            parameters = members.map { it.convertToParameterModel() },
-            type = TypeValueModel(
-                value = IdentifierEntity(name),
-                params = listOf(),
-                metaDescription = null,
-                fqName = toFqName()
-            ),
-            typeParameters = listOf(),
-            annotations = mutableListOf(
-                AnnotationModel(
-                    name = "Suppress",
-                    params = listOf(
-                        IdentifierEntity("INVISIBLE_REFERENCE"),
-                        IdentifierEntity("INVISIBLE_MEMBER")
-                    )
+                name = IdentifierEntity(name),
+                parameters = members.map { it.convertToParameterModel() },
+                type = TypeValueModel(
+                        value = IdentifierEntity(name),
+                        params = listOf(),
+                        metaDescription = null,
+                        fqName = toFqName()
                 ),
-                AnnotationModel(
-                    name = "kotlin.internal.InlineOnly",
-                    params = listOf()
-                )
-            ),
-            export = false,
-            inline = true,
-            operator = false,
-            extend = null,
-            body = BlockStatementModel(generateFunctionBody()),
-            visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null,
-            external = true
+                typeParameters = listOf(),
+                annotations = mutableListOf(
+                        AnnotationModel(
+                                name = "Suppress",
+                                params = listOf(
+                                        IdentifierEntity("INVISIBLE_REFERENCE"),
+                                        IdentifierEntity("INVISIBLE_MEMBER")
+                                )
+                        ),
+                        AnnotationModel(
+                                name = "kotlin.internal.InlineOnly",
+                                params = listOf()
+                        )
+                ),
+                export = false,
+                inline = true,
+                operator = false,
+                extend = null,
+                body = BlockStatementModel(generateFunctionBody()),
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null,
+                external = true
         )
         return listOf(declaration, generatedFunction)
     }
 
     private fun IDLEnumDeclaration.convertToModel(): List<TopLevelModel> {
         val declaration = InterfaceModel(
-            name = IdentifierEntity(name),
-            members = listOf(),
-            companionObject = ObjectModel(
-                name = IdentifierEntity(""),
+                name = IdentifierEntity(name),
                 members = listOf(),
-                parentEntities = listOf(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null,
-                external = false
-            ),
-            typeParameters = listOf(),
-            parentEntities = unions.map {
-                HeritageModel(
-                    it.convertToModel(),
-                    listOf(),
-                    null
-                )
-            },
-            comment = SimpleCommentEntity(
-                "please, don't implement this interface!"
-            ),
-            annotations = mutableListOf(
-                AnnotationModel(
-                    "Suppress",
-                    listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
-                )
-            ),
-            external = true,
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+                companionObject = ObjectModel(
+                        name = IdentifierEntity(""),
+                        members = listOf(),
+                        parentEntities = listOf(),
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = null,
+                        external = false
+                ),
+                typeParameters = listOf(),
+                parentEntities = unions.map {
+                    HeritageModel(
+                            it.convertToModel(),
+                            listOf(),
+                            null
+                    )
+                },
+                comment = SimpleCommentEntity(
+                        "please, don't implement this interface!"
+                ),
+                annotations = mutableListOf(
+                        AnnotationModel(
+                                "Suppress",
+                                listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                        )
+                ),
+                external = true,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
         val generatedVariables = members.map { memberName ->
             val processedName = processEnumMember(memberName)
             VariableModel(
-                name = IdentifierEntity(processEnumMember(memberName)),
-                type = TypeValueModel(
-                    value = declaration.name,
-                    params = listOf(),
-                    metaDescription = null,
-                    fqName = processedName.toFqName()
-                ),
-                annotations = mutableListOf(),
-                immutable = true,
-                inline = true,
-                external = true,
-                initializer = null,
-                get = ExpressionStatementModel(
-                    PropertyAccessExpressionModel(
-                        PropertyAccessExpressionModel(
-                            IdentifierExpressionModel(
-                                IdentifierEntity(memberName)
-                            ),
-                            CallExpressionModel(
-                                IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                listOf()
-                            )
-                        ),
-                        CallExpressionModel(
-                            IdentifierExpressionModel(
-                                IdentifierEntity("unsafeCast")
-                            ),
-                            listOf(),
-                            typeParameters = listOf(
-                                IdentifierEntity(name)
-                            )
-                        )
-                    )
-                ),
-                set = null,
-                typeParameters = listOf(),
-                extend = ClassLikeReferenceModel(
-                    name = QualifierEntity(
-                        IdentifierEntity(name),
-                        IdentifierEntity("Companion")
+                    name = IdentifierEntity(processEnumMember(memberName)),
+                    type = TypeValueModel(
+                            value = declaration.name,
+                            params = listOf(),
+                            metaDescription = null,
+                            fqName = processedName.toFqName()
                     ),
-                    typeParameters = listOf()
-                ),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
+                    annotations = mutableListOf(),
+                    immutable = true,
+                    inline = true,
+                    external = true,
+                    initializer = null,
+                    get = ExpressionStatementModel(
+                            PropertyAccessExpressionModel(
+                                    PropertyAccessExpressionModel(
+                                            IdentifierExpressionModel(
+                                                    IdentifierEntity(memberName)
+                                            ),
+                                            CallExpressionModel(
+                                                    IdentifierExpressionModel(IdentifierEntity("asDynamic")),
+                                                    listOf()
+                                            )
+                                    ),
+                                    CallExpressionModel(
+                                            IdentifierExpressionModel(
+                                                    IdentifierEntity("unsafeCast")
+                                            ),
+                                            listOf(),
+                                            typeParameters = listOf(
+                                                    IdentifierEntity(name)
+                                            )
+                                    )
+                            )
+                    ),
+                    set = null,
+                    typeParameters = listOf(),
+                    extend = ClassLikeReferenceModel(
+                            name = QualifierEntity(
+                                    IdentifierEntity(name),
+                                    IdentifierEntity("Companion")
+                            ),
+                            typeParameters = listOf()
+                    ),
+                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    comment = null
             )
         }
         return listOf(declaration) + generatedVariables
@@ -638,33 +646,33 @@ private class IdlFileConverter(
 
     private fun IDLNamespaceDeclaration.convertToModel(): TopLevelModel {
         return ObjectModel(
-            name = IdentifierEntity(name),
-            members = attributes.mapNotNull { it.convertToModel() } +
-                    operations.mapNotNull { it.convertToModel() },
-            parentEntities = listOf(),
-            visibilityModifier = VisibilityModifierModel.DEFAULT,
-            comment = null,
-            external = true
+                name = IdentifierEntity(name),
+                members = attributes.mapNotNull { it.convertToModel() } +
+                        operations.mapNotNull { it.convertToModel() },
+                parentEntities = listOf(),
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null,
+                external = true
         )
     }
 
     private fun IDLUnionDeclaration.convertToModel(): TopLevelModel {
         return InterfaceModel(
-            name = IdentifierEntity(name),
-            members = listOf(),
-            companionObject = null,
-            typeParameters = listOf(),
-            parentEntities = unions.map {
-                HeritageModel(
-                    it.convertToModel(),
-                    listOf(),
-                    null
-                )
-            },
-            comment = null,
-            annotations = mutableListOf(),
-            external = true,
-            visibilityModifier = VisibilityModifierModel.DEFAULT
+                name = IdentifierEntity(name),
+                members = listOf(),
+                companionObject = null,
+                typeParameters = listOf(),
+                parentEntities = unions.map {
+                    HeritageModel(
+                            it.convertToModel(),
+                            listOf(),
+                            null
+                    )
+                },
+                comment = null,
+                annotations = mutableListOf(),
+                external = true,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
 
@@ -685,33 +693,33 @@ private class IdlFileConverter(
     private fun IDLMemberDeclaration.convertToModel(): MemberModel? {
         return when (this) {
             is IDLAttributeDeclaration -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.convertToModel(),
-                typeParameters = listOf(),
-                static = false,
-                override = null,
-                immutable = readOnly,
-                initializer = null,
-                getter = false,
-                setter = false,
-                open = open
+                    name = IdentifierEntity(name),
+                    type = type.convertToModel(),
+                    typeParameters = listOf(),
+                    static = false,
+                    override = null,
+                    immutable = readOnly,
+                    initializer = null,
+                    getter = type.nullable,
+                    setter = type.nullable && !readOnly,
+                    open = open
             )
             is IDLOperationDeclaration -> MethodModel(
-                name = IdentifierEntity(name),
-                parameters = arguments.map { it.convertToParameterModel() },
-                type = returnType.convertToModel(),
-                typeParameters = listOf(),
-                static = false,
-                override = null,
-                operator = false,
-                annotations = listOf(),
-                open = false,
-                body = null
+                    name = IdentifierEntity(name),
+                    parameters = arguments.map { it.convertToParameterModel() },
+                    type = returnType.convertToModel(),
+                    typeParameters = listOf(),
+                    static = false,
+                    override = null,
+                    operator = false,
+                    annotations = listOf(),
+                    open = false,
+                    body = null
             )
             is IDLConstructorDeclaration -> ConstructorModel(
-                parameters = arguments.map { it.convertToParameterModel() },
-                typeParameters = listOf(),
-                generated = false
+                    parameters = arguments.map { it.convertToParameterModel() },
+                    typeParameters = listOf(),
+                    generated = false
             )
             is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
@@ -721,38 +729,38 @@ private class IdlFileConverter(
                 override = null,
                 immutable = false,
                 initializer = null,
-                getter = false,
-                setter = false,
+                getter = !required,
+                setter = !required,
                 open = false
             )
             is IDLGetterDeclaration -> MethodModel(
-                name = IdentifierEntity(name),
-                parameters = listOf(key.convertToParameterModel()),
-                type = valueType.convertToModel(),
-                typeParameters = listOf(),
-                static = false,
-                override = null,
-                operator = false,
-                annotations = listOf(),
-                open = false,
-                body = null
+                    name = IdentifierEntity(name),
+                    parameters = listOf(key.convertToParameterModel()),
+                    type = valueType.convertToModel(),
+                    typeParameters = listOf(),
+                    static = false,
+                    override = null,
+                    operator = false,
+                    annotations = listOf(),
+                    open = false,
+                    body = null
             )
             is IDLSetterDeclaration -> MethodModel(
-                name = IdentifierEntity(name),
-                parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
-                type = TypeValueModel(
-                    value = IdentifierEntity("Unit"),
-                    params = listOf(),
-                    metaDescription = null,
-                    fqName = "Unit".stdFqName()
-                ),
-                typeParameters = listOf(),
-                static = false,
-                override = null,
-                operator = false,
-                annotations = listOf(),
-                open = false,
-                body = null
+                    name = IdentifierEntity(name),
+                    parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
+                    type = TypeValueModel(
+                            value = IdentifierEntity("Unit"),
+                            params = listOf(),
+                            metaDescription = null,
+                            fqName = "Unit".stdFqName()
+                    ),
+                    typeParameters = listOf(),
+                    static = false,
+                    override = null,
+                    operator = false,
+                    annotations = listOf(),
+                    open = false,
+                    body = null
             )
             else -> raiseConcern("unprocessed member declaration: ${this}") { null }
         }
@@ -764,30 +772,30 @@ private class IdlFileConverter(
         }.mapNotNull { it.convertToModel() }.flatten()
 
         val enumModels =
-            fileDeclaration.declarations.filterIsInstance<IDLEnumDeclaration>().map { it.convertToModel() }.flatten()
+                fileDeclaration.declarations.filterIsInstance<IDLEnumDeclaration>().map { it.convertToModel() }.flatten()
 
         val generatedModels = fileDeclaration.declarations.filter {
             it is IDLInterfaceDeclaration && it.generated
         }.mapNotNull { it.convertToModel() }.flatten()
 
         val module = ModuleModel(
-            name = fileDeclaration.packageName ?: ROOT_PACKAGENAME,
-            shortName = fileDeclaration.packageName?.rightMost() ?: ROOT_PACKAGENAME,
-            declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
-            annotations = mutableListOf(),
-            submodules = listOf(),
-            imports = mutableListOf(
-                ImportModel("kotlin.js.*".toNameEntity()),
-                ImportModel("org.khronos.webgl.*".toNameEntity()) // for typed arrays
-            ),
-            comment = null
+                name = fileDeclaration.packageName ?: ROOT_PACKAGENAME,
+                shortName = fileDeclaration.packageName?.rightMost() ?: ROOT_PACKAGENAME,
+                declarations = modelsExceptEnumsAndGenerated + generatedModels + enumModels,
+                annotations = mutableListOf(),
+                submodules = listOf(),
+                imports = mutableListOf(
+                        ImportModel("kotlin.js.*".toNameEntity()),
+                        ImportModel("org.khronos.webgl.*".toNameEntity()) // for typed arrays
+                ),
+                comment = null
         )
 
         return SourceFileModel(
-            name = null,
-            fileName = File(fileDeclaration.fileName).normalize().absolutePath,
-            root = module,
-            referencedFiles = fileDeclaration.referencedFiles
+                name = null,
+                fileName = File(fileDeclaration.fileName).normalize().absolutePath,
+                root = module,
+                referencedFiles = fileDeclaration.referencedFiles
         )
 
     }
@@ -795,8 +803,8 @@ private class IdlFileConverter(
 
 private class IDLReferenceVisitor(private val visit: (IDLDeclaration, NameEntity?) -> Unit) : IDLLowering {
     override fun lowerTopLevelDeclaration(
-        declaration: IDLTopLevelDeclaration,
-        owner: IDLFileDeclaration
+            declaration: IDLTopLevelDeclaration,
+            owner: IDLFileDeclaration
     ): IDLTopLevelDeclaration {
         visit(declaration, owner.packageName)
         return super.lowerTopLevelDeclaration(declaration, owner)
@@ -813,7 +821,7 @@ fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
     }.lowerSourceSetDeclaration(this)
 
     return SourceSetModel(
-        listOf("<IRRELEVANT>"),
-        sources = files.map { IdlFileConverter(it, typeMap).convert() }
+            listOf("<IRRELEVANT>"),
+            sources = files.map { IdlFileConverter(it, typeMap).convert() }
     )
 }

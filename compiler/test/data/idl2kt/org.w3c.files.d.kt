@@ -19,6 +19,8 @@ public external open class Blob(blobParts: Array<dynamic> = definedExternally, o
 
 public external interface BlobPropertyBag {
     var type: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -39,6 +41,8 @@ public external open class File(fileBits: Array<dynamic>, fileName: String, opti
 
 public external interface FilePropertyBag : BlobPropertyBag {
     var lastModified: Int?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -96,3 +100,4 @@ public external open class FileReaderSync {
     fun readAsText(blob: Blob, label: String = definedExternally): String
     fun readAsDataURL(blob: Blob): String
 }
+

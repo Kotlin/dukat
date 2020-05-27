@@ -14,7 +14,11 @@ public external open class A(a: Int) {
 
 public external interface B {
     var a: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var b: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")

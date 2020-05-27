@@ -56,6 +56,8 @@ public external open class Request(input: dynamic, init: RequestInit = definedEx
 
 public external interface RequestInit {
     var method: String?
+        get() = definedExternally
+        set(value) = definedExternally
     var headers: dynamic
         get() = definedExternally
         set(value) = definedExternally
@@ -63,16 +65,32 @@ public external interface RequestInit {
         get() = definedExternally
         set(value) = definedExternally
     var referrer: String?
+        get() = definedExternally
+        set(value) = definedExternally
     var referrerPolicy: dynamic
         get() = definedExternally
         set(value) = definedExternally
     var mode: RequestMode?
+        get() = definedExternally
+        set(value) = definedExternally
     var credentials: RequestCredentials?
+        get() = definedExternally
+        set(value) = definedExternally
     var cache: RequestCache?
+        get() = definedExternally
+        set(value) = definedExternally
     var redirect: RequestRedirect?
+        get() = definedExternally
+        set(value) = definedExternally
     var integrity: String?
+        get() = definedExternally
+        set(value) = definedExternally
     var keepalive: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
     var window: Any?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -123,7 +141,11 @@ public external open class Response(body: dynamic = definedExternally, init: Res
 
 public external interface ResponseInit {
     var status: Short? /* = 200 */
+        get() = definedExternally
+        set(value) = definedExternally
     var statusText: String? /* = "OK" */
+        get() = definedExternally
+        set(value) = definedExternally
     var headers: dynamic
         get() = definedExternally
         set(value) = definedExternally
@@ -270,3 +292,4 @@ public inline val ResponseType.Companion.ERROR: ResponseType get() = "error".asD
 public inline val ResponseType.Companion.OPAQUE: ResponseType get() = "opaque".asDynamic().unsafeCast<ResponseType>()
 
 public inline val ResponseType.Companion.OPAQUEREDIRECT: ResponseType get() = "opaqueredirect".asDynamic().unsafeCast<ResponseType>()
+

@@ -6,13 +6,29 @@ import org.w3c.dom.events.*
 
 public external interface WebGLContextAttributes {
     var alpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var depth: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var stencil: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var antialias: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var premultipliedAlpha: Boolean? /* = true */
+        get() = definedExternally
+        set(value) = definedExternally
     var preserveDrawingBuffer: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var preferLowPowerToHighPerformance: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
     var failIfMajorPerformanceCaveat: Boolean? /* = false */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -863,6 +879,8 @@ public external open class WebGLContextEvent(type: String, eventInit: WebGLConte
 
 public external interface WebGLContextEventInit : EventInit {
     var statusMessage: String? /* = "" */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -877,3 +895,4 @@ public inline fun WebGLContextEventInit(statusMessage: String? = "", bubbles: Bo
 }
 
 public external interface TexImageSource
+

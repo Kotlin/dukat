@@ -3,7 +3,11 @@ import org.khronos.webgl.*
 
 public external interface A {
     var a: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
     var b: Int? /* = 1 */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
@@ -17,7 +21,11 @@ public inline fun A(a: Int? = 0, b: Int? = 1): A {
 
 public external interface B : A {
     var c: Int? /* = 2 */
+        get() = definedExternally
+        set(value) = definedExternally
     var d: Int? /* = 3 */
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
