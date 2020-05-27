@@ -67,6 +67,8 @@ abstract class OutputTests {
 
         @Suppress("UNUSED_VARIABLE") val targetShortName = "${descriptor}.d.kt"
 
+        println("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
+
         val translated = output(tsPath, getTranslator())
 
         assertEquals(
