@@ -54,23 +54,7 @@ where possible options include:
 ./gradlew test -Pdukat.test.failure.always
 ```  
 
-# Recent Changes
-
-### [0.0.28] - 13'February 2020
-  - [descriptors] support for `inline` and `crosslinine` modifiers in descriptors
-  - [typescript] Inlined invoke extension function can have return type
-  - [typescript] Merge vars and interfaces even if they are in different files (but in the same package)
-  - [typescript] Merge classlikes correctly (under some conditions they were copied after merge)
-  - [typescript] Preserve type params while resolving this return type in extension functions    
-
-### [0.0.27] - 07'February 2020
- - [build] make it possible to build with arbitrary version of kotlin compiler
- - [build] typescript compiler version updated to 3.5.3
- - [descriptors] support for compiling with 1.3.70-eap-42
- - [typescript] Move top level declarations into a separate file whenever it's invalid to keep them with the rest of declarations (that is, when there's file-level JsQualifier or JsModule annotations)
- - [idl] Don't add import for the same package this file belongs to
-        
-[see full CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
+[see CHANGELOG](https://github.com/Kotlin/dukat/blob/master/CHANGELOG.md)
 
 # Useful links
 

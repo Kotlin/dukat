@@ -1,5 +1,31 @@
 # Changelog
 
+### [0.5.0] - 28'May 2020
+  This release changes behaviour in some common scenarios so we've decided to update version to 0.5.0.
+
+  Say, we have `declarationA.d.ts` and `declarationB.d.ts`. Say, also, `declarationA` depends on `ClassA` from `libC`,
+  while `declarationB` is importing `InterfaceB` from `libC`. 
+  
+  Before this release running both `dukat declarationA.d.ts` and `dukat declarationB.d.ts`
+  would have generate all definitions for `libC`, which can be pretty big and contain hundreds of declarations
+  which dukat user actually had no intentions to use. Users actually asked us a lot to translate only those
+  of declarations that are actually needed. We've implemented this but everything comes with a price.
+  
+  So, as of know calling `dukat declarationA.d.ts` will translate only ClassA and its dependencies from libC. 
+  The same will do the `dukat declarationB.d.ts`. It's very important to understand that **this can lead for the loss
+  of declarations that declarationA depends on**. To avoid this **just call dukat passing both declarationA.d.ts and declarationB.d.ts**. 
+  
+  In other words, translate all declarations you need in a single pass, this is the main scenario.                   
+
+  - [#283](https://github.com/Kotlin/dukat/issues/283) Add possibility to pass tsconfig.json 
+  - [#245](https://github.com/Kotlin/dukat/issues/245) Merge interfaces and classes
+  - [#281](https://github.com/Kotlin/dukat/issues/281) Override is not resolved correctly for classes with generic parents that are narrowed down
+  - [#280](https://github.com/Kotlin/dukat/issues/280) Method copied to interface implementation preserving type params
+  - [#268](https://github.com/Kotlin/dukat/issues/268) Conflicting overloads are not resolved for functions
+  - [#265](https://github.com/Kotlin/dukat/issues/265) Default export is not propagated to the overloaded implementations 
+  - [#252](https://github.com/Kotlin/dukat/issues/252) Dynamic type aliases are impossible
+       
+
 ### [0.0.28] - 13'February 2020
   - [descriptors] support for `inline` and `crosslinine` modifiers in descriptors
   - [typescript] Inlined invoke extension function can have return type
