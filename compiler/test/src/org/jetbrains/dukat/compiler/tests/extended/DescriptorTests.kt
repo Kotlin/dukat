@@ -27,7 +27,6 @@ class DescriptorTests {
     @DisplayName("descriptors test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("descriptorsTestSet")
-    @EnabledIfSystemProperty(named = "dukat.test.descriptors", matches = "true")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertDescriptorEquals(name, tsPath, ktPath)
     }
@@ -73,10 +72,26 @@ class DescriptorTests {
     companion object {
         private val translator = createStandardCliTranslator()
 
+        private val skippedDescriptorTests = setOf(
+                "class/inheritance/overrides",
+                "class/inheritance/overridesFromReferencedFile",
+                "class/inheritance/overridingStdLib",
+                "class/inheritance/simple",
+                "escaping/escaping",
+                "interface/inheritance/simple",
+                "interface/inheritance/withQualifiedParent",
+                "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
+                "misc/missedOverloads",
+                "misc/stringTypeInAlias",
+                "qualifiedNames/extendingEntityFromParentModule",
+                "stdlib/convertTsStdlib",
+                "typePredicate/simple"
+        )
+
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return MethodSourceSourceFiles("./test/data/typescript/", D_TS_DECLARATION_EXTENSION).fileSetWithDescriptors()
+            return MethodSourceSourceFiles("./test/data/typescript/", D_TS_DECLARATION_EXTENSION)
+                .fileSetWithDescriptors().filter { !skippedDescriptorTests.contains(it.first()) }.toTypedArray()
         }
     }
-
 }
