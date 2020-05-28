@@ -1,5 +1,6 @@
 import {
     BlockDeclarationProto,
+    BindingElementDeclarationProto,
     CallSignatureDeclarationProto,
     ClassDeclarationProto,
     ConstructorDeclarationProto,
@@ -36,6 +37,7 @@ import {
 } from "declarations";
 
 export type Block = BlockDeclarationProto;
+export type BindingElementDeclaration = BindingElementDeclarationProto;
 export type CallSignatureDeclaration = CallSignatureDeclarationProto;
 export type ClassDeclaration = ClassDeclarationProto;
 export type ConstructorDeclaration = ConstructorDeclarationProto;

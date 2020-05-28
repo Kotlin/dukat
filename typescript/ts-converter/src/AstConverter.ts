@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import {createLogger} from "./Logger";
 import {uid} from "./uid";
 import {
+  BindingElementDeclaration,
   Block,
   Declaration,
   DefinitionInfoDeclaration,
@@ -37,6 +38,7 @@ import {
 import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KIND = ModifierDeclarationProto.MODIFIER_KIND;
+import {ArrayBindingPattern, BindingElement} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -837,18 +839,45 @@ export class AstConverter {
     );
   }
 
+  convertBindingElements(elements: ts.NodeArray<ts.ArrayBindingElement>): Array<BindingElementDeclaration> {
+    let res: Array<BindingElementDeclaration> = [];
+
+    for (let element of elements) {
+
+      if (ts.isIdentifier(element.name)) {
+        res.push(this.astFactory.createBindingVariableDeclaration(
+            element.name.getText(),
+            element.initializer == null ? null : this.astExpressionConverter.convertExpression(element.initializer),
+        ));
+      } else if (ts.isArrayBindingPattern(element.name)) {
+        res.push(this.astFactory.declareArrayBindingPatternAsBindingElement(
+            this.convertBindingElements(element.name.elements)
+        ))
+      }
+    }
+
+    return res
+  }
+
   convertVariableDeclarationList(list: ts.VariableDeclarationList, modifiers: ts.ModifiersArray | null): Array<StatementDeclaration> {
     let res: Array<StatementDeclaration> = [];
 
     for (let declaration of list.declarations) {
-      res.push(this.astFactory.declareVariable(
-        declaration.name.getText(),
-        this.convertType(declaration.type),
-        this.convertModifiers(modifiers),
-        declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
-        this.convertDefinitions(declaration),
-        this.exportContext.getUID(declaration)
-      ));
+
+      if (ts.isIdentifier(declaration.name)) {
+        res.push(this.astFactory.declareVariable(
+            declaration.name.getText(),
+            this.convertType(declaration.type),
+            this.convertModifiers(modifiers),
+            declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
+            this.convertDefinitions(declaration),
+            this.exportContext.getUID(declaration)
+        ));
+      } else if (ts.isArrayBindingPattern(declaration.name)) {
+        res.push(this.astFactory.declareArrayBindingPatternAsStatement(
+            this.convertBindingElements(declaration.name.elements)
+        ))
+      }
     }
 
     return res
