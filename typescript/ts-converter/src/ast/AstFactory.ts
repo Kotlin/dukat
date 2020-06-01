@@ -540,7 +540,7 @@ export class AstFactory {
     return parameterDeclaration;
   }
 
-  createQualifiedNameDeclaration(left: NameEntity, right: IdentifierDeclaration): NameEntity {
+  createQualifiedNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
     let qualifier = new QualifierDeclarationProto();
     qualifier.setLeft(left);
     qualifier.setRight(right);

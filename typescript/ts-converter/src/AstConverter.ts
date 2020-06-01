@@ -379,7 +379,7 @@ export class AstConverter {
 
   convertEntityName(entityName: ts.EntityName): NameEntity {
     if (ts.isQualifiedName(entityName)) {
-      return this.astFactory.createQualifiedNameDeclaration(
+      return this.astFactory.createQualifiedNameEntity(
         this.convertEntityName(entityName.left),
         this.convertEntityName(entityName.right).getIdentifier()!
       )
@@ -740,7 +740,7 @@ export class AstConverter {
       throw new Error("never supposed to be there")
     }
 
-    return this.astFactory.createQualifiedNameDeclaration(convertedExpression, name);
+    return this.astFactory.createQualifiedNameEntity(convertedExpression, name);
   }
 
   private getFirstDeclaration(symbol: ts.Symbol | null): ts.Declaration | null {

@@ -25,16 +25,6 @@ export class AstExpressionConverter {
         return expression;
     }
 
-    private createQualifierAsNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
-        let qualifier = new declarations.QualifierDeclarationProto();
-        qualifier.setLeft(left);
-        qualifier.setRight(right);
-
-        let name = new declarations.NameDeclarationProto();
-        name.setQualifier(qualifier);
-        return name;
-    }
-
     createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
         let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
         binaryExpression.setLeft(left);
@@ -373,7 +363,7 @@ export class AstExpressionConverter {
         let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.getText())
         if (convertedExpression.hasNameexpression()) {
             let leftSideName = convertedExpression.getNameexpression()!.getName()!
-            let newName = this.createQualifierAsNameEntity(leftSideName, rightSideName)
+            let newName = this.astFactory.createQualifiedNameEntity(leftSideName, rightSideName)
             return this.createNameExpression(newName)
         }
 
@@ -421,7 +411,7 @@ export class AstExpressionConverter {
 
     convertEntityName(entityName: ts.EntityName): NameEntity {
         if (ts.isQualifiedName(entityName)) {
-            return this.createQualifierAsNameEntity(
+            return this.astFactory.createQualifiedNameEntity(
                 this.convertEntityName(entityName.left),
                 this.convertEntityName(entityName.right).getIdentifier()!
             )
