@@ -2,17 +2,15 @@ import * as ts from "typescript";
 import {
     Block,
     Expression, HeritageClauseDeclaration,
-    IdentifierDeclaration,
+    IdentifierDeclaration, LiteralExpression,
     MemberDeclaration, ModifierDeclaration,
     NameEntity, ParameterDeclaration,
     TemplateTokenDeclaration,
     TypeDeclaration, TypeParameter,
 } from "./ast";
-import {AstExpressionFactory} from "./AstExpressionFactory";
 import {AstConverter} from "../AstConverter";
 import {AstFactory} from "./AstFactory";
-import {ModifierDeclarationProto} from "declarations";
-import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
+import * as declarations from "declarations";
 
 export class AstExpressionConverter {
     constructor(
@@ -21,104 +19,263 @@ export class AstExpressionConverter {
     ) {
     }
 
-    createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
-        return AstExpressionFactory.createBinaryExpressionDeclarationAsExpression(left, operator, right);
+    private asExpression(literalExpression: LiteralExpression): Expression {
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setLiteralexpression(literalExpression);
+        return expression;
     }
 
-    createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean) {
-        return AstExpressionFactory.createUnaryExpressionDeclarationAsExpression(operand, operator, isPrefix);
+    private createQualifierAsNameEntity(left: NameEntity, right: IdentifierDeclaration): NameEntity {
+        let qualifier = new declarations.QualifierDeclarationProto();
+        qualifier.setLeft(left);
+        qualifier.setRight(right);
+
+        let name = new declarations.NameDeclarationProto();
+        name.setQualifier(qualifier);
+        return name;
+    }
+
+    createBinaryExpression(left: Expression, operator: string, right: Expression): Expression {
+        let binaryExpression = new declarations.BinaryExpressionDeclarationProto();
+        binaryExpression.setLeft(left);
+        binaryExpression.setOperator(operator);
+        binaryExpression.setRight(right);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setBinaryexpression(binaryExpression);
+        return expression;
+    }
+
+    createUnaryExpression(operand: Expression, operator: string, isPrefix: boolean): Expression {
+        let unaryExpression = new declarations.UnaryExpressionDeclarationProto();
+        unaryExpression.setOperand(operand);
+        unaryExpression.setOperator(operator);
+        unaryExpression.setIsprefix(isPrefix);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setUnaryexpression(unaryExpression);
+        return expression;
     }
 
     createFunctionExpression(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, isGenerator: boolean) {
-        return AstExpressionFactory.convertFunctionDeclarationToExpression(this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [],"__NO_UID__", isGenerator));
+        let functionExpression = this.astFactory.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [],"__NO_UID__", isGenerator);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setFunctionexpression(functionExpression);
+        return expression;
     }
 
     createClassExpression(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>) {
-        return AstExpressionFactory.convertClassDeclarationToExpression(this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, [], "__NO_UID__"));
+        let classExpression = this.astFactory.createClassDeclaration(name, members, typeParams, parentEntities, modifiers, [], "__NO_UID__");
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setClassexpression(classExpression);
+        return expression;
     }
 
-    createTypeOfExpression(expression: Expression) {
-        return AstExpressionFactory.createTypeOfExpressionDeclarationAsExpression(expression);
+    createTypeOfExpression(expression: Expression): Expression {
+        let typeOfExpression = new declarations.TypeOfExpressionDeclarationProto();
+        typeOfExpression.setExpression(expression);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setTypeofexpression(typeOfExpression);
+        return expressionProto;
     }
 
-    createCallExpression(expression: Expression, args: Array<Expression>) {
-        return AstExpressionFactory.createCallExpressionDeclarationAsExpression(expression, args);
+    createCallExpression(expression: Expression, args: Array<Expression>): Expression {
+        let callExpression = new declarations.CallExpressionDeclarationProto();
+        callExpression.setExpression(expression);
+        callExpression.setArgumentsList(args);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setCallexpression(callExpression);
+        return expressionProto;
     }
 
-    createPropertyAccessExpression(expression: Expression, name: IdentifierDeclaration) {
-        return AstExpressionFactory.createPropertyAccessExpressionDeclarationAsExpression(expression, name);
+    createPropertyAccessExpression(expression: Expression, name: IdentifierDeclaration): Expression {
+        let propertyAccessExpression = new declarations.PropertyAccessExpressionDeclarationProto();
+        propertyAccessExpression.setExpression(expression);
+        propertyAccessExpression.setName(name);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setPropertyaccessexpression(propertyAccessExpression);
+        return expressionProto;
     }
 
-    createElementAccessExpression(expression: Expression, argumentExpression: Expression) {
-        return AstExpressionFactory.createElementAccessExpressionDeclarationAsExpression(expression, argumentExpression);
+    createElementAccessExpression(expression: Expression, argumentExpression: Expression): Expression {
+        let elementAccessExpression = new declarations.ElementAccessExpressionDeclarationProto();
+        elementAccessExpression.setExpression(expression);
+        elementAccessExpression.setArgumentexpression(argumentExpression);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setElementaccessexpression(elementAccessExpression);
+
+        return expressionProto;
     }
 
     createNewExpression(expression: Expression, args: Array<Expression>) {
-        return AstExpressionFactory.createNewExpressionDeclarationAsExpression(expression, args);
+        let newExpression = new declarations.NewExpressionDeclarationProto();
+        newExpression.setExpression(expression);
+        newExpression.setArgumentsList(args);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setNewexpression(newExpression);
+        return expressionProto;
     }
 
-    createConditionalExpression(condition: Expression, whenTrue: Expression, whenFalse: Expression) {
-        return AstExpressionFactory.createConditionalExpressionDeclarationAsExpression(condition, whenTrue, whenFalse);
+    createConditionalExpression(condition: Expression, whenTrue: Expression, whenFalse: Expression): Expression {
+        let conditionalExpression = new declarations.ConditionalExpressionDeclarationProto();
+
+        conditionalExpression.setCondition(condition);
+        conditionalExpression.setWhentrue(whenTrue);
+        conditionalExpression.setWhenfalse(whenFalse);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setConditionalexpression(conditionalExpression);
+
+        return expressionProto;
     }
 
     createYieldExpression(expression: Expression | null, hasAsterisk: boolean) {
-        return AstExpressionFactory.createYieldExpressionDeclarationAsExpression(expression, hasAsterisk)
+        let yieldExpression = new declarations.YieldExpressionDeclarationProto();
+
+        if (expression) {
+            yieldExpression.setExpression(expression)
+        }
+        yieldExpression.setHasasterisk(hasAsterisk);
+
+        let expressionProto = new declarations.ExpressionDeclarationProto();
+        expressionProto.setYieldexpression(yieldExpression);
+        return expressionProto;
     }
 
     createNameExpression(name: NameEntity): Expression {
-        return AstExpressionFactory.createNameExpressionDeclarationAsExpression(name)
+        let nameExpressionProto = new declarations.NameExpressionDeclarationProto();
+        nameExpressionProto.setName(name);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setNameexpression(nameExpressionProto);
+
+        return expression;
     }
 
     createNumericLiteralExpression(value: string): Expression {
-        return AstExpressionFactory.createNumericLiteralDeclarationAsExpression(value);
+        let numericLiteralExpression = new declarations.NumericLiteralExpressionDeclarationProto();
+        numericLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setNumericliteral(numericLiteralExpression);
+        return this.asExpression(literalExpression);
     }
 
     createBigIntLiteralExpression(value: string): Expression {
-        return AstExpressionFactory.createBigIntLiteralDeclarationAsExpression(value);
+        let bigIntLiteralExpression = new declarations.BigIntLiteralExpressionDeclarationProto();
+        bigIntLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setBigintliteral(bigIntLiteralExpression);
+        return this.asExpression(literalExpression);
     }
 
     createStringLiteralExpression(value: string): Expression {
-        return AstExpressionFactory.createStringLiteralDeclarationAsExpression(value);
+        let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
+        stringLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setStringliteral(stringLiteralExpression);
+        return this.asExpression(literalExpression);
     }
 
     createBooleanLiteralExpression(value: boolean): Expression {
-        return AstExpressionFactory.createBooleanLiteralDeclarationAsExpression(value);
+        let booleanLiteralExpression = new declarations.BooleanLiteralExpressionDeclarationProto();
+        booleanLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setBooleanliteral(booleanLiteralExpression);
+        return this.asExpression(literalExpression);
     }
 
     createObjectLiteralExpression(members: Array<MemberDeclaration>): Expression {
-        return AstExpressionFactory.createObjectLiteralDeclarationAsExpression(members);
+        let objectLiteral = new declarations.ObjectLiteralDeclarationProto();
+        objectLiteral.setMembersList(members);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setObjectliteral(objectLiteral);
+        return this.asExpression(literalExpression);
     }
 
     createArrayLiteralExpression(elements: Array<Expression>): Expression {
-        return AstExpressionFactory.createArrayLiteralDeclarationAsExpression(elements);
+        let arrayLiteral = new declarations.ArrayLiteralExpressionDeclarationProto();
+        arrayLiteral.setElementsList(elements);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setArrayliteral(arrayLiteral);
+
+        return this.asExpression(literalExpression);
     }
 
     createRegExLiteralExpression(value: string): Expression {
-        return AstExpressionFactory.createRegExLiteralDeclarationAsExpression(value);
+        let regExLiteralExpression = new declarations.RegExLiteralExpressionDeclarationProto();
+        regExLiteralExpression.setValue(value);
+
+        let literalExpression = new declarations.LiteralExpressionDeclarationProto();
+        literalExpression.setRegexliteral(regExLiteralExpression);
+        return this.asExpression(literalExpression);
     }
 
     createStringTemplateToken(value: string): TemplateTokenDeclaration {
-        return AstExpressionFactory.createStringTemplateToken(value);
+        let stringLiteralExpression = new declarations.StringLiteralExpressionDeclarationProto();
+        stringLiteralExpression.setValue(value);
+
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setStringliteral(
+          stringLiteralExpression
+        );
+        return templateToken;
     }
 
     createExpressionTemplateToken(expression: Expression): TemplateTokenDeclaration {
-        return AstExpressionFactory.createExpressionTemplateToken(expression);
+        let templateToken = new declarations.TemplateTokenDeclarationProto();
+        templateToken.setExpression(expression);
+        return templateToken;
     }
 
     createTemplateExpression(tokens: Array<TemplateTokenDeclaration>): Expression {
-        return AstExpressionFactory.createTemplateExpression(tokens)
+        let templateExpression = new declarations.TemplateExpressionDeclarationProto();
+        templateExpression.setTokenList(tokens);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setTemplateexpression(templateExpression);
+        return expression;
     }
 
-    createAsExpression(expression: Expression, type: TypeDeclaration): Expression {
-        return AstExpressionFactory.createAsExpression(expression, type)
+    createAsExpression(subExpression: Expression, type: TypeDeclaration): Expression {
+        let asExpression = new declarations.AsExpressionDeclarationProto();
+        asExpression.setExpression(subExpression);
+        asExpression.setType(type);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setAsexpression(asExpression);
+
+        return expression;
     }
 
-    createNonNullExpression(expression: Expression): Expression {
-        return AstExpressionFactory.createNonNullExpression(expression)
+    createNonNullExpression(subExpression: Expression): Expression {
+        let nonNullExpression = new declarations.NonNullExpressionDeclarationProto();
+        nonNullExpression.setExpression(subExpression);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setNonnullexpression(nonNullExpression);
+
+        return expression;
     }
 
-    createUnknownExpression(value: string): Expression {
-        return AstExpressionFactory.createUnknownExpressionDeclarationAsExpression(value);
+    createUnknownExpression(meta: string): Expression {
+        let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
+        unknownExpression.setMeta(meta);
+
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setUnknownexpression(unknownExpression);
+        return expression;
     }
 
 
@@ -213,12 +370,13 @@ export class AstExpressionConverter {
 
     convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
         let convertedExpression = this.convertExpression(expression.expression)
-        let rightSideName = AstExpressionFactory.createIdentifier(expression.name.getText())
+        let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.getText())
         if (convertedExpression.hasNameexpression()) {
             let leftSideName = convertedExpression.getNameexpression()!.getName()!
-            let newName = AstExpressionFactory.createQualifierAsNameEntity(leftSideName, rightSideName)
-            return AstExpressionFactory.createNameExpressionDeclarationAsExpression(newName)
+            let newName = this.createQualifierAsNameEntity(leftSideName, rightSideName)
+            return this.createNameExpression(newName)
         }
+
         return this.createPropertyAccessExpression(
             convertedExpression,
             rightSideName
@@ -263,12 +421,12 @@ export class AstExpressionConverter {
 
     convertEntityName(entityName: ts.EntityName): NameEntity {
         if (ts.isQualifiedName(entityName)) {
-            return AstExpressionFactory.createQualifierAsNameEntity(
+            return this.createQualifierAsNameEntity(
                 this.convertEntityName(entityName.left),
                 this.convertEntityName(entityName.right).getIdentifier()!
             )
         } else {
-            return AstExpressionFactory.createIdentifierAsNameEntity(
+            return this.astFactory.createIdentifierDeclarationAsNameEntity(
                 entityName.getText()
             )
         }

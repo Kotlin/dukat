@@ -389,8 +389,7 @@ export class AstFactory {
   }
 
   createIdentifierDeclarationAsNameEntity(value: string): NameEntity {
-    let identifierProto = new IdentifierDeclarationProto();
-    identifierProto.setValue(value);
+    let identifierProto = this.createIdentifierDeclaration(value);
 
     let nameDeclaration = new NameDeclarationProto();
     nameDeclaration.setIdentifier(identifierProto);
