@@ -352,9 +352,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     static = static,
                     override = null,
                     immutable = getter && !setter,
-                    initializer = with(ExpressionConverter(this@DocumentConverter)) {
-                        initializer?.convert()
-                    },
+                    initializer = convertExpressionDeclaration(initializer),
                     getter = getter,
                     setter = setter,
                     open = open
@@ -728,7 +726,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 open = open,
 
                 body = body?.let {
-                    val convertedBody = ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                    val convertedBody = convertBlockDeclaration(it)
                     if (isGenerator) {
                         convertedBody.wrapBodyAsLazyIterator()
                     } else {
@@ -768,7 +766,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         operator = operator,
                         extend = extend.convert(),
                         body = body?.let {
-                            val convertedBody = ExpressionConverter(this@DocumentConverter).convertBlock(it)
+                            val convertedBody = convertBlockDeclaration(it)
                             if (isGenerator) {
                                 convertedBody.wrapBodyAsLazyIterator()
                             } else {

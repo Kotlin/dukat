@@ -106,7 +106,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDecla
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 
-internal class ExpressionConverter(val documentConverter: DocumentConverter) {
+private class ExpressionConverter() {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
@@ -502,4 +502,15 @@ internal class ExpressionConverter(val documentConverter: DocumentConverter) {
             )
         }
     }
+}
+
+
+fun convertExpressionDeclaration(expressionDeclaration: ExpressionDeclaration?): ExpressionModel? {
+    return with(ExpressionConverter()) {
+        expressionDeclaration?.convert()
+    }
+}
+
+fun convertBlockDeclaration(blockDeclaration: BlockDeclaration): BlockStatementModel {
+    return ExpressionConverter().convertBlock(blockDeclaration)
 }
