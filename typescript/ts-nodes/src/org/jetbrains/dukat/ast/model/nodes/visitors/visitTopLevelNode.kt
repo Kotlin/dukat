@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.visitors
+package org.jetbrains.dukat.ast.model.nodes.visitors
 
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode

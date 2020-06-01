@@ -4,8 +4,6 @@ plugins {
 
 dependencies {
     implementation(project(":ast-common"))
-    implementation(project(":ownerContext"))
     implementation(project(":panic"))
     implementation(project(":ts-model"))
-    implementation(project(":ts-nodes"))
 }

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":module-name-resolver"))
     implementation(project(":ownerContext"))
     implementation(project(":panic"))
+    implementation(project(":ts-nodes"))
     implementation(project(":ts-model"))
     implementation(project(":stdlib"))
 }

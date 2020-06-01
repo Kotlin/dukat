@@ -1,6 +1,5 @@
-package org.jetbrains.dukat.ast.model
+package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 

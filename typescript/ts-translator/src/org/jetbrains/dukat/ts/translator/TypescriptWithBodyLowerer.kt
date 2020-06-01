@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ts.translator
+    package org.jetbrains.dukat.ts.translator
 
 import RemoveDuplicateMembers
 import org.jetbrains.dukat.astCommon.NameEntity

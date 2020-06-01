@@ -1,6 +1,5 @@
-package org.jetbrains.dukat.ast.model
+package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.nodes.UniqueNode
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 
 interface TopLevelNode : TopLevelEntity, UniqueNode {
