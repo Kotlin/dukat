@@ -45,7 +45,8 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
                     .map {
                         arrayOf(
                                 it.getTestDescriptorName(),
-                                it.absolutePath
+                                it.absolutePath,
+                                ""
                         )
                     }.toList().toTypedArray()
 
