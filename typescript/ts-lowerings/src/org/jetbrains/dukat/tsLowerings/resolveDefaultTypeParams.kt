@@ -24,7 +24,7 @@ private fun NameEntity.addPostfix(postfix: String): NameEntity {
     }
 }
 
-private class SubstituteTypeLowering(private val generatedEntities: Map<String, Map<Int, ClassLikeDeclaration>>) : DeclarationTypeLowering {
+private class SubstituteTypeLowering(private val generatedEntities: Map<String, Map<Int, ClassLikeDeclaration>>) : DeclarationLowering {
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
         val heritageClauseResolved = generatedEntities[heritageClause.reference?.uid]?.get(heritageClause.typeArguments.size)?.let { reference ->
@@ -43,7 +43,7 @@ private class SubstituteTypeLowering(private val generatedEntities: Map<String, 
     }
 }
 
-private class EntityWithDefaultTypeParamsGenerator(private val references: Map<String, ClassLikeDeclaration>, private val generatedEntities: MutableMap<String, MutableMap<Int, ClassLikeDeclaration>>) : DeclarationTypeLowering {
+private class EntityWithDefaultTypeParamsGenerator(private val references: Map<String, ClassLikeDeclaration>, private val generatedEntities: MutableMap<String, MutableMap<Int, ClassLikeDeclaration>>) : DeclarationLowering {
 
     private fun checkForDefaultTypeParams(declarationParams: List<ParameterValueDeclaration>, resolvedClassLike: ClassLikeDeclaration?) {
         if (resolvedClassLike != null) {

@@ -37,7 +37,7 @@ private fun TypeDeclaration.isPrimitive(primitive: String): Boolean {
 }
 
 
-private class PrimitivesLowering : DeclarationTypeLowering {
+private class PrimitivesLowering : DeclarationLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         if (declaration.value == IdentifierEntity("Function")) {
             return declaration.copy(params = listOf(TypeDeclaration(IdentifierEntity("*"), emptyList())))

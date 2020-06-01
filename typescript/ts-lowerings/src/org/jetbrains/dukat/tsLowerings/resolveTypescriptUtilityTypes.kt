@@ -48,7 +48,7 @@ private fun TypeDeclaration.resolvePick(): ParameterValueDeclaration? {
     return null
 }
 
-private class UtilityTypeLowering : DeclarationTypeLowering {
+private class UtilityTypeLowering : DeclarationLowering {
     override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         val declarationLowered = when (declaration) {
             is TypeDeclaration -> declaration.resolvePartial()

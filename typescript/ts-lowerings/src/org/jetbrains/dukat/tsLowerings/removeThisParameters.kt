@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
-private class RemoveThisParametersLowering : DeclarationTypeLowering {
+private class RemoveThisParametersLowering : DeclarationLowering {
 
     fun removeThisParam(parameters: List<ParameterDeclaration>): List<ParameterDeclaration> {
         return if (parameters.firstOrNull()?.name == "this") {

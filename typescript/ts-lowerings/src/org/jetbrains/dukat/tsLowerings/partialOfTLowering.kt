@@ -110,7 +110,7 @@ private class TypeVisitor(
         private val classLikeReferences: Map<String, ClassLikeWithOwner>,
         private val partialReferences: MutableMap<String, GeneratedInterfaceDeclaration>,
         private val heritageClauses: MutableSet<String>
-) : DeclarationTypeLowering {
+) : DeclarationLowering {
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         val singleTypeParam = declaration.params.singleOrNull()
