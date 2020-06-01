@@ -39,6 +39,7 @@ import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
@@ -290,6 +291,11 @@ private fun BinaryOperatorModel.translate(): String {
         GT -> ">"
         LE -> "<="
         GE -> ">="
+        BITWISE_AND -> "and"
+        BITWISE_OR -> "or"
+        BITWISE_XOR -> "xor"
+        SHIFT_LEFT -> "shl"
+        SHIFT_RIGHT -> "shr"
         else -> raiseConcern("unable to process binaryOperatorModel $this") {
             ""
         }
@@ -315,6 +321,7 @@ private fun ExpressionModel.translate(): String {
         is ThisExpressionModel -> "this"
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
+        is ParenthesizedExpressionModel -> "(${expression.translate()})"
         is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
         is BinaryExpressionModel -> "${left.translate()} ${operator.translate()} ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"

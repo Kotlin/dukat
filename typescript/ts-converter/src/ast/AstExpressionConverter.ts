@@ -259,6 +259,10 @@ export class AstExpressionConverter {
         return expression;
     }
 
+    createParenthesizedExpression(expression: Expression): Expression {
+        return AstExpressionFactory.createParenthesizedExpression(expression)
+    }
+
     createUnknownExpression(meta: string): Expression {
         let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
         unknownExpression.setMeta(meta);
@@ -565,6 +569,10 @@ export class AstExpressionConverter {
         return this.createNonNullExpression(this.convertExpression(expression.expression))
     }
 
+    private convertParenthesizedExpression(expression: ts.ParenthesizedExpression): Expression {
+        return this.createParenthesizedExpression(this.convertExpression(expression.expression))
+    }
+
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
     }
@@ -615,6 +623,8 @@ export class AstExpressionConverter {
             return this.convertAsExpression(expression)
         } else if (ts.isNonNullExpression(expression)) {
             return this.convertNonNullExpression(expression)
+        } else if (ts.isParenthesizedExpression(expression)) {
+            return this.convertParenthesizedExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

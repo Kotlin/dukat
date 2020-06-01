@@ -56,6 +56,7 @@ import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
@@ -138,6 +139,7 @@ import org.jetbrains.dukat.tsmodelproto.NumericLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ObjectLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterValueDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ParenthesizedExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyAccessExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
@@ -712,6 +714,12 @@ fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
     )
 }
 
+fun ParenthesizedExpressionDeclarationProto.convert(): ParenthesizedExpressionDeclaration {
+    return ParenthesizedExpressionDeclaration(
+        expression = expression.convert()
+    )
+}
+
 fun YieldExpressionDeclarationProto.convert(): YieldExpressionDeclaration {
     return YieldExpressionDeclaration(
         expression = if (hasExpression()) expression.convert() else null,
@@ -766,6 +774,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasAsExpression() -> asExpression.convert()
         hasNonNullExpression() -> nonNullExpression.convert()
         hasYieldExpression() -> yieldExpression.convert()
+        hasParenthesizedExpression() -> parenthesizedExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

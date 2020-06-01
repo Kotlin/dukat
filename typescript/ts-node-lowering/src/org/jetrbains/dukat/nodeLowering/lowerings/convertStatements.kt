@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
@@ -22,33 +23,9 @@ import org.jetbrains.dukat.astModel.expressions.literals.NullLiteralExpressionMo
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GE
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GT
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LE
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LT
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS_ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD_ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT_ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.NOT_EQ
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.OR
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.NOT
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_MINUS
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_PLUS
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -92,6 +69,7 @@ import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -164,6 +142,11 @@ private class ExpressionConverter() {
             ">" -> GT
             "<=" -> LE
             ">=" -> GE
+            "&" -> BITWISE_AND
+            "|" -> BITWISE_OR
+            "^" -> BITWISE_XOR
+            "<<" -> SHIFT_LEFT
+            ">>" -> SHIFT_RIGHT
             else -> raiseConcern("unable to process binary operator $this") {
                 PLUS
             }
@@ -270,6 +253,9 @@ private class ExpressionConverter() {
                     if (hasAsterisk) "yieldAll" else "yield"
                 )),
                 arguments = listOf(expression?.convert() ?: NullLiteralExpressionModel())
+            )
+            is ParenthesizedExpressionDeclaration -> ParenthesizedExpressionModel(
+                expression = expression.convert()
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()

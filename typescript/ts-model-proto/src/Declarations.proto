@@ -329,6 +329,10 @@ message YieldExpressionDeclarationProto {
     bool hasAsterisk = 2;
 }
 
+message ParenthesizedExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -351,7 +355,8 @@ message ExpressionDeclarationProto {
         AsExpressionDeclarationProto asExpression = 14;
         NonNullExpressionDeclarationProto nonNullExpression = 15;
         YieldExpressionDeclarationProto yieldExpression = 16;
-        UnknownExpressionDeclarationProto unknownExpression = 17;
+        ParenthesizedExpressionDeclarationProto parenthesizedExpression = 17;
+        UnknownExpressionDeclarationProto unknownExpression = 18;
     }
 }
 
