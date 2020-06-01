@@ -57,7 +57,8 @@ class TopNCompilationTests : CompilationTests() {
                 }
                 arrayOf(
                         descriptor,
-                        File("$TOPN_DIR/node_modules/$name").normalize().absolutePath
+                        File("$TOPN_DIR/node_modules/$name").normalize().absolutePath,
+                        ""
                 )
             }.toTypedArray()
 
