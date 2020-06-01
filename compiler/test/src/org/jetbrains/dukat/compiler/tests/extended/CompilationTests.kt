@@ -71,7 +71,8 @@ abstract class CompilationTests {
 
     abstract fun runTests(
             descriptor: String,
-            sourcePath: String
+            sourcePath: String,
+            tsConfig: String
     )
 
     protected fun compile(descriptor: String, sources: List<String>, targetPath: String): ExitCode {
@@ -111,7 +112,7 @@ abstract class CompilationTests {
     }
 
     protected fun assertContentCompiles(
-            descriptor: String, sourcePath: String
+            descriptor: String, sourcePath: String, tsConfig: String? = null
     ) {
         println(sourcePath.toFileUriScheme())
         val targetPath = "./build/tests/compiled/$START_TIMESTAMP/$descriptor"
@@ -121,7 +122,7 @@ abstract class CompilationTests {
         targetDir.deleteRecursively()
 
         val translationStarted = System.currentTimeMillis()
-        getTranslator().translate(sourcePath, targetPath)
+        getTranslator().translate(sourcePath, targetPath, null, null, false, tsConfig)
         reportDataMap.getReportFor(descriptor).translationTime = System.currentTimeMillis() - translationStarted
 
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"

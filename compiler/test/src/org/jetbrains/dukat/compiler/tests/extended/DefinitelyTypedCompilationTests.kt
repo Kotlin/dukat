@@ -24,7 +24,8 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
     @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
     override fun runTests(
             descriptor: String,
-            sourcePath: String
+            sourcePath: String,
+            tsConfig: String
     ) {
         assertContentCompiles(descriptor, sourcePath)
     }

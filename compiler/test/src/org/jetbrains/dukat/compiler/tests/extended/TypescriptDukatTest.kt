@@ -6,16 +6,17 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
-class TypescriptDukatCompilationTest : CompilationTests() {
+class TranspileConverterTest : CompilationTests() {
     @DisplayName("typescript dukat test")
     @ParameterizedTest(name = "{0}")
     @MethodSource("typescriptDukatSet")
     @EnabledIfSystemProperty(named = "dukat.test.typescriptDukat", matches = "true")
     override fun runTests(
         descriptor: String,
-        sourcePath: String
+        sourcePath: String,
+        tsConfig: String
     ) {
-        assertContentCompiles(descriptor, sourcePath)
+        assertContentCompiles(descriptor, sourcePath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     companion object  {
@@ -26,7 +27,8 @@ class TypescriptDukatCompilationTest : CompilationTests() {
         fun typescriptDukatSet(): Array<Array<String>> {
             return arrayOf(arrayOf(
                 "converter",
-                File(inputPath + entryPoint).normalize().absolutePath
+                File(inputPath + entryPoint).normalize().absolutePath,
+                File(inputPath, "../tsconfig.json").absolutePath
             ))
         }
     }
