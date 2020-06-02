@@ -141,7 +141,7 @@ interface DeclarationLowering: TopLevelDeclarationLowering  {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner?.wrap(declaration)) })
     }
 
-    fun lowerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ObjectLiteralDeclaration {
+    fun lowerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, owner?.wrap(declaration)) })
     }
 
