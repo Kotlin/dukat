@@ -58,7 +58,7 @@ private fun mergeInterfaces(a: InterfaceDeclaration, b: InterfaceDeclaration): I
 
 
 private class SpecifyTypeReferenceLowering(private val typeParamMap: Map<NameEntity, ParameterValueDeclaration?>) : DeclarationLowering {
-    override fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+    override fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration): ParameterValueDeclaration {
         return typeParamMap.get(declaration.value) ?: declaration
     }
 }

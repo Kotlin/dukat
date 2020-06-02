@@ -23,19 +23,6 @@ import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
@@ -48,11 +35,10 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private val logger = Logging.logger("TypeLowering")
 
-interface DeclarationLowering: TopLevelDeclarationLowering  {
+interface DeclarationLowering : TopLevelDeclarationLowering {
 
     fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberDeclaration>?): PropertyDeclaration {
         return declaration.copy(
-                initializer = declaration.initializer?.let { lowerExpressionDeclaration(it) },
                 type = lowerParameterValue(declaration.type, owner?.wrap(declaration)),
                 typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner?.wrap(declaration)) }
         )
@@ -154,63 +140,14 @@ interface DeclarationLowering: TopLevelDeclarationLowering  {
 
     fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterDeclaration {
         return declaration.copy(
-            type = lowerParameterValue(declaration.type, owner),
-            initializer = declaration.initializer?.let { lowerExpressionDeclaration(it) }
+                type = lowerParameterValue(declaration.type, owner)
         )
     }
 
     override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration {
         return declaration.copy(
-            type = lowerParameterValue(declaration.type, owner?.wrap(declaration)),
-            initializer = declaration.initializer?.let { lowerExpressionDeclaration(it) }
+                type = lowerParameterValue(declaration.type, owner?.wrap(declaration))
         )
-    }
-
-    fun lowerExpressionDeclaration(declaration: ExpressionDeclaration): ExpressionDeclaration {
-        return when(declaration) {
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, null)
-            is ClassDeclaration -> lowerClassDeclaration(declaration, null)
-            is UnaryExpressionDeclaration -> declaration.copy(operand = lowerExpressionDeclaration(declaration.operand))
-            is ConditionalExpressionDeclaration -> declaration.copy(
-                condition = lowerExpressionDeclaration(declaration.condition),
-                whenTrue = lowerExpressionDeclaration(declaration.whenTrue),
-                whenFalse = lowerExpressionDeclaration(declaration.whenFalse)
-            )
-            is ElementAccessExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression),
-                argumentExpression = lowerExpressionDeclaration(declaration.argumentExpression)
-            )
-            is UnknownExpressionDeclaration -> declaration
-            is CallExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression),
-                arguments = declaration.arguments.map { lowerExpressionDeclaration(it) }
-            )
-            is PropertyAccessExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration)
-            )
-            is BinaryExpressionDeclaration -> declaration.copy(
-                left = lowerExpressionDeclaration(declaration.left),
-                right = lowerExpressionDeclaration(declaration.right)
-            )
-            is TypeOfExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression)
-            )
-            is NewExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression),
-                arguments = declaration.arguments.map { lowerExpressionDeclaration(it) }
-            )
-            is AsExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression),
-                type = lowerParameterValue(declaration.type, null)
-            )
-            is NonNullExpressionDeclaration -> declaration.copy(
-                expression = lowerExpressionDeclaration(declaration.expression)
-            )
-            is YieldExpressionDeclaration -> declaration.copy(
-                expression = declaration.expression?.let { lowerExpressionDeclaration(it) }
-            )
-            else -> declaration
-        }
     }
 
     fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
@@ -259,14 +196,14 @@ interface DeclarationLowering: TopLevelDeclarationLowering  {
         )
     }
 
-    fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration = declaration
+    fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration): ParameterValueDeclaration = declaration
 
     fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration, owner)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration, owner)
             is UnionTypeDeclaration -> lowerUnionTypeDeclaration(declaration, owner)
-            is TypeParamReferenceDeclaration -> lowerTypeParamReferenceDeclaration(declaration, owner)
+            is TypeParamReferenceDeclaration -> lowerTypeParamReferenceDeclaration(declaration)
             is TupleDeclaration -> lowerTupleDeclaration(declaration, owner)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration, owner)
             is ObjectLiteralDeclaration -> lowerObjectLiteralDeclaration(declaration, owner)
