@@ -27,15 +27,6 @@ import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
-@Suppress("UNCHECKED_CAST")
-private fun NodeOwner<*>.findOwnerPackage(): ModuleDeclaration {
-    val ownerPackage = getOwners().first() {
-        (it is NodeOwner<*>) && (it.node is ModuleDeclaration)
-    } as NodeOwner<ModuleDeclaration>
-
-    return ownerPackage.node
-}
-
 private fun ParameterDeclaration.isIdenticalTo(parameterDeclaration: ParameterDeclaration): Boolean {
     return (type == parameterDeclaration.type) &&
             (initializer == parameterDeclaration.initializer) &&
@@ -255,8 +246,7 @@ class GeneratedInterfacesContext {
                         typeParameters = generatedTypeParameters,
                         parentEntities = emptyList(),
                         definitionsInfo = emptyList(),
-                        uid = generatedUid,
-                        packageOwner = owner.findOwnerPackage()
+                        uid = generatedUid
                 )
 
 

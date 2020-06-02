@@ -68,7 +68,6 @@ private fun ModuleDeclaration.collectClassLikeReferences(): Map<String, ClassLik
 }
 
 private fun ClassLikeDeclaration.generatePartialInterface(
-        owner: ModuleDeclaration,
         heritageClauses: MutableSet<String>?
 ): GeneratedInterfaceDeclaration {
     val membersResolved = members.mapNotNull {
@@ -102,8 +101,7 @@ private fun ClassLikeDeclaration.generatePartialInterface(
             typeParameters,
             partialParentEntities,
             emptyList(),
-            uid.withPartialSuffix(),
-            owner)
+            uid.withPartialSuffix())
 }
 
 private class TypeVisitor(
@@ -118,8 +116,8 @@ private class TypeVisitor(
             val uid = singleTypeParam.reference?.uid
             val typeAny = TypeDeclaration(IdentifierEntity("Any"), emptyList())
             if (uid != null) {
-                classLikeReferences[uid]?.let { (classLike, owner) ->
-                    val generatePartialInterface = classLike.generatePartialInterface(owner, heritageClauses)
+                classLikeReferences[uid]?.let { (classLike, _) ->
+                    val generatePartialInterface = classLike.generatePartialInterface(heritageClauses)
                     partialReferences.putIfAbsent(uid, generatePartialInterface)
                     singleTypeParam.copy(value = generatePartialInterface.name, reference = ReferenceDeclaration(generatePartialInterface.uid))
                 } ?: typeAny
@@ -167,8 +165,8 @@ private fun ModuleDeclaration.lowerPartialOfT(): ModuleDeclaration {
     heritageClauses.map { uid ->
         val originalUid = uid.removeSuffix(PARTIAL_SUFFIX)
         if (partialReferences[originalUid] !is ClassLikeDeclaration) {
-            updatedClassReferences[originalUid]?.let { (classLike, owner) ->
-                partialReferencesFromHeritage.putIfAbsent(classLike.uid, classLike.generatePartialInterface(owner, null))
+            updatedClassReferences[originalUid]?.let { (classLike, _) ->
+                partialReferencesFromHeritage.putIfAbsent(classLike.uid, classLike.generatePartialInterface(null))
             }
         }
     }
