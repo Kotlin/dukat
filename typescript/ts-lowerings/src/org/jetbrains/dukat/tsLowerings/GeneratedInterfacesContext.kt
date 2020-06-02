@@ -204,8 +204,7 @@ class GeneratedInterfacesContext {
         return null
     }
 
-    internal fun registerObjectLiteralDeclaration(owner: NodeOwner<ObjectLiteralDeclaration>, uid: String): GeneratedInterfaceReferenceDeclaration {
-        val declaration = owner.node
+    internal fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, uid: String): GeneratedInterfaceReferenceDeclaration {
         val typeParams = LinkedHashSet<TypeParameterDeclaration>()
 
         declaration.members.forEach { member ->

@@ -73,9 +73,9 @@ private class GenerateInterfaceReferencesDeclarationLowering : DeclarationWithOw
                 val ownerUID = ownerEntity?.uid ?: ""
 
                 myAstContext.registerObjectLiteralDeclaration(
-                        owner.wrap(declaration.copy(members = declaration.members.map { param ->
+                        declaration.copy(members = declaration.members.map { param ->
                             lowerMemberDeclaration(owner.wrap(param))
-                        })),
+                        }),
                         ownerUID
                 )
             }
