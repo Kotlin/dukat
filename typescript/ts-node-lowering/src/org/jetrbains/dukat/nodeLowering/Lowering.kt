@@ -31,7 +31,7 @@ interface Lowering<T : TypeEntity> {
     fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
 
-    fun lowerTypeNode(declaration: TypeValueNode): T
+    fun lowerTypeValueNode(declaration: TypeValueNode): T
     fun lowerFunctionNode(declaration: FunctionTypeNode): T
     fun lowerUnionTypeNode(declaration: UnionTypeNode): T
 

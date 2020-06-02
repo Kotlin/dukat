@@ -45,7 +45,7 @@ private fun NodeOwner<*>.classLikeOwnerNode(): TopLevelEntity? {
 
 private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
 
-    override fun lowerTypeNode(owner: NodeOwner<TypeNode>): TypeNode {
+    override fun lowerType(owner: NodeOwner<TypeNode>): TypeNode {
         val declaration = owner.node
 
         return when (declaration) {
@@ -60,7 +60,7 @@ private class LowerThisTypeNodeLowering : NodeWithOwnerTypeLowering {
                     else -> anyNode
                 }
             }
-            else -> super.lowerTypeNode(owner)
+            else -> super.lowerType(owner)
         }
     }
 }

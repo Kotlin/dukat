@@ -33,7 +33,7 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
     fun lowerType(declaration: TypeNode): TypeNode {
         return when (declaration) {
             is TypeParameterNode -> lowerTypeParameter(declaration)
-            is TypeValueNode -> lowerTypeNode(declaration)
+            is TypeValueNode -> lowerTypeValueNode(declaration)
             is FunctionTypeNode -> lowerFunctionNode(declaration)
             is UnionTypeNode -> lowerUnionTypeNode(declaration)
             is TupleTypeNode -> lowerTupleNode(declaration)
@@ -121,7 +121,7 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
     }
 
 
-    override fun lowerTypeNode(declaration: TypeValueNode): TypeValueNode {
+    override fun lowerTypeValueNode(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(
             params = declaration.params.map { param -> lowerType(param) },
             meta = declaration.meta?.let { lowerMeta(it) }

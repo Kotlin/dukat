@@ -8,9 +8,8 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.TopLevelEntity
-import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
+import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 
 fun ModuleNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
@@ -24,15 +23,10 @@ fun ModuleNode.visitTopLevelNode(visitor: (TopLevelEntity) -> Unit) {
     }
 }
 
-private class ParameterValueVisitor(private val moduleNode: ModuleNode, private val visit: (paramValue: ParameterValueDeclaration) -> Unit) : NodeWithOwnerTypeLowering {
-
-    override fun lowerTypeNode(owner: NodeOwner<TypeNode>): TypeNode {
-        visit(owner.node)
-        return super.lowerTypeNode(owner)
-    }
-
-    fun visit() {
-        lowerRoot(moduleNode, NodeOwner(moduleNode, null))
+private class ParameterValueVisitor(private val visit: (paramValue: ParameterValueDeclaration) -> Unit) : NodeTypeLowering {
+    override fun lowerType(declaration: TypeNode): TypeNode {
+        visit(declaration)
+        return super.lowerType(declaration)
     }
 }
 
@@ -51,7 +45,7 @@ private fun ModuleNode.removeUnusedReferences(referencesToRemove: Set<String>): 
 
 private fun ModuleNode.removeUnusedGeneratedEntities(): ModuleNode {
     val typeRefs = mutableSetOf<String>()
-    ParameterValueVisitor(this) { value ->
+    ParameterValueVisitor { value ->
         when (value) {
             //TODO: we are not supposed to have reference declaration up to this point (but we have)
             is GeneratedInterfaceReferenceNode -> {
@@ -65,7 +59,7 @@ private fun ModuleNode.removeUnusedGeneratedEntities(): ModuleNode {
                 }
             }
         }
-    }.visit()
+    }.lowerModuleNode(this)
 
 
     val unusedGeneratedInterfaces = mutableSetOf<String>()
