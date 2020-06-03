@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
 
-class ExpressionLowering {
+interface ExpressionLowering {
     fun lower(declaration: ExpressionDeclaration): ExpressionDeclaration {
         return when (declaration) {
             is UnaryExpressionDeclaration -> declaration.copy(operand = lower(declaration.operand))

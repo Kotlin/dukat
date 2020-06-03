@@ -18,7 +18,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 
-open class DeclarationStatementLowering(private val expressionLowering: ExpressionLowering = ExpressionLowering()) {
+open class DeclarationStatementLowering : ExpressionLowering {
 
     open fun lowerBlock(statement: BlockDeclaration): BlockDeclaration {
         return statement.copy(
@@ -52,7 +52,7 @@ open class DeclarationStatementLowering(private val expressionLowering: Expressi
     }
 
     private fun lowerExpressionDeclaration(expression: ExpressionDeclaration): ExpressionDeclaration {
-        return this.expressionLowering.lower(expression)
+        return this.lower(expression)
     }
 
     open fun lowerExpression(statement: ExpressionStatementDeclaration): ExpressionStatementDeclaration {
@@ -117,7 +117,6 @@ open class DeclarationStatementLowering(private val expressionLowering: Expressi
 
     fun lower(moduleDeclaration: ModuleDeclaration): ModuleDeclaration {
         return moduleDeclaration.copy(declarations = moduleDeclaration.declarations.map { declaration ->
-            println("DECL [${declaration is StatementDeclaration}] ${declaration}")
             when(declaration) {
                 is StatementDeclaration -> lower(declaration)
                 else -> declaration
