@@ -6,6 +6,7 @@ import {
   TranslateAllSymbolsDependency,
   TranslateSubsetOfSymbolsDependency
 } from "./Dependency";
+import {resolveDeclarations} from "./ExportContext";
 
 export class DependencyBuilder {
   private dependencies = new Map<string, Dependency>();
@@ -53,42 +54,8 @@ export class DependencyBuilder {
   ) {
   }
 
-  private getDeclarations(node: ts.Node): Array<ts.Node> {
-    let symbolAtLocation = this.typeChecker.getSymbolAtLocation(node);
-    if (symbolAtLocation) {
-
-      if (symbolAtLocation.flags & ts.SymbolFlags.Alias) {
-        let aliasedSymbol = this.typeChecker.getAliasedSymbol(symbolAtLocation);
-        if (aliasedSymbol && Array.isArray(aliasedSymbol.declarations)) {
-          return aliasedSymbol.declarations;
-        } else {
-          return [];
-        }
-      }
-
-      if (Array.isArray(symbolAtLocation.declarations)) {
-        return symbolAtLocation.declarations;
-      } else {
-        let declaredTyped = this.typeChecker.getDeclaredTypeOfSymbol(symbolAtLocation);
-        if (declaredTyped) {
-          let resolvedASymbol = declaredTyped.symbol || declaredTyped.aliasSymbol;
-          if (resolvedASymbol && Array.isArray(resolvedASymbol.declarations)) {
-            return resolvedASymbol.declarations;
-          }
-        }
-      }
-    }
-
-    let symbol = this.typeChecker.getTypeAtLocation(node).symbol;
-    if (symbol && Array.isArray(symbol.declarations)) {
-      return symbol.declarations;
-    }
-
-    return [];
-  }
-
   private checkReferences(node: ts.Node) {
-    let declarations = this.getDeclarations(node);
+    let declarations = resolveDeclarations(node, this.typeChecker);
 
     for (let declaration of declarations) {
       if (this.checkedReferences.has(declaration)) {

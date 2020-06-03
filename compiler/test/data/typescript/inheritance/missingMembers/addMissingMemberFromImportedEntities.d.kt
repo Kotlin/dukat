@@ -20,7 +20,7 @@ external open class C : A {
     override fun ping(a: String)
 }
 
-external open class D : A {
+external open class D : B {
     open fun ping(d: Any)
     override fun ping(a: String)
 }

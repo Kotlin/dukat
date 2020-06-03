@@ -24,7 +24,7 @@ import {
 import {AstFactory} from "./ast/AstFactory";
 import {DeclarationResolver} from "./DeclarationResolver";
 import {AstExpressionConverter} from "./ast/AstExpressionConverter";
-import {ExportContext} from "./ExportContext";
+import {ExportContext, resolveDeclarations} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {
   CaseDeclarationProto,
@@ -404,16 +404,13 @@ export class AstConverter {
   }
 
   private createUid(identifier: ts.Identifier): string | null {
-    let typeOfSymbol = this.typeChecker.getDeclaredTypeOfSymbol(this.typeChecker.getSymbolAtLocation(identifier));
-    let uid: string | null = null;
-    if (typeOfSymbol && typeOfSymbol.symbol && Array.isArray(typeOfSymbol.symbol.declarations)) {
-      let declarationFromSymbol = typeOfSymbol.symbol.declarations[0];
-      //TODO: encountered in @types/express, need to work on a separate test case
-      let uidContext = (declarationFromSymbol.parent && ts.isTypeAliasDeclaration(declarationFromSymbol.parent)) ?
-        declarationFromSymbol.parent : declarationFromSymbol;
-      uid = this.exportContext.getUID(uidContext);
+    let declarations = resolveDeclarations(identifier, this.typeChecker);
+
+    if (declarations[0]) {
+      return this.exportContext.getUID(declarations[0]);
     }
-    return uid;
+
+    return null;
   }
 
   private createTypeReferenceFromSymbol(declaration: ts.Declaration | null): ReferenceEntity | null {
