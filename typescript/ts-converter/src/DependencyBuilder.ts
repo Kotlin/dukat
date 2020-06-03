@@ -114,7 +114,7 @@ export class DependencyBuilder {
   private visit(node: ts.Node) {
     if (ts.isNamedImports(node)) {
       for (let element of node.elements) {
-        this.checkReferences(element)
+        this.checkReferences(element.name);
       }
     } else if (ts.isTypeReferenceNode(node)) {
       this.checkReferences(node.typeName);

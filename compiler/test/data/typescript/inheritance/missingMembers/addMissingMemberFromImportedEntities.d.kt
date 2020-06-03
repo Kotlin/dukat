@@ -46,3 +46,5 @@ import org.w3c.xhr.*
 external interface A {
     fun ping(a: String)
 }
+
+typealias B = A
