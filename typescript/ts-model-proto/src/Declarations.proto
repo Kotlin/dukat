@@ -40,7 +40,12 @@ message ParameterValueDeclarationProto {
         TypeReferenceDeclarationProto typeReferenceDeclaration = 7;
         FunctionTypeDeclarationProto functionTypeDeclaration = 8;
         TypeParamReferenceDeclarationProto typeParamReferenceDeclaration = 9;
+        NumericLiteralDeclarationProto numericLiteral = 10;
     }
+}
+
+message NumericLiteralDeclarationProto {
+    string token = 1;
 }
 
 message StringLiteralDeclarationProto {

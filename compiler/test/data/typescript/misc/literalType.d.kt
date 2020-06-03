@@ -28,3 +28,18 @@ external open class C {
     open fun baz(s: String /* "number" */): Number
     open fun baz(s: String /* "string" */): String
 }
+
+external interface Foo {
+    var defaultPort: Number /* 80 */
+    var primeSeed: Number? /* 2 | 3 | 5 | 7 | 11 | 13 */
+        get() = definedExternally
+        set(value) = definedExternally
+    var floatSeed: Number /* 1.34 | 5.66 | 7.22 */
+    var stringSeed: String /* "a" | "b" | "c" */
+    var alphaNumeric: dynamic /* Number | Number | String | String */
+        get() = definedExternally
+        set(value) = definedExternally
+    var alwaysTrue: Boolean
+    fun ping(evt: String /* "show" | "hide" | "destroy" | "create" */)
+    fun randomEvent(): String /* "show" | "hide" | "destroy" | "create" */
+}

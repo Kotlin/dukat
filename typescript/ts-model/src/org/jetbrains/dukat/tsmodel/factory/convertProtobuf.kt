@@ -80,6 +80,7 @@ import org.jetbrains.dukat.tsmodel.importClause.ReferenceClauseDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
@@ -549,6 +550,7 @@ private fun ParameterDeclarationProto.convert(): ParameterDeclaration {
 private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration {
     return when {
         hasStringLiteral() -> StringLiteralDeclaration(stringLiteral.token)
+        hasNumericLiteral() -> NumericLiteralDeclaration(numericLiteral.token)
         hasThisType() -> ThisTypeDeclaration()
         hasIntersectionType() -> IntersectionTypeDeclaration(intersectionType.paramsList.map { it.convert() })
         hasTupleDeclaration() -> TupleDeclaration(tupleDeclaration.paramsList.map { it.convert() })

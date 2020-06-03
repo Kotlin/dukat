@@ -17,7 +17,6 @@ import {
   ParameterDeclaration,
   ReferenceEntity,
   SourceFileDeclaration,
-  SourceSet,
   StatementDeclaration,
   TypeDeclaration,
   TypeParameter,
@@ -57,6 +56,7 @@ import {
   NameDeclarationProto,
   NamedImportsDeclarationProto,
   NamespaceImportDeclarationProto,
+  NumericLiteralDeclarationProto,
   ObjectLiteralDeclarationProto,
   ParameterDeclarationProto,
   ParameterValueDeclarationProto,
@@ -66,7 +66,6 @@ import {
   ReferenceDeclarationProto,
   ReturnStatementDeclarationProto,
   SourceFileDeclarationProto,
-  SourceSetDeclarationProto,
   StatementDeclarationProto,
   StringLiteralDeclarationProto,
   SwitchStatementDeclarationProto,
@@ -99,7 +98,7 @@ export class AstFactory {
     return importClause;
   }
 
-  createImportSpecifier(name: ts.Identifier, propertyName: ts.Identifier | null, uid: string | null ): ImportSpecifierDeclaration {
+  createImportSpecifier(name: ts.Identifier, propertyName: ts.Identifier | null, uid: string | null): ImportSpecifierDeclaration {
     let importSpecifier = new ImportSpecifierDeclarationProto();
     importSpecifier.setName(name.getText());
     if (propertyName) {
@@ -577,6 +576,15 @@ export class AstFactory {
     return topLevelStatement;
   }
 
+  createNumericLiteralDeclaration(token: string): TypeDeclaration {
+    let numericLiteral = new NumericLiteralDeclarationProto();
+    numericLiteral.setToken(token);
+
+    let paramValueDeclaration = new ParameterValueDeclarationProto();
+    paramValueDeclaration.setNumericliteral(numericLiteral);
+    return paramValueDeclaration;
+  }
+
   createStringLiteralDeclaration(token: string): TypeDeclaration {
     let stringLiteral = new StringLiteralDeclarationProto();
     stringLiteral.setToken(token);
@@ -665,7 +673,7 @@ export class AstFactory {
   declareProperty(name: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
     let propertyDeclaration = new PropertyDeclarationProto();
     propertyDeclaration.setName(name);
-    if(initializer) {
+    if (initializer) {
       propertyDeclaration.setInitializer(initializer);
     }
     propertyDeclaration.setType(type);
@@ -683,7 +691,7 @@ export class AstFactory {
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
     variableDeclaration.setModifiersList(modifiers);
-    if(initializer) {
+    if (initializer) {
       variableDeclaration.setInitializer(initializer);
     }
     variableDeclaration.setUid(uid);

@@ -6,7 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
+import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -27,6 +27,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
@@ -50,6 +51,7 @@ fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
         is TypeNode -> makeNullable()
 
+        is NumericLiteralDeclaration -> copy(nullable = true)
         is StringLiteralDeclaration -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)
         is TypeParamReferenceDeclaration -> copy(nullable = true)
@@ -83,7 +85,7 @@ fun <T : Entity> Entity.duplicate(): T {
         is GeneratedInterfaceReferenceNode -> copy() as T
         is InterfaceNode -> copy() as T
         is ObjectNode -> copy() as T
-        is StringLiteralUnionNode -> copy() as T
+        is LiteralUnionNode -> copy() as T
         is TupleTypeNode -> copy() as T
         is TypeAliasNode -> copy() as T
         is TypeParameterNode -> copy() as T

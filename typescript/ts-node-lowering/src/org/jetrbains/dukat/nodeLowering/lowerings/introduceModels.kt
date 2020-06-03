@@ -22,12 +22,13 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.StringLiteralUnionNode
+import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
@@ -222,8 +223,11 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             else -> IdentifierEntity("dynamic")
         }
         return when (this) {
-            is StringLiteralUnionNode -> TypeValueModel(
-                    IdentifierEntity("String"),
+            is LiteralUnionNode -> TypeValueModel(
+                    when (kind) {
+                        UnionLiteralKind.NUMBER -> IdentifierEntity("Number")
+                        else -> IdentifierEntity("String")
+                    },
                     emptyList(),
                     params.joinToString(" | "),
                     null,

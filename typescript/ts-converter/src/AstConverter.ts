@@ -523,10 +523,13 @@ export class AstConverter {
         return this.astFactory.createThisTypeDeclaration()
       } else if (ts.isLiteralTypeNode(type)) {
         // TODO: we need to pass information on literal futher and convert it in some lowering
-        if ((type.literal.kind == ts.SyntaxKind.TrueKeyword) || (type.literal.kind == ts.SyntaxKind.FalseKeyword)) {
+        let literal = type.literal;
+        if ((literal.kind == ts.SyntaxKind.TrueKeyword) || (literal.kind == ts.SyntaxKind.FalseKeyword)) {
           return this.createTypeDeclaration("boolean");
+        } else if (literal.kind == ts.SyntaxKind.FirstLiteralToken) {
+          return this.astFactory.createNumericLiteralDeclaration(literal.getText())
         } else {
-          return this.astFactory.createStringLiteralDeclaration(type.literal.getText());
+          return this.astFactory.createStringLiteralDeclaration(literal.getText());
         }
       } else if (ts.isTupleTypeNode(type)) {
         return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
