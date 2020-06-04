@@ -72,10 +72,11 @@ export class AstExpressionConverter {
         return expressionProto;
     }
 
-    createCallExpression(expression: Expression, args: Array<Expression>): Expression {
+    createCallExpression(expression: Expression, args: Array<Expression>, typeArguments: Array<TypeDeclaration>): Expression {
         let callExpression = new declarations.CallExpressionDeclarationProto();
         callExpression.setExpression(expression);
         callExpression.setArgumentsList(args);
+        callExpression.setTypeargumentsList(typeArguments);
 
         let expressionProto = new declarations.ExpressionDeclarationProto();
         expressionProto.setCallexpression(callExpression);
@@ -103,10 +104,11 @@ export class AstExpressionConverter {
         return expressionProto;
     }
 
-    createNewExpression(expression: Expression, args: Array<Expression>) {
+    createNewExpression(expression: Expression, args: Array<Expression>, typeArguments: Array<TypeDeclaration>) {
         let newExpression = new declarations.NewExpressionDeclarationProto();
         newExpression.setExpression(expression);
         newExpression.setArgumentsList(args);
+        newExpression.setTypeargumentsList(typeArguments);
 
         let expressionProto = new declarations.ExpressionDeclarationProto();
         expressionProto.setNewexpression(newExpression);
@@ -362,7 +364,9 @@ export class AstExpressionConverter {
     convertCallExpression(expression: ts.CallExpression): Expression {
         return this.createCallExpression(
             this.convertExpression(expression.expression),
-            expression.arguments.map(arg => this.convertExpression(arg))
+            expression.arguments.map(arg => this.convertExpression(arg)),
+            expression.typeArguments ?
+                expression.typeArguments.map(arg => this.astConverter.convertType(arg)) : []
         )
     }
 
@@ -392,7 +396,9 @@ export class AstExpressionConverter {
         return this.createNewExpression(
             this.convertExpression(expression.expression),
             expression.arguments ?
-                expression.arguments.map(arg => this.convertExpression(arg)) : []
+                expression.arguments.map(arg => this.convertExpression(arg)) : [],
+            expression.typeArguments ?
+                expression.typeArguments.map(arg => this.astConverter.convertType(arg)) : []
         )
     }
 

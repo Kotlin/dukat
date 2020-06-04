@@ -209,7 +209,16 @@ private class ExpressionConverter() {
             }
             is CallExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
-                arguments.map { it.convert() }
+                arguments.map { it.convert() },
+                typeArguments.map {
+                    //TODO
+                    TypeValueModel(
+                        IdentifierEntity("Any"),
+                        listOf(),
+                        null,
+                        null
+                    )
+                }
             )
             is FunctionDeclaration -> LambdaExpressionModel(
                 parameters.map {
@@ -234,7 +243,16 @@ private class ExpressionConverter() {
             )
             is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
-                arguments.map { it.convert() }
+                arguments.map { it.convert() },
+                typeArguments.map {
+                    //TODO
+                    TypeValueModel(
+                        IdentifierEntity("Any"),
+                        listOf(),
+                        null,
+                        null
+                    )
+                }
             )
             is PropertyAccessExpressionDeclaration -> PropertyAccessExpressionModel(
                 expression.convert(),

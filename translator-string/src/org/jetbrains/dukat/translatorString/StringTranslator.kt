@@ -246,7 +246,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
 }
 
 private fun CallExpressionModel.translate(): String {
-    return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.value }}>"}${"(${arguments.joinToString(
+    return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.translate() }}>"}${"(${arguments.joinToString(
         ", "
     ) { it.translate() }})"}"
 }

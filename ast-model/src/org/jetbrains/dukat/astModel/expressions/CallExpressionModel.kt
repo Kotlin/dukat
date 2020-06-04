@@ -1,9 +1,9 @@
 package org.jetbrains.dukat.astModel.expressions
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astModel.TypeModel
 
 data class CallExpressionModel(
     val expression: ExpressionModel,
     val arguments: List<ExpressionModel>,
-    val typeParameters: List<IdentifierEntity> = listOf()
+    val typeParameters: List<TypeModel> = listOf()
 ) : ExpressionModel

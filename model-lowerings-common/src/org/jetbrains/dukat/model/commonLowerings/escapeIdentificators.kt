@@ -140,8 +140,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     private fun CallExpressionModel.escape(): CallExpressionModel {
         return copy(
                 expression = expression.escape(),
-                arguments = arguments.map { it.escape() },
-                typeParameters = typeParameters.map { it.escape() }
+                arguments = arguments.map { it.escape() }
         )
     }
 

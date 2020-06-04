@@ -619,7 +619,8 @@ fun TypeOfExpressionDeclarationProto.convert(): TypeOfExpressionDeclaration {
 fun CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
     return CallExpressionDeclaration(
             expression = expression.convert(),
-            arguments = argumentsList.map { it.convert() }
+            arguments = argumentsList.map { it.convert() },
+            typeArguments = typeArgumentsList.map { it.convert() }
     )
 }
 
@@ -683,7 +684,8 @@ fun ElementAccessExpressionDeclarationProto.convert(): ElementAccessExpressionDe
 fun NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
     return NewExpressionDeclaration(
             expression = expression.convert(),
-            arguments = argumentsList.map { it.convert() }
+            arguments = argumentsList.map { it.convert() },
+            typeArguments = typeArgumentsList.map { it.convert() }
     )
 }
 

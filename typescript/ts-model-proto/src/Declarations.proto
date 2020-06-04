@@ -292,6 +292,7 @@ message TypeOfExpressionDeclarationProto {
 message CallExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
     repeated ExpressionDeclarationProto arguments = 2;
+    repeated ParameterValueDeclarationProto typeArguments = 3;
 }
 
 message PropertyAccessExpressionDeclarationProto {
@@ -307,6 +308,7 @@ message ElementAccessExpressionDeclarationProto {
 message NewExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
     repeated ExpressionDeclarationProto arguments = 2;
+    repeated ParameterValueDeclarationProto typeArguments = 3;
 }
 
 message ConditionalExpressionDeclarationProto {
