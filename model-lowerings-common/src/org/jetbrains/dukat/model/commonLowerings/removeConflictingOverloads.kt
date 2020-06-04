@@ -3,14 +3,13 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
-import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -22,46 +21,28 @@ private fun TypeModel.withoutMeta(): TypeModel {
     }
 }
 
-private fun ParameterModel.withoutMeta(): ParameterModel {
-    return copy(type = type.withoutMeta())
-}
-
-private fun MemberModel.normalize(): MemberModel {
-    return when (this) {
-        is MethodModel -> copy(
-                parameters = parameters.map { it.withoutMeta() },
-                override = null
-        )
-        else -> this
-    }
-}
-
-private fun filterOutConflictingOverloads(members: List<MemberModel>): List<MemberModel> {
-    return members.groupBy { it.normalize() }.map { (_, bucketMembers) ->
-        if (bucketMembers.size > 1) {
-            bucketMembers.first().normalize()
-        } else {
-            bucketMembers.first()
-        }
-    }
-}
-
 private class ConflictingOverloads : TopLevelModelLowering {
-
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
-        val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
+        val node = ownerContext.node.copy(members = ownerContext.node.resolveMembers())
         return super.lowerInterfaceModel(ownerContext.copy(node = node), parentModule)
     }
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
-        val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
+        val node = ownerContext.node.copy(members = ownerContext.node.resolveMembers())
         return super.lowerClassModel(ownerContext.copy(node = node), parentModule)
     }
 }
 
 private fun mergeTypeModels(a: TypeModel, b: TypeModel): TypeModel {
     return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-        a.copy(metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).joinToString(" | "))
+        val metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).distinct().let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                it.joinToString(" | ")
+            }
+        }
+        a.copy(metaDescription = metaDescription)
     } else {
         a
     }
@@ -69,7 +50,6 @@ private fun mergeTypeModels(a: TypeModel, b: TypeModel): TypeModel {
 
 private fun mergeTypeModelsAsReturn(a: TypeModel, b: TypeModel): TypeModel {
     return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-        a.copy(metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).joinToString(" | "))
         if (a.withoutMeta() == b.withoutMeta()) {
             mergeTypeModels(a, b)
         } else {
@@ -80,6 +60,13 @@ private fun mergeTypeModelsAsReturn(a: TypeModel, b: TypeModel): TypeModel {
     }
 }
 
+private fun mergeMethodModels(a: MethodModel, b: MethodModel): MethodModel {
+    val paramsMerged = a.parameters.zip(b.parameters).map { (paramA, paramB) ->
+        paramA.copy(type = mergeTypeModels(paramA.type, paramB.type))
+    }
+
+    return a.copy(parameters = paramsMerged, type = mergeTypeModelsAsReturn(a.type, b.type))
+}
 
 private fun mergeFunctionModels(a: FunctionModel, b: FunctionModel): FunctionModel {
     val paramsMerged = a.parameters.zip(b.parameters).map { (paramA, paramB) ->
@@ -89,21 +76,44 @@ private fun mergeFunctionModels(a: FunctionModel, b: FunctionModel): FunctionMod
     return a.copy(parameters = paramsMerged, type = mergeTypeModelsAsReturn(a.type, b.type))
 }
 
-typealias FunctionModelKey = Triple<NameEntity, List<TypeModel>, List<TypeModel>>
+typealias CallableKey = Triple<NameEntity, List<TypeModel>, List<TypeModel>>
 
-private fun FunctionModel.getKey(): FunctionModelKey {
+private fun ClassLikeModel.resolveMembers(): List<MemberModel> {
+    val keyCache = mutableMapOf<MethodModel, CallableKey>()
+
+    val methodsBucket = members.filterIsInstance(MethodModel::class.java).groupBy { methodModel ->
+        val key = methodModel.getKey()
+        keyCache.put(methodModel, key)
+        key
+    }.toMutableMap()
+
+    return members.mapNotNull { memberModel ->
+        when (memberModel) {
+            is MethodModel -> {
+                methodsBucket.remove(keyCache[memberModel])?.reduce { a, b -> mergeMethodModels(a, b) }
+            }
+            else -> memberModel
+        }
+    }
+}
+
+private fun FunctionModel.getKey(): CallableKey {
+    return Triple(name, parameters.map { it.type.withoutMeta() }, typeParameters.map { it.type.withoutMeta() })
+}
+
+private fun MethodModel.getKey(): CallableKey {
     return Triple(name, parameters.map { it.type.withoutMeta() }, typeParameters.map { it.type.withoutMeta() })
 }
 
 class RemoveConflictingOverloads : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
-        val keyCache = mutableMapOf<FunctionModel, FunctionModelKey>()
+        val keyCache = mutableMapOf<FunctionModel, CallableKey>()
 
         val functionsBucket = module.declarations.filterIsInstance(FunctionModel::class.java).groupBy { functionModel ->
             val key = functionModel.getKey()
             keyCache.put(functionModel, key)
             key
-         }.toMutableMap()
+        }.toMutableMap()
 
         val declarationsResolved = module.declarations.mapNotNull { topLevelModel ->
             when (topLevelModel) {

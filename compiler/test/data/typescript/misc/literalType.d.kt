@@ -18,13 +18,11 @@ import org.w3c.xhr.*
 external fun foo(s: String /* "number" | "string" */): dynamic /* Number | String */
 
 external interface I {
-    fun bar(s: String /* "number" */): Number
-    fun bar(s: String /* "string" */): String
+    fun bar(s: String /* "number" | "string" */): dynamic /* Number | String */
 }
 
 external open class C {
-    open fun baz(s: String /* "number" */): Number
-    open fun baz(s: String /* "string" */): String
+    open fun baz(s: String /* "number" | "string" */): dynamic /* Number | String */
 }
 
 external interface Foo {

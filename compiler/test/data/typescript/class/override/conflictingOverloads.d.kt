@@ -16,7 +16,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Message {
-    open fun once(event: String, listener: () -> Unit): Message /* this */
+    open fun once(event: String /* 'abort' | 'timeout' | 'close' | 'drain' | "cancel" | "submit" | "start" | 'end' | 'finish' | 'basta' */, listener: () -> Unit): Message /* this */
     open fun once(event: Any, listener: () -> Unit): Message /* this */
 }
 
@@ -26,4 +26,4 @@ external interface Ping {
     fun ping(a: Boolean)
 }
 
-external fun addListener(event: String /* "disconnect" | "online" */, listener: (worker: Ping) -> Unit): Message /*  */
+external fun addListener(event: String /* "disconnect" | "online" */, listener: (worker: Ping) -> Unit): Message

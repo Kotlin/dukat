@@ -39,7 +39,6 @@ external interface API {
     fun ping(): Boolean
     fun pong(a: String): Boolean
     fun foo(a: String)
-    fun pong(b: String): Boolean
     fun pong(c: Number): Boolean
     fun foo(a: String, b: Boolean = definedExternally)
     fun foo(a: Number, b: Boolean = definedExternally)
