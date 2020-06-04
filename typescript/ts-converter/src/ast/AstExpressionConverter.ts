@@ -314,7 +314,7 @@ export class AstExpressionConverter {
     }
 
     convertFunctionExpression(expression: ts.FunctionExpression): Expression {
-        let name = expression.name ? expression.name.getText() : "";
+        let name = expression.name ? expression.name.text : "";
 
         let parameterDeclarations = expression.parameters.map(
             (param, count) => this.astConverter.convertParameterDeclaration(param, count)
@@ -364,7 +364,7 @@ export class AstExpressionConverter {
 
     convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
         let convertedExpression = this.convertExpression(expression.expression)
-        let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.getText())
+        let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.text)
         if (convertedExpression.hasNameexpression()) {
             let leftSideName = convertedExpression.getNameexpression()!.getName()!
             let newName = this.astFactory.createQualifiedNameEntity(leftSideName, rightSideName)
@@ -421,21 +421,21 @@ export class AstExpressionConverter {
             )
         } else {
             return this.astFactory.createIdentifierDeclarationAsNameEntity(
-                entityName.getText()
+                entityName.text
             )
         }
     }
 
     convertNumericLiteralExpression(literal: ts.NumericLiteral): Expression {
-        return this.createNumericLiteralExpression(literal.getText())
+        return this.createNumericLiteralExpression(literal.text)
     }
 
     convertBigIntLiteralExpression(literal: ts.BigIntLiteral): Expression {
-        return this.createBigIntLiteralExpression(literal.getText())
+        return this.createBigIntLiteralExpression(literal.text)
     }
 
     convertStringLiteralExpression(literal: ts.StringLiteral): Expression {
-        return this.createStringLiteralExpression(literal.getText())
+        return this.createStringLiteralExpression(literal.text)
     }
 
     private convertObjectProperty(name: ts.PropertyName, initializer: ts.Expression, optional: boolean): MemberDeclaration | null {
@@ -503,7 +503,7 @@ export class AstExpressionConverter {
     }
 
     convertRegExLiteralExpression(literal: ts.RegularExpressionLiteral): Expression {
-        return this.createRegExLiteralExpression(literal.getText())
+        return this.createRegExLiteralExpression(literal.text)
     }
 
     convertLiteralExpression(expression: ts.LiteralExpression): Expression {
@@ -547,7 +547,7 @@ export class AstExpressionConverter {
     }
 
     convertNoSubstitutionTemplateLiteral(literal: ts.NoSubstitutionTemplateLiteral): Expression {
-        return this.createStringLiteralExpression(literal.getText()
+        return this.createStringLiteralExpression(literal.text
             .split('`').join( '"'))
     }
 

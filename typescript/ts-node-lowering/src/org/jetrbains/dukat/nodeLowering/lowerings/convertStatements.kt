@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
@@ -23,9 +24,38 @@ import org.jetbrains.dukat.astModel.expressions.literals.NullLiteralExpressionMo
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_XOR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_LEFT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_RIGHT
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.NOT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_PLUS
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -71,6 +101,7 @@ import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
@@ -111,10 +142,10 @@ private class ExpressionConverter() {
 
     private fun TemplateTokenDeclaration.convert(): TemplateTokenModel {
         return when (this) {
-            is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.convert() as StringLiteralExpressionModel)
+            is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.value)
             is ExpressionTemplateTokenDeclaration -> ExpressionTemplateTokenModel(expression.convert())
             else -> raiseConcern("unable to process TemplateTokenDeclaration $this") {
-                StringTemplateTokenModel(StringLiteralExpressionModel("ERROR"))
+                StringTemplateTokenModel("ERROR")
             }
         }
     }
@@ -217,11 +248,7 @@ private class ExpressionConverter() {
             is TemplateExpressionDeclaration -> TemplateExpressionModel(
                 tokens.map { it.convert() }
             )
-            is BinaryExpressionDeclaration -> BinaryExpressionModel(
-                left.convert(),
-                convertBinaryOperator(operator),
-                right.convert()
-            )
+            is BinaryExpressionDeclaration -> this.convert()
             is UnaryExpressionDeclaration -> UnaryExpressionModel(
                 operand.convert(),
                 convertUnaryOperator(operator),
@@ -549,6 +576,46 @@ private class ExpressionConverter() {
                 )
             )
         }
+    }
+
+    private fun convertTypeOf(expression: ExpressionModel, type: String): ExpressionModel {
+        return IsExpressionModel(
+            expression = expression,
+            type = TypeValueModel(
+                IdentifierEntity(
+                    when (type) {
+                        "boolean" -> "Boolean"
+                        "number" -> "Number"
+                        "string" -> "String"
+                        else -> raiseConcern("unsupported type in typeof: $type") {
+                            "UNSUPPORTED_TYPE"
+                        }
+                    }),
+                listOf(),
+                null,
+                null
+            )
+        )
+    }
+
+    private fun BinaryExpressionDeclaration.convert(): ExpressionModel {
+        if (convertBinaryOperator(operator) == EQ) {
+            val left = left
+            val right = right
+            when {
+                left is TypeOfExpressionDeclaration && right is StringLiteralExpressionDeclaration -> {
+                    return convertTypeOf(left.expression.convert(), right.value)
+                }
+                right is TypeOfExpressionDeclaration && left is StringLiteralExpressionDeclaration -> {
+                    return convertTypeOf(right.expression.convert(), left.value)
+                }
+            }
+        }
+        return BinaryExpressionModel(
+            left.convert(),
+            convertBinaryOperator(operator),
+            right.convert()
+        )
     }
 }
 

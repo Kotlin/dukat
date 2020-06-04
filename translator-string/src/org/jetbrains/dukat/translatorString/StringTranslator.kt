@@ -37,6 +37,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
@@ -252,7 +253,7 @@ private fun CallExpressionModel.translate(): String {
 
 private fun LiteralExpressionModel.translate(): String {
     return when (this) {
-        is StringLiteralExpressionModel -> value
+        is StringLiteralExpressionModel -> "\"$value\""
         is NumericLiteralExpressionModel -> value.toString()
         is BooleanLiteralExpressionModel -> value.toString()
         is NullLiteralExpressionModel -> "null"
@@ -262,7 +263,7 @@ private fun LiteralExpressionModel.translate(): String {
 
 private fun TemplateTokenModel.translate(): String {
     return when (this) {
-        is StringTemplateTokenModel -> value.translate()
+        is StringTemplateTokenModel -> value
         is ExpressionTemplateTokenModel -> "\${${expression.translate()}}"
         else -> raiseConcern("unknown TemplateTokenModel ${this}") { "" }
     }
@@ -339,6 +340,7 @@ private fun ExpressionModel.translate(): String {
             val arguments = if (parameters.isNotEmpty()) "${translateParameters(parameters)} -> " else ""
             "{ $arguments${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")} }"
         }
+        is IsExpressionModel -> "${expression.translate()} is ${type.translate()}"
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }

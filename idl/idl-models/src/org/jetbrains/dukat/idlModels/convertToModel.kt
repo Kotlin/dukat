@@ -489,7 +489,7 @@ private class IdlFileConverter(
                                 ),
                                 listOf(
                                         StringLiteralExpressionModel(
-                                                "\"({})\""
+                                                "({})"
                                         )
                                 )
                         )
