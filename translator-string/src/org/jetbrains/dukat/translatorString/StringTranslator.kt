@@ -333,7 +333,11 @@ private fun ExpressionModel.translate(): String {
         } else {
             "${operand.translate()}${operator.translate()}"
         }
-        is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
+        is ConditionalExpressionModel -> "if (${
+            when (val condition = condition) {
+                is ParenthesizedExpressionModel -> condition.expression.translate()
+                else -> condition.translate()
+            }}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> "${expression.translate()}!!"
         is LambdaExpressionModel -> {
