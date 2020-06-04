@@ -1,5 +1,8 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
@@ -33,13 +36,6 @@ private fun MemberModel.normalize(): MemberModel {
     }
 }
 
-private fun TopLevelModel.normalize(): TopLevelModel {
-    return when (this) {
-        is FunctionModel -> copy(parameters = parameters.map { it.withoutMeta() })
-        else -> this
-    }
-}
-
 private fun filterOutConflictingOverloads(members: List<MemberModel>): List<MemberModel> {
     return members.groupBy { it.normalize() }.map { (_, bucketMembers) ->
         if (bucketMembers.size > 1) {
@@ -50,26 +46,71 @@ private fun filterOutConflictingOverloads(members: List<MemberModel>): List<Memb
     }
 }
 
-private class ConflictingOverloads() : ModelWithOwnerTypeLowering {
+private class ConflictingOverloads : TopLevelModelLowering {
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
         val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
         return super.lowerInterfaceModel(ownerContext.copy(node = node), parentModule)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
         val node = ownerContext.node.copy(members = filterOutConflictingOverloads(ownerContext.node.members))
         return super.lowerClassModel(ownerContext.copy(node = node), parentModule)
     }
 }
 
+private fun mergeTypeModels(a: TypeModel, b: TypeModel): TypeModel {
+    return if ((a is TypeValueModel) && (b is TypeValueModel)) {
+        a.copy(metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).joinToString(" | "))
+    } else {
+        a
+    }
+}
+
+private fun mergeTypeModelsAsReturn(a: TypeModel, b: TypeModel): TypeModel {
+    return if ((a is TypeValueModel) && (b is TypeValueModel)) {
+        a.copy(metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).joinToString(" | "))
+        if (a.withoutMeta() == b.withoutMeta()) {
+            mergeTypeModels(a, b)
+        } else {
+            TypeValueModel(IdentifierEntity("dynamic"), listOf(), listOfNotNull(a.fqName?.rightMost(), b.fqName?.rightMost()).joinToString(" | ") { it.toString() }, null)
+        }
+    } else {
+        TypeValueModel(IdentifierEntity("dynamic"), listOf(), null, null)
+    }
+}
+
+
+private fun mergeFunctionModels(a: FunctionModel, b: FunctionModel): FunctionModel {
+    val paramsMerged = a.parameters.zip(b.parameters).map { (paramA, paramB) ->
+        paramA.copy(type = mergeTypeModels(paramA.type, paramB.type))
+    }
+
+    return a.copy(parameters = paramsMerged, type = mergeTypeModelsAsReturn(a.type, b.type))
+}
+
+typealias FunctionModelKey = Triple<NameEntity, List<TypeModel>, List<TypeModel>>
+
+private fun FunctionModel.getKey(): FunctionModelKey {
+    return Triple(name, parameters.map { it.type.withoutMeta() }, typeParameters.map { it.type.withoutMeta() })
+}
+
 class RemoveConflictingOverloads : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
-        val declarationsResolved = module.declarations.groupBy { it.normalize() }.map { (_, bucketMembers) ->
-            if (bucketMembers.size > 1) {
-                bucketMembers.first().normalize()
-            } else {
-                bucketMembers.first()
+        val keyCache = mutableMapOf<FunctionModel, FunctionModelKey>()
+
+        val functionsBucket = module.declarations.filterIsInstance(FunctionModel::class.java).groupBy { functionModel ->
+            val key = functionModel.getKey()
+            keyCache.put(functionModel, key)
+            key
+         }.toMutableMap()
+
+        val declarationsResolved = module.declarations.mapNotNull { topLevelModel ->
+            when (topLevelModel) {
+                is FunctionModel -> {
+                    functionsBucket.remove(keyCache[topLevelModel])?.reduce { a, b -> mergeFunctionModels(a, b) }
+                }
+                else -> topLevelModel
             }
         }
 
