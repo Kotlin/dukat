@@ -38,7 +38,6 @@ import {
 import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KIND = ModifierDeclarationProto.MODIFIER_KIND;
-import {ArrayBindingPattern, BindingElement} from "../.tsdeclarations/typescript";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -56,7 +55,7 @@ export class AstConverter {
   private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
 
   private resolveModulePath(node: ts.Expression): string | null {
-    const module = ts.getResolvedModule(node.getSourceFile(), node.text);
+    const module = ts.getResolvedModule(node.getSourceFile(), node.getText());
     if (module && (typeof module.resolvedFileName == "string")) {
       return tsInternals.normalizePath(module.resolvedFileName);
     }

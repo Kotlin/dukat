@@ -259,8 +259,12 @@ export class AstExpressionConverter {
         return expression;
     }
 
-    createParenthesizedExpression(expression: Expression): Expression {
-        return AstExpressionFactory.createParenthesizedExpression(expression)
+    createParenthesizedExpression(subExpression: Expression): Expression {
+        let nonNullExpression = new declarations.NonNullExpressionDeclarationProto();
+        nonNullExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setParenthesizedexpression(nonNullExpression);
+        return expression;
     }
 
     createUnknownExpression(meta: string): Expression {
