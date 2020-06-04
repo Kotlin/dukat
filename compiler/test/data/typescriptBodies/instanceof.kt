@@ -15,12 +15,17 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun f() {
-    var m: Any = mutableMapOf<Any, Any>()
-    for (_i: Any in m) {
-        var key: Any = _i.key
-        var value: Any = _i.value
-        console.log(key)
-        console.log(value)
+fun f(isSet: Boolean) {
+    var x: Any
+    if (isSet) {
+        x = mutableSetOf()
+    } else {
+        x = arrayOf()
+    }
+    if (x is Set) {
+        console.log(x.has(5))
+    }
+    if (x is Array) {
+        x.push(5)
     }
 }

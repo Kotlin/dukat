@@ -617,6 +617,28 @@ private class ExpressionConverter() {
     }
 
     private fun BinaryExpressionDeclaration.convert(): ExpressionModel {
+        if (operator == "instanceof") {
+            val right = right
+            return IsExpressionModel(
+                expression = left.convert(),
+                type = if (right is IdentifierExpressionDeclaration) {
+                    TypeValueModel(
+                        value = right.identifier,
+                        params = listOf(),
+                        metaDescription = null,
+                        fqName = null
+                    )
+                } else {
+                    // TODO: support cases when rhs is not identifier
+                    TypeValueModel(
+                        value = IdentifierEntity("UNSUPPORTED_TYPE"),
+                        params = listOf(),
+                        metaDescription = null,
+                        fqName = null
+                    )
+                }
+            )
+        }
         if (convertBinaryOperator(operator) == EQ) {
             val left = left
             val right = right
