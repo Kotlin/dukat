@@ -33,7 +33,7 @@ interface ExpressionLowering {
                     arguments = declaration.arguments.map { lower(it) }
             )
             is PropertyAccessExpressionDeclaration -> declaration.copy(
-                    expression = lower(declaration)
+                    expression = lower(declaration.expression)
             )
             is BinaryExpressionDeclaration -> declaration.copy(
                     left = lower(declaration.left),
