@@ -1,5 +1,6 @@
 import {
   Block,
+  BindingElementDeclaration,
   ClassDeclaration,
   Declaration,
   DefinitionInfoDeclaration,
@@ -25,6 +26,7 @@ import {
 } from "./ast";
 import {createLogger} from "../Logger";
 import {
+  ArrayDestructuringDeclarationProto, BindingElementDeclarationProto, BindingVariableDeclarationProto,
   BlockDeclarationProto,
   BreakStatementDeclarationProto,
   CallSignatureDeclarationProto,
@@ -79,6 +81,7 @@ import {
   TypeReferenceDeclarationProto,
   UnionTypeDeclarationProto,
   VariableDeclarationProto,
+  VariableLikeDeclarationProto,
   WhileStatementDeclarationProto
 } from "declarations";
 import {tsInternals} from "../TsInternals";
@@ -697,8 +700,46 @@ export class AstFactory {
     variableDeclaration.setUid(uid);
     variableDeclaration.setDefinitionsinfoList(definitions);
 
+    let variableLikeDeclaration = new VariableLikeDeclarationProto();
+    variableLikeDeclaration.setVariable(variableDeclaration);
+
     let statementDeclaration = new StatementDeclarationProto();
-    statementDeclaration.setVariabledeclaration(variableDeclaration);
+    statementDeclaration.setVariablelikedeclaration(variableLikeDeclaration);
+    return statementDeclaration;
+  }
+
+  createBindingVariableDeclaration(name: string, expression: Expression | null): BindingElementDeclaration {
+    let bindingVariableDeclaration = new BindingVariableDeclarationProto();
+    bindingVariableDeclaration.setName(name);
+    if (expression) {
+      bindingVariableDeclaration.setExpression(expression);
+    }
+
+    let bindingElementDeclaration = new BindingElementDeclarationProto();
+    bindingElementDeclaration.setBindingvariable(bindingVariableDeclaration);
+    return bindingElementDeclaration;
+  }
+
+  declareArrayBindingPatternAsBindingElement(elements: Array<BindingElementDeclaration>): BindingElementDeclaration {
+    let arrayDestructuringDeclaration = new ArrayDestructuringDeclarationProto();
+    arrayDestructuringDeclaration.setElementsList(elements);
+
+    let bindingElementDeclaration = new BindingElementDeclarationProto();
+    bindingElementDeclaration.setArraydestructuring(arrayDestructuringDeclaration);
+
+    return bindingElementDeclaration;
+  }
+
+  declareArrayBindingPatternAsStatement(elements: Array<BindingElementDeclaration>): StatementDeclaration {
+
+    let arrayDestructuringDeclaration = new ArrayDestructuringDeclarationProto();
+    arrayDestructuringDeclaration.setElementsList(elements);
+
+    let variableLikeDeclaration = new VariableLikeDeclarationProto();
+    variableLikeDeclaration.setArraydestructuring(arrayDestructuringDeclaration);
+
+    let statementDeclaration = new StatementDeclarationProto();
+    statementDeclaration.setVariablelikedeclaration(variableLikeDeclaration);
     return statementDeclaration;
   }
 

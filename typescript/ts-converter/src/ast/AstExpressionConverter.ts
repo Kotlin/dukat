@@ -259,6 +259,14 @@ export class AstExpressionConverter {
         return expression;
     }
 
+    createParenthesizedExpression(subExpression: Expression): Expression {
+        let nonNullExpression = new declarations.NonNullExpressionDeclarationProto();
+        nonNullExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setParenthesizedexpression(nonNullExpression);
+        return expression;
+    }
+
     createUnknownExpression(meta: string): Expression {
         let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
         unknownExpression.setMeta(meta);
@@ -310,7 +318,7 @@ export class AstExpressionConverter {
     }
 
     convertFunctionExpression(expression: ts.FunctionExpression): Expression {
-        let name = expression.name ? expression.name.getText() : "";
+        let name = expression.name ? expression.name.text : "";
 
         let parameterDeclarations = expression.parameters.map(
             (param, count) => this.astConverter.convertParameterDeclaration(param, count)
@@ -360,7 +368,7 @@ export class AstExpressionConverter {
 
     convertPropertyAccessExpression(expression: ts.PropertyAccessExpression): Expression {
         let convertedExpression = this.convertExpression(expression.expression)
-        let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.getText())
+        let rightSideName = this.astFactory.createIdentifierDeclaration(expression.name.text)
         if (convertedExpression.hasNameexpression()) {
             let leftSideName = convertedExpression.getNameexpression()!.getName()!
             let newName = this.astFactory.createQualifiedNameEntity(leftSideName, rightSideName)
@@ -417,21 +425,21 @@ export class AstExpressionConverter {
             )
         } else {
             return this.astFactory.createIdentifierDeclarationAsNameEntity(
-                entityName.getText()
+                entityName.text
             )
         }
     }
 
     convertNumericLiteralExpression(literal: ts.NumericLiteral): Expression {
-        return this.createNumericLiteralExpression(literal.getText())
+        return this.createNumericLiteralExpression(literal.text)
     }
 
     convertBigIntLiteralExpression(literal: ts.BigIntLiteral): Expression {
-        return this.createBigIntLiteralExpression(literal.getText())
+        return this.createBigIntLiteralExpression(literal.text)
     }
 
     convertStringLiteralExpression(literal: ts.StringLiteral): Expression {
-        return this.createStringLiteralExpression(literal.getText())
+        return this.createStringLiteralExpression(literal.text)
     }
 
     private convertObjectProperty(name: ts.PropertyName, initializer: ts.Expression, optional: boolean): MemberDeclaration | null {
@@ -499,7 +507,7 @@ export class AstExpressionConverter {
     }
 
     convertRegExLiteralExpression(literal: ts.RegularExpressionLiteral): Expression {
-        return this.createRegExLiteralExpression(literal.getText())
+        return this.createRegExLiteralExpression(literal.text)
     }
 
     convertLiteralExpression(expression: ts.LiteralExpression): Expression {
@@ -543,7 +551,7 @@ export class AstExpressionConverter {
     }
 
     convertNoSubstitutionTemplateLiteral(literal: ts.NoSubstitutionTemplateLiteral): Expression {
-        return this.createStringLiteralExpression(literal.getText()
+        return this.createStringLiteralExpression(literal.text
             .split('`').join( '"'))
     }
 
@@ -563,6 +571,10 @@ export class AstExpressionConverter {
 
     private convertNonNullExpression(expression: ts.NonNullExpression): Expression {
         return this.createNonNullExpression(this.convertExpression(expression.expression))
+    }
+
+    private convertParenthesizedExpression(expression: ts.ParenthesizedExpression): Expression {
+        return this.createParenthesizedExpression(this.convertExpression(expression.expression))
     }
 
     convertUnknownExpression(expression: ts.Expression): Expression {
@@ -615,6 +627,8 @@ export class AstExpressionConverter {
             return this.convertAsExpression(expression)
         } else if (ts.isNonNullExpression(expression)) {
             return this.convertNonNullExpression(expression)
+        } else if (ts.isParenthesizedExpression(expression)) {
+            return this.convertParenthesizedExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

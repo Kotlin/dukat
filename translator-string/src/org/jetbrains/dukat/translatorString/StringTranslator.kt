@@ -37,8 +37,10 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
@@ -251,7 +253,7 @@ private fun CallExpressionModel.translate(): String {
 
 private fun LiteralExpressionModel.translate(): String {
     return when (this) {
-        is StringLiteralExpressionModel -> value
+        is StringLiteralExpressionModel -> "\"$value\""
         is NumericLiteralExpressionModel -> value.toString()
         is BooleanLiteralExpressionModel -> value.toString()
         is NullLiteralExpressionModel -> "null"
@@ -261,7 +263,7 @@ private fun LiteralExpressionModel.translate(): String {
 
 private fun TemplateTokenModel.translate(): String {
     return when (this) {
-        is StringTemplateTokenModel -> value.translate()
+        is StringTemplateTokenModel -> value
         is ExpressionTemplateTokenModel -> "\${${expression.translate()}}"
         else -> raiseConcern("unknown TemplateTokenModel ${this}") { "" }
     }
@@ -290,6 +292,11 @@ private fun BinaryOperatorModel.translate(): String {
         GT -> ">"
         LE -> "<="
         GE -> ">="
+        BITWISE_AND -> "and"
+        BITWISE_OR -> "or"
+        BITWISE_XOR -> "xor"
+        SHIFT_LEFT -> "shl"
+        SHIFT_RIGHT -> "shr"
         else -> raiseConcern("unable to process binaryOperatorModel $this") {
             ""
         }
@@ -315,6 +322,7 @@ private fun ExpressionModel.translate(): String {
         is ThisExpressionModel -> "this"
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
+        is ParenthesizedExpressionModel -> "(${expression.translate()})"
         is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
         is BinaryExpressionModel -> "${left.translate()} ${operator.translate()} ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
@@ -325,13 +333,18 @@ private fun ExpressionModel.translate(): String {
         } else {
             "${operand.translate()}${operator.translate()}"
         }
-        is ConditionalExpressionModel -> "if (${condition.translate()}) ${whenTrue.translate()} else ${whenFalse.translate()}"
+        is ConditionalExpressionModel -> "if (${
+            when (val condition = condition) {
+                is ParenthesizedExpressionModel -> condition.expression.translate()
+                else -> condition.translate()
+            }}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> "${expression.translate()}!!"
         is LambdaExpressionModel -> {
             val arguments = if (parameters.isNotEmpty()) "${translateParameters(parameters)} -> " else ""
             "{ $arguments${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")} }"
         }
+        is IsExpressionModel -> "${expression.translate()} is ${type.translate()}"
         else -> raiseConcern("unknown ExpressionModel ${this}") { "" }
     }
 }

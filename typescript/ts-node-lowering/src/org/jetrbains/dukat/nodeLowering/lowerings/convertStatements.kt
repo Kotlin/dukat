@@ -11,8 +11,10 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
+import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
@@ -24,6 +26,9 @@ import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpression
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_XOR
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
@@ -43,6 +48,8 @@ import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PL
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_LEFT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_RIGHT
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
@@ -68,6 +75,8 @@ import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.tsmodel.ArrayDestructuringDeclaration
+import org.jetbrains.dukat.tsmodel.BindingVariableDeclaration
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
@@ -90,7 +99,9 @@ import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.YieldExpressionDeclaration
@@ -105,6 +116,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenD
 import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class ExpressionConverter() {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
@@ -130,10 +142,10 @@ private class ExpressionConverter() {
 
     private fun TemplateTokenDeclaration.convert(): TemplateTokenModel {
         return when (this) {
-            is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.convert() as StringLiteralExpressionModel)
+            is StringTemplateTokenDeclaration -> StringTemplateTokenModel(value.value)
             is ExpressionTemplateTokenDeclaration -> ExpressionTemplateTokenModel(expression.convert())
             else -> raiseConcern("unable to process TemplateTokenDeclaration $this") {
-                StringTemplateTokenModel(StringLiteralExpressionModel("ERROR"))
+                StringTemplateTokenModel("ERROR")
             }
         }
     }
@@ -161,6 +173,11 @@ private class ExpressionConverter() {
             ">" -> GT
             "<=" -> LE
             ">=" -> GE
+            "&" -> BITWISE_AND
+            "|" -> BITWISE_OR
+            "^" -> BITWISE_XOR
+            "<<" -> SHIFT_LEFT
+            ">>" -> SHIFT_RIGHT
             else -> raiseConcern("unable to process binary operator $this") {
                 PLUS
             }
@@ -231,11 +248,7 @@ private class ExpressionConverter() {
             is TemplateExpressionDeclaration -> TemplateExpressionModel(
                 tokens.map { it.convert() }
             )
-            is BinaryExpressionDeclaration -> BinaryExpressionModel(
-                left.convert(),
-                convertBinaryOperator(operator),
-                right.convert()
-            )
+            is BinaryExpressionDeclaration -> this.convert()
             is UnaryExpressionDeclaration -> UnaryExpressionModel(
                 operand.convert(),
                 convertUnaryOperator(operator),
@@ -267,6 +280,9 @@ private class ExpressionConverter() {
                     if (hasAsterisk) "yieldAll" else "yield"
                 )),
                 arguments = listOf(expression?.convert() ?: NullLiteralExpressionModel())
+            )
+            is ParenthesizedExpressionDeclaration -> ParenthesizedExpressionModel(
+                expression = expression.convert()
             )
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()
@@ -372,6 +388,69 @@ private class ExpressionConverter() {
         )
     }
 
+    private fun ForOfStatementDeclaration.convert(): StatementModel {
+        return when (variable) {
+            is VariableDeclaration -> ForInStatementModel(
+                variable.convert() as VariableModel,
+                expression.convert(),
+                convertBlock(body)
+            )
+            is ArrayDestructuringDeclaration -> {
+                val fictiveVariable = VariableDeclaration(
+                    name = "_i",
+                    type = TypeDeclaration(
+                        value = IdentifierEntity("Any"),
+                        params = listOf()
+                    ),
+                    modifiers = setOf(),
+                    initializer = null,
+                    definitionsInfo = listOf(),
+                    uid = ""
+                )
+                val newAssignments = (variable as ArrayDestructuringDeclaration).elements.mapIndexedNotNull { index, element ->
+                    if (index < 2 && element is BindingVariableDeclaration) {
+                        VariableDeclaration(
+                            name = element.name,
+                            type = TypeDeclaration(
+                                value = IdentifierEntity("Any"),
+                                params = listOf()
+                            ),
+                            modifiers = setOf(),
+                            initializer = PropertyAccessExpressionDeclaration(
+                                IdentifierExpressionDeclaration(
+                                    IdentifierEntity(fictiveVariable.name)
+                                ),
+                                IdentifierEntity(when (index) {
+                                    0 -> "key"
+                                    1 -> "value"
+                                    else -> raiseConcern("invalid index in $element") { "" }
+                                })
+                            ),
+                            definitionsInfo = listOf(),
+                            uid = ""
+                        )
+                    } else {
+                        // TODO: nested destructuring
+                        // TODO: not only key/value destructuring, but also normal arrays
+                        null
+                    }
+                }
+                ForInStatementModel(
+                    fictiveVariable.convert() as VariableModel,
+                    expression.convert(),
+                    convertBlock( body.copy(
+                        statements = newAssignments + body.statements
+                    ))
+                )
+            }
+            else -> raiseConcern("unable to process ForOfStatementDeclaration $this") {
+                ExpressionStatementModel(
+                    IdentifierExpressionModel(IdentifierEntity("ERROR"))
+                )
+            }
+        }
+    }
+
     private fun StatementDeclaration.convert(): StatementModel {
         return when (this) {
             is ExpressionStatementDeclaration -> ExpressionStatementModel(
@@ -394,11 +473,7 @@ private class ExpressionConverter() {
                 condition.convert(),
                 convertBlock(statement)
             )
-            is ForOfStatementDeclaration -> ForInStatementModel(
-                variable.convert() as VariableModel,
-                expression.convert(),
-                convertBlock(body)
-            )
+            is ForOfStatementDeclaration -> convert()
             is SwitchStatementDeclaration -> convert()
             is BlockDeclaration -> RunBlockStatementModel(
                 statements.map { it.convert() }
@@ -501,6 +576,46 @@ private class ExpressionConverter() {
                 )
             )
         }
+    }
+
+    private fun convertTypeOf(expression: ExpressionModel, type: String): ExpressionModel {
+        return IsExpressionModel(
+            expression = expression,
+            type = TypeValueModel(
+                IdentifierEntity(
+                    when (type) {
+                        "boolean" -> "Boolean"
+                        "number" -> "Number"
+                        "string" -> "String"
+                        else -> raiseConcern("unsupported type in typeof: $type") {
+                            "UNSUPPORTED_TYPE"
+                        }
+                    }),
+                listOf(),
+                null,
+                null
+            )
+        )
+    }
+
+    private fun BinaryExpressionDeclaration.convert(): ExpressionModel {
+        if (convertBinaryOperator(operator) == EQ) {
+            val left = left
+            val right = right
+            when {
+                left is TypeOfExpressionDeclaration && right is StringLiteralExpressionDeclaration -> {
+                    return convertTypeOf(left.expression.convert(), right.value)
+                }
+                right is TypeOfExpressionDeclaration && left is StringLiteralExpressionDeclaration -> {
+                    return convertTypeOf(right.expression.convert(), left.value)
+                }
+            }
+        }
+        return BinaryExpressionModel(
+            left.convert(),
+            convertBinaryOperator(operator),
+            right.convert()
+        )
     }
 }
 

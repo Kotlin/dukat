@@ -12,4 +12,4 @@ data class VariableDeclaration(
 
     override val definitionsInfo: List<DefinitionInfoDeclaration>,
     override val uid: String
-) : StatementDeclaration, ParameterOwnerDeclaration, WithModifiersDeclaration, MergeableDeclaration
+) : StatementDeclaration, ParameterOwnerDeclaration, WithModifiersDeclaration, MergeableDeclaration, VariableLikeDeclaration

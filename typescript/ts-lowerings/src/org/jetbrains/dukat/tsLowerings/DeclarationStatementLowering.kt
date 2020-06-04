@@ -1,5 +1,8 @@
 package org.jetbrains.dukat.tsLowerings
 
+import org.jetbrains.dukat.tsmodel.ArrayDestructuringDeclaration
+import org.jetbrains.dukat.tsmodel.BindingElementDeclaration
+import org.jetbrains.dukat.tsmodel.BindingVariableDeclaration
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
@@ -15,6 +18,7 @@ import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.VariableLikeDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 
@@ -86,14 +90,38 @@ open class DeclarationStatementLowering : ExpressionLowering {
 
     open fun lowerForOfStatementDeclaration(statement: ForOfStatementDeclaration): ForOfStatementDeclaration {
         return statement.copy(
-            variable = this.lowerVariableDeclaration(statement.variable),
+            variable = this.lowerVariableLikeDeclaration(statement.variable),
             expression = this.lowerExpressionDeclaration(statement.expression),
             body = lowerBlock(statement.body)
         )
     }
 
+    open fun lowerVariableLikeDeclaration(statement: VariableLikeDeclaration): VariableLikeDeclaration {
+        return when (statement) {
+            is VariableDeclaration -> lowerVariableDeclaration(statement)
+            is ArrayDestructuringDeclaration -> lowerArrayDestructuringDeclaration(statement)
+            else -> statement
+        }
+    }
+
+    open fun lowerBindingVariableDeclaration(statement: BindingVariableDeclaration): BindingVariableDeclaration {
+        return statement.copy(initializer = statement.initializer?.let { lowerExpressionDeclaration(it) })
+    }
+
     open fun lowerVariableDeclaration(statement: VariableDeclaration): VariableDeclaration {
         return statement.copy(initializer = statement.initializer?.let { lowerExpressionDeclaration(it) })
+    }
+
+    open fun lowerArrayDestructuringDeclaration(statement: ArrayDestructuringDeclaration): ArrayDestructuringDeclaration {
+        return statement.copy(elements = statement.elements.map { lowerBindingElementDeclaration(it) })
+    }
+
+    open fun lowerBindingElementDeclaration(statement: BindingElementDeclaration): BindingElementDeclaration {
+        return when (statement) {
+            is BindingVariableDeclaration -> lowerBindingVariableDeclaration(statement)
+            is ArrayDestructuringDeclaration -> lowerArrayDestructuringDeclaration(statement)
+            else -> statement
+        }
     }
 
     open fun lower(statement: StatementDeclaration): StatementDeclaration {

@@ -3,6 +3,9 @@ package org.jetbrains.dukat.tsmodel.factory
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.tsmodel.ArrayDestructuringDeclaration
+import org.jetbrains.dukat.tsmodel.BindingElementDeclaration
+import org.jetbrains.dukat.tsmodel.BindingVariableDeclaration
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
@@ -45,6 +48,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.VariableLikeDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
@@ -52,6 +56,7 @@ import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
@@ -88,10 +93,13 @@ import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodelproto.ArrayDestructuringDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ArrayLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.AsExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BigIntLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BinaryExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.BindingElementDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.BindingVariableDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BlockDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BooleanLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.BreakStatementDeclarationProto
@@ -131,6 +139,7 @@ import org.jetbrains.dukat.tsmodelproto.NumericLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ObjectLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParameterValueDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ParenthesizedExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyAccessExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
@@ -154,6 +163,8 @@ import org.jetbrains.dukat.tsmodelproto.TypeReferenceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.VariableDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.VariableLikeDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.VariableLikeDeclarationProtoOrBuilder
 import org.jetbrains.dukat.tsmodelproto.WhileStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.YieldExpressionDeclarationProto
 
@@ -380,7 +391,7 @@ fun ForStatementDeclarationProto.convert(): ForStatementDeclaration {
 
 fun ForOfStatementDeclarationProto.convert(): ForOfStatementDeclaration {
     return ForOfStatementDeclaration(
-        variable = variable.convert() as VariableDeclaration,
+        variable = variable.convert() as VariableLikeDeclaration,
         expression = expression.convert(),
         body = statementList.convert() ?: BlockDeclaration(emptyList())
     )
@@ -703,11 +714,46 @@ fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
     )
 }
 
+fun ParenthesizedExpressionDeclarationProto.convert(): ParenthesizedExpressionDeclaration {
+    return ParenthesizedExpressionDeclaration(
+        expression = expression.convert()
+    )
+}
+
 fun YieldExpressionDeclarationProto.convert(): YieldExpressionDeclaration {
     return YieldExpressionDeclaration(
         expression = if (hasExpression()) expression.convert() else null,
         hasAsterisk = hasAsterisk
     )
+}
+
+fun BindingVariableDeclarationProto.convert(): BindingVariableDeclaration {
+    return BindingVariableDeclaration(
+        name = name,
+        initializer = if (hasExpression()) expression.convert() else null
+    )
+}
+
+fun BindingElementDeclarationProto.convert(): BindingElementDeclaration {
+    return when {
+        hasArrayDestructuring() -> arrayDestructuring.convert()
+        hasBindingVariable() -> bindingVariable.convert()
+        else -> throw Exception("unknown binding element: $this")
+    }
+}
+
+fun ArrayDestructuringDeclarationProto.convert(): ArrayDestructuringDeclaration {
+    return ArrayDestructuringDeclaration(
+        elements = elementsList.map { it.convert() }
+    )
+}
+
+fun VariableLikeDeclarationProto.convert(): VariableLikeDeclaration {
+    return when {
+        hasVariable() -> variable.convert()
+        hasArrayDestructuring() -> arrayDestructuring.convert()
+        else -> throw Exception("unknown variable-like declaration: $this")
+    }
 }
 
 fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
@@ -728,6 +774,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasAsExpression() -> asExpression.convert()
         hasNonNullExpression() -> nonNullExpression.convert()
         hasYieldExpression() -> yieldExpression.convert()
+        hasParenthesizedExpression() -> parenthesizedExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }
@@ -743,7 +790,7 @@ fun StatementDeclarationProto.convert(): StatementDeclaration {
         hasContinueStatement() -> continueStatement.convert()
         hasThrowStatement() -> throwStatement.convert()
         hasBlockStatement() -> blockStatement.convert()
-        hasVariableDeclaration() -> variableDeclaration.convert()
+        hasVariableLikeDeclaration() -> variableLikeDeclaration.convert()
         hasFunctionDeclaration() -> functionDeclaration.convert()
         hasForStatement() -> forStatement.convert()
         hasSwitchStatement() -> switchStatement.convert()

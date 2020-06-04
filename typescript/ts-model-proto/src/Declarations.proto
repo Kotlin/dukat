@@ -329,6 +329,10 @@ message YieldExpressionDeclarationProto {
     bool hasAsterisk = 2;
 }
 
+message ParenthesizedExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -351,7 +355,8 @@ message ExpressionDeclarationProto {
         AsExpressionDeclarationProto asExpression = 14;
         NonNullExpressionDeclarationProto nonNullExpression = 15;
         YieldExpressionDeclarationProto yieldExpression = 16;
-        UnknownExpressionDeclarationProto unknownExpression = 17;
+        ParenthesizedExpressionDeclarationProto parenthesizedExpression = 17;
+        UnknownExpressionDeclarationProto unknownExpression = 18;
     }
 }
 
@@ -471,6 +476,29 @@ message InterfaceDeclarationProto {
     string uid = 7;
 }
 
+message BindingVariableDeclarationProto {
+    string name = 1;
+    ExpressionDeclarationProto expression = 2;
+}
+
+message BindingElementDeclarationProto {
+    oneof type {
+        ArrayDestructuringDeclarationProto arrayDestructuring = 1;
+        BindingVariableDeclarationProto bindingVariable = 2;
+    }
+}
+
+message ArrayDestructuringDeclarationProto {
+    repeated BindingElementDeclarationProto elements = 1;
+}
+
+message VariableLikeDeclarationProto {
+    oneof type {
+        VariableDeclarationProto variable = 1;
+        ArrayDestructuringDeclarationProto arrayDestructuring = 2;
+    }
+}
+
 message StatementDeclarationProto {
     oneof type {
         ExpressionStatementDeclarationProto expressionStatement = 1;
@@ -479,7 +507,7 @@ message StatementDeclarationProto {
         BlockDeclarationProto blockStatement = 4;
         IfStatementDeclarationProto ifStatement = 5;
         WhileStatementDeclarationProto whileStatement = 6;
-        VariableDeclarationProto variableDeclaration = 7;
+        VariableLikeDeclarationProto variableLikeDeclaration = 7;
         FunctionDeclarationProto functionDeclaration = 8;
         ForStatementDeclarationProto forStatement = 9;
         ForOfStatementDeclarationProto forOfStatement = 10;
