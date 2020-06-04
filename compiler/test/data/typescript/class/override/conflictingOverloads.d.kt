@@ -27,3 +27,29 @@ external interface Ping {
 }
 
 external fun addListener(event: String /* "disconnect" | "online" */, listener: (worker: Ping) -> Unit): Message
+
+external interface Options<A, B>
+
+external interface Result<T>
+
+external interface `T$0` {
+    var publicKey: String
+    var privateKey: String
+}
+
+external fun generate(options: Options<String /* 'pem' | 'der' | 'der' */, String /* 'pem' | 'der' | 'pem' | 'der' */>): dynamic /* Result */
+
+external interface `T$1` {
+    var publicKey: String
+    var privateKey: Any
+}
+
+external interface `T$2` {
+    var publicKey: Any
+    var privateKey: String
+}
+
+external interface `T$3` {
+    var publicKey: Any
+    var privateKey: Any
+}

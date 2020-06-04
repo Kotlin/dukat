@@ -10,13 +10,15 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun TypeModel.withoutMeta(): TypeModel {
     return when (this) {
-        is TypeValueModel -> copy(metaDescription = null)
+        is TypeValueModel -> copy(metaDescription = null, params = params.map { param -> param.copy(type = param.type.withoutMeta()) })
         else -> this
     }
 }
@@ -42,7 +44,7 @@ private fun mergeTypeModels(a: TypeModel, b: TypeModel): TypeModel {
                 it.joinToString(" | ")
             }
         }
-        a.copy(metaDescription = metaDescription)
+        a.copy(metaDescription = metaDescription, params = mergeTypeParams(a.params, b.params))
     } else {
         a
     }
@@ -60,20 +62,24 @@ private fun mergeTypeModelsAsReturn(a: TypeModel, b: TypeModel): TypeModel {
     }
 }
 
-private fun mergeMethodModels(a: MethodModel, b: MethodModel): MethodModel {
-    val paramsMerged = a.parameters.zip(b.parameters).map { (paramA, paramB) ->
+private fun mergeTypeParams(a: List<TypeParameterModel>, b: List<TypeParameterModel>): List<TypeParameterModel> {
+    return a.zip(b).map { (paramA, paramB) ->
         paramA.copy(type = mergeTypeModels(paramA.type, paramB.type))
     }
+}
 
-    return a.copy(parameters = paramsMerged, type = mergeTypeModelsAsReturn(a.type, b.type))
+private fun mergeParams(a: List<ParameterModel>, b: List<ParameterModel>): List<ParameterModel> {
+    return a.zip(b).map { (paramA, paramB) ->
+        paramA.copy(type = mergeTypeModels(paramA.type, paramB.type))
+    }
+}
+
+private fun mergeMethodModels(a: MethodModel, b: MethodModel): MethodModel {
+    return a.copy(parameters = mergeParams(a.parameters, b.parameters), type = mergeTypeModelsAsReturn(a.type, b.type))
 }
 
 private fun mergeFunctionModels(a: FunctionModel, b: FunctionModel): FunctionModel {
-    val paramsMerged = a.parameters.zip(b.parameters).map { (paramA, paramB) ->
-        paramA.copy(type = mergeTypeModels(paramA.type, paramB.type))
-    }
-
-    return a.copy(parameters = paramsMerged, type = mergeTypeModelsAsReturn(a.type, b.type))
+    return a.copy(parameters = mergeParams(a.parameters, b.parameters), type = mergeTypeModelsAsReturn(a.type, b.type))
 }
 
 typealias CallableKey = Triple<NameEntity, List<TypeModel>, List<TypeModel>>

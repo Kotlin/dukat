@@ -18,3 +18,10 @@ declare interface Ping {
 declare function addListener(event: "disconnect", listener: (worker: Ping) => void): Message;
 declare function addListener(event: "online", listener: (worker: Ping) => void): Message;
 
+interface Options<A, B> {}
+interface Result<T> {}
+
+declare function generate(options: Options<'pem', 'pem'>): Result<{ publicKey: string, privateKey: string }>;
+declare function generate(options: Options<'pem', 'der'>): Result<{ publicKey: string, privateKey: Buffer }>;
+declare function generate(options: Options<'der', 'pem'>): Result<{ publicKey: Buffer, privateKey: string }>;
+declare function generate(options: Options<'der', 'der'>): Result<{ publicKey: Buffer, privateKey: Buffer }>;
