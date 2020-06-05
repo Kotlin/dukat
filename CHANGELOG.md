@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.1] - 5'June 2020
+  - [#174](https://github.com/Kotlin/dukat/issues/174) Function overloaded with different string literals causes duplicate function
+  - [#270](https://github.com/Kotlin/dukat/issues/270) Imported string unions are set to Any
+  - [#273](https://github.com/Kotlin/dukat/issues/273) Number literal unions are resolved as String
+  - [#279](https://github.com/Kotlin/dukat/issues/279) Declarations clash after removing string literals in params and type params
+  - [#299](https://github.com/Kotlin/dukat/issues/299) Exported type aliases are missing          
+
 ### [0.5.0] - 28'May 2020
   This release changes behaviour in some common scenarios so we've decided to update version to 0.5.0.
 
