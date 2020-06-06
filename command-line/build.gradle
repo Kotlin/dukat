@@ -17,7 +17,7 @@ dependencies {
 
   implementation(project(":ast-common"))
   implementation(project(":ast-model"))
-  implementation(project(":compiler"))
+  implementation(project(path: ":compiler", configuration: "default"))
   implementation(project(":descriptors"))
   implementation(project(":idl-reference-resolver"))
   implementation(project(":js-translator"))
@@ -28,7 +28,6 @@ dependencies {
   implementation(project(":ts-ast-declarations"))
   implementation(project(":ts-model"))
   implementation(project(":ts-translator"))
-
 
   cliRuntime(project(":compiler"))
 }
