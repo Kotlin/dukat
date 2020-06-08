@@ -269,6 +269,14 @@ export class AstExpressionConverter {
         return expression;
     }
 
+    createSpreadExpression(subExpression: Expression): Expression {
+        let spreadExpression = new declarations.SpreadExpressionDeclarationProto();
+        spreadExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setSpreadexpression(spreadExpression);
+        return expression;
+    }
+
     createUnknownExpression(meta: string): Expression {
         let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
         unknownExpression.setMeta(meta);
@@ -583,6 +591,10 @@ export class AstExpressionConverter {
         return this.createParenthesizedExpression(this.convertExpression(expression.expression))
     }
 
+    private convertSpreadExpression(expression: ts.SpreadElement): Expression {
+        return this.createSpreadExpression(this.convertExpression(expression.expression))
+    }
+
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
     }
@@ -635,6 +647,8 @@ export class AstExpressionConverter {
             return this.convertNonNullExpression(expression)
         } else if (ts.isParenthesizedExpression(expression)) {
             return this.convertParenthesizedExpression(expression)
+        } else if (ts.isSpreadElement(expression)) {
+            return this.convertSpreadExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

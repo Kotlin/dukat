@@ -15,7 +15,7 @@ data class QualifierEntity(
     override fun toString() = "${left}.${right}"
 }
 
-private operator fun NameEntity.plus(b: NameEntity): NameEntity {
+private operator fun NameEntity.plus(b: NameEntity): QualifierEntity {
     return when (b) {
         is IdentifierEntity -> QualifierEntity(this, b)
         is QualifierEntity -> ((this + b.left) + b.right)
@@ -29,11 +29,11 @@ fun NameEntity.process(handler: (String) -> String): NameEntity {
     }
 }
 
-fun NameEntity.appendLeft(qualifiedNode: NameEntity): NameEntity {
+fun NameEntity.appendLeft(qualifiedNode: NameEntity): QualifierEntity {
     return this + qualifiedNode
 }
 
-fun NameEntity.appendRight(qualifiedNode: NameEntity): NameEntity {
+fun NameEntity.appendRight(qualifiedNode: NameEntity): QualifierEntity {
     return qualifiedNode + this
 }
 

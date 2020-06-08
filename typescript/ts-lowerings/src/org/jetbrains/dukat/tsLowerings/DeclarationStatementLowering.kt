@@ -132,7 +132,7 @@ open class DeclarationStatementLowering : ExpressionLowering {
         }
     }
 
-    open fun lower(statement: StatementDeclaration): StatementDeclaration {
+    override fun lower(statement: StatementDeclaration): StatementDeclaration {
         return when (statement) {
             is BlockDeclaration -> lowerBlock(statement)
             is IfStatementDeclaration -> lowerIfStatement(statement)

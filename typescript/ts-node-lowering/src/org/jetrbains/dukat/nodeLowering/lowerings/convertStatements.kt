@@ -1,6 +1,7 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -434,15 +435,15 @@ private class ExpressionConverter() {
                                 params = listOf()
                             ),
                             modifiers = setOf(),
-                            initializer = PropertyAccessExpressionDeclaration(
-                                IdentifierExpressionDeclaration(
-                                    IdentifierEntity(fictiveVariable.name)
-                                ),
-                                IdentifierEntity(when (index) {
-                                    0 -> "key"
-                                    1 -> "value"
-                                    else -> raiseConcern("invalid index in $element") { "" }
-                                })
+                            initializer = QualifierExpressionDeclaration(
+                                QualifierEntity(
+                                    IdentifierEntity(fictiveVariable.name),
+                                    IdentifierEntity(when (index) {
+                                        0 -> "key"
+                                        1 -> "value"
+                                        else -> raiseConcern("invalid index in $element") { "" }
+                                    })
+                                )
                             ),
                             definitionsInfo = listOf(),
                             uid = ""

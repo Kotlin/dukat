@@ -15,17 +15,14 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun f(isSet: Boolean) {
-    var x: Any
-    if (isSet) {
-        x = mutableSetOf()
-    } else {
-        x = arrayOf()
-    }
-    if (x is Set) {
-        console.log(x.contains(5))
-    }
-    if (x is Array) {
-        x = x + 5
+open class A {
+    open var a1: Any = arrayOf()
+    open var a2: Any = arrayOf<Any>()
+    open fun f() {
+        var a: Any = arrayOf()
+        a = a + 1 + 2 + 3
+        a = a + 4
+        a = a + arrayOf(5, 6, 7)
+        a.forEach({ x: Any -> console.log(x) })
     }
 }

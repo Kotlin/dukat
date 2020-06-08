@@ -18,5 +18,13 @@ import org.w3c.xhr.*
 open class A {
     open var s1: Any = mutableSetOf()
     open var s2: Any = mutableSetOf<Any>()
-    open fun f() { var s3: Any = mutableSetOf() }
+    open fun f() {
+        var s: Any = mutableSetOf()
+        s.add(3)
+        s.add(5)
+        console.log(s.contains(3))
+        s.forEach({ x: Any -> console.log(x) })
+        s.remove(3)
+        console.log(s.contains(3))
+    }
 }
