@@ -1,8 +1,10 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
+import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -623,9 +625,26 @@ private class ExpressionConverter() {
             return IsExpressionModel(
                 expression = left.convert(),
                 type = if (right is IdentifierExpressionDeclaration) {
+
+                    // TODO: determine if rhs of instanceof demands type paramaters
+                    val params = if (right.identifier.value == "Map") {
+                        val star = TypeParameterModel(
+                            type = TypeValueModel(
+                                value = IdentifierEntity("*"),
+                                params = listOf(),
+                                metaDescription = null,
+                                fqName = null
+                            ),
+                            constraints = listOf()
+                        )
+                        listOf(star, star.duplicate())
+                    } else {
+                        listOf()
+                    }
+
                     TypeValueModel(
                         value = right.identifier,
-                        params = listOf(),
+                        params = params,
                         metaDescription = null,
                         fqName = null
                     )
