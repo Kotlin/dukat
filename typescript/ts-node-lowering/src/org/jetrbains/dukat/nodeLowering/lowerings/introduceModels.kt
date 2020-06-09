@@ -103,7 +103,6 @@ internal sealed class TranslationContext {
     object IRRELEVANT : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
     object INLINE_EXTENSION : TranslationContext()
-    object CONSTRUCTOR : TranslationContext()
 }
 
 private data class Members(
@@ -125,10 +124,6 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
 
 internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
-
-    companion object {
-        val IMPOSSIBLE_CONSTRAINT = IdentifierEntity("<IMPOSSIBLE-CONSTRAINT>")
-    }
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
@@ -343,7 +338,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorNode -> ConstructorModel(
-                    parameters = parameters.map { param -> param.process(TranslationContext.CONSTRUCTOR) },
+                    parameters = parameters.map { param -> param.process().copy(initializer = null) },
                     typeParameters = convertTypeParams(typeParameters),
                     generated = generated
             )
@@ -378,9 +373,6 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 type = type.process(context),
                 name = name,
                 initializer = when (context) {
-                    TranslationContext.CONSTRUCTOR -> {
-                        null
-                    }
                     TranslationContext.INLINE_EXTENSION -> {
                         if (optional) {
                             ExpressionStatementModel(
