@@ -102,7 +102,6 @@ private fun MemberNode.isStatic() = when (this) {
 internal sealed class TranslationContext {
     object IRRELEVANT : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
-    object INLINE_EXTENSION : TranslationContext()
 }
 
 private data class Members(
@@ -363,7 +362,11 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return LambdaParameterModel(
                 type = type.process(context),
                 //TODO: we have to do this check because somewhere deep in constrainToDeclaration conversion something is passing empty param
-                name = if (name.isEmpty()) { null } else { name }
+                name = if (name.isEmpty()) {
+                    null
+                } else {
+                    name
+                }
         )
     }
 
@@ -372,36 +375,20 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return ParameterModel(
                 type = type.process(context),
                 name = name,
-                initializer = when (context) {
-                    TranslationContext.INLINE_EXTENSION -> {
-                        if (optional) {
-                            ExpressionStatementModel(
-                                    IdentifierExpressionModel(
-                                            IdentifierEntity("null")
-                                    ),
-                                    meta
-                            )
-                        } else {
-                            null
-                        }
-                    }
-                    else -> {
-                        when {
-                            initializer != null -> ExpressionStatementModel(
-                                    IdentifierExpressionModel(
-                                            initializer!!.value
-                                    ),
-                                    meta
-                            )
-                            optional -> ExpressionStatementModel(
-                                    IdentifierExpressionModel(
-                                            IdentifierEntity("definedExternally")
-                                    ),
-                                    meta
-                            )
-                            else -> null
-                        }
-                    }
+                initializer = when {
+                    initializer != null -> ExpressionStatementModel(
+                            IdentifierExpressionModel(
+                                    initializer!!.value
+                            ),
+                            meta
+                    )
+                    optional -> ExpressionStatementModel(
+                            IdentifierExpressionModel(
+                                    IdentifierEntity("definedExternally")
+                            ),
+                            meta
+                    )
+                    else -> null
                 },
                 vararg = vararg,
                 modifier = null
@@ -497,21 +484,21 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun BlockStatementModel.wrapBodyAsLazyIterator(): BlockStatementModel {
         return BlockStatementModel(
-            statements = listOf(
-                ReturnStatementModel(
-                    expression = CallExpressionModel(
-                        expression = IdentifierExpressionModel(
-                            IdentifierEntity("iterator")
-                        ),
-                        arguments = listOf(
-                            LambdaExpressionModel(
-                                parameters = listOf(),
-                                body = this
-                            )
+                statements = listOf(
+                        ReturnStatementModel(
+                                expression = CallExpressionModel(
+                                        expression = IdentifierExpressionModel(
+                                                IdentifierEntity("iterator")
+                                        ),
+                                        arguments = listOf(
+                                                LambdaExpressionModel(
+                                                        parameters = listOf(),
+                                                        body = this
+                                                )
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         )
     }
 
@@ -620,7 +607,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             else -> null
         }
 
-        return  blockStatements?.let { BlockStatementModel(it) }
+        return blockStatements?.let { BlockStatementModel(it) }
     }
 
     private fun convertTypeParams(typeParameters: List<TypeValueNode>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
@@ -744,14 +731,25 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is FunctionNode -> {
-                val context = if (inline) {
-                    TranslationContext.INLINE_EXTENSION
-                } else {
-                    TranslationContext.IRRELEVANT
-                }
                 FunctionModel(
                         name = name,
-                        parameters = parameters.map { param -> param.process(context) },
+                        parameters = parameters.map { param ->
+                            val processedParam = param.process()
+                            if (inline) {
+                                processedParam.copy(initializer = if (param.optional) {
+                                    ExpressionStatementModel(
+                                            IdentifierExpressionModel(
+                                                    IdentifierEntity("null")
+                                            ),
+                                            param.meta
+                                    )
+                                } else {
+                                    null
+                                })
+                            } else {
+                                processedParam
+                            }
+                        },
                         type = type.process(),
 
                         typeParameters = convertTypeParams(typeParameters),
