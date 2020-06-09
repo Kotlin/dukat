@@ -27,6 +27,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -49,8 +50,8 @@ fun TypeNode.makeNullable(): TypeNode {
 
 fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration {
     return when (this) {
+        is IntersectionTypeDeclaration -> copy(nullable = true)
         is TypeNode -> makeNullable()
-
         is NumericLiteralDeclaration -> copy(nullable = true)
         is StringLiteralDeclaration -> copy(nullable = true)
         is TypeDeclaration -> copy(nullable = true)

@@ -15,6 +15,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external interface A
+
+external interface B
+
+external interface C
+
 external interface Foo {
     var propAny: Any?
         get() = definedExternally
@@ -32,6 +38,12 @@ external interface Foo {
         get() = definedExternally
         set(value) = definedExternally
     var propSingleLiteral: String? /* "a" */
+        get() = definedExternally
+        set(value) = definedExternally
+    var propABCIntersection: A? /* A & B & C */
+        get() = definedExternally
+        set(value) = definedExternally
+    var propABC: dynamic /* A? | B? | C? */
         get() = definedExternally
         set(value) = definedExternally
 }

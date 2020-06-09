@@ -141,85 +141,90 @@ private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
 }
 
 private fun ParameterValueDeclaration.convertToNodeNullable(meta: ParameterValueDeclaration? = null): TypeNode? {
-    return when (val declaration = this) {
+    return when (this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
-                name = declaration.value,
-                nullable = declaration.nullable,
-                meta = meta ?: declaration.meta
+                name = value,
+                nullable = nullable,
+                meta = meta ?: meta
         )
         is TypeDeclaration -> TypeValueNode(
-                value = declaration.value,
-                params = declaration.params.map { param -> param.convertToNode() },
-                typeReference = declaration.reference?.let {
+                value = value,
+                params = params.map { param -> param.convertToNode() },
+                typeReference = reference?.let {
                     ReferenceNode(it.uid)
                 },
-                nullable = declaration.nullable,
-                meta = meta ?: declaration.meta
+                nullable = nullable,
+                meta = meta ?: meta
         )
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
         is FunctionTypeDeclaration -> FunctionTypeNode(
-                parameters = declaration.parameters.map { parameterDeclaration ->
+                parameters = parameters.map { parameterDeclaration ->
                     parameterDeclaration.convertToNode(PARAMETER_CONTEXT.FUNCTION_TYPE)
                 },
-                type = declaration.type.convertToNode(),
-                nullable = declaration.nullable,
-                meta = meta ?: declaration.meta
+                type = type.convertToNode(),
+                nullable = nullable,
+                meta = meta ?: meta
         )
         is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
-                declaration.name,
-                declaration.typeParameters,
-                declaration.reference,
-                declaration.nullable,
-                meta ?: declaration.meta
+                name,
+                typeParameters,
+                reference,
+                nullable,
+                meta ?: meta
         )
         is IntersectionTypeDeclaration -> {
-            declaration.params[0].convertToNodeNullable(IntersectionMetadata(declaration.params.map { it.convertToNodeNullable() ?: it }))
+            val firstParam = params[0].convertToNodeNullable(IntersectionMetadata(params.map { it.convertToNodeNullable() ?: it }))
+            if (nullable) {
+                firstParam?.makeNullable()
+            } else {
+                firstParam
+            }
         }
         is StringLiteralDeclaration -> {
             LiteralUnionNode(
-                    params = listOf(declaration.token),
+                    params = listOf(token),
                     kind = UnionLiteralKind.STRING,
-                    nullable = declaration.nullable
+                    nullable = nullable
             )
         }
         is NumericLiteralDeclaration -> {
             LiteralUnionNode(
-                    params = listOf(declaration.token),
+                    params = listOf(token),
                     kind = UnionLiteralKind.NUMBER,
-                    nullable = declaration.nullable
+                    nullable = nullable
             )
         }
         is UnionTypeDeclaration ->
             when {
-                declaration.canBeTranslatedAsStringLiteral() -> {
+                canBeTranslatedAsStringLiteral() -> {
                     LiteralUnionNode(
-                            params = declaration.params.mapNotNull { (it as? StringLiteralDeclaration)?.token },
+                            params = params.mapNotNull { (it as? StringLiteralDeclaration)?.token },
                             kind = UnionLiteralKind.STRING,
-                            nullable = declaration.nullable
+                            nullable = nullable
                     )
                 }
-                declaration.canBeTranslatedAsNumericLiteral() -> {
+                canBeTranslatedAsNumericLiteral() -> {
                     LiteralUnionNode(
-                            params = declaration.params.mapNotNull { (it as? NumericLiteralDeclaration)?.token },
+                            params = params.mapNotNull { (it as? NumericLiteralDeclaration)?.token },
                             kind = UnionLiteralKind.NUMBER,
-                            nullable = declaration.nullable
+                            nullable = nullable
                     )
                 }
                 else -> {
                     UnionTypeNode(
-                            params = declaration.params.map { param -> param.convertToNode() },
-                            nullable = declaration.nullable,
-                            meta = meta ?: declaration.meta
+                            params = params.map { param -> param.convertToNode() },
+                            nullable = nullable,
+                            meta = meta ?: meta
                     ).lowerAsNullable()
                 }
             }
         is TupleDeclaration -> TupleTypeNode(
-                params = declaration.params.map { param -> param.convertToNode() },
-                nullable = declaration.nullable,
-                meta = meta ?: declaration.meta
+                params = params.map { param -> param.convertToNode() },
+                nullable = nullable,
+                meta = meta ?: meta
         )
         is ThisTypeDeclaration -> SELF_REFERENCE_TYPE
-        is TypeNode -> declaration
+        is TypeNode -> this
         else -> null
     }
 }
