@@ -102,7 +102,6 @@ private fun MemberNode.isStatic() = when (this) {
 internal sealed class TranslationContext {
     object TYPE_CONSTRAINT : TranslationContext()
     object IRRELEVANT : TranslationContext()
-    object FUNCTION_TYPE : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
     object INLINE_EXTENSION : TranslationContext()
     object CONSTRUCTOR : TranslationContext()
@@ -270,9 +269,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is FunctionTypeNode -> {
                 FunctionTypeModel(
                         parameters = (parameters.map { param ->
-                            param.processAsLambdaParam(TranslationContext.FUNCTION_TYPE)
+                            param.processAsLambdaParam()
                         }),
-                        type = type.process(TranslationContext.FUNCTION_TYPE),
+                        type = type.process(),
                         metaDescription = meta.processMeta(),
                         nullable = nullable
                 )
