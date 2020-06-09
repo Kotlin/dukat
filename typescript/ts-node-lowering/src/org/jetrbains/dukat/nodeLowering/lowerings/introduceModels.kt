@@ -100,7 +100,6 @@ private fun MemberNode.isStatic() = when (this) {
 }
 
 internal sealed class TranslationContext {
-    object TYPE_CONSTRAINT : TranslationContext()
     object IRRELEVANT : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
     object INLINE_EXTENSION : TranslationContext()
@@ -216,11 +215,12 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         )
     }
 
+    private fun TypeModel.isDynamic(): Boolean {
+        return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
+    }
+
     fun TypeNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
-        val dynamicName = when (context) {
-            TranslationContext.TYPE_CONSTRAINT -> IMPOSSIBLE_CONSTRAINT
-            else -> IdentifierEntity("dynamic")
-        }
+        val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
             is LiteralUnionNode -> TypeValueModel(
                     when (kind) {
@@ -639,8 +639,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         emptyList()
                     } else {
                         typeParam.params
-                                .map { param -> param.process(TranslationContext.TYPE_CONSTRAINT) }
-                                .filterNot { (it is TypeValueModel) && (it.value == IMPOSSIBLE_CONSTRAINT) }
+                                .map { param -> param.process() }
+                                .filterNot { it.isDynamic() }
 
                     }
             )
