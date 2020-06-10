@@ -19,6 +19,7 @@ import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
+import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
@@ -89,6 +90,7 @@ open class TypescriptLowerer(
         val models = nodes
                 .introduceModels()
                 .lower(
+                        RemoveRedundantTypeParams(),
                         RemoveConflictingOverloads(),
                         SubstituteTsStdLibEntities(),
                         EscapeIdentificators(),
