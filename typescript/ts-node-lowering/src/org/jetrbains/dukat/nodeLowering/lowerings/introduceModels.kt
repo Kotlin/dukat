@@ -286,15 +286,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     }
                     else -> typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                type = TypeValueModel(
-                                        typeParam.name,
-                                        emptyList(),
-                                        null,
-                                        if (reference?.uid?.endsWith("_GENERATED") == true) {
-                                            null
-                                        } else {
-                                            reference?.getFqName()
-                                        }),
+                                type = TypeParameterReferenceModel(typeParam.name, null),
                                 constraints = emptyList()
                         )
                     }
