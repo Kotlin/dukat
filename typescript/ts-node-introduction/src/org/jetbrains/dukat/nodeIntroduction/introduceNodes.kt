@@ -360,7 +360,7 @@ private class LowerDeclarationsToNodes(
                 ),
                 MethodNode(
                         "set",
-                        convertParameters(declaration.indexTypes.toMutableList() + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable() ?: declaration.returnType, null, false, false))),
+                        convertParameters(declaration.indexTypes + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable() ?: declaration.returnType, null, false, false))),
                         TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
                         false,

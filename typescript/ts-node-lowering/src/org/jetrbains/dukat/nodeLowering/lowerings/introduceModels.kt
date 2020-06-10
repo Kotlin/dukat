@@ -84,6 +84,7 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
+import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
@@ -166,7 +167,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun TypeValueNode.getFqName(): NameEntity? {
         return typeReference?.getFqName() ?: if (KotlinStdlibEntities.contains(value)) {
-            TSLIBROOT.appendLeft(value)
+            KLIBROOT.appendLeft(value)
         } else null
     }
 
@@ -216,16 +217,19 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     fun TypeNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
-            is LiteralUnionNode -> TypeValueModel(
-                    when (kind) {
-                        UnionLiteralKind.NUMBER -> IdentifierEntity("Number")
-                        else -> IdentifierEntity("String")
-                    },
-                    emptyList(),
-                    params.joinToString(" | "),
-                    null,
-                    context == TranslationContext.PROPERTY(true)
-            )
+            is LiteralUnionNode -> {
+                val value = when (kind) {
+                    UnionLiteralKind.NUMBER -> IdentifierEntity("Number")
+                    else -> IdentifierEntity("String")
+                }
+                TypeValueModel(
+                        value,
+                        emptyList(),
+                        params.joinToString(" | "),
+                        KLIBROOT.appendLeft(value),
+                        context == TranslationContext.PROPERTY(true)
+                )
+            }
             is UnionTypeNode -> TypeValueModel(
                     dynamicName,
                     emptyList(),
@@ -684,7 +688,6 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     }
 
     private fun MethodNode.process(override: NameEntity? = null): MethodModel {
-        // TODO: how ClassModel end up here?
         return MethodModel(
                 name = IdentifierEntity(name),
                 parameters = parameters.map { param -> param.process() },

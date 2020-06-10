@@ -3,7 +3,6 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.CallableModel
 import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -16,13 +15,12 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
-import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.KLIBROOT
 
 private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
@@ -242,7 +240,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
 
     private fun NameEntity.withLibPrefix(): NameEntity {
         return when (this) {
-            is IdentifierEntity -> QualifierEntity(TSLIBROOT, this)
+            is IdentifierEntity -> QualifierEntity(KLIBROOT, this)
             is QualifierEntity -> this
         }
     }

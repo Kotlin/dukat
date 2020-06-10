@@ -72,13 +72,6 @@ private class NameVisitor(private val name: NameEntity, private val importContex
     }
 
     override fun lowerIdentifierExpressionModel(ownerContext: NodeOwner<IdentifierExpressionModel>): IdentifierExpressionModel {
-
-        // TODO: enable it when we figure out correct approach to star imports
-
-        /*val node = ownerContext.node
-
-        return getNewName(node.identifier)?.let { node.copy(identifier = it) } ?: node*/
-
         return ownerContext.node
     }
 
