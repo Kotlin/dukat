@@ -623,7 +623,12 @@ private class IdlFileConverter(
                                             ),
                                             listOf(),
                                             typeParameters = listOf(
-                                                    IdentifierEntity(name)
+                                                    TypeValueModel(
+                                                        value = IdentifierEntity(name),
+                                                        params = listOf(),
+                                                        metaDescription = null,
+                                                        fqName = null
+                                                    )
                                             )
                                     )
                             )

@@ -48,7 +48,11 @@ fun ModuleDeclaration.filterOutNonDeclarations(isSubModule: Boolean): ModuleDecl
 }
 
 fun SourceFileDeclaration.filterOutNonDeclarations(): SourceFileDeclaration {
-   return copy(root = root.filterOutNonDeclarations(false))
+   return if (fileName.endsWith(".d.ts")) {
+       copy(root = root.filterOutNonDeclarations(false))
+   } else {
+       this
+   }
 }
 
 private fun SourceSetDeclaration.filterOutNonDeclarations() = copy(sources = sources.map(SourceFileDeclaration::filterOutNonDeclarations))

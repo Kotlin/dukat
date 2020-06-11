@@ -15,12 +15,18 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun f() {
-    var m: Any = mutableMapOf<Any, Any>()
-    for (_i: Any in m) {
-        var key: Any = _i.key
-        var value: Any = _i.value
-        console.log(key)
-        console.log(value)
+open class A {
+    open var m1: Any = mutableMapOf()
+    open var m2: Any = mutableMapOf<Any, Any>()
+    open fun f() {
+        var m: Any = mutableMapOf()
+        m.set(3, 2)
+        m.set(5, 1)
+        console.log(m.get(3))
+        for (_i: Any in m) {
+            var x: Any = _i.key
+            var y: Any = _i.value
+            console.log("${x} ${y}")
+        }
     }
 }

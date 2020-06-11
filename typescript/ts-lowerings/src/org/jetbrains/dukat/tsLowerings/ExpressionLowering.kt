@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.tsLowerings
 
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.AsExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
@@ -9,6 +11,7 @@ import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.SpreadExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
@@ -33,7 +36,12 @@ interface ExpressionLowering {
                     arguments = declaration.arguments.map { lower(it) }
             )
             is PropertyAccessExpressionDeclaration -> declaration.copy(
-                    expression = lower(declaration)
+                    expression = lower(declaration.expression)
+            )
+            is FunctionDeclaration -> declaration.copy(
+                    body = declaration.body?.copy(
+                        statements = declaration.body!!.statements.map { lower(it) }
+                    )
             )
             is BinaryExpressionDeclaration -> declaration.copy(
                     left = lower(declaration.left),
@@ -55,7 +63,12 @@ interface ExpressionLowering {
             is YieldExpressionDeclaration -> declaration.copy(
                     expression = declaration.expression?.let { lower(it) }
             )
+            is SpreadExpressionDeclaration -> declaration.copy(
+                    expression = lower(declaration.expression)
+            )
             else -> declaration
         }
     }
+
+    fun lower(statement: StatementDeclaration): StatementDeclaration
 }

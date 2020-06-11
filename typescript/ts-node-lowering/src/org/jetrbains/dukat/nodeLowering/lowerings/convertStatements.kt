@@ -1,7 +1,10 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
+import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -209,7 +212,16 @@ private class ExpressionConverter() {
             }
             is CallExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
-                arguments.map { it.convert() }
+                arguments.map { it.convert() },
+                typeArguments.map {
+                    //TODO
+                    TypeValueModel(
+                        IdentifierEntity("Any"),
+                        listOf(),
+                        null,
+                        null
+                    )
+                }
             )
             is FunctionDeclaration -> LambdaExpressionModel(
                 parameters.map {
@@ -234,7 +246,16 @@ private class ExpressionConverter() {
             )
             is NewExpressionDeclaration -> CallExpressionModel(
                 expression.convert(),
-                arguments.map { it.convert() }
+                arguments.map { it.convert() },
+                typeArguments.map {
+                    //TODO
+                    TypeValueModel(
+                        IdentifierEntity("Any"),
+                        listOf(),
+                        null,
+                        null
+                    )
+                }
             )
             is PropertyAccessExpressionDeclaration -> PropertyAccessExpressionModel(
                 expression.convert(),
@@ -416,15 +437,15 @@ private class ExpressionConverter() {
                                 params = listOf()
                             ),
                             modifiers = setOf(),
-                            initializer = PropertyAccessExpressionDeclaration(
-                                IdentifierExpressionDeclaration(
-                                    IdentifierEntity(fictiveVariable.name)
-                                ),
-                                IdentifierEntity(when (index) {
-                                    0 -> "key"
-                                    1 -> "value"
-                                    else -> raiseConcern("invalid index in $element") { "" }
-                                })
+                            initializer = QualifierExpressionDeclaration(
+                                QualifierEntity(
+                                    IdentifierEntity(fictiveVariable.name),
+                                    IdentifierEntity(when (index) {
+                                        0 -> "key"
+                                        1 -> "value"
+                                        else -> raiseConcern("invalid index in $element") { "" }
+                                    })
+                                )
                             ),
                             definitionsInfo = listOf(),
                             uid = ""
@@ -599,6 +620,45 @@ private class ExpressionConverter() {
     }
 
     private fun BinaryExpressionDeclaration.convert(): ExpressionModel {
+        if (operator == "instanceof") {
+            val right = right
+            return IsExpressionModel(
+                expression = left.convert(),
+                type = if (right is IdentifierExpressionDeclaration) {
+
+                    // TODO: determine if rhs of instanceof demands type paramaters
+                    val params = if (right.identifier.value == "Map") {
+                        val star = TypeParameterModel(
+                            type = TypeValueModel(
+                                value = IdentifierEntity("*"),
+                                params = listOf(),
+                                metaDescription = null,
+                                fqName = null
+                            ),
+                            constraints = listOf()
+                        )
+                        listOf(star, star.duplicate())
+                    } else {
+                        listOf()
+                    }
+
+                    TypeValueModel(
+                        value = right.identifier,
+                        params = params,
+                        metaDescription = null,
+                        fqName = null
+                    )
+                } else {
+                    // TODO: support cases when rhs is not identifier
+                    TypeValueModel(
+                        value = IdentifierEntity("UNSUPPORTED_TYPE"),
+                        params = listOf(),
+                        metaDescription = null,
+                        fqName = null
+                    )
+                }
+            )
+        }
         if (convertBinaryOperator(operator) == EQ) {
             val left = left
             val right = right

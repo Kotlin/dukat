@@ -72,10 +72,11 @@ export class AstExpressionConverter {
         return expressionProto;
     }
 
-    createCallExpression(expression: Expression, args: Array<Expression>): Expression {
+    createCallExpression(expression: Expression, args: Array<Expression>, typeArguments: Array<TypeDeclaration>): Expression {
         let callExpression = new declarations.CallExpressionDeclarationProto();
         callExpression.setExpression(expression);
         callExpression.setArgumentsList(args);
+        callExpression.setTypeargumentsList(typeArguments);
 
         let expressionProto = new declarations.ExpressionDeclarationProto();
         expressionProto.setCallexpression(callExpression);
@@ -103,10 +104,11 @@ export class AstExpressionConverter {
         return expressionProto;
     }
 
-    createNewExpression(expression: Expression, args: Array<Expression>) {
+    createNewExpression(expression: Expression, args: Array<Expression>, typeArguments: Array<TypeDeclaration>) {
         let newExpression = new declarations.NewExpressionDeclarationProto();
         newExpression.setExpression(expression);
         newExpression.setArgumentsList(args);
+        newExpression.setTypeargumentsList(typeArguments);
 
         let expressionProto = new declarations.ExpressionDeclarationProto();
         expressionProto.setNewexpression(newExpression);
@@ -267,6 +269,14 @@ export class AstExpressionConverter {
         return expression;
     }
 
+    createSpreadExpression(subExpression: Expression): Expression {
+        let spreadExpression = new declarations.SpreadExpressionDeclarationProto();
+        spreadExpression.setExpression(subExpression);
+        let expression = new declarations.ExpressionDeclarationProto();
+        expression.setSpreadexpression(spreadExpression);
+        return expression;
+    }
+
     createUnknownExpression(meta: string): Expression {
         let unknownExpression = new declarations.UnknownExpressionDeclarationProto();
         unknownExpression.setMeta(meta);
@@ -362,7 +372,9 @@ export class AstExpressionConverter {
     convertCallExpression(expression: ts.CallExpression): Expression {
         return this.createCallExpression(
             this.convertExpression(expression.expression),
-            expression.arguments.map(arg => this.convertExpression(arg))
+            expression.arguments.map(arg => this.convertExpression(arg)),
+            expression.typeArguments ?
+                expression.typeArguments.map(arg => this.astConverter.convertType(arg)) : []
         )
     }
 
@@ -392,7 +404,9 @@ export class AstExpressionConverter {
         return this.createNewExpression(
             this.convertExpression(expression.expression),
             expression.arguments ?
-                expression.arguments.map(arg => this.convertExpression(arg)) : []
+                expression.arguments.map(arg => this.convertExpression(arg)) : [],
+            expression.typeArguments ?
+                expression.typeArguments.map(arg => this.astConverter.convertType(arg)) : []
         )
     }
 
@@ -577,6 +591,10 @@ export class AstExpressionConverter {
         return this.createParenthesizedExpression(this.convertExpression(expression.expression))
     }
 
+    private convertSpreadExpression(expression: ts.SpreadElement): Expression {
+        return this.createSpreadExpression(this.convertExpression(expression.expression))
+    }
+
     convertUnknownExpression(expression: ts.Expression): Expression {
         return this.createUnknownExpression(expression.getText())
     }
@@ -629,6 +647,8 @@ export class AstExpressionConverter {
             return this.convertNonNullExpression(expression)
         } else if (ts.isParenthesizedExpression(expression)) {
             return this.convertParenthesizedExpression(expression)
+        } else if (ts.isSpreadElement(expression)) {
+            return this.convertSpreadExpression(expression)
         } else {
             return this.convertUnknownExpression(expression)
         }

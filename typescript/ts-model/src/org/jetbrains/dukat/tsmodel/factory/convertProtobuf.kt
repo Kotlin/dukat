@@ -58,6 +58,7 @@ import org.jetbrains.dukat.tsmodel.expression.ElementAccessExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.NewExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.PropertyAccessExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.SpreadExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.TypeOfExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
@@ -149,6 +150,7 @@ import org.jetbrains.dukat.tsmodelproto.RegExLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReturnStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceFileDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SourceSetDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.SpreadExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.StringLiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.SwitchStatementDeclarationProto
@@ -619,7 +621,8 @@ fun TypeOfExpressionDeclarationProto.convert(): TypeOfExpressionDeclaration {
 fun CallExpressionDeclarationProto.convert(): CallExpressionDeclaration {
     return CallExpressionDeclaration(
             expression = expression.convert(),
-            arguments = argumentsList.map { it.convert() }
+            arguments = argumentsList.map { it.convert() },
+            typeArguments = typeArgumentsList.map { it.convert() }
     )
 }
 
@@ -683,7 +686,8 @@ fun ElementAccessExpressionDeclarationProto.convert(): ElementAccessExpressionDe
 fun NewExpressionDeclarationProto.convert(): NewExpressionDeclaration {
     return NewExpressionDeclaration(
             expression = expression.convert(),
-            arguments = argumentsList.map { it.convert() }
+            arguments = argumentsList.map { it.convert() },
+            typeArguments = typeArgumentsList.map { it.convert() }
     )
 }
 
@@ -716,6 +720,12 @@ fun NonNullExpressionDeclarationProto.convert(): NonNullExpressionDeclaration {
 
 fun ParenthesizedExpressionDeclarationProto.convert(): ParenthesizedExpressionDeclaration {
     return ParenthesizedExpressionDeclaration(
+        expression = expression.convert()
+    )
+}
+
+fun SpreadExpressionDeclarationProto.convert(): SpreadExpressionDeclaration {
+    return SpreadExpressionDeclaration(
         expression = expression.convert()
     )
 }
@@ -775,6 +785,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasNonNullExpression() -> nonNullExpression.convert()
         hasYieldExpression() -> yieldExpression.convert()
         hasParenthesizedExpression() -> parenthesizedExpression.convert()
+        hasSpreadExpression() -> spreadExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
         else -> throw Exception("unknown expression: ${this}")
     }

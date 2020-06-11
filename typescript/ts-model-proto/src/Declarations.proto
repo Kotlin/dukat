@@ -292,6 +292,7 @@ message TypeOfExpressionDeclarationProto {
 message CallExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
     repeated ExpressionDeclarationProto arguments = 2;
+    repeated ParameterValueDeclarationProto typeArguments = 3;
 }
 
 message PropertyAccessExpressionDeclarationProto {
@@ -307,6 +308,7 @@ message ElementAccessExpressionDeclarationProto {
 message NewExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
     repeated ExpressionDeclarationProto arguments = 2;
+    repeated ParameterValueDeclarationProto typeArguments = 3;
 }
 
 message ConditionalExpressionDeclarationProto {
@@ -333,6 +335,10 @@ message ParenthesizedExpressionDeclarationProto {
     ExpressionDeclarationProto expression = 1;
 }
 
+message SpreadExpressionDeclarationProto {
+    ExpressionDeclarationProto expression = 1;
+}
+
 message UnknownExpressionDeclarationProto {
     string meta = 1;
 }
@@ -356,7 +362,8 @@ message ExpressionDeclarationProto {
         NonNullExpressionDeclarationProto nonNullExpression = 15;
         YieldExpressionDeclarationProto yieldExpression = 16;
         ParenthesizedExpressionDeclarationProto parenthesizedExpression = 17;
-        UnknownExpressionDeclarationProto unknownExpression = 18;
+        SpreadExpressionDeclarationProto spreadExpression = 18;
+        UnknownExpressionDeclarationProto unknownExpression = 19;
     }
 }
 
