@@ -11,7 +11,6 @@ import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.ts.translator.ECMAScriptLowerer
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
-import org.jetbrains.dukat.ts.translator.TypescriptWithBodyLowerer
 
 
 @OptIn(UnstableDefault::class)
@@ -44,7 +43,7 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binData, dirName, JsRuntimeByteArrayTranslator(TypescriptWithBodyLowerer(moduleNameResolver, null)), reportPath, withDescriptors)
+        translateBinaryBundle(binData, dirName, JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null)), reportPath, withDescriptors)
     }
 }
 

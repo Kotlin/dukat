@@ -36,8 +36,10 @@ import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
+import org.jetbrains.dukat.tsLowerings.ResolveCollections
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
+import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -70,7 +72,9 @@ open class TypescriptLowerer(
                         GenerateInterfaceReferences(),
                         DesugarArrayDeclarations(),
                         FixImpossibleInheritance(),
-                        LowerPartialOf()
+                        LowerPartialOf(),
+                        ResolveLoops(),
+                        ResolveCollections()
                 )
 
 
