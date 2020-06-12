@@ -20,6 +20,8 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
+import org.jetbrains.dukat.graphs.Graph
+import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 import org.jetbrains.dukat.stdlib.KLIBROOT
 
 private fun TypeModel.isAny(): Boolean {
@@ -35,7 +37,19 @@ private enum class MemberOverrideStatus {
     IS_IMPOSSIBLE
 }
 
-private class ClassLikeOverrideResolver(private val context: ModelContext, private val classLike: ClassLikeModel) {
+private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
+    val graph = Graph<ClassLikeModel>()
+
+    getClassLikeIterable().forEach { classLike ->
+        getAllParents(classLike).forEach { resolvedClassLike ->
+            graph.addEdge(classLike, resolvedClassLike.classLike)
+        }
+    }
+
+    return graph
+}
+
+private class ClassLikeOverrideResolver(private val context: ModelContext, private val inheritanceContext: InheritanceContext, private val classLike: ClassLikeModel) {
 
     private fun TypeModel.resolveAsTypeParam(): TypeParameterModel? {
         return when (this) {
@@ -115,7 +129,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                     else -> listOf(this)
                 }
             }
-            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, this).resolve())
+            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, inheritanceContext,this).resolve())
             else -> listOf(this)
         }
     }
@@ -207,7 +221,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             val classLikeA = type.resolveClassLike()?.classLike
             val classLikeB = otherPropertyModel.type.resolveClassLike()?.classLike
 
-            return ((classLikeA != null) && (classLikeA === classLikeB)) || context.inheritanceContext.isDescendant(classLike, classLikeB)
+            return ((classLikeA != null) && (classLikeA === classLikeB)) || inheritanceContext.isDescendant(classLike, classLikeB)
         }
         return (!type.nullable && otherPropertyModel.type.nullable)
     }
@@ -326,7 +340,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                 val classLikeB = b.type.resolveClassLike()
 
                 if (classLikeA != null && classLikeB != null) {
-                    context.inheritanceContext.areRelated(classLikeA.classLike, classLikeB.classLike)
+                    inheritanceContext.areRelated(classLikeA.classLike, classLikeB.classLike)
                 } else {
                     val aType = a.type.normalize()
                     val bType = b.type.normalize()
@@ -414,7 +428,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                 val isSameClass = classLikeA === classLikeB
 
                 if (params.isEmpty() && otherParameterType.params.isEmpty()) {
-                    if (isSameClass || context.inheritanceContext.isDescendant(classLikeA, classLikeB)) {
+                    if (isSameClass || inheritanceContext.isDescendant(classLikeA, classLikeB)) {
                         return true
                     }
                 } else if (params.size == otherParameterType.params.size) {
@@ -447,11 +461,11 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
     }
 }
 
-private class OverrideResolver(private val context: ModelContext) {
+private class OverrideResolver(private val context: ModelContext, private val inheritanceContext: InheritanceContext) {
     fun lowerOverrides(moduleModel: ModuleModel): ModuleModel {
         val loweredDeclarations = moduleModel.declarations.map { declaration ->
             when (declaration) {
-                is ClassLikeModel -> ClassLikeOverrideResolver(context, declaration).resolve()
+                is ClassLikeModel -> ClassLikeOverrideResolver(context, inheritanceContext, declaration).resolve()
                 else -> {
                     declaration
                 }
@@ -464,13 +478,15 @@ private class OverrideResolver(private val context: ModelContext) {
 
 class LowerOverrides : ModelLowering {
     private lateinit var modelContext: ModelContext
+    private lateinit var inheritanceContext: InheritanceContext
 
     override fun lower(module: ModuleModel): ModuleModel {
-        return OverrideResolver(modelContext).lowerOverrides(module)
+        return OverrideResolver(modelContext, inheritanceContext).lowerOverrides(module)
     }
 
     override fun lower(source: SourceSetModel): SourceSetModel {
         modelContext = ModelContext(source)
+        inheritanceContext = InheritanceContext(modelContext.buildInheritanceGraph())
         return super.lower(source)
     }
 }

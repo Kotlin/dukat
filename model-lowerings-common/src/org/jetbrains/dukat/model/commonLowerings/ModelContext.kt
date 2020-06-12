@@ -41,29 +41,14 @@ private fun ModuleModel.forEachTopLevelModel(handler: (TopLevelModel, ownerName:
     imports.forEach { handler(it, name) }
 }
 
-private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
-    val graph = Graph<ClassLikeModel>()
-
-    getClassLikeIterable().forEach { classLike ->
-        getAllParents(classLike).forEach { resolvedClassLike ->
-            graph.addEdge(classLike, resolvedClassLike.classLike)
-        }
-    }
-
-    return graph
-}
-
 class ModelContext(sourceSetModel: SourceSetModel) {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
     private val myAliases: MutableMap<NameEntity, TypeAliasModel> = mutableMapOf()
     private val myNamedImports: MutableMap<NameEntity, NameEntity> = mutableMapOf()
 
-    val inheritanceContext: InheritanceContext
-
     init {
         sourceSetModel.forEachTopLevelModel { topLevelModel, ownerName -> topLevelModel.register(ownerName) }
-        inheritanceContext = InheritanceContext(buildInheritanceGraph())
     }
 
     private fun ClassLikeModel.register(ownerName: NameEntity) {
