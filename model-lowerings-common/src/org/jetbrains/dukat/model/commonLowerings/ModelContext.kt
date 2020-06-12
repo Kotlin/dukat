@@ -12,8 +12,8 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.graphs.Graph
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
-import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceGraph
 
 data class ResolvedClassLike<T : ClassLikeModel>(
         val classLike: T,
@@ -41,6 +41,18 @@ private fun ModuleModel.forEachTopLevelModel(handler: (TopLevelModel, ownerName:
     imports.forEach { handler(it, name) }
 }
 
+private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
+    val graph = Graph<ClassLikeModel>()
+
+    getClassLikeIterable().forEach { classLike ->
+        getAllParents(classLike).forEach { resolvedClassLike ->
+            graph.addEdge(classLike, resolvedClassLike.classLike)
+        }
+    }
+
+    return graph
+}
+
 class ModelContext(sourceSetModel: SourceSetModel) {
     private val myInterfaces: MutableMap<NameEntity, InterfaceModel> = mutableMapOf()
     private val myClassNodes: MutableMap<NameEntity, ClassModel> = mutableMapOf()
@@ -51,7 +63,7 @@ class ModelContext(sourceSetModel: SourceSetModel) {
 
     init {
         sourceSetModel.forEachTopLevelModel { topLevelModel, ownerName -> topLevelModel.register(ownerName) }
-        inheritanceContext = InheritanceContext(InheritanceGraph(this))
+        inheritanceContext = InheritanceContext(buildInheritanceGraph())
     }
 
     private fun ClassLikeModel.register(ownerName: NameEntity) {

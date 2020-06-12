@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.model.commonLowerings.overrides
 
 import org.jetbrains.dukat.astModel.ClassLikeModel
+import org.jetbrains.dukat.graphs.Graph
 
-class InheritanceContext(private val inheritanceGraph: InheritanceGraph) {
-    fun isDescendant(classLikeModel: ClassLikeModel?, parentCandidate: ClassLikeModel?): Boolean {
-        return inheritanceGraph.getAdjacentVertices(classLikeModel)?.contains(parentCandidate) == true
+class InheritanceContext(private val inheritanceGraph: Graph<ClassLikeModel>) {
+    fun isDescendant(classLikeModelA: ClassLikeModel?, classLikeModelB: ClassLikeModel?): Boolean {
+        return inheritanceGraph.areConnected(classLikeModelA, classLikeModelB)
     }
 
     fun areRelated(classLikeModelA: ClassLikeModel?, classLikeModelB: ClassLikeModel?): Boolean {
