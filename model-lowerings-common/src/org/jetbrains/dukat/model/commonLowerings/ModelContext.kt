@@ -12,8 +12,6 @@ import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.graphs.Graph
-import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 
 data class ResolvedClassLike<T : ClassLikeModel>(
         val classLike: T,

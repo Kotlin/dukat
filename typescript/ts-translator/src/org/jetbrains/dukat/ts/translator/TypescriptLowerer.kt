@@ -12,7 +12,6 @@ import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
-import org.jetbrains.dukat.model.commonLowerings.AddNoinlineModifier
 import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
@@ -106,7 +105,6 @@ open class TypescriptLowerer(
                         SpecifyTypeNodesWithModuleData(),
                         AddExplicitGettersAndSetters(),
                         AnyfyUnresolvedTypes(),
-                        AddNoinlineModifier(),
                         RemoveKotlinBuiltIns(),
                         CorrectStdLibTypes(),
                         RemoveDuplicateMembers(),
