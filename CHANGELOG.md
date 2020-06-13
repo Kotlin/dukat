@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.2] - 13'June 2020
+   Minor release dedicated to reducing the number of conflicting overloads.
+   
+  - [#301](https://github.com/Kotlin/dukat/issues/301) Rudiment type params lead to conflicting overloads 
+  - [#306](https://github.com/Kotlin/dukat/issues/306) Conflicting overload on unrolling union type containing both string literal and string 
+  - [#305](https://github.com/Kotlin/dukat/issues/305) Translation failure when trying to nullify intersection type
+
 ### [0.5.1] - 5'June 2020
   - [#174](https://github.com/Kotlin/dukat/issues/174) Function overloaded with different string literals causes duplicate function
   - [#270](https://github.com/Kotlin/dukat/issues/270) Imported string unions are set to Any
