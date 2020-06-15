@@ -5,12 +5,12 @@ module.exports = {
   target: "node",
   entry: {
     "converter": [
-      path.resolve("./build/ts/converter.js")
+      path.resolve(__dirname, "build/ts/converter.js")
     ]
   },
   resolve: {
     alias: {
-      "declarations": path.resolve("../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb")
+      "declarations": path.resolve(__dirname, "../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb")
     }
   },
   externals: {
@@ -23,7 +23,7 @@ module.exports = {
   },
   output: {
     libraryTarget: "commonjs",
-    path: path.resolve("build/bundle"),
+    path: path.resolve(__dirname, "build/bundle"),
     filename: "[name].js"
   }
 };

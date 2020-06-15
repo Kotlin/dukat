@@ -44,6 +44,7 @@ task copyTypescriptDeclarations(type: Copy) {
 
 task compileTs(type: NodeTask) {
   dependsOn = [yarn, copyTypescriptDeclarations, ":ts-model-proto:build"]
+
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   inputs.dir(packagePath)
@@ -51,7 +52,7 @@ task compileTs(type: NodeTask) {
 
   script = file("${packagePath}/node_modules/typescript/bin/tsc")
 
-  args = ["-p", "tsconfig.json"]
+  args = ["-p", file("./tsconfig.json").path]
 }
 
 task webpack(type: NodeTask) {
@@ -59,6 +60,7 @@ task webpack(type: NodeTask) {
   def scriptName = "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
 
   inputs.file(scriptName)
+  inputs.file("webpack.config.js")
   inputs.dir("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js")
   inputs.dir("${project.buildDir}/ts")
   inputs.dir("${project.buildDir}/package/node_modules")

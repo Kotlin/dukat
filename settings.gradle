@@ -22,8 +22,6 @@ pluginManagement {
         useModule("org.jetbrains.kotlin:kotlin-serialization:${gradle.kotlinVersion}")
       } else if (pluginId == 'com.google.protobuf') {
         useModule("com.google.protobuf:protobuf-gradle-plugin:${gradle.protobufGradlePluginVersion}")
-      } else if (pluginId == "com.moowork.node") {
-        useModule("com.moowork.gradle:gradle-node-plugin:${gradle.nodePluginVersion}")
       }
     }
   }
@@ -46,7 +44,6 @@ gradle.ext {
   nodeVersion = "13.11.0"
   npmVersion = "6.13.4"
   yarnVersion = "1.17.3"
-  nodePluginVersion = "1.3.1"
   defaultTsVersion = "3.5.3"
   defaultNpmPackageVersion = "0.5.2"
   kotlinSerializationRuntimeVersion = "0.20.0"
