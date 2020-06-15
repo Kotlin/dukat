@@ -3,11 +3,15 @@ package org.jetrbains.dukat.nodeLowering
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -20,6 +24,14 @@ interface TopLevelNodeLowering {
     fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode = declaration
     fun lowerEnumNode(declaration: EnumNode, owner: ModuleNode): EnumNode = declaration
     fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode = declaration
+
+    fun lowerConstructorParameterNode(declaration: ConstructorParameterNode): ConstructorParameterNode {
+        return when (declaration) {
+            is ParameterNode -> lowerParameterNode(declaration)
+            is PropertyParameterNode -> lowerPropertyParameterNode(declaration)
+            else -> declaration
+        }
+    }
 
     fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         return when (declaration) {

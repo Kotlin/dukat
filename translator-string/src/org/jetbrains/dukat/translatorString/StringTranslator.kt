@@ -1,9 +1,11 @@
 package org.jetbrains.dukat.translatorString
 
+import org.jetbrains.dukat.astModel.PropertyParameterModel
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -75,7 +77,6 @@ import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
@@ -163,33 +164,52 @@ fun TypeModel.translate(): String {
     }
 }
 
-private fun ParameterModel.translate(needsMeta: Boolean = true): String {
+private fun CallableParameterModel.translate(needsMeta: Boolean = true): String {
     var res = name + ": " + type.translate()
-    if (vararg) {
-        res = "vararg $res"
-    }
+    return when (this) {
+        is ParameterModel -> {
+            if (vararg) {
+                res = "vararg $res"
+            }
 
-    modifier?.let {
-        val modifierTranslated = when (it) {
-            ParameterModifierModel.NOINLINE -> "noinline"
-            ParameterModifierModel.CROSSINLINE -> "crossinline"
+            modifier?.let {
+                val modifierTranslated = when (it) {
+                    ParameterModifierModel.NOINLINE -> "noinline"
+                    ParameterModifierModel.CROSSINLINE -> "crossinline"
+                }
+
+                res = "$modifierTranslated $res"
+            }
+
+            if (needsMeta) {
+                res += type.translateMeta()
+            }
+
+            initializer?.let {
+                res += " = ${it.translateAsOneLine()}"
+                if (needsMeta) {
+                    res += it.translateMeta()
+                }
+            }
+
+            res
         }
+        is PropertyParameterModel -> {
+            if (needsMeta) {
+                res += type.translateMeta()
+            }
 
-        res = "$modifierTranslated $res"
-    }
+            initializer?.let {
+                res += " = ${it.translateAsOneLine()}"
+                if (needsMeta) {
+                    res += it.translateMeta()
+                }
+            }
 
-    if (needsMeta) {
-        res += type.translateMeta()
-    }
-
-    initializer?.let {
-        res += " = ${it.translateAsOneLine()}"
-        if (needsMeta) {
-            res += it.translateMeta()
+            "${visibilityModifier.asClause()}var $res"
         }
+        else -> res
     }
-
-    return res
 }
 
 private fun translateTypeParameters(typeParameters: List<TypeParameterModel>): String {
@@ -224,7 +244,7 @@ private fun translateTypeArguments(typeParameters: List<TypeModel>): String {
 }
 
 
-private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boolean = true): String {
+private fun translateParameters(parameters: List<CallableParameterModel>, needsMeta: Boolean = true): String {
     return parameters
         .map { parameter -> parameter.translate(needsMeta) }
         .joinToString(", ")
@@ -253,7 +273,7 @@ private fun CallExpressionModel.translate(): String {
 
 private fun LiteralExpressionModel.translate(): String {
     return when (this) {
-        is StringLiteralExpressionModel -> "\"$value\""
+        is StringLiteralExpressionModel -> "\"${value.replace("\"", "\\\"")}\""
         is NumericLiteralExpressionModel -> value.toString()
         is BooleanLiteralExpressionModel -> value.toString()
         is NullLiteralExpressionModel -> "null"

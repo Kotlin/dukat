@@ -11,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -135,6 +136,14 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
         )
     }
 
+    override fun lowerPropertyParameterNode(owner: NodeOwner<PropertyParameterNode>): PropertyParameterNode {
+        val declaration = owner.node
+        return declaration.copy(
+            name = lowerIdentificator(declaration.name),
+            type = lowerType(owner.wrap(declaration.type))
+        )
+    }
+
     override fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode {
         val declaration = owner.node
         return declaration.copy(
@@ -177,7 +186,7 @@ interface NodeWithOwnerTypeLowering : NodeWithOwnerLowering<ParameterValueDeclar
     fun lowerConstructorNode(owner: NodeOwner<ConstructorNode>): ConstructorNode {
         val declaration = owner.node
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterNode(owner.wrap(parameter)) },
+                parameters = declaration.parameters.map { parameter -> lowerConstructorParameterNode(owner.wrap(parameter)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(params = typeParameter.params.map { param -> lowerType(owner.wrap(param)) })
                 }

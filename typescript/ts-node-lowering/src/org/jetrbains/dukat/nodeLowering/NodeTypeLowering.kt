@@ -12,6 +12,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -142,6 +143,13 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
+    override fun lowerPropertyParameterNode(declaration: PropertyParameterNode): PropertyParameterNode {
+        return declaration.copy(
+            name = lowerIdentificator(declaration.name),
+            type = lowerType(declaration.type)
+        )
+    }
+
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
         return declaration.copy(name = lowerIdentificator(declaration.name), type = lowerType(declaration.type))
     }
@@ -175,7 +183,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
 
     fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterNode(parameter) },
+                parameters = declaration.parameters.map { parameter -> lowerConstructorParameterNode(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
                 }

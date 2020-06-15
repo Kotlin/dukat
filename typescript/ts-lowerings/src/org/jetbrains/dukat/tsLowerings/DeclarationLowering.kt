@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorParameterDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
@@ -20,6 +21,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyParameterDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -46,7 +48,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
 
     fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberDeclaration>?): ConstructorDeclaration {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner?.wrap(declaration)) },
+                parameters = declaration.parameters.map { parameter -> lowerConstructorParameterDeclaration(parameter, owner?.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner?.wrap(declaration)) })
                 }
@@ -138,9 +140,23 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
         )
     }
 
+    fun lowerConstructorParameterDeclaration(declaration: ConstructorParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?) : ConstructorParameterDeclaration {
+        return when (declaration) {
+            is ParameterDeclaration -> lowerParameterDeclaration(declaration, owner)
+            is PropertyParameterDeclaration -> lowerPropertyParameter(declaration, owner)
+            else -> declaration
+        }
+    }
+
     fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type, owner)
+        )
+    }
+
+    fun lowerPropertyParameter(declaration: PropertyParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): PropertyParameterDeclaration {
+        return declaration.copy(
+            type = lowerParameterValue(declaration.type, owner)
         )
     }
 

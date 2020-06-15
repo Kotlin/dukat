@@ -3,6 +3,7 @@ package org.jetrbains.dukat.nodeLowering
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -25,6 +27,7 @@ interface NodeWithOwnerLowering<T : TypeEntity> {
     fun lowerInterfaceNode(owner: NodeOwner<InterfaceNode>): InterfaceNode
 
     fun lowerParameterNode(owner: NodeOwner<ParameterNode>): ParameterNode
+    fun lowerPropertyParameterNode(owner: NodeOwner<PropertyParameterNode>): PropertyParameterNode
     fun lowerTypeParameter(owner: NodeOwner<TypeValueNode>): TypeValueNode
     fun lowerMemberNode(owner: NodeOwner<MemberNode>): MemberNode
     fun lowerTypeAliasNode(owner: NodeOwner<TypeAliasNode>): TypeAliasNode
@@ -33,6 +36,14 @@ interface NodeWithOwnerLowering<T : TypeEntity> {
     fun lowerTypeValueNode(owner: NodeOwner<TypeValueNode>): T
     fun lowerFunctionTypeNode(owner: NodeOwner<FunctionTypeNode>): T
     fun lowerUnionTypeNode(owner: NodeOwner<UnionTypeNode>): T
+
+    fun lowerConstructorParameterNode(owner: NodeOwner<ConstructorParameterNode>): ConstructorParameterNode {
+        return when (val declaration = owner.node) {
+            is ParameterNode -> lowerParameterNode(owner.wrap(declaration))
+            is PropertyParameterNode -> lowerPropertyParameterNode(owner.wrap(declaration))
+            else -> declaration
+        }
+    }
 
     fun lowerClassLikeNode(owner: NodeOwner<ClassLikeNode>): ClassLikeNode {
         val declaration = owner.node

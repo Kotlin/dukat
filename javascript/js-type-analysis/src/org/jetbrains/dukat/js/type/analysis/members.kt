@@ -9,13 +9,14 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
     owner.constructorConstraint = FunctionDeclaration(
             name = "",
-            parameters = parameters,
+            parameters = parameters.filterIsInstance<ParameterDeclaration>(),
             type = TypeDeclaration(
                     value = IdentifierEntity("Unit"),
                     params = emptyList()

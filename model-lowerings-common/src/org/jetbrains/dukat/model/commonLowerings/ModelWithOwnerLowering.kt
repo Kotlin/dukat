@@ -1,22 +1,35 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.OwnerContext
 
 interface ModelWithOwnerLowering : TopLevelModelLowering {
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel
     fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>): LambdaParameterModel
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
+    fun lowerPropertyParameterModel(ownerContext: NodeOwner<PropertyParameterModel>): PropertyParameterModel
     fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel?
+
+    fun lowerCallableParameterModel(ownerContext: NodeOwner<CallableParameterModel>): CallableParameterModel {
+        return when (val declaration = ownerContext.node) {
+            is ParameterModel -> lowerParameterModel(NodeOwner(declaration, ownerContext))
+            is LambdaParameterModel -> lowerLambdaParameterModel(NodeOwner(declaration, ownerContext))
+            is PropertyParameterModel -> lowerPropertyParameterModel(NodeOwner(declaration, ownerContext))
+            else -> declaration
+        }
+    }
 
     fun lowerTypeParameterModel(ownerContext: NodeOwner<TypeParameterModel>): TypeParameterModel {
         val typeParameterModel = ownerContext.node

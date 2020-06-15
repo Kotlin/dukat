@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -17,6 +18,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
+import org.jetbrains.dukat.astModel.PropertyParameterModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.BinaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
@@ -113,6 +115,11 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
     }
 
+    override fun lowerPropertyParameterModel(ownerContext: NodeOwner<PropertyParameterModel>): PropertyParameterModel {
+        val declaration = ownerContext.node
+        return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
+    }
+
     override fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel {
         val declaration = ownerContext.node
         return declaration.copy(type = lowerTypeModel(NodeOwner(declaration.type, ownerContext)))
@@ -163,7 +170,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     fun lowerConstructorModel(ownerContext: NodeOwner<ConstructorModel>): ConstructorModel {
         val declaration = ownerContext.node
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) }
+                parameters = declaration.parameters.map { parameter -> lowerCallableParameterModel(NodeOwner(parameter, ownerContext)) }
         )
     }
 
