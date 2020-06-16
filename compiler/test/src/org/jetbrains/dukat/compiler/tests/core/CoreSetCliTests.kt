@@ -69,21 +69,7 @@ open class CoreSetCliTests {
             println("OUTPUT ${output}")
             val targetFile = File(dirName, output)
 
-            //TODO: unify with OutputTests.SKIPPED_DECLARATIONS
-            val skippedDeclarations = setOf(
-                    "Q.Q.kt",
-                    "Q.kt",
-                    "_skippedReferenced.kt",
-                    "jquery.kt",
-                    "node-ffi-buffer.kt",
-                    "ref-array.kt",
-                    "ref-array.ref_array.kt",
-                    "ref.kt",
-                    "ref.ref.kt"
-            )
-            if (skippedDeclarations.contains(targetFile.name)) {
-                null
-            } else if (output.startsWith("lib.")) {
+            if (output.startsWith("lib.")) {
                 null
             } else {
                 targetFile.readText()
