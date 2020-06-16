@@ -25,15 +25,6 @@ abstract class OutputTests {
 
 // ------------------------------------------------------------------------------------------
 """.replace("\n", System.getProperty("line.separator"))
-
-        val SKIPPED_DECLARATIONS = setOf(
-                "jquery.d.ts",
-                "node-ffi-buffer.d.ts",
-                "ref-array.d.ts",
-                "ref.d.ts",
-                "Q.d.ts",
-                "_skippedReferenced.d.ts"
-        )
     }
 
     open fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
@@ -48,9 +39,7 @@ abstract class OutputTests {
         return if (units.isEmpty()) {
             "// NO DECLARATIONS"
         } else {
-            units.filter { (_, fileName, _, _) ->
-                !SKIPPED_DECLARATIONS.contains(File(fileName).name)
-            }.joinToString(SEPARATOR) { it.content }
+            units.joinToString(SEPARATOR) { it.content }
         }
     }
 
