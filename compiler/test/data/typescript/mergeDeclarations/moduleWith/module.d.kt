@@ -1,3 +1,4 @@
+// [test] module.Ext.kt
 @file:JsQualifier("Ext")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Ext
@@ -51,6 +52,7 @@ external fun bar()
 external interface IBase
 
 // ------------------------------------------------------------------------------------------
+// [test] module.Ext.util.kt
 @file:JsQualifier("Ext.util")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Ext.util
@@ -81,6 +83,7 @@ external interface IElementContainer
 external interface IRenderable
 
 // ------------------------------------------------------------------------------------------
+// [test] module.Ext.state.kt
 @file:JsQualifier("Ext.state")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Ext.state

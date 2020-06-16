@@ -1,3 +1,4 @@
+// [test] nestedModulesWithSameName.Foo.kt
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo
@@ -24,6 +25,7 @@ external interface A {
 external fun d(a: A, b: Any, c: Foo.Foo.B)
 
 // ------------------------------------------------------------------------------------------
+// [test] nestedModulesWithSameName.Foo.Foo.kt
 @file:JsQualifier("Foo.Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo.Foo

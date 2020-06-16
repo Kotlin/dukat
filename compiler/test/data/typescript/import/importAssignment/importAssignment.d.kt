@@ -1,3 +1,4 @@
+// [test] importAssignment.module_importAssignment.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -22,6 +23,7 @@ external fun calcStats(): Stats
 external fun ping(a: InterfaceA)
 
 // ------------------------------------------------------------------------------------------
+// [test] index.module__fs.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -42,6 +44,7 @@ import org.w3c.xhr.*
 external interface Stats
 
 // ------------------------------------------------------------------------------------------
+// [test] index.module__api.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*

@@ -1,3 +1,4 @@
+// [test] nonDeclarations.api.Tooling.nonDeclarations.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package api.Tooling
 
@@ -21,6 +22,7 @@ typealias WatchOptions = Any
 typealias Handler = Any
 
 // ------------------------------------------------------------------------------------------
+// [test] breakingInheritance.api.kt
 @file:JsModule("<RESOLVED_MODULE_NAME>")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
@@ -47,6 +49,7 @@ external interface Watching {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] breakingInheritance.api.Tooling.kt
 @file:JsQualifier("api.Tooling")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package api.Tooling

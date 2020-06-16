@@ -1,3 +1,4 @@
+// [test] paramsFromNestedModule.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -22,6 +23,7 @@ external interface SomeStaticAPI {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] _referenced.SomeNamespace.kt
 @file:JsQualifier("SomeNamespace")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package SomeNamespace

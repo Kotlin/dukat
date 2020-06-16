@@ -1,3 +1,4 @@
+// [test] shareTempTypesBetweenModules.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -27,6 +28,7 @@ external object foo {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] shareTempTypesBetweenModules.Foo.kt
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo
@@ -74,6 +76,7 @@ external object foo {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] shareTempTypesBetweenModules.Bar.kt
 @file:JsQualifier("Bar")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Bar

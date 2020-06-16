@@ -1,3 +1,4 @@
+// [test] intersectionWithTypeAlias.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -23,4 +24,3 @@ external interface Coordinates {
 external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` */, b: Coordinates /* Coordinates & `T$0` */): dynamic /* Coordinates | Coordinates */
 
 external open class WithTrickyConstuctor(scales: Coordinates /* Coordinates & `T$0` */)
-

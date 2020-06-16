@@ -1,3 +1,4 @@
+// [test] withMerging.Foo.kt
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo
@@ -24,6 +25,7 @@ external fun funcFoo()
 external open class AFoo
 
 // ------------------------------------------------------------------------------------------
+// [test] withMerging.Foo.Bar.kt
 @file:JsQualifier("Foo.Bar")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo.Bar
@@ -50,6 +52,7 @@ external fun funcFooBar()
 external open class AFooBar
 
 // ------------------------------------------------------------------------------------------
+// [test] withMerging.Foo.Bar.Baz.kt
 @file:JsQualifier("Foo.Bar.Baz")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo.Bar.Baz

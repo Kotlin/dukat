@@ -1,3 +1,4 @@
+// [test] genericWithDefaultNonGenericValue.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -30,6 +31,7 @@ external var yargs: Argv__0
 external var yarrrrgs: Arrrrgv__0
 
 // ------------------------------------------------------------------------------------------
+// [test] genericWithDefaultNonGenericValue.yargs.kt
 @file:JsQualifier("yargs")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package yargs

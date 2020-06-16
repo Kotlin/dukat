@@ -1,3 +1,4 @@
+// [test] namespaceImportForward.lib1.kt
 @file:JsQualifier("lib1")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package lib1
@@ -22,6 +23,7 @@ external interface I {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] namespaceImportForward.lib2.kt
 @file:JsQualifier("lib2")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package lib2

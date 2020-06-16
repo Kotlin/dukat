@@ -1,3 +1,4 @@
+// [test] module.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -19,6 +20,7 @@ import org.w3c.xhr.*
 external val `_`: `_`.LoDashStatic
 
 // ------------------------------------------------------------------------------------------
+// [test] module._.kt
 @file:JsModule("lodash")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")

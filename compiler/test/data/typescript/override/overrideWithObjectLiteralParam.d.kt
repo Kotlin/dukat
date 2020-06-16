@@ -1,3 +1,4 @@
+// [test] overrideWithObjectLiteralParam.myStream.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package myStream
 
@@ -36,6 +37,7 @@ external open class internal {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] _global.GlobalNamespace.kt
 @file:JsQualifier("GlobalNamespace")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package GlobalNamespace

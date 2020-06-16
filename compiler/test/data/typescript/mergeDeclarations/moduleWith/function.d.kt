@@ -1,3 +1,4 @@
+// [test] function.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -22,6 +23,7 @@ external interface Fiber_ {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] function.fibers.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package fibers
 
@@ -45,6 +47,7 @@ import Fiber_
 external fun Fiber(fn: Function<*>): Fiber_
 
 // ------------------------------------------------------------------------------------------
+// [test] function.fibers.Fiber.kt
 @file:JsModule("fibers")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")

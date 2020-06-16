@@ -1,3 +1,4 @@
+// [test] tscEscaping.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -37,6 +38,7 @@ external enum class __E {
 external fun <__T> foo(__a: __T, _b: __M.__N.__C)
 
 // ------------------------------------------------------------------------------------------
+// [test] tscEscaping.atpl.kt
 @file:JsModule("atpl")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
@@ -62,6 +64,7 @@ external var __foo: Any
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
+// [test] tscEscaping.__M.kt
 @file:JsQualifier("__M")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package __M
@@ -86,6 +89,7 @@ external var __foo: Number
 external fun __express(filename: String, options: Any, callback: Function<*>): Any
 
 // ------------------------------------------------------------------------------------------
+// [test] tscEscaping.__M.__N.kt
 @file:JsQualifier("__M.__N")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package __M.__N

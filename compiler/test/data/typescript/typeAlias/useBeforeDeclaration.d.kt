@@ -1,3 +1,4 @@
+// [test] nonDeclarations.Foo.nonDeclarations.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo
 
@@ -19,6 +20,7 @@ import org.w3c.xhr.*
 typealias Value = String
 
 // ------------------------------------------------------------------------------------------
+// [test] useBeforeDeclaration.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -45,6 +47,7 @@ external fun listOfNumberFunction(a: Values<Number>)
 typealias Values<V> = List<V>
 
 // ------------------------------------------------------------------------------------------
+// [test] useBeforeDeclaration.Foo.kt
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo

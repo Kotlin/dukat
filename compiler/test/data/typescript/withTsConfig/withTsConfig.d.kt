@@ -1,3 +1,4 @@
+// [test] withTsConfig.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -19,6 +20,7 @@ import _api.PingPong
 external fun createPingPong(): PingPong
 
 // ------------------------------------------------------------------------------------------
+// [test] index._api.module__api.kt
 @file:JsModule("_api")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")

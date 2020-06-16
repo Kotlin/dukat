@@ -1,3 +1,4 @@
+// [test] interfaces.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -27,6 +28,7 @@ external interface SomeElement : SomeNode, Assignable {
 }
 
 // ------------------------------------------------------------------------------------------
+// [test] interfaces._.kt
 @file:JsQualifier("_")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `_`

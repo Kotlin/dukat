@@ -1,3 +1,4 @@
+// [test] namespace.child_process.kt
 @file:JsModule("child_process")
 @file:JsNonModule
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
@@ -21,6 +22,7 @@ import org.w3c.xhr.*
 external interface PromiseWithChild<T> : Promise<T>
 
 // ------------------------------------------------------------------------------------------
+// [test] namespace.child_process.exec.kt
 @file:JsQualifier("child_process.exec")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package child_process.exec

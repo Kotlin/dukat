@@ -1,3 +1,4 @@
+// [test] withNonExportDeclarations.Foo.kt
 @file:JsQualifier("Foo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo
@@ -30,6 +31,7 @@ external var c: Number
 external fun d(a: Boolean, b: Any, c: Foo.Bar.SomeType)
 
 // ------------------------------------------------------------------------------------------
+// [test] withNonExportDeclarations.Foo.Bar.kt
 @file:JsQualifier("Foo.Bar")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package Foo.Bar

@@ -1,3 +1,4 @@
+// [test] escaping.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 import kotlin.js.*
@@ -75,6 +76,7 @@ typealias `__` = Foo
 external fun ping(n: `__`)
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.when.kt
 @file:JsQualifier("when")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `when`
@@ -107,6 +109,7 @@ external interface `$foo`
 external interface Promise<T>
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.bar.string.kt
 @file:JsQualifier("bar.string")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package bar.string
@@ -129,6 +132,7 @@ import org.w3c.xhr.*
 external interface `interface`
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.$boo.kt
 @file:JsQualifier("$boo")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `$boo`
@@ -151,6 +155,7 @@ import org.w3c.xhr.*
 external interface `typealias`
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.__.kt
 @file:JsQualifier("__")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `__`
@@ -175,6 +180,7 @@ external interface `___`
 external interface _OK_
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.__.xxx.kt
 @file:JsQualifier("__.xxx")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `__`.xxx
@@ -197,6 +203,7 @@ import org.w3c.xhr.*
 external interface Amsterdam
 
 // ------------------------------------------------------------------------------------------
+// [test] escaping.fun.kt
 @file:JsQualifier("fun")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package `fun`

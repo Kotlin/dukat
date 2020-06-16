@@ -39,6 +39,7 @@ open class CoreSetCliTests {
     @MethodSource("coreSet")
     open fun withValueSource(name: String, tsPath: String, ktPath: String, tsConfig: String) {
         assertContentEqualsBinary(name, tsPath, ktPath, if (tsConfig.isEmpty()) null else tsConfig)
+        assertContentEqualsBinary(name, tsPath, ktPath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     open fun getTranslator(): CliTranslator = createStandardCliTranslator()
@@ -72,12 +73,14 @@ open class CoreSetCliTests {
             if (output.startsWith("lib.")) {
                 null
             } else {
-                targetFile.readText()
+                targetFile
             }
         }
 
         println("CLI TESTS ${reportJson.outputs.size} => ${translatedOutput.size}")
-        val translated = translatedOutput.joinToString(OutputTests.SEPARATOR)
+        val translated = translatedOutput.joinToString(OutputTests.SEPARATOR) { file ->
+            "// [test] ${file.name}" + System.getProperty("line.separator") + file.readText()
+        }
 
         assertEquals(
                 if (translated.isEmpty()) {

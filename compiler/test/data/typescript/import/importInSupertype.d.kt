@@ -1,3 +1,4 @@
+// [test] importInSupertype.lib.kt
 @file:JsQualifier("lib")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package lib
@@ -20,6 +21,7 @@ import org.w3c.xhr.*
 external interface I
 
 // ------------------------------------------------------------------------------------------
+// [test] importInSupertype.main.kt
 @file:JsQualifier("main")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 package main
