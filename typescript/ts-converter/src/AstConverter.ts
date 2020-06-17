@@ -785,6 +785,7 @@ export class AstConverter {
           let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
           let declaration = this.getFirstDeclaration(symbol);
 
+          // class can implement itself, but in overwhelming majority of cases this was not the intention of the declaration author - see https://stackoverflow.com/questions/62418219/class-implementing-itself-instead-of-inheriting-an-eponymous-interface-in-outer
           if (declaration != parent) {
             let typeReference = this.createTypeReferenceFromSymbol(declaration);
 
