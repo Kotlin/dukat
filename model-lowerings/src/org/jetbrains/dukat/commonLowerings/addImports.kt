@@ -95,11 +95,15 @@ private fun NameEntity.normalize(): NameEntity? {
     }
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 private fun ModuleModel.addImports(): ModuleModel {
-    val importContext = mutableMapOf<NameEntity, NameEntity>()
-    declarations.map { importContext[it.name] = name }
 
-    val nameVisitor = NameVisitor(name, importContext)
+    val nameVisitor = NameVisitor(name, buildMap<NameEntity, NameEntity> {
+        declarations.forEach {
+            this[it.name] = name
+        }
+    }.toMutableMap())
+
     val moduleWithFqNames = nameVisitor.lowerRoot(this, NodeOwner(this, null))
 
     return moduleWithFqNames.copy(
