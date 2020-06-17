@@ -1,4 +1,4 @@
-import * as ping from "ping";
+import * as ping from "_ping";
 
 declare function withOneAny(a?: any): any;
 declare function withOneString(s?: string): string;
