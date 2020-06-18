@@ -16,6 +16,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class Foo(var x: Any)
+open class Foo(var x: Any)
 
-external open class Bar(var n: Number, var a: Any)
+open class Bar(var n: Number, var a: Any)
