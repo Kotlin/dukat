@@ -3,22 +3,19 @@ package org.jetrbains.dukat.nodeLowering
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.astCommon.TypeEntity
 
-interface Lowering<T : TypeEntity> {
+interface TopLevelNodeLowering {
     fun lowerVariableNode(declaration: VariableNode): VariableNode
     fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
     fun lowerClassNode(declaration: ClassNode): ClassNode
@@ -30,10 +27,6 @@ interface Lowering<T : TypeEntity> {
     fun lowerMemberNode(declaration: MemberNode): MemberNode
     fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode
     fun lowerObjectNode(declaration: ObjectNode): ObjectNode
-
-    fun lowerTypeValueNode(declaration: TypeValueNode): T
-    fun lowerFunctionNode(declaration: FunctionTypeNode): T
-    fun lowerUnionTypeNode(declaration: UnionTypeNode): T
 
     fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         return when (declaration) {

@@ -28,7 +28,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 private val logger = Logging.logger("TypeLowering")
 
-interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
+interface NodeTypeLowering : TopLevelNodeLowering {
 
     fun lowerType(declaration: TypeNode): TypeNode {
         return when (declaration) {
@@ -116,19 +116,19 @@ interface NodeTypeLowering : Lowering<ParameterValueDeclaration> {
         )
     }
 
-    override fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
+    fun lowerUnionTypeNode(declaration: UnionTypeNode): UnionTypeNode {
         return declaration.copy(params = declaration.params.map { param -> lowerType(param) })
     }
 
 
-    override fun lowerTypeValueNode(declaration: TypeValueNode): TypeValueNode {
+    fun lowerTypeValueNode(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(
             params = declaration.params.map { param -> lowerType(param) },
             meta = declaration.meta?.let { lowerMeta(it) }
         )
     }
 
-    override fun lowerFunctionNode(declaration: FunctionTypeNode): FunctionTypeNode {
+    fun lowerFunctionNode(declaration: FunctionTypeNode): FunctionTypeNode {
         return declaration.copy(
                 parameters = declaration.parameters.map { param -> lowerParameterNode(param) },
                 type = lowerType(declaration.type)
