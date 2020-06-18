@@ -723,8 +723,7 @@ private class IdlFileConverter(
             )
             is IDLConstructorDeclaration -> ConstructorModel(
                     parameters = arguments.map { it.convertToParameterModel() },
-                    typeParameters = listOf(),
-                    generated = false
+                    typeParameters = listOf()
             )
             is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),

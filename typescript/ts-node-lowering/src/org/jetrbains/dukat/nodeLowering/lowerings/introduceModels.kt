@@ -334,8 +334,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return when (this) {
             is ConstructorNode -> ConstructorModel(
                     parameters = parameters.map { param -> param.process().copy(initializer = null) },
-                    typeParameters = convertTypeParams(typeParameters),
-                    generated = generated
+                    typeParameters = convertTypeParams(typeParameters)
             )
             is MethodNode -> process()
             is PropertyNode -> PropertyModel(
@@ -646,8 +645,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 primaryConstructor = primaryConstructor?.let { constructor ->
                     ConstructorModel(
                             parameters = constructor.parameters.map { param -> param.process() },
-                            typeParameters = convertTypeParams(constructor.typeParameters),
-                            generated = constructor.generated
+                            typeParameters = convertTypeParams(constructor.typeParameters)
                     )
                 },
                 typeParameters = convertTypeParams(typeParameters),
