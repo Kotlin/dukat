@@ -15,6 +15,7 @@ import org.jetbrains.dukat.commonLowerings.merge.SpecifyTypeNodesWithModuleData
 import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.IntroduceMissedOverloads
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.RearrangeConstructors
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
@@ -44,7 +45,6 @@ import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.IntroduceMissedOverloads
 import org.jetrbains.dukat.nodeLowering.lowerings.RemoveUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.SpecifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
@@ -85,13 +85,13 @@ open class TypescriptLowerer(
                         LowerThisType(),
                         ResolveTypeAliases(),
                         SpecifyUnionType(),
-                        RemoveUnusedGeneratedEntities(),
-                        IntroduceMissedOverloads()
+                        RemoveUnusedGeneratedEntities()
                 )
 
         val models = nodes
                 .introduceModels()
                 .lower(
+                        IntroduceMissedOverloads(),
                         RearrangeConstructors(),
                         RemoveRedundantTypeParams(),
                         RemoveConflictingOverloads(),
