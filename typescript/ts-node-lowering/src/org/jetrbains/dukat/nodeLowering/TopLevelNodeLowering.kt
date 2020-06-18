@@ -6,27 +6,20 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 
 interface TopLevelNodeLowering {
-    fun lowerVariableNode(declaration: VariableNode): VariableNode
-    fun lowerFunctionNode(declaration: FunctionNode): FunctionNode
-    fun lowerClassNode(declaration: ClassNode): ClassNode
-    fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode
+    fun lowerVariableNode(declaration: VariableNode): VariableNode = declaration
+    fun lowerFunctionNode(declaration: FunctionNode): FunctionNode = declaration
+    fun lowerClassNode(declaration: ClassNode): ClassNode = declaration
+    fun lowerObjectNode(declaration: ObjectNode): ObjectNode = declaration
+    fun lowerInterfaceNode(declaration: InterfaceNode): InterfaceNode = declaration
     fun lowerEnumNode(declaration: EnumNode, owner: ModuleNode): EnumNode = declaration
-
-    fun lowerParameterNode(declaration: ParameterNode): ParameterNode
-    fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode
-    fun lowerMemberNode(declaration: MemberNode): MemberNode
-    fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode
-    fun lowerObjectNode(declaration: ObjectNode): ObjectNode
+    fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode = declaration
 
     fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         return when (declaration) {

@@ -86,7 +86,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
-    override fun lowerMemberNode(declaration: MemberNode): MemberNode {
+    fun lowerMemberNode(declaration: MemberNode): MemberNode {
         return when (declaration) {
             is MethodNode -> lowerMethodNode(declaration)
             is PropertyNode -> lowerPropertyNode(declaration)
@@ -109,7 +109,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
-    override fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode {
+    fun lowerTypeParameter(declaration: TypeValueNode): TypeValueNode {
         return declaration.copy(
                 value = lowerIdentificator(declaration.value),
                 params = declaration.params.map { params -> lowerType(params) }
@@ -135,7 +135,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
-    override fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
+    fun lowerParameterNode(declaration: ParameterNode): ParameterNode {
         return declaration.copy(
                 name = lowerIdentificator(declaration.name),
                 type = lowerType(declaration.type)

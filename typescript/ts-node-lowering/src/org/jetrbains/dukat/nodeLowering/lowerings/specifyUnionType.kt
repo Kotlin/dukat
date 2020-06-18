@@ -5,20 +5,19 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNodeMeta
+import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
+import org.jetrbains.dukat.nodeLowering.TopLevelNodeLowering
 
 const val COMPLEXITY_THRESHOLD = 15
 
@@ -45,7 +44,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
     }
 }
 
-private class SpecifyUnionTypeLowering : NodeTypeLowering {
+private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
 
     fun generateParams(params: List<ParameterNode>): Pair<List<List<ParameterNode>>, Boolean> {
         val specifyParams = specifyArguments(params)
