@@ -2,6 +2,7 @@ package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -143,11 +144,19 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
-    override fun lowerPropertyParameterNode(declaration: PropertyParameterNode): PropertyParameterNode {
+    fun lowerPropertyParameterNode(declaration: PropertyParameterNode): PropertyParameterNode {
         return declaration.copy(
             name = lowerIdentificator(declaration.name),
             type = lowerType(declaration.type)
         )
+    }
+
+    fun lowerConstructorParameterNode(declaration: ConstructorParameterNode): ConstructorParameterNode {
+        return when (declaration) {
+            is ParameterNode -> lowerParameterNode(declaration)
+            is PropertyParameterNode -> lowerPropertyParameterNode(declaration)
+            else -> declaration
+        }
     }
 
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {

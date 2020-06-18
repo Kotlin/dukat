@@ -337,7 +337,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorNode -> ConstructorModel(
-                    parameters = parameters.map { param -> param.process().copy() },
+                    parameters = parameters.map { param -> param.process() },
                     typeParameters = convertTypeParams(typeParameters)
             )
             is MethodNode -> process()
