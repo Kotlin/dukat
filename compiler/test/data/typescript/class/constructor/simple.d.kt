@@ -19,3 +19,17 @@ import org.w3c.xhr.*
 external open class Foo
 
 external open class Bar(a: Number)
+
+external open class BarOptional(a: Number = definedExternally)
+
+external open class BarMultiple {
+    constructor(a: Number)
+    constructor(b: String)
+    constructor(c: Boolean)
+}
+
+external open class BarMultipleUnion {
+    constructor(a: Number)
+    constructor(a: String)
+    constructor(a: Boolean)
+}

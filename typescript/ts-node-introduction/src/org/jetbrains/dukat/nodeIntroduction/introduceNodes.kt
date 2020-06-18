@@ -414,7 +414,6 @@ private class LowerDeclarationsToNodes(
                     TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 convertToHeritageNodes(parentEntities),
-                null,
 
                 uid,
                 resolveAsExportQualifier(),

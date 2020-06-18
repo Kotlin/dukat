@@ -333,7 +333,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorNode -> ConstructorModel(
-                    parameters = parameters.map { param -> param.process().copy(initializer = null) },
+                    parameters = parameters.map { param -> param.process().copy() },
                     typeParameters = convertTypeParams(typeParameters)
             )
             is MethodNode -> process()
@@ -642,19 +642,14 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 } else {
                     null
                 },
-                primaryConstructor = primaryConstructor?.let { constructor ->
-                    ConstructorModel(
-                            parameters = constructor.parameters.map { param -> param.process() },
-                            typeParameters = convertTypeParams(constructor.typeParameters)
-                    )
-                },
                 typeParameters = convertTypeParams(typeParameters),
                 parentEntities = parentModelEntities,
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
                 external = external,
                 inheritanceModifier = InheritanceModifierModel.OPEN,
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                primaryConstructor = null
         )
     }
 
