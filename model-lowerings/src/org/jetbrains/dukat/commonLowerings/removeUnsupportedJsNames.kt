@@ -99,32 +99,36 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     body = null
             )
 
-            val unsupportedSetter = MethodModel(
-                    name = IdentifierEntity("set"),
-                    parameters = listOf(ParameterModel(
-                            name = "key",
-                            type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
-                            initializer = null,
-                            vararg = false,
-                            modifier = null
-                    ), ParameterModel(
-                            name = "value",
-                            type = commonType,
-                            initializer = null,
-                            vararg = false,
-                            modifier = null
-                    )),
-                    type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
-                    typeParameters = emptyList(),
-                    static = false,
-                    override = null,
-                    operator = true,
-                    annotations = emptyList(),
-                    open = false,
-                    body = null
-            )
+            val unrolledTypes = unsupportedMembers.mapNotNull { it.getType() }
 
-            listOf(unsupportedGetter, unsupportedSetter) + supportedMembers
+            val unsupportedSetters = unrolledTypes.map {setterType ->
+                MethodModel(
+                        name = IdentifierEntity("set"),
+                        parameters = listOf(ParameterModel(
+                                name = "key",
+                                type = TypeValueModel(IdentifierEntity("String"), emptyList(), null, null),
+                                initializer = null,
+                                vararg = false,
+                                modifier = null
+                        ), ParameterModel(
+                                name = "value",
+                                type = setterType,
+                                initializer = null,
+                                vararg = false,
+                                modifier = null
+                        )),
+                        type = TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
+                        typeParameters = emptyList(),
+                        static = false,
+                        override = null,
+                        operator = true,
+                        annotations = emptyList(),
+                        open = false,
+                        body = null
+                )
+            }
+
+            listOf(unsupportedGetter) + unsupportedSetters + supportedMembers
         } else {
             supportedMembers
         }

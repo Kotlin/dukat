@@ -1,5 +1,4 @@
 declare var val: any;
-// declare var var: boolean;
 declare var $foo: boolean;
 declare function bar$(ba$z: number);
 declare function fun();

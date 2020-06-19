@@ -27,7 +27,11 @@ external fun `fun`()
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
     operator fun get(key: String): Any?
-    operator fun set(key: String, value: Any?)
+    operator fun set(key: String, value: Boolean)
+    operator fun set(key: String, value: String)
+    operator fun set(key: String, value: String?)
+    operator fun set(key: String, value: Any)
+    operator fun set(key: String, value: Number?)
     var this_one_shouldnt_be_escaped: Boolean
     var `when`: String
     var `typealias`: Number

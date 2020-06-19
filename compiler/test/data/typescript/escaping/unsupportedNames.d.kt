@@ -30,7 +30,9 @@ external interface ExtendeConfigurationBoolean {
 
 external interface HeterogenousConfig {
     operator fun get(key: String): Any?
-    operator fun set(key: String, value: Any?)
+    operator fun set(key: String, value: Boolean)
+    operator fun set(key: String, value: String)
+    operator fun set(key: String, value: Array<Boolean>)
     var valid_field: Boolean
     var other_valid_field: String
 }
