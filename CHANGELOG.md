@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.3] - 20'June 2020
+  - [#309](https://github.com/Kotlin/dukat/issues/309) Unresolved property expressions in constructor params
+  - [#313](https://github.com/Kotlin/dukat/issues/313) Set primary constructor only when there's a single constructor
+  - [#310](https://github.com/Kotlin/dukat/issues/310) Regenerated setter causes invalid override
+  - [#311](https://github.com/Kotlin/dukat/issues/311) Narrow types in setter whenever it makes sense 
+ 
+
 ### [0.5.2] - 13'June 2020
    Minor release dedicated to reducing the number of conflicting overloads.
    
