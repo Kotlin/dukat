@@ -15,9 +15,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import app.EventEmitter
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external fun app(): app.EventEmitter
+external fun app(): EventEmitter
 
 // ------------------------------------------------------------------------------------------
 // [test] inNameSpace.app.kt

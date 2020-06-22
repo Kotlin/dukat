@@ -15,9 +15,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import `_`.StaticInstance
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external val `_`: `_`.StaticInstance
+external val `_`: StaticInstance
 
 // ------------------------------------------------------------------------------------------
 // [test] typeParamsAndConstraints._.kt

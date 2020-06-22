@@ -41,10 +41,11 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import child_process.PromiseWithChild
 
 external interface `T$0` {
     var stdout: String
     var stderr: String
 }
 
-external fun __promisify__(command: String): child_process.PromiseWithChild<`T$0`>
+external fun __promisify__(command: String): PromiseWithChild<`T$0`>

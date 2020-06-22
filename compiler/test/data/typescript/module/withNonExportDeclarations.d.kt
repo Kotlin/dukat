@@ -17,6 +17,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Foo.Bar.SomeType
 
 external interface A {
     fun baz()
@@ -28,7 +29,7 @@ external open class B {
 
 external var c: Number
 
-external fun d(a: Boolean, b: Any, c: Foo.Bar.SomeType)
+external fun d(a: Boolean, b: Any, c: SomeType)
 
 // ------------------------------------------------------------------------------------------
 // [test] withNonExportDeclarations.Foo.Bar.kt

@@ -38,5 +38,6 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import ContextResponse
 
 external interface BaseResponse : ContextResponse

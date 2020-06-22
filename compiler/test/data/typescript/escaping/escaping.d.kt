@@ -15,6 +15,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import `__`.`___`
 
 external var `val`: Any
 
@@ -65,9 +66,9 @@ external open class `is`<`interface`> {
     }
 }
 
-external fun <T, U> When(value: `when`.Promise<T>, transform: (param_val: T) -> U): `fun`.Promise<U>
+external fun <T, U> When(value: Promise<T>, transform: (param_val: T) -> U): Promise<U>
 
-external var `_`: `__`.`___`
+external var `_`: `___`
 
 typealias WatchHandler<T> = (param_val: T, oldVal: T) -> Unit
 

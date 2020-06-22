@@ -15,9 +15,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import a.SomeInterface
 
 @JsModule("<RESOLVED_MODULE_NAME>")
-external val myInterface: a.SomeInterface<dynamic /* String | Number */>
+external val myInterface: SomeInterface<dynamic /* String | Number */>
 
 // ------------------------------------------------------------------------------------------
 // [test] crossModuleGeneric.a.kt

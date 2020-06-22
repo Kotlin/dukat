@@ -15,6 +15,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import __M.__N.__C
 
 external var __foo: Any
 
@@ -35,7 +36,7 @@ external enum class __E {
     __B
 }
 
-external fun <__T> foo(__a: __T, _b: __M.__N.__C)
+external fun <__T> foo(__a: __T, _b: __C)
 
 // ------------------------------------------------------------------------------------------
 // [test] tscEscaping.atpl.kt

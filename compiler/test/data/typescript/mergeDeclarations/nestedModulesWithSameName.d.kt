@@ -17,12 +17,13 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Foo.Foo.B
 
 external interface A {
     fun baz()
 }
 
-external fun d(a: A, b: Any, c: Foo.Foo.B)
+external fun d(a: A, b: Any, c: B)
 
 // ------------------------------------------------------------------------------------------
 // [test] nestedModulesWithSameName.Foo.Foo.kt
@@ -44,9 +45,10 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Foo.A
 
 external open class B {
-    open fun boo(): Foo.A
+    open fun boo(): A
 }
 
 external var c: Number

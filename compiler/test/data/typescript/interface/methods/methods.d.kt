@@ -15,11 +15,12 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import foo.Bar
 
 external interface Foo {
     fun methodWithOutArgs()
     fun methodWithString(s: String): String
-    fun methodWithManyArgs(n: Number, settings: foo.Bar): Boolean
+    fun methodWithManyArgs(n: Number, settings: Bar): Boolean
 }
 
 // ------------------------------------------------------------------------------------------
