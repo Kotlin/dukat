@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -316,7 +317,8 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
 
     private fun paramTypesAreEquivalent(paramsA: List<CallableParameterModel>, paramsB: List<CallableParameterModel>): Boolean {
         return compareLists(paramsA, paramsB) { a, b ->
-            a.type.isEquivalent(b.type)
+            val varargsEquivalent = (a as? ParameterModel)?.vararg == (b as? ParameterModel)?.vararg
+            varargsEquivalent && a.type.isEquivalent(b.type)
         }
     }
 
