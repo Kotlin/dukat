@@ -26,7 +26,7 @@ private fun NameEntity.translate(): String = when (this) {
 
 private fun NameEntity.isTopLevelImport(): Boolean {
     if (this is QualifierEntity) {
-        return left == IdentifierEntity("<ROOT>")
+        return leftMost() == IdentifierEntity("<ROOT>")
     }
 
     return false
