@@ -2,6 +2,7 @@ package org.jetrbains.dukat.nodeLowering
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -12,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -142,6 +144,21 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         )
     }
 
+    fun lowerPropertyParameterNode(declaration: PropertyParameterNode): PropertyParameterNode {
+        return declaration.copy(
+            name = lowerIdentificator(declaration.name),
+            type = lowerType(declaration.type)
+        )
+    }
+
+    fun lowerConstructorParameterNode(declaration: ConstructorParameterNode): ConstructorParameterNode {
+        return when (declaration) {
+            is ParameterNode -> lowerParameterNode(declaration)
+            is PropertyParameterNode -> lowerPropertyParameterNode(declaration)
+            else -> declaration
+        }
+    }
+
     override fun lowerVariableNode(declaration: VariableNode): VariableNode {
         return declaration.copy(name = lowerIdentificator(declaration.name), type = lowerType(declaration.type))
     }
@@ -175,7 +192,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
 
     fun lowerConstructorNode(declaration: ConstructorNode): ConstructorNode {
         return declaration.copy(
-                parameters = declaration.parameters.map { parameter -> lowerParameterNode(parameter) },
+                parameters = declaration.parameters.map { parameter -> lowerConstructorParameterNode(parameter) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter)
                 }

@@ -2,9 +2,11 @@ package org.jetbrains.dukat.tsLowerings.mergeDuplicates
 
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorParameterDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -16,6 +18,17 @@ internal fun ParameterDeclaration.normalize(name: String = "") = copy(
         name = name,
         type = type.normalize()
 )
+
+internal fun PropertyParameterDeclaration.normalize(name: String = "") = copy(
+        name = name,
+        type = type.normalize()
+)
+
+private fun ConstructorParameterDeclaration.normalize(name: String = "") = when (this) {
+    is ParameterDeclaration -> normalize(name)
+    is PropertyParameterDeclaration -> normalize(name)
+    else -> this
+}
 
 internal fun CallSignatureDeclaration.normalize(substituteType: ParameterValueDeclaration? = null) = copy(
         parameters = parameters.map { parameter -> parameter.normalize(parameter.name) },

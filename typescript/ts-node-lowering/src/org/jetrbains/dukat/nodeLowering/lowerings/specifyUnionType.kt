@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -16,12 +17,14 @@ import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.changeName
+import org.jetbrains.dukat.ast.model.nodes.changeType
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetrbains.dukat.nodeLowering.TopLevelNodeLowering
 
 const val COMPLEXITY_THRESHOLD = 15
 
-private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNode>> {
+private fun specifyArguments(params: List<ConstructorParameterNode>): List<List<ConstructorParameterNode>> {
 
     var currentComplexity = 1
 
@@ -31,7 +34,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
                 currentComplexity *= type.params.size
                 if (currentComplexity <= COMPLEXITY_THRESHOLD) {
                     type.params.map { param ->
-                        parameterDeclaration.copy(type = (if (type.nullable) param.makeNullable() else param))
+                        parameterDeclaration.changeType(if (type.nullable) param.makeNullable() else param)
                     }
                 } else {
                     listOf(parameterDeclaration)
@@ -46,7 +49,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
 
 private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
 
-    fun generateParams(params: List<ParameterNode>): Pair<List<List<ParameterNode>>, Boolean> {
+    fun generateParams(params: List<ConstructorParameterNode>): Pair<List<List<ConstructorParameterNode>>, Boolean> {
         val specifyParams = specifyArguments(params)
         val hasUnrolledParams = specifyParams.any { it.size > 1 }
 
@@ -60,14 +63,14 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
     fun generateMethods(declaration: MethodNode): List<MethodNode> {
         val generatedParams = generateParams(declaration.parameters)
         return generatedParams.first.map { params ->
-            declaration.copy(parameters = params, meta = MethodNodeMeta(generated = generatedParams.second))
+            declaration.copy(parameters = params.filterIsInstance<ParameterNode>(), meta = MethodNodeMeta(generated = generatedParams.second))
         }
     }
 
 
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
         return generateParams(declaration.parameters).first.map { params ->
-            declaration.copy(parameters = params)
+            declaration.copy(parameters = params.filterIsInstance<ParameterNode>())
         }.distinctBy { node ->
             node.copy(
                     parameters = node.parameters.mapIndexed { index, param ->
@@ -91,9 +94,10 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
         }.distinctBy { node ->
             node.copy(
                     parameters = node.parameters.mapIndexed { index, param ->
-                        val paramCopy = param.copy(
-                                name = "p${index}",
-                                type = param.type.duplicate()
+                        val paramCopy = param.changeType(
+                                param.type.duplicate()
+                        ).changeName(
+                            "p${index}"
                         )
 
                         paramCopy.type.meta = null

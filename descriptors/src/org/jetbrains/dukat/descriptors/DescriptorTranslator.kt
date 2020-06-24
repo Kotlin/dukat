@@ -561,7 +561,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 SourceElement.NO_SOURCE
         )
         constructorDescriptor.initialize(
-                translateParameters(constructorModel.parameters, constructorDescriptor),
+                translateParameters(constructorModel.parameters.filterIsInstance<ParameterModel>(), constructorDescriptor),
                 visibility
         )
         constructorDescriptor.returnType = LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {

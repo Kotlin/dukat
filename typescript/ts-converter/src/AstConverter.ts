@@ -29,6 +29,7 @@ import {ExportContext, resolveDeclarations} from "./ExportContext";
 import {tsInternals} from "./TsInternals";
 import {
   CaseDeclarationProto,
+  ConstructorParameterDeclarationProto,
   ModifierDeclarationProto,
   ModuleDeclarationProto,
   ReferenceClauseDeclarationProto,
@@ -571,6 +572,25 @@ export class AstConverter {
     );
   }
 
+  convertPropertyParameterDeclaration(param: ts.ParameterDeclaration, index: number): ConstructorParameterDeclarationProto {
+    let initializer: Expression | null = null;
+
+    if (param.initializer != null) {
+      initializer = this.astExpressionConverter.convertExpression(param.initializer)
+    }
+
+    let paramType = this.convertType(param.type);
+
+    let name = ts.isIdentifier(param.name) ? param.name.getText() : `__${index}`;
+
+    return this.astFactory.createPropertyParameterDeclaration(
+        name,
+        paramType,
+        initializer,
+        this.convertModifiers(param.modifiers)
+    );
+  }
+
   convertPropertySignature(node: ts.PropertySignature): MemberDeclaration | null {
     let name = this.convertName(node.name);
 
@@ -689,24 +709,24 @@ export class AstConverter {
   }
 
   convertConstructorDeclaration(constructorDeclaration: ts.ConstructorDeclaration): Array<MemberDeclaration> {
-    let params: Array<ParameterDeclaration> = [];
+    let params: Array<ConstructorParameterDeclarationProto> = [];
 
     let res: Array<MemberDeclaration> = [];
 
     constructorDeclaration.parameters.forEach((parameter, count) => {
-      if (parameter.modifiers) {
-        let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
-        if (isField) {
-          let convertedVariable = this.convertPropertyDeclaration(
-            parameter as ts.ParameterDeclaration
-          );
-          if (convertedVariable != null) {
-            res.push(convertedVariable)
-          }
-        }
+      if (parameter.modifiers && parameter.modifiers.some(modifier =>
+          modifier.kind == ts.SyntaxKind.PublicKeyword ||
+          modifier.kind == ts.SyntaxKind.ProtectedKeyword ||
+          modifier.kind == ts.SyntaxKind.PrivateKeyword
+      )) {
+        params.push(this.convertPropertyParameterDeclaration(
+            parameter, count
+        ));
+      } else {
+        params.push(this.astFactory.createSimpleConstructorParameterDeclaration(
+            this.convertParameterDeclaration(parameter, count))
+        );
       }
-
-      params.push(this.convertParameterDeclaration(parameter, count));
     });
 
     res.push(this.astFactory.createConstructorDeclaration(

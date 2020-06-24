@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -10,6 +11,7 @@ import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.PropertyParameterModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -43,6 +45,10 @@ private class ModifyVisibility(private val visibility: VisibilityModifierModel) 
     }
 
     override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
+        return ownerContext.node.copy(visibilityModifier = visibility)
+    }
+
+    override fun lowerPropertyParameterModel(ownerContext: NodeOwner<PropertyParameterModel>): PropertyParameterModel {
         return ownerContext.node.copy(visibilityModifier = visibility)
     }
 

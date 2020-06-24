@@ -3,6 +3,7 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
@@ -24,6 +25,7 @@ import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
@@ -52,6 +54,7 @@ import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorParameterDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
@@ -65,6 +68,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -129,6 +133,16 @@ private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARA
             meta = null,
             vararg = vararg,
             optional = optional
+    )
+}
+
+private fun PropertyParameterDeclaration.convertToNode(): PropertyParameterNode {
+    return PropertyParameterNode(
+        name = name,
+        type = type.convertToNode(),
+        initializer = if (initializer != null) {
+            TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
+        } else null
     )
 }
 
@@ -300,6 +314,16 @@ private class LowerDeclarationsToNodes(
         return parameters.map { param -> param.convertToNode() }
     }
 
+    private fun convertConstructorParameters(parameters: List<ConstructorParameterDeclaration>): List<ConstructorParameterNode> {
+        return parameters.mapNotNull { param ->
+            when (param) {
+                is ParameterDeclaration -> param.convertToNode()
+                is PropertyParameterDeclaration -> param.convertToNode()
+                else -> null
+            }
+        }
+    }
+
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
         return typeParams.map { typeParam ->
             TypeValueNode(
@@ -453,7 +477,7 @@ private class LowerDeclarationsToNodes(
 
     private fun ConstructorDeclaration.convert(): ConstructorNode {
         return ConstructorNode(
-                convertParameters(parameters),
+                convertConstructorParameters(parameters),
                 convertTypeParameters(typeParameters)
         )
     }

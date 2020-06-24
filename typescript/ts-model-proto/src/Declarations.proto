@@ -101,7 +101,7 @@ message CallSignatureDeclarationProto {
 }
 
 message ConstructorDeclarationProto {
-    repeated ParameterDeclarationProto parameters = 1;
+    repeated ConstructorParameterDeclarationProto parameters = 1;
     repeated TypeParameterDeclarationProto typeParameters = 2;
     repeated ModifierDeclarationProto modifiers = 3;
     BlockDeclarationProto body = 6;
@@ -419,6 +419,20 @@ message ContinueStatementDeclarationProto {
 
 message ThrowStatementDeclarationProto {
     ExpressionDeclarationProto expression = 1;
+}
+
+message ConstructorParameterDeclarationProto {
+    oneof type {
+        ParameterDeclarationProto parameter = 1;
+        PropertyParameterDeclarationProto propertyParameter = 2;
+    }
+}
+
+message PropertyParameterDeclarationProto {
+    string name = 1;
+    ParameterValueDeclarationProto type = 2;
+    ExpressionDeclarationProto initializer = 3;
+    repeated ModifierDeclarationProto modifiers = 4;
 }
 
 message ParameterDeclarationProto {

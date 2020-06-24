@@ -4,6 +4,7 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
+import org.jetbrains.dukat.ast.model.nodes.ConstructorParameterNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
@@ -23,6 +24,7 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
+import org.jetbrains.dukat.ast.model.nodes.PropertyParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -44,6 +46,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -61,6 +64,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.PropertyParameterModel
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
@@ -333,7 +337,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorNode -> ConstructorModel(
-                    parameters = parameters.map { param -> param.process().copy() },
+                    parameters = parameters.map { param -> param.process() },
                     typeParameters = convertTypeParams(typeParameters)
             )
             is MethodNode -> process()
@@ -388,6 +392,39 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 vararg = vararg,
                 modifier = null
         )
+    }
+
+    private fun PropertyParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): PropertyParameterModel {
+        return PropertyParameterModel(
+            type = type.process(context),
+            name = name,
+            initializer = initializer?.let {
+                ExpressionStatementModel(
+                    IdentifierExpressionModel(
+                        initializer!!.value
+                    )
+                )
+            },
+            visibilityModifier = VisibilityModifierModel.DEFAULT
+        )
+    }
+
+    private fun ConstructorParameterNode.process(): CallableParameterModel {
+        return when (this) {
+            is ParameterNode -> process()
+            is PropertyParameterNode -> process()
+            else -> raiseConcern("unable to process ConstructorParameterNode ${this}") {
+                LambdaParameterModel(
+                    null,
+                    TypeValueModel(
+                        IdentifierEntity("ERROR"),
+                        listOf(),
+                        null,
+                        null
+                    )
+                )
+            }
+        }
     }
 
     private fun ParameterValueDeclaration?.processMeta(): String? {

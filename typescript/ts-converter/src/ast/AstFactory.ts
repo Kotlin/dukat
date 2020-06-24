@@ -33,6 +33,7 @@ import {
   CaseDeclarationProto,
   ClassDeclarationProto,
   ConstructorDeclarationProto,
+  ConstructorParameterDeclarationProto,
   ContinueStatementDeclarationProto,
   DefinitionInfoDeclarationProto,
   EnumDeclarationProto,
@@ -63,6 +64,7 @@ import {
   ParameterDeclarationProto,
   ParameterValueDeclarationProto,
   PropertyDeclarationProto,
+  PropertyParameterDeclarationProto,
   QualifierDeclarationProto,
   ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto,
@@ -159,7 +161,7 @@ export class AstFactory {
     return topLevelDeclaration;
   }
 
-  createConstructorDeclaration(parameters: Array<ParameterDeclaration>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
+  createConstructorDeclaration(parameters: Array<ConstructorParameterDeclarationProto>, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null): MemberDeclaration {
     let constructorDeclaration = new ConstructorDeclarationProto();
 
     constructorDeclaration.setParametersList(parameters);
@@ -528,6 +530,26 @@ export class AstFactory {
     let paramValueDeclaration = new ParameterValueDeclarationProto();
     paramValueDeclaration.setObjectliteral(objectLiteral);
     return paramValueDeclaration;
+  }
+
+  createSimpleConstructorParameterDeclaration(parameter: ParameterDeclaration): ConstructorParameterDeclarationProto {
+    let constructorParameterDeclaration = new ConstructorParameterDeclarationProto();
+    constructorParameterDeclaration.setParameter(parameter);
+    return constructorParameterDeclaration
+  }
+
+  createPropertyParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, modifiers: Array<ModifierDeclaration>): ConstructorParameterDeclarationProto {
+    let parameterDeclaration = new PropertyParameterDeclarationProto();
+    parameterDeclaration.setName(name);
+    parameterDeclaration.setType(type);
+    if (initializer != null) {
+      parameterDeclaration.setInitializer(initializer);
+    }
+    parameterDeclaration.setModifiersList(modifiers);
+
+    let constructorParameterDeclaration = new ConstructorParameterDeclarationProto();
+    constructorParameterDeclaration.setPropertyparameter(parameterDeclaration);
+    return constructorParameterDeclaration
   }
 
   createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {

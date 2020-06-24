@@ -12,6 +12,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -34,6 +35,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.expression.NonNullExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceKindDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
@@ -110,6 +112,7 @@ import org.jetbrains.dukat.tsmodelproto.CaseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConditionalExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ConstructorParameterDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ContinueStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.DefinitionInfoDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ElementAccessExpressionDeclarationProto
@@ -143,6 +146,7 @@ import org.jetbrains.dukat.tsmodelproto.ParameterValueDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ParenthesizedExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyAccessExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.PropertyDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.PropertyParameterDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.QualifierDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReferenceClauseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ReferenceDeclarationProto
@@ -500,6 +504,25 @@ fun MemberDeclarationProto.convert(): MemberDeclaration {
         hasIndexSignature() -> indexSignature.convert()
         hasCallSignature() -> callSignature.convert()
         else -> throw Exception("unknown MemberEntityProto: ${this}")
+    }
+}
+
+fun PropertyParameterDeclarationProto.convert(): PropertyParameterDeclaration {
+    return PropertyParameterDeclaration(
+        name,
+        type.convert(),
+        if (hasInitializer()) {
+            initializer.convert()
+        } else null,
+        modifiersList.mapNotNull { it.convert() }.toSet()
+    )
+}
+
+fun ConstructorParameterDeclarationProto.convert(): ConstructorParameterDeclaration {
+    return when {
+        hasParameter() -> parameter.convert()
+        hasPropertyParameter() -> propertyParameter.convert()
+        else -> throw Exception("unknown ConstructorParameterDeclarationProto: $this")
     }
 }
 

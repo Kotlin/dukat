@@ -4,11 +4,13 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructorParameterDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionLikeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyParameterDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
@@ -150,6 +152,16 @@ private fun List<MemberDeclaration>.mergeMembers() : List<MemberDeclaration> {
 private fun ParameterDeclaration.mergeDuplicates() = copy(
         type = type.mergeDuplicates()
 )
+
+private fun PropertyParameterDeclaration.mergeDuplicates() = copy(
+        type = type.mergeDuplicates()
+)
+
+private fun ConstructorParameterDeclaration.mergeDuplicates() = when (this) {
+    is ParameterDeclaration -> mergeDuplicates()
+    is PropertyParameterDeclaration -> mergeDuplicates()
+    else -> this
+}
 
 private fun ConstructorDeclaration.mergeDuplicates() = copy(
         parameters = parameters.map { it.mergeDuplicates() }
