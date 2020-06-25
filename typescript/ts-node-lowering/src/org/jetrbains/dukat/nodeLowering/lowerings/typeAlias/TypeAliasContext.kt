@@ -7,7 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 
 private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, TypeNode>) : NodeTypeLowering {
@@ -26,15 +26,15 @@ private class TypeSpecifierLowering(private val aliasParamMap: Map<NameEntity, T
         return declarationResolved
     }
 
-    override fun lowerMeta(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    override fun lowerMeta(declaration: MetaData): MetaData {
         return when (declaration) {
             is IntersectionMetadata -> {
                 IntersectionMetadata(params = declaration.params.map {
                     //TODO: this is our way of avoiding SOE on assigning meta
-                    (when (it) {
-                        is TypeNode -> lowerType(it)
-                        else -> lowerMeta(it)
-                    }).duplicate<ParameterValueDeclaration>()
+                    when (it) {
+                        is TypeNode -> lowerType(it).duplicate()
+                        else -> it
+                    }
                 })
             }
             else -> super.lowerMeta(declaration)

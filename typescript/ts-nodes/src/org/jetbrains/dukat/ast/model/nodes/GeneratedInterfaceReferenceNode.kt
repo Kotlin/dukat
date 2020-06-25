@@ -3,7 +3,7 @@ package org.jetbrains.dukat.ast.model.nodes
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 
 data class GeneratedInterfaceReferenceNode(
         val name: NameEntity,
@@ -11,5 +11,5 @@ data class GeneratedInterfaceReferenceNode(
         val reference: ReferenceEntity?,
 
         override val nullable: Boolean = false,
-        override var meta: ParameterValueDeclaration? = null
+        override var meta: MetaData? = null
 ) : TypeNode

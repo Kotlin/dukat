@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 
 enum class UnionLiteralKind {
     STRING,
@@ -12,5 +12,5 @@ data class LiteralUnionNode(
         val kind: UnionLiteralKind,
 
         override var nullable: Boolean = false,
-        override var meta: ParameterValueDeclaration? = null
+        override var meta: MetaData? = null
 ): TypeNode

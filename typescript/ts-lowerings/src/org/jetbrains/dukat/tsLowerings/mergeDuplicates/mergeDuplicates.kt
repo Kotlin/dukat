@@ -14,6 +14,7 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -22,7 +23,7 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 private object IRRELEVANT_TYPE : ParameterValueDeclaration {
     override val nullable: Boolean
         get() = raiseConcern("Irrelevant type is not supposed to be used") { false }
-    override var meta: ParameterValueDeclaration?
+    override var meta: MetaData?
         get() = raiseConcern("Irrelevant type is not supposed to be used") { null }
         set(_) {}
 }

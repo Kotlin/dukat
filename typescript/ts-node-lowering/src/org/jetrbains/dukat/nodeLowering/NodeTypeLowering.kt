@@ -24,7 +24,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 
 private val logger = Logging.logger("TypeLowering")
 
@@ -41,7 +41,7 @@ interface NodeTypeLowering : TopLevelNodeLowering {
         }
     }
 
-    fun lowerMeta(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
+    fun lowerMeta(declaration: MetaData): MetaData {
         return declaration
     }
 

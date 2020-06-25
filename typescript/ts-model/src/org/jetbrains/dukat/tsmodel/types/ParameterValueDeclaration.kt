@@ -2,10 +2,11 @@ package org.jetbrains.dukat.tsmodel.types
 
 import org.jetbrains.dukat.astCommon.TypeEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.MetaData
 
 interface ParameterValueDeclaration : TypeEntity {
     val nullable: Boolean
-    var meta: ParameterValueDeclaration?
+    var meta: MetaData?
 }
 
 fun ParameterValueDeclaration.isSimpleType(str: String): Boolean {

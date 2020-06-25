@@ -76,6 +76,7 @@ import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -140,7 +141,7 @@ private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
     return params.all { it is NumericLiteralDeclaration }
 }
 
-private fun ParameterValueDeclaration.convertToNodeNullable(meta: ParameterValueDeclaration? = null): TypeNode? {
+private fun ParameterValueDeclaration.convertToNodeNullable(meta: MetaData? = null): TypeNode? {
     return when (this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = value,
@@ -231,7 +232,7 @@ private fun ParameterValueDeclaration.convertToNodeNullable(meta: ParameterValue
 
 private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
 
-private fun ParameterValueDeclaration.convertToNode(meta: ParameterValueDeclaration? = null): TypeNode {
+private fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): TypeNode {
     return convertToNodeNullable(meta) ?: TYPE_ANY
 }
 

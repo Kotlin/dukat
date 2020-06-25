@@ -14,6 +14,7 @@ import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
@@ -22,7 +23,6 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
@@ -88,7 +88,7 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
@@ -390,7 +390,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         )
     }
 
-    private fun ParameterValueDeclaration?.processMeta(): String? {
+    private fun MetaData?.processMeta(): String? {
         return when (this) {
             is ThisTypeInGeneratedInterfaceMetaData -> "this"
             is IntersectionMetadata -> params.filterIsInstance(TypeNode::class.java).map {
