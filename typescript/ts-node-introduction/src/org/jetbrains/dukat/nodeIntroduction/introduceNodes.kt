@@ -33,7 +33,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.constants.SELF_REFERENCE_TYPE
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -68,7 +67,6 @@ import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.ThisTypeDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -224,7 +222,6 @@ private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? 
                 nullable = nullable,
                 meta = metaData ?: meta
         )
-        is ThisTypeDeclaration -> SELF_REFERENCE_TYPE
         is TypeNode -> this
         else -> null
     }

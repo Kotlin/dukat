@@ -35,7 +35,6 @@ import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.ast.model.nodes.metadata.ThisTypeInGeneratedInterfaceMetaData
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -89,6 +88,7 @@ import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.astCommon.MetaData
+import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
@@ -392,7 +392,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun MetaData?.processMeta(): String? {
         return when (this) {
-            is ThisTypeInGeneratedInterfaceMetaData -> "this"
+            is SimpleMetaData -> value
             is IntersectionMetadata -> params.filterIsInstance(TypeNode::class.java).map {
                 it.process().translate()
             }.joinToString(" & ")
