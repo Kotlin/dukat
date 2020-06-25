@@ -141,12 +141,12 @@ private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
     return params.all { it is NumericLiteralDeclaration }
 }
 
-private fun ParameterValueDeclaration.convertToNodeNullable(meta: MetaData? = null): TypeNode? {
+private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): TypeNode? {
     return when (this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = value,
                 nullable = nullable,
-                meta = meta ?: meta
+                meta = metaData ?: meta
         )
         is TypeDeclaration -> TypeValueNode(
                 value = value,
@@ -155,7 +155,7 @@ private fun ParameterValueDeclaration.convertToNodeNullable(meta: MetaData? = nu
                     ReferenceNode(it.uid)
                 },
                 nullable = nullable,
-                meta = meta ?: meta
+                meta = metaData ?: meta
         )
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
         is FunctionTypeDeclaration -> FunctionTypeNode(
@@ -164,14 +164,14 @@ private fun ParameterValueDeclaration.convertToNodeNullable(meta: MetaData? = nu
                 },
                 type = type.convertToNode(),
                 nullable = nullable,
-                meta = meta ?: meta
+                meta = metaData ?: meta
         )
         is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
                 name,
                 typeParameters,
                 reference,
                 nullable,
-                meta ?: meta
+                metaData ?: meta
         )
         is IntersectionTypeDeclaration -> {
             val firstParam = params[0].convertToNodeNullable(IntersectionMetadata(params.map { it.convertToNodeNullable() ?: it }))
@@ -215,14 +215,14 @@ private fun ParameterValueDeclaration.convertToNodeNullable(meta: MetaData? = nu
                     UnionTypeNode(
                             params = params.map { param -> param.convertToNode() },
                             nullable = nullable,
-                            meta = meta ?: meta
+                            meta = metaData ?: meta
                     ).lowerAsNullable()
                 }
             }
         is TupleDeclaration -> TupleTypeNode(
                 params = params.map { param -> param.convertToNode() },
                 nullable = nullable,
-                meta = meta ?: meta
+                meta = metaData ?: meta
         )
         is ThisTypeDeclaration -> SELF_REFERENCE_TYPE
         is TypeNode -> this
