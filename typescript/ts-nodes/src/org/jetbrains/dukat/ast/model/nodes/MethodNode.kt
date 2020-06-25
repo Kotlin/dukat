@@ -4,7 +4,7 @@ import org.jetbrains.dukat.tsmodel.BlockDeclaration
 
 data class MethodNode(
         val name: String,
-        val parameters: List<ParameterNode>,
+        override val parameters: List<ParameterNode>,
         val type: TypeNode,
         val typeParameters: List<TypeValueNode>,
 
@@ -15,4 +15,4 @@ data class MethodNode(
 
         val body: BlockDeclaration?,
         val isGenerator: Boolean
-) : MemberNode
+) : MemberNode, ParameterOwnerNode
