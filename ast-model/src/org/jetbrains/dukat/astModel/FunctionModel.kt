@@ -23,4 +23,4 @@ data class FunctionModel(
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean
-) : MemberEntity, TopLevelModel, CanHaveExternalModifierModel, CallableModel, CanBeExtensionModel
+) : MemberEntity, TopLevelModel, CanHaveExternalModifierModel, CallableModel<ParameterModel>, CanBeExtensionModel

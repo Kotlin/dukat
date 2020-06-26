@@ -6,4 +6,4 @@ data class FunctionTypeModel(
 
         val metaDescription: String?,
         override var nullable: Boolean = false
-) : TypeModel, CallableModel
+) : TypeModel, CallableModel<LambdaParameterModel>

@@ -17,4 +17,4 @@ data class MethodModel(
         val open: Boolean,
 
         val body: BlockStatementModel?
-) : MemberModel, CallableModel
+) : MemberModel, CallableModel<ParameterModel>

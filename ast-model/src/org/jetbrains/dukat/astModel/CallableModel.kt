@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.astModel
 
-interface CallableModel {
-    val parameters: List<CallableParameterModel>
+interface CallableModel<T : CallableParameterModel> {
+    val parameters: List<T>
     val type: TypeModel
 }

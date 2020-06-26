@@ -162,7 +162,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         return context.resolve(this.fqName)
     }
 
-    private fun CallableModel.isOverriding(otherCallableModel: CallableModel): MemberOverrideStatus {
+    private fun CallableModel<*>.isOverriding(otherCallableModel: CallableModel<*>): MemberOverrideStatus {
         val parametersAreEquivalent = paramTypesAreEquivalent(parameters, otherCallableModel.parameters)
         val overridingReturnType = type.isOverridingReturnType(otherCallableModel.type)
 
@@ -186,7 +186,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             return MemberOverrideStatus.IS_NOT_OVERRIDE
         }
 
-        return (this as CallableModel).isOverriding(otherMethodModel)
+        return (this as CallableModel<*>).isOverriding(otherMethodModel)
     }
 
     private fun PropertyModel.isOverriding(otherPropertyModel: MemberModel): MemberOverrideStatus {
@@ -202,7 +202,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             }
         } else {
             if ((type is FunctionTypeModel) && (otherPropertyModel.type is FunctionTypeModel)) {
-                if ((type as CallableModel).isOverriding(otherPropertyModel.type as CallableModel) == MemberOverrideStatus.IS_RELATED) {
+                if ((type as CallableModel<*>).isOverriding(otherPropertyModel.type as CallableModel<*>) == MemberOverrideStatus.IS_RELATED) {
                     MemberOverrideStatus.IS_RELATED
                 } else {
                     MemberOverrideStatus.IS_NOT_OVERRIDE
