@@ -11,9 +11,11 @@ import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNodeMeta
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
+import org.jetbrains.dukat.ast.model.nodes.ParameterOwnerNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.transform
@@ -64,23 +66,17 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
         }
     }
 
+    private fun ParameterOwnerNode.asKey() = parameters.map { param ->
+        param.type.duplicate<TypeNode>().let {
+            it.meta = null
+            it
+        }
+    }
 
     fun generateFunctionNodes(declaration: FunctionNode): List<FunctionNode> {
         return generateParams(declaration.parameters).first.map { params ->
             declaration.copy(parameters = params)
-        }.distinctBy { node ->
-            node.copy(
-                    parameters = node.parameters.mapIndexed { index, param ->
-                        val paramCopy = param.copy(
-                                name = "p${index}",
-                                type = param.type.duplicate()
-                        )
-
-                        paramCopy.type.meta = null
-                        paramCopy
-                    }
-            )
-        }
+        }.distinctBy { node -> node.asKey() }
     }
 
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
@@ -88,19 +84,7 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
 
         return generateParams(declaration.parameters).first.map { params ->
             declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)
-        }.distinctBy { node ->
-            node.copy(
-                    parameters = node.parameters.mapIndexed { index, param ->
-                        val paramCopy = param.copy(
-                                name = "p${index}",
-                                type = param.type.duplicate()
-                        )
-
-                        paramCopy.type.meta = null
-                        paramCopy
-                    }
-            )
-        }
+        }.distinctBy { node -> node.asKey() }
     }
 
     override fun lowerClassNode(declaration: ClassNode): ClassNode {
