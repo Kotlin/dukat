@@ -16,6 +16,7 @@ import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.IntroduceMissedOverloads
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
 import org.jetbrains.dukat.model.commonLowerings.RearrangeConstructors
 import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
@@ -100,7 +101,10 @@ open class TypescriptLowerer(
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         SeparateNonExternalEntities(),
-                        LowerOverrides(),
+                        ModelContextAwareLowering()
+                            .lower { context, inheritanceContext ->
+                                LowerOverrides(context, inheritanceContext)
+                            },
                         AddExplicitGettersAndSetters(),
                         AnyfyUnresolvedTypes(),
                         RemoveKotlinBuiltIns(),

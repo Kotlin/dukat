@@ -478,17 +478,8 @@ private class OverrideResolver(private val context: ModelContext, private val in
     }
 }
 
-class LowerOverrides : ModelLowering {
-    private lateinit var modelContext: ModelContext
-    private lateinit var inheritanceContext: InheritanceContext
-
+class LowerOverrides(modelContext: ModelContext, inheritanceContext: InheritanceContext) : ModuleModelContextAwareLowering(modelContext, inheritanceContext) {
     override fun lower(module: ModuleModel): ModuleModel {
         return OverrideResolver(modelContext, inheritanceContext).lowerOverrides(module)
-    }
-
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        modelContext = ModelContext(source)
-        inheritanceContext = InheritanceContext(modelContext.buildInheritanceGraph())
-        return super.lower(source)
     }
 }

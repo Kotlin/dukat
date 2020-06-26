@@ -24,6 +24,7 @@ import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
+import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
 import org.jetbrains.dukat.model.commonLowerings.VisibilityModifierResolver
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.model.commonLowerings.resolveTopLevelVisibility
@@ -51,7 +52,10 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : Inpu
                 .addOverloadsForCallbacks()
                 .convertToModel()
                 .lower(
-                        LowerOverrides(),
+                        ModelContextAwareLowering()
+                                .lower { context, inheritanceContext ->
+                                    LowerOverrides(context, inheritanceContext)
+                                },
                         EscapeIdentificators(),
                         AddExplicitGettersAndSetters()
                 )
