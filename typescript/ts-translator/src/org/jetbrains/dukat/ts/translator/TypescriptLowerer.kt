@@ -14,6 +14,7 @@ import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
 import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
+import org.jetbrains.dukat.model.commonLowerings.IntroduceAmbiguousInterfaceMembers
 import org.jetbrains.dukat.model.commonLowerings.IntroduceMissedOverloads
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
@@ -102,6 +103,9 @@ open class TypescriptLowerer(
                         MergeVarsAndInterfaces(),
                         SeparateNonExternalEntities(),
                         ModelContextAwareLowering()
+                            .lower { context, inheritanceContext ->
+                                IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
+                            }
                             .lower { context, inheritanceContext ->
                                 LowerOverrides(context, inheritanceContext)
                             },

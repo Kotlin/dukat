@@ -78,6 +78,7 @@ class DescriptorTests {
                 "class/inheritance/overridingStdLib",
                 "class/inheritance/simple",
                 "escaping/escaping",
+                "inheritance/missingMembers/ambiguousProperties",
                 "interface/inheritance/simple",
                 "interface/inheritance/withQualifiedParent",
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",

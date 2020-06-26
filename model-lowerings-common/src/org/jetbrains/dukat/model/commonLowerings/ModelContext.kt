@@ -127,7 +127,7 @@ class ModelContext(sourceSetModel: SourceSetModel) {
         return resolveInterface(name) ?: resolveClass(name) ?: resolveImport(name)
     }
 
-    private fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
+    fun getParents(classLikeModel: ClassLikeModel): List<ResolvedClassLike<out ClassLikeModel>> {
         return classLikeModel.parentEntities.mapNotNull { heritageModel ->
             val value = unalias(heritageModel.value)
             if (value is TypeValueModel) {
