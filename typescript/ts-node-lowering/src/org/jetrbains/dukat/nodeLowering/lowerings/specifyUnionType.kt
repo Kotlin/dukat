@@ -83,10 +83,8 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
     }
 
     fun generateConstructors(declaration: ConstructorNode): List<ConstructorNode> {
-        val hasDynamic = declaration.parameters.any { (it.type is UnionTypeNode) }
-
         return generateParams(declaration.parameters).first.map { params ->
-            declaration.copy(parameters = params, generated = declaration.generated || hasDynamic)
+            declaration.copy(parameters = params)
         }.distinctBy { node -> node.asKey() }
     }
 
