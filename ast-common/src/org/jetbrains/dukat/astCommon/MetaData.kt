@@ -1,4 +1,3 @@
 package org.jetbrains.dukat.astCommon
 
-interface MetaData {
-}
+interface MetaData

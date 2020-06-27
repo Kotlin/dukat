@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNodeMeta
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterOwnerNode
@@ -18,7 +17,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetrbains.dukat.nodeLowering.TopLevelNodeLowering
 
 const val COMPLEXITY_THRESHOLD = 15
@@ -46,7 +44,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
     }
 }
 
-private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
+private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableMap<String, MutableList<MethodNode>>) : TopLevelNodeLowering {
 
     fun generateParams(params: List<ParameterNode>): Pair<List<List<ParameterNode>>, Boolean> {
         val specifyParams = specifyArguments(params)
@@ -59,10 +57,15 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
         }
     }
 
-    fun generateMethods(declaration: MethodNode): List<MethodNode> {
+    fun generateMethods(declaration: MethodNode, uid: String?): List<MethodNode> {
         val generatedParams = generateParams(declaration.parameters)
         return generatedParams.first.map { params ->
-            declaration.copy(parameters = params, meta = MethodNodeMeta(generated = generatedParams.second))
+            val declarationResolved = declaration.copy(parameters = params)
+            if (generatedParams.second && (uid != null)) {
+                generatedMethodsMap.getOrPut(uid) { mutableListOf() }.add(declarationResolved)
+            }
+
+            declarationResolved
         }
     }
 
@@ -91,7 +94,7 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
         val members = declaration.members.flatMap { member ->
             when (member) {
                 is ConstructorNode -> generateConstructors(member)
-                is MethodNode -> generateMethods(member)
+                is MethodNode -> generateMethods(member, null)
                 else -> listOf(member)
             }
         }
@@ -102,7 +105,7 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
         //TODO: discuss whether we need this limitation at all
         val members = declaration.members.flatMap { member ->
             when (member) {
-                is MethodNode -> generateMethods(member)
+                is MethodNode -> generateMethods(member, declaration.uid)
                 else -> listOf(member)
             }
         }
@@ -126,18 +129,25 @@ private class SpecifyUnionTypeLowering : TopLevelNodeLowering {
             lowerTopLevelDeclarationList(declaration, owner)
         }
     }
-
 }
 
-
-private fun ModuleNode.specifyUnionType(): ModuleNode {
-    return SpecifyUnionTypeLowering().lowerModuleNode(this)
+private class IntroduceGeneratedMembersToDescendantClasses(private val generatedMembersMap: Map<String, List<MethodNode>>) : TopLevelNodeLowering {
+    override fun lowerClassNode(declaration: ClassNode): ClassNode {
+        val generatedMembers = declaration.parentEntities.mapNotNull { generatedMembersMap[it.reference?.uid] }.flatten()
+        return super.lowerClassNode(declaration.copy(members = declaration.members + generatedMembers))
+    }
 }
 
-private fun SourceSetNode.specifyUnionType(): SourceSetNode = transform { it.specifyUnionType() }
-
-class SpecifyUnionType(): NodeLowering {
+class SpecifyUnionType() : NodeLowering {
     override fun lower(source: SourceSetNode): SourceSetNode {
-        return source.specifyUnionType()
+        val generatedMethodsMap = mutableMapOf<String, MutableList<MethodNode>>()
+
+        val unrolledSourceSet =  source.copy(sources = source.sources.map { sourceFile ->
+            sourceFile.copy(root = SpecifyUnionTypeLowering(generatedMethodsMap).lowerModuleNode(sourceFile.root))
+        })
+
+        return unrolledSourceSet.copy(sources = unrolledSourceSet.sources.map { sourceFile ->
+            sourceFile.copy(root = IntroduceGeneratedMembersToDescendantClasses(generatedMethodsMap).lowerModuleNode(sourceFile.root))
+        })
     }
 }

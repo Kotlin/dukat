@@ -336,7 +336,6 @@ private class LowerDeclarationsToNodes(
                     false,
                     true,
                     null,
-                    null,
                     false
             )
         }
@@ -355,7 +354,6 @@ private class LowerDeclarationsToNodes(
                         true,
                         true,
                         null,
-                        null,
                         false
                 ),
                 MethodNode(
@@ -367,7 +365,6 @@ private class LowerDeclarationsToNodes(
                         false,
                         true,
                         true,
-                        null,
                         null,
                         false
                 )
@@ -384,7 +381,6 @@ private class LowerDeclarationsToNodes(
                 false,
                 true,
                 true,
-                null,
                 null,
                 false
         )
@@ -529,7 +525,6 @@ private class LowerDeclarationsToNodes(
                     declaration.isStatic(),
                     false,
                     true,
-                    null,
                     declaration.body,
                     declaration.isGenerator
             ))

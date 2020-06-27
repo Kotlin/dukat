@@ -37,8 +37,10 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
+import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.rightMost
@@ -87,8 +89,6 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
-import org.jetbrains.dukat.astCommon.MetaData
-import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
@@ -415,21 +415,6 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         }
     }
 
-    private fun collectParentGeneratedMethods(parentEntities: List<HeritageNode>): List<MethodModel> {
-        return parentEntities.flatMap { parentEntity ->
-            val node = uidToNameMapper[parentEntity.reference?.uid]?.node
-            if (node is InterfaceNode) {
-                val generatedMethods = node.members.filterIsInstance(MethodNode::class.java).filter { it.meta?.generated == true }
-                generatedMethods.map() {
-                    it.process(uidToNameMapper[node.uid]?.fqName)
-                }
-            } else {
-                emptyList()
-            }
-        }
-    }
-
-
     private fun convertParentEntities(parentEntities: List<HeritageNode>): List<HeritageModel> {
         return parentEntities.map { parentEntity -> parentEntity.convertToModel() }
     }
@@ -625,11 +610,11 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
-        val generatedMethods = collectParentGeneratedMethods(parentEntities)
+        //val generatedMethods = collectParentGeneratedMethods(parentEntities)
 
         return ClassModel(
                 name = name,
-                members = members.ownMembers + generatedMethods,
+                members = members.ownMembers,
                 companionObject = if (members.staticMembers.isNotEmpty()) {
                     ObjectModel(
                             IdentifierEntity(""),
