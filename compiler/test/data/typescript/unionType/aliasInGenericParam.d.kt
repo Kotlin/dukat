@@ -18,7 +18,7 @@ import org.w3c.xhr.*
 
 external interface OurObject {
     @nativeGetter
-    operator fun get(x: String): dynamic /* String | Number | Boolean | Date | OurObject | OurListArray */
+    operator fun get(x: String): dynamic /* String? | Number? | Boolean? | Date? | OurObject? | OurListArray? */
     @nativeSetter
     operator fun set(x: String, value: String)
     @nativeSetter

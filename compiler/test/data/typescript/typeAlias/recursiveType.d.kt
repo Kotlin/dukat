@@ -24,7 +24,7 @@ external interface Rec {
 
 external interface `T$0` {
     @nativeGetter
-    operator fun get(key: String): dynamic /* `T$0` | AnimatedValue */
+    operator fun get(key: String): dynamic /* `T$0`? | AnimatedValue? */
     @nativeSetter
     operator fun set(key: String, value: `T$0`)
     @nativeSetter

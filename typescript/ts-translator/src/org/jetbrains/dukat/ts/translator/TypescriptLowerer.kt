@@ -43,6 +43,7 @@ import org.jetbrains.dukat.tsLowerings.ResolveCollections
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
 import org.jetbrains.dukat.tsLowerings.ResolveLoops
+import org.jetbrains.dukat.tsLowerings.ResolveTypeAliases
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -50,7 +51,6 @@ import org.jetrbains.dukat.nodeLowering.lowerings.RemoveUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.SpecifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lower
-import org.jetrbains.dukat.nodeLowering.lowerings.typeAlias.ResolveTypeAliases
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
@@ -76,7 +76,8 @@ open class TypescriptLowerer(
                         LowerPartialOf(),
                         ResolveLoops(),
                         ResolveCollections(),
-                        LowerThisType()
+                        LowerThisType(),
+                        ResolveTypeAliases()
                 )
 
 
@@ -84,7 +85,6 @@ open class TypescriptLowerer(
                 .lower(declarations)
                 .lower(
                         ResolveModuleAnnotations(),
-                        ResolveTypeAliases(),
                         SpecifyUnionType(),
                         RemoveUnusedGeneratedEntities()
                 )

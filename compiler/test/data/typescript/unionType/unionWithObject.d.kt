@@ -19,15 +19,15 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun toTex(input: Fraction): String
+external fun toTex(input: Fraction?): String
 
-external fun toTex(input: Expression): String
+external fun toTex(input: Expression?): String
 
-external fun toTex(input: Equation): String
+external fun toTex(input: Equation?): String
 
 external fun toTex(input: Any?): String
 
-external fun toTex(input: Array<dynamic /* Fraction | Any? */>): String
+external fun toTex(input: Array<dynamic /* Fraction? | Any? */>?): String
 
 external open class Equation
 
