@@ -13,6 +13,7 @@ import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
+import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
@@ -23,7 +24,6 @@ import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
@@ -39,6 +39,7 @@ import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
+import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -74,7 +75,6 @@ import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
-import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -172,7 +172,9 @@ private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? 
                 metaData ?: meta
         )
         is IntersectionTypeDeclaration -> {
-            val firstParam = params[0].convertToNodeNullable(IntersectionMetadata(params.map { it.convertToNodeNullable() ?: it }))
+            val firstParam = params[0].convertToNodeNullable(IntersectionMetadata(params.map {
+                it.convertToNodeNullable() ?: it
+            }))
             if (nullable) {
                 firstParam?.makeNullable()
             } else {
@@ -358,7 +360,8 @@ private class LowerDeclarationsToNodes(
                 ),
                 MethodNode(
                         "set",
-                        convertParameters(declaration.indexTypes + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable() ?: declaration.returnType, null, false, false))),
+                        convertParameters(declaration.indexTypes + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable()
+                                ?: declaration.returnType, null, false, false))),
                         TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                         emptyList(),
                         false,
@@ -516,40 +519,6 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    private fun mergeTypeParameters(interfaceTypeParams: List<TypeParameterDeclaration>, ownTypeParams: List<TypeParameterDeclaration>): List<TypeParameterDeclaration> {
-        val ownNames = ownTypeParams.map { typeParam -> typeParam.name }.toSet()
-        return interfaceTypeParams.map { typeParam ->
-            val name = typeParam.name
-            //TODO: it's quite easy to break this, so consider to introduce "breaking" test and fix for it
-            typeParam.copy(name = if (ownNames.contains(name)) {
-                when (name) {
-                    is IdentifierEntity -> {
-                        name.copy(value = name.value + "0")
-                    }
-                    is QualifierEntity -> {
-                        name.copy(right = name.right.copy(value = name.right.value + "0"))
-                    }
-                }
-            } else {
-                name
-            })
-        }
-    }
-
-    private fun unrollOptionalParams(parameters: List<ParameterDeclaration>): List<List<ParameterNode>> {
-        var (head, optionalTail) = convertParameters(parameters).partition { !it.optional }
-
-        val generatedParams = mutableListOf(head)
-        val tail = mutableListOf<ParameterNode>()
-        while (optionalTail.isNotEmpty()) {
-            tail.add(optionalTail[0].copy(optional = false, initializer = null))
-            optionalTail = optionalTail.drop(1)
-            generatedParams.add(head + tail)
-        }
-
-        return generatedParams
-    }
-
     fun lowerMemberDeclaration(declaration: MemberEntity): List<MemberNode> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
@@ -698,7 +667,7 @@ private class LowerDeclarationsToNodes(
 
         val hasDefaultExport = documentRoot.declarations.any {
             (it is WithModifiersDeclaration) && (it !is InterfaceDeclaration) && (it.hasExportModifier()) && (it.hasDefaultModifier())
-         }
+        }
 
         return ModuleNode(
                 moduleName = moduleName,
