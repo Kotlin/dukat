@@ -460,7 +460,7 @@ export class AstConverter {
         let params = type.types
           .map(argumentType => this.convertType(argumentType));
 
-        return this.astFactory.createUnionTypeDeclaration(params)
+        return this.astFactory.createUnionTypeDeclaration(params);
       } else if (ts.isIntersectionTypeNode(type)) {
         let params = type.types
           .map(argumentType => this.convertType(argumentType));
@@ -529,11 +529,7 @@ export class AstConverter {
       } else if (ts.isTypePredicateNode(type)) {
         return this.createTypeDeclaration("boolean");
       } else if (type.kind == ts.SyntaxKind.ObjectKeyword) {
-        return this.astFactory.createUnionTypeDeclaration([
-            this.createTypeDeclaration("any"),
-            this.createTypeDeclaration("undefined")
-          ]
-        )
+        return this.createTypeDeclaration("object");
       } else {
         // TODO: use raiseConcern for this
         this.unsupportedDeclarations.add(type.kind);

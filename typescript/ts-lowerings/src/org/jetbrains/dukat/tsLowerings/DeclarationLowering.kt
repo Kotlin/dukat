@@ -111,7 +111,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
         return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint, owner?.wrap(declaration)) })
     }
 
-    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): UnionTypeDeclaration {
+    fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return declaration.copy(params = declaration.params.map { param -> lowerParameterValue(param, owner?.wrap(declaration)) })
     }
 

@@ -7,4 +7,5 @@ dependencies {
 
     implementation(project(":ast-common"))
     implementation(project(":ts-model-proto"))
+    implementation(project(":panic"))
 }

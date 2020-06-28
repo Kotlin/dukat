@@ -2,7 +2,6 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 
 import cartesian
 import org.jetbrains.dukat.ast.model.duplicate
-import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -31,7 +30,7 @@ private fun specifyArguments(params: List<ParameterNode>): List<List<ParameterNo
                 currentComplexity *= type.params.size
                 if (currentComplexity <= COMPLEXITY_THRESHOLD) {
                     type.params.map { param ->
-                        parameterDeclaration.copy(type = (if (type.nullable) param.makeNullable() else param))
+                        parameterDeclaration.copy(type = param)
                     }
                 } else {
                     listOf(parameterDeclaration)
@@ -140,7 +139,7 @@ class SpecifyUnionType() : NodeLowering {
     override fun lower(source: SourceSetNode): SourceSetNode {
         val generatedMethodsMap = mutableMapOf<String, MutableList<MethodNode>>()
 
-        val unrolledSourceSet =  source.copy(sources = source.sources.map { sourceFile ->
+        val unrolledSourceSet = source.copy(sources = source.sources.map { sourceFile ->
             sourceFile.copy(root = SpecifyUnionTypeLowering(generatedMethodsMap).lowerModuleNode(sourceFile.root))
         })
 

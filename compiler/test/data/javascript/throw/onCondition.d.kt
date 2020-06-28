@@ -15,4 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun assertNotNull(value: Any?, message: Any?): dynamic /* Nothing | Any? */
+external fun assertNotNull(value: Any?, message: Any?): dynamic /* Nothing? | Any? */

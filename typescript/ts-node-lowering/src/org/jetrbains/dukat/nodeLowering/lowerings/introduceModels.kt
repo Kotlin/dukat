@@ -176,17 +176,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return Members(ownNodes.mapNotNull { it.process() }, staticNodes.mapNotNull { it.process() })
     }
 
-    private fun NameEntity.addLibPrefix() = TSLIBROOT.appendLeft(this)
-
     private fun UnionTypeNode.convertMeta(): String {
         return params.joinToString(" | ") { unionMember ->
-            unionMember.process().translate().let {
-                if (nullable) {
-                    "${it}?"
-                } else {
-                    it
-                }
-            }
+            unionMember.process().translate()
         }
     }
 

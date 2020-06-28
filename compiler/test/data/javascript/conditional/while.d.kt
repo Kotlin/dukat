@@ -15,4 +15,4 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun product(arr: Any?): dynamic /* Number | Any? */
+external fun product(arr: Any?): dynamic /* Number? | Any? */

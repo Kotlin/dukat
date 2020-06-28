@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.makeNullable
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
@@ -84,6 +83,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import org.jetbrains.dukat.tsmodel.types.makeNullable
 
 
 private fun unquote(name: String): String {
@@ -172,14 +172,9 @@ private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? 
                 metaData ?: meta
         )
         is IntersectionTypeDeclaration -> {
-            val firstParam = params[0].convertToNodeNullable(IntersectionMetadata(params.map {
+            params[0].convertToNodeNullable(IntersectionMetadata(params.map {
                 it.convertToNodeNullable() ?: it
             }))
-            if (nullable) {
-                firstParam?.makeNullable()
-            } else {
-                firstParam
-            }
         }
         is StringLiteralDeclaration -> {
             LiteralUnionNode(
@@ -216,7 +211,7 @@ private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? 
                             params = params.map { param -> param.convertToNode() },
                             nullable = nullable,
                             meta = metaData ?: meta
-                    ).lowerAsNullable()
+                    )
                 }
             }
         is TupleDeclaration -> TupleTypeNode(
@@ -233,42 +228,6 @@ private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null,
 
 private fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): TypeNode {
     return convertToNodeNullable(meta) ?: TYPE_ANY
-}
-
-private fun UnionTypeNode.resolveAsNullableType(): TypeNode? {
-    val paramsFiltered = params.filter { param ->
-        when (param) {
-            is TypeValueNode -> {
-                val value = param.value
-                value != IdentifierEntity("undefined") && value != IdentifierEntity("null")
-            }
-            else -> true
-        }
-    }
-
-    return if ((paramsFiltered.size < params.size)) {
-        if (paramsFiltered.size == 1) {
-            paramsFiltered[0]
-        } else {
-            copy(params = paramsFiltered, nullable = true)
-        }
-    } else {
-        null
-    }
-}
-
-private fun UnionTypeNode.lowerAsNullable(): TypeNode {
-    return resolveAsNullableType()?.let { nullableType ->
-        when (nullableType) {
-            is TypeValueNode -> nullableType.copy(nullable = true, meta = null)
-            is TypeParameterNode -> nullableType.copy(nullable = true)
-            is FunctionTypeNode -> nullableType.copy(nullable = true, meta = null)
-            is UnionTypeNode -> nullableType
-            else -> raiseConcern("can not lower nullables for unknown param type ${nullableType}") {
-                nullableType
-            }
-        }
-    } ?: this
 }
 
 private class LowerDeclarationsToNodes(
@@ -343,12 +302,11 @@ private class LowerDeclarationsToNodes(
 
 
     private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<MethodNode> {
-        val parameterValueDeclaration = declaration.returnType.makeNullable()
         return listOf(
                 MethodNode(
                         "get",
                         convertParameters(declaration.indexTypes),
-                        parameterValueDeclaration.convertToNode(),
+                        declaration.returnType.makeNullable().convertToNode(),
                         emptyList(),
                         false,
                         true,

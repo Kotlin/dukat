@@ -61,7 +61,7 @@ private class ResolveTypeAliasesLowering(private val typeAliasContext: TypeAlias
         }
     }
 
-    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): UnionTypeDeclaration {
+    override fun lowerUnionTypeDeclaration(declaration: UnionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return super.lowerUnionTypeDeclaration(declaration.copy(params = declaration.unroll()), owner)
     }
 }

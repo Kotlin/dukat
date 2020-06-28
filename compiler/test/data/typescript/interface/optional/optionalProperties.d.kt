@@ -41,7 +41,7 @@ external interface Foo {
     var propSingleLiteral: String? /* "a" */
         get() = definedExternally
         set(value) = definedExternally
-    var propABCIntersection: A? /* A & B & C */
+    var propABCIntersection: A? /* A? & B? & C? */
         get() = definedExternally
         set(value) = definedExternally
     var propABC: dynamic /* A? | B? | C? */

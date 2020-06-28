@@ -37,6 +37,7 @@ import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.LowerThisType
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
+import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveCollections
@@ -77,7 +78,8 @@ open class TypescriptLowerer(
                         ResolveLoops(),
                         ResolveCollections(),
                         LowerThisType(),
-                        ResolveTypeAliases()
+                        ResolveTypeAliases(),
+                        PreprocessUnionTypes()
                 )
 
 
