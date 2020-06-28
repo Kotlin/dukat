@@ -455,17 +455,14 @@ export class AstConverter {
       if (type.kind == ts.SyntaxKind.VoidKeyword) {
         return this.createTypeDeclaration("Unit")
       } else if (ts.isArrayTypeNode(type)) {
-        let arrayType = type as ts.ArrayTypeNode;
-        return this.createTypeDeclaration("@@ArraySugar", [this.convertType(arrayType.elementType)])
+        return this.createTypeDeclaration("@@ArraySugar", [this.convertType(type.elementType)])
       } else if (ts.isUnionTypeNode(type)) {
-        let unionTypeNode = type as ts.UnionTypeNode;
-        let params = unionTypeNode.types
+        let params = type.types
           .map(argumentType => this.convertType(argumentType));
 
         return this.astFactory.createUnionTypeDeclaration(params)
       } else if (ts.isIntersectionTypeNode(type)) {
-        let intersectionTypeNode = type as ts.IntersectionTypeNode;
-        let params = intersectionTypeNode.types
+        let params = type.types
           .map(argumentType => this.convertType(argumentType));
 
         return this.createIntersectionType(params);
@@ -495,8 +492,7 @@ export class AstConverter {
           typeReference
         );
       } else if (type.kind == ts.SyntaxKind.ParenthesizedType) {
-        let parenthesizedTypeNode = type as ts.ParenthesizedTypeNode;
-        return this.convertType(parenthesizedTypeNode.type);
+        return this.convertType(type.type);
       } else if (type.kind == ts.SyntaxKind.NullKeyword) {
         return this.createTypeDeclaration("null")
       } else if (type.kind == ts.SyntaxKind.UndefinedKeyword) {
@@ -510,13 +506,12 @@ export class AstConverter {
       } else if (type.kind == ts.SyntaxKind.AnyKeyword) {
         return this.createTypeDeclaration("any")
       } else if (type.kind == ts.SyntaxKind.FunctionType) {
-        const functionDeclaration = type as ts.FunctionTypeNode;
-        let parameterDeclarations = functionDeclaration.parameters.map(
+        let parameterDeclarations = type.parameters.map(
           (param, count) => this.convertParameterDeclaration(param, count)
         );
-        return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(functionDeclaration.type))
+        return this.astFactory.createFunctionTypeDeclaration(parameterDeclarations, this.convertType(type.type))
       } else if (ts.isTypeLiteralNode(type)) {
-        return this.convertTypeLiteralToObjectLiteralDeclaration(type as ts.TypeLiteralNode)
+        return this.convertTypeLiteralToObjectLiteralDeclaration(type)
       } else if (ts.isThisTypeNode(type)) {
         return this.astFactory.createThisTypeDeclaration()
       } else if (ts.isLiteralTypeNode(type)) {
@@ -649,7 +644,7 @@ export class AstConverter {
         members.push(this.convertIndexSignature(memberDeclaration));
       } else if (ts.isPropertyDeclaration(memberDeclaration)) {
         let propertyDeclaration = this.convertPropertyDeclaration(
-          memberDeclaration as ts.PropertyDeclaration
+          memberDeclaration
         );
         if (propertyDeclaration != null) {
           members.push(propertyDeclaration)
@@ -697,9 +692,7 @@ export class AstConverter {
       if (parameter.modifiers) {
         let isField = parameter.modifiers.some(modifier => modifier.kind == ts.SyntaxKind.PublicKeyword);
         if (isField) {
-          let convertedVariable = this.convertPropertyDeclaration(
-            parameter as ts.ParameterDeclaration
-          );
+          let convertedVariable = this.convertPropertyDeclaration(parameter);
           if (convertedVariable != null) {
             res.push(convertedVariable)
           }
