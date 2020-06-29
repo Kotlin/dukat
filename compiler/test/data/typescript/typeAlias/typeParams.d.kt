@@ -60,7 +60,7 @@ external fun addRef(ref: (instance: Number) -> Any)
 
 external interface `T$0`<T> {
     @nativeInvoke
-    operator fun <T : (args: Array<Any>) -> Any> invoke(func: T, resolver: (args: Array<Any>) -> Any = definedExternally): T
+    operator fun <T : (args: Any) -> Any> invoke(func: T, resolver: (args: Any) -> Any = definedExternally): T
 }
 
 external interface SomeInterface {

@@ -114,8 +114,14 @@ private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclara
 }
 
 private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode {
-    val parameterValueDeclaration = if (vararg && context == PARAMETER_CONTEXT.IRRELEVANT) {
-        type.extractVarargType()
+    var varargResolved = vararg
+    val parameterValueDeclaration = if (vararg) {
+        if (context == PARAMETER_CONTEXT.IRRELEVANT) {
+            type.extractVarargType()
+        } else {
+            varargResolved = false
+            type.extractVarargType()
+        }
     } else {
         type
     }
@@ -126,7 +132,7 @@ private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARA
                 TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
             } else null,
             meta = null,
-            vararg = vararg,
+            vararg = varargResolved,
             optional = optional
     )
 }

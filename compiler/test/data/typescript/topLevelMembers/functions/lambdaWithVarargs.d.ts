@@ -1,0 +1,1 @@
+declare function ping(func: (...str: Array<string>) => boolean)

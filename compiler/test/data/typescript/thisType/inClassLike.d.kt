@@ -19,13 +19,13 @@ import org.w3c.xhr.*
 external open class MyClass {
     open var self: MyClass /* this */
     open fun that(): MyClass /* this */
-    open fun load(ids: String, handler: (self: MyClass /* this */, args: Array<Any>) -> Unit)
+    open fun load(ids: String, handler: (self: MyClass /* this */, args: Any) -> Unit)
 }
 
 external interface MyInterface {
     var self: MyInterface /* this */
     fun that(): MyInterface /* this */
-    fun load(ids: String, handler: (self: MyInterface /* this */, args: Array<Any>) -> Unit)
+    fun load(ids: String, handler: (self: MyInterface /* this */, args: Any) -> Unit)
 }
 
 external interface WeaklikeMaplike<K : Any?, V> {
