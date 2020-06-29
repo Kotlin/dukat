@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.expression.SpreadExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
 
-private class CollectionsLowering : DeclarationStatementLowering() {
+private class CollectionsLowering : DeclarationLowering {
 
     private val setMethodRenames = mapOf(
         "has" to "contains",
@@ -160,7 +160,7 @@ private class CollectionsLowering : DeclarationStatementLowering() {
 class ResolveCollections : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.copy(sources = source.sources.map {
-            it.copy(root = CollectionsLowering().lower(it.root))
+            it.copy(root = CollectionsLowering().lowerSourceDeclaration(it.root))
         })
     }
 }

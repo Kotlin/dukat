@@ -35,12 +35,13 @@ import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private val logger = Logging.logger("TypeLowering")
 
-interface DeclarationLowering : TopLevelDeclarationLowering {
+interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatementLowering {
 
     fun lowerPropertyDeclaration(declaration: PropertyDeclaration, owner: NodeOwner<MemberDeclaration>?): PropertyDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type, owner?.wrap(declaration)),
-                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner?.wrap(declaration)) }
+                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner?.wrap(declaration)) },
+                initializer = declaration.initializer?.let { lower(it) }
         )
     }
 
@@ -49,7 +50,8 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner?.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner?.wrap(declaration)) })
-                }
+                },
+                body = declaration.body?.let { lowerBlockStatement(it) }
         )
     }
 
@@ -103,7 +105,8 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner?.wrap(declaration)) })
                 },
-                type = lowerParameterValue(declaration.type, owner?.wrap(declaration))
+                type = lowerParameterValue(declaration.type, owner?.wrap(declaration)),
+                body = declaration.body?.let { lowerBlockStatement(it) }
         )
     }
 
@@ -144,9 +147,15 @@ interface DeclarationLowering : TopLevelDeclarationLowering {
         )
     }
 
+
+    override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
+        return lowerVariableDeclaration(declaration, null)
+    }
+
     override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration {
         return declaration.copy(
-                type = lowerParameterValue(declaration.type, owner?.wrap(declaration))
+                type = lowerParameterValue(declaration.type, owner?.wrap(declaration)),
+                initializer = declaration.initializer?.let { lower(it) }
         )
     }
 

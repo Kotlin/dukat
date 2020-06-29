@@ -30,15 +30,16 @@ import org.jetbrains.dukat.tsmodel.VariableLikeDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 
-open class DeclarationStatementLowering : ExpressionLowering {
+interface DeclarationStatementLowering : ExpressionLowering {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration
 
-    open fun lowerBlock(statement: BlockDeclaration): BlockDeclaration {
+    fun lowerBlock(statement: BlockDeclaration): BlockDeclaration {
         return statement.copy(
                 statements = statement.statements.map { lower(it) }
         )
     }
 
-    open fun lowerIfStatement(statement: IfStatementDeclaration): IfStatementDeclaration {
+    fun lowerIfStatement(statement: IfStatementDeclaration): IfStatementDeclaration {
         return statement.copy(
                 condition = this.lowerExpressionDeclaration(statement.condition),
                 thenStatement = this.lowerBlock(statement.thenStatement),
@@ -46,18 +47,18 @@ open class DeclarationStatementLowering : ExpressionLowering {
         )
     }
 
-    open fun lowerThrowStatement(statement: ThrowStatementDeclaration): ThrowStatementDeclaration {
+    fun lowerThrowStatement(statement: ThrowStatementDeclaration): ThrowStatementDeclaration {
         return statement.copy(expression = this.lowerExpressionDeclaration(statement.expression))
     }
 
-    open fun lowerWhileStatement(statement: WhileStatementDeclaration): WhileStatementDeclaration {
+    fun lowerWhileStatement(statement: WhileStatementDeclaration): WhileStatementDeclaration {
         return statement.copy(
                 condition = this.lowerExpressionDeclaration(statement.condition),
                 statement = this.lowerBlock(statement.statement)
         )
     }
 
-    open fun lowerReturnStatement(statement: ReturnStatementDeclaration): ReturnStatementDeclaration {
+    fun lowerReturnStatement(statement: ReturnStatementDeclaration): ReturnStatementDeclaration {
         return statement.copy(
                 expression = statement.expression?.let { this.lowerExpressionDeclaration(it) }
         )
@@ -67,13 +68,13 @@ open class DeclarationStatementLowering : ExpressionLowering {
         return this.lower(expression)
     }
 
-    open fun lowerExpression(statement: ExpressionStatementDeclaration): ExpressionStatementDeclaration {
+    fun lowerExpression(statement: ExpressionStatementDeclaration): ExpressionStatementDeclaration {
         return statement.copy(
                 expression = this.lowerExpressionDeclaration(statement.expression)
         )
     }
 
-    open fun lowerForStatementDeclaration(statement: ForStatementDeclaration): StatementDeclaration {
+    fun lowerForStatementDeclaration(statement: ForStatementDeclaration): StatementDeclaration {
         return statement.copy(
                 initializer = this.lowerBlock(statement.initializer),
                 condition = statement.condition?.let { this.lowerExpressionDeclaration(it) },
@@ -82,21 +83,21 @@ open class DeclarationStatementLowering : ExpressionLowering {
         )
     }
 
-    open fun lowerCase(statement: CaseDeclaration): CaseDeclaration {
+    fun lowerCase(statement: CaseDeclaration): CaseDeclaration {
         return statement.copy(
                 condition = statement.condition?.let { this.lowerExpressionDeclaration(it) },
                 body = lowerBlock(statement.body)
         )
     }
 
-    open fun lowerSwitchStatementDeclaration(statement: SwitchStatementDeclaration): SwitchStatementDeclaration {
+    fun lowerSwitchStatementDeclaration(statement: SwitchStatementDeclaration): SwitchStatementDeclaration {
         return statement.copy(
                 expression = this.lowerExpressionDeclaration(statement.expression),
                 cases = statement.cases.map { lowerCase(it) }
         )
     }
 
-    open fun lowerForOfStatementDeclaration(statement: ForOfStatementDeclaration): ForOfStatementDeclaration {
+    fun lowerForOfStatementDeclaration(statement: ForOfStatementDeclaration): ForOfStatementDeclaration {
         return statement.copy(
             variable = this.lowerVariableLikeDeclaration(statement.variable),
             expression = this.lowerExpressionDeclaration(statement.expression),
@@ -104,7 +105,7 @@ open class DeclarationStatementLowering : ExpressionLowering {
         )
     }
 
-    open fun lowerVariableLikeDeclaration(statement: VariableLikeDeclaration): VariableLikeDeclaration {
+    fun lowerVariableLikeDeclaration(statement: VariableLikeDeclaration): VariableLikeDeclaration {
         return when (statement) {
             is VariableDeclaration -> lowerVariableDeclaration(statement)
             is ArrayDestructuringDeclaration -> lowerArrayDestructuringDeclaration(statement)
@@ -112,19 +113,15 @@ open class DeclarationStatementLowering : ExpressionLowering {
         }
     }
 
-    open fun lowerBindingVariableDeclaration(statement: BindingVariableDeclaration): BindingVariableDeclaration {
+    fun lowerBindingVariableDeclaration(statement: BindingVariableDeclaration): BindingVariableDeclaration {
         return statement.copy(initializer = statement.initializer?.let { lowerExpressionDeclaration(it) })
     }
 
-    open fun lowerVariableDeclaration(statement: VariableDeclaration): VariableDeclaration {
-        return statement.copy(initializer = statement.initializer?.let { lowerExpressionDeclaration(it) })
-    }
-
-    open fun lowerArrayDestructuringDeclaration(statement: ArrayDestructuringDeclaration): ArrayDestructuringDeclaration {
+    fun lowerArrayDestructuringDeclaration(statement: ArrayDestructuringDeclaration): ArrayDestructuringDeclaration {
         return statement.copy(elements = statement.elements.map { lowerBindingElementDeclaration(it) })
     }
 
-    open fun lowerBindingElementDeclaration(statement: BindingElementDeclaration): BindingElementDeclaration {
+    fun lowerBindingElementDeclaration(statement: BindingElementDeclaration): BindingElementDeclaration {
         return when (statement) {
             is BindingVariableDeclaration -> lowerBindingVariableDeclaration(statement)
             is ArrayDestructuringDeclaration -> lowerArrayDestructuringDeclaration(statement)
@@ -151,65 +148,8 @@ open class DeclarationStatementLowering : ExpressionLowering {
         }
     }
 
-    private fun lowerBlockStatement(block: BlockDeclaration): BlockDeclaration {
+    fun lowerBlockStatement(block: BlockDeclaration): BlockDeclaration {
         return BlockDeclaration(block.statements.map { lower(it) })
-    }
-
-    private fun lowerTopLevelVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
-        return declaration.copy(
-            initializer = declaration.initializer?.let { lower(it) }
-        )
-    }
-
-    private fun lowerConstructorDeclaration(declaration: ConstructorDeclaration): ConstructorDeclaration {
-        return declaration.copy(body = declaration.body?.let { lowerBlockStatement(it) })
-    }
-
-    private fun lowerFunctionDeclaration(declaration: FunctionDeclaration): FunctionDeclaration {
-        return declaration.copy(body = declaration.body?.let { lowerBlockStatement(it) })
-    }
-
-    private fun lowerPropertyDeclaration(declaration: PropertyDeclaration): PropertyDeclaration {
-        return declaration.copy(initializer = declaration.initializer?.let { lower(it) })
-    }
-
-    private fun lowerMemberDeclaration(declaration: MemberDeclaration): MemberDeclaration {
-        return when (declaration) {
-            is ConstructorDeclaration -> lowerConstructorDeclaration(declaration)
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-            is PropertyDeclaration -> lowerPropertyDeclaration(declaration)
-            else -> declaration
-        }
-    }
-
-    private fun lowerClassLikeDeclaration(declaration: ClassLikeDeclaration): ClassLikeDeclaration {
-        val newMembers = declaration.members.map { lowerMemberDeclaration(it) }
-        return when (declaration) {
-            is InterfaceDeclaration -> declaration.copy(members = newMembers)
-            is ClassDeclaration -> declaration.copy(members = newMembers)
-            is GeneratedInterfaceDeclaration -> declaration.copy(members = newMembers)
-            else -> declaration
-        }
-    }
-
-    private fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration): TopLevelDeclaration {
-        return when (declaration) {
-            is VariableDeclaration -> lowerTopLevelVariableDeclaration(declaration)
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration)
-            is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration)
-            is ModuleDeclaration -> lower(declaration)
-            else -> declaration
-        }
-    }
-
-    private fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>): List<TopLevelDeclaration> {
-        return declarations.map { declaration ->
-            lowerTopLevelDeclaration(declaration)
-        }
-    }
-
-    fun lower(documentRoot: ModuleDeclaration): ModuleDeclaration {
-        return documentRoot.copy(declarations = lowerTopLevelDeclarations(documentRoot.declarations))
     }
 
 }
