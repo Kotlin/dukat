@@ -8,11 +8,9 @@ import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
@@ -24,21 +22,16 @@ import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
-import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.convertToNode
+import org.jetbrains.dukat.ast.model.nodes.convertToNodeNullable
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
-import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
-import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
@@ -54,7 +47,6 @@ import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -71,169 +63,14 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
-import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
 
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
-}
-
-private fun TypeDeclaration.isPrimitive(primitive: String): Boolean {
-    return when (this.value) {
-        is IdentifierEntity -> (value as IdentifierEntity).value == primitive
-        else -> false
-    }
-}
-
-private enum class PARAMETER_CONTEXT {
-    IRRELEVANT,
-    FUNCTION_TYPE
-}
-
-private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclaration {
-    if (this is TypeDeclaration) {
-        when {
-            isPrimitive("Array") -> return params[0]
-            isPrimitive("Any") -> return this
-        }
-    }
-
-    return this
-}
-
-private fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode {
-    var varargResolved = vararg
-    val parameterValueDeclaration = if (vararg) {
-        if (context == PARAMETER_CONTEXT.IRRELEVANT) {
-            type.extractVarargType()
-        } else {
-            varargResolved = false
-            type.extractVarargType()
-        }
-    } else {
-        type
-    }
-    return ParameterNode(
-            name = name,
-            type = parameterValueDeclaration.convertToNode(),
-            initializer = if (initializer != null || optional) {
-                TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
-            } else null,
-            meta = null,
-            vararg = varargResolved,
-            optional = optional
-    )
-}
-
-private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
-    return params.all { it is StringLiteralDeclaration }
-}
-
-private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
-    return params.all { it is NumericLiteralDeclaration }
-}
-
-private fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): TypeNode? {
-    return when (this) {
-        is TypeParamReferenceDeclaration -> TypeParameterNode(
-                name = value,
-                nullable = nullable,
-                meta = metaData ?: meta
-        )
-        is TypeDeclaration -> TypeValueNode(
-                value = value,
-                params = params.map { param -> param.convertToNode() },
-                typeReference = reference?.let {
-                    ReferenceNode(it.uid)
-                },
-                nullable = nullable,
-                meta = metaData ?: meta
-        )
-        //TODO: investigate where we still have FunctionTypeDeclarations up to this point
-        is FunctionTypeDeclaration -> FunctionTypeNode(
-                parameters = parameters.map { parameterDeclaration ->
-                    parameterDeclaration.convertToNode(PARAMETER_CONTEXT.FUNCTION_TYPE)
-                },
-                type = type.convertToNode(),
-                nullable = nullable,
-                meta = metaData ?: meta
-        )
-        is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
-                name,
-                typeParameters,
-                reference,
-                nullable,
-                metaData ?: meta
-        )
-        is IntersectionTypeDeclaration -> {
-            params[0].convertToNodeNullable(IntersectionMetadata(params.map {
-                it.convertToNodeNullable() ?: it
-            }))
-        }
-        is StringLiteralDeclaration -> {
-            LiteralUnionNode(
-                    params = listOf(token),
-                    kind = UnionLiteralKind.STRING,
-                    nullable = nullable
-            )
-        }
-        is NumericLiteralDeclaration -> {
-            LiteralUnionNode(
-                    params = listOf(token),
-                    kind = UnionLiteralKind.NUMBER,
-                    nullable = nullable
-            )
-        }
-        is UnionTypeDeclaration ->
-            when {
-                canBeTranslatedAsStringLiteral() -> {
-                    LiteralUnionNode(
-                            params = params.mapNotNull { (it as? StringLiteralDeclaration)?.token },
-                            kind = UnionLiteralKind.STRING,
-                            nullable = nullable
-                    )
-                }
-                canBeTranslatedAsNumericLiteral() -> {
-                    LiteralUnionNode(
-                            params = params.mapNotNull { (it as? NumericLiteralDeclaration)?.token },
-                            kind = UnionLiteralKind.NUMBER,
-                            nullable = nullable
-                    )
-                }
-                else -> {
-                    UnionTypeNode(
-                            params = params.map { param -> param.convertToNode() },
-                            nullable = nullable,
-                            meta = metaData ?: meta
-                    )
-                }
-            }
-        is TupleDeclaration -> TupleTypeNode(
-                params = params.map { param -> param.convertToNode() },
-                nullable = nullable,
-                meta = metaData ?: meta
-        )
-        is TypeNode -> this
-        else -> null
-    }
-}
-
-private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
-
-private fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): TypeNode {
-    return convertToNodeNullable(meta) ?: TYPE_ANY
 }
 
 private class LowerDeclarationsToNodes(

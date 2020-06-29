@@ -1,6 +1,10 @@
 package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
+import org.jetbrains.dukat.ast.model.nodes.TypeNode
+import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
+import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
+import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
@@ -477,15 +481,16 @@ private class ExpressionConverter() {
     }
 
     private fun ParameterValueDeclaration.convert(): TypeModel {
-        return when (this) {
-            is TypeParamReferenceDeclaration -> TypeParameterReferenceModel(
-                    name = value,
+        val nodeType = this.convertToNode()
+        return when (nodeType) {
+            is TypeParameterNode -> TypeParameterReferenceModel(
+                    name = nodeType.name,
                     nullable = nullable,
                     metaDescription = null
             )
-            is TypeDeclaration -> TypeValueModel(
-                    value = value,
-                    params = params.map { param -> TypeParameterModel(param.convert(), listOf()) },
+            is TypeValueNode -> TypeValueModel(
+                    value = nodeType.value,
+                    params = nodeType.params.map { param -> TypeParameterModel(param.convert(), listOf()) },
                     fqName = null,
                     nullable = nullable,
                     metaDescription = null
