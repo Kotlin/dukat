@@ -231,16 +231,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 parameters.map {
                     ParameterModel(
                         it.name,
-                        TypeValueModel(
-                            IdentifierEntity("Any"),
-                            listOf(),
-                            null,
-                            null
-                        ),
-                        //TODO
-                        /*with (documentConverter) {
-                            type.process()
-                        }*/
+                        type.convert(),
                         null,
                         false,
                         null

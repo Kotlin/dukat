@@ -17,7 +17,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f(isSet: Boolean) {
-    var x: Any
+    var x: dynamic /* Set<Number> | Array<Number> */
     if (isSet) {
         x = mutableSetOf()
     } else {
