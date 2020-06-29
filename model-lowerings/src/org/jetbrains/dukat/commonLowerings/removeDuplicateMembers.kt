@@ -1,3 +1,5 @@
+package org.jetbrains.dukat.commonLowerings
+
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel

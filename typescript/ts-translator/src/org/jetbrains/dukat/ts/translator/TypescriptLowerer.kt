@@ -1,11 +1,11 @@
 package org.jetbrains.dukat.ts.translator
 
-import RemoveDuplicateMembers
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
 import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
+import org.jetbrains.dukat.commonLowerings.RemoveDuplicateMembers
 import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
@@ -89,7 +89,6 @@ open class TypescriptLowerer(
                 .lower(
                         ResolveModuleAnnotations(),
                         SpecifyUnionType()
-                        //RemoveUnusedGeneratedEntitiesNode()
                 )
 
         val models = nodes
@@ -106,12 +105,12 @@ open class TypescriptLowerer(
                         MergeVarsAndInterfaces(),
                         SeparateNonExternalEntities(),
                         ModelContextAwareLowering()
-                            .lower { context, inheritanceContext ->
-                                IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
-                            }
-                            .lower { context, inheritanceContext ->
-                                LowerOverrides(context, inheritanceContext)
-                            },
+                                .lower { context, inheritanceContext ->
+                                    IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
+                                }
+                                .lower { context, inheritanceContext ->
+                                    LowerOverrides(context, inheritanceContext)
+                                },
                         AddExplicitGettersAndSetters(),
                         AnyfyUnresolvedTypes(),
                         RemoveKotlinBuiltIns(),
