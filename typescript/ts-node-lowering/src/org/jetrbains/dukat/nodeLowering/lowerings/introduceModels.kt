@@ -124,6 +124,9 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
 
 internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
+    private val expressionConverter = ExpressionConverter() { typeNode ->
+        typeNode.process()
+    }
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
@@ -336,9 +339,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     static = static,
                     override = null,
                     immutable = getter && !setter,
-                    initializer = convertExpressionDeclaration(initializer) {
-                        it.process()
-                    },
+                    initializer = expressionConverter.convertExpression(initializer),
                     getter = getter,
                     setter = setter,
                     open = open
@@ -675,9 +676,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 open = open,
 
                 body = body?.let {
-                    val convertedBody = convertBlockDeclaration(it) { typeNode ->
-                        typeNode.process()
-                    }
+                    val convertedBody = expressionConverter.convertBlock(it)
                     if (isGenerator) {
                         convertedBody.wrapBodyAsLazyIterator()
                     } else {
@@ -728,9 +727,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         operator = operator,
                         extend = extend.convert(),
                         body = body?.let {
-                            val convertedBody = convertBlockDeclaration(it) { typeNode ->
-                                typeNode.process()
-                            }
+                            val convertedBody = expressionConverter.convertBlock(it)
                             if (isGenerator) {
                                 convertedBody.wrapBodyAsLazyIterator()
                             } else {

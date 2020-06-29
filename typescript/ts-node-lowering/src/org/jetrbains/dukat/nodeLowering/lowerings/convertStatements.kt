@@ -2,15 +2,12 @@ package org.jetrbains.dukat.nodeLowering.lowerings
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -127,9 +124,8 @@ import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclar
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
-private class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
+class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
@@ -208,7 +204,7 @@ private class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeM
         }
     }
 
-    fun ExpressionDeclaration.convert(): ExpressionModel {
+    private fun ExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is IdentifierExpressionDeclaration -> IdentifierExpressionModel(
                 identifier
@@ -684,15 +680,8 @@ private class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeM
             right.convert()
         )
     }
-}
 
-
-fun convertExpressionDeclaration(expressionDeclaration: ExpressionDeclaration?, typeConverter: (TypeNode) -> TypeModel): ExpressionModel? {
-    return with(ExpressionConverter(typeConverter)) {
-        expressionDeclaration?.convert()
+    fun convertExpression(expression: ExpressionDeclaration?): ExpressionModel? {
+        return expression?.convert()
     }
-}
-
-fun convertBlockDeclaration(blockDeclaration: BlockDeclaration, typeConverter: (TypeNode) -> TypeModel): BlockStatementModel {
-    return ExpressionConverter(typeConverter).convertBlock(blockDeclaration)
 }
