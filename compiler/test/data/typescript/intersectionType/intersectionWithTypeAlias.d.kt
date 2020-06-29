@@ -21,6 +21,14 @@ external interface Coordinates {
     var latitude: Number
 }
 
+external interface `T$0` {
+    var zoom: Number
+}
+
+external interface `T$1` {
+    var scale: Number
+}
+
 external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` */, b: Coordinates /* Coordinates & `T$0` */): dynamic /* Coordinates | Coordinates */
 
 external open class WithTrickyConstuctor(scales: Coordinates /* Coordinates & `T$0` */)

@@ -39,6 +39,7 @@ import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
+import org.jetbrains.dukat.tsLowerings.RemoveUnusedGeneratedEntities
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveCollections
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
@@ -48,7 +49,6 @@ import org.jetbrains.dukat.tsLowerings.ResolveTypeAliases
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.RemoveUnusedGeneratedEntities
 import org.jetrbains.dukat.nodeLowering.lowerings.SpecifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lower
@@ -79,7 +79,8 @@ open class TypescriptLowerer(
                         ResolveCollections(),
                         LowerThisType(),
                         ResolveTypeAliases(),
-                        PreprocessUnionTypes()
+                        PreprocessUnionTypes(),
+                        RemoveUnusedGeneratedEntities()
                 )
 
 
@@ -87,8 +88,8 @@ open class TypescriptLowerer(
                 .lower(declarations)
                 .lower(
                         ResolveModuleAnnotations(),
-                        SpecifyUnionType(),
-                        RemoveUnusedGeneratedEntities()
+                        SpecifyUnionType()
+                        //RemoveUnusedGeneratedEntitiesNode()
                 )
 
         val models = nodes
