@@ -20,7 +20,7 @@ open class A {
     open var s1: Any = mutableSetOf()
     open var s2: Any = mutableSetOf<Any>()
     open fun f() {
-        var s: Any = mutableSetOf()
+        var s: Set<Number> = mutableSetOf()
         s.add(3)
         s.add(5)
         console.log(s.contains(3))

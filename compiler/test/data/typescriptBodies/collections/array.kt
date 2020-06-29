@@ -20,7 +20,7 @@ open class A {
     open var a1: Any = arrayOf()
     open var a2: Any = arrayOf<Any>()
     open fun f() {
-        var a: Any = arrayOf()
+        var a: Array<Number> = arrayOf()
         a = a + 1 + 2 + 3
         a = a + 4
         a = a + arrayOf(5, 6, 7)

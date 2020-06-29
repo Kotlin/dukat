@@ -20,7 +20,7 @@ open class A {
     open var m1: Any = mutableMapOf()
     open var m2: Any = mutableMapOf<Any, Any>()
     open fun f() {
-        var m: Any = mutableMapOf()
+        var m: Map<Number, Number> = mutableMapOf()
         m.set(3, 2)
         m.set(5, 1)
         console.log(m.get(3))

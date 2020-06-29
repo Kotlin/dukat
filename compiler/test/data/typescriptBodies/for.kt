@@ -18,7 +18,7 @@ import org.w3c.xhr.*
 
 fun f() {
     run {
-        var i: Any = 0
+        var i: Number = 0
         while (i < 1000) {
             console.log(i)
             i++

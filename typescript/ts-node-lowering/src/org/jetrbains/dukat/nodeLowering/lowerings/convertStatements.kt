@@ -4,7 +4,9 @@ import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.AsExpressionModel
@@ -119,7 +121,9 @@ import org.jetbrains.dukat.tsmodel.expression.templates.ExpressionTemplateTokenD
 import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
 private class ExpressionConverter() {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
@@ -457,7 +461,7 @@ private class ExpressionConverter() {
                     }
                 }
                 ForInStatementModel(
-                    fictiveVariable.convert() as VariableModel,
+                    fictiveVariable.convert(),
                     expression.convert(),
                     convertBlock( body.copy(
                         statements = newAssignments + body.statements
@@ -470,6 +474,47 @@ private class ExpressionConverter() {
                 )
             }
         }
+    }
+
+    private fun ParameterValueDeclaration.convert(): TypeModel {
+        return when (this) {
+            is TypeParamReferenceDeclaration -> TypeParameterReferenceModel(
+                    name = value,
+                    nullable = nullable,
+                    metaDescription = null
+            )
+            is TypeDeclaration -> TypeValueModel(
+                    value = value,
+                    params = params.map { param -> TypeParameterModel(param.convert(), listOf()) },
+                    fqName = null,
+                    nullable = nullable,
+                    metaDescription = null
+            )
+            else -> TypeValueModel(
+                    IdentifierEntity("Any"),
+                    listOf(),
+                    null,
+                    null
+            )
+        }
+    }
+
+    private fun VariableDeclaration.convert(): VariableModel {
+        return VariableModel(
+                name = IdentifierEntity(name),
+                type = type.convert(),
+                annotations = mutableListOf(),
+                immutable = false,
+                inline = false,
+                external = false,
+                initializer = initializer?.convert(),
+                get = null,
+                set = null,
+                typeParameters = listOf(),
+                extend = null,
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                comment = null
+        )
     }
 
     private fun StatementDeclaration.convert(): StatementModel {
@@ -499,30 +544,7 @@ private class ExpressionConverter() {
             is BlockDeclaration -> RunBlockStatementModel(
                 statements.map { it.convert() }
             )
-            is VariableDeclaration -> VariableModel(
-                name = IdentifierEntity(name),
-                type = TypeValueModel(
-                    IdentifierEntity("Any"),
-                    listOf(),
-                    null,
-                    null
-                )
-                //TODO
-                /*with (documentConverter) {
-                    type.process()
-                }*/,
-                annotations = mutableListOf(),
-                immutable = false,
-                inline = false,
-                external = false,
-                initializer = initializer?.convert(),
-                get = null,
-                set = null,
-                typeParameters = listOf(),
-                extend = null,
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
-            )
+            is VariableDeclaration -> convert()
             else -> raiseConcern("unable to process StatementDeclaration $this") {
                 ExpressionStatementModel(
                     IdentifierExpressionModel(IdentifierEntity("ERROR"))
