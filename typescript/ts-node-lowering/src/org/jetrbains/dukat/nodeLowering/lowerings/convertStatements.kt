@@ -129,7 +129,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
-private class ExpressionConverter() {
+private class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
@@ -481,27 +481,7 @@ private class ExpressionConverter() {
     }
 
     private fun ParameterValueDeclaration.convert(): TypeModel {
-        val nodeType = this.convertToNode()
-        return when (nodeType) {
-            is TypeParameterNode -> TypeParameterReferenceModel(
-                    name = nodeType.name,
-                    nullable = nullable,
-                    metaDescription = null
-            )
-            is TypeValueNode -> TypeValueModel(
-                    value = nodeType.value,
-                    params = nodeType.params.map { param -> TypeParameterModel(param.convert(), listOf()) },
-                    fqName = null,
-                    nullable = nullable,
-                    metaDescription = null
-            )
-            else -> TypeValueModel(
-                    IdentifierEntity("Any"),
-                    listOf(),
-                    null,
-                    null
-            )
-        }
+        return typeConverter(this.convertToNode())
     }
 
     private fun VariableDeclaration.convert(): VariableModel {
@@ -707,12 +687,12 @@ private class ExpressionConverter() {
 }
 
 
-fun convertExpressionDeclaration(expressionDeclaration: ExpressionDeclaration?): ExpressionModel? {
-    return with(ExpressionConverter()) {
+fun convertExpressionDeclaration(expressionDeclaration: ExpressionDeclaration?, typeConverter: (TypeNode) -> TypeModel): ExpressionModel? {
+    return with(ExpressionConverter(typeConverter)) {
         expressionDeclaration?.convert()
     }
 }
 
-fun convertBlockDeclaration(blockDeclaration: BlockDeclaration): BlockStatementModel {
-    return ExpressionConverter().convertBlock(blockDeclaration)
+fun convertBlockDeclaration(blockDeclaration: BlockDeclaration, typeConverter: (TypeNode) -> TypeModel): BlockStatementModel {
+    return ExpressionConverter(typeConverter).convertBlock(blockDeclaration)
 }
