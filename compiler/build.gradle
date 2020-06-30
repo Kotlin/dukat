@@ -176,6 +176,9 @@ task installTopN(type: YarnTask) {
 
 yarn.dependsOn = [yarnSetup, prepareTopNPackage]
 
+task prebuild {
+    dependsOn = ["testClasses", ":node-package:buildDistrib"]
+}
 
 //TODO: having download and downloadDist is a shame
 test.dependsOn = [
