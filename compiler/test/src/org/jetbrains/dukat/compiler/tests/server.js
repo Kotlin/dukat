@@ -3,14 +3,35 @@ var path = require("path");
 
 var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
+function closeServer(server, socketsSet) {
+    console.log("shutting down server");
+    server.close(function() {
+        console.log("server is down");
+    });
+    console.log(`${socketsSet.size} connections to destroy`);
+    socketsSet.forEach(socket => {
+        socket.destroy();
+    })
+}
+
+function ok(res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.statusCode = 200;
+    res.end("OK");
+}
+
 function createServer(port, sandboxDirs) {
     console.log(`starting server at port ${port} with following sandboxed dirs: ${sandboxDirs}`);
+    var socketsSet = new Set();
 
     var server = http.createServer(function (req, res) {
-        if (req.method === 'GET' && req.url === '/status') {
-            res.setHeader('Content-Type', 'text/plain');
-            res.statusCode = 200;
-            res.end("OK");
+        if (req.method === 'GET') {
+            if (req.url === '/status') {
+                ok(res);
+            } else if (req.url === '/shutdown') {
+                ok(res);
+                closeServer(server, socketsSet);
+            }
         }
         if (req.method === 'POST' && req.url === '/dukat') {
             var body = [];
@@ -58,8 +79,18 @@ function createServer(port, sandboxDirs) {
         }
     });
 
+    server.on("connection", function(socket) {
+        socketsSet.add(socket);
 
-    server.listen(port);
+        socket.on("close", function() {
+            socketsSet.delete(socket)
+        });
+    })
+
+
+    server.listen(port, function() {
+        console.log("server is up");
+    });
 }
 
 function main() {
