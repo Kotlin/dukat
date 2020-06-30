@@ -1,8 +1,10 @@
 var http = require("http");
+var path = require("path");
+
+const PROJECT_DIR = path.resolve(__dirname, "../../../../../../../..");
 var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
 function createServer(port) {
-
     var server = http.createServer(function (req, res) {
         if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'text/plain');
@@ -24,13 +26,23 @@ function createServer(port) {
                     res.end();
                 };
 
+                let files = data.files.filter(file => {
+                    let relpath = path.relative(PROJECT_DIR, file);
+                    if (relpath.startsWith("..")) {
+                        console.log(`skipping ${file} since it does not belong to the project dir (${PROJECT_DIR})`);
+                        return false;
+                    }
+
+                    return true;
+                });
+
                 try {
                     res.setHeader('Content-Type', 'application/octet-stream');
                     dukatCli.createReadableStream(
                         dukatCli.createBinary(
                             data.tsConfig,
                             dukatCli.getStdLib(),
-                            data.files
+                            files
                         ),
                         onBinaryStreamData,
                         onBinaryStreamEnd
