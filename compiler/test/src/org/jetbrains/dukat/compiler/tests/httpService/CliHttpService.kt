@@ -10,7 +10,7 @@ class CliHttpService() {
     private val maxOldSpaceSize = 8192
 
     @OptIn(UnstableDefault::class)
-    fun startService(port: String): Process {
-        return ProcessBuilder().inheritIO().command(nodeResolver.nodePath, "--max-old-space-size=${maxOldSpaceSize}", serverPath, port).start()
+    fun startService(port: String, vararg sandboxDirs: String): Process {
+        return ProcessBuilder().inheritIO().command(nodeResolver.nodePath, "--max-old-space-size=${maxOldSpaceSize}", serverPath, port, *sandboxDirs).start()
     }
 }

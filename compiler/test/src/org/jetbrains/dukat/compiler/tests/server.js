@@ -1,10 +1,11 @@
 var http = require("http");
 var path = require("path");
 
-const PROJECT_DIR = path.resolve(__dirname, "../../../../../../../..");
 var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
-function createServer(port) {
+function createServer(port, sandboxDirs) {
+    console.log(`starting server at port ${port} with following sandboxed dirs: ${sandboxDirs}`);
+
     var server = http.createServer(function (req, res) {
         if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'text/plain');
@@ -27,9 +28,9 @@ function createServer(port) {
                 };
 
                 let files = data.files.filter(file => {
-                    let relpath = path.relative(PROJECT_DIR, file);
-                    if (relpath.startsWith("..")) {
-                        console.log(`skipping ${file} since it does not belong to the project dir (${PROJECT_DIR})`);
+                    let fileIsSandboxed = sandboxDirs.some(sandboxDir => !path.relative(sandboxDir, file).startsWith(".."));
+                    if (!fileIsSandboxed) {
+                        console.log(`skipping ${file} since it does not belong to any of sandbox locations: ${sandboxDirs}`);
                         return false;
                     }
 
@@ -62,7 +63,10 @@ function createServer(port) {
 }
 
 function main() {
-    createServer(process.argv[2] || 8090);
+    const projectDir = path.resolve(__dirname, "../../../../../../../..");
+    let sandboxDirs = process.argv.slice(3);
+    sandboxDirs.push(projectDir);
+    createServer(process.argv[2], sandboxDirs.map(it => path.resolve(it)));
 }
 
 main();

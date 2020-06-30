@@ -11,7 +11,9 @@ private var CLI_PROCESS: Process? = null
 
 class CliTestsStarted : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
-        CLI_PROCESS = CliHttpService().startService(TestConfig.CLI_TEST_SERVER_PORT)
+        CLI_PROCESS = CliHttpService().startService(TestConfig.CLI_TEST_SERVER_PORT,
+                *listOf(TestConfig.DEFINITELY_TYPED_DIR).filterNotNull().toTypedArray()
+        )
         CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
         println("cli http process creation: ${CLI_PROCESS?.isAlive}")
     }
