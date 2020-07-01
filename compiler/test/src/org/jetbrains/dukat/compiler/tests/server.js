@@ -1,5 +1,7 @@
 var http = require("http");
 var path = require("path");
+var cluster = require('cluster');
+var os = require('os');
 
 var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
@@ -93,11 +95,24 @@ function createServer(port, sandboxDirs) {
     });
 }
 
+function createCluster(port, sandboxDirs) {
+    if (cluster.isMaster) {
+        var cpus = os.cpus();
+        console.log(`CPU count => ${cpus.length}`);
+
+        cpus.forEach( _ => {
+            cluster.fork();
+        });
+    } else {
+        createServer(port, sandboxDirs);
+    }
+}
+
 function main() {
     const projectDir = path.resolve(__dirname, "../../../../../../../..");
     let sandboxDirs = process.argv.slice(3);
     sandboxDirs.push(projectDir);
-    createServer(process.argv[2], sandboxDirs.map(it => path.resolve(it)));
+    createCluster(process.argv[2], sandboxDirs.map(it => path.resolve(it)));
 }
 
 main();
