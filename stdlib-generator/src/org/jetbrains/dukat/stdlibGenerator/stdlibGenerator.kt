@@ -109,7 +109,7 @@ private fun DeclarationDescriptor.convertToTopLevelModel(): TopLevelModel? {
 private fun SimpleType.convertToFunctionTypeModel(): FunctionTypeModel {
     return FunctionTypeModel(
             nullable = isMarkedNullable,
-            parameters = listOf(LambdaParameterModel(null, arguments[0].type.convertToTypeModel())),
+            parameters = listOf(LambdaParameterModel(null, arguments[0].type.convertToTypeModel(), true)),
             type = arguments[1].type.convertToTypeModel(),
             metaDescription = null
     )
@@ -186,7 +186,8 @@ private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
                     getter = getter != null,
                     setter = setter != null,
                     type = getType().convertToTypeModel(),
-                    open = true
+                    open = true,
+                    hasType = true
             )
         }
         is FunctionDescriptor -> convertToMethodModel()

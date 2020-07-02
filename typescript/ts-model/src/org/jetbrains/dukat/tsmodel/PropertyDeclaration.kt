@@ -9,5 +9,6 @@ data class PropertyDeclaration(
     val type: ParameterValueDeclaration,
     val typeParameters: List<TypeParameterDeclaration>,
     val optional: Boolean,
-    override val modifiers: Set<ModifierDeclaration>
+    override val modifiers: Set<ModifierDeclaration>,
+    val hasType: Boolean
 ) : MemberDeclaration, WithModifiersDeclaration

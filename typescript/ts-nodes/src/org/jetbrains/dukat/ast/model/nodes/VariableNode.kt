@@ -16,5 +16,6 @@ data class VariableNode(
         val extend: ClassLikeReferenceNode?,
         override val uid: String,
         val comment: CommentEntity?,
-        override val external: Boolean
+        override val external: Boolean,
+        val hasType: Boolean
 ) : TopLevelNode, ExportableNode

@@ -17,5 +17,7 @@ data class PropertyModel(
         val getter: Boolean,
         val setter: Boolean,
 
-        val open: Boolean
+        val open: Boolean,
+
+        val hasType: Boolean
 ) : MemberModel

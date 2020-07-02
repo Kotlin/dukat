@@ -5,7 +5,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
-import org.jetbrains.dukat.astModel.ParameterModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
@@ -218,23 +218,15 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 expression.convert(),
                 arguments.map { it.convert() },
                 typeArguments.map {
-                    //TODO
-                    TypeValueModel(
-                        IdentifierEntity("Any"),
-                        listOf(),
-                        null,
-                        null
-                    )
+                    it.convert()
                 }
             )
             is FunctionDeclaration -> LambdaExpressionModel(
                 parameters.map {
-                    ParameterModel(
+                    LambdaParameterModel(
                         it.name,
-                        type.convert(),
-                        null,
-                        false,
-                        null
+                        it.type.convert(),
+                        it.hasType
                     )
                 },
                 convertLambdaBody(body!!)
@@ -243,13 +235,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 expression.convert(),
                 arguments.map { it.convert() },
                 typeArguments.map {
-                    //TODO
-                    TypeValueModel(
-                        IdentifierEntity("Any"),
-                        listOf(),
-                        null,
-                        null
-                    )
+                    it.convert()
                 }
             )
             is PropertyAccessExpressionDeclaration -> PropertyAccessExpressionModel(
@@ -277,16 +263,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
             )
             is AsExpressionDeclaration -> AsExpressionModel(
                 expression.convert(),
-                TypeValueModel(
-                    IdentifierEntity("Any"),
-                    listOf(),
-                    null,
-                    null
-                )
-                //TODO
-                /*with (documentConverter) {
-                    type.process()
-                }*/
+                type.convert()
             )
             is NonNullExpressionDeclaration -> NonNullExpressionModel(
                 expression.convert()
@@ -421,7 +398,8 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                     modifiers = setOf(),
                     initializer = null,
                     definitionsInfo = listOf(),
-                    uid = ""
+                    uid = "",
+                    hasType = false
                 )
                 val newAssignments = (variable as ArrayDestructuringDeclaration).elements.mapIndexedNotNull { index, element ->
                     if (index < 2 && element is BindingVariableDeclaration) {
@@ -443,7 +421,8 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                                 )
                             ),
                             definitionsInfo = listOf(),
-                            uid = ""
+                            uid = "",
+                            hasType = false
                         )
                     } else {
                         // TODO: nested destructuring
@@ -485,7 +464,8 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 typeParameters = listOf(),
                 extend = null,
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
-                comment = null
+                comment = null,
+                hasType = hasType
         )
     }
 

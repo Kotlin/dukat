@@ -15,6 +15,7 @@ import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -120,6 +121,27 @@ private fun StatementModel.translateMeta(): String {
     return metaDescription.translateMeta()
 }
 
+private fun LambdaParameterModel.translate(): String {
+    val paramNameSerialized = if (name != null && hasType) {
+        "$name: "
+    } else {
+        name ?: ""
+    }
+    val type = if (hasType) {
+        type.translate() + type.translateMeta()
+    } else {
+        ""
+    }
+
+    return "$paramNameSerialized$type"
+}
+
+private fun translateLambdaParameters(parameters: List<LambdaParameterModel>): String {
+    return parameters.map {
+        it.translate()
+    }.joinToString(", ")
+}
+
 fun TypeModel.translate(): String {
     return when (this) {
         is TypeParameterReferenceModel -> {
@@ -141,17 +163,8 @@ fun TypeModel.translate(): String {
         }
         is FunctionTypeModel -> {
             val res = mutableListOf("(")
-            val paramsList = mutableListOf<String>()
-            for (param in parameters) {
-                val paramNameSerialized = if (param.name != null) {
-                    param.name + ": "
-                } else {
-                    ""
-                }
-                val paramSerialized = paramNameSerialized + param.type.translate() + param.type.translateMeta()
-                paramsList.add(paramSerialized)
-            }
-            res.add(paramsList.joinToString(", ") + ")")
+
+            res.add(translateLambdaParameters(parameters) + ")")
             res.add(" -> ${type.translate()}")
             var translated = res.joinToString("")
             if (nullable) {
@@ -341,7 +354,7 @@ private fun ExpressionModel.translate(): String {
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> "${expression.translate()}!!"
         is LambdaExpressionModel -> {
-            val arguments = if (parameters.isNotEmpty()) "${translateParameters(parameters)} -> " else ""
+            val arguments = if (parameters.isNotEmpty()) "${translateLambdaParameters(parameters)} -> " else ""
             "{ $arguments${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")} }"
         }
         is IsExpressionModel -> "${expression.translate()} is ${type.translate()}"
@@ -606,12 +619,18 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
         " ${translateTypeParameters(typeParameters)}"
     }
 
+    val type = if (hasType) {
+        ": ${type.translate()}${type.translateMeta()}"
+    } else {
+        ""
+    }
+
     val varName = if (extend == null) {
         name.translate()
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams}${varName}: ${type.translate()}${type.translateMeta()}${body}"
+    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams}${varName}${type}${body}"
 }
 
 private fun EnumModel.translate(): String {
@@ -629,8 +648,13 @@ private fun PropertyModel.translate(): String {
     val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
     val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
+    val type = if (hasType) {
+        ": ${type.translate()}${type.translateMeta()}"
+    } else {
+        ""
+    }
 
-    return "$modifier$varModifier ${name.translate()}: ${type.translate()}${type.translateMeta()}$initializer"
+    return "$modifier$varModifier ${name.translate()}$type$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {

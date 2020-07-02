@@ -292,7 +292,8 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
                 initializer?.convert()
             } else null,
             definitionsInfoList.map { it.convert() },
-            uid
+            uid,
+            hasType
     )
 }
 
@@ -472,7 +473,8 @@ fun PropertyDeclarationProto.convert(): PropertyDeclaration {
             type.convert(),
             typeParametersList.map { it.convert() },
             optional,
-            modifiersList.mapNotNull { it.convert() }.toSet()
+            modifiersList.mapNotNull { it.convert() }.toSet(),
+            hasType
     )
 }
 
@@ -556,7 +558,8 @@ private fun ParameterDeclarationProto.convert(): ParameterDeclaration {
                 initializer.convert()
             } else null,
             vararg,
-            optional
+            optional,
+            hasType
     )
 }
 

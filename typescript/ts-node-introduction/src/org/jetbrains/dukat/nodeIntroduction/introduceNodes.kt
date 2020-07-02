@@ -84,7 +84,7 @@ private class LowerDeclarationsToNodes(
 
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
-    fun convertPropertyDeclaration(declaration: PropertyDeclaration): PropertyNode {
+    fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyNode {
         val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
         return PropertyNode(
                 name = declaration.name,
@@ -96,7 +96,9 @@ private class LowerDeclarationsToNodes(
                 getter = declaration.optional,
                 setter = declaration.optional,  // TODO: it's actually wrong
 
-                open = true
+                open = true,
+
+                hasType = inDeclaredDeclaration || declaration.hasType
         )
     }
 
@@ -128,6 +130,7 @@ private class LowerDeclarationsToNodes(
                     null,
                     true,
                     false,
+                    true,
                     true
             )
         } else {
@@ -170,7 +173,7 @@ private class LowerDeclarationsToNodes(
             MethodNode(
                     "set",
                     convertParameters(declaration.parameters + listOf(ParameterDeclaration("value", returnType.convertToNodeNullable()
-                            ?: returnType, null, false, false))),
+                            ?: returnType, null, false, false, true))),
                     TypeValueNode(IdentifierEntity("Unit"), emptyList()),
                     emptyList(),
                     false,
@@ -217,7 +220,7 @@ private class LowerDeclarationsToNodes(
     private fun ClassDeclaration.convert(inDeclaredModule: Boolean): ClassNode {
         val declaration = ClassNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member) },
+                members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || hasDeclareModifier()) },
                 typeParameters.map { typeParameter ->
                     TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
@@ -234,7 +237,7 @@ private class LowerDeclarationsToNodes(
     private fun InterfaceDeclaration.convert(): TopLevelNode {
         return InterfaceNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member) },
+                members.flatMap { member -> lowerMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 false,
@@ -247,7 +250,7 @@ private class LowerDeclarationsToNodes(
     private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
         val declaration = InterfaceNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member) },
+                members.flatMap { member -> lowerMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 true,
@@ -326,7 +329,7 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberEntity): List<MemberNode> {
+    fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberNode> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
@@ -341,7 +344,7 @@ private class LowerDeclarationsToNodes(
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
-            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration))
+            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
             is ConstructorDeclaration -> listOf(declaration.convert())
             else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberNode>() }
@@ -363,13 +366,14 @@ private class LowerDeclarationsToNodes(
                         null,
                         declaration.uid,
                         null,
-                        declaration.hasDeclareModifier()
+                        declaration.hasDeclareModifier(),
+                        inDeclaredModule || declaration.hasType
                 )
             } else {
                 //TODO: don't forget to create owner
                 val objectNode = ObjectNode(
                         IdentifierEntity(declaration.name),
-                        type.members.flatMap { member -> lowerMemberDeclaration(member) },
+                        type.members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || declaration.hasDeclareModifier()) },
                         emptyList(),
                         declaration.uid,
                         declaration.hasDeclareModifier()
@@ -394,7 +398,8 @@ private class LowerDeclarationsToNodes(
                     null,
                     declaration.uid,
                     null,
-                    inDeclaredModule || declaration.hasDeclareModifier()
+                    inDeclaredModule || declaration.hasDeclareModifier(),
+                    inDeclaredModule || declaration.hasType
             )
         }
     }

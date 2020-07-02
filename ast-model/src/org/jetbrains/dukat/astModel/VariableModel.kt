@@ -23,5 +23,6 @@ data class VariableModel(
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
 
-        override val metaDescription: String? = null
+        override val metaDescription: String? = null,
+        val hasType: Boolean
 ) : TopLevelModel, StatementModel, CanHaveExternalModifierModel, CanBeExtensionModel

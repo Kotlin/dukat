@@ -88,6 +88,7 @@ import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
+import has = Reflect.has;
 
 export class AstFactory {
 
@@ -530,7 +531,7 @@ export class AstFactory {
     return paramValueDeclaration;
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean, hasType: boolean): ParameterDeclaration {
     let parameterDeclaration = new ParameterDeclarationProto();
     parameterDeclaration.setName(name);
     parameterDeclaration.setType(type);
@@ -539,6 +540,7 @@ export class AstFactory {
     }
     parameterDeclaration.setVararg(vararg);
     parameterDeclaration.setOptional(optional);
+    parameterDeclaration.setHastype(hasType);
     return parameterDeclaration;
   }
 
@@ -673,7 +675,7 @@ export class AstFactory {
     return paramValueDeclaration;
   }
 
-  declareProperty(name: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
+  declareProperty(name: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>, hasType: boolean): MemberDeclaration {
     let propertyDeclaration = new PropertyDeclarationProto();
     propertyDeclaration.setName(name);
     if (initializer) {
@@ -683,13 +685,14 @@ export class AstFactory {
     propertyDeclaration.setTypeparametersList(typeParams);
     propertyDeclaration.setOptional(optional);
     propertyDeclaration.setModifiersList(modifiers);
+    propertyDeclaration.setHastype(hasType);
 
     let memberProto = new MemberDeclarationProto();
     memberProto.setProperty(propertyDeclaration);
     return memberProto;
   }
 
-  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, definitions: Array<DefinitionInfoDeclaration>, uid: string): StatementDeclaration {
+  declareVariable(name: string, type: TypeDeclaration, modifiers: Array<ModifierDeclaration>, initializer: Expression | null, definitions: Array<DefinitionInfoDeclaration>, uid: string, hasType: boolean): StatementDeclaration {
     let variableDeclaration = new VariableDeclarationProto();
     variableDeclaration.setName(name);
     variableDeclaration.setType(type);
@@ -699,6 +702,7 @@ export class AstFactory {
     }
     variableDeclaration.setUid(uid);
     variableDeclaration.setDefinitionsinfoList(definitions);
+    variableDeclaration.setHastype(hasType);
 
     let variableLikeDeclaration = new VariableLikeDeclarationProto();
     variableLikeDeclaration.setVariable(variableDeclaration);

@@ -10,5 +10,6 @@ data class ParameterDeclaration(
     val initializer: ExpressionDeclaration?,
 
     val vararg: Boolean,
-    val optional: Boolean
+    val optional: Boolean,
+    val hasType: Boolean
 ) : Entity

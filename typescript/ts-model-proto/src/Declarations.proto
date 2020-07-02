@@ -144,6 +144,7 @@ message PropertyDeclarationProto {
     repeated TypeParameterDeclarationProto typeParameters = 4;
     bool optional = 5;
     repeated ModifierDeclarationProto modifiers = 6;
+    bool hasType = 7;
 }
 
 message ModifierDeclarationProto {
@@ -427,6 +428,7 @@ message ParameterDeclarationProto {
     ExpressionDeclarationProto initializer = 3;
     bool vararg = 4;
     bool optional = 5;
+    bool hasType = 6;
 }
 
 message VariableDeclarationProto {
@@ -436,6 +438,7 @@ message VariableDeclarationProto {
     ExpressionDeclarationProto initializer = 4;
     repeated DefinitionInfoDeclarationProto definitionsInfo = 5;
     string uid = 6;
+    bool hasType = 7;
 }
 
 message TypeAliasDeclarationProto {

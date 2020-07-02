@@ -32,7 +32,8 @@ private fun VariableModel.convert(): MemberModel {
             initializer = initializer,
             getter = false,
             setter = false,
-            open = false
+            open = false,
+            hasType = hasType
     )
 }
 

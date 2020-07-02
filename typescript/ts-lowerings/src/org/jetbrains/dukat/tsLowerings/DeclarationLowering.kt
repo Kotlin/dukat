@@ -110,7 +110,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         )
     }
 
-    fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>?): TypeParameterDeclaration {
+    override fun lowerTypeParameter(declaration: TypeParameterDeclaration, owner: NodeOwner<Declaration>?): TypeParameterDeclaration {
         return declaration.copy(constraints = declaration.constraints.map { constraint -> lowerParameterValue(constraint, owner?.wrap(declaration)) })
     }
 
@@ -141,7 +141,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         )
     }
 
-    fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterDeclaration {
+    override fun lowerParameterDeclaration(declaration: ParameterDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type, owner)
         )
@@ -207,7 +207,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
 
     fun lowerTypeParamReferenceDeclaration(declaration: TypeParamReferenceDeclaration): ParameterValueDeclaration = declaration
 
-    fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+    override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration -> lowerTypeDeclaration(declaration, owner)
             is FunctionTypeDeclaration -> lowerFunctionTypeDeclaration(declaration, owner)
