@@ -5,21 +5,6 @@ var os = require('os');
 
 var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/dukat-cli.js");
 
-function closeServer(server, socketsSet) {
-    console.log("shutting down server");
-    server.close(function () {
-        console.log("server is down");
-    });
-
-    if (typeof process.send == "function") {
-        process.send("shutdown");
-    }
-
-    console.log(`${socketsSet.size} connections to destroy`);
-    socketsSet.forEach(socket => {
-        socket.destroy();
-    });
-}
 
 function ok(res) {
     res.setHeader('Content-Type', 'text/plain');
@@ -29,7 +14,6 @@ function ok(res) {
 
 function createServer(port, sandboxDirs) {
     console.log(`starting server at port ${port} (pid = ${process.pid})`);
-    var socketsSet = new Set();
 
     var server = http.createServer(function (req, res) {
         if (req.method === 'GET') {
@@ -37,7 +21,7 @@ function createServer(port, sandboxDirs) {
                 ok(res);
             } else if (req.url === '/shutdown') {
                 ok(res);
-                closeServer(server, socketsSet);
+                process.send("shutdown");
             }
         }
         if (req.method === 'POST' && req.url === '/dukat') {
@@ -86,19 +70,17 @@ function createServer(port, sandboxDirs) {
         }
     });
 
-    server.on("connection", function (socket) {
-        socketsSet.add(socket);
-
-        socket.on("close", function () {
-            socketsSet.delete(socket)
-        });
-    })
-
-
     server.listen(port, function () {
         console.log(`server (pid=${process.pid}) is up`);
     });
 
+    server.on("error", function(err) {
+        console.log(err);
+        if (err.code == "EADDRINUSE") {
+            console.log("address is already in use but most likely it's fine");
+        }
+        cluster.worker.send("shutdown")
+    })
 }
 
 function shutdown(cluster) {
@@ -126,19 +108,18 @@ function createCluster(port, sandboxDirs) {
     if (cluster.isMaster) {
         console.log(`sandbox ${sandboxDirs}`);
 
+        cluster.on("message", function(worker, message) {
+            if (message == "shutdown") {
+                shutdown(cluster);
+            }
+        });
+
         var cpus = os.cpus();
         console.log(`CPU count => ${cpus.length}`);
 
 
         cpus.forEach(_ => {
             let worker = cluster.fork();
-
-            worker.on('message', message => {
-                if (message == "shutdown") {
-                    console.log("one of workers received shutdown message, broadcasting it to other workers")
-                    shutdown(cluster);
-                }
-            })
 
             worker.on('disconnect', function () {
                 console.log(`disconnecting ${worker.process.pid}`);
