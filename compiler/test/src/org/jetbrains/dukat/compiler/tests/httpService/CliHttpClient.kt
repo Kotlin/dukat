@@ -18,13 +18,22 @@ private data class TranslationRequest(
 
 class CliHttpClient(private val port: String) {
 
-    private fun pingStatus(): Int? {
-        val url = URL("http://localhost:${port}/status")
+    private fun requestGET(path: String): Int? {
+        val url = URL("http://localhost:${port}/$path")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
 
         return connection.responseCode
     }
+
+    private fun pingStatus(): Int? {
+        return requestGET("status")
+    }
+
+    fun shutdown(): Int? {
+        return requestGET("shutdown")
+    }
+
 
     suspend fun waitForServer(): Boolean {
         var count = 0
@@ -36,7 +45,7 @@ class CliHttpClient(private val port: String) {
                     return true
                 }
             } catch (e: Exception) {
-                if (count > 10) {
+                if (count > 20) {
                     throw e
                 }
 

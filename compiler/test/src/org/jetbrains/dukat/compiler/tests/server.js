@@ -7,13 +7,18 @@ var dukatCli = require("../../../../../../../../node-package/build/distrib/bin/d
 
 function closeServer(server, socketsSet) {
     console.log("shutting down server");
-    server.close(function() {
+    server.close(function () {
         console.log("server is down");
     });
+
+    if (typeof process.send == "function") {
+        process.send("shutdown");
+    }
+
     console.log(`${socketsSet.size} connections to destroy`);
     socketsSet.forEach(socket => {
         socket.destroy();
-    })
+    });
 }
 
 function ok(res) {
@@ -23,7 +28,7 @@ function ok(res) {
 }
 
 function createServer(port, sandboxDirs) {
-    console.log(`starting server at port ${port} with following sandboxed dirs: ${sandboxDirs}`);
+    console.log(`starting server at port ${port} (pid = ${process.pid})`);
     var socketsSet = new Set();
 
     var server = http.createServer(function (req, res) {
@@ -81,27 +86,63 @@ function createServer(port, sandboxDirs) {
         }
     });
 
-    server.on("connection", function(socket) {
+    server.on("connection", function (socket) {
         socketsSet.add(socket);
 
-        socket.on("close", function() {
+        socket.on("close", function () {
             socketsSet.delete(socket)
         });
     })
 
 
-    server.listen(port, function() {
-        console.log("server is up");
+    server.listen(port, function () {
+        console.log(`server (pid=${process.pid}) is up`);
     });
+
+}
+
+function shutdown(cluster) {
+    let connectedWorkers = Object.values(cluster.workers).filter(it => it.connected).map(it => {
+        try {
+            if (it.connected) {
+                it.kill();
+            }
+        } catch (e) {}
+
+        return it
+    }
+    );
+    console.log(`${connectedWorkers.length} connected workers found`);
+    if (connectedWorkers.length > 0) {
+        setTimeout(function () {
+            shutdown(cluster)
+        }, 200);
+    } else {
+        process.exit();
+    }
 }
 
 function createCluster(port, sandboxDirs) {
     if (cluster.isMaster) {
+        console.log(`sandbox ${sandboxDirs}`);
+
         var cpus = os.cpus();
         console.log(`CPU count => ${cpus.length}`);
 
-        cpus.forEach( _ => {
-            cluster.fork();
+
+        cpus.forEach(_ => {
+            let worker = cluster.fork();
+
+            worker.on('message', message => {
+                if (message == "shutdown") {
+                    console.log("one of workers received shutdown message, broadcasting it to other workers")
+                    shutdown(cluster);
+                }
+            })
+
+            worker.on('disconnect', function () {
+                console.log(`disconnecting ${worker.process.pid}`);
+            });
         });
     } else {
         createServer(port, sandboxDirs);
