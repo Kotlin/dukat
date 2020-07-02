@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpService
@@ -12,7 +14,13 @@ private var CLI_PROCESS: Process? = null
 class CliTestsStarted : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
         CLI_PROCESS = CliHttpService().start()
-        CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
+
+        runBlocking {
+            async {
+                CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
+            }.await()
+        }
+
         println("cli http process creation: ${CLI_PROCESS?.isAlive}")
     }
 }

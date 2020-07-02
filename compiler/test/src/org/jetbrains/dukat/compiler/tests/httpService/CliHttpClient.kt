@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.httpService
 
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -22,19 +23,26 @@ class CliHttpClient(private val port: String) {
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
 
-        return try {
-            connection.responseCode
-        } catch (e: Exception) {
-            null
-        }
+        return connection.responseCode
     }
 
-    fun waitForServer() {
+    suspend fun waitForServer(): Boolean {
         var count = 0
-        do {
-            Thread.sleep(250)
-            count++
-        } while (pingStatus() != 200 || count < 10)
+        while (true) {
+            println("connecting, attempt ${count++} ")
+            try {
+                val status = pingStatus()
+                if (status == 200) {
+                    return true
+                }
+            } catch (e: Exception) {
+                if (count > 10) {
+                    throw e
+                }
+
+                delay(250)
+            }
+        }
     }
 
     fun translate(fileName: String, tsConfig: String?): ByteArray {
@@ -69,6 +77,6 @@ class CliHttpClient(private val port: String) {
     }
 }
 
-fun main() {
+suspend fun main() {
     CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
 }
