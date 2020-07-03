@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.5] - 3'July 2020
+  In this release we switched typescript compiler API to 3.9.5 and if you won't notices it's actually a good sign.
+  - [#320](https://github.com/Kotlin/dukat/issues/320) Test server should reject file paths from outside the repository 
+  - [#323](https://github.com/Kotlin/dukat/issues/323) Omit Object inheritance clause
+  - [#318](https://github.com/Kotlin/dukat/issues/318) Switch to typescript 3.9.5
+  - [#266](https://github.com/Kotlin/dukat/issues/266) Resolve star exports
+
 ### [0.5.4] - 26'June 2020
   - [#316](https://github.com/Kotlin/dukat/issues/316) Vararg param is mistakenly resolved as overriding 
   - [#315](https://github.com/Kotlin/dukat/issues/315) Imported entities name clash lead to override errors
