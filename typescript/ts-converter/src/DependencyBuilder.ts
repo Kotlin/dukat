@@ -78,6 +78,15 @@ export class DependencyBuilder {
     }
   }
 
+  private resolveModulePath(node: ts.Expression): string | null {
+    const module = ts.getResolvedModule(node.getSourceFile(), node.text);
+    if (module && (typeof module.resolvedFileName == "string")) {
+      return tsInternals.normalizePath(module.resolvedFileName);
+    }
+    return null;
+  }
+
+
   private visit(node: ts.Node) {
     if (ts.isNamedImports(node)) {
       for (let element of node.elements) {
@@ -94,10 +103,17 @@ export class DependencyBuilder {
         this.checkReferences(type);
       }
     } else if (ts.isExportDeclaration(node)) {
-      if (node.exportClause && Array.isArray(node.exportClause.elements)) {
-        node.exportClause.elements.forEach(exportSpecifier => {
-          this.checkReferences(exportSpecifier.name);
-        });
+      if (node.exportClause) {
+        if (Array.isArray(node.exportClause.elements)) {
+          node.exportClause.elements.forEach(exportSpecifier => {
+            this.checkReferences(exportSpecifier.name);
+          });
+        }
+      } else {
+        let resolvedModuleName = this.resolveModulePath(node.moduleSpecifier);
+        if (resolvedModuleName) {
+          this.registerDependency(new TranslateAllSymbolsDependency(resolvedModuleName));
+        }
       }
     } else if (ts.isCallExpression(node)) {
       this.checkReferences(node.expression)
