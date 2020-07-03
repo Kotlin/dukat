@@ -52,13 +52,14 @@ private enum class SubstitutedEntities(val value: IdentifierEntity) {
     EXCLUDE(IdentifierEntity("Exclude")),
     REQUIRED(IdentifierEntity("Required")),
     READONLY_ARRAY(IdentifierEntity("ReadonlyArray")),
-    TEMPLATE_STRINGS_ARRAY(IdentifierEntity("TemplateStringsArray"))
+    TEMPLATE_STRINGS_ARRAY(IdentifierEntity("TemplateStringsArray")),
+    OBJECT(IdentifierEntity("Object"))
 }
 
 private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
     val isLibReference = isLibReference()
 
-    return if (value == SubstitutedEntities.NON_NULLABLE.value || value == SubstitutedEntities.EXCLUDE.value || value == SubstitutedEntities.REQUIRED.value) {
+    return if (value == SubstitutedEntities.NON_NULLABLE.value || value == SubstitutedEntities.EXCLUDE.value || value == SubstitutedEntities.REQUIRED.value || value == SubstitutedEntities.OBJECT.value) {
         if (isLibReference) {
             createStdType("Any")
         } else null
@@ -173,7 +174,7 @@ private class SubstituteLowering : ModelWithOwnerTypeLowering {
     }
 }
 
-class SubstituteTsStdLibEntities() : ModelLowering {
+class SubstituteTsStdLibEntities : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
         return SubstituteLowering().lowerRoot(module, NodeOwner(module, null))
     }
