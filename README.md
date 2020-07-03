@@ -43,10 +43,10 @@ kotlin.js.experimental.generateKotlinExternals=true
 
 The version of dukat can be specified in build.gradle.kts by adding the following:
 ```
-rootProject.plugins.withType<NodeJsRootPlugin> {
-    (extensions[NodeJsRootExtension.EXTENSION_NAME] as NodeJsRootExtension).apply {
-        versions.dukat.version = "SPECIFIC-VERSION"
-    }
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
+...
+NodeJsRootPlugin.apply(project).apply {
+    versions.dukat.version = "SPECIFIC-VERSION"
 }
 ```
 
