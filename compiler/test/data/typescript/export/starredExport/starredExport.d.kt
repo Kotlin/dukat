@@ -16,7 +16,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-open external class Some
+external open class Some
 
 // ------------------------------------------------------------------------------------------
 // [test] _api.kt
@@ -39,6 +39,6 @@ import org.w3c.xhr.*
 
 external interface SomeInterface
 
-open external class SomeClass
+external open class SomeClass
 
 external fun someFunc()
