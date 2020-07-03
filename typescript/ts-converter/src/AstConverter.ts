@@ -38,6 +38,7 @@ import {
 import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KIND = ModifierDeclarationProto.MODIFIER_KIND;
+import {resolveModulePath} from "./resolveModulePath";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
@@ -53,14 +54,6 @@ export class AstConverter {
   }
 
   private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
-
-  private resolveModulePath(node: ts.Expression): string | null {
-    const module = ts.getResolvedModule(node.getSourceFile(), node.getText());
-    if (module && (typeof module.resolvedFileName == "string")) {
-      return tsInternals.normalizePath(module.resolvedFileName);
-    }
-    return null;
-  }
 
   private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
     let curDir = tsInternals.getDirectoryPath(sourceFile.fileName);
@@ -87,7 +80,7 @@ export class AstConverter {
 
     //TODO: Consider to place it to getImports
     for (let importDeclaration of sourceFile.imports) {
-      const modulePath = this.resolveModulePath(importDeclaration);
+      const modulePath = resolveModulePath(importDeclaration);
       if (modulePath) {
         if (!visitedReferences.has(modulePath)) {
           visitedReferences.add(modulePath);
@@ -115,7 +108,7 @@ export class AstConverter {
               ));
             }
             if (importClause) {
-              let referenceFile = this.resolveModulePath(node.moduleSpecifier);
+              let referenceFile = resolveModulePath(node.moduleSpecifier);
               if (referenceFile) {
                 importClause.setReferencedfile(referenceFile);
               }

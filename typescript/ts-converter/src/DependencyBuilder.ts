@@ -7,6 +7,7 @@ import {
   TranslateSubsetOfSymbolsDependency
 } from "./Dependency";
 import {resolveDeclarations} from "./ExportContext";
+import {resolveModulePath} from "./resolveModulePath";
 
 export class DependencyBuilder {
   private dependencies = new Map<string, Dependency>();
@@ -78,15 +79,6 @@ export class DependencyBuilder {
     }
   }
 
-  private resolveModulePath(node: ts.Expression): string | null {
-    const module = ts.getResolvedModule(node.getSourceFile(), node.text);
-    if (module && (typeof module.resolvedFileName == "string")) {
-      return tsInternals.normalizePath(module.resolvedFileName);
-    }
-    return null;
-  }
-
-
   private visit(node: ts.Node) {
     if (ts.isNamedImports(node)) {
       for (let element of node.elements) {
@@ -110,7 +102,7 @@ export class DependencyBuilder {
           });
         }
       } else {
-        let resolvedModuleName = this.resolveModulePath(node.moduleSpecifier);
+        let resolvedModuleName = resolveModulePath(node.moduleSpecifier);
         if (resolvedModuleName) {
           this.registerDependency(new TranslateAllSymbolsDependency(resolvedModuleName));
         }
