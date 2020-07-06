@@ -13,7 +13,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private data class ModelData<T>(
+private data class ModelData<T : NamedCallableModel>(
         val optionalArgs: MutableList<Int>,
         val names: List<String>,
         val methodNode: T
@@ -28,74 +28,71 @@ private fun <CALLABLE_MODEL : NamedCallableModel> CALLABLE_MODEL.process(modelsD
     }
 
     val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
-    val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
-
     val methodNodeRecord = modelsDataMap.getOrPut(name) { mutableMapOf() }
-    val methodData = methodNodeRecord.getOrPut(headTypes) { ModelData(mutableListOf(), headNames, this) }
+
+    val methodData = methodNodeRecord.getOrPut(headTypes) {
+        val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
+        ModelData(mutableListOf(), headNames, this)
+    }
+
     methodData.optionalArgs.add(parameters.size - nonOptionalHead.size)
 }
 
 
-@OptIn(kotlin.ExperimentalStdlibApi::class)
 private fun ClassLikeModel.createDataMap(): ModelsDataMap<MethodModel> {
-    return buildMap {
-        members.forEach { member ->
-            if (member is MethodModel) {
-                member.process(this)
-            }
+    val res = mutableMapOf<NameEntity, ModelDataRecord<MethodModel>>()
+
+    members.forEach { member ->
+        if (member is MethodModel) {
+            member.process(res)
         }
     }
+
+    return res
 }
 
-@OptIn(kotlin.ExperimentalStdlibApi::class)
 private fun ModuleModel.createDataMap(): ModelsDataMap<FunctionModel> {
-    return buildMap {
-        declarations.forEach { member ->
-            if (member is FunctionModel) {
-                member.process(this)
-            }
+    val res = mutableMapOf<NameEntity, ModelDataRecord<FunctionModel>>()
+
+    declarations.forEach { member ->
+        if (member is FunctionModel) {
+            member.process(res)
         }
     }
+
+    return res
 }
 
-private fun <T> Map.Entry<NameEntity, ModelDataRecord<T>>.process(
-        generatedMethods: MutableList<T>,
-        paramsResolved: (node: T, params: List<ParameterModel>) -> T
-) {
-    val optionalData = value
-
-    optionalData.forEach { types, (argsCount, names, originalNode) ->
-
-        val params = types.zip(names).map { (type, name) ->
+private fun <CALLABLE_MODEL:NamedCallableModel> ModelDataRecord<CALLABLE_MODEL>.process(
+        paramsResolved: (node: CALLABLE_MODEL, params: List<ParameterModel>) -> CALLABLE_MODEL
+): List<CALLABLE_MODEL> {
+    return mapNotNull { (types, modelData) ->
+        val params = types.zip(modelData.names).map { (type, name) ->
             ParameterModel(name, type, null, false, null)
         }
 
-        val argsCountGrouped = argsCount.groupingBy { it }.eachCount()
+        val argsCountGrouped = modelData.optionalArgs.groupingBy { it }.eachCount()
 
         val hasUniqueArity = argsCountGrouped.values.any { it == 1 }
         val doesntNeedsOverload = hasUniqueArity || (types.isEmpty() && argsCountGrouped.keys.contains(0))
 
         if (!doesntNeedsOverload) {
-            generatedMethods.add(paramsResolved(originalNode, params))
+            paramsResolved(modelData.methodNode, params)
+        } else {
+            null
         }
     }
 }
 
-@OptIn(kotlin.ExperimentalStdlibApi::class)
 private fun ModelsDataMap<MethodModel>.generateMethods(): List<MethodModel> {
-    return buildList {
-        this@generateMethods.forEach { methodDataRecord ->
-            methodDataRecord.process(this) { node, params -> node.copy(parameters = params) }
-        }
+    return flatMap { (_, methodData) ->
+        methodData.process{ node, params -> node.copy(parameters = params) }
     }
 }
 
-@OptIn(kotlin.ExperimentalStdlibApi::class)
 private fun ModelsDataMap<FunctionModel>.generateFunctions(): List<FunctionModel> {
-    return buildList {
-        this@generateFunctions.forEach { functionDataRecord ->
-            functionDataRecord.process(this) { node, params -> node.copy(parameters = params) }
-        }
+    return flatMap { (_, functionData) ->
+        functionData.process{ node, params -> node.copy(parameters = params) }
     }
 }
 
