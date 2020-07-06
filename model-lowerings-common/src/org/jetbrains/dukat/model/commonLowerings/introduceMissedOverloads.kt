@@ -27,7 +27,9 @@ private fun <CALLABLE_MODEL : NamedCallableModel> CALLABLE_MODEL.process(modelsD
 
     val methodNodeRecord = modelsDataMap.getOrPut(name) { mutableMapOf() }
 
-    val methodData = methodNodeRecord.getOrPut(nonOptionalHead) {
+    val methodData = methodNodeRecord.getOrPut(
+            nonOptionalHead.map { ParameterModel(it.name, it.type, null, false, null) }
+    ) {
         ModelData(mutableListOf(), this)
     }
 
@@ -63,17 +65,13 @@ private fun <CALLABLE_MODEL : NamedCallableModel> ModelDataRecord<CALLABLE_MODEL
         paramsResolved: (node: CALLABLE_MODEL, params: List<ParameterModel>) -> CALLABLE_MODEL
 ): List<CALLABLE_MODEL> {
     return mapNotNull { (types, modelData) ->
-        val params = types.map { param ->
-            ParameterModel(param.name, param.type, null, false, null)
-        }
-
         val argsCountGrouped = modelData.optionalArgs.groupingBy { it }.eachCount()
 
         val hasUniqueArity = argsCountGrouped.values.any { it == 1 }
-        val doesntNeedsOverload = hasUniqueArity || (types.isEmpty() && argsCountGrouped.keys.contains(0))
+        val doesntNeedOverload = hasUniqueArity || (types.isEmpty() && argsCountGrouped.keys.contains(0))
 
-        if (!doesntNeedsOverload) {
-            paramsResolved(modelData.methodNode, params)
+        if (!doesntNeedOverload) {
+            paramsResolved(modelData.methodNode, types)
         } else {
             null
         }
