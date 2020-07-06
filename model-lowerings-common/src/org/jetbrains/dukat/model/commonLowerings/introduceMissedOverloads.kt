@@ -112,9 +112,9 @@ private class IntroduceMissedOverloadsTypeLowering : ModelWithOwnerTypeLowering 
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         val nodesDataMap = moduleModel.createDataMap()
-        return super.lowerRoot(moduleModel.copy(
+        return moduleModel.copy(
                 declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel) + nodesDataMap.generateFunctions()
-        ), ownerContext)
+        )
     }
 }
 
