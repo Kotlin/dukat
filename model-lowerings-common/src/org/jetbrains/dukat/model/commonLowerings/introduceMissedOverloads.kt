@@ -10,16 +10,14 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.NamedCallableModel
 import org.jetbrains.dukat.astModel.ParameterModel
-import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private data class ModelData<T : NamedCallableModel>(
         val optionalArgs: MutableList<Int>,
-        val names: List<String>,
         val methodNode: T
 )
 
-private typealias ModelDataRecord<T> = MutableMap<List<TypeModel>, ModelData<T>>
+private typealias ModelDataRecord<T> = MutableMap<List<ParameterModel>, ModelData<T>>
 private typealias ModelsDataMap<T> = Map<NameEntity, ModelDataRecord<T>>
 
 private fun <CALLABLE_MODEL : NamedCallableModel> CALLABLE_MODEL.process(modelsDataMap: MutableMap<NameEntity, ModelDataRecord<CALLABLE_MODEL>>) {
@@ -27,12 +25,10 @@ private fun <CALLABLE_MODEL : NamedCallableModel> CALLABLE_MODEL.process(modelsD
         paramDeclaration.initializer == null
     }
 
-    val headTypes = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.type }
     val methodNodeRecord = modelsDataMap.getOrPut(name) { mutableMapOf() }
 
-    val methodData = methodNodeRecord.getOrPut(headTypes) {
-        val headNames = nonOptionalHead.map { parameterDeclaration -> parameterDeclaration.name }
-        ModelData(mutableListOf(), headNames, this)
+    val methodData = methodNodeRecord.getOrPut(nonOptionalHead) {
+        ModelData(mutableListOf(), this)
     }
 
     methodData.optionalArgs.add(parameters.size - nonOptionalHead.size)
@@ -63,12 +59,12 @@ private fun ModuleModel.createDataMap(): ModelsDataMap<FunctionModel> {
     return res
 }
 
-private fun <CALLABLE_MODEL:NamedCallableModel> ModelDataRecord<CALLABLE_MODEL>.process(
+private fun <CALLABLE_MODEL : NamedCallableModel> ModelDataRecord<CALLABLE_MODEL>.process(
         paramsResolved: (node: CALLABLE_MODEL, params: List<ParameterModel>) -> CALLABLE_MODEL
 ): List<CALLABLE_MODEL> {
     return mapNotNull { (types, modelData) ->
-        val params = types.zip(modelData.names).map { (type, name) ->
-            ParameterModel(name, type, null, false, null)
+        val params = types.map { param ->
+            ParameterModel(param.name, param.type, null, false, null)
         }
 
         val argsCountGrouped = modelData.optionalArgs.groupingBy { it }.eachCount()
@@ -86,13 +82,13 @@ private fun <CALLABLE_MODEL:NamedCallableModel> ModelDataRecord<CALLABLE_MODEL>.
 
 private fun ModelsDataMap<MethodModel>.generateMethods(): List<MethodModel> {
     return flatMap { (_, methodData) ->
-        methodData.process{ node, params -> node.copy(parameters = params) }
+        methodData.process { node, params -> node.copy(parameters = params) }
     }
 }
 
 private fun ModelsDataMap<FunctionModel>.generateFunctions(): List<FunctionModel> {
     return flatMap { (_, functionData) ->
-        functionData.process{ node, params -> node.copy(parameters = params) }
+        functionData.process { node, params -> node.copy(parameters = params) }
     }
 }
 
