@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
+import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.NamedCallableModel
@@ -98,18 +99,23 @@ private fun ModelsDataMap<FunctionModel>.generateFunctions(): List<FunctionModel
     }
 }
 
+private fun ClassLikeModel.withGeneratedMembers(): List<MemberModel> {
+    return members + createDataMap().generateMethods()
+}
+
 private class IntroduceMissedOverloadsTypeLowering : ModelWithOwnerTypeLowering {
+
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val model = ownerContext.node
-        return super.lowerInterfaceModel(ownerContext.copy(node = ownerContext.node.copy(
-                members = model.members + model.createDataMap().generateMethods()
+        return super.lowerInterfaceModel(ownerContext.copy(node = model.copy(
+                members = model.withGeneratedMembers()
         )), parentModule)
     }
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val model = ownerContext.node
-        return super.lowerClassModel(ownerContext.copy(node = ownerContext.node.copy(
-                members = model.members + model.createDataMap().generateMethods()
+        return super.lowerClassModel(ownerContext.copy(node = model.copy(
+                members = model.withGeneratedMembers()
         )), parentModule)
     }
 
