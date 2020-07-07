@@ -4,7 +4,7 @@ import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dukat.compiler.tests.NodeResolver
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 
-class CliHttpService(
+class CliHttpService @OptIn(UnstableDefault::class) constructor(
         private val serverPath: String = "./test/src/org/jetbrains/dukat/compiler/tests/server.js",
         private val nodeResolver: NodeResolver = NodeResolver("../node-package/build/env.json"),
         private val inspectNodeProcess: Boolean = false
@@ -35,6 +35,7 @@ class CliHttpService(
     )
 }
 
+@OptIn(UnstableDefault::class)
 fun main() {
     CliHttpService(
             serverPath = "./compiler/test/src/org/jetbrains/dukat/compiler/tests/server.js",
