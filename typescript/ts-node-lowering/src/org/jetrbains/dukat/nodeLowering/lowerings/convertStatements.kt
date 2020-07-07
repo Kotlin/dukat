@@ -280,6 +280,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()
                 "super" -> SuperExpressionModel()
+                "null" -> NullLiteralExpressionModel()
                 else -> raiseConcern("unable to process ExpressionDeclaration $this") {
                     IdentifierExpressionModel(IdentifierEntity(meta))
                 }

@@ -73,7 +73,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<MemberOwnerDeclaration>?): MemberDeclaration {
+    override fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<MemberOwnerDeclaration>?): MemberDeclaration {
         val newOwner = owner?.wrap(declaration)
         return when (declaration) {
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, newOwner as NodeOwner<FunctionOwnerDeclaration>)
