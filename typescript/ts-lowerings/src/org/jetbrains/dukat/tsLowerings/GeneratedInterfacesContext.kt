@@ -4,7 +4,6 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.logger.Logging
-import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -129,7 +128,7 @@ private fun PropertyDeclaration.isIdenticalTo(propertyDeclaration: PropertyDecla
 }
 
 private fun IndexSignatureDeclaration.isIdenticalTo(indexSignatureDeclaration: IndexSignatureDeclaration): Boolean {
-    if (!indexTypes.isIdenticalTo(indexSignatureDeclaration.indexTypes) { a, b -> a.isIdenticalTo(b) }) {
+    if (!parameters.isIdenticalTo(indexSignatureDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }) {
         return false
     }
 
@@ -210,7 +209,7 @@ class GeneratedInterfacesContext {
         declaration.members.forEach { member ->
             when (member) {
                 is IndexSignatureDeclaration -> {
-                    member.indexTypes.forEach { param -> param.type.resolveTypeParams(typeParams) }
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParams) }
                     member.returnType.resolveTypeParams(typeParams)
                 }
                 is CallSignatureDeclaration -> {

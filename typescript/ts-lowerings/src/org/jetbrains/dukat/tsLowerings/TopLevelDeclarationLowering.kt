@@ -39,16 +39,18 @@ interface TopLevelDeclarationLowering {
         }
     }
 
-    fun lowerModuleModel(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration? {
-        return moduleDeclaration.copy(declarations = moduleDeclaration.declarations.mapNotNull { declaration ->
+    fun lowerTopLevelDeclarations(declarations: List<TopLevelDeclaration>, owner: NodeOwner<ModuleDeclaration>?): List<TopLevelDeclaration> {
+        return declarations.mapNotNull { declaration ->
             lowerTopLevelDeclaration(declaration, owner)
-        })
+        }
+    }
+
+    fun lowerModuleModel(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration? {
+        return moduleDeclaration.copy(declarations = lowerTopLevelDeclarations(moduleDeclaration.declarations, owner))
     }
 
     fun lowerSourceDeclaration(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>? = NodeOwner(moduleDeclaration, null)): ModuleDeclaration {
-        return moduleDeclaration.copy(declarations = moduleDeclaration.declarations.mapNotNull { declaration ->
-            lowerTopLevelDeclaration(declaration, owner)
-        })
+        return moduleDeclaration.copy(declarations = lowerTopLevelDeclarations(moduleDeclaration.declarations, owner))
     }
 
 }

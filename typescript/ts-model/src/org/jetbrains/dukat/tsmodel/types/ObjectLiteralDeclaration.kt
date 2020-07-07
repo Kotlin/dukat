@@ -22,11 +22,11 @@ fun ObjectLiteralDeclaration.canBeJson(): Boolean {
     }
 
     val indexSignatureDeclaration = members.get(0) as IndexSignatureDeclaration
-    if (indexSignatureDeclaration.indexTypes.size != 1) {
+    if (indexSignatureDeclaration.parameters.size != 1) {
         return false
     }
 
-    val indexType = indexSignatureDeclaration.indexTypes.get(0)
+    val indexType = indexSignatureDeclaration.parameters.get(0)
 
     if (indexType.type !is TypeDeclaration) {
         return false

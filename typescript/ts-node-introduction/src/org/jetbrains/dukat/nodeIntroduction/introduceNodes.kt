@@ -65,6 +65,8 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
@@ -143,12 +145,19 @@ private class LowerDeclarationsToNodes(
         }
     }
 
+    private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
+        return when (this) {
+            is UnionTypeDeclaration -> params
+            else -> listOf(this)
+        }
+    }
+
 
     private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<MethodNode> {
         return listOf(
                 MethodNode(
                         "get",
-                        convertParameters(declaration.indexTypes),
+                        convertParameters(declaration.parameters),
                         declaration.returnType.makeNullable().convertToNode(),
                         emptyList(),
                         false,
@@ -156,20 +165,21 @@ private class LowerDeclarationsToNodes(
                         true,
                         null,
                         false
-                ),
-                MethodNode(
-                        "set",
-                        convertParameters(declaration.indexTypes + listOf(ParameterDeclaration("value", declaration.returnType.convertToNodeNullable()
-                                ?: declaration.returnType, null, false, false))),
-                        TypeValueNode(IdentifierEntity("Unit"), emptyList()),
-                        emptyList(),
-                        false,
-                        true,
-                        true,
-                        null,
-                        false
                 )
-        )
+        ) + declaration.returnType.unroll().map { returnType ->
+            MethodNode(
+                    "set",
+                    convertParameters(declaration.parameters + listOf(ParameterDeclaration("value", returnType.convertToNodeNullable()
+                            ?: returnType, null, false, false))),
+                    TypeValueNode(IdentifierEntity("Unit"), emptyList()),
+                    emptyList(),
+                    false,
+                    true,
+                    true,
+                    null,
+                    false
+            )
+        }
     }
 
 

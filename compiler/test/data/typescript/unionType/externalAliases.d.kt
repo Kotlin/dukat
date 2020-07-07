@@ -28,11 +28,7 @@ external fun barArray(a: Array<dynamic /* String | Foo | Number */>)
 
 external interface Parent {
     @nativeInvoke
-    operator fun invoke(vararg children: String): Foo
-    @nativeInvoke
-    operator fun invoke(vararg children: Foo): Foo
-    @nativeInvoke
-    operator fun invoke(vararg children: Number): Foo
+    operator fun invoke(vararg children: dynamic /* String | Foo | Number */): Foo
 }
 
 // ------------------------------------------------------------------------------------------

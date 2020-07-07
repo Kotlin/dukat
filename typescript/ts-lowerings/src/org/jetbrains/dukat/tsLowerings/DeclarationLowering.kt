@@ -67,7 +67,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
 
     fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): IndexSignatureDeclaration {
         return declaration.copy(
-                indexTypes = declaration.indexTypes.map { indexType -> lowerParameterDeclaration(indexType, owner?.wrap(declaration)) },
+                parameters = declaration.parameters.map { indexType -> lowerParameterDeclaration(indexType, owner?.wrap(declaration)) },
                 returnType = lowerParameterValue(declaration.returnType, owner?.wrap(declaration))
         );
     }

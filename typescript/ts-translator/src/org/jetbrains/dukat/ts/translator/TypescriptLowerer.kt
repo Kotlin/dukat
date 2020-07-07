@@ -47,9 +47,9 @@ import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
 import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypeAliases
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
+import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.SpecifyUnionType
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
 import org.jetrbains.dukat.nodeLowering.lowerings.lower
 
@@ -80,6 +80,7 @@ open class TypescriptLowerer(
                         LowerThisType(),
                         ResolveTypeAliases(),
                         PreprocessUnionTypes(),
+                        SpecifyUnionType(),
                         RemoveUnusedGeneratedEntities()
                 )
 
@@ -87,8 +88,7 @@ open class TypescriptLowerer(
         val nodes = IntroduceNodes(moduleNameResolver)
                 .lower(declarations)
                 .lower(
-                        ResolveModuleAnnotations(),
-                        SpecifyUnionType()
+                        ResolveModuleAnnotations()
                 )
 
         val models = nodes
@@ -116,6 +116,7 @@ open class TypescriptLowerer(
                         RemoveKotlinBuiltIns(),
                         CorrectStdLibTypes(),
                         RemoveDuplicateMembers(),
+                        RearrangeConstructors(),
                         AddImports(),
                         AddStandardImportsAndAnnotations()
                 )
