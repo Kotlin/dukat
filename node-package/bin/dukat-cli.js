@@ -129,9 +129,8 @@ function cliMode(args) {
     }
 
     var runtimePath = path.resolve(packageDir, "build/runtime");
-    var jsPath = path.resolve(runtimePath, "js.jar");
     var cliPath = path.resolve(runtimePath, "dukat-cli.jar");
-    var classPath = [jsPath, cliPath].join(path.delimiter);
+    var classPath = [cliPath].join(path.delimiter);
 
     guardJavaExists();
 
