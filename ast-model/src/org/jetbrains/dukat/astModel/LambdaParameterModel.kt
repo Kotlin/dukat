@@ -5,5 +5,5 @@ import org.jetbrains.dukat.astCommon.Entity
 data class LambdaParameterModel(
         override val name: String?,
         override val type: TypeModel,
-        val hasType: Boolean
+        val explicitlyDeclaredType: Boolean
 ) : Entity, CallableParameterModel

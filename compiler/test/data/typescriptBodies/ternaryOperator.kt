@@ -17,7 +17,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f() {
-    var i: Any = 1
+    var i = 1
     while (i <= 100) {
         console.log(if (i % 15 == 0) "FizzBuzz" else (if (i % 3 == 0) "Fizz" else (if (i % 5 == 0) "Buzz" else "")))
         i++

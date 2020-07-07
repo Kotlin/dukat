@@ -12,5 +12,5 @@ data class VariableDeclaration(
 
     override val definitionsInfo: List<DefinitionInfoDeclaration>,
     override val uid: String,
-    val hasType: Boolean
+    val explicitlyDeclaredType: Boolean
 ) : StatementDeclaration, ParameterOwnerDeclaration, WithModifiersDeclaration, MergeableDeclaration, VariableLikeDeclaration

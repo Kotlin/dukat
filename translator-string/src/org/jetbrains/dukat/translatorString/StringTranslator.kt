@@ -122,12 +122,12 @@ private fun StatementModel.translateMeta(): String {
 }
 
 private fun LambdaParameterModel.translate(): String {
-    val paramNameSerialized = if (name != null && hasType) {
+    val paramNameSerialized = if (name != null && explicitlyDeclaredType) {
         "$name: "
     } else {
         name ?: ""
     }
-    val type = if (hasType) {
+    val type = if (explicitlyDeclaredType) {
         type.translate() + type.translateMeta()
     } else {
         ""
@@ -619,7 +619,7 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
         " ${translateTypeParameters(typeParameters)}"
     }
 
-    val type = if (hasType) {
+    val type = if (explicitlyDeclaredType) {
         ": ${type.translate()}${type.translateMeta()}"
     } else {
         ""
@@ -648,7 +648,7 @@ private fun PropertyModel.translate(): String {
     val modifier = if (override != null) "override " else if (open) "open " else ""
     val varModifier = if (immutable) "val" else "var"
     val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
-    val type = if (hasType) {
+    val type = if (explicitlyDeclaredType) {
         ": ${type.translate()}${type.translateMeta()}"
     } else {
         ""

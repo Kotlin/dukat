@@ -53,7 +53,7 @@ private fun getVariableDeclaration(name: String, type: ParameterValueDeclaration
         initializer = null,
         definitionsInfo = emptyList(),
         uid = generateUID(),
-        hasType = true
+        explicitlyDeclaredType = true
 )
 
 private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration, isStatic: Boolean) = PropertyDeclaration(
@@ -63,7 +63,7 @@ private fun getPropertyDeclaration(name: String, type: ParameterValueDeclaration
         typeParameters = emptyList(),
         optional = false,
         modifiers = if (isStatic) STATIC_MODIFIERS else emptySet(),
-        hasType = true
+        explicitlyDeclaredType = true
 )
 
 private fun Constraint.toParameterDeclaration(name: String): ParameterDeclaration {
@@ -73,7 +73,7 @@ private fun Constraint.toParameterDeclaration(name: String): ParameterDeclaratio
             initializer = null,
             vararg = false,
             optional = false,
-            hasType = true
+            explicitlyDeclaredType = true
     )
 }
 

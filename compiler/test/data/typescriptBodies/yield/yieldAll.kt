@@ -16,12 +16,12 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-fun f() = iterator({ var i: Any = 1; while (i <= 3) { yield(i); i++ } })
+fun f() = iterator({ var i = 1; while (i <= 3) { yield(i); i++ } })
 
 fun g() = iterator({ yieldAll(f()); yieldAll(f()) })
 
 fun h() {
-    for (x: Any in g()) {
+    for (x in g()) {
         console.log(x)
     }
 }

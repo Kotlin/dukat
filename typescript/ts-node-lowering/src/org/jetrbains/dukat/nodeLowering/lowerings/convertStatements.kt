@@ -226,7 +226,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                     LambdaParameterModel(
                         it.name,
                         it.type.convert(),
-                        it.hasType
+                        it.explicitlyDeclaredType
                     )
                 },
                 convertLambdaBody(body!!)
@@ -399,7 +399,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                     initializer = null,
                     definitionsInfo = listOf(),
                     uid = "",
-                    hasType = false
+                    explicitlyDeclaredType = false
                 )
                 val newAssignments = (variable as ArrayDestructuringDeclaration).elements.mapIndexedNotNull { index, element ->
                     if (index < 2 && element is BindingVariableDeclaration) {
@@ -422,7 +422,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                             ),
                             definitionsInfo = listOf(),
                             uid = "",
-                            hasType = false
+                            explicitlyDeclaredType = false
                         )
                     } else {
                         // TODO: nested destructuring
@@ -465,7 +465,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 extend = null,
                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                 comment = null,
-                hasType = hasType
+                explicitlyDeclaredType = explicitlyDeclaredType
         )
     }
 

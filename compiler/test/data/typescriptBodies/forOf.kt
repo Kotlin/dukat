@@ -17,7 +17,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f(arr: Array<String>) {
-    for (s: Any in arr) {
+    for (s in arr) {
         console.log(s)
     }
 }

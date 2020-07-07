@@ -343,7 +343,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     getter = getter,
                     setter = setter,
                     open = open,
-                    hasType = hasType
+                    explicitlyDeclaredType = explicitlyDeclaredType
             )
             else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
         }
@@ -358,7 +358,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 } else {
                     name
                 },
-                hasType = true
+                explicitlyDeclaredType = true
         )
     }
 
@@ -755,7 +755,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     extend = extend.convert(),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null,
-                    hasType = hasType
+                    explicitlyDeclaredType = explicitlyDeclaredType
             )
             is ObjectNode -> ObjectModel(
                     name = name,

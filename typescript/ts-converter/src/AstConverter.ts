@@ -359,12 +359,12 @@ export class AstConverter {
     return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean, hasType: boolean): ParameterDeclaration {
-    return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional, hasType);
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean, explicitlyDeclaredType: boolean): ParameterDeclaration {
+    return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional, explicitlyDeclaredType);
   }
 
-  createProperty(value: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean, hasType: boolean): MemberDeclaration {
-    return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, [], hasType);
+  createProperty(value: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean, explicitlyDeclaredType: boolean): MemberDeclaration {
+    return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, [], explicitlyDeclaredType);
   }
 
 

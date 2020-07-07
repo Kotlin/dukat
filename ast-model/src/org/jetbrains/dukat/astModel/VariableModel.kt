@@ -24,5 +24,5 @@ data class VariableModel(
         override val comment: CommentEntity?,
 
         override val metaDescription: String? = null,
-        val hasType: Boolean
+        val explicitlyDeclaredType: Boolean
 ) : TopLevelModel, StatementModel, CanHaveExternalModifierModel, CanBeExtensionModel

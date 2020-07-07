@@ -46,7 +46,7 @@ private fun MethodSignatureDeclaration.convertToLambdaProperty(): PropertyDeclar
             optional = true,
             modifiers = modifiers,
             typeParameters = typeParameters,
-            hasType = true
+            explicitlyDeclaredType = true
     )
 }
 

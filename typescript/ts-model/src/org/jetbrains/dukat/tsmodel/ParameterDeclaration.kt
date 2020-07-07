@@ -11,5 +11,5 @@ data class ParameterDeclaration(
 
     val vararg: Boolean,
     val optional: Boolean,
-    val hasType: Boolean
+    val explicitlyDeclaredType: Boolean
 ) : Entity

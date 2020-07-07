@@ -98,7 +98,7 @@ private class LowerDeclarationsToNodes(
 
                 open = true,
 
-                hasType = inDeclaredDeclaration || declaration.hasType
+                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType
         )
     }
 
@@ -367,7 +367,7 @@ private class LowerDeclarationsToNodes(
                         declaration.uid,
                         null,
                         declaration.hasDeclareModifier(),
-                        inDeclaredModule || declaration.hasType
+                        inDeclaredModule || declaration.explicitlyDeclaredType
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -399,7 +399,7 @@ private class LowerDeclarationsToNodes(
                     declaration.uid,
                     null,
                     inDeclaredModule || declaration.hasDeclareModifier(),
-                    inDeclaredModule || declaration.hasType
+                    inDeclaredModule || declaration.explicitlyDeclaredType
             )
         }
     }

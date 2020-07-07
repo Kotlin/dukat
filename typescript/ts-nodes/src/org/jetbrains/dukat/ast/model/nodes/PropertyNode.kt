@@ -16,5 +16,5 @@ data class PropertyNode(
 
         val open: Boolean,
 
-        val hasType: Boolean
+        val explicitlyDeclaredType: Boolean
 ) : MemberNode

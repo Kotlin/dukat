@@ -17,10 +17,10 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f() {
-    var m: Any = mutableMapOf<Any, Any>()
-    for (_i: Any in m) {
-        var key: Any = _i.key
-        var value: Any = _i.value
+    var m = mutableMapOf<Number, Number>()
+    for (_i in m) {
+        var key = _i.key
+        var value = _i.value
         console.log(key)
         console.log(value)
     }
