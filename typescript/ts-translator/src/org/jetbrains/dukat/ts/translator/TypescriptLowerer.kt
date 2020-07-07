@@ -16,7 +16,6 @@ import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotation
 import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.IntroduceAmbiguousInterfaceMembers
-import org.jetbrains.dukat.model.commonLowerings.IntroduceMissedOverloads
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
 import org.jetbrains.dukat.model.commonLowerings.RearrangeConstructors
@@ -95,7 +94,6 @@ open class TypescriptLowerer(
         val models = nodes
                 .introduceModels()
                 .lower(
-                        IntroduceMissedOverloads(),
                         RearrangeConstructors(),
                         RemoveRedundantTypeParams(),
                         RemoveConflictingOverloads(),

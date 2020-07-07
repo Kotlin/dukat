@@ -19,6 +19,4 @@ import org.w3c.xhr.*
 external interface Locale {
     fun ping(key: String /* 'sameDay' | 'nextDay' | 'lastDay' | 'nextWeek' | 'lastWeek' | 'sameElse' */ = definedExternally): String
     fun pong(key: Number /* 1 | 2 | 3 */ = definedExternally): String
-    fun ping(): String
-    fun pong(): String
 }

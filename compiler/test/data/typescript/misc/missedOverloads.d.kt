@@ -45,8 +45,6 @@ external interface JQueryStatic {
     fun fadeTo(duration: Number, opacity: Number, complete: Function<*> = definedExternally): MyQuery
     fun fadeTo(duration: String, opacity: Number, easing: String = definedExternally, complete: Function<*> = definedExternally): MyQuery
     fun fadeTo(duration: Number, opacity: Number, easing: String = definedExternally, complete: Function<*> = definedExternally): MyQuery
-    @nativeInvoke
-    operator fun invoke(selector: String): MyQuery
 }
 
 external open class JJ {
@@ -60,9 +58,6 @@ external open class JJ {
     open fun trigger(eventType: String, extraParameters: Any = definedExternally): MyQuery
     open fun trigger(event: MyEvent, extraParameters: Array<Any> = definedExternally): MyQuery
     open fun trigger(event: MyEvent, extraParameters: Any = definedExternally): MyQuery
-    open fun hide(): MyQuery
-    open fun trigger(eventType: String): MyQuery
-    open fun trigger(event: MyEvent): MyQuery
 }
 
 external fun foo(data: String, context: HTMLElement = definedExternally, keepScripts: Boolean = definedExternally): Array<Any>
@@ -84,9 +79,3 @@ external fun trigger(eventType: String, extraParameters: Any = definedExternally
 external fun trigger(event: MyEvent, extraParameters: Array<Any> = definedExternally): MyQuery
 
 external fun trigger(event: MyEvent, extraParameters: Any = definedExternally): MyQuery
-
-external fun hide(): MyQuery
-
-external fun trigger(eventType: String): MyQuery
-
-external fun trigger(event: MyEvent): MyQuery
