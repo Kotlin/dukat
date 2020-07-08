@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.process
-import org.jetbrains.dukat.astCommon.rightMost
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: MutableMap<String, ModuleNode> = mutableMapOf()): Map<String, ModuleNode> {
@@ -65,6 +64,7 @@ private class ExportAssignmentLowering(
 
     fun lower(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>): ModuleNode {
         if (assignExports.contains(docRoot.uid)) {
+
             assignExports[docRoot.uid]?.let { exportOwner ->
                 docRoot.jsModule = exportOwner.moduleName
             }
@@ -94,12 +94,6 @@ private class ExportAssignmentLowering(
 
 
                         docRoot.removeExportQualifiers()
-
-                        docRoot.declarations.filterIsInstance(ModuleNode::class.java).firstOrNull { submodule ->
-                            submodule.qualifiedPackageName.rightMost() == declaration.name
-                        }?.let { eponymousDeclaration ->
-                            mergedDocs.put(eponymousDeclaration.uid, docRoot.moduleName)
-                        }
                     }
                 }
                 is VariableNode -> {
