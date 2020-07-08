@@ -17,8 +17,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f() {
-    var x: Any = 5
-    var y: Any = 6
+    var x = 5
+    var y = 6
     console.log("aaaaa")
     console.log("aaa ${x} bcd ${y} def")
     console.log("${x}${y}")

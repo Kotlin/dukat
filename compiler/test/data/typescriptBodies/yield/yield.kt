@@ -17,12 +17,12 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 open class Yielder {
-    open fun f() = iterator({ var i: Any = 1; while (true) { yield(i); i++ } })
+    open fun f() = iterator({ var i = 1; while (true) { yield(i); i++ } })
 }
 
 fun g() {
-    var yielder: Any = Yielder()
-    for (x: Any in yielder.f()) {
+    var yielder = Yielder()
+    for (x in yielder.f()) {
         if (x > 10) {
             break
         }

@@ -226,7 +226,8 @@ private class IdlFileConverter(
                 } else {
                     name
                 },
-                type = type.convertToModel()
+                type = type.convertToModel(),
+                explicitlyDeclaredType = true
         )
     }
 
@@ -643,7 +644,8 @@ private class IdlFileConverter(
                             typeParameters = listOf()
                     ),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null
+                    comment = null,
+                    explicitlyDeclaredType = true
             )
         }
         return listOf(declaration) + generatedVariables
@@ -707,7 +709,8 @@ private class IdlFileConverter(
                     initializer = null,
                     getter = type.nullable,
                     setter = type.nullable && !readOnly,
-                    open = open
+                    open = open,
+                    explicitlyDeclaredType = true
             )
             is IDLOperationDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
@@ -735,7 +738,8 @@ private class IdlFileConverter(
                 initializer = null,
                 getter = !required,
                 setter = !required,
-                open = false
+                open = false,
+                explicitlyDeclaredType = true
             )
             is IDLGetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),

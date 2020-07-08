@@ -465,7 +465,8 @@ export class AstExpressionConverter {
                 this.convertExpression(initializer),
                 this.astConverter.createTypeDeclaration("Unit"),
                 [],
-                optional
+                optional,
+                true
             )
         } else {
             return null;

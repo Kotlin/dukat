@@ -185,7 +185,8 @@ export class AstConverter {
         this.convertType(nativePropertyDeclaration.type),
         [],
         false,
-        this.convertModifiers(nativePropertyDeclaration.modifiers)
+        this.convertModifiers(nativePropertyDeclaration.modifiers),
+          nativePropertyDeclaration.type != undefined
       );
     }
 
@@ -358,12 +359,12 @@ export class AstConverter {
     return this.astFactory.createTypeReferenceDeclarationAsParamValue(this.astFactory.createIdentifierDeclarationAsNameEntity(value), params, null);
   }
 
-  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean): ParameterDeclaration {
-    return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional);
+  createParameterDeclaration(name: string, type: TypeDeclaration, initializer: Expression | null, vararg: boolean, optional: boolean, explicitlyDeclaredType: boolean): ParameterDeclaration {
+    return this.astFactory.createParameterDeclaration(name, type, initializer, vararg, optional, explicitlyDeclaredType);
   }
 
-  createProperty(value: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean): MemberDeclaration {
-    return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, []);
+  createProperty(value: string, initializer: Expression | null, type: TypeDeclaration, typeParams: Array<TypeParameter> = [], optional: boolean, explicitlyDeclaredType: boolean): MemberDeclaration {
+    return this.astFactory.declareProperty(value, initializer, type, typeParams, optional, [], explicitlyDeclaredType);
   }
 
 
@@ -551,7 +552,8 @@ export class AstConverter {
       paramType,
       initializer,
       !!param.dotDotDotToken,
-      !!param.questionToken
+      !!param.questionToken,
+      param.type != undefined
     );
   }
 
@@ -565,7 +567,8 @@ export class AstConverter {
               this.astExpressionConverter.convertExpression(node.initializer) : null,
           this.convertType(node.type),
           [],
-          !!node.questionToken
+          !!node.questionToken,
+          node.type != undefined
       );
     }
 
@@ -845,7 +848,6 @@ export class AstConverter {
     let res: Array<StatementDeclaration> = [];
 
     for (let declaration of list.declarations) {
-
       if (ts.isIdentifier(declaration.name)) {
         res.push(this.astFactory.declareVariable(
             declaration.name.getText(),
@@ -853,7 +855,8 @@ export class AstConverter {
             this.convertModifiers(modifiers),
             declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
             this.convertDefinitions(declaration),
-            this.exportContext.getUID(declaration)
+            this.exportContext.getUID(declaration),
+            declaration.type != undefined
         ));
       } else if (ts.isArrayBindingPattern(declaration.name)) {
         res.push(this.astFactory.declareArrayBindingPatternAsStatement(

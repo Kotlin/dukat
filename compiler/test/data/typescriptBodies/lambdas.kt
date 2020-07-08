@@ -17,7 +17,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 fun f() {
-    var a: Any = arrayOf(1, 2, 3)
-    var b: Any = a.map({ x: Unit -> var y: Any = x * x; y })
-    b.forEach({ x: Unit -> console.log(x) })
+    var a = arrayOf(1, 2, 3)
+    var b = a.map({ x -> var y = x * x; y })
+    b.forEach({ x -> console.log(x) })
 }

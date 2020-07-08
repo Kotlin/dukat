@@ -18,7 +18,7 @@ import org.w3c.xhr.*
 
 fun f() {
     var x: Any = "hi there"
-    var s: Any = x as Any
-    var ss: Any = s.substring(0, 3)
+    var s = x as String
+    var ss = s.substring(0, 3)
     console.log(ss)
 }

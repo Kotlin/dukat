@@ -19,7 +19,7 @@ import org.w3c.xhr.*
 fun f() {
     var x: Number = 5
     var y: Number = 7
-    var arr1: Any = arrayOf(x, y)
-    var arr2: Any = arrayOf(5, 7)
+    var arr1 = arrayOf(x, y)
+    var arr2 = arrayOf(5, 7)
     var arr3: Array<Number> = arrayOf()
 }

@@ -17,13 +17,13 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 open class A {
-    open var a1: Any = arrayOf()
-    open var a2: Any = arrayOf<Any>()
+    open var a1 = arrayOf()
+    open var a2 = arrayOf<String>()
     open fun f() {
         var a: Array<Number> = arrayOf()
         a = a + 1 + 2 + 3
         a = a + 4
         a = a + arrayOf(5, 6, 7)
-        a.forEach({ x: Unit -> console.log(x) })
+        a.forEach({ x -> console.log(x) })
     }
 }

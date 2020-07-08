@@ -18,14 +18,14 @@ import org.w3c.xhr.*
 import tsstdlib.Set
 
 open class A {
-    open var s1: Any = mutableSetOf()
-    open var s2: Any = mutableSetOf<Any>()
+    open var s1 = mutableSetOf()
+    open var s2 = mutableSetOf<String>()
     open fun f() {
         var s: Set<Number> = mutableSetOf()
         s.add(3)
         s.add(5)
         console.log(s.contains(3))
-        s.forEach({ x: Unit -> console.log(x) })
+        s.forEach({ x -> console.log(x) })
         s.remove(3)
         console.log(s.contains(3))
     }

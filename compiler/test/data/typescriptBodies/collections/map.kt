@@ -18,16 +18,16 @@ import org.w3c.xhr.*
 import tsstdlib.Map
 
 open class A {
-    open var m1: Any = mutableMapOf()
-    open var m2: Any = mutableMapOf<Any, Any>()
+    open var m1 = mutableMapOf()
+    open var m2 = mutableMapOf<String, String>()
     open fun f() {
         var m: Map<Number, Number> = mutableMapOf()
         m.set(3, 2)
         m.set(5, 1)
         console.log(m.get(3))
-        for (_i: Any in m) {
-            var x: Any = _i.key
-            var y: Any = _i.value
+        for (_i in m) {
+            var x = _i.key
+            var y = _i.value
             console.log("${x} ${y}")
         }
     }
