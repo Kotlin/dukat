@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 interface ModelWithOwnerLowering : TopLevelModelLowering {
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel

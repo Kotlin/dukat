@@ -5,6 +5,7 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration

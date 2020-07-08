@@ -17,6 +17,7 @@ import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.TypeEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 interface NodeWithOwnerLowering<T : TypeEntity> {
     fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode

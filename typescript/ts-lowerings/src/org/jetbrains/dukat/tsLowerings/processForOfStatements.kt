@@ -24,7 +24,8 @@ class ProcessForOfStatementsLowering : DeclarationLowering {
                     modifiers = setOf(),
                     initializer = null,
                     definitionsInfo = listOf(),
-                    uid = ""
+                    uid = "",
+                    explicitlyDeclaredType = false
                 )
                 val newAssignments =
                     (statement.variable as ArrayDestructuringDeclaration).elements.mapIndexedNotNull { index, element ->
@@ -47,7 +48,8 @@ class ProcessForOfStatementsLowering : DeclarationLowering {
                                     )
                                 ),
                                 definitionsInfo = listOf(),
-                                uid = ""
+                                uid = "",
+                                explicitlyDeclaredType = false
                             )
                         } else {
                             // TODO: nested destructuring
