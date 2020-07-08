@@ -6,7 +6,6 @@ import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
@@ -14,8 +13,6 @@ import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private class ProcessNullabilityChecksLowering : DeclarationLowering {
 
@@ -94,45 +91,6 @@ private class ProcessNullabilityChecksLowering : DeclarationLowering {
         val newFunction = super.lowerFunctionDeclaration(declaration, owner)
         typeContext.endScope()
         return newFunction
-    }
-}
-
-private class StatementTypeContext {
-
-    private data class Scope(
-        val variables: MutableMap<String, ParameterValueDeclaration> = mutableMapOf()
-    )
-
-    private val scopes = mutableListOf<Scope>()
-
-    // if we are not sure, returns true
-    fun hasBooleanType(expression: ExpressionDeclaration): Boolean {
-        when (expression) {
-            is IdentifierExpressionDeclaration -> {
-                val registeredType = scopes.mapNotNull { it.variables[expression.identifier.value] }.firstOrNull()
-                return registeredType?.let {
-                    it == TypeDeclaration(IdentifierEntity("Boolean"), listOf())
-                } ?: true
-            }
-        }
-        return true
-    }
-
-    fun registerVariable(variable: VariableDeclaration) {
-        scopes.last().variables[variable.name] = variable.type
-    }
-
-    fun registerParameter(parameter: ParameterDeclaration) {
-        scopes.last().variables[parameter.name] = parameter.type
-    }
-
-    fun startScope() {
-        scopes += Scope()
-    }
-
-    @OptIn(ExperimentalStdlibApi::class)
-    fun endScope() {
-        scopes.removeLast()
     }
 }
 
