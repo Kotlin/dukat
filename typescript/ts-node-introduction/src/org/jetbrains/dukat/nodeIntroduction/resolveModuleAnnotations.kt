@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
+import org.jetbrains.dukat.ast.model.nodes.ExportableNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -12,7 +11,6 @@ import org.jetbrains.dukat.astCommon.process
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: MutableMap<String, ModuleNode> = mutableMapOf()): Map<String, ModuleNode> {
-
     val exports = docRoot.export
     if (exports?.isExportEquals == true) {
         exports.uids.forEach { uid ->
@@ -64,7 +62,6 @@ private class ExportAssignmentLowering(
 
     fun lower(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>): ModuleNode {
         if (assignExports.contains(docRoot.uid)) {
-
             assignExports[docRoot.uid]?.let { exportOwner ->
                 docRoot.jsModule = exportOwner.moduleName
             }
@@ -80,32 +77,17 @@ private class ExportAssignmentLowering(
 
         docRoot.declarations.forEach { declaration ->
             val exportOwner = assignExports[declaration.uid]
-            when (declaration) {
-                is FunctionNode -> {
-                    exportOwner?.moduleName?.let { moduleName ->
-                        declaration.exportQualifier = JsModule(moduleName)
+            exportOwner?.moduleName?.let { moduleName ->
+                if (declaration is ExportableNode) {
+                    declaration.exportQualifier = JsModule(moduleName)
+                    docRoot.removeExportQualifiers()
 
-                        docRoot.removeExportQualifiers()
-                    }
-                }
-                is ClassNode -> {
-                    exportOwner?.moduleName?.let {
-                        declaration.exportQualifier = JsModule(it)
-
-                        docRoot.removeExportQualifiers()
-                    }
-                }
-                is VariableNode -> {
-                    exportOwner?.moduleName?.let {
-                        declaration.exportQualifier = JsModule(it)
-
+                    if (declaration is VariableNode) {
                         if (exportOwner.moduleNameIsStringLiteral && (exportOwner.uid == docRoot.uid)) {
                             declaration.name = exportOwner.qualifiedPackageName
                         }
 
                         declaration.immutable = true
-
-                        docRoot.removeExportQualifiers()
                     }
                 }
             }
