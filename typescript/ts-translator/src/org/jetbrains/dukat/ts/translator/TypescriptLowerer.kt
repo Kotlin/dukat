@@ -38,6 +38,7 @@ import org.jetbrains.dukat.tsLowerings.LowerThisType
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
+import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
 import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RemoveUnusedGeneratedEntities
@@ -83,6 +84,7 @@ open class TypescriptLowerer(
                         PreprocessUnionTypes(),
                         SpecifyUnionType(),
                         RemoveUnusedGeneratedEntities(),
+                        ProcessForOfStatements(),
                         ProcessNullabilityChecks()
                 )
 
