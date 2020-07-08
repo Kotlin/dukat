@@ -38,6 +38,8 @@ import org.jetbrains.dukat.tsLowerings.LowerThisType
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
+import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
+import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RemoveUnusedGeneratedEntities
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
@@ -81,7 +83,9 @@ open class TypescriptLowerer(
                         ResolveTypeAliases(),
                         PreprocessUnionTypes(),
                         SpecifyUnionType(),
-                        RemoveUnusedGeneratedEntities()
+                        RemoveUnusedGeneratedEntities(),
+                        ProcessForOfStatements(),
+                        ProcessNullabilityChecks()
                 )
 
 

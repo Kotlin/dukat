@@ -2,6 +2,7 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
@@ -37,7 +38,7 @@ private class GenerateInterfaceReferencesDeclarationLowering : DeclarationLoweri
 
                 myAstContext.registerObjectLiteralDeclaration(
                         declaration.copy(members = declaration.members.map { param ->
-                            lowerMemberDeclaration(param, owner?.wrap(declaration))
+                            lowerMemberDeclaration(param, owner.wrap(declaration))
                         }),
                         ownerUID
                 )
@@ -53,10 +54,10 @@ private class GenerateInterfaceReferencesDeclarationLowering : DeclarationLoweri
         return when (val type = declaration.type) {
             is ObjectLiteralDeclaration -> {
                 declaration.copy(type = type.copy(
-                        members = type.members.map { member -> lowerMemberDeclaration(member, owner?.wrap(declaration)?.wrap(type)) }
+                        members = type.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration).wrap(type)) }
                 ))
             }
-            else -> declaration.copy(type = lowerParameterValue(type, owner?.wrap(declaration)))
+            else -> declaration.copy(type = lowerParameterValue(type, owner.wrap(declaration)))
         }
     }
 

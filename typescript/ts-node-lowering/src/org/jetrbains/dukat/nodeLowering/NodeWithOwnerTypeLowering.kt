@@ -21,6 +21,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 

@@ -280,6 +280,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
             is UnknownExpressionDeclaration -> when (meta) {
                 "this" -> ThisExpressionModel()
                 "super" -> SuperExpressionModel()
+                "null" -> NullLiteralExpressionModel()
                 else -> raiseConcern("unable to process ExpressionDeclaration $this") {
                     IdentifierExpressionModel(IdentifierEntity(meta))
                 }
@@ -388,56 +389,6 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 expression.convert(),
                 convertBlock(body)
             )
-            is ArrayDestructuringDeclaration -> {
-                val fictiveVariable = VariableDeclaration(
-                    name = "_i",
-                    type = TypeDeclaration(
-                        value = IdentifierEntity("Any"),
-                        params = listOf()
-                    ),
-                    modifiers = setOf(),
-                    initializer = null,
-                    definitionsInfo = listOf(),
-                    uid = "",
-                    explicitlyDeclaredType = false
-                )
-                val newAssignments = (variable as ArrayDestructuringDeclaration).elements.mapIndexedNotNull { index, element ->
-                    if (index < 2 && element is BindingVariableDeclaration) {
-                        VariableDeclaration(
-                            name = element.name,
-                            type = TypeDeclaration(
-                                value = IdentifierEntity("Any"),
-                                params = listOf()
-                            ),
-                            modifiers = setOf(),
-                            initializer = QualifierExpressionDeclaration(
-                                QualifierEntity(
-                                    IdentifierEntity(fictiveVariable.name),
-                                    IdentifierEntity(when (index) {
-                                        0 -> "key"
-                                        1 -> "value"
-                                        else -> raiseConcern("invalid index in $element") { "" }
-                                    })
-                                )
-                            ),
-                            definitionsInfo = listOf(),
-                            uid = "",
-                            explicitlyDeclaredType = false
-                        )
-                    } else {
-                        // TODO: nested destructuring
-                        // TODO: not only key/value destructuring, but also normal arrays
-                        null
-                    }
-                }
-                ForInStatementModel(
-                    fictiveVariable.convert(),
-                    expression.convert(),
-                    convertBlock( body.copy(
-                        statements = newAssignments + body.statements
-                    ))
-                )
-            }
             else -> raiseConcern("unable to process ForOfStatementDeclaration $this") {
                 ExpressionStatementModel(
                     IdentifierExpressionModel(IdentifierEntity("ERROR"))

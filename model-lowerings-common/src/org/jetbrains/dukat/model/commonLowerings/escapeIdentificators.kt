@@ -28,6 +28,7 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
 private val STARTS_WITH_NUMBER = "^\\d+".toRegex()

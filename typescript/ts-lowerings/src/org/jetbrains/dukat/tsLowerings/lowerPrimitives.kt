@@ -3,6 +3,7 @@ package org.jetbrains.dukat.tsLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -56,7 +57,7 @@ private class PrimitivesLowering : DeclarationLowering {
 
         return declaration.copy(
                 value = value,
-                params = declaration.params.map { lowerParameterValue(it, owner?.wrap(declaration)) },
+                params = declaration.params.map { lowerParameterValue(it, owner.wrap(declaration)) },
                 reference = if (value != declaration.value) {
                     null
                 } else {

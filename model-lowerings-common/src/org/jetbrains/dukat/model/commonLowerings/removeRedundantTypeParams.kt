@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 private fun TypeModel.collectTypeParams(): List<NameEntity> {
     return when (this) {

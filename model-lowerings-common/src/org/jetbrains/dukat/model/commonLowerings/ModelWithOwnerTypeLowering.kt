@@ -49,6 +49,7 @@ import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 
 private val logger = Logging.logger("introduceModels")
