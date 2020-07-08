@@ -6,12 +6,11 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.transform
-import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.process
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: MutableMap<String, ModuleNode> = mutableMapOf()): Map<String, ModuleNode> {
-    val exports = docRoot.export
+     val exports = docRoot.export
     if (exports?.isExportEquals == true) {
         exports.uids.forEach { uid ->
             assignExports[uid] = docRoot
@@ -43,24 +42,10 @@ private class ExportAssignmentLowering(
     private val assignExports: Map<String, ModuleNode> = buildExportAssignmentTable(root)
 
     fun lower(): ModuleNode {
-        val mergedDocs = mutableMapOf<String, NameEntity?>()
-        val doc = lower(root, mergedDocs)
-        mergeDocumentRoot(doc, mergedDocs)
-        return doc
+        return lower(root)
     }
 
-    private fun mergeDocumentRoot(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>) {
-        if (mergedDocs.contains(docRoot.uid)) {
-            mergedDocs[docRoot.uid]?.let { qualifiedName ->
-                docRoot.jsQualifier = null
-                docRoot.jsModule = qualifiedName
-            }
-        }
-
-        docRoot.declarations.filterIsInstance(ModuleNode::class.java).forEach { mergeDocumentRoot(it, mergedDocs) }
-    }
-
-    fun lower(docRoot: ModuleNode, mergedDocs: MutableMap<String, NameEntity?>): ModuleNode {
+    fun lower(docRoot: ModuleNode): ModuleNode {
         if (assignExports.contains(docRoot.uid)) {
             assignExports[docRoot.uid]?.let { exportOwner ->
                 docRoot.jsModule = exportOwner.moduleName
@@ -95,7 +80,7 @@ private class ExportAssignmentLowering(
 
         val declarationsResolved = docRoot.declarations.map { declaration ->
             when (declaration) {
-                is ModuleNode -> lower(declaration, mergedDocs)
+                is ModuleNode -> lower(declaration)
                 else -> declaration
             }
         }
