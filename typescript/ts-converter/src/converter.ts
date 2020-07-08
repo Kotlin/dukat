@@ -45,9 +45,15 @@ class SourceBundleBuilder {
   constructor(
     private tsConfig: string | null,
     private stdLib: string,
+    private emitDiagnostics: boolean,
     originalFiles: Array<string>
   ) {
     this.program = this.createProgram(originalFiles);
+
+    if (emitDiagnostics) {
+      this.printDiagnostics(this.program);
+    }
+
     this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
 
     let dependencyBuilder = new DependencyBuilder(this.program);
@@ -69,6 +75,17 @@ class SourceBundleBuilder {
     );
   }
 
+  private printDiagnostics(program: ts.Program) {
+    let diagnostics = ts.getPreEmitDiagnostics(program).concat(program.emit().diagnostics);
+
+    if (diagnostics.length > 0) {
+      diagnostics.forEach(diagnostic => {
+        let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+        console.log(`[warning] [tsc] ${message} ${diagnostic.file.fileName}:${line + 1}:${character + 1}`);
+      });
+    }
+  }
 
   private createProgram(files: Array<string>): ts.Program {
     let host = new DukatLanguageServiceHost(this.tsConfig, this.stdLib);
@@ -99,6 +116,6 @@ class SourceBundleBuilder {
   }
 }
 
-export function createSourceSet(tsConfig: string | null, stdlib: string, files: Array<string>): declarations.SourceSetDeclarationProto  {
-  return new SourceBundleBuilder(tsConfig, stdlib, files).createBundle();
+export function createSourceSet(tsConfig: string | null, stdlib: string, emitDiagnostics: boolean, files: Array<string>): declarations.SourceSetDeclarationProto  {
+  return new SourceBundleBuilder(tsConfig, stdlib, emitDiagnostics, files).createBundle();
 }
