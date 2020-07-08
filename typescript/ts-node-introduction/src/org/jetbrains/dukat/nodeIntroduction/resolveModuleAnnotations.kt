@@ -83,15 +83,14 @@ private class ExportAssignmentLowering(
             when (declaration) {
                 is FunctionNode -> {
                     exportOwner?.moduleName?.let { moduleName ->
-
                         declaration.exportQualifier = JsModule(moduleName)
-                        docRoot.declarations
-                                .filterIsInstance(FunctionNode::class.java)
-                                .filter { it.name == declaration.name }
-                                .forEach { functionNode ->
-                                    functionNode.exportQualifier = JsModule(moduleName)
-                                }
 
+                        docRoot.removeExportQualifiers()
+                    }
+                }
+                is ClassNode -> {
+                    exportOwner?.moduleName?.let {
+                        declaration.exportQualifier = JsModule(it)
 
                         docRoot.removeExportQualifiers()
                     }
@@ -105,13 +104,6 @@ private class ExportAssignmentLowering(
                         }
 
                         declaration.immutable = true
-
-                        docRoot.removeExportQualifiers()
-                    }
-                }
-                is ClassNode -> {
-                    exportOwner?.moduleName?.let {
-                        declaration.exportQualifier = JsModule(it)
 
                         docRoot.removeExportQualifiers()
                     }
