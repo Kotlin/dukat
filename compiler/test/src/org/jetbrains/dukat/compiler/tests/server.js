@@ -135,6 +135,7 @@ function main() {
     const projectDir = path.resolve(__dirname, "../../../../../../../..");
     let sandboxDirs = process.argv.slice(4);
     sandboxDirs.push(projectDir);
+
     createCluster(process.argv[2], process.argv[3], sandboxDirs.map(it => path.resolve(it)));
 }
 

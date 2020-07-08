@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 
 class CliTestsStarted : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext?) {
-        CliHttpService().start()
+        CliHttpService(emitDiagnostics = System.getProperty("dukat.test.emitTsDiagnostics") == "true").start()
         runBlocking {
             async {
                 CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).waitForServer()
