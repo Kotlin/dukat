@@ -25,7 +25,7 @@ class CompileMessageCollector(private val onError: (message: String, severity: C
 
             onError(message, severity, location)
             val source = "${location?.path}:${location?.line}:${location?.column}"
-            System.err.println("[failure] ${severity} ${message} ${source.toFileUriScheme()}")
+            System.err.println("[failure] ${severity} ${message.take(5000)} ${source.toFileUriScheme()}")
         } else {
             println("[warning] ${severity} ${message} ${location}")
         }
