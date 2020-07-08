@@ -12,7 +12,7 @@ function ok(res) {
     res.end("OK");
 }
 
-function createServer(port, sandboxDirs) {
+function createServer(port, emitDiagnostics, sandboxDirs) {
     console.log(`starting server at port ${port} (pid = ${process.pid})`);
 
     var server = http.createServer(function (req, res) {
@@ -55,7 +55,7 @@ function createServer(port, sandboxDirs) {
                         dukatCli.createBinary(
                             data.tsConfig,
                             dukatCli.getStdLib(),
-                            false,
+                            emitDiagnostics == "true",
                             files
                         ),
                         onBinaryStreamData,
@@ -105,7 +105,7 @@ function shutdown(cluster) {
     }
 }
 
-function createCluster(port, sandboxDirs) {
+function createCluster(port, emitDiagnostics, sandboxDirs) {
     if (cluster.isMaster) {
         console.log(`sandbox ${sandboxDirs}`);
 
@@ -127,15 +127,15 @@ function createCluster(port, sandboxDirs) {
             });
         });
     } else {
-        createServer(port, sandboxDirs);
+        createServer(port, emitDiagnostics, sandboxDirs);
     }
 }
 
 function main() {
     const projectDir = path.resolve(__dirname, "../../../../../../../..");
-    let sandboxDirs = process.argv.slice(3);
+    let sandboxDirs = process.argv.slice(4);
     sandboxDirs.push(projectDir);
-    createCluster(process.argv[2], sandboxDirs.map(it => path.resolve(it)));
+    createCluster(process.argv[2], process.argv[3], sandboxDirs.map(it => path.resolve(it)));
 }
 
 main();

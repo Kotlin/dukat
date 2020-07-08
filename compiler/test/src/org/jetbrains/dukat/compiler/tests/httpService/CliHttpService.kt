@@ -7,7 +7,8 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig
 class CliHttpService @OptIn(UnstableDefault::class) constructor(
         private val serverPath: String = "./test/src/org/jetbrains/dukat/compiler/tests/server.js",
         private val nodeResolver: NodeResolver = NodeResolver("../node-package/build/env.json"),
-        private val inspectNodeProcess: Boolean = false
+        private val inspectNodeProcess: Boolean = false,
+        private val emitDiagnostics: Boolean = false
 ) {
 
     @OptIn(UnstableDefault::class)
@@ -24,6 +25,7 @@ class CliHttpService @OptIn(UnstableDefault::class) constructor(
                 "--max-old-space-size=${maxOldSpaceSize}",
                 serverPath,
                 port,
+                emitDiagnostics.toString(),
                 *sandboxDirs
         ).filterNotNull().toTypedArray()
         return ProcessBuilder().inheritIO().command(*args).start()
