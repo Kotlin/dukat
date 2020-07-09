@@ -16,8 +16,7 @@ private fun ModuleModel.addStandardImportsAndAnnotations() {
             "INTERFACE_WITH_SUPERCLASS",
             "OVERRIDING_FINAL_MEMBER",
             "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
-            "CONFLICTING_OVERLOADS",
-            "EXTERNAL_DELEGATION"
+            "CONFLICTING_OVERLOADS"
     ).map { it.toNameEntity() }))
 
     imports.addAll(0,
@@ -48,13 +47,27 @@ private fun InterfaceModel.hasNestedEntity(): Boolean {
     return members.any { (it is ClassLikeModel) }
 }
 
+private fun ClassLikeModel.hasDelegation(): Boolean {
+    return companionObject?.parentEntities?.any { it.delegateTo != null } == true
+}
+
 class AddStandardImportsAndAnnotations : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
         module.visitTopLevelModel { topLevelModel ->
             when (topLevelModel) {
                 is InterfaceModel -> {
+                    val supressionAnnotations = mutableListOf<IdentifierEntity>()
+
+                    if (topLevelModel.hasDelegation()) {
+                        supressionAnnotations.add(IdentifierEntity("EXTERNAL_DELEGATION"))
+                    }
+
                     if (topLevelModel.hasNestedEntity()) {
-                        topLevelModel.annotations.add(AnnotationModel("Suppress", listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))))
+                        supressionAnnotations.add(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
+                    }
+
+                    if (supressionAnnotations.isNotEmpty()) {
+                        topLevelModel.annotations.add(AnnotationModel("Suppress", supressionAnnotations))
                     }
                 }
                 is ModuleModel -> {

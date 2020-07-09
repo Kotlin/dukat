@@ -1,6 +1,6 @@
 // [test] inGenericParam.My.Deeply.Nested.Response.kt
 @file:JsQualifier("My.Deeply.Nested.Response")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package My.Deeply.Nested.Response
 
 import kotlin.js.*

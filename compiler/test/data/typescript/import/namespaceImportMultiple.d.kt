@@ -1,6 +1,6 @@
 // [test] namespaceImportMultiple.lib1.kt
 @file:JsQualifier("lib1")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package lib1
 
 import kotlin.js.*
@@ -25,7 +25,7 @@ external interface I {
 // ------------------------------------------------------------------------------------------
 // [test] namespaceImportMultiple.lib1.lib3.kt
 @file:JsQualifier("lib1.lib3")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package lib1.lib3
 
 import kotlin.js.*
@@ -48,7 +48,7 @@ external interface K
 // ------------------------------------------------------------------------------------------
 // [test] namespaceImportMultiple.lib1.lib2.kt
 @file:JsQualifier("lib1.lib2")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package lib1.lib2
 
 import kotlin.js.*
@@ -74,7 +74,7 @@ external interface J {
 // ------------------------------------------------------------------------------------------
 // [test] namespaceImportMultiple.lib1.lib2.lib3.kt
 @file:JsQualifier("lib1.lib2.lib3")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package lib1.lib2.lib3
 
 import kotlin.js.*

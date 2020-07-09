@@ -1,6 +1,6 @@
 // [test] nestedModulesWithSameName.Foo.kt
 @file:JsQualifier("Foo")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package Foo
 
 import kotlin.js.*
@@ -28,7 +28,7 @@ external fun d(a: A, b: Any, c: B)
 // ------------------------------------------------------------------------------------------
 // [test] nestedModulesWithSameName.Foo.Foo.kt
 @file:JsQualifier("Foo.Foo")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package Foo.Foo
 
 import kotlin.js.*

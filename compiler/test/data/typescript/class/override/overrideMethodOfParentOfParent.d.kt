@@ -1,6 +1,6 @@
 // [test] overrideMethodOfParentOfParent.TypeScript.kt
 @file:JsQualifier("TypeScript")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package TypeScript
 
 import kotlin.js.*
@@ -35,7 +35,7 @@ external interface SyntaxKind
 // ------------------------------------------------------------------------------------------
 // [test] overrideMethodOfParentOfParent.TypeScript.Syntax.kt
 @file:JsQualifier("TypeScript.Syntax")
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package TypeScript.Syntax
 
 import kotlin.js.*
