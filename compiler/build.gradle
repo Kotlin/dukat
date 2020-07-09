@@ -17,7 +17,6 @@ plugins {
 
 configurations {
     toDownload
-    kotlinJsLibs
 }
 
 compileTestKotlin {
@@ -94,8 +93,6 @@ dependencies {
 
     testImplementation(project(":command-line"))
 
-    kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
-
     toDownload 'org.jetbrains.kotlin:kotlin-stdlib-js'
 }
 
@@ -147,16 +144,6 @@ task fetchDefinitelyTyped(dependsOn: downloadDefinitelyTyped, type: Copy) {
     into "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped"
 }
 
-task extractKoltinJsLibs(type: Copy) {
-    configurations.kotlinJsLibs.each {
-        from it.absolutePath
-    }
-    into "${project.buildDir}/kotlinHome"
-    rename { String fileName ->
-        return fileName.replace("-${gradle.kotlinVersion}.jar", ".jar")
-    }
-}
-
 task prepareTopNPackage(type: Copy) {
     from "${TOPN_DIR}/package.template.json"
     into TOPN_TARGET_DIR
@@ -186,7 +173,6 @@ test.dependsOn = [
         downloadDist,
         fetchDefinitelyTyped,
         installTopN,
-        extractKoltinJsLibs,
         ":node-package:nodeEnv",
         ":node-package:buildDistrib"
 ]
