@@ -14,7 +14,7 @@ node {
   version = gradle.nodeVersion
   yarnVersion = gradle.yarnVersion
 
-  download = true
+  download = false
 
   nodeModulesDir = file(packagePath)
 }
@@ -32,7 +32,7 @@ task prepareNpmPackage(type: Copy) {
   into packagePath
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+yarn.dependsOn = [":ts-model-proto:nodeSetup", yarnSetup, prepareNpmPackage]
 
 task copyTypescriptDeclarations(type: Copy) {
   dependsOn = ["yarn"]

@@ -20,7 +20,7 @@ node {
     yarnVersion = gradle.yarnVersion
 
     nodeModulesDir = file(DISTRIB_PATH)
-    download = true
+    download = false
 }
 
 configurations {
@@ -53,7 +53,7 @@ task prepareNpmPackage {
     }
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+yarn.dependsOn = [":ts-model-proto:nodeSetup", yarnSetup, prepareNpmPackage]
 
 task buildDistrib {
     dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
