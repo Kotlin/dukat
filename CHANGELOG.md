@@ -1,5 +1,9 @@
 # Changelog
 
+### [0.5.6] - 10'July 2020
+    Minor release dedicated to build and performance improvements
+  - [#329](https://github.com/Kotlin/dukat/issues/329) Add Suppress(EXTERNAL_DELEGATION) only where we actually need it
+
 ### [0.5.5] - 3'July 2020
   In this release we switched typescript compiler API to 3.9.5 and if you won't notices it's actually a good sign.
   - [#320](https://github.com/Kotlin/dukat/issues/320) Test server should reject file paths from outside the repository 
