@@ -117,7 +117,7 @@ interface ExpressionLowering {
             is BooleanLiteralExpressionDeclaration -> declaration
             is NumericLiteralExpressionDeclaration -> declaration
             is RegExLiteralExpressionDeclaration -> declaration
-            is StringLiteralExpressionDeclaration -> declaration
+            is StringLiteralExpressionDeclaration -> lowerStringLiteralDeclaration(declaration)
             is IdentifierExpressionDeclaration -> declaration
             is QualifierExpressionDeclaration -> declaration
             else -> {
@@ -127,12 +127,18 @@ interface ExpressionLowering {
         }
     }
 
+    fun lowerStringLiteralDeclaration(literal: StringLiteralExpressionDeclaration): StringLiteralExpressionDeclaration {
+        return literal
+    }
+
     fun lowerTemplateToken(token: TemplateTokenDeclaration): TemplateTokenDeclaration {
         return when (token) {
             is ExpressionTemplateTokenDeclaration -> token.copy(
                 expression = lower(token.expression)
             )
-            is StringTemplateTokenDeclaration -> token
+            is StringTemplateTokenDeclaration -> token.copy(
+                value = lowerStringLiteralDeclaration(token.value)
+            )
             else -> {
                 logger.debug("[${this}] skipping $token")
                 token

@@ -28,6 +28,7 @@ import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
+import org.jetbrains.dukat.tsLowerings.EscapeLiterals
 import org.jetbrains.dukat.tsLowerings.FilterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
 import org.jetbrains.dukat.tsLowerings.GenerateInterfaceReferences
@@ -85,7 +86,8 @@ open class TypescriptLowerer(
                         SpecifyUnionType(),
                         RemoveUnusedGeneratedEntities(),
                         ProcessForOfStatements(),
-                        ProcessNullabilityChecks()
+                        ProcessNullabilityChecks(),
+                        EscapeLiterals()
                 )
 
 
