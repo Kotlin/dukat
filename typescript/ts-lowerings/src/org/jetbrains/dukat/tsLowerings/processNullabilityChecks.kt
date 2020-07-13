@@ -12,15 +12,16 @@ import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 
-private class ProcessNullabilityChecksLowering : DeclarationLowering {
+private class ProcessNullabilityChecksLowering(private val typeContext: StatementTypeContext) : DeclarationLowering {
 
-    private val typeContext = StatementTypeContext()
+    private val booleanUnaryOperators = listOf("!")
+    private val booleanBinaryOperators = listOf("&&", "||")
 
-    private val booleanOperators = listOf("&&", "||")
-
-    private fun ExpressionDeclaration.convertToNullabilityCheck(): ExpressionDeclaration {
+    private fun ExpressionDeclaration.convertToNonNullCheck(): ExpressionDeclaration {
         return BinaryExpressionDeclaration(
             left = this,
             operator = "!=",
@@ -28,9 +29,24 @@ private class ProcessNullabilityChecksLowering : DeclarationLowering {
         )
     }
 
-    private fun processCondition(condition: ExpressionDeclaration): ExpressionDeclaration {
+    private fun ExpressionDeclaration.convertToEqualsNullCheck(): ExpressionDeclaration {
+        return BinaryExpressionDeclaration(
+            left = this,
+            operator = "==",
+            right = IdentifierExpressionDeclaration(IdentifierEntity("null"))
+        )
+    }
+
+    private fun processConditionNonNull(condition: ExpressionDeclaration): ExpressionDeclaration {
         if (!typeContext.hasBooleanType(condition)) {
-            return condition.convertToNullabilityCheck()
+            return ParenthesizedExpressionDeclaration(condition.convertToNonNullCheck())
+        }
+        return condition
+    }
+
+    private fun processEqualsNull(condition: UnaryExpressionDeclaration): ExpressionDeclaration {
+        if (!typeContext.hasBooleanType(condition.operand)) {
+            return ParenthesizedExpressionDeclaration(condition.operand.convertToEqualsNullCheck())
         }
         return condition
     }
@@ -38,14 +54,21 @@ private class ProcessNullabilityChecksLowering : DeclarationLowering {
     override fun lower(declaration: ExpressionDeclaration): ExpressionDeclaration {
         return when (val newExpression = super.lower(declaration)) {
             is ConditionalExpressionDeclaration -> newExpression.copy(
-                condition = processCondition(newExpression.condition)
+                condition = processConditionNonNull(newExpression.condition)
             )
             is BinaryExpressionDeclaration -> {
-                if (booleanOperators.contains(newExpression.operator)) {
+                if (booleanBinaryOperators.contains(newExpression.operator)) {
                     newExpression.copy(
-                        left = processCondition(newExpression.left),
-                        right = processCondition(newExpression.right)
+                        left = processConditionNonNull(newExpression.left),
+                        right = processConditionNonNull(newExpression.right)
                     )
+                } else {
+                    newExpression
+                }
+            }
+            is UnaryExpressionDeclaration -> {
+                if (booleanUnaryOperators.contains(newExpression.operator)) {
+                    processEqualsNull(newExpression)
                 } else {
                     newExpression
                 }
@@ -57,14 +80,14 @@ private class ProcessNullabilityChecksLowering : DeclarationLowering {
     override fun lowerIfStatement(statement: IfStatementDeclaration): IfStatementDeclaration {
         val newStatement = super.lowerIfStatement(statement)
         return newStatement.copy(
-            condition = processCondition(newStatement.condition)
+            condition = processConditionNonNull(newStatement.condition)
         )
     }
 
     override fun lowerWhileStatement(statement: WhileStatementDeclaration): WhileStatementDeclaration {
         val newStatement = super.lowerWhileStatement(statement)
         return newStatement.copy(
-            condition = processCondition(newStatement.condition)
+            condition = processConditionNonNull(newStatement.condition)
         )
     }
 
@@ -96,8 +119,15 @@ private class ProcessNullabilityChecksLowering : DeclarationLowering {
 
 class ProcessNullabilityChecks : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        val typeContext = StatementTypeContext()
+        source.sources.map {
+            typeContext.lowerSourceDeclaration(it.root)
+        }
+
         return source.copy(sources = source.sources.map { sourceFileDeclaration ->
-            sourceFileDeclaration.copy(root = ProcessNullabilityChecksLowering().lowerSourceDeclaration(sourceFileDeclaration.root))
+            sourceFileDeclaration.copy(root = ProcessNullabilityChecksLowering(
+                typeContext
+            ).lowerSourceDeclaration(sourceFileDeclaration.root))
         })
     }
 }
