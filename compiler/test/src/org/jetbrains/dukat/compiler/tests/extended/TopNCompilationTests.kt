@@ -12,7 +12,6 @@ class TopNCompilationTests : CompilationTests() {
     @DisplayName("core test set compile")
     @ParameterizedTest(name = "{0}")
     @MethodSource("extendedSet")
-    @EnabledIfSystemProperty(named = "dukat.test.extended.topn", matches = "true")
     override fun runTests(
             descriptor: String,
             sourcePath: String,
@@ -25,31 +24,39 @@ class TopNCompilationTests : CompilationTests() {
 
         @JvmStatic
         fun extendedSet(): Array<Array<String>> {
-
-            return listOf(
+            val minimalCore = listOf(
                     "@types/async",
+                    "@types/lodash",
+                    "@types/prop-types",
+                    "@types/yargs",
+                    "axios",
+                    "chalk",
+                    "moment/moment.d.ts",
+                    "tslib/tslib.d.ts"
+            )
+
+            val allTests = minimalCore + listOf(
                     "@types/bluebird",
                     "@types/body-parser",
                     "@types/express",
                     "@types/fs-extra",
                     "@types/jquery",
-                    "@types/lodash",
                     "@types/node",
-                    "@types/prop-types",
                     "@types/react",
                     "@types/react-dom",
                     "@types/request",
                     "@types/underscore",
                     "@types/webpack",
-                    "@types/yargs",
-                    "axios",
-                    "chalk",
                     "commander/typings",
-                    "moment/moment.d.ts",
                     "rxjs",
-                    "tslib/tslib.d.ts",
                     "vue/types"
-            ).map { descriptor ->
+            )
+
+            return (if (System.getProperty("dukat.test.extended.topn") == "true") {
+                allTests
+            } else {
+                minimalCore
+            }).sorted().map { descriptor ->
                 val name = if (descriptor.endsWith("d.ts")) {
                     descriptor
                 } else {
@@ -61,7 +68,6 @@ class TopNCompilationTests : CompilationTests() {
                         ""
                 )
             }.toTypedArray()
-
         }
 
     }
