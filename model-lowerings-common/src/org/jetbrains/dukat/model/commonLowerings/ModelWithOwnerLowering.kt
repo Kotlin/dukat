@@ -15,7 +15,6 @@ import org.jetbrains.dukat.ownerContext.wrap
 
 interface ModelWithOwnerLowering : TopLevelModelLowering {
     fun lowerFunctionTypeModel(ownerContext: NodeOwner<FunctionTypeModel>): FunctionTypeModel
-    fun lowerLambdaParameterModel(ownerContext: NodeOwner<LambdaParameterModel>): LambdaParameterModel
     fun lowerParameterModel(ownerContext: NodeOwner<ParameterModel>): ParameterModel
     fun lowerMemberModel(ownerContext: NodeOwner<MemberModel>, parentModule: ModuleModel): MemberModel?
 
@@ -33,22 +32,11 @@ interface ModelWithOwnerLowering : TopLevelModelLowering {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
+    override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
         return when (val declaration = ownerContext.node) {
             is FunctionTypeModel -> lowerFunctionTypeModel(ownerContext as NodeOwner<FunctionTypeModel>)
             is TypeValueModel -> lowerTypeValueModel(ownerContext as NodeOwner<TypeValueModel>)
             else -> declaration
         }
-    }
-
-    fun lowerStatementBody(ownerContext: NodeOwner<BlockStatementModel>) : BlockStatementModel {
-        val declaration = ownerContext.node
-        return declaration.copy(statements = declaration.statements.map { statementModel ->
-            lowerStatementModel(ownerContext.wrap(statementModel))
-        })
-    }
-
-    fun lowerStatementModel(ownerContext: NodeOwner<StatementModel>) : StatementModel {
-        return ownerContext.node
     }
 }

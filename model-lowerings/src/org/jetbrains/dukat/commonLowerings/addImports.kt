@@ -71,10 +71,6 @@ private class NameVisitor(private val name: NameEntity, private val importContex
         return super.lowerTypeValueModel(ownerContextResolved)
     }
 
-    override fun lowerIdentifierExpressionModel(ownerContext: NodeOwner<IdentifierExpressionModel>): IdentifierExpressionModel {
-        return ownerContext.node
-    }
-
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         return moduleModel.copy(
                 declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel)

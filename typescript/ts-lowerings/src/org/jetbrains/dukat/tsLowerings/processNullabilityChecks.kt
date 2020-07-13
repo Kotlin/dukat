@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
-import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
 
 private class ProcessNullabilityChecksLowering(private val typeContext: StatementTypeContext) : DeclarationLowering {
 
@@ -25,7 +25,7 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
         return BinaryExpressionDeclaration(
             left = this,
             operator = "!=",
-            right = IdentifierExpressionDeclaration(IdentifierEntity("null"))
+            right = UnknownExpressionDeclaration("null")
         )
     }
 
@@ -33,7 +33,7 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
         return BinaryExpressionDeclaration(
             left = this,
             operator = "==",
-            right = IdentifierExpressionDeclaration(IdentifierEntity("null"))
+            right = UnknownExpressionDeclaration("null")
         )
     }
 

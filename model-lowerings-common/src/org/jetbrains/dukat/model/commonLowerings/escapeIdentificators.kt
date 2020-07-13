@@ -12,21 +12,11 @@ import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
-import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
-import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
-import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
-import org.jetbrains.dukat.astModel.statements.BlockStatementModel
-import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
-import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 
@@ -138,30 +128,12 @@ fun NameEntity.escape(): NameEntity {
 
 private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
-    private fun CallExpressionModel.escape(): CallExpressionModel {
-        return copy(
-                expression = expression.escape(),
-                arguments = arguments.map { it.escape() }
-        )
-    }
-
-    private fun ExpressionModel.escape(): ExpressionModel {
-        return when (this) {
-            is IdentifierExpressionModel -> copy(identifier = identifier.renameAsParameter())
-            is CallExpressionModel -> escape()
-            is PropertyAccessExpressionModel -> copy(left = left.escape(), right = right.escape())
-            is IndexExpressionModel -> copy(array = array.escape(), index = index.escape())
-            is ThisExpressionModel -> this
-            else -> this
-        }
-    }
-
-    private fun StatementModel.escape(): StatementModel {
-        return when (this) {
-            is ExpressionStatementModel -> copy(expression = expression.escape())
-            is ReturnStatementModel -> copy(expression = expression?.escape())
-            is AssignmentStatementModel -> copy(left = left.escape(), right = right.escape())
-            else -> this
+    override fun lower(expression: ExpressionModel): ExpressionModel {
+        return super.lower(expression).let {
+            when (it) {
+                is IdentifierExpressionModel -> it.copy(identifier = it.identifier.escape())
+                else -> it
+            }
         }
     }
 
@@ -189,8 +161,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val declaration = ownerContext.node
         return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape(),
-                body = declaration.body?.let { BlockStatementModel(it.statements.map { it.escape() }) }
+                name = declaration.name.escape()
         )), parentModule)
     }
 
