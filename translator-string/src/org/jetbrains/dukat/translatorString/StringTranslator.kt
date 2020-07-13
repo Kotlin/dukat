@@ -335,7 +335,12 @@ private fun ExpressionModel.translate(): String {
         is ThisExpressionModel -> "this"
         is SuperExpressionModel -> "super"
         is LiteralExpressionModel -> this.translate()
-        is ParenthesizedExpressionModel -> "(${expression.translate()})"
+        is ParenthesizedExpressionModel -> {
+            when (expression) {
+                is ParenthesizedExpressionModel -> expression.translate()
+                else -> "(${expression.translate()})"
+            }
+        }
         is TemplateExpressionModel -> "\"${tokens.map { it.translate() }.joinToString(separator = "")}\""
         is BinaryExpressionModel -> "${left.translate()} ${operator.translate()} ${right.translate()}"
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
@@ -377,7 +382,10 @@ private fun StatementModel.translate(): List<String> {
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")
         is IfStatementModel -> {
-            val header = "if (${condition.translate()}) {"
+            val header = "if (${when (val condition = condition) {
+                is ParenthesizedExpressionModel -> condition.expression.translate()
+                else -> condition.translate()
+            }}) {"
             val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
             val elseStatement = elseStatement
             when {
