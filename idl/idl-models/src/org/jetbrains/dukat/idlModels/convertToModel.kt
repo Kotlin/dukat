@@ -610,8 +610,8 @@ private class IdlFileConverter(
                     get = ExpressionStatementModel(
                             PropertyAccessExpressionModel(
                                     PropertyAccessExpressionModel(
-                                            IdentifierExpressionModel(
-                                                    IdentifierEntity(memberName)
+                                            StringLiteralExpressionModel(
+                                                    memberName.removeSurrounding("\"")
                                             ),
                                             CallExpressionModel(
                                                     IdentifierExpressionModel(IdentifierEntity("asDynamic")),

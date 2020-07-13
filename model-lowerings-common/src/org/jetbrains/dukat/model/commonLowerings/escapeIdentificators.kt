@@ -131,7 +131,7 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     override fun lower(expression: ExpressionModel): ExpressionModel {
         return super.lower(expression).let {
             when (it) {
-                is IdentifierExpressionModel -> it.copy(identifier = it.identifier.escape())
+                is IdentifierExpressionModel -> it.copy(identifier = it.identifier.renameAsParameter().escape())
                 else -> it
             }
         }

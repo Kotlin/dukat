@@ -3,6 +3,7 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
+import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.BreakStatementModel
 import org.jetbrains.dukat.astModel.statements.CaseModel
@@ -23,6 +24,13 @@ interface ModelStatementLowering : ModelExpressionLowering {
     fun lowerBlock(statement: BlockStatementModel): BlockStatementModel {
         return statement.copy(
             statements = statement.statements.map { lower(it) }
+        )
+    }
+
+    fun lowerAssignmentStatement(statement: AssignmentStatementModel): AssignmentStatementModel {
+        return statement.copy(
+            left = lower(statement.left),
+            right = lower(statement.right)
         )
     }
 
@@ -85,6 +93,7 @@ interface ModelStatementLowering : ModelExpressionLowering {
 
     override fun lower(statement: StatementModel): StatementModel {
         return when (statement) {
+            is AssignmentStatementModel -> lowerAssignmentStatement(statement)
             is BlockStatementModel -> lowerBlock(statement)
             is IfStatementModel -> lowerIfStatement(statement)
             is ThrowStatementModel -> lowerThrowStatement(statement)
