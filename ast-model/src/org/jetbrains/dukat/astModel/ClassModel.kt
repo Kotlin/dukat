@@ -17,4 +17,4 @@ data class ClassModel(
         override val external: Boolean,
         val inheritanceModifier: InheritanceModifierModel,
         override val visibilityModifier: VisibilityModifierModel
-) : ClassLikeModel, DelegationModel, MemberModel, CanHaveExternalModifierModel
+) : ClassLikeModel, DelegationModel, CanHaveExternalModifierModel
