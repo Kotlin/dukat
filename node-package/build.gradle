@@ -110,7 +110,7 @@ task npmrc() {
 //${registry}/:_authToken="${token}"
         """
         def configFile = "${DISTRIB_PATH}/.npmrc"
-        file(configFile).text = customConfig;
+        file(configFile).text = customConfig
     }
 }
 

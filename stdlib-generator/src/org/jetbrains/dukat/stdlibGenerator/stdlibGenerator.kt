@@ -1,7 +1,14 @@
 package org.jetbrains.dukat.stdlibGenerator
 
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
@@ -28,7 +35,6 @@ import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.stdlib.KLIBROOT
-import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoots
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -45,7 +51,6 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
-import org.jetbrains.kotlin.ir.util.kotlinPackageFqn
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -65,6 +70,7 @@ import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadata
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadataUtils
 import java.io.File
+
 
 private fun KotlinJavascriptMetadata.calculatePackageFragmentProvider(): PackageFragmentProvider {
     val (header, packageFragmentProtos) = readModuleAsProto(body, version)
@@ -142,33 +148,34 @@ private fun KotlinType.convertToTypeModel(): TypeModel {
 
 private fun ValueParameterDescriptor.convertToParameterModel(): ParameterModel {
     return ParameterModel(
-        name = name.toString(),
-        type = type.convertToTypeModel(),
-        initializer = if (this.declaresDefaultValue()) {
-            ExpressionStatementModel(
-                    IdentifierExpressionModel(
-                            IdentifierEntity("definedExternally")
-                    )
-            )
-        } else null ,
-        vararg = isVararg,
-        modifier = null
+            name = name.toString(),
+            type = type.convertToTypeModel(),
+            initializer = if (this.declaresDefaultValue()) {
+                ExpressionStatementModel(
+                        IdentifierExpressionModel(
+                                IdentifierEntity("definedExternally")
+                        )
+                )
+            } else null,
+            vararg = isVararg,
+            modifier = null
     )
 }
 
 private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
     val override = (overriddenDescriptors.firstOrNull()?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity()
     return MethodModel(
-        name = name.toString().toNameEntity(),
-        parameters = valueParameters.map { it.convertToParameterModel() },
-        typeParameters = typeParameters.map { it.convertToTypeParameterModel() },
-        type = returnType?.convertToTypeModel() ?: TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
-        static = false,
-        override = override,
-        open = true,
-        body = null,
-        operator = isOperator,
-        annotations = mutableListOf()
+            name = name.toString().toNameEntity(),
+            parameters = valueParameters.map { it.convertToParameterModel() },
+            typeParameters = typeParameters.map { it.convertToTypeParameterModel() },
+            type = returnType?.convertToTypeModel()
+                    ?: TypeValueModel(IdentifierEntity("Unit"), emptyList(), null, null),
+            static = false,
+            override = override,
+            open = true,
+            body = null,
+            operator = isOperator,
+            annotations = mutableListOf()
     )
 }
 
@@ -185,7 +192,7 @@ private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
                     initializer = null,
                     getter = getter != null,
                     setter = setter != null,
-                    type = getType().convertToTypeModel(),
+                    type = type.convertToTypeModel(),
                     open = true,
                     explicitlyDeclaredType = true
             )
@@ -209,10 +216,10 @@ private fun org.jetbrains.kotlin.types.Variance.convertToVarianceModel(): Varian
 
 private fun TypeParameterDescriptor.convertToTypeParameterModel(): TypeParameterModel {
     return TypeParameterModel(
-        type = TypeParameterReferenceModel(name = name.toString().toNameEntity(), metaDescription = null),
-        constraints = emptyList(),
-        variance = variance.convertToVarianceModel(),
-        nullable = false
+            type = TypeParameterReferenceModel(name = name.toString().toNameEntity(), metaDescription = null),
+            constraints = emptyList(),
+            variance = variance.convertToVarianceModel(),
+            nullable = false
     )
 }
 
@@ -280,9 +287,10 @@ private fun PackageFragmentDescriptor.convertToModuleModel(): SourceFileModel {
 }
 
 fun processPackageFragments(packageFragmentProvider: PackageFragmentProvider, fqName: String): List<SourceFileModel> {
-    return packageFragmentProvider.getPackageFragments(FqName(fqName)).map {
+    val packageFragments = packageFragmentProvider.getPackageFragments(FqName(fqName))
+    return (packageFragments.map {
         it.convertToModuleModel()
-    }
+    })
 }
 
 private val KOTLIN_STD_PACKAGE_NAMES = listOf(
@@ -303,11 +311,73 @@ private val KOTLIN_STD_PACKAGE_NAMES = listOf(
 )
 
 fun createSourceSetFromMetaDescriptors(source: String, packageNames: List<String>): SourceSetModel {
+    val now = System.currentTimeMillis()
     val packageFragmentProvider = getPackageFragmentProvider(source)
+    println("LOAD IN ${System.currentTimeMillis() - now}")
     val sources = packageNames.flatMap { packageName -> processPackageFragments(packageFragmentProvider, packageName) }
     return SourceSetModel(sources = sources, sourceName = listOf(source))
 }
 
 fun createKotlinStdLibFromMetaDescriptors(source: String): SourceSetModel {
     return createSourceSetFromMetaDescriptors(source, KOTLIN_STD_PACKAGE_NAMES)
+}
+
+
+private fun NameEntity.convertToStatement(): String {
+    return when (this) {
+        is IdentifierEntity -> "IdentifierEntity(\"${value}\")"
+        is QualifierEntity -> "QualifierEntity(${left.convertToStatement()}.${right.convertToStatement()})"
+    }
+}
+
+private fun MemberModel.convertToStatement(): String? {
+    return when (this) {
+        is MethodModel -> name.convertToStatement()
+        is PropertyModel -> name.convertToStatement()
+        else -> null
+    }
+}
+
+fun createClassMethodMap(source: String): String {
+    val processedEntities = setOf(IdentifierEntity("Uint8Array"))
+
+    val sourceSet = createKotlinStdLibFromMetaDescriptors(source)
+    val file = FileSpec.builder("org.jetbrains.dukat.stdlibGenerator.generated", "stdlibClassMethodsMap")
+    val mapType = ClassName("kotlin.collections", "Map")
+    val setType = ClassName("kotlin.collections", "Set")
+    val nameEntityType = ClassName("org.jetbrains.dukat.astCommon", "NameEntity")
+
+    file.addImport("org.jetbrains.dukat.astCommon", "IdentifierEntity")
+
+    val codeBlock = CodeBlock.builder()
+    val propSpec = PropertySpec.builder("stdlibClassMethodsMap",  mapType.parameterizedBy(
+            nameEntityType,
+            setType.parameterizedBy(nameEntityType)
+    ))
+
+    codeBlock.addStatement("mapOf(")
+        sourceSet.sources.forEach { sourceFile ->
+        sourceFile.root.declarations.forEach { declaration ->
+            if (declaration is ClassLikeModel) {
+                if (processedEntities.contains(declaration.name)) {
+                    val members = declaration.members.mapNotNull { member ->
+                        member.convertToStatement()
+                    }.distinct().joinToString(", ")
+                    codeBlock.addStatement("Pair(${declaration.name.convertToStatement()}, setOf(${members})),")
+                }
+            }
+        }
+    }
+    codeBlock.addStatement(")")
+
+    propSpec.initializer(codeBlock.build())
+    file.addProperty(propSpec.build())
+
+
+    file.build().writeTo(File("./stdlib-generator/src"))
+    return file.build().toString()
+}
+
+fun main() {
+    createClassMethodMap("./stdlib-generator/build/libs/kotlin-stdlib-js.jar")
 }

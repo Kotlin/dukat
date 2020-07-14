@@ -6,7 +6,8 @@
     "dukat": "./bin/dukat-cli.js"
   },
   "files": [
-    "build/runtime/*.jar",
+    "build/runtime/dukat-cli.jar",
+    "build/runtime/kotlin-stdlib-js.jar",
     "bin/dukat-cli.js",
     "lib/converter.js",
     "d.ts.libs/*",

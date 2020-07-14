@@ -3,6 +3,7 @@ package org.jetbrains.dukat.model.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astCommon.startsWith
 import org.jetbrains.dukat.astModel.CallableModel
 import org.jetbrains.dukat.astModel.CallableParameterModel
 import org.jetbrains.dukat.astModel.ClassLikeModel
@@ -13,9 +14,9 @@ import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.NamedModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
@@ -24,6 +25,8 @@ import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.graphs.Graph
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 import org.jetbrains.dukat.stdlib.KLIBROOT
+import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlibGenerator.generated.stdlibClassMethodsMap
 
 private fun TypeModel.isAny(): Boolean {
     return this is TypeValueModel && value == IdentifierEntity("Any")
@@ -50,7 +53,16 @@ private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
     return graph
 }
 
-private class ClassLikeOverrideResolver(private val context: ModelContext, private val inheritanceContext: InheritanceContext, private val classLike: ClassLikeModel) {
+
+private fun <T : ClassLikeModel> ResolvedClassLike<T>.existsOnlyInTsStdlib(member: NamedModel): Boolean {
+    return (fqName?.startsWith(TSLIBROOT) == true && (stdlibClassMethodsMap.containsKey(classLike.name)) && (stdlibClassMethodsMap[classLike.name]?.contains(member.name) == false))
+}
+
+private class ClassLikeOverrideResolver(
+        private val context: ModelContext,
+        private val inheritanceContext: InheritanceContext,
+        private val classLike: ClassLikeModel
+) {
 
     private fun TypeModel.resolveAsTypeParam(): TypeParameterModel? {
         return when (this) {
@@ -111,7 +123,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                 }
             }
             is PropertyModel -> {
-                val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, isOverriding(it.memberModel)) }?.firstOrNull() { (_, status) ->
+                val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, isOverriding(it.memberModel)) }?.firstOrNull { (_, status) ->
                     (status == MemberOverrideStatus.IS_OVERRIDE) || (status == MemberOverrideStatus.IS_RELATED) || (status == MemberOverrideStatus.IS_IMPOSSIBLE)
                 }
 
@@ -130,7 +142,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
                     else -> listOf(this)
                 }
             }
-            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, inheritanceContext,this).resolve())
+            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, inheritanceContext, this).resolve())
             else -> listOf(this)
         }
     }
@@ -141,8 +153,11 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
         getKnownParents().forEach { resolvedClassLike ->
             resolvedClassLike.classLike.members.forEach {
                 when (it) {
-                    is MethodModel -> memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, this))
-                    is PropertyModel -> memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, this))
+                    is NamedModel -> {
+                        if (!resolvedClassLike.existsOnlyInTsStdlib(it)) {
+                            memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, this))
+                        }
+                    }
                 }
             }
         }
@@ -461,6 +476,7 @@ private class ClassLikeOverrideResolver(private val context: ModelContext, priva
             else -> classLike
         }
     }
+
 }
 
 private class OverrideResolver(private val context: ModelContext, private val inheritanceContext: InheritanceContext) {
