@@ -4,7 +4,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 
 data class PropertyModel(
-        val name: NameEntity,
+        override val name: NameEntity,
         val type: TypeModel,
         val typeParameters: List<TypeParameterModel>,
 
@@ -20,4 +20,4 @@ data class PropertyModel(
         val open: Boolean,
 
         val explicitlyDeclaredType: Boolean
-) : MemberModel
+) : MemberModel, NamedModel
