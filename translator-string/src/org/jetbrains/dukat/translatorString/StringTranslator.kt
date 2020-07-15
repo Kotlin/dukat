@@ -76,7 +76,6 @@ import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
@@ -751,10 +750,7 @@ private fun TypeModel.translateAsHeritageClause(): String {
                 "<${params.joinToString("::") { it.type.translateAsHeritageClause() }}>"
             }
 
-            when (value) {
-                is IdentifierEntity -> "${(value as IdentifierEntity).value}${typeParams}"
-                else -> raiseConcern("unknown NameEntity ${value}") { "" }
-            }
+            "${value}${typeParams}"
         }
         else -> ""
     }
