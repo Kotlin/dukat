@@ -4,9 +4,17 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 
 private class EscapeLiteralsLowering : DeclarationLowering {
+
+    private val replacements = mapOf(
+        "\n" to "\\n",
+        "\"" to "\\\""
+    )
+
     override fun lowerStringLiteralDeclaration(literal: StringLiteralExpressionDeclaration): StringLiteralExpressionDeclaration {
         return literal.copy(
-            value = literal.value.replace("\n", "\\n")
+            value = replacements.entries.fold(literal.value) { string, replacement ->
+                string.replace(replacement.key, replacement.value)
+            }
         )
     }
 }
