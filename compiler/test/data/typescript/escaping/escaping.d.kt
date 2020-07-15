@@ -15,6 +15,7 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import `when`.`interface`
 import `__`.`___`
 
 external var `val`: Any
@@ -47,12 +48,12 @@ external interface This {
     companion object {
         var `$foo`: Boolean
         fun `bar$`(`ba$z`: Number)
-        var aaa: `when`.`interface`
+        var aaa: `interface`
         var bbb: `when`.`$foo`
     }
 }
 
-external open class `is`<`interface`> {
+open external class `is`<`interface`> {
     open var `as`: Number
     open fun `package`(a: Any): Boolean
 
@@ -72,9 +73,9 @@ external var `_`: `___`
 
 typealias WatchHandler<T> = (param_val: T, oldVal: T) -> Unit
 
-external open class `$tring`
+open external class `$tring`
 
-external open class Foo
+open external class Foo
 
 typealias `__` = Foo
 

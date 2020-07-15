@@ -149,7 +149,8 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
                 typeParameters = declaration.typeParameters.map { typeParameterModel ->  lowerTypeParameterModel(ownerContext.wrap(typeParameterModel)) },
                 parentEntities = declaration.parentEntities.map { heritageClause ->
                     lowerHeritageModel(NodeOwner(heritageClause, ownerContext))
-                }
+                },
+                companionObject = declaration.companionObject?.let { lowerObjectModel(ownerContext.wrap(it), parentModule) }
         )
     }
 
@@ -171,6 +172,9 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
     override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel {
         val declaration = ownerContext.node
         return declaration.copy(
+                parentEntities = declaration.parentEntities.map { heritageClause ->
+                    lowerHeritageModel(NodeOwner(heritageClause, ownerContext))
+                },
                 members = declaration.members.mapNotNull { member -> lowerMemberModel(NodeOwner(member, ownerContext), parentModule) }
         )
 
