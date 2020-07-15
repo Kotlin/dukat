@@ -124,7 +124,7 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
 
 internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
-    private val expressionConverter = ExpressionConverter() { typeNode ->
+    private val expressionConverter = ExpressionConverter { typeNode ->
         typeNode.process()
     }
 
@@ -245,19 +245,18 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 )
             }
             is TypeValueNode -> {
-                uidToNameMapper[typeReference?.uid]?.let {
-                    if ((it.node is TypeAliasNode) && (it.node.typeReference is UnionTypeNode)) {
-                        dynamicType("typealias ${it.node.name} = dynamic")
-                    } else {
-                        null
-                    }
-                } ?: TypeValueModel(
-                        value,
-                        params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
-                        meta.processMeta(),
-                        getFqName(),
-                        nullable
-                )
+                val node = uidToNameMapper[typeReference?.uid]?.node
+                if ((node is TypeAliasNode) && (node.typeReference is UnionTypeNode)) {
+                    dynamicType("typealias ${node.name} = dynamic")
+                } else {
+                    TypeValueModel(
+                            value,
+                            params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
+                            meta.processMeta(),
+                            getFqName(),
+                            nullable
+                    )
+                }
             }
             is FunctionTypeNode -> {
                 FunctionTypeModel(
