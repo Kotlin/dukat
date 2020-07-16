@@ -1,5 +1,10 @@
 # Changelog
 
+### [0.5.7] - 16'July 2020
+  - Fix some issues with inheriting from UInt8Array  
+  - [#331](https://github.com/Kotlin/dukat/issues/331) - Rename type alias if there's a name clash
+  - [#330](https://github.com/Kotlin/dukat/issues/330) - Leave fqName if short import is problematic
+
 ### [0.5.6] - 10'July 2020
     Minor release dedicated to build and performance improvements
   - [#329](https://github.com/Kotlin/dukat/issues/329) Add Suppress(EXTERNAL_DELEGATION) only where we actually need it
