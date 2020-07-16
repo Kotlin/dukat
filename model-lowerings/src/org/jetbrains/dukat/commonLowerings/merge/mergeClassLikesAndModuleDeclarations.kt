@@ -73,19 +73,14 @@ private fun ObjectModel?.merge(module: ModuleModel): ObjectModel? {
 }
 
 private fun ModuleModel.mergeClassLikesAndModuleDeclarations(classLikes: Map<NameEntity, MergeClassLikeData>): ModuleModel {
-    val extractedTypeAliases = mutableListOf<TypeAliasModel>()
-
     val declarationLowered = declarations.map { declaration ->
-        classLikes[name.appendLeft(declaration.name)]?.let {
-            extractedTypeAliases.addAll(it.extractedTypeAliases)
-            it.model
-        } ?: declaration
+        classLikes[name.appendLeft(declaration.name)]?.model ?: declaration
     }
     val submodulesLowered = submodules.filter {
         !classLikes.containsKey(it.mergeClassLikesAndModuleDeclarations(classLikes).name)
     }.map { it.mergeClassLikesAndModuleDeclarations(classLikes) }
 
-    return copy(declarations = extractedTypeAliases + declarationLowered, submodules = submodulesLowered)
+    return copy(declarations = declarationLowered, submodules = submodulesLowered)
 }
 
 private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
@@ -120,7 +115,7 @@ private operator fun ClassModel.plus(moduleModel: ModuleModel): ClassModel {
     )
 }
 
-internal data class MergeClassLikeData(val model: ClassLikeModel, val extractedTypeAliases: List<TypeAliasModel>)
+internal data class MergeClassLikeData(val model: ClassLikeModel)
 
 class MergeClassLikesAndModuleDeclarations : ModelLowering {
     private lateinit var classLikes: Map<NameEntity, MergeClassLikeData>
@@ -142,8 +137,7 @@ class MergeClassLikesAndModuleDeclarations : ModelLowering {
                 .mapValues { (name, v) ->
                     val moduleToMerge = modules[name]!!
                     MergeClassLikeData(
-                            v[0].model + moduleToMerge,
-                            moduleToMerge.declarations.filterIsInstance(TypeAliasModel::class.java)
+                            v[0].model + moduleToMerge
                     )
                 }
 
