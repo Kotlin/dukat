@@ -1,4 +1,4 @@
-function* f() {
+function* f(): Iterable<number> {
     let i = 1;
     while (i <= 3) {
         yield i;
@@ -6,7 +6,7 @@ function* f() {
     }
 }
 
-function* g() {
+function* g(): Iterable<number> {
     yield* f();
     yield* f();
 }

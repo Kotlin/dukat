@@ -25,7 +25,9 @@ open class A {
         s.add(3)
         s.add(5)
         console.log(s.contains(3))
-        s.forEach({ x -> console.log(x) })
+        s.forEach({ x ->
+            console.log(x)
+        })
         s.remove(3)
         console.log(s.contains(3))
     }

@@ -1,5 +1,5 @@
 class Yielder {
-    * f() {
+    * f(): Iterable<number> {
         let i = 1;
         while (true) {
             yield i;

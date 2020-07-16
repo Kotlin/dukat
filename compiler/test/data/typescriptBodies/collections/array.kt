@@ -24,6 +24,8 @@ open class A {
         a = a + 1 + 2 + 3
         a = a + 4
         a = a + arrayOf(5, 6, 7)
-        a.forEach({ x -> console.log(x) })
+        a.forEach({ x ->
+            console.log(x)
+        })
     }
 }

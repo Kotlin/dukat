@@ -15,9 +15,20 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import tsstdlib.Iterable
 
 open class Yielder {
-    open fun f() = iterator({ var i = 1; while (true) { yield(i); i++ } })
+    open fun f(): Iterable<Number> {
+        return Iterable({
+            iterator({
+                var i = 1
+                while (true) {
+                    yield(i)
+                    i++
+                }
+            })
+        })
+    }
 }
 
 fun g() {

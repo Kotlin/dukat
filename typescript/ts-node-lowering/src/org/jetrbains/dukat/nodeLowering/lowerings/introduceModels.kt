@@ -460,21 +460,35 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun BlockStatementModel.wrapBodyAsLazyIterator(): BlockStatementModel {
         return BlockStatementModel(
-                statements = listOf(
-                        ReturnStatementModel(
-                                expression = CallExpressionModel(
-                                        expression = IdentifierExpressionModel(
-                                                IdentifierEntity("iterator")
-                                        ),
-                                        arguments = listOf(
-                                                LambdaExpressionModel(
+            statements = listOf(
+                ReturnStatementModel(
+                    expression = CallExpressionModel(
+                        expression = IdentifierExpressionModel(IdentifierEntity("Iterable")),
+                        arguments = listOf(
+                            LambdaExpressionModel(
+                                parameters = listOf(),
+                                body = BlockStatementModel(
+                                    listOf(
+                                        ExpressionStatementModel(
+                                            CallExpressionModel(
+                                                expression = IdentifierExpressionModel(
+                                                    IdentifierEntity("iterator")
+                                                ),
+                                                arguments = listOf(
+                                                    LambdaExpressionModel(
                                                         parameters = listOf(),
                                                         body = this
+                                                    )
                                                 )
+                                            )
                                         )
+                                    )
                                 )
+                            )
                         )
+                    )
                 )
+            )
         )
     }
 

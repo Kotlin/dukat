@@ -15,10 +15,28 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import tsstdlib.Iterable
 
-fun f() = iterator({ var i = 1; while (i <= 3) { yield(i); i++ } })
+fun f(): Iterable<Number> {
+    return Iterable({
+        iterator({
+            var i = 1
+            while (i <= 3) {
+                yield(i)
+                i++
+            }
+        })
+    })
+}
 
-fun g() = iterator({ yieldAll(f()); yieldAll(f()) })
+fun g(): Iterable<Number> {
+    return Iterable({
+        iterator({
+            yieldAll(f())
+            yieldAll(f())
+        })
+    })
+}
 
 fun h() {
     for (x in g()) {

@@ -257,6 +257,30 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
     return annotationTranslated
 }
 
+private fun LambdaExpressionModel.translateMultiLine(): List<String> {
+    val arguments = if (parameters.isNotEmpty()) " ${translateLambdaParameters(parameters)} ->" else ""
+    return listOf("{$arguments") + body.statements.flatMap { it.translate() }.map { FORMAT_TAB + it } + listOf("}")
+}
+
+private fun CallExpressionModel.translateMultiLine(): List<String> {
+    val lines = mutableListOf<String>()
+    var currentString = "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.translate() }}>"}("
+    arguments.forEachIndexed { index, argument ->
+        if (index != 0) {
+            currentString += ", "
+        }
+        val argumentLines = argument.translateMultiLine()
+        if (argumentLines.size > 1) {
+            lines += listOf(currentString + argumentLines.first()) + argumentLines.drop(1).dropLast(1)
+            currentString = argumentLines.last()
+        } else {
+            currentString += argumentLines.first()
+        }
+    }
+    lines += ("$currentString)")
+    return lines
+}
+
 private fun CallExpressionModel.translate(): String {
     return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.translate() }}>"}${"(${arguments.joinToString(
         ", "
@@ -328,6 +352,23 @@ private fun UnaryOperatorModel.translate(): String {
     }
 }
 
+private fun ExpressionModel.translateMultiLine(): List<String> {
+    return when (this) {
+        is CallExpressionModel -> translateMultiLine()
+        is LambdaExpressionModel -> translateMultiLine()
+        is PropertyAccessExpressionModel -> {
+            val left = left.translateMultiLine()
+            val right = right.translateMultiLine()
+            left.dropLast(1) + listOf("${left.last()}.${right.first()}") + right.drop(1)
+        }
+        is BinaryExpressionModel -> {
+            val (firstLine, nextLines) = right.translateMultiLine().splitLines()
+            listOf("${left.translate()} ${operator.translate()} $firstLine") + nextLines
+        }
+        else -> listOf(translate())
+    }
+}
+
 private fun ExpressionModel.translate(): String {
     return when (this) {
         is IdentifierExpressionModel -> identifier.translate()
@@ -366,14 +407,25 @@ private fun ExpressionModel.translate(): String {
     }
 }
 
+private fun <T> List<T>.splitLines() = Pair(this[0], drop(1))
+
 private fun StatementModel.translate(): List<String> {
     return when (this) {
-        is AssignmentStatementModel -> listOf("${left.translate()} = ${right.translate()}")
-        is ReturnStatementModel -> listOf("return ${expression?.translate()}")
-        is ThrowStatementModel -> listOf("throw ${expression.translate()}")
+        is AssignmentStatementModel -> {
+            val (firstLine, nextLines) = right.translateMultiLine().splitLines()
+            listOf("${left.translate()} = $firstLine") + nextLines
+        }
+        is ReturnStatementModel -> {
+            val (firstLine, nextLines) = (expression?.translateMultiLine() ?: listOf("")).splitLines()
+            listOf("return $firstLine") + nextLines
+        }
+        is ThrowStatementModel -> {
+            val (firstLine, nextLines) = expression.translateMultiLine().splitLines()
+            listOf("throw $firstLine") + nextLines
+        }
         is BreakStatementModel -> listOf("break")
         is ContinueStatementModel -> listOf("continue")
-        is ExpressionStatementModel -> listOf(expression.translate())
+        is ExpressionStatementModel -> expression.translateMultiLine()
         is BlockStatementModel -> listOf("{") +
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")

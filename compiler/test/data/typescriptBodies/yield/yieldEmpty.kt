@@ -15,5 +15,14 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import tsstdlib.Iterable
 
-fun f() = iterator({ while (true) { yield(null) } })
+fun f(): Iterable<Any> {
+    return Iterable({
+        iterator({
+            while (true) {
+                yield(null)
+            }
+        })
+    })
+}

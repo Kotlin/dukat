@@ -19,5 +19,7 @@ import org.w3c.xhr.*
 fun f() {
     var a = arrayOf(1, 2, 3)
     var b = a.map({ x -> var y = x * x; y })
-    b.forEach({ x -> console.log(x) })
+    b.forEach({ x ->
+        console.log(x)
+    })
 }
