@@ -19,5 +19,7 @@ data class PropertyModel(
 
         val open: Boolean,
 
-        val explicitlyDeclaredType: Boolean
+        val explicitlyDeclaredType: Boolean,
+
+        val lateinit: Boolean
 ) : MemberModel, NamedModel

@@ -98,7 +98,9 @@ private class LowerDeclarationsToNodes(
 
                 open = true,
 
-                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType
+                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType,
+
+                lateinit = !inDeclaredDeclaration && (declaration.initializer == null)
         )
     }
 
@@ -118,20 +120,21 @@ private class LowerDeclarationsToNodes(
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode {
         return if (declaration.optional) {
             PropertyNode(
-                    declaration.name,
-                    FunctionTypeNode(
-                            convertParameters(declaration.parameters),
-                            declaration.type.convertToNode(),
-                            true,
-                            null
-                    ),
-                    convertTypeParameters(declaration.typeParameters),
-                    false,
-                    null,
+                name = declaration.name,
+                type = FunctionTypeNode(
+                    convertParameters(declaration.parameters),
+                    declaration.type.convertToNode(),
                     true,
-                    false,
-                    true,
-                    true
+                    null
+                ),
+                typeParameters = convertTypeParameters(declaration.typeParameters),
+                static = false,
+                initializer = null,
+                getter = true,
+                setter = false,
+                open = true,
+                explicitlyDeclaredType = true,
+                lateinit = false
             )
         } else {
             MethodNode(

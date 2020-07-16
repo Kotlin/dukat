@@ -33,7 +33,8 @@ private fun VariableModel.convert(): MemberModel {
             getter = false,
             setter = false,
             open = false,
-            explicitlyDeclaredType = explicitlyDeclaredType
+            explicitlyDeclaredType = explicitlyDeclaredType,
+            lateinit = false
     )
 }
 

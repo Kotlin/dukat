@@ -710,7 +710,8 @@ private class IdlFileConverter(
                     getter = type.nullable,
                     setter = type.nullable && !readOnly,
                     open = open,
-                    explicitlyDeclaredType = true
+                    explicitlyDeclaredType = true,
+                    lateinit = false
             )
             is IDLOperationDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
@@ -739,7 +740,8 @@ private class IdlFileConverter(
                 getter = !required,
                 setter = !required,
                 open = false,
-                explicitlyDeclaredType = true
+                explicitlyDeclaredType = true,
+                lateinit = false
             )
             is IDLGetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),

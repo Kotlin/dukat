@@ -705,6 +705,7 @@ private fun EnumModel.translate(): String {
 private fun PropertyModel.translate(): String {
     val open = !static && open
     val modifier = if (override != null) "override " else if (open) "open " else ""
+    val lateinitModifier = if (lateinit) "lateinit " else ""
     val varModifier = if (immutable) "val" else "var"
     val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
     val type = if (explicitlyDeclaredType) {
@@ -713,7 +714,7 @@ private fun PropertyModel.translate(): String {
         ""
     }
 
-    return "$modifier$varModifier ${name.translate()}$type$initializer"
+    return "$modifier$lateinitModifier$varModifier ${name.translate()}$type$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {

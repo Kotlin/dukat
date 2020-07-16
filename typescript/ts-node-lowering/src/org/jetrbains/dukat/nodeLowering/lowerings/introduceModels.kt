@@ -342,7 +342,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     getter = getter,
                     setter = setter,
                     open = open,
-                    explicitlyDeclaredType = explicitlyDeclaredType
+                    explicitlyDeclaredType = explicitlyDeclaredType,
+                    lateinit = lateinit
             )
             else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
         }

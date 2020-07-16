@@ -194,7 +194,8 @@ private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
                     setter = setter != null,
                     type = type.convertToTypeModel(),
                     open = true,
-                    explicitlyDeclaredType = true
+                    explicitlyDeclaredType = true,
+                    lateinit = false
             )
         }
         is FunctionDescriptor -> convertToMethodModel()
