@@ -19,7 +19,8 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 private data class Scope(
-    val variables: MutableMap<NameEntity, ParameterValueDeclaration> = mutableMapOf()
+    val variables: MutableMap<NameEntity, ParameterValueDeclaration> = mutableMapOf(),
+    val expressionsToReplace: MutableSet<ExpressionDeclaration> = mutableSetOf()
 )
 
 internal class StatementTypeContext : DeclarationLowering {
@@ -76,6 +77,16 @@ internal class StatementTypeContext : DeclarationLowering {
     @OptIn(ExperimentalStdlibApi::class)
     fun endScope() {
         scopes.removeLast()
+    }
+
+    fun addExpressionToReplace(expression: ExpressionDeclaration) {
+        scopes.last().expressionsToReplace += expression
+    }
+
+    fun getRelevantExpressionsToReplace(): Set<ExpressionDeclaration> {
+        val expressions = scopes.last().expressionsToReplace.toSet()
+        scopes.last().expressionsToReplace.clear()
+        return expressions
     }
 
     override fun lowerClassLikeDeclaration(

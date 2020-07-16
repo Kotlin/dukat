@@ -52,7 +52,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 },
-                body = declaration.body?.let { lowerBlockStatement(it) }
+                body = declaration.body?.let { lowerBlock(it) }
         )
     }
 
@@ -107,7 +107,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
                     typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
                 },
                 type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
-                body = declaration.body?.let { lowerBlockStatement(it) }
+                body = declaration.body?.let { lowerBlock(it) }
         )
     }
 
