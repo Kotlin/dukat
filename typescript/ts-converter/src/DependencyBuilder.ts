@@ -107,8 +107,8 @@ export class DependencyBuilder {
           this.registerDependency(new TranslateAllSymbolsDependency(resolvedModuleName));
         }
       }
-    } else if (ts.isCallExpression(node)) {
-      this.checkReferences(node.expression)
+    } else if (ts.isIdentifier(node)) {
+      this.checkReferences(node)
     }
     ts.forEachChild(node, node => this.visit(node));
   }

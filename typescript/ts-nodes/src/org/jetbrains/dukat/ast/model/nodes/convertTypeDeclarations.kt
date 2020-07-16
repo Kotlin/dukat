@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TypePredicateDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
@@ -151,11 +152,13 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 meta = metaData ?: meta
         )
         is TypeNode -> this
+        is TypePredicateDeclaration -> TYPE_BOOLEAN
         else -> null
     }
 }
 
 private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
+private val TYPE_BOOLEAN = TypeValueNode(IdentifierEntity("Boolean"), emptyList(), null, false)
 
 fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): TypeNode {
     return convertToNodeNullable(meta) ?: TYPE_ANY

@@ -521,7 +521,7 @@ export class AstConverter {
       } else if (ts.isTupleTypeNode(type)) {
         return this.astFactory.createTupleDeclaration(type.elementTypes.map(elementType => this.convertType(elementType)))
       } else if (ts.isTypePredicateNode(type)) {
-        return this.createTypeDeclaration("boolean");
+        return this.astFactory.createTypePredicate(type.parameterName.getText(), this.convertType(type.type));
       } else if (type.kind == ts.SyntaxKind.ObjectKeyword) {
         return this.createTypeDeclaration("object");
       } else {

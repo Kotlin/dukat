@@ -41,6 +41,7 @@ message ParameterValueDeclarationProto {
         FunctionTypeDeclarationProto functionTypeDeclaration = 8;
         TypeParamReferenceDeclarationProto typeParamReferenceDeclaration = 9;
         NumericLiteralDeclarationProto numericLiteral = 10;
+        TypePredicateDeclarationProto typePredicate = 11;
     }
 }
 
@@ -82,6 +83,11 @@ message TupleDeclarationProto {
 
 message UnionTypeDeclarationProto {
     repeated ParameterValueDeclarationProto params = 1;
+}
+
+message TypePredicateDeclarationProto {
+    string parameter = 1;
+    ParameterValueDeclarationProto type = 2;
 }
 
 message TypeReferenceDeclarationProto {
