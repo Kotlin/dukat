@@ -8,7 +8,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 val stdlibClassMethodsMap: Map<NameEntity, Set<NameEntity>> = mapOf(
 Pair(IdentifierEntity("Uint8Array"), setOf(IdentifierEntity("buffer"),
     IdentifierEntity("byteLength"), IdentifierEntity("byteOffset"), IdentifierEntity("length"),
-    IdentifierEntity("equals"), IdentifierEntity("hashCode"), IdentifierEntity("set"),
-    IdentifierEntity("subarray"), IdentifierEntity("toString")))
+    IdentifierEntity("equals"), IdentifierEntity("hashCode"), IdentifierEntity("set"), IdentifierEntity("toString")))
 )
 
