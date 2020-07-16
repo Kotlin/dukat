@@ -13,6 +13,7 @@ import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
+import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
@@ -31,6 +32,7 @@ fun NameEntity.translate(): String = when (this) {
     is QualifierEntity -> {
         when (leftMost()) {
             ROOT_PACKAGENAME -> shiftLeft()!!.translate()
+            KLIBROOT -> shiftLeft()!!.translate()
             else -> "${left.translate()}.${right.translate()}"
         }
     }
