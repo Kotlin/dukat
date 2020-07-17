@@ -268,7 +268,8 @@ private class LowerDeclarationsToNodes(
     private fun ConstructorDeclaration.convert(): ConstructorNode {
         return ConstructorNode(
                 convertParameters(parameters),
-                convertTypeParameters(typeParameters)
+                convertTypeParameters(typeParameters),
+                body
         )
     }
 

@@ -54,6 +54,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ImportModel
+import org.jetbrains.dukat.astModel.InitBlockModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -176,7 +177,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun ClassLikeNode.processMembers(): Members {
         val (staticNodes, ownNodes) = members.partition { it.isStatic() }
-        return Members(ownNodes.mapNotNull { it.process() }, staticNodes.mapNotNull { it.process() })
+        return Members(ownNodes.flatMap { it.process() }, staticNodes.flatMap { it.process() })
     }
 
     private fun UnionTypeNode.convertMeta(): String {
@@ -323,15 +324,22 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         return emptyList()
     }
 
-    private fun MemberNode.process(): MemberModel? {
+    private fun MemberNode.process(): List<MemberModel> {
         // TODO: how ClassModel end up here?
         return when (this) {
-            is ConstructorNode -> ConstructorModel(
+            is ConstructorNode -> listOfNotNull(
+                ConstructorModel(
                     parameters = parameters.map { param -> param.process().copy() },
                     typeParameters = convertTypeParams(typeParameters)
+                ),
+                body?.let {
+                    InitBlockModel(
+                        body = expressionConverter.convertBlock(it)
+                    )
+                }
             )
-            is MethodNode -> process()
-            is PropertyNode -> PropertyModel(
+            is MethodNode -> listOf(process())
+            is PropertyNode -> listOf(PropertyModel(
                     name = IdentifierEntity(name),
                     type = type.process(TranslationContext.PROPERTY(getter || setter)),
                     typeParameters = convertTypeParams(typeParameters),
@@ -344,8 +352,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     open = open,
                     explicitlyDeclaredType = explicitlyDeclaredType,
                     lateinit = lateinit
-            )
-            else -> raiseConcern("unprocessed MemberNode: ${this}") { null }
+            ))
+            else -> raiseConcern("unprocessed MemberNode: ${this}") { listOf<MemberModel>() }
         }
     }
 
@@ -773,7 +781,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             )
             is ObjectNode -> ObjectModel(
                     name = name,
-                    members = members.mapNotNull { member -> member.process() },
+                    members = members.flatMap { member -> member.process() },
                     parentEntities = convertParentEntities(parentEntities),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null,

@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
+import org.jetbrains.dukat.astModel.InitBlockModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -84,6 +85,7 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
             is PropertyModel -> lowerPropertyModel(NodeOwner(declaration, ownerContext))
             is ConstructorModel -> lowerConstructorModel(NodeOwner(declaration, ownerContext))
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext), parentModule)
+            is InitBlockModel -> lowerInitBlockModel(NodeOwner(declaration, ownerContext))
             else -> {
                 logger.trace("skipping $declaration")
                 declaration
@@ -166,6 +168,13 @@ interface ModelWithOwnerTypeLowering : ModelWithOwnerLowering {
         val declaration = ownerContext.node
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterModel(NodeOwner(parameter, ownerContext)) }
+        )
+    }
+
+    fun lowerInitBlockModel(ownerContext: NodeOwner<InitBlockModel>): InitBlockModel {
+        val declaration = ownerContext.node
+        return declaration.copy(
+            body = lowerBlock(declaration.body)
         )
     }
 

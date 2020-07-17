@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.ImportModel
+import org.jetbrains.dukat.astModel.InitBlockModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -648,6 +649,11 @@ private fun ConstructorModel.translate(): List<String> {
     return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
+private fun InitBlockModel.translate(): List<String> {
+    val (firstLine, nextLines) = body.translate().splitLines()
+    return listOf("init $firstLine") + nextLines
+}
+
 private fun TypeAliasModel.translate(): String {
     return "typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
 }
@@ -722,6 +728,7 @@ private fun MemberModel.translate(): List<String> {
         is MethodModel -> translate()
         is PropertyModel -> listOf(translate())
         is ConstructorModel -> translate()
+        is InitBlockModel -> translate()
         is ClassModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
         else -> raiseConcern("can not translate MemberModel ${this}") { listOf("") }
