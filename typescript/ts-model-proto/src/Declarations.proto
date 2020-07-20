@@ -557,8 +557,6 @@ message ModuleDeclarationProto {
             NAMESPACE = 3;
     }
     MODULE_KIND kind = 9;
-
-    bool isLibSource = 10;
 }
 
 message SourceFileDeclarationProto {

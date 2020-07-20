@@ -131,10 +131,8 @@ export class AstConverter {
 
     let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
 
-    let isLib = this.isLibNode(sourceFile);
-
     return this.astFactory.createModuleDeclaration(
-      isLib ? this.TSLIBROOT : null,
+      this.isLibNode(sourceFile) ? this.TSLIBROOT : null,
       this.getImports(sourceFile),
       this.getReferences(sourceFile),
       this.convertStatements(statements),
@@ -142,8 +140,7 @@ export class AstConverter {
       uid(),
       sourceName,
       [],
-      sourceFile.isDeclarationFile ? MODULE_KIND.DECLARATION_FILE : MODULE_KIND.SOURCE_FILE,
-      isLib
+      sourceFile.isDeclarationFile ? MODULE_KIND.DECLARATION_FILE : MODULE_KIND.SOURCE_FILE
     );
   }
 
@@ -161,8 +158,8 @@ export class AstConverter {
     });
   }
 
-  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap], isLib: boolean): TopLevelDeclarationProto {
-    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind, isLib));
+  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
+    return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind));
   }
 
   convertName(name: ts.BindingName | ts.PropertyName): string | null {
@@ -1107,8 +1104,7 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      let isLib = this.isLibNode(body)
-      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE, isLib);
+      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE);
     }
 
     return null;
