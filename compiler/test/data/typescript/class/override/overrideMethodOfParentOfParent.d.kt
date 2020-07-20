@@ -58,8 +58,8 @@ import TypeScript.ISyntaxElement
 import TypeScript.ISyntaxList
 
 external open class EmptySyntaxList : ISyntaxList {
-    override fun kind(): SyntaxKind
-    override fun childAt(index: Number): ISyntaxNodeOrToken
-    override fun toArray(): Array<ISyntaxNodeOrToken>
-    override fun insertChildrenInto(array: Array<ISyntaxElement>, index: Number)
+    public override fun kind(): SyntaxKind
+    public override fun childAt(index: Number): ISyntaxNodeOrToken
+    public override fun toArray(): Array<ISyntaxNodeOrToken>
+    public override fun insertChildrenInto(array: Array<ISyntaxElement>, index: Number)
 }

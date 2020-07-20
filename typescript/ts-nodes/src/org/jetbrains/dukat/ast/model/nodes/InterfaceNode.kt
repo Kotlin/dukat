@@ -10,5 +10,7 @@ data class InterfaceNode(
 
         val generated: Boolean,
         override val uid: String,
-        override val external: Boolean
+        override val external: Boolean,
+
+        val visibility: VisibilityNode
 ) : ClassLikeNode

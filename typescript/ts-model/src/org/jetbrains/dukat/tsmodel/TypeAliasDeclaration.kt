@@ -8,5 +8,7 @@ data class TypeAliasDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         val typeReference: ParameterValueDeclaration,
 
-        override val uid: String
+        override val uid: String,
+
+        val modifiers: Set<ModifierDeclaration>
 ) : TopLevelDeclaration, WithUidDeclaration, ParameterOwnerDeclaration

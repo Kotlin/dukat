@@ -18,8 +18,8 @@ import org.w3c.xhr.*
 import tsstdlib.Map
 
 open class A {
-    open var m1 = mutableMapOf()
-    open var m2 = mutableMapOf<String, String>()
+    private var m1 = mutableMapOf()
+    private var m2 = mutableMapOf<String, String>()
     open fun f() {
         var m: Map<Number, Number> = mutableMapOf()
         m.set(3, 2)

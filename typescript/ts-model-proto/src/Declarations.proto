@@ -153,6 +153,9 @@ message ModifierDeclarationProto {
         DECLARE = 1;
         EXPORT = 2;
         DEFAULT = 3;
+        PUBLIC = 4;
+        PRIVATE = 5;
+        PROTECTED = 6;
     }
     MODIFIER_KIND token = 1;
 }
@@ -446,6 +449,7 @@ message TypeAliasDeclarationProto {
     repeated TypeParameterDeclarationProto typeParameters = 2;
     ParameterValueDeclarationProto typeReference = 3;
     string uid = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
 }
 
 message HeritageClauseDeclarationProto {
@@ -464,6 +468,7 @@ message EnumDeclarationProto {
     string name = 1;
     repeated EnumTokenDeclarationProto values = 2;
     string uid = 3;
+    repeated ModifierDeclarationProto modifiers = 4;
 }
 
 message ClassDeclarationProto {

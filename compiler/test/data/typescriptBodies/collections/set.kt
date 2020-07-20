@@ -18,8 +18,8 @@ import org.w3c.xhr.*
 import tsstdlib.Set
 
 open class A {
-    open var s1 = mutableSetOf()
-    open var s2 = mutableSetOf<String>()
+    private var s1 = mutableSetOf()
+    private var s2 = mutableSetOf<String>()
     open fun f() {
         var s: Set<Number> = mutableSetOf()
         s.add(3)

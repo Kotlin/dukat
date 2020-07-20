@@ -290,6 +290,12 @@ export class AstConverter {
           res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.EXPORT))
         } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
           res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.DEFAULT))
+        } else if (modifier.kind == ts.SyntaxKind.PublicKeyword) {
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.PUBLIC))
+        } else if (modifier.kind == ts.SyntaxKind.ProtectedKeyword) {
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.PROTECTED))
+        } else if (modifier.kind == ts.SyntaxKind.PrivateKeyword) {
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.PRIVATE))
         }
       });
     }
@@ -707,7 +713,8 @@ export class AstConverter {
       this.convertEntityName(declaration.name),
       this.convertTypeParams(declaration.typeParameters),
       this.convertType(declaration.type),
-      this.exportContext.getUID(declaration)
+      this.exportContext.getUID(declaration),
+      this.convertModifiers(declaration.modifiers)
     )
   }
 
@@ -981,7 +988,8 @@ export class AstConverter {
       yield this.astFactory.createEnumDeclaration(
         statement.name.getText(),
         enumTokens,
-        this.exportContext.getUID(statement)
+        this.exportContext.getUID(statement),
+        this.convertModifiers(statement.modifiers)
       )
     } else if (
       ts.isExpressionStatement(statement) ||

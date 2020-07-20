@@ -11,5 +11,7 @@ data class ClassNode(
 
         override val uid: String,
         override val exportQualifier: ExportQualifier?,
-        override val external: Boolean
+        override val external: Boolean,
+
+        val visibility: VisibilityNode
 ) : ClassLikeNode, ExportableNode

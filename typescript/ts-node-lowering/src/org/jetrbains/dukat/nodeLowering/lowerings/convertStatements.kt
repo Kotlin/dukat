@@ -91,6 +91,7 @@ import org.jetbrains.dukat.tsmodel.ExpressionStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ForOfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ReturnStatementDeclaration
 import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.SwitchStatementDeclaration
@@ -126,6 +127,15 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
+
+    private fun convertVisibilities(modifiers: Set<ModifierDeclaration>): VisibilityModifierModel {
+        return when {
+            modifiers.contains(ModifierDeclaration.PUBLIC_KEYWORD) -> VisibilityModifierModel.PUBLIC
+            modifiers.contains(ModifierDeclaration.PROTECTED_KEYWORD) -> VisibilityModifierModel.PROTECTED
+            modifiers.contains(ModifierDeclaration.PRIVATE_KEYWORD) -> VisibilityModifierModel.PRIVATE
+            else -> VisibilityModifierModel.DEFAULT
+        }
+    }
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(
@@ -414,7 +424,7 @@ class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
                 set = null,
                 typeParameters = listOf(),
                 extend = null,
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                visibilityModifier = convertVisibilities(modifiers),
                 comment = null,
                 explicitlyDeclaredType = explicitlyDeclaredType
         )

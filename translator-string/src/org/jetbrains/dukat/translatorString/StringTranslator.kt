@@ -614,6 +614,8 @@ private fun MethodModel.translate(): List<String> {
     val operatorModifier = if (operator) "operator " else ""
     val annotations = annotations.map { "@${it.name}" }
 
+    val visibility = visibilityModifier.asClause()
+
     val open = !static && open
     val overrideClause = if (override != null) "override " else if (open) "open " else ""
 
@@ -637,7 +639,7 @@ private fun MethodModel.translate(): List<String> {
 
     return annotations +
             listOf(
-                "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(
+                "$visibility${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(
                     parameters
                 )})${returnClause}$metaClause${bodyFirstLine}"
             ) +
@@ -646,7 +648,7 @@ private fun MethodModel.translate(): List<String> {
 
 private fun ConstructorModel.translate(): List<String> {
     val typeParams = translateTypeParameters(typeParameters)
-    return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
+    return listOf("${visibilityModifier.asClause()}constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
 private fun InitBlockModel.translate(): List<String> {
@@ -709,6 +711,7 @@ private fun EnumModel.translate(): String {
 }
 
 private fun PropertyModel.translate(): String {
+    val visibility = visibilityModifier.asClause()
     val open = !static && open
     val modifier = if (override != null) "override " else if (open) "open " else ""
     val lateinitModifier = if (lateinit) "lateinit " else ""
@@ -720,7 +723,7 @@ private fun PropertyModel.translate(): String {
         ""
     }
 
-    return "$modifier$lateinitModifier$varModifier ${name.translate()}$type$initializer"
+    return "$visibility$modifier$lateinitModifier$varModifier ${name.translate()}$type$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {
@@ -858,10 +861,18 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     val parents = translateHeritagModels(parentEntities)
     val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
 
-    val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(
+    val params = when {
+        primaryConstructor == null -> ""
+        primaryConstructor.visibilityModifier != VisibilityModifierModel.DEFAULT -> " ${
+            primaryConstructor.visibilityModifier.asClause()
+        }constructor(${translateParameters(
             primaryConstructor.parameters
         )})"
+        primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors -> ""
+        else -> "(${translateParameters(
+            primaryConstructor.parameters
+        )})"
+    }
 
     val openClause = when (inheritanceModifier) {
         InheritanceModifierModel.ABSTRACT -> "abstract"

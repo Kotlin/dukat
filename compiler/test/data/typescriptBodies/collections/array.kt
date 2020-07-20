@@ -17,8 +17,8 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 open class A {
-    open var a1 = arrayOf()
-    open var a2 = arrayOf<String>()
+    private var a1 = arrayOf()
+    private var a2 = arrayOf<String>()
     open fun f() {
         var a: Array<Number> = arrayOf()
         a = a + 1 + 2 + 3

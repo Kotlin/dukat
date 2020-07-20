@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeValueModel
+import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
@@ -96,7 +97,8 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     operator = true,
                     annotations = emptyList(),
                     open = false,
-                    body = null
+                    body = null,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
 
             val unrolledTypes = unsupportedMembers.mapNotNull { it.getType() }
@@ -124,9 +126,9 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                         operator = true,
                         annotations = emptyList(),
                         open = false,
-                        body = null
-                )
-            }
+                        body = null,
+                        visibilityModifier = VisibilityModifierModel.DEFAULT
+            )}
 
             listOf(unsupportedGetter) + unsupportedSetters + supportedMembers
         } else {

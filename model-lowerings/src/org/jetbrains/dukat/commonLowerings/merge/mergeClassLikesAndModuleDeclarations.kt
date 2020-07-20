@@ -34,7 +34,8 @@ private fun VariableModel.convert(): MemberModel {
             setter = false,
             open = false,
             explicitlyDeclaredType = explicitlyDeclaredType,
-            lateinit = false
+            lateinit = false,
+            visibilityModifier = visibilityModifier
     )
 }
 
@@ -50,7 +51,8 @@ private fun FunctionModel.convert(): MemberModel {
             operator = false,
             annotations = annotations,
             open = false,
-            body = null
+            body = null,
+            visibilityModifier = visibilityModifier
     )
 }
 

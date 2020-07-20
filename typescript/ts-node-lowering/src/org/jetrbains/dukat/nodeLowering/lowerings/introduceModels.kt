@@ -31,6 +31,7 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.VisibilityNode
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
@@ -168,6 +169,15 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 imports = imports,
                 comment = null
         )
+    }
+
+    private fun VisibilityNode.process(): VisibilityModifierModel {
+        return when (this) {
+            VisibilityNode.PUBLIC -> VisibilityModifierModel.PUBLIC
+            VisibilityNode.PROTECTED -> VisibilityModifierModel.PROTECTED
+            VisibilityNode.PRIVATE -> VisibilityModifierModel.PRIVATE
+            VisibilityNode.NOT_SPECIFIED -> VisibilityModifierModel.DEFAULT
+        }
     }
 
     private fun ReferenceEntity.getFqName(): NameEntity? {
@@ -335,7 +345,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
             is ConstructorNode -> listOfNotNull(
                 ConstructorModel(
                     parameters = parameters.map { param -> param.process().copy() },
-                    typeParameters = convertTypeParams(typeParameters)
+                    typeParameters = convertTypeParams(typeParameters),
+                    visibilityModifier = visibility.process()
                 ),
                 body?.let {
                     InitBlockModel(
@@ -356,7 +367,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     setter = setter,
                     open = open,
                     explicitlyDeclaredType = explicitlyDeclaredType,
-                    lateinit = lateinit
+                    lateinit = lateinit,
+                    visibilityModifier = visibility.process()
             ))
             else -> raiseConcern("unprocessed MemberNode: ${this}") { listOf<MemberModel>() }
         }
@@ -636,6 +648,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         val parentModelEntities = convertParentEntities(parentEntities)
         //val generatedMethods = collectParentGeneratedMethods(parentEntities)
 
+        val visibility = visibility.process()
+
         return ClassModel(
                 name = name,
                 members = members.ownMembers,
@@ -644,7 +658,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                             IdentifierEntity(""),
                             members.staticMembers,
                             emptyList(),
-                            VisibilityModifierModel.DEFAULT,
+                            visibility,
                             null,
                             external
                     )
@@ -656,8 +670,11 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 annotations = exportQualifier.toAnnotation(),
                 comment = null,
                 external = external,
-                inheritanceModifier = InheritanceModifierModel.OPEN,
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                inheritanceModifier = when (visibility) {
+                    VisibilityModifierModel.PRIVATE -> InheritanceModifierModel.FINAL
+                    else -> InheritanceModifierModel.OPEN
+                },
+                visibilityModifier = visibility,
                 primaryConstructor = null
         )
     }
@@ -673,7 +690,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                             IdentifierEntity(""),
                             members.staticMembers,
                             emptyList(),
-                            VisibilityModifierModel.DEFAULT,
+                            visibility.process(),
                             null,
                             false
                     )
@@ -685,7 +702,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 annotations = mutableListOf(),
                 comment = null,
                 external = true,
-                visibilityModifier = VisibilityModifierModel.DEFAULT
+                visibilityModifier = visibility.process()
         )
     }
 
@@ -711,7 +728,9 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     } else {
                         convertedBody
                     }
-                }
+                },
+
+                visibilityModifier = visibility.process()
         )
     }
 
@@ -723,7 +742,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 EnumModel(
                         name = name,
                         values = values.map { token -> EnumTokenModel(token.value, token.meta) },
-                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        visibilityModifier = visibility.process(),
                         comment = null
                 )
             }
@@ -763,7 +782,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                                 convertedBody
                             }
                         } ?: resolveBody(),
-                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        visibilityModifier = visibility.process(),
                         comment = comment,
                         external = external
                 )
@@ -780,7 +799,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     set = resolveSetter(),
                     typeParameters = convertTypeParams(typeParameters),
                     extend = extend.convert(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    visibilityModifier = visibility.process(),
                     comment = null,
                     explicitlyDeclaredType = explicitlyDeclaredType
             )
@@ -788,7 +807,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     name = name,
                     members = members.flatMap { member -> member.process() },
                     parentEntities = convertParentEntities(parentEntities),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
+                    visibilityModifier = visibility.process(),
                     comment = null,
                     external = external
             )
@@ -800,7 +819,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                             name = name,
                             typeReference = typeReference.process(),
                             typeParameters = convertTypeParams(typeParameters, true),
-                            visibilityModifier = VisibilityModifierModel.DEFAULT,
+                            visibilityModifier = visibility.process(),
                             comment = null
                     )
                 }

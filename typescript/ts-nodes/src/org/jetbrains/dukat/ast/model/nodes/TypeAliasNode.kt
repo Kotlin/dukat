@@ -7,5 +7,6 @@ data class TypeAliasNode(
         val typeReference: TypeNode,
         val typeParameters: List<TypeValueNode>,
         override val uid: String,
-        override val external: Boolean
+        override val external: Boolean,
+        val visibility: VisibilityNode
 ) : TopLevelNode

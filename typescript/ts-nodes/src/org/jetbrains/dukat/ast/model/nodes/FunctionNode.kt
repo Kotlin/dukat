@@ -33,5 +33,7 @@ data class FunctionNode(
 
         val body: BlockDeclaration?,
         override val external: Boolean,
-        val isGenerator: Boolean
+        val isGenerator: Boolean,
+
+        val visibility: VisibilityNode
 ) : MemberEntity, TopLevelNode, ExportableNode, ParameterOwnerNode

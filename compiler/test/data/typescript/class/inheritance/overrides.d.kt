@@ -49,7 +49,7 @@ external interface NumberEvent : BaseEvent {
 }
 
 external open class ParentClass {
-    open var prop: Any
+    public open var prop: Any
     open fun ping(message: String)
 }
 

@@ -200,6 +200,9 @@ fun ModifierDeclarationProto.convert(): ModifierDeclaration? {
         ModifierDeclarationProto.MODIFIER_KIND.DEFAULT -> ModifierDeclaration.DEFAULT_KEYWORD
         ModifierDeclarationProto.MODIFIER_KIND.EXPORT -> ModifierDeclaration.EXPORT_KEYWORD
         ModifierDeclarationProto.MODIFIER_KIND.STATIC -> ModifierDeclaration.STATIC_KEYWORD
+        ModifierDeclarationProto.MODIFIER_KIND.PUBLIC -> ModifierDeclaration.PUBLIC_KEYWORD
+        ModifierDeclarationProto.MODIFIER_KIND.PROTECTED -> ModifierDeclaration.PROTECTED_KEYWORD
+        ModifierDeclarationProto.MODIFIER_KIND.PRIVATE -> ModifierDeclaration.PRIVATE_KEYWORD
         else -> null
     }
 }
@@ -279,7 +282,8 @@ fun TypeAliasDeclarationProto.convert(): TypeAliasDeclaration {
             aliasName.convert(),
             typeParametersList.map { it.convert() },
             typeReference.convert(),
-            uid
+            uid,
+            modifiersList.mapNotNull { it.convert() }.toSet()
     )
 }
 
@@ -298,7 +302,12 @@ fun VariableDeclarationProto.convert(): VariableDeclaration {
 }
 
 fun EnumDeclarationProto.convert(): EnumDeclaration {
-    return EnumDeclaration(name, valuesList.map { EnumTokenDeclaration(it.value, it.meta) }, uid)
+    return EnumDeclaration(
+        name,
+        valuesList.map { EnumTokenDeclaration(it.value, it.meta) },
+        uid,
+        modifiersList.mapNotNull { it.convert() }.toSet()
+    )
 }
 
 private fun DefinitionInfoDeclarationProto.convert(): DefinitionInfoDeclaration {

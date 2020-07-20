@@ -17,5 +17,6 @@ data class VariableNode(
         override val uid: String,
         val comment: CommentEntity?,
         override val external: Boolean,
-        val explicitlyDeclaredType: Boolean
+        val explicitlyDeclaredType: Boolean,
+        val visibility: VisibilityNode
 ) : TopLevelNode, ExportableNode

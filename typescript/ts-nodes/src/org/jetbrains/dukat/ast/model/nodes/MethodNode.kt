@@ -13,5 +13,7 @@ data class MethodNode(
         val open: Boolean,
 
         val body: BlockDeclaration?,
-        val isGenerator: Boolean
+        val isGenerator: Boolean,
+
+        override val visibility: VisibilityNode
 ) : MemberNode, ParameterOwnerNode

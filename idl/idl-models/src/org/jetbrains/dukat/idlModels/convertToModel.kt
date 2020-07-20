@@ -711,7 +711,8 @@ private class IdlFileConverter(
                     setter = type.nullable && !readOnly,
                     open = open,
                     explicitlyDeclaredType = true,
-                    lateinit = false
+                    lateinit = false,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             is IDLOperationDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
@@ -723,11 +724,13 @@ private class IdlFileConverter(
                     operator = false,
                     annotations = listOf(),
                     open = false,
-                    body = null
+                    body = null,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             is IDLConstructorDeclaration -> ConstructorModel(
                     parameters = arguments.map { it.convertToParameterModel() },
-                    typeParameters = listOf()
+                    typeParameters = listOf(),
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             is IDLDictionaryMemberDeclaration -> PropertyModel(
                 name = IdentifierEntity(name),
@@ -741,7 +744,8 @@ private class IdlFileConverter(
                 setter = !required,
                 open = false,
                 explicitlyDeclaredType = true,
-                lateinit = false
+                lateinit = false,
+                visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             is IDLGetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
@@ -753,7 +757,8 @@ private class IdlFileConverter(
                     operator = false,
                     annotations = listOf(),
                     open = false,
-                    body = null
+                    body = null,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             is IDLSetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
@@ -770,7 +775,8 @@ private class IdlFileConverter(
                     operator = false,
                     annotations = listOf(),
                     open = false,
-                    body = null
+                    body = null,
+                    visibilityModifier = VisibilityModifierModel.DEFAULT
             )
             else -> raiseConcern("unprocessed member declaration: ${this}") { null }
         }

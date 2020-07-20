@@ -18,5 +18,7 @@ data class PropertyNode(
 
         val explicitlyDeclaredType: Boolean,
 
-        val lateinit: Boolean
+        val lateinit: Boolean,
+
+        override val visibility: VisibilityNode
 ) : MemberNode

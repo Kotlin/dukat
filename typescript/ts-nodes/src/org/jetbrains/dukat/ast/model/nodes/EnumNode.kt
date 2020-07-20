@@ -6,5 +6,6 @@ data class EnumNode(
         val name: NameEntity,
         val values: List<EnumTokenNode>,
         override val uid: String,
-        override val external: Boolean
+        override val external: Boolean,
+        val visibility: VisibilityNode
 ) : TopLevelNode, UniqueNode

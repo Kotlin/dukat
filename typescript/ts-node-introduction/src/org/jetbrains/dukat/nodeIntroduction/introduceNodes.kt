@@ -25,6 +25,7 @@ import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
+import org.jetbrains.dukat.ast.model.nodes.VisibilityNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNodeNullable
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
@@ -103,8 +104,18 @@ private class LowerDeclarationsToNodes(
 
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
+    private fun convertVisibilities(modifiers: Set<ModifierDeclaration>): VisibilityNode {
+        return when {
+            modifiers.contains(ModifierDeclaration.PUBLIC_KEYWORD) -> VisibilityNode.PUBLIC
+            modifiers.contains(ModifierDeclaration.PROTECTED_KEYWORD) -> VisibilityNode.PROTECTED
+            modifiers.contains(ModifierDeclaration.PRIVATE_KEYWORD) -> VisibilityNode.PRIVATE
+            else -> VisibilityNode.NOT_SPECIFIED
+        }
+    }
+
     fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyNode {
         val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
+        val visibility = convertVisibilities(declaration.modifiers)
         return PropertyNode(
                 name = declaration.name,
                 type = parameterValueDeclaration.convertToNode(),
@@ -115,11 +126,12 @@ private class LowerDeclarationsToNodes(
                 getter = declaration.optional,
                 setter = declaration.optional,  // TODO: it's actually wrong
 
-                open = true,
-
                 explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType,
 
-                lateinit = !inDeclaredDeclaration && (declaration.initializer == null)
+                lateinit = !inDeclaredDeclaration && (declaration.initializer == null),
+                open = visibility != VisibilityNode.PRIVATE,
+
+                visibility = visibility
         )
     }
 
@@ -137,6 +149,7 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode {
+        val visibility = convertVisibilities(declaration.modifiers)
         return if (declaration.optional) {
             PropertyNode(
                     name = declaration.name,
@@ -151,7 +164,8 @@ private class LowerDeclarationsToNodes(
                     initializer = null,
                     getter = true,
                     setter = false,
-                    open = true,
+                    open = visibility != VisibilityNode.PRIVATE,
+                visibility = visibility,
                     explicitlyDeclaredType = true,
                     lateinit = false
             )
@@ -163,9 +177,10 @@ private class LowerDeclarationsToNodes(
                     convertTypeParameters(declaration.typeParameters),
                     false,
                     false,
-                    true,
+                    visibility != VisibilityNode.PRIVATE,
                     null,
-                    false
+                    false,
+                    visibility
             )
         }
     }
@@ -189,7 +204,8 @@ private class LowerDeclarationsToNodes(
                         true,
                         true,
                         null,
-                        false
+                        false,
+                        VisibilityNode.NOT_SPECIFIED
                 )
         ) + declaration.returnType.unroll().map { returnType ->
             MethodNode(
@@ -202,7 +218,8 @@ private class LowerDeclarationsToNodes(
                     true,
                     true,
                     null,
-                    false
+                    false,
+                    VisibilityNode.NOT_SPECIFIED
             )
         }
     }
@@ -218,7 +235,8 @@ private class LowerDeclarationsToNodes(
                 true,
                 true,
                 null,
-                false
+                false,
+                VisibilityNode.NOT_SPECIFIED
         )
     }
 
@@ -250,7 +268,9 @@ private class LowerDeclarationsToNodes(
 
                 uid,
                 resolveAsExportQualifier(),
-                inDeclaredModule || hasDeclareModifier()
+                inDeclaredModule || hasDeclareModifier(),
+
+                convertVisibilities(modifiers)
         )
 
         return declaration
@@ -264,7 +284,8 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
                 false,
                 uid,
-                true
+                true,
+                convertVisibilities(modifiers)
         )
     }
 
@@ -277,7 +298,8 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
                 true,
                 uid,
-                true
+                true,
+                VisibilityNode.NOT_SPECIFIED
         )
 
         return declaration
@@ -288,7 +310,8 @@ private class LowerDeclarationsToNodes(
         return ConstructorNode(
                 convertParameters(parameters),
                 convertTypeParameters(typeParameters),
-                body
+                body,
+                convertVisibilities(modifiers)
         )
     }
 
@@ -297,7 +320,8 @@ private class LowerDeclarationsToNodes(
                 name = IdentifierEntity(name),
                 values = values.map { value -> EnumTokenNode(value.value, value.meta) },
                 uid = uid,
-                external = false
+                external = false,
+                visibility = convertVisibilities(modifiers)
         )
     }
 
@@ -309,7 +333,8 @@ private class LowerDeclarationsToNodes(
                     TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 uid = uid,
-                external = false
+                external = false,
+                visibility = convertVisibilities(modifiers)
         )
     }
 
@@ -334,7 +359,8 @@ private class LowerDeclarationsToNodes(
                 null,
                 body,
                 inDeclaredModule || hasDeclareModifier(),
-                isGenerator
+                isGenerator,
+                convertVisibilities(modifiers)
         )
     }
 
@@ -352,17 +378,21 @@ private class LowerDeclarationsToNodes(
 
     fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberNode> {
         return when (declaration) {
-            is FunctionDeclaration -> listOf(MethodNode(
+            is FunctionDeclaration -> {
+                val visibility = convertVisibilities(declaration.modifiers)
+                listOf(MethodNode(
                     declaration.name,
                     convertParameters(declaration.parameters),
                     declaration.type.convertToNode(),
                     convertTypeParameters(declaration.typeParameters),
                     declaration.isStatic(),
                     false,
-                    true,
+                    visibility != VisibilityNode.PRIVATE,
                     declaration.body,
-                    declaration.isGenerator
-            ))
+                    declaration.isGenerator,
+                    visibility
+                ))
+            }
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
@@ -388,7 +418,8 @@ private class LowerDeclarationsToNodes(
                         declaration.uid,
                         null,
                         declaration.hasDeclareModifier(),
-                        inDeclaredModule || declaration.explicitlyDeclaredType
+                        inDeclaredModule || declaration.explicitlyDeclaredType,
+                        convertVisibilities(declaration.modifiers)
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -397,7 +428,8 @@ private class LowerDeclarationsToNodes(
                         type.members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || declaration.hasDeclareModifier()) },
                         emptyList(),
                         declaration.uid,
-                        declaration.hasDeclareModifier()
+                        declaration.hasDeclareModifier(),
+                        VisibilityNode.NOT_SPECIFIED
                 )
 
                 objectNode.copy(members = objectNode.members.map {
@@ -420,7 +452,8 @@ private class LowerDeclarationsToNodes(
                     declaration.uid,
                     null,
                     inDeclaredModule || declaration.hasDeclareModifier(),
-                    inDeclaredModule || declaration.explicitlyDeclaredType
+                    inDeclaredModule || declaration.explicitlyDeclaredType,
+                    convertVisibilities(declaration.modifiers)
             )
         }
     }

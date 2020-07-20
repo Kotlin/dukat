@@ -23,7 +23,7 @@ external interface IFactory {
 }
 
 external open class NormalModeFactory : IFactory {
-    override fun sourceUnit(moduleElements: ISyntaxList, endOfFileToken: ISyntaxToken): SourceUnitSyntax
+    public override fun sourceUnit(moduleElements: ISyntaxList, endOfFileToken: ISyntaxToken): SourceUnitSyntax
 }
 
 external interface ISyntaxList

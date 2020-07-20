@@ -49,6 +49,8 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices
@@ -71,6 +73,14 @@ import org.jetbrains.kotlin.utils.KotlinJavascriptMetadata
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadataUtils
 import java.io.File
 
+private fun Visibility.convert(): VisibilityModifierModel {
+    return when (this) {
+        Visibilities.PUBLIC -> VisibilityModifierModel.PUBLIC
+        Visibilities.PRIVATE -> VisibilityModifierModel.PRIVATE
+        Visibilities.PROTECTED -> VisibilityModifierModel.PROTECTED
+        else -> VisibilityModifierModel.DEFAULT
+    }
+}
 
 private fun KotlinJavascriptMetadata.calculatePackageFragmentProvider(): PackageFragmentProvider {
     val (header, packageFragmentProtos) = readModuleAsProto(body, version)
@@ -175,7 +185,8 @@ private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
             open = true,
             body = null,
             operator = isOperator,
-            annotations = mutableListOf()
+            annotations = mutableListOf(),
+            visibilityModifier = visibility.convert()
     )
 }
 
@@ -195,7 +206,8 @@ private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
                     type = type.convertToTypeModel(),
                     open = true,
                     explicitlyDeclaredType = true,
-                    lateinit = false
+                    lateinit = false,
+                    visibilityModifier = visibility.convert()
             )
         }
         is FunctionDescriptor -> convertToMethodModel()

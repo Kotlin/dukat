@@ -185,11 +185,12 @@ export class AstFactory {
     return definition;
   }
 
-  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string): Declaration {
+  createEnumDeclaration(name: string, values: Array<EnumTokenDeclaration>, uid: string, modifiers: Array<ModifierDeclaration>): Declaration {
     let enumDeclaration = new EnumDeclarationProto();
     enumDeclaration.setName(name);
     enumDeclaration.setValuesList(values);
     enumDeclaration.setUid(uid);
+    enumDeclaration.setModifiersList(modifiers);
 
     let topLevelDeclaration = new TopLevelDeclarationProto();
     topLevelDeclaration.setEnumdeclaration(enumDeclaration);
@@ -615,12 +616,13 @@ export class AstFactory {
     return paramValueDeclaration;
   }
 
-  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<TypeParameterDeclarationProto>, typeReference: TypeDeclaration, uid: string): Declaration {
+  createTypeAliasDeclaration(aliasName: NameEntity, typeParams: Array<TypeParameterDeclarationProto>, typeReference: TypeDeclaration, uid: string, modifiers: Array<ModifierDeclaration>): Declaration {
     let typeAlias = new TypeAliasDeclarationProto();
     typeAlias.setAliasname(aliasName);
     typeAlias.setTypeparametersList(typeParams);
     typeAlias.setTypereference(typeReference);
     typeAlias.setUid(uid);
+    typeAlias.setModifiersList(modifiers);
 
     let topLevelDeclaration = new TopLevelDeclarationProto();
     topLevelDeclaration.setAliasdeclaration(typeAlias);
