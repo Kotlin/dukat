@@ -36,6 +36,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
@@ -313,9 +314,7 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
-        return if (hasDefaultModifier() && hasExportModifier()) {
-            JsDefault()
-        } else null
+        return if (hasDefaultModifier() && hasExportModifier()) { JsDefault } else null
     }
 
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
@@ -455,13 +454,6 @@ private class LowerDeclarationsToNodes(
         }
     }
 
-    private fun NameEntity.isStringLiteral(): Boolean {
-        return when (this) {
-            is IdentifierEntity -> value.matches("^[\"\'].*[\"\']$".toRegex())
-            else -> false
-        }
-    }
-
     @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
@@ -503,7 +495,6 @@ private class LowerDeclarationsToNodes(
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
-                moduleNameIsStringLiteral = moduleNameIsStringLiteral,
                 jsModule = if (hasDefaultExport) {
                     moduleName
                 } else {

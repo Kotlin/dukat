@@ -11,8 +11,6 @@ data class ModuleNode(
         val declarations: List<TopLevelNode> = emptyList(),
         val imports: Map<String, ImportNode>,
 
-        val moduleNameIsStringLiteral: Boolean,
-
         val jsModule: NameEntity?,
         val jsQualifier: NameEntity?,
 

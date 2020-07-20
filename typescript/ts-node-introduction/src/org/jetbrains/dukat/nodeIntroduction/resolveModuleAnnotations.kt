@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
@@ -54,13 +55,13 @@ private class ExportAssignmentLowering(
             }
         } else {
             if (moduleNode.uid != root.uid) {
-                if (moduleNode.moduleNameIsStringLiteral) {
-                    qualifierDataMap[moduleNode.uid] = QualifierData(
+                qualifierDataMap[moduleNode.uid] = if (moduleNode.packageName.isStringLiteral()) {
+                    QualifierData(
                             jsModule = moduleNode.packageName,
                             jsQualifier = null
                     )
                 } else {
-                    qualifierDataMap[moduleNode.uid] = QualifierData(
+                    QualifierData(
                             jsModule = null,
                             jsQualifier = moduleNode.qualifiedPackageName
                     )
@@ -116,7 +117,7 @@ private class ExportAssignmentLowering(
                 qualifierDataMap[moduleNode.uid] = QualifierData(null, null)
             }
 
-            if (exportOwner.moduleNameIsStringLiteral && (exportOwner.uid == moduleNode?.uid)) {
+            if (exportOwner.packageName.isStringLiteral() && (exportOwner.uid == moduleNode?.uid)) {
                 declaration.name = exportOwner.qualifiedPackageName
             }
         }
