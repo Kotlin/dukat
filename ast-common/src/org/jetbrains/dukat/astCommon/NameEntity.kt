@@ -87,30 +87,6 @@ private fun NameEntity.countDepth(current: Int): Int {
 val NameEntity.size: Int
     get() = countDepth(0)
 
-//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
-private fun escapeName(name: String): String {
-    return name
-            .replace("/".toRegex(), ".")
-            .replace("-".toRegex(), "_")
-            .replace("^_$".toRegex(), "`_`")
-            .replace("^class$".toRegex(), "`class`")
-            .replace("^var$".toRegex(), "`var`")
-            .replace("^val$".toRegex(), "`val`")
-            .replace("^interface$".toRegex(), "`interface`")
-}
-
-//TODO: it actually hardly belongs here
-private fun String.unquote(): String {
-    return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
-}
-
-fun NameEntity.unquote(): NameEntity {
-    return when (this) {
-        is IdentifierEntity -> copy(value = escapeName(value.unquote()))
-        else -> this
-    }
-}
-
 fun NameEntity.startsWith(prefix: NameEntity): Boolean {
     return generateSequence(this) { it.shiftRight() }.any { prefix == it }
 }

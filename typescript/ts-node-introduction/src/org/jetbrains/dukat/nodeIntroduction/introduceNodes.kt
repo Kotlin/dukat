@@ -37,10 +37,8 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.process
-import org.jetbrains.dukat.astCommon.unquote
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -71,9 +69,29 @@ import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
 
-private fun unquote(name: String): String {
-    return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+private fun escapeName(name: String): String {
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
 }
+
+private fun String.unquote(): String {
+    return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
+}
+
+private fun NameEntity.unquote(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> copy(value = escapeName(value.unquote()))
+        else -> this
+    }
+}
+
 
 private class LowerDeclarationsToNodes(
         private val fileName: String,
@@ -120,21 +138,21 @@ private class LowerDeclarationsToNodes(
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode {
         return if (declaration.optional) {
             PropertyNode(
-                name = declaration.name,
-                type = FunctionTypeNode(
-                    convertParameters(declaration.parameters),
-                    declaration.type.convertToNode(),
-                    true,
-                    null
-                ),
-                typeParameters = convertTypeParameters(declaration.typeParameters),
-                static = false,
-                initializer = null,
-                getter = true,
-                setter = false,
-                open = true,
-                explicitlyDeclaredType = true,
-                lateinit = false
+                    name = declaration.name,
+                    type = FunctionTypeNode(
+                            convertParameters(declaration.parameters),
+                            declaration.type.convertToNode(),
+                            true,
+                            null
+                    ),
+                    typeParameters = convertTypeParameters(declaration.typeParameters),
+                    static = false,
+                    initializer = null,
+                    getter = true,
+                    setter = false,
+                    open = true,
+                    explicitlyDeclaredType = true,
+                    lateinit = false
             )
         } else {
             MethodNode(
@@ -469,7 +487,7 @@ private class LowerDeclarationsToNodes(
         val moduleNameIsStringLiteral = name.isStringLiteral()
 
         val moduleName = if (moduleNameIsStringLiteral) {
-            name.process { unquote(it) }
+            name.process { it.unquote() }
         } else {
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
