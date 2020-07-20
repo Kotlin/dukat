@@ -483,7 +483,7 @@ export class AstFactory {
   }
 
   createModuleDeclaration(
-    packageName: NameEntity | null,
+    packageName: NameEntity,
     imports: Array<ImportClauseDeclaration>,
     references: Array<ReferenceClauseDeclarationProto>,
     moduleDeclarations: Iterable<Declaration>,

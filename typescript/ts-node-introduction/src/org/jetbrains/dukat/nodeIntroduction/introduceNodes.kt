@@ -447,7 +447,7 @@ private class LowerDeclarationsToNodes(
     @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
-        val name = documentRoot.name ?:  IdentifierEntity("<ROOT>")
+        val name = documentRoot.name
 
         val shortName = name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
