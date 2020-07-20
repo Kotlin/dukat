@@ -30,7 +30,6 @@ function getLibPaths(program: ts.Program, libPath: ts.SourceFile | undefined, li
 }
 
 class SourceBundleBuilder {
-  private astFactory = new AstFactory();
   private program: ts.Program;
   private libsSet: Set<string>;
 
@@ -70,7 +69,6 @@ class SourceBundleBuilder {
       new ExportContext(),
       this.program.getTypeChecker(),
       new DeclarationResolver(this.program),
-      this.astFactory,
       (node: ts.Node) => this.isLibSource(node)
     );
   }

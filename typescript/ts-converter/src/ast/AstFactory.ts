@@ -88,7 +88,6 @@ import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
-import has = Reflect.has;
 
 export class AstFactory {
 

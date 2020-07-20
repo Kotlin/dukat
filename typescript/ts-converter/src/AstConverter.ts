@@ -48,11 +48,10 @@ export class AstConverter {
     private exportContext: ExportContext,
     private typeChecker: ts.TypeChecker,
     private declarationResolver: DeclarationResolver,
-    private astFactory: AstFactory,
     private isLibNode: (node: ts.Node) => boolean
   ) {
   }
-
+  private astFactory: AstFactory = new AstFactory();
   private astExpressionConverter = new AstExpressionConverter(this, this.astFactory);
 
   private getReferences(sourceFile: ts.SourceFile): Array<ReferenceClauseDeclarationProto> {
