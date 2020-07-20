@@ -6,9 +6,7 @@ import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
-import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
@@ -131,8 +129,10 @@ private fun ModuleNode.resolveModuleAnnotations(qualifierDataMap: MutableMap<Str
     return ExportAssignmentLowering(this, qualifierDataMap).lowerRoot(this, NodeOwner(this, null))
 }
 
-private fun SourceSetNode.resolveModuleAnnotations(qualifierDataMap: MutableMap<String, QualifierData>) = transform {
-    it.resolveModuleAnnotations(qualifierDataMap)
+private fun SourceSetNode.resolveModuleAnnotations(qualifierDataMap: MutableMap<String, QualifierData>): SourceSetNode {
+    return copy(sources = sources.map { sourceFileNode ->
+        sourceFileNode.copy(root = sourceFileNode.root.resolveModuleAnnotations(qualifierDataMap))
+    })
 }
 
 private class ResolveQualifierAnnotations(
