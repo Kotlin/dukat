@@ -7,12 +7,12 @@ import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 
-sealed class FunctionNodeContext()
+sealed class FunctionNodeContext
 data class FunctionFromMethodSignatureDeclaration(val name: String, val params: List<IdentifierEntity>) : FunctionNodeContext()
 data class IndexSignatureGetter(val name: String) : FunctionNodeContext()
 data class IndexSignatureSetter(val name: String) : FunctionNodeContext()
 data class FunctionFromCallSignature(val params: List<IdentifierEntity>) : FunctionNodeContext()
-class FunctionNodeContextIrrelevant() : FunctionNodeContext()
+class FunctionNodeContextIrrelevant : FunctionNodeContext()
 
 data class FunctionNode(
         val name: NameEntity,
@@ -20,7 +20,7 @@ data class FunctionNode(
         val type: TypeNode,
         val typeParameters: List<TypeValueNode>,
 
-        override var exportQualifier: ExportQualifier?,
+        override val exportQualifier: ExportQualifier?,
 
         val export: Boolean,
         val inline: Boolean,

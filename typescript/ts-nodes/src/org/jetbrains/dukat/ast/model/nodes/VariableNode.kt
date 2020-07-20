@@ -8,9 +8,9 @@ data class VariableNode(
         var name: NameEntity,
         val type: TypeNode,
 
-        override var exportQualifier: ExportQualifier?,
+        override val exportQualifier: ExportQualifier?,
 
-        var immutable: Boolean,
+        val immutable: Boolean,
         val inline: Boolean,
         val typeParameters: List<TypeValueNode>,
         val extend: ClassLikeReferenceNode?,

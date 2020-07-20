@@ -10,6 +10,6 @@ data class ClassNode(
         val parentEntities: List<HeritageNode>,
 
         override val uid: String,
-        override var exportQualifier: ExportQualifier?,
+        override val exportQualifier: ExportQualifier?,
         override val external: Boolean
 ) : ClassLikeNode, ExportableNode

@@ -13,8 +13,8 @@ data class ModuleNode(
 
         val moduleNameIsStringLiteral: Boolean,
 
-        var jsModule: NameEntity?,
-        var jsQualifier: NameEntity?,
+        val jsModule: NameEntity?,
+        val jsQualifier: NameEntity?,
 
         override var uid: String,
         override val external: Boolean
