@@ -89,9 +89,13 @@ import * as ts from "../../.tsdeclarations/typescript";
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
 
-export class AstFactory {
 
+export class AstFactory {
   private log = createLogger("AstFactory");
+
+  private static FACTORY = new AstFactory()
+  static TSLIBROOT = AstFactory.FACTORY.createIdentifierDeclarationAsNameEntity("tsstdlib");
+  static ROOT = AstFactory.FACTORY.createIdentifierDeclarationAsNameEntity("<ROOT>");
 
   createNamespaceImportClause(name: string): ImportClauseDeclaration {
     let namespaceClause = new NamespaceImportDeclarationProto();
