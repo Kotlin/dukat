@@ -13,7 +13,9 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexTypeDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.types.KeyOfTypeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
@@ -135,6 +137,17 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         return declaration.copy(members = declaration.members.map { member -> lowerMemberDeclaration(member, owner.wrap(declaration)) })
     }
 
+    fun lowerKeyOfTypeDeclaration(declaration: KeyOfTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+        return declaration.copy(type = lowerParameterValue(declaration.type, owner.wrap(declaration)))
+    }
+
+    fun lowerIndexTypeDeclaration(declaration: IndexTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+        return declaration.copy(
+            objectType = lowerParameterValue(declaration.objectType, owner.wrap(declaration)),
+            indexType = lowerParameterValue(declaration.indexType, owner.wrap(declaration))
+        )
+    }
+
     fun lowerFunctionTypeDeclaration(declaration: FunctionTypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): FunctionTypeDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { param -> lowerParameterDeclaration(param, owner.wrap(declaration)) },
@@ -217,6 +230,8 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
             is TupleDeclaration -> lowerTupleDeclaration(declaration, owner)
             is IntersectionTypeDeclaration -> lowerIntersectionTypeDeclaration(declaration, owner)
             is ObjectLiteralDeclaration -> lowerObjectLiteralDeclaration(declaration, owner)
+            is KeyOfTypeDeclaration -> lowerKeyOfTypeDeclaration(declaration, owner)
+            is IndexTypeDeclaration -> lowerIndexTypeDeclaration(declaration, owner)
             else -> declaration
         }
     }

@@ -524,6 +524,17 @@ export class AstConverter {
         return this.createTypeDeclaration("boolean");
       } else if (type.kind == ts.SyntaxKind.ObjectKeyword) {
         return this.createTypeDeclaration("object");
+      } else if (ts.isTypeOperatorNode(type)) {
+        switch (type.operator) {
+          case ts.SyntaxKind.KeyOfKeyword:
+            return this.astFactory.createKeyOfTypeDeclaration(this.convertType(type.type));
+          case ts.SyntaxKind.ReadonlyKeyword:
+            return this.convertType(type.type);
+          default:
+            return this.convertType(type.type);
+        }
+      } else if (ts.isIndexedAccessTypeNode(type)) {
+        return this.astFactory.createIndexTypeDeclaration(this.convertType(type.objectType), this.convertType(type.indexType))
       } else {
         // TODO: use raiseConcern for this
         this.unsupportedDeclarations.add(type.kind);
