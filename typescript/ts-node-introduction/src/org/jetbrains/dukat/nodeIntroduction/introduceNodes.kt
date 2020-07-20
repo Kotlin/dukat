@@ -447,19 +447,13 @@ private class LowerDeclarationsToNodes(
     @Suppress("UNCHECKED_CAST")
     fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
 
-        val name = documentRoot.name ?: if (documentRoot.isLib) {
-            TSLIBROOT
-        } else {
-            IdentifierEntity("<ROOT>")
-        }
+        val name = documentRoot.name ?:  IdentifierEntity("<ROOT>")
 
         val shortName = name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val imports = mutableMapOf<String, ImportNode>()
         val nonImports = mutableListOf<TopLevelNode>()
-
-
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {

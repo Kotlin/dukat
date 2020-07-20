@@ -347,8 +347,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
                 ModuleDeclarationProto.MODULE_KIND.AMBIENT_MODULE -> ModuleDeclarationKind.AMBIENT_MODULE
                 ModuleDeclarationProto.MODULE_KIND.NAMESPACE -> ModuleDeclarationKind.NAMESPACE
                 else -> ModuleDeclarationKind.SOURCE_FILE
-            },
-            isLib = isLibSource
+            }
     )
 }
 

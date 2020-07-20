@@ -123,14 +123,18 @@ export class AstConverter {
     return imports;
   }
 
+  private TSLIBROOT = this.astFactory.createIdentifierDeclarationAsNameEntity("tsstdlib");
+
   private createModuleFromSourceFile(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
     let packageNameFragments = sourceFile.fileName.split("/");
     let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
 
     let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
 
+    let isLib = this.isLibNode(sourceFile);
+
     return this.astFactory.createModuleDeclaration(
-      null,
+      isLib ? this.TSLIBROOT : null,
       this.getImports(sourceFile),
       this.getReferences(sourceFile),
       this.convertStatements(statements),
@@ -139,7 +143,7 @@ export class AstConverter {
       sourceName,
       [],
       sourceFile.isDeclarationFile ? MODULE_KIND.DECLARATION_FILE : MODULE_KIND.SOURCE_FILE,
-      this.isLibNode(sourceFile)
+      isLib
     );
   }
 
