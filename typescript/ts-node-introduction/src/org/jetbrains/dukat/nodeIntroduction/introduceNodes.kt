@@ -377,7 +377,7 @@ private class LowerDeclarationsToNodes(
     }
 
     fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberNode> {
-        return when (declaration) {
+        val memberModels = when (declaration) {
             is FunctionDeclaration -> {
                 val visibility = convertVisibilities(declaration.modifiers)
                 listOf(MethodNode(
@@ -400,6 +400,9 @@ private class LowerDeclarationsToNodes(
             is ConstructorDeclaration -> listOf(declaration.convert())
             else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberNode>() }
         }
+        return if (inDeclaredDeclaration)
+            memberModels.filter { it.visibility != VisibilityNode.PRIVATE }
+        else memberModels
     }
 
     fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelNode {
