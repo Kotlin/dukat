@@ -43,6 +43,7 @@ import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
@@ -122,6 +123,10 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         null
 )
 
+// TODO: duplication, think of separate place to have this (but please don't call it utils )))
+private fun unquote(name: String): String {
+    return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
+}
 
 internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
     private val imports = mutableListOf<ImportModel>()
@@ -145,13 +150,13 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        moduleNode.jsModule?.let {
-            annotations.add(AnnotationModel("file:JsModule", listOf(it)))
+        moduleNode.jsModule?.let { qualifier ->
+            annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
             annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
         }
 
-        moduleNode.jsQualifier?.let {
-            annotations.add(AnnotationModel("file:JsQualifier", listOf(it)))
+        moduleNode.jsQualifier?.let { qualifier ->
+            annotations.add(AnnotationModel("file:JsQualifier", listOf(qualifier.process { unquote(it) })))
         }
 
         return ModuleModel(

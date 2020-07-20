@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
 import org.jetbrains.dukat.ast.model.nodes.transform
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -37,11 +36,6 @@ private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: Mutab
     return assignExports
 }
 
-// TODO: duplication, think of separate place to have this (but please don't call it utils )))
-private fun unquote(name: String): String {
-    return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
-}
-
 private fun NodeOwner<*>.moduleOwner(): ModuleNode? {
     return generateSequence(owner) { it.owner }.firstOrNull { it.node is ModuleNode }?.node as? ModuleNode
 }
@@ -64,13 +58,13 @@ private class ExportAssignmentLowering(
             if (moduleNode.uid != root.uid) {
                 if (moduleNode.moduleNameIsStringLiteral) {
                     qualifierDataMap[moduleNode.uid] = QualifierData(
-                            jsModule = moduleNode.packageName.process { unquote(it) },
+                            jsModule = moduleNode.packageName,
                             jsQualifier = null
                     )
                 } else {
                     qualifierDataMap[moduleNode.uid] = QualifierData(
                             jsModule = null,
-                            jsQualifier = moduleNode.qualifiedPackageName.process { unquote(it) }
+                            jsQualifier = moduleNode.qualifiedPackageName
                     )
                 }
             }
