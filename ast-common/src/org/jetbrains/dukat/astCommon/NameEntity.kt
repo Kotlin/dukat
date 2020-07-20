@@ -76,17 +76,6 @@ fun String.toNameEntity(): NameEntity {
     return split(".").map { IdentifierEntity(it) }.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
 }
 
-
-private fun NameEntity.countDepth(current: Int): Int {
-    return when (this) {
-        is IdentifierEntity -> current + 1
-        is QualifierEntity -> left.countDepth(current) + right.countDepth(current)
-    }
-}
-
-val NameEntity.size: Int
-    get() = countDepth(0)
-
 fun NameEntity.startsWith(prefix: NameEntity): Boolean {
     return generateSequence(this) { it.shiftRight() }.any { prefix == it }
 }
