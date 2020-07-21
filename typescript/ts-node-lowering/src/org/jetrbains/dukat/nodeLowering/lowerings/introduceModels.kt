@@ -412,7 +412,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
     private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
         return when (this) {
-            is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name)))
+            is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name).filterNotNull()))
             is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
             else -> mutableListOf()
         }
