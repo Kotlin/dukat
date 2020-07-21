@@ -484,10 +484,6 @@ private class LowerDeclarationsToNodes(
             moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
         }
 
-        val hasDefaultExport = documentRoot.declarations.any {
-            (it is WithModifiersDeclaration) && (it !is InterfaceDeclaration) && (it.hasExportModifier()) && (it.hasDefaultModifier())
-        }
-
         return ModuleNode(
                 moduleName = moduleName,
                 export = documentRoot.export?.let { ExportAssignmentNode(it.uids, it.isExportEquals) },
@@ -495,11 +491,7 @@ private class LowerDeclarationsToNodes(
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
-                jsModule = if (hasDefaultExport) {
-                    moduleName
-                } else {
-                    null
-                },
+                jsModule = null,
                 jsQualifier = null,
                 uid = documentRoot.uid,
                 external = isDeclaration
