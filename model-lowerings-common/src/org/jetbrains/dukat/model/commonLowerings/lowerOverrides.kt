@@ -174,9 +174,7 @@ private class ClassLikeOverrideResolver(
                             )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_RELATED)
                         }
 
-                        val ownerModel = related?.ownerModel
-
-                        if ((related != null) && (ownerModel?.isAbstractClass() != true)) {
+                        if ((related != null) && (classLike.isAbstractClass() != true)) {
                             listOf(this, (related.memberModel as MethodModel).removeDefaultParamValues(override = related.fqName))
                         } else {
                             listOf(this)
@@ -246,7 +244,7 @@ private class ClassLikeOverrideResolver(
                 when (it) {
                     is NamedModel -> {
                         if (!resolvedClassLike.existsOnlyInTsStdlib(it)) {
-                            memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, this))
+                            memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, resolvedClassLike.classLike))
                         }
                     }
                 }
