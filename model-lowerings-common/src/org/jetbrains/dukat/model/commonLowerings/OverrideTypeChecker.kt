@@ -286,6 +286,17 @@ internal class OverrideTypeChecker(
         return true
     }
 
+    private fun TypeParameterReferenceModel.isEquivalent(otherTypeParameter: TypeParameterReferenceModel): Boolean {
+        val otherTypeParameterIndex = parent.typeParameters.indexOfFirst {
+            val type = it.type
+            type is TypeValueModel && type.value == otherTypeParameter.name
+        }
+        val relevantHeritage = declaration.parentEntities.firstOrNull {
+            it.value.value == parent.name
+        }
+        return this == relevantHeritage?.typeParams?.getOrNull(otherTypeParameterIndex)
+    }
+
     private fun TypeModel.isEquivalent(otherParameterType: TypeModel): Boolean {
         if (this == otherParameterType) {
             return true
@@ -306,7 +317,7 @@ internal class OverrideTypeChecker(
         }
 
         if ((this is TypeParameterReferenceModel) && (otherParameterType is TypeParameterReferenceModel)) {
-
+            return isEquivalent(otherParameterType)
         }
 
         if ((this is TypeValueModel) && (otherParameterType is TypeValueModel)) {
