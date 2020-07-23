@@ -31,28 +31,41 @@ def getDistribName(version) {
     return distribName
 }
 
+def existsOnlyAsZip() {
+    return DefaultNativePlatform.currentOperatingSystem.windows
+}
+
+def archiveExtension() {
+    return existsOnlyAsZip() ? ".zip" : ".tar.gz"
+}
+
 def distribUrl(version) {
     def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
     def url = "$NODE_DISTRIB_REPO/v${version}"
-    return "${url}/${getDistribName(version)}.tar.gz"
+    def ext = existsOnlyAsZip() ? ".zip" : ".tar.gz"
+    return "${url}/${getDistribName(version)}${archiveExtension()}"
 }
 
 task downloadNodeDistrib(type: Download) {
     onlyIfModified true
     overwrite false
     src distribUrl(gradle.nodeVersion)
-    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}/node.tar.gz")
+    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}/node${archiveExtension()}")
 }
 
 task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
-    from tarTree(resources.gzip(downloadNodeDistrib.dest))
+    from existsOnlyAsZip() ?
+            zipTree(downloadNodeDistrib.dest) :
+            tarTree(resources.gzip(downloadNodeDistrib.dest))
     into gradle.nodeDistribUnpackDir
 }
 
-task renameUnpackedDistrib() {
+task renameUnpackedDistrib(dependsOn: unpackNodeDistrib) {
+    def inputFile = new File(gradle.nodeDistribUnpackDir, "${getDistribName(gradle.nodeVersion)}")
+    def outputFile = new File(gradle.nodeDistribUnpackDir, "v${gradle.nodeVersion}")
+    inputs.dir(inputFile)
+    outputs.dir(outputFile)
     doLast {
-        println(new File(unpackNodeDistrib.destinationDir, "${getDistribName(gradle.nodeVersion)}").absolutePath)
-        new File(gradle.nodeDistribUnpackDir, "${getDistribName(gradle.nodeVersion)}").renameTo(
-                new File(gradle.nodeDistribUnpackDir, "v${gradle.nodeVersion}"))
+        inputFile.renameTo(outputFile)
     }
 }
