@@ -20,6 +20,10 @@ def getDistribName(version) {
         distribName = "node-v${version}-linux-x64"
     }
 
+    if (os.windows) {
+        distribName = "node-v${version}-win-x64"
+    }
+
     if (distribName == null) {
         throw new GradleException("unkown architecture and/or operating system ${architecture.displayName} : ${os.displayName}")
     }
