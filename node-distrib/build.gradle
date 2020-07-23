@@ -61,7 +61,6 @@ task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
 
 task config(dependsOn: unpackNodeDistrib) {
     ext.packageDir = "${project.buildDir}"
-    ext.yarnPath = "${ext.packageDir}/node-distrib/build/node_modules/yarn/lib/cli.js"
     ext.distribPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}"
     ext.nodePath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/bin/node"
     ext.npmPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js"
@@ -73,10 +72,9 @@ task prepareNpmPackage(type: Copy) {
     rename { String fileName -> fileName.replace(".template", "") }
 }
 
-task npmInstall(dependsOn: [prepareNpmPackage], type: Exec) {
-    doFirst {
-        println("DO FIRST ${config.packageDir}")
-    }
+task setup(dependsOn: [prepareNpmPackage], type: Exec) {
     workingDir config.packageDir
     commandLine config.npmPath, "install", "--verbose"
+
+    ext.yarnPath = "${config.packageDir}/node_modules/yarn/lib/cli.js"
 }
