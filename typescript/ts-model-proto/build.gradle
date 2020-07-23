@@ -20,7 +20,7 @@ task prepareNpmPackage(type: Copy) {
 
 task npmYnstall(dependsOn: [prepareNpmPackage], type: Exec) {
     workingDir nodeModulesPath
-    commandLine project(":node-distrib").nodeDistrib.npmPath, "install", "--verbose"
+    commandLine project(":node-distrib").config.npmPath, "install", "--verbose"
 }
 
 task copyGeneratedTs(type: Copy) {
