@@ -18,9 +18,14 @@ task prepareNpmPackage(type: Copy) {
     into nodeModulesPath
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage], type: Exec) {
+task yarnInstallConfig {
+    doLast {
+        yarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
+    }
+}
+
+task yarnInstall(dependsOn: [prepareNpmPackage, yarnInstallConfig], type: Exec) {
     workingDir nodeModulesPath
-    commandLine project(":node-distrib").setup.yarnPath, "install"
 }
 
 task copyGeneratedTs(type: Copy) {

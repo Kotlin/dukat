@@ -166,12 +166,16 @@ task prepareTopNPackage(type: Copy) {
     into TOPN_TARGET_DIR
 }
 
-task installTopN(type: YarnTask) {
+task installTopNConfig {
+    doLast {
+        installTopN.commandLine  project(":node-distrib").setup.yarnPath, "install"
+    }
+}
+task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec) {
     onlyIf {
         project.hasProperty("dukat.test.extended.topn")
     }
-    dependsOn = [prepareTopNPackage]
-    args = ["install"]
+    workingDir TOPN_TARGET_DIR
 }
 
 yarn.dependsOn = [yarnSetup, prepareTopNPackage]
