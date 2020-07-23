@@ -11,7 +11,6 @@ buildscript {
 
 plugins {
     id("kotlin")
-    id("com.github.node-gradle.node")
     id("kotlinx-serialization")
 }
 
@@ -29,17 +28,6 @@ def DEF_TYPE_DIR = "${rootProject.gradle.gradleUserHomeDir}/definitelyTyped/Defi
 
 def TOPN_DIR = "${project.projectDir}/test/data/topN"
 def TOPN_TARGET_DIR = "${project.buildDir}/tests/topN"
-
-node {
-    workDir = gradle.nodeWorkingDir
-    // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
-    version = gradle.nodeVersion
-    yarnVersion = gradle.yarnVersion
-
-    download = true
-    nodeModulesDir = file(TOPN_TARGET_DIR)
-}
-
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
@@ -177,8 +165,6 @@ task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec)
     }
     workingDir TOPN_TARGET_DIR
 }
-
-yarn.dependsOn = [yarnSetup, prepareTopNPackage]
 
 task prebuild {
     dependsOn = ["testClasses", ":node-package:buildDistrib"]
