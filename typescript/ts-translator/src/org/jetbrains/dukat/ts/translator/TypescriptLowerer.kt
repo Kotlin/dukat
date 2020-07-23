@@ -23,6 +23,7 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
 import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
+import org.jetbrains.dukat.model.commonLowerings.overrides.VarConflictResolveLowering
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
@@ -119,6 +120,7 @@ open class TypescriptLowerer(
                                 .lower { context, inheritanceContext ->
                                     LowerOverrides(context, inheritanceContext)
                                 },
+                        VarConflictResolveLowering(),
                         AddExplicitGettersAndSetters(),
                         AnyfyUnresolvedTypes(),
                         RemoveKotlinBuiltIns(),

@@ -5,7 +5,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.graphs.Graph
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 
-private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
+internal fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
     val graph = Graph<ClassLikeModel>()
 
     getClassLikeIterable().forEach { classLike ->

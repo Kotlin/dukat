@@ -86,7 +86,9 @@ class DescriptorTests {
                 "misc/stringTypeInAlias",
                 "qualifiedNames/extendingEntityFromParentModule",
                 "stdlib/convertTsStdlib",
-                "typePredicate/simple"
+                "typePredicate/simple",
+                "override/varConflict",
+                "override/varConflictWithoutPropertyInChild"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 
         @JvmStatic
