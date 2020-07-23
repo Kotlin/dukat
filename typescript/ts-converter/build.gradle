@@ -32,10 +32,18 @@ task prepareNpmPackage(type: Copy) {
   into packagePath
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+task yarnInstallConfig {
+  doLast {
+    jarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
+  }
+}
+
+task jarnInstall(dependsOn: [prepareNpmPackage, yarnInstallConfig], type: Exec) {
+  workingDir packagePath
+}
 
 task copyTypescriptDeclarations(type: Copy) {
-  dependsOn = ["yarn"]
+  dependsOn = [jarnInstall]
 
   from "${packagePath}/node_modules/typescript/lib"
   into tsDeclarationsPath
@@ -43,7 +51,7 @@ task copyTypescriptDeclarations(type: Copy) {
 }
 
 task compileTs(type: NodeTask) {
-  dependsOn = [yarn, copyTypescriptDeclarations, ":ts-model-proto:build"]
+  dependsOn = [jarnInstall, copyTypescriptDeclarations, ":ts-model-proto:build"]
 
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
