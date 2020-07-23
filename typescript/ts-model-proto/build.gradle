@@ -1,4 +1,4 @@
-import org.gradle.internal.os.OperatingSystem;
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id "java"
@@ -29,6 +29,18 @@ task prepareNpmPackage(type: Copy) {
 
     from "yarn.lock"
     into nodeModulesPath
+}
+
+task npmYnstall(type: Exec) {
+    outputs.file("${nodeModulesPath}/package.jspn")
+    workingDir nodeModulesPath
+    commandLine gradle.npmBinary, "install"
+
+    doLast {
+        println("==================")
+        println(gradle.npmBinary)
+        println("==================")
+    }
 }
 
 yarn.dependsOn = [yarnSetup, prepareNpmPackage]

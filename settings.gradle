@@ -44,6 +44,8 @@ gradle.ext {
   nodeVersion = "13.11.0"
   nodeDistribUnpackDir = new File(gradle.gradleUserHomeDir, "node-distrib/unpacked").absolutePath
   nodeDistribDir = new File(nodeDistribUnpackDir, "v${nodeVersion}").absolutePath
+  nodeBinary = new File(nodeDistribUnpackDir, "v${nodeVersion}/bin/node").absolutePath
+  npmBinary = new File(nodeDistribUnpackDir, "v${nodeVersion}/bin/npm").absolutePath
   npmVersion = "6.13.4"
   yarnVersion = "1.17.3"
   defaultTsVersion = "3.9.5"
