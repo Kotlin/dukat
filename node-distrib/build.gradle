@@ -13,7 +13,11 @@ def getDistribName(version) {
     String distribName = null
 
     if (os.macOsX) {
-        distribName = "$node-v${version}-darwin-x64.tar.gz"
+        distribName = "node-v${version}-darwin-x64"
+    }
+
+    if (os.linux) {
+        distribName = "node-v${version}-linux-x64"
     }
 
     if (distribName == null) {
@@ -26,19 +30,25 @@ def getDistribName(version) {
 def distribUrl(version) {
     def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
     def url = "$NODE_DISTRIB_REPO/v${version}"
-    return "${url}/${getDistribName(version)}"
+    return "${url}/${getDistribName(version)}.tar.gz"
 }
-
 
 task downloadNodeDistrib(type: Download) {
     onlyIfModified true
     overwrite false
     src distribUrl(gradle.nodeVersion)
-    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}")
+    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}/node.tar.gz")
 }
 
 task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
     from tarTree(resources.gzip(downloadNodeDistrib.dest))
-    into new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/bin")
+    into gradle.nodeDistribUnpackDir
 }
 
+task renameUnpackedDistrib() {
+    doLast {
+        println(new File(unpackNodeDistrib.destinationDir, "${getDistribName(gradle.nodeVersion)}").absolutePath)
+        new File(gradle.nodeDistribUnpackDir, "${getDistribName(gradle.nodeVersion)}").renameTo(
+                new File(gradle.nodeDistribUnpackDir, "v${gradle.nodeVersion}"))
+    }
+}
