@@ -1,25 +1,44 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.nativeplatform.platform.OperatingSystem
 import  org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
+
+def getDistribName(version) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+    Architecture architecture = DefaultNativePlatform.currentArchitecture
+
+    if (!architecture.amd64) {
+        throw new GradleException("unkown architecture ${architecture.displayName}")
+    }
+
+    String distribName = null
+
+    if (os.macOsX) {
+        distribName = "$node-v${version}-darwin-x64.tar.gz"
+    }
+
+    if (distribName == null) {
+        throw new GradleException("unkown architecture and/or operating system ${architecture.displayName} : ${os.displayName}")
+    }
+
+    return distribName
+}
 
 def distribUrl(version) {
-    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
-    os.
-    println("LINUX ${os.linux}")
-    println("MACOS ${os.macOsX}")
-    println("WIN ${os.windows}")
+    def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
+    def url = "$NODE_DISTRIB_REPO/v${version}"
+    return "${url}/${getDistribName(version)}"
 }
 
-
-task pingping {
-    doLast {
-        distribUrl(gradle.nodeVersion)
-    }
-}
 
 task downloadNodeDistrib(type: Download) {
     onlyIfModified true
     overwrite false
+    src distribUrl(gradle.nodeVersion)
+    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}")
 }
+
+task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
+    from tarTree(resources.gzip(downloadNodeDistrib.dest))
+    into new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/bin")
+}
+
