@@ -59,13 +59,9 @@ task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
     into gradle.nodeDistribUnpackDir
 }
 
-task renameUnpackedDistrib(dependsOn: unpackNodeDistrib) {
-    def inputFile = new File(gradle.nodeDistribUnpackDir, "${getDistribName(gradle.nodeVersion)}")
-    def outputFile = new File(gradle.nodeDistribUnpackDir, "v${gradle.nodeVersion}")
-    inputs.dir(inputFile)
-    outputs.dir(outputFile)
-    doLast {
-        println("renaming ${inputFile} => ${outputFile}")
-        inputFile.renameTo(outputFile)
-    }
+task nodeDistrib(dependsOn: unpackNodeDistrib) {
+    ext.distribPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}"
+    ext.nodePath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/bin/node"
+    ext.npmPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js"
 }
+

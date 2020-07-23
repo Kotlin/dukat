@@ -3,24 +3,11 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     id "java"
     id "com.google.protobuf"
-    id "com.github.node-gradle.node"
 }
 
 def targetMainDir = "${project.buildDir}/generated/source/proto/main"
 
 def nodeModulesPath = "${project.buildDir}/ts-model-proto-npm"
-
-node {
-    workDir = gradle.nodeWorkingDir
-
-    version = gradle.nodeVersion
-    npmVersion = gradle.npmVersion
-    yarnVersion = gradle.yarnVersion
-
-    nodeModulesDir = file(nodeModulesPath)
-    download = true
-}
-
 
 task prepareNpmPackage(type: Copy) {
     from "package.template.json"
@@ -31,19 +18,10 @@ task prepareNpmPackage(type: Copy) {
     into nodeModulesPath
 }
 
-task npmYnstall(type: Exec) {
-    outputs.file("${nodeModulesPath}/package.jspn")
+task npmYnstall(dependsOn: [prepareNpmPackage], type: Exec) {
     workingDir nodeModulesPath
-    commandLine gradle.npmBinary, "install"
-
-    doLast {
-        println("==================")
-        println(gradle.npmBinary)
-        println("==================")
-    }
+    commandLine project(":node-distrib").nodeDistrib.npmPath, "install", "--verbose"
 }
-
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
 
 task copyGeneratedTs(type: Copy) {
     from "$targetMainDir/ts"
@@ -84,7 +62,7 @@ protobuf {
     generateProtoTasks {
         all().each { task ->
             if(task.name == 'generateProto') {
-                task.dependsOn = [yarn]
+                task.dependsOn = [npmYnstall]
                 task.finalizedBy(copyGeneratedTs)
             }
 
