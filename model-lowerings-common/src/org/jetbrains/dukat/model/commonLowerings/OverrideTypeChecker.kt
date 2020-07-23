@@ -27,7 +27,7 @@ internal class OverrideTypeChecker(
     private val context: ModelContext,
     private val inheritanceContext: InheritanceContext,
     private val declaration: ClassLikeModel,
-    private val parent: ClassLikeModel
+    private val parent: ClassLikeModel?
 ) {
 
     private fun TypeModel.isDynamic(): Boolean {
@@ -154,7 +154,7 @@ internal class OverrideTypeChecker(
         }
     }
 
-    private fun TypeModel.isOverridingReturnType(otherParameterType: TypeModel, box: TypeValueModel? = null): Boolean {
+    fun TypeModel.isOverridingReturnType(otherParameterType: TypeModel, box: TypeValueModel? = null): Boolean {
         val inbox = (box == null || box.value == IdentifierEntity("Array"))
 
         if (isEquivalent(otherParameterType) && inbox) {
@@ -192,7 +192,7 @@ internal class OverrideTypeChecker(
                     }
                 }
             } else {
-                return fqName == otherParameterType.fqName
+                return fqName == otherParameterType.fqName && !(otherParameterType.nullable && !nullable)
             }
         }
 
@@ -287,6 +287,9 @@ internal class OverrideTypeChecker(
     }
 
     private fun TypeParameterReferenceModel.isEquivalent(otherTypeParameter: TypeParameterReferenceModel): Boolean {
+        if (parent == null) {
+            return false
+        }
         val otherTypeParameterIndex = parent.typeParameters.indexOfFirst {
             val type = it.type
             type is TypeValueModel && type.value == otherTypeParameter.name
@@ -297,7 +300,7 @@ internal class OverrideTypeChecker(
         return this == relevantHeritage?.typeParams?.getOrNull(otherTypeParameterIndex)
     }
 
-    private fun TypeModel.isEquivalent(otherParameterType: TypeModel): Boolean {
+    fun TypeModel.isEquivalent(otherParameterType: TypeModel): Boolean {
         if (this == otherParameterType) {
             return true
         }
