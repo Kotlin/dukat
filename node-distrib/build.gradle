@@ -1,0 +1,25 @@
+import de.undercouch.gradle.tasks.download.Download
+import org.gradle.nativeplatform.platform.OperatingSystem
+import  org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
+
+def distribUrl(version) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+    os.
+    println("LINUX ${os.linux}")
+    println("MACOS ${os.macOsX}")
+    println("WIN ${os.windows}")
+}
+
+
+task pingping {
+    doLast {
+        distribUrl(gradle.nodeVersion)
+    }
+}
+
+task downloadNodeDistrib(type: Download) {
+    onlyIfModified true
+    overwrite false
+}
