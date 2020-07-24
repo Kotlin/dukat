@@ -32,11 +32,6 @@ task prepareNpmPackage {
             }
             rename { String fileName -> fileName.replace(".template", "") }
         }
-
-        copy {
-            from "yarn.lock"
-            into DISTRIB_PATH
-        }
     }
 }
 

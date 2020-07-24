@@ -14,9 +14,6 @@ task prepareNpmPackage(type: Copy) {
             .replaceAll("__PROTOBUF_VERSION__", gradle.protobufImplementationVersion)
   }
   rename { String fileName -> fileName.replace(".template", "") }
-
-  from "yarn.lock"
-  into packagePath
 }
 
 task execConfig {

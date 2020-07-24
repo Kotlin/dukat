@@ -149,9 +149,6 @@ task prepareTopNPackage(type: Copy) {
     from "${TOPN_DIR}/package.template.json"
     into TOPN_TARGET_DIR
     rename { String fileName -> fileName.replace(".template", "") }
-
-    from "${TOPN_DIR}/yarn.lock"
-    into TOPN_TARGET_DIR
 }
 
 task installTopNConfig {
