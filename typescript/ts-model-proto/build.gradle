@@ -14,7 +14,7 @@ task prepareNpmPackage(type: Copy) {
     into nodeModulesPath
     rename { String fileName -> fileName.replace(".template", "") }
 
-    from "yarn.lock"
+    from "package-lock.json"
     into nodeModulesPath
 }
 
