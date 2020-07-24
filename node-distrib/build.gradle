@@ -1,6 +1,8 @@
 import de.undercouch.gradle.tasks.download.Download
 import  org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
+def NODE_DISTRIB_DIR = new File(gradle.gradleUserHomeDir, "node-distrib/unpacked").absolutePath
+
 def getDistribName(version) {
     OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
     Architecture architecture = DefaultNativePlatform.currentArchitecture
@@ -56,18 +58,18 @@ task unpackNodeDistrib(dependsOn: [downloadNodeDistrib], type: Copy) {
     from existsOnlyAsZip() ?
             zipTree(downloadNodeDistrib.dest) :
             tarTree(resources.gzip(downloadNodeDistrib.dest))
-    into gradle.nodeDistribUnpackDir
+    into NODE_DISTRIB_DIR
 }
 
 task config(dependsOn: unpackNodeDistrib) {
     OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
 
         ext.packageDir = "${project.buildDir}"
-        ext.distribPath = file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}").absolutePath
+        ext.distribPath = file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}").absolutePath
         ext.nodePath = os.windows ?
-                file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/node.exe").absolutePath :
-                file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/bin/node").absolutePath
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/node.exe").absolutePath :
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/bin/node").absolutePath
         ext.npmPath = os.windows ?
-                file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/node_modules/npm/bin/npm-cli.js").absolutePath :
-                file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js").absolutePath
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/node_modules/npm/bin/npm-cli.js").absolutePath :
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js").absolutePath
 }
