@@ -56,6 +56,7 @@ task prepareNpmPackage {
 task execConfig {
     doLast {
         jarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
+        npmPack.commandLine  project(":node-distrib").config.npmPath, "pack"
     }
 }
 
@@ -105,9 +106,9 @@ task nodeEnv(type: NodeTask) {
 }
 
 
-task npmPack(type: NpmTask) {
+task npmPack(type: Exec) {
     dependsOn = [":command-line:build", buildDistrib]
-    args = ["pack"]
+    workingDir DISTRIB_PATH
 }
 
 task npmrc() {
