@@ -21,7 +21,7 @@ task prepareNpmPackage(type: Copy) {
 
 task execConfig {
   doLast {
-    installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+    installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
     webpack.commandLine project(":node-distrib").config.nodePath, "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
     compileTs.commandLine project(":node-distrib").config.nodePath, file("${packagePath}/node_modules/typescript/bin/tsc"), "-p", file("./tsconfig.json").path
   }

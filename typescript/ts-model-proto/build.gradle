@@ -20,7 +20,7 @@ task prepareNpmPackage(type: Copy) {
 
 task execConfig {
     doLast {
-        installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+        installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
     }
 }
 
