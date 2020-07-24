@@ -59,7 +59,7 @@ task execConfig {
     }
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, project(":node-distrib").setup], type: Exec) {
+task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
     workingDir DISTRIB_PATH
 }
 
