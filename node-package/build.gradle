@@ -42,7 +42,7 @@ task prepareNpmPackage {
 
 task execConfig {
     doLast {
-        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
         npmPack.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "pack"
         nodeEnv.commandLine project(":node-distrib").config.nodePath, file("env.js"), "${project.buildDir}/env.json"
 
