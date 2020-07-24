@@ -52,7 +52,7 @@ task downloadNodeDistrib(type: Download) {
     dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}/node${archiveExtension()}")
 }
 
-task unpackNodeDistrib(dependsOn: downloadNodeDistrib, type: Copy) {
+task unpackNodeDistrib(dependsOn: [downloadNodeDistrib], type: Copy) {
     from existsOnlyAsZip() ?
             zipTree(downloadNodeDistrib.dest) :
             tarTree(resources.gzip(downloadNodeDistrib.dest))
@@ -72,9 +72,19 @@ task prepareNpmPackage(type: Copy) {
     rename { String fileName -> fileName.replace(".template", "") }
 }
 
-task setup(dependsOn: [prepareNpmPackage], type: Exec) {
-    workingDir config.packageDir
-    commandLine config.npmPath, "install", "--verbose"
+task execConfig() {
+    doLast {
+        setup.commandLine config.nodePath, config.npmPath, "install", "--verbose"
+    }
+}
 
+task setup(dependsOn: [prepareNpmPackage, config, execConfig], type: Exec) {
+    doFirst {
+        println("START SETUP")
+    }
+    workingDir config.packageDir
     ext.yarnPath = "${config.packageDir}/node_modules/yarn/lib/cli.js"
+    doLast {
+        println("END SETUP")
+    }
 }
