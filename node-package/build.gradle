@@ -42,7 +42,7 @@ task prepareNpmPackage {
 
 task execConfig {
     doLast {
-        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
+        installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
         npmPack.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "pack"
         nodeEnv.commandLine project(":node-distrib").config.nodePath, file("env.js"), "${project.buildDir}/env.json"
 
@@ -59,7 +59,7 @@ task execConfig {
     }
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
     workingDir DISTRIB_PATH
     errorOutput = new ByteArrayOutputStream()
     ignoreExitValue true
@@ -72,7 +72,7 @@ task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup
 }
 
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack", yarnInstall, ":command-line:build"]
+    dependsOn = [":ts-converter:webpack", installNpmDependencies, ":command-line:build"]
 
     doLast {
         copy {

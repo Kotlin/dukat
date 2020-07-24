@@ -21,18 +21,18 @@ task prepareNpmPackage(type: Copy) {
 
 task execConfig {
   doLast {
-    yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+    installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
     webpack.commandLine project(":node-distrib").config.nodePath, "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
     compileTs.commandLine project(":node-distrib").config.nodePath, file("${packagePath}/node_modules/typescript/bin/tsc"), "-p", file("./tsconfig.json").path
   }
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
   workingDir packagePath
 }
 
 task copyTypescriptDeclarations(type: Copy) {
-  dependsOn = [yarnInstall]
+  dependsOn = [installNpmDependencies]
 
   from "${packagePath}/node_modules/typescript/lib"
   into tsDeclarationsPath
@@ -40,7 +40,7 @@ task copyTypescriptDeclarations(type: Copy) {
 }
 
 task compileTs(type: Exec) {
-  dependsOn = [execConfig, yarnInstall, copyTypescriptDeclarations, ":ts-model-proto:build"]
+  dependsOn = [execConfig, installNpmDependencies, copyTypescriptDeclarations, ":ts-model-proto:build"]
   workingDir project.projectDir
 
   inputs.file("./tsconfig.json")

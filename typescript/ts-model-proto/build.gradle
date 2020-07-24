@@ -20,11 +20,11 @@ task prepareNpmPackage(type: Copy) {
 
 task execConfig {
     doLast {
-        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+        installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
     }
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
     workingDir nodeModulesPath
 }
 
@@ -67,7 +67,7 @@ protobuf {
     generateProtoTasks {
         all().each { task ->
             if(task.name == 'generateProto') {
-                task.dependsOn = [yarnInstall]
+                task.dependsOn = [installNpmDependencies]
                 task.finalizedBy(copyGeneratedTs)
             }
 
